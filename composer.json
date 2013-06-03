@@ -1,7 +1,7 @@
 {
     "name": "oro/platform",
     "description": "Business Application Platform (BAP)",
-    "homepage": "git@gitlab.orocrm.com:platform.git",
+    "homepage": "https://github.com/laboro/platform.git",
     "license": "MIT",
     "require": {
         "symfony/symfony": "2.1.*",
@@ -47,7 +47,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "http://gitlab.orocrm.com/vendors/sonataadminbundle.git"
+            "url": "https://github.com/laboro/SonataAdminBundle.git"
         }
     ],
     "autoload": {
