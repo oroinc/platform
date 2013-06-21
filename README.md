@@ -9,7 +9,7 @@ Installation
 ------------
 
 ```bash
-git clone http://github.com/laboro/platform.git
+git clone https://github.com/orocrm/platform.git
 
 curl -s https://getcomposer.org/installer | php
 
@@ -36,7 +36,7 @@ Until it's a private repository and it's not published on packagist :
     "repositories": [
         {
             "type": "vcs",
-            "url": "http://github.com/laboro/platform.git",
+            "url": "https://github.com/orocrm/platform.git",
             "branch": "master"
         }
     ],
