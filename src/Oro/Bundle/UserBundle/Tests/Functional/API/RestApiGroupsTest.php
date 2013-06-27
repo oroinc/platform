@@ -30,7 +30,7 @@ class RestApiGroupsTest extends WebTestCase
         $request = array(
             "group" => array(
                 "name" => 'Group_'.mt_rand(100, 500),
-                "roles" => array(1),
+                "roles" => array(2),
             )
         );
 
@@ -43,7 +43,7 @@ class RestApiGroupsTest extends WebTestCase
 
     /**
      * @depends testApiCreateGroup
-     * @param array $request
+     * @param  array $request
      * @return array $group
      */
     public function testApiGetGroups($request)
@@ -66,8 +66,8 @@ class RestApiGroupsTest extends WebTestCase
     /**
      * @depends testApiCreateGroup
      * @depends testApiGetGroups
-     * @param array $request
-     * @param array $group
+     * @param  array $request
+     * @param  array $group
      * @return array $group
      */
     public function testApiUpdateGroup($request, $group)

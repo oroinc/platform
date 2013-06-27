@@ -7,6 +7,7 @@ use JMS\Serializer\Annotation\Type;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
+use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
 use Symfony\Component\Validator\ExecutionContext;
 
 /**
@@ -53,15 +54,6 @@ class AddressBase extends AbstractEntityFlexible
     /**
      * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Region", cascade={"persist"})
-     * @ORM\JoinColumn(name="region_id", referencedColumnName="id")
-     * @Soap\ComplexType("string", nillable=true)
-     */
-    protected $state;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="state_text", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
@@ -79,10 +71,19 @@ class AddressBase extends AbstractEntityFlexible
      * @var string
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Country", cascade={"persist"})
-     * @ORM\JoinColumn(name="country_id", referencedColumnName="iso2_code")
+     * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
      * @Soap\ComplexType("string", nillable=false)
      */
     protected $country;
+
+    /**
+     * @var Region
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Region", cascade={"persist"})
+     * @ORM\JoinColumn(name="region_code", referencedColumnName="combined_code")
+     * @Soap\ComplexType("string", nillable=true)
+     */
+    protected $state;
 
     /**
      * @var string
@@ -103,7 +104,7 @@ class AddressBase extends AbstractEntityFlexible
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -113,20 +114,20 @@ class AddressBase extends AbstractEntityFlexible
     /**
      * Set street
      *
-     * @param string $street
+     * @param  string      $street
      * @return AddressBase
      */
     public function setStreet($street)
     {
         $this->street = $street;
-    
+
         return $this;
     }
 
     /**
      * Get street
      *
-     * @return string 
+     * @return string
      */
     public function getStreet()
     {
@@ -136,20 +137,20 @@ class AddressBase extends AbstractEntityFlexible
     /**
      * Set street2
      *
-     * @param string $street2
+     * @param  string      $street2
      * @return AddressBase
      */
     public function setStreet2($street2)
     {
         $this->street2 = $street2;
-    
+
         return $this;
     }
 
     /**
      * Get street2
      *
-     * @return string 
+     * @return string
      */
     public function getStreet2()
     {
@@ -159,20 +160,20 @@ class AddressBase extends AbstractEntityFlexible
     /**
      * Set city
      *
-     * @param string $city
+     * @param  string      $city
      * @return AddressBase
      */
     public function setCity($city)
     {
         $this->city = $city;
-    
+
         return $this;
     }
 
     /**
      * Get city
      *
-     * @return string 
+     * @return string
      */
     public function getCity()
     {
@@ -188,7 +189,7 @@ class AddressBase extends AbstractEntityFlexible
     public function setState($state)
     {
         $this->state = $state;
-    
+
         return $this;
     }
 
@@ -199,17 +200,13 @@ class AddressBase extends AbstractEntityFlexible
      */
     public function getState()
     {
-        if (!empty($this->stateText)) {
-            return $this->stateText;
-        } else {
-            return $this->state;
-        }
+        return $this->state;
     }
 
     /**
      * Set state text
      *
-     * @param Region $stateText
+     * @param string $stateText
      * @return AddressBase
      */
     public function setStateText($stateText)
@@ -222,7 +219,7 @@ class AddressBase extends AbstractEntityFlexible
     /**
      * Get state test
      *
-     * @return Region
+     * @return string
      */
     public function getStateText()
     {
@@ -230,22 +227,36 @@ class AddressBase extends AbstractEntityFlexible
     }
 
     /**
+     * Get state
+     *
+     * @return Region|string
+     */
+    public function getUniversalState()
+    {
+        if (!empty($this->stateText)) {
+            return $this->stateText;
+        } else {
+            return $this->state;
+        }
+    }
+
+    /**
      * Set postal_code
      *
-     * @param string $postalCode
+     * @param  string      $postalCode
      * @return AddressBase
      */
     public function setPostalCode($postalCode)
     {
         $this->postalCode = $postalCode;
-    
+
         return $this;
     }
 
     /**
      * Get postal_code
      *
-     * @return string 
+     * @return string
      */
     public function getPostalCode()
     {
@@ -255,13 +266,13 @@ class AddressBase extends AbstractEntityFlexible
     /**
      * Set country
      *
-     * @param Country $country
+     * @param  Country     $country
      * @return AddressBase
      */
     public function setCountry($country)
     {
         $this->country = $country;
-    
+
         return $this;
     }
 
@@ -380,11 +391,38 @@ class AddressBase extends AbstractEntityFlexible
             $this->getStreet(),
             $this->getStreet2(),
             $this->getCity(),
-            $this->getState(),
+            $this->getUniversalState(),
             ',',
             $this->getCountry(),
             $this->getPostalCode(),
         );
-        return implode(' ', $data);
+
+        $str = implode(' ', $data);
+        $check = trim(str_replace(',', '', $str));
+        return empty($check) ? '' : $str;
+    }
+
+    /**
+     * Check if entity is empty.
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        $isEmpty = empty($this->firstName)
+            && empty($this->lastName)
+            && empty($this->street)
+            && empty($this->street2)
+            && empty($this->city)
+            && empty($this->state)
+            && empty($this->stateText)
+            && empty($this->country)
+            && empty($this->postalCode);
+        /** @var FlexibleValueInterface $value */
+        foreach ($this->values as $value) {
+            $flexibleValue = $value->getData();
+            $isEmpty = $isEmpty && empty($flexibleValue);
+        }
+        return $isEmpty;
     }
 }

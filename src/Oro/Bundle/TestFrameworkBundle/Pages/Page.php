@@ -18,7 +18,7 @@ class Page
     public function __construct($testCase, $redirect = true)
     {
         $this->test = $testCase;
-
+        $this->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
         if (!is_null($this->redirectUrl) && $redirect) {
             $this->test->url($this->redirectUrl);
             $this->waitPageToLoad();
@@ -35,7 +35,8 @@ class Page
     {
         if (preg_match('/open(.*)/i', "{$name}", $result) > 0) {
             $class = __NAMESPACE__ . '\\Objects\\' . $result[1];
-            return new $class($this);
+            $class = new \ReflectionClass($class);
+            return $class->newInstanceArgs(array_merge(array($this->test), $arguments));
         }
 
         if (method_exists($this, $name)) {
@@ -133,8 +134,12 @@ class Page
     public function assertMessage($messageText, $message = '')
     {
         PHPUnit_Framework_Assert::assertTrue(
-            $this->isElementPresent("//div[contains(@class,'alert') and contains(., '{$messageText}')]"),
-            $message
+            $this->isElementPresent("//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]"),
+            'Flash message is missing'
+        );
+        $actualResult = $this->byXPath("//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]/div")->text();
+
+        PHPUnit_Framework_Assert::assertEquals($messageText, $actualResult, $message
         );
         return $this;
     }

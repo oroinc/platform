@@ -1,1 +1,6 @@
-<div id="redirect" {{ full_redirect ? 'data-redirect=true' : '' }} >{{ location }}</div>
+{% set data = {
+    'redirect': true,
+    'fullRedirect': full_redirect,
+    'location': location
+} %}
+{{ data|json_encode|raw }}

@@ -1,0 +1,155 @@
+{% block oro_ticker_symbol_widget %}
+    <script type="text/javascript">
+        $(function() {
+            var cache = {};
+            $("#{{ id }}").typeahead({
+                source: function (request, process) {
+                    YAHOO = {
+                        Finance: {
+                            SymbolSuggest: {
+                                ssCallback: function (data) {
+                                    var result = $.map(data.ResultSet.Result, function (item) {
+                                        return item.name + " (" + item.symbol + ")";
+                                    });
+                                    $.each(data.ResultSet.Result, function (itemKey, item) {
+                                        cache[item.name + " (" + item.symbol + ")"] = item.symbol;
+                                    });
+                                    process(result)
+                                }
+                            }
+                        }
+                    };
+                    $.ajax({
+                        type: "GET",
+                        dataType: "jsonp",
+                        jsonp: "callback",
+                        jsonpCallback: "YAHOO.Finance.SymbolSuggest.ssCallback",
+                        data: {
+                            query: request
+                        },
+                        cache: true,
+                        url: "http://autoc.finance.yahoo.com/autoc"
+                    });
+                },
+                updater: function(item) {
+                    if (typeof cache[item] != 'undefined') {
+                        return cache[item];
+                    } else {
+                        return item;
+                    }
+                }
+            });
+        });
+    </script>
+
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block genemu_jqueryselect2_country_row %}
+    {{ block('genemu_jqueryselect2_row') }}
+{% endblock %}
+
+{% block genemu_jqueryselect2_choice_row %}
+    {{ block('genemu_jqueryselect2_row') }}
+{% endblock %}
+
+{% block genemu_jqueryselect2_entity_row %}
+    {{ block('genemu_jqueryselect2_row') }}
+{% endblock %}
+
+{% block oro_jqueryselect2_hidden_row %}
+    {{ block('genemu_jqueryselect2_row') }}
+{% endblock %}
+
+{% block genemu_jqueryselect2_row %}
+    {{ form_row(form) }}
+    {{ form_javascript(form) }}
+{% endblock %}
+
+{% block genemu_jqueryselect2_javascript %}
+    <script type="text/javascript">
+        (function() {
+            var $field = $('#{{ id }}');
+
+            {% block genemu_jqueryselect2_javascript_prototype %}
+                {% set url = '' %}
+                {% if configs.ajax.url is defined and configs.ajax.url%}
+                    {% set url = configs.ajax.url %}
+                {% elseif configs.route_name is defined and configs.route_name %}
+                    {% set url = path(configs.route_name) %}
+                {% endif %}
+
+                {% if configs.placeholder is defined %}
+                    {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
+                {% endif %}
+                {% if configs.result_template_twig is defined and configs.result_template_twig %}
+                    {% set configs = configs|merge({'result_template': include(configs.result_template_twig) }) %}
+                {% endif %}
+                {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
+                    {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
+                {% endif %}
+
+                var select2Config = {{ configs|json_encode|raw }};
+                {% if configs.extra_config is defined and configs.extra_config %}
+                    {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
+                {% endif %}
+
+                if ($field.length && $field[0].tagName.toLowerCase() === 'input') {
+                    var configurator = new OroSelect2Config(select2Config, {{ url|json_encode|raw }}, {{ configs.per_page|default(10) }});
+                    select2Config = configurator.getConfig();
+                }
+
+                $field.select2(select2Config);
+
+                $field.trigger('select2-init');
+            {% endblock %}
+        })();
+    </script>
+{% endblock %}
+
+{% block oro_combobox_dataconfig_autocomplete %}
+    {% set url = '' %}
+    {% if configs.ajax.url is defined and configs.ajax.url%}
+    {% set url = configs.ajax.url %}
+    {% elseif configs.route_name is defined and configs.route_name %}
+        {% set url = path(configs.route_name) %}
+    {% endif %}
+    select2Config.ajax = {
+        'url': {{ url|json_encode|raw }},
+        'data': function (query, page) {
+            return {
+                'page': page,
+                'per_page': {{ configs.per_page|default(10) }},
+                'name': "{{ configs.autocomplete_alias }}",
+                'query': query
+            };
+        },
+        'results': function (data, page) {
+            return data;
+        }
+    };
+{% endblock %}
+
+{% block oro_combobox_dataconfig_grid %}
+    {% set url = configs.ajax.url is defined ? configs.ajax.url : path(configs.route, {'_format': 'json'}) %}
+    select2Config.ajax = {
+        'url': {{ url|json_encode|raw }},
+        'data': function (query, page) {
+            return {
+                '{{ configs.grid.name }}[_pager][_page]': page,
+                '{{ configs.grid.name }}[_pager][_per_page]': {{ configs.per_page|default(10) }},
+                '{{ configs.grid.name }}[_sort_by][{{ configs.grid.sort_by|default(configs.properties[0]) }}]': "{{ configs.grid.sort_order|default('ASC') }}",
+                '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][type]': 1,
+                '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][value]': query
+            };
+        },
+        'results': function (data, page) {
+            return {
+                results: $.map(data.data, function(item) {
+                    return {'id': item.id, 'text': item.{{- configs.properties[0] -}} };
+                }),
+                more: page*10 < data.options.totalRecords
+            };
+        }
+    };
+{% endblock %}

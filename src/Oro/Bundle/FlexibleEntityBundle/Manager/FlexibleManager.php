@@ -83,8 +83,13 @@ class FlexibleManager implements TranslatableInterface, ScopableInterface
      * @param EventDispatcherInterface $eventDispatcher      Event dispatcher
      * @param AttributeTypeFactory     $attributeTypeFactory Attribute type factory
      */
-    public function __construct($flexibleName, $flexibleConfig, ObjectManager $storageManager, EventDispatcherInterface $eventDispatcher, AttributeTypeFactory $attributeTypeFactory)
-    {
+    public function __construct(
+        $flexibleName,
+        $flexibleConfig,
+        ObjectManager $storageManager,
+        EventDispatcherInterface $eventDispatcher,
+        AttributeTypeFactory $attributeTypeFactory
+    ) {
         $this->flexibleName         = $flexibleName;
         $this->flexibleConfig       = $flexibleConfig['entities_config'][$flexibleName];
         $this->storageManager       = $storageManager;
@@ -366,21 +371,6 @@ class FlexibleManager implements TranslatableInterface, ScopableInterface
         $this->eventDispatcher->dispatch(FlexibleEntityEvents::CREATE_VALUE, $event);
 
         return $value;
-    }
-
-    /**
-     * Return only localized values of flexible entity
-     *
-     * @param integer $id
-     *
-     * @return AbstractFlexible
-     */
-    public function localizedFind($id)
-    {
-        $fr = $this->getFlexibleRepository();
-        $fr->setLocale($this->getLocale());
-
-        return $fr->findWithLocalizedValuesAndSortedAttributes($id);
     }
 
     /**

@@ -5,9 +5,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Entity\Item;
-use Oro\Bundle\FlexibleEntityBundle\AttributeType\AbstractAttributeType;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
@@ -23,6 +21,7 @@ class OrmTest extends \PHPUnit_Framework_TestCase
     private $orm;
     private $om;
     private $container;
+    private $mapper;
 
     public function setUp()
     {
@@ -221,7 +220,45 @@ class OrmTest extends \PHPUnit_Framework_TestCase
         $searchRepo->expects($this->any())
             ->method('setDriversClasses');
 
-        $this->orm->save($this->product, true);
+        $meta = $this
+            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectionProperty = $this
+            ->getMockBuilder('\ReflectionProperty')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $meta->expects($this->any())
+            ->method('getReflectionProperty')
+            ->will($this->returnValue($reflectionProperty));
+
+        $this->om->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($meta));
+
+        $meta->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('id'));
+
+        $reflectionProperty->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue(1));
+
+        $uow = $this
+            ->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->om->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
+        $uow->expects($this->any())
+            ->method('computeFields');
+
+        $this->orm->save($this->product, true, true);
         $this->orm->save($this->product, false);
 
         $this->mapper->expects($this->once())
@@ -236,6 +273,37 @@ class OrmTest extends \PHPUnit_Framework_TestCase
 
     public function testFailedSave()
     {
+        $reflectionProperty = $this
+            ->getMockBuilder('\ReflectionProperty')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $reflectionProperty->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnValue(1));
+
+        $meta = $this
+            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->om->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValue($meta));
+
+        $meta->expects($this->any())
+            ->method('getReflectionProperty')
+            ->will($this->returnValue($reflectionProperty));
+
+        $meta->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('id'));
+
         $this->assertEquals(false, $this->orm->save(new Attribute(), true));
+    }
+
+    public function testGetMapper()
+    {
+        $this->assertEquals($this->mapper, $this->orm->getMapper());
     }
 }

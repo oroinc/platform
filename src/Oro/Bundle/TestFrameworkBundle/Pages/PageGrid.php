@@ -40,12 +40,16 @@ class PageGrid extends Page
     public function changePage($page = 1)
     {
         $pager = $this->byXPath("{$this->filtersPath}//div[contains(@class,'pagination')]/ul//input");
+        $pagerLabel = $this->byXPath("{$this->filtersPath}//div[contains(@class,'pagination')]/label[@class = 'dib' and text() = 'Page:']");
         //set focus
         $pager->click();
         //clear field
         $this->clearInput($pager);
         $pager->value($page);
+        //simulate lost focus
         $this->keysSpecial('enter');
+        $this->waitForAjax();
+        $pagerLabel->click();
         $this->waitForAjax();
         return $this;
     }
@@ -215,7 +219,10 @@ class PageGrid extends Page
      */
     public function getColumn($columnId)
     {
-        $columnData = $this->elements($this->using('xpath')->value("{$this->gridPath}//table/tbody/tr/td[{$columnId}]"));
+        $columnData = $this->elements(
+            $this->using('xpath')
+                ->value("{$this->gridPath}//table/tbody/tr/td[not(contains(@style, 'display: none;'))][{$columnId}]")
+        );
         $rowData = array();
         foreach ($columnData as $value) {
             $rowData[] = $value->text();

@@ -117,6 +117,7 @@ Oro.Filter.SelectFilter = Oro.Filter.AbstractFilter.extend({
      * @property
      */
     events: {
+        'keydown select': '_preventEnterProcessing',
         'click .filter-select': '_onClickFilterArea',
         'click .disable-filter': '_onClickDisableFilter',
         'change select': '_onSelectChange'
@@ -209,7 +210,7 @@ Oro.Filter.SelectFilter = Oro.Filter.AbstractFilter.extend({
      */
     _setDropdownWidth: function() {
         if (!this.minimumWidth) {
-            this.minimumWidth = this.selectWidget.getMinimumDropdownWidth() + 12;
+            this.minimumWidth = this.selectWidget.getMinimumDropdownWidth() + 22;
         }
         var widget = this.selectWidget.getWidget();
         var filterWidth = this.$(this.containerSelector).width();

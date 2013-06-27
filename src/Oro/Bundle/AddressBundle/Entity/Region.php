@@ -3,9 +3,11 @@
 namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation\Type;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
 
 use Oro\Bundle\AddressBundle\Entity\Country;
 
@@ -13,25 +15,25 @@ use Oro\Bundle\AddressBundle\Entity\Country;
  * Region
  *
  * @ORM\Table("oro_dictionary_region")
- * @ORM\Entity
- * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionLocalized")
+ * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
+ * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
  */
-class Region
+class Region implements Translatable
 {
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(name="id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(name="combined_code", type="string", length=16)
+     * @Soap\ComplexType("string", nillable=true)
      */
-    private $id;
+    private $combinedCode;
 
     /**
      * @var string
      *
      * @ORM\ManyToOne(targetEntity="Country", inversedBy="regions",cascade={"persist"})
-     * @ORM\JoinColumn(name="country_id", referencedColumnName="iso2_code")
+     * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
      * @Type("string")
      * @Soap\ComplexType("string", nillable=true)
      */
@@ -60,25 +62,33 @@ class Region
     private $locale;
 
     /**
+     * @param string $combinedCode
+     */
+    public function __construct($combinedCode)
+    {
+        $this->combinedCode = $combinedCode;
+    }
+
+    /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
-    public function getId()
+    public function getCombinedCode()
     {
-        return $this->id;
+        return $this->combinedCode;
     }
 
     /**
      * Set country
      *
-     * @param Country $country
+     * @param  Country $country
      * @return Region
      */
     public function setCountry($country)
     {
         $this->country = $country;
-    
+
         return $this;
     }
 
@@ -95,20 +105,20 @@ class Region
     /**
      * Set code
      *
-     * @param string $code
+     * @param  string $code
      * @return Region
      */
     public function setCode($code)
     {
         $this->code = $code;
-    
+
         return $this;
     }
 
     /**
      * Get code
      *
-     * @return string 
+     * @return string
      */
     public function getCode()
     {
@@ -118,20 +128,20 @@ class Region
     /**
      * Set name
      *
-     * @param string $name
+     * @param  string $name
      * @return Region
      */
     public function setName($name)
     {
         $this->name = $name;
-    
+
         return $this;
     }
 
     /**
      * Get name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
@@ -142,9 +152,9 @@ class Region
      * Set locale
      *
      * @param string $locale
-     * @return $this
+     * @return Region
      */
-    public function setLocale($locale = 'en_US')
+    public function setLocale($locale)
     {
         $this->locale = $locale;
 

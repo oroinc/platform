@@ -9,9 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\SearchBundle\Datagrid\SearchDatagridManager;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\GridBundle\Datagrid\DatagridView;
-use Oro\Bundle\SearchBundle\Provider\ResultProvider;
+use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
 
 class SearchController extends Controller
 {
@@ -44,8 +43,8 @@ class SearchController extends Controller
     }
 
     /**
-     * @param string $from
-     * @param string $string
+     * @param  string       $from
+     * @param  string       $string
      * @return DatagridView
      */
     protected function getSearchResultsDatagridView($from, $string)
@@ -78,8 +77,8 @@ class SearchController extends Controller
 
         $datagridView = $this->getSearchResultsDatagridView($from, $string);
 
-        /** @var $resultProvider ResultProvider */
-        $resultProvider = $this->get('oro_search.result_provider');
+        /** @var $resultProvider ResultStatisticsProvider */
+        $resultProvider = $this->get('oro_search.provider.result_statistics_provider');
 
         return array(
             'from'           => $from,

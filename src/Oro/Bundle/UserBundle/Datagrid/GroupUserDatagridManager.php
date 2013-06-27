@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Datagrid;
 
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\GridBundle\Field\FieldDescription;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\GridBundle\Filter\FilterInterface;
 use Oro\Bundle\GridBundle\Sorter\SorterInterface;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 
 class GroupUserDatagridManager extends UserRelationDatagridManager
 {
@@ -33,6 +33,7 @@ class GroupUserDatagridManager extends UserRelationDatagridManager
         if (!$this->group) {
             throw new \LogicException('Datagrid manager has no configured Group entity');
         }
+
         return $this->group;
     }
 
@@ -57,25 +58,30 @@ class GroupUserDatagridManager extends UserRelationDatagridManager
                 'show_filter' => true,
             )
         );
+
         return $fieldHasGroup;
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function createQuery()
+    protected function prepareQuery(ProxyQueryInterface $query)
     {
-        $query = parent::createQuery();
+        $entityAlias = $query->getRootAlias();
+
         if ($this->getGroup()->getId()) {
             $query->addSelect(
-                'CASE WHEN ' .
-                '(:group MEMBER OF u.groups OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in) '.
-                'THEN 1 ELSE 0 END AS hasCurrentGroup',
+                "CASE WHEN " .
+                "(:group MEMBER OF $entityAlias.groups OR $entityAlias.id IN (:data_in)) AND " .
+                "$entityAlias.id NOT IN (:data_not_in) ".
+                "THEN 1 ELSE 0 END AS hasCurrentGroup",
                 true
             );
         } else {
             $query->addSelect(
-                ' 0 as hasCurrentGroup',
+                "CASE WHEN " .
+                "$entityAlias.id IN (:data_in) AND $entityAlias.id NOT IN (:data_not_in) " .
+                "THEN 1 ELSE 0 END AS hasCurrentGroup",
                 true
             );
         }
@@ -88,10 +94,13 @@ class GroupUserDatagridManager extends UserRelationDatagridManager
      */
     protected function getQueryParameters()
     {
-        return array_merge(
-            parent::getQueryParameters(),
-            array('group' => $this->getGroup())
-        );
+        $parameters = parent::getQueryParameters();
+
+        if ($this->getGroup()->getId()) {
+            $parameters['group'] = $this->getGroup();
+        }
+
+        return $parameters;
     }
 
     /**

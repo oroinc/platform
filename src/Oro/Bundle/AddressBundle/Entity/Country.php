@@ -3,8 +3,12 @@
 namespace Oro\Bundle\AddressBundle\Entity;
 
 use JMS\Serializer\Annotation\Exclude;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\Translatable\Translatable;
+
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
@@ -12,8 +16,9 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  *
  * @ORM\Table("oro_dictionary_country")
  * @ORM\Entity
+ * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
  */
-class Country
+class Country implements Translatable
 {
     /**
      * @var string
@@ -35,29 +40,47 @@ class Country
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=100)
+     * @ORM\Column(name="name", type="string", length=255)
      * @Soap\ComplexType("string", nillable=true)
+     * @Gedmo\Translatable
      */
     private $name;
 
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="Region", mappedBy="country", cascade={"ALL"}, fetch="EXTRA_LAZY")
+     * @ORM\OneToMany(
+     *     targetEntity="Oro\Bundle\AddressBundle\Entity\Region",
+     *     mappedBy="country",
+     *     cascade={"ALL"},
+     *     fetch="EXTRA_LAZY"
+     * )
      * @Exclude
      */
     private $regions;
 
     /**
-     * @param null|string $name
-     * @param null|string $iso2Code
-     * @param null|string $iso3Code
+     * @Gedmo\Locale
      */
-    public function __construct($name = null, $iso2Code = null, $iso3Code = null)
+    private $locale;
+
+    /**
+     * @param string $iso2Code ISO2 country code
+     */
+    public function __construct($iso2Code)
     {
-        $this->setName($name);
-        $this->setIso2Code($iso2Code);
-        $this->setIso3Code($iso3Code);
+        $this->iso2Code = $iso2Code;
+        $this->regions  = new ArrayCollection();
+    }
+
+    /**
+     * Get iso2_code
+     *
+     * @return string
+     */
+    public function getIso2Code()
+    {
+        return $this->iso2Code;
     }
 
     /**
@@ -81,6 +104,34 @@ class Country
     }
 
     /**
+     * @param Region $region
+     * @return Country
+     */
+    public function addRegion(Region $region)
+    {
+        if (!$this->regions->contains($region)) {
+            $this->regions->add($region);
+            $region->setCountry($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Region $region
+     * @return Country
+     */
+    public function removeRegion(Region $region)
+    {
+        if ($this->regions->contains($region)) {
+            $this->regions->removeElement($region);
+            $region->setCountry(null);
+        }
+
+        return $this;
+    }
+
+    /**
      * Check if country contains regions
      *
      * @return bool
@@ -91,45 +142,22 @@ class Country
     }
 
     /**
-     * Set iso2_code
-     *
-     * @param string $iso2Code
-     * @return Country
-     */
-    public function setIso2Code($iso2Code)
-    {
-        $this->iso2Code = $iso2Code;
-    
-        return $this;
-    }
-
-    /**
-     * Get iso2_code
-     *
-     * @return string 
-     */
-    public function getIso2Code()
-    {
-        return $this->iso2Code;
-    }
-
-    /**
      * Set iso3_code
      *
-     * @param string $iso3Code
+     * @param  string  $iso3Code
      * @return Country
      */
     public function setIso3Code($iso3Code)
     {
         $this->iso3Code = $iso3Code;
-    
+
         return $this;
     }
 
     /**
      * Get iso3_code
      *
-     * @return string 
+     * @return string
      */
     public function getIso3Code()
     {
@@ -139,24 +167,47 @@ class Country
     /**
      * Set country name
      *
-     * @param string $name
+     * @param  string  $name
      * @return Country
      */
     public function setName($name)
     {
         $this->name = $name;
-    
+
         return $this;
     }
 
     /**
      * Get country name
      *
-     * @return string 
+     * @return string
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set locale
+     *
+     * @param string $locale
+     * @return Country
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Returns locale code
+     *
+     * @return mixed
+     */
+    public function getLocale()
+    {
+        return $this->locale;
     }
 
     /**

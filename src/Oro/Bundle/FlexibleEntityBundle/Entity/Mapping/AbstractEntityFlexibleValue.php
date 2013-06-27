@@ -85,6 +85,14 @@ abstract class AbstractEntityFlexibleValue extends AbstractFlexibleValue
     protected $decimal;
 
     /**
+     * Store boolean value
+     * @var boolean $boolean
+     *
+     * @ORM\Column(name="value_boolean", type="boolean", nullable=true)
+     */
+    protected $boolean;
+
+    /**
      * Store text value
      * @var string $text
      *
@@ -147,6 +155,16 @@ abstract class AbstractEntityFlexibleValue extends AbstractFlexibleValue
     {
         $this->options = new ArrayCollection();
         $this->collection = new ArrayCollection();
+    }
+
+    /**
+     * Get entity
+     *
+     * @return AbstractFlexible $entity
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 
     /**
@@ -262,6 +280,30 @@ abstract class AbstractEntityFlexibleValue extends AbstractFlexibleValue
     }
 
     /**
+     * Get boolean data
+     *
+     * @return boolean
+     */
+    public function getBoolean()
+    {
+        return $this->boolean;
+    }
+
+    /**
+     * Set boolean data
+     *
+     * @param boolean $boolean
+     *
+     * @return EntityAttributeValue
+     */
+    public function setBoolean($boolean)
+    {
+        $this->boolean = $boolean;
+
+        return $this;
+    }
+
+    /**
      * Get text data
      *
      * @return string
@@ -340,7 +382,7 @@ abstract class AbstractEntityFlexibleValue extends AbstractFlexibleValue
      *
      * @return AbstractEntityFlexibleValue
      */
-    public function setOption(AbstractEntityAttributeOption $option)
+    public function setOption(AbstractEntityAttributeOption $option = null)
     {
         $this->option = $option;
 
@@ -421,7 +463,7 @@ abstract class AbstractEntityFlexibleValue extends AbstractFlexibleValue
      * @param AbstractEntityFlexibleValue $value
      * @return $this
      */
-    public function setCollections(AbstractEntityFlexibleValue $value)
+    public function setCollections(AbstractEntityFlexibleValue $value = null)
     {
         $this->collection = $value->getCollections();
 
@@ -460,7 +502,7 @@ abstract class AbstractEntityFlexibleValue extends AbstractFlexibleValue
 
             return implode(', ', $items);
 
-        } else if (is_object($data)) {
+        } elseif (is_object($data)) {
 
             return $data->__toString();
         }

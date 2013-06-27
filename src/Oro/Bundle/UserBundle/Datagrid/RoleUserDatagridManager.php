@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Datagrid;
 
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\GridBundle\Field\FieldDescription;
 use Oro\Bundle\GridBundle\Field\FieldDescriptionInterface;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\GridBundle\Filter\FilterInterface;
 use Oro\Bundle\GridBundle\Sorter\SorterInterface;
+use Oro\Bundle\GridBundle\Datagrid\ProxyQueryInterface;
 
 class RoleUserDatagridManager extends UserRelationDatagridManager
 {
@@ -33,6 +33,7 @@ class RoleUserDatagridManager extends UserRelationDatagridManager
         if (!$this->role) {
             throw new \LogicException('Datagrid manager has no configured Role entity');
         }
+
         return $this->role;
     }
 
@@ -57,25 +58,30 @@ class RoleUserDatagridManager extends UserRelationDatagridManager
                 'show_filter' => true,
             )
         );
+
         return $fieldHasRole;
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function createQuery()
+    protected function prepareQuery(ProxyQueryInterface $query)
     {
-        $query = parent::createQuery();
+        $entityAlias = $query->getRootAlias();
+
         if ($this->getRole()->getId()) {
             $query->addSelect(
-                'CASE WHEN ' .
-                '(:role MEMBER OF u.roles OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in) '.
-                'THEN 1 ELSE 0 END AS hasCurrentRole',
+                "CASE WHEN " .
+                "(:role MEMBER OF $entityAlias.roles OR $entityAlias.id IN (:data_in)) AND " .
+                "$entityAlias.id NOT IN (:data_not_in) ".
+                "THEN 1 ELSE 0 END AS hasCurrentRole",
                 true
             );
         } else {
             $query->addSelect(
-                ' 0 as hasCurrentRole',
+                "CASE WHEN " .
+                "$entityAlias.id IN (:data_in) AND $entityAlias.id NOT IN (:data_not_in) ".
+                "THEN 1 ELSE 0 END AS hasCurrentRole",
                 true
             );
         }
@@ -88,10 +94,13 @@ class RoleUserDatagridManager extends UserRelationDatagridManager
      */
     protected function getQueryParameters()
     {
-        return array_merge(
-            parent::getQueryParameters(),
-            array('role' => $this->getRole())
-        );
+        $parameters = parent::getQueryParameters();
+
+        if ($this->getRole()->getId()) {
+            $parameters['role'] = $this->getRole();
+        }
+
+        return $parameters;
     }
 
     /**

@@ -16,7 +16,10 @@ class CountryType extends AbstractType
                     return $er->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 },
-                'empty_value' => 'Choose a country...',
+                'configs' => array(
+                    'placeholder' => 'oro.address.form.choose_country'
+                ),
+                'empty_value' => '',
                 'empty_data'  => null
             )
         );
@@ -24,7 +27,7 @@ class CountryType extends AbstractType
 
     public function getParent()
     {
-        return 'entity';
+        return 'genemu_jqueryselect2_translatable_entity';
     }
 
     public function getName()

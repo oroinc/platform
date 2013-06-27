@@ -11,26 +11,10 @@
         processIsolation            = "false"
         stopOnFailure               = "false"
         syntaxCheck                 = "false"
-        bootstrap                   = "vendor/autoload.php">
-
+        bootstrap                   = "tests/bootstrap.php">
     <testsuites>
         <testsuite name="Project Unit Tests">
-            <directory suffix="Test.php">src/Oro/Bundle/AddressBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/ConfigBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/DataAuditBundle/Tests/Unit</directory>
-            <!--<directory suffix="Test.php">src/Oro/Bundle/DataFlowBundle/Tests/Unit</directory>-->
-            <directory suffix="Test.php">src/Oro/Bundle/FilterBundle/Tests/Unit</directory>
-            <!--<directory suffix="Test.php">src/Oro/Bundle/FlexibleEntityBundle/Tests/Unit</directory>-->
-            <directory suffix="Test.php">src/Oro/Bundle/GridBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/MeasureBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/NavigationBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/SearchBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/SegmentationTreeBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/SoapBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/TestFrameworkBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/UIBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/UserBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/WindowsBundle/Tests/Unit</directory>
+            <directory suffix="Test.php">src/*/Bundle/*Bundle/Tests/Unit</directory>
         </testsuite>
     </testsuites>
 

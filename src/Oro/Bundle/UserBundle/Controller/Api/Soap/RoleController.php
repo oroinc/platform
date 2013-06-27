@@ -103,15 +103,15 @@ class RoleController extends SoapController
     /**
      * Link ACL resource to role
      *
-     * @param int    $id       Role id
-     * @param string $resource ACL resource id
+     * @param  int    $id       Role id
+     * @param  string $resource ACL resource id
      * @return string
      *
      * @Soap\Method("addAclToRole")
      * @Soap\Param("id", phpType="int")
      * @Soap\Param("resource", phpType="string")
      * @Soap\Result(phpType="string")
-     * @AclAncestor("oro_user_acl_save")
+     * @AclAncestor("oro_user_role_acl")
      */
     public function postAclAction($id, $resource)
     {
@@ -123,15 +123,15 @@ class RoleController extends SoapController
     /**
      * Unlink ACL resource from role
      *
-     * @param int    $id       Role id
-     * @param string $resource ACL resource id
+     * @param  int    $id       Role id
+     * @param  string $resource ACL resource id
      * @return string
      *
      * @Soap\Method("removeAclFromRole")
      * @Soap\Param("id", phpType="int")
      * @Soap\Param("resource", phpType="string")
      * @Soap\Result(phpType="string")
-     * @AclAncestor("oro_user_acl_save")
+     * @AclAncestor("oro_user_role_acl")
      */
     public function deleteAclAction($id, $resource)
     {
@@ -143,15 +143,15 @@ class RoleController extends SoapController
     /**
      * Link ACL resources to role
      *
-     * @param int   $id        Role id
-     * @param array $resources Array of ACL resource ids
+     * @param  int    $id        Role id
+     * @param  array  $resources Array of ACL resource ids
      * @return string
      *
      * @Soap\Method("addAclsToRole")
      * @Soap\Param("id", phpType="int")
      * @Soap\Param("resources", phpType="string[]")
      * @Soap\Result(phpType="string")
-     * @AclAncestor("oro_user_acl_save")
+     * @AclAncestor("oro_user_role_acl")
      */
     public function addAclsToRoleAction($id, $resources)
     {
@@ -163,15 +163,15 @@ class RoleController extends SoapController
     /**
      * Unlink ACL resources from role
      *
-     * @param int   $id        Role id
-     * @param array $resources Array of ACL resource ids
+     * @param  int    $id        Role id
+     * @param  array  $resources Array of ACL resource ids
      * @return string
      *
      * @Soap\Method("removeAclsFromRole")
      * @Soap\Param("id", phpType="int")
      * @Soap\Param("resources", phpType="string[]")
      * @Soap\Result(phpType="string")
-     * @AclAncestor("oro_user_acl_save")
+     * @AclAncestor("oro_user_role_acl")
      */
     public function deleteAclsAction($id, $resources)
     {
