@@ -32,9 +32,9 @@ navigation.pinbar.ItemView = Backbone.View.extend({
         Oro.Events.bind(
             "hash_navigation_request:complete",
             function() {
-                if (!this.isRemoved && this.checkCurrentUrl()) {
+                /*if (!this.isRemoved && this.checkCurrentUrl()) {
                     this.maximize();
-                }
+                }*/
                 this.setActiveItem();
             },
             this
@@ -43,7 +43,18 @@ navigation.pinbar.ItemView = Backbone.View.extend({
 
     unpin: function()
     {
-        this.model.destroy({wait: false});
+        Oro.Events.trigger("pinbar_item_remove_before", this.model);
+        this.model.destroy({
+            wait: true,
+            error: _.bind(function(model, xhr, options) {
+                if (xhr.status == 404 && !Oro.debug) {
+                    // Suppress error if it's 404 response and not debug mode
+                    this.removeItem();
+                } else {
+                    Oro.BackboneError.Dispatch(model, xhr, options);
+                }
+            }, this)
+        });
         return false;
     },
 
@@ -59,12 +70,22 @@ navigation.pinbar.ItemView = Backbone.View.extend({
 
     checkCurrentUrl: function() {
         var url = '';
+        var modelUrl = this.model.get('url');
         if (Oro.hashNavigationEnabled()) {
-            url = Oro.Navigation.prototype.getHashUrl();
+            url = Oro.hashNavigationInstance.getHashUrl();
+            url = Oro.hashNavigationInstance.removeGridParams(url);
+            modelUrl = Oro.hashNavigationInstance.removeGridParams(modelUrl);
         } else {
             url = window.location.pathname;
         }
-        return this.model.get('url') ==  url;
+        return this.cleanupUrl(modelUrl) == this.cleanupUrl(url);
+    },
+
+    cleanupUrl: function(url) {
+        if (url) {
+            url = url.replace(/(\?|&)restore=1/ig, '');
+        }
+        return url;
     },
 
     setActiveItem: function() {

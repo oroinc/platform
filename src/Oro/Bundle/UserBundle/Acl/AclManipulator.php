@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Acl;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Cache\CacheProvider;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Acl;
@@ -53,8 +54,6 @@ abstract class AclManipulator
         $this->cache = $cache;
         $this->securityContext = $securityContext;
         $this->configReader = $configReader;
-
-        $this->cache->setNamespace('oro_user.cache');
     }
 
     /**
@@ -92,7 +91,7 @@ abstract class AclManipulator
      * @param Acl  $acl
      * @param Role $role
      *
-     * @return True if ACL has been added, false otherwise
+     * @return boolean True if ACL has been added, false otherwise
      */
     protected function addAclToRole(Acl $acl, Role $role)
     {
@@ -105,6 +104,7 @@ abstract class AclManipulator
             }
 
             foreach ($role->getAclResources() as $resource) {
+                /** @var $resource Acl */
                 if ($resource->getId() == Acl::ROOT_NODE) {
                     $resource->setAccessRoles(new ArrayCollection(array($role)));
 
