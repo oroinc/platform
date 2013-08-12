@@ -66,8 +66,8 @@ class TransactionEmails extends PageFilteredGrid
     {
         $this->filterBy('Recipient email', $entityname);
         $this->waitForAjax();
-        if ($this->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->displayed()) {
-            $this->byXPath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        if ($this->isElementPresent("//td[@class='action-cell']//a[contains(., '...')]")) {
+              $this->byXPath("//td[@class='action-cell']//a[contains(., '...')]")->click();
             $this->waitForAjax();
             return $this->assertElementNotPresent("//td[@class='action-cell']//a[@title= '{$contextname}']");
         }
