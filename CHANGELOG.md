@@ -1,3 +1,18 @@
+CHANGELOG for 1.0.0-alpha5
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-alpha5 versions.
+
+* 1.0.0-alpha5 (2013-08-29)
+ * Custom entity creation
+ * Cron Job
+ * Record ownership
+ * Grid Improvements
+ * Filter Improvements
+ * Email Template Improvements
+ * Implemented extractor for messages in PHP code
+ * Removed dependency on SonataAdminBundle
+ * Added possibility to unpin page using pin icon
+
 CHANGELOG for 1.0.0-alpha4
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-alpha4 versions.

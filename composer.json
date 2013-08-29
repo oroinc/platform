@@ -11,7 +11,7 @@
         "doctrine/doctrine-fixtures-bundle": "@dev",
         "twig/extensions": "1.0.*@dev",
         "symfony/assetic-bundle": "2.3.*@dev",
-        "symfony/swiftmailer-bundle": "2.3.2",
+        "symfony/swiftmailer-bundle": "2.3.*",
         "symfony/monolog-bundle": "2.3.*",
         "sensio/distribution-bundle": "2.3.*",
         "sensio/framework-extra-bundle": "2.3.*",
@@ -36,23 +36,17 @@
         "ddeboer/data-import": "dev-master",
         "stof/doctrine-extensions-bundle": "dev-master",
         "escapestudios/wsse-authentication-bundle": "2.1.x-dev",
-        "sonata-project/admin-bundle": "dev-master",
-        "sonata-project/doctrine-orm-admin-bundle": "dev-master",
         "liip/imagine-bundle": "dev-master",
         "leafo/lessphp": "dev-master",
         "willdurand/expose-translation-bundle": "0.2.*@dev",
         "apy/jsfv-bundle": "dev-master",
         "genemu/form-bundle": "2.2.*",
-        "a2lix/translation-form-bundle" : "1.0@dev"
+        "a2lix/translation-form-bundle" : "1.*@dev"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/orocrm/SonataAdminBundle.git"
-        }
-    ],
     "autoload": {
-        "psr-0": { "Oro\\Bundle": "src/" }
+        "psr-0": { 
+              "Oro\\Bundle": "src/"
+        }
     },
     "minimum-stability": "dev",
     "extra": {

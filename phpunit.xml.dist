@@ -11,10 +11,11 @@
         processIsolation            = "false"
         stopOnFailure               = "false"
         syntaxCheck                 = "false"
-        bootstrap                   = "tests/bootstrap.php">
+        bootstrap                   = "tests/bootstrap.php"
+>
     <testsuites>
         <testsuite name="Project Unit Tests">
-            <directory suffix="Test.php">src/*/Bundle/*Bundle/Tests/Unit</directory>
+            <directory suffix="Test.php">src/Oro/Bundle/*Bundle/Tests/Unit</directory>
         </testsuite>
     </testsuites>
 
