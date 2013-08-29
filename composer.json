@@ -44,7 +44,10 @@
         "a2lix/translation-form-bundle" : "1.*@dev"
     },
     "autoload": {
-        "psr-0": { "Oro\\Bundle": "src/" }
+        "psr-0": { 
+              "Oro\\Bundle": "src/",
+              "Extend\\": "app/entities/"
+        }
     },
     "minimum-stability": "dev",
     "extra": {
