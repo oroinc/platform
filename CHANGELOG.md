@@ -4,7 +4,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
 
 * 1.0.0-alpha6 (2013-09-12)
  * Maintenance Mode
- * Instant messaging between the browser and the web server
+ * WebSocket messaging between browser and the web server
  * Asynchronous Module Definition of JS resources
  * Added multiple sorting for a Grid
  * System configuration
