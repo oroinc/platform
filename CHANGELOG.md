@@ -7,6 +7,7 @@ This changelog references the relevant changes (new features, changes and bugs) 
  * Instant messaging between the browser and the web server
  * Asynchronous Module Definition of JS resources
  * Added multiple sorting for a Grid
+ * System configuration
 
 CHANGELOG for 1.0.0-alpha5
 ===================
