@@ -41,3 +41,9 @@ Until it's a private repository and it's not published on packagist :
         }
     ],
 ```
+Instant messaging between the browser and the web server
+--------------------------------------------------------
+To use this feature you need to configure parameters.yml websocket parameters and run server with console command
+
+ ```bash
+app/console clank:server

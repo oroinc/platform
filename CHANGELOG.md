@@ -1,3 +1,13 @@
+CHANGELOG for 1.0.0-alpha6
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-alpha6 versions.
+
+* 1.0.0-alpha6 (2013-09-12)
+ * Maintenance Mode
+ * Instant messaging between the browser and the web server
+ * Asynchronous Module Definition of JS resources
+ * Added multiple sorting for a Grid
+
 CHANGELOG for 1.0.0-alpha5
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-alpha5 versions.
