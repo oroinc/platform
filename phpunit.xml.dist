@@ -16,9 +16,9 @@
     <testsuites>
         <testsuite name="Project Unit Tests">
             <directory suffix="Test.php">src/Oro/Bundle/AddressBundle/Tests/Unit</directory>
+            <directory suffix="Test.php">src/Oro/Bundle/BatchBundle/Tests/Unit</directory>
             <directory suffix="Test.php">src/Oro/Bundle/ConfigBundle/Tests/Unit</directory>
             <directory suffix="Test.php">src/Oro/Bundle/DataAuditBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/DataFlowBundle/Tests/Unit</directory>
             <directory suffix="Test.php">src/Oro/Bundle/FilterBundle/Tests/Unit</directory>
             <directory suffix="Test.php">src/Oro/Bundle/FlexibleEntityBundle/Tests/Unit</directory>
             <directory suffix="Test.php">src/Oro/Bundle/GridBundle/Tests/Unit</directory>
