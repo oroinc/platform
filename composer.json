@@ -4,7 +4,7 @@
     "homepage": "https://github.com/laboro/platform.git",
     "license": "MIT",
     "require": {
-        "symfony/symfony": "2.3.*",
+        "symfony/symfony": "v2.3.4",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.2.*",
         "doctrine/data-fixtures": "@dev",
