@@ -47,7 +47,10 @@
         "lexik/maintenance-bundle": "dev-master"
     },
     "autoload": {
-        "psr-0": { "Oro\\Bundle": "src/" }
+        "psr-0": {
+            "Oro\\Bundle": "src/",
+            "Extend\\": "app/entities/"
+        }
     },
     "minimum-stability": "dev",
     "extra": {
