@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 use Oro\Bundle\EntityExtendBundle\Entity\EntityConfig;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EntityConfigRepository;
+
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
@@ -32,7 +33,7 @@ class ExtendConfigDumper
 
     /**
      * @param OroEntityManager $em
-     * @param string $cacheDir
+     * @param string           $cacheDir
      */
     public function __construct(OroEntityManager $em, $cacheDir)
     {
