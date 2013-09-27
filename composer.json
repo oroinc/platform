@@ -1,9 +1,10 @@
 {
     "name": "oro/platform",
     "description": "Business Application Platform (BAP)",
-    "homepage": "https://github.com/laboro/platform.git",
+    "homepage": "https://github.com/orocrm/platform.git",
     "license": "MIT",
     "require": {
+        "php": ">=5.3.8",
         "symfony/symfony": "v2.3.4",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.2.*",
@@ -18,8 +19,8 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
         "jms/job-queue-bundle": "dev-master",
-        "jms/serializer": "0.12.*@dev",
-        "jms/serializer-bundle": "0.12.*@dev",
+        "jms/serializer": "0.14.*@dev",
+        "jms/serializer-bundle": "0.13.*@dev",
         "kriswallsmith/assetic": "1.1.*@dev",
         "knplabs/knp-menu": "dev-master",
         "knplabs/knp-menu-bundle": "dev-master",
@@ -30,31 +31,26 @@
         "ass/xmlsecurity": "dev-master",
         "besimple/soap-common": "dev-master",
         "besimple/soap-server": "dev-master",
-        "besimple/soap-bundle": "dev-master",
+        "besimple/soap-bundle": "dev-master#57a05d5c82f1401e9ab2aa2e89f94d72e602d2c9",
         "ddeboer/data-import": "dev-master",
         "stof/doctrine-extensions-bundle": "dev-master",
-        "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
+        "escapestudios/wsse-authentication-bundle": "2.1.x-dev",
         "liip/imagine-bundle": "dev-master",
         "leafo/lessphp": "dev-master",
-        "willdurand/expose-translation-bundle": ">=0.2@dev,<0.4@dev",
+        "willdurand/expose-translation-bundle": "0.2.*@dev",
         "apy/jsfv-bundle": "dev-master",
         "genemu/form-bundle": "2.2.*",
+        "zendframework/zend-mail": "2.1.*",
         "a2lix/translation-form-bundle" : "1.*@dev",
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "dev-master",
         "lexik/maintenance-bundle": "dev-master",
         "sylius/flow-bundle": "0.1.*"
     },
-    "autoload": {
-        "psr-0": {
-            "Oro\\Bundle": "src/",
-            "Extend\\": "app/entities/"
-        }
-    },
     "minimum-stability": "dev",
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
+    "autoload": {
+        "psr-0": { 
+              "Oro\\Bundle": "src/"
         }
     }
 }
