@@ -55,5 +55,14 @@
 		{
 			"Oro\\Bundle": "src/"
 		}
-	}
+	},
+       "extra": {
+                        "symfony-app-dir": "app",
+                        "symfony-web-dir": "web",
+                        "symfony-assets-install": "symlink",
+                        "incenteev-parameters": {
+                               "file": "app/config/parameters.yml"
+                         }
+    }
+
 }
