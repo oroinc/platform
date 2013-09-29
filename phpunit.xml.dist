@@ -29,13 +29,10 @@
             <directory>src</directory>
             <exclude>
                 <directory>vendor</directory>
-                <directory>src/Oro/Bundle/DataFixtures</directory>
-                <directory>src/Oro/Bundle/DataFixtures</directory>
-                <directory>src/Oro/Bundle/Resources</directory>
-                <directory>src/Oro/Bundle/Tests</directory>
-                <directory>src/Oro/Bundle/Resources</directory>
-                <directory>src/Oro/Bundle/Tests</directory>
-                <directory>src/Oro/Bundle/vendor</directory>
+                <directory>src/Oro/Bundle/*Bundle/DataFixtures</directory>
+                <directory>src/Oro/Bundle/*Bundle/Resources</directory>
+                <directory>src/Oro/Bundle/*Bundle/Tests</directory>
+                <directory>vendor</directory>
             </exclude>
         </whitelist>
     </filter>
