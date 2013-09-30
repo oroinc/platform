@@ -1,7 +1,7 @@
 /* global define */
 define(['jquery', 'underscore', 'backbone', 'routing', 'oro/navigation', 'oro/translator', 'oro/mediator',
-    'oro/messenger', 'oro/error', 'oro/widget-manager', 'oro/modal', 'oro/datagrid/action-launcher'],
-function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, widgetManager, Modal, ActionLauncher) {
+    'oro/messenger', 'oro/error', 'oro/modal', 'oro/datagrid/action-launcher'],
+function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
     'use strict';
 
     /**
@@ -55,8 +55,8 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, wi
             confirm_title: __('Execution Confirmation'),
             confirm_content: __('Are you sure you want to do this?'),
             confirm_ok: __('Yes, do it'),
-            success: __('Action was successfully performed.'),
-            error: __('Action was not performed.'),
+            success: __('Action performed.'),
+            error: __('Action is not performed.'),
             empty_selection: __('Please, select item to perform action.')
         },
 
@@ -139,7 +139,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, wi
                 this._handleAjax(action);
             } else if (action.frontend_type == 'redirect') {
                 this._handleRedirect(action);
-            } else if (widgetManager.isSupportedType(action.frontend_type)) {
+            } else {
                 this._handleWidget(action);
             }
         },
@@ -158,7 +158,12 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, wi
             }
             action.frontend_options.url = action.frontend_options.url || this.getLinkWithParameters();
             action.frontend_options.title = action.frontend_options.title || this.label;
-            widgetManager.createWidget(action.frontend_type, action.frontend_options).render();
+            require(['oro/' + action.frontend_type + '-widget', 'oro/widget-manager'],
+            function(WidgetType, WidgetManager) {
+                var widget = new WidgetType(action.frontend_options);
+                WidgetManager.addWidgetInstance(widget);
+                widget.render();
+            });
         },
 
         _handleRedirect: function(action) {
