@@ -15,22 +15,7 @@
 >
     <testsuites>
         <testsuite name="Project Unit Tests">
-            <directory suffix="Test.php">src/Oro/Bundle/AddressBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/ConfigBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/DataAuditBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/DataFlowBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/FilterBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/FlexibleEntityBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/GridBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/MeasureBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/NavigationBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/SearchBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/SegmentationTreeBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/SoapBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/TestFrameworkBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/UIBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/UserBundle/Tests/Unit</directory>
-            <directory suffix="Test.php">src/Oro/Bundle/WindowsBundle/Tests/Unit</directory>
+            <directory suffix="Test.php">src/Oro/Bundle/*Bundle/Tests/Unit</directory>
         </testsuite>
     </testsuites>
 
@@ -44,13 +29,10 @@
             <directory>src</directory>
             <exclude>
                 <directory>vendor</directory>
-                <directory>src/Oro/Bundle/DataFixtures</directory>
-                <directory>src/Oro/Bundle/DataFixtures</directory>
-                <directory>src/Oro/Bundle/Resources</directory>
-                <directory>src/Oro/Bundle/Tests</directory>
-                <directory>src/Oro/Bundle/Resources</directory>
-                <directory>src/Oro/Bundle/Tests</directory>
-                <directory>src/Oro/Bundle/vendor</directory>
+                <directory>src/Oro/Bundle/*Bundle/DataFixtures</directory>
+                <directory>src/Oro/Bundle/*Bundle/Resources</directory>
+                <directory>src/Oro/Bundle/*Bundle/Tests</directory>
+                <directory>vendor</directory>
             </exclude>
         </whitelist>
     </filter>
