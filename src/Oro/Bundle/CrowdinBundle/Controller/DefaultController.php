@@ -10,10 +10,10 @@ class DefaultController extends Controller
 {
     /**
      * @Route("/hello/{name}")
-     * @Template()
      */
     public function indexAction($name)
     {
-        return array('name' => $name);
+        $adapter = $this->get('oro_crowdin.adapter');
+        $adapter->addFile('@./../oro.yml');
     }
 }
