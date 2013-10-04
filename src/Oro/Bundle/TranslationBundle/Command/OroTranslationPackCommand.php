@@ -7,6 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -72,51 +73,78 @@ EOF
             $projectNamespace = $input->getArgument('project');
             $defaultLocale    = $input->getArgument('default-locale');
 
-            $bundles   = $this->getContainer()->get('kernel')->getBundles();
-            $writer    = $this->getContainer()->get('translation.writer');
-            $extractor = $this->getContainer()->get('translation.extractor');
-            $loader    = $this->getContainer()->get('translation.loader');
-            $fs        = new Filesystem();
+            $container = $this->getContainer();
+            $bundles   = $container->get('kernel')->getBundles();
+            $writer    = $container->get('translation.writer');
 
             foreach ($bundles as $bundle) {
                 $namespaceParts = explode('\\', $bundle->getNamespace());
                 if ($namespaceParts && reset($namespaceParts) === $projectNamespace) {
-                    $bundleTransPath        = $bundle->getPath() . '/Resources/translations';
-                    $bundleViewsPath        = $bundle->getPath() . '/Resources/views/';
-                    $bundleLanguagePackPath = $this->getContainer()->getParameter('kernel.root_dir')
+                    $bundleLanguagePackPath = $container->getParameter('kernel.root_dir')
                         . '/Resources/language-pack/' . $projectNamespace . '/' . $bundle->getName()
                         . '/translations';
 
                     if (!is_dir($bundleLanguagePackPath)) {
-                        $fs->mkdir($bundleLanguagePackPath);
+                        $this->createDirectory($bundleLanguagePackPath);
                     }
-                    $currentCatalogue   = new MessageCatalogue($defaultLocale);
-                    $extractedCatalogue = new MessageCatalogue($defaultLocale);
-                    if (is_dir($bundleViewsPath)) {
-                        $extractor->extract($bundleViewsPath, $extractedCatalogue);
-                    }
-                    if (is_dir($bundleTransPath)) {
-                        $loader->loadMessages($bundleTransPath, $currentCatalogue);
-                    }
-                    $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
-                    foreach ($operation->getDomains() as $domain) {
-                        $output->writeln(
-                            sprintf(
-                                PHP_EOL . 'Writing files for <info>%s: %s</info>',
-                                $bundle->getName(),
-                                $domain
-                            )
-                        );
-                        $writer->writeTranslations(
-                            $operation->getResult(),
-                            $input->getOption('output-format'),
-                            array('path' => $bundleLanguagePackPath)
-                        );
-                    }
+
+                    $operation = $this->getMergedTranslations($defaultLocale, $bundle);
+                    $output->writeln(
+                        sprintf(
+                            'Writing files for <info>%s</info>',
+                            $bundle->getName()
+                        )
+                    );
+                    $writer->writeTranslations(
+                        $operation->getResult(),
+                        $input->getOption('output-format'),
+                        array('path' => $bundleLanguagePackPath)
+                    );
                 }
             }
         }
 
         return 0;
+    }
+
+    /**
+     * Create directory using Filesystem object
+     *
+     * @param string $dirPath
+     */
+    protected function createDirectory($dirPath)
+    {
+        $fs = new Filesystem();
+        $fs->mkdir($dirPath);
+    }
+
+    /**
+     * Merge current and extracted translations
+     *
+     * @param string          $defaultLocale
+     * @param BundleInterface $bundle
+     *
+     * @return MergeOperation
+     */
+    protected function getMergedTranslations($defaultLocale, BundleInterface $bundle)
+    {
+        $bundleTransPath = $bundle->getPath() . '/Resources/translations';
+        $bundleViewsPath = $bundle->getPath() . '/Resources/views/';
+
+        $container = $this->getContainer();
+        $extractor = $container->get('translation.extractor');
+        $loader    = $container->get('translation.loader');
+
+        $currentCatalogue   = new MessageCatalogue($defaultLocale);
+        $extractedCatalogue = new MessageCatalogue($defaultLocale);
+        if (is_dir($bundleViewsPath)) {
+            $extractor->extract($bundleViewsPath, $extractedCatalogue);
+        }
+        if (is_dir($bundleTransPath)) {
+            $loader->loadMessages($bundleTransPath, $currentCatalogue);
+        }
+        $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
+
+        return $operation;
     }
 }
