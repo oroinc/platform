@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CrowdinBundle\Provider;
 
 
-abstract class TranslationAPIAdapter
+abstract class AbstractAPIAdapter
 {
     /**
      * @var string
@@ -30,10 +30,10 @@ abstract class TranslationAPIAdapter
     /**
      * Upload source files to translation service
      *
-     * @param string $dir directory or file to upload
+     * @param $files file list with translations
      * @return mixed
      */
-    abstract public function upload($dir);
+    abstract public function upload($files);
 
     /**
      * Perform request
