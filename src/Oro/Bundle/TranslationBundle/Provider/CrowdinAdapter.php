@@ -99,12 +99,13 @@ class CrowdinAdapter extends AbstractAPIAdapter
         // create remote dirs
         foreach ($dirs as $dir) {
             if ($this->addDirectory($dir)) {
-                $this->notifyProgress(sprintf('Directory "%s" created', $dir));
+                $this->notifyProgress(sprintf('Directory <info>%s</info> created', $dir));
             }
         }
 
         $results = array();
         $failed = array();
+        $i = 0;
         foreach ($files as $apiPath => $filePath) {
             try {
                 $results[] = $this->addFile($apiPath, $filePath);
@@ -112,7 +113,11 @@ class CrowdinAdapter extends AbstractAPIAdapter
                 $failed[$filePath] = $e->getMessage();
             }
 
-            $this->notifyProgress(sprintf('File "%s" uploaded', $apiPath));
+            $i++;
+            $this->notifyProgress(
+                sprintf('File <info>%s</info> uploaded', $apiPath),
+                sprintf('%0.2f%%', $i*100 / count($files))
+            );
         }
 
         return array('results' => $results, 'failed' => $failed);

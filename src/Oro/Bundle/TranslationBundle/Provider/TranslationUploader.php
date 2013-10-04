@@ -40,7 +40,9 @@ class TranslationUploader
             $files[ str_replace($dir, '', (string)$file) ] = (string)$file;
         }
 
-//        /$this
+        if (!is_null($progressCallback)) {
+            $this->adapter->setProgressCallback($progressCallback);
+        }
 
         return $this->adapter->upload($files);
     }
