@@ -1,7 +1,8 @@
 <?php
 
-namespace Oro\Bundle\CrowdinBundle\Provider;
+namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Oro\Bundle\CrowdinBundle\Provider\AbstractAPIAdapter;
 use Symfony\Component\Finder\Finder;
 
 class TranslationUploader
@@ -12,18 +13,12 @@ class TranslationUploader
     protected $adapter;
 
     /**
-     * @var array bundles
-     */
-    protected $bundles;
-
-    /**
      * @param array $bundles
      * @param AbstractAPIAdapter $adapter
      */
     public function __construct($bundles, AbstractAPIAdapter $adapter = null)
     {
         $this->adapter = $adapter;
-        $this->bundles = $bundles;
     }
 
     /**
@@ -33,15 +28,18 @@ class TranslationUploader
      */
     public function upload($dir)
     {
-        // compile file list to be uploaded
-        $files = array();
-
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
 
-        foreach ($finder->files() as $splFileInfo) {
+        $results = $this->adapter->upload($finder->files());
 
-        }
+        var_dump($results);
+    }
 
-        $results = $this->adapter->upload($files);
+    /**
+     * @param AbstractAPIAdapter $adapter
+     */
+    public function setAdapter(AbstractAPIAdapter $adapter)
+    {
+        $this->adapter = $adapter;
     }
 }

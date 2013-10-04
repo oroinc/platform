@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CrowdinBundle\Provider;
+namespace Oro\Bundle\TranslationBundle\Provider;
 
 class CrowdinAdapter extends AbstractAPIAdapter
 {

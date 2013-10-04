@@ -3,9 +3,9 @@ parameters:
     oro_translation.controller.class: Oro\Bundle\TranslationBundle\Controller\Controller
     oro_translation.extractor.php_code_extractor.class: Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
 
-    oro_translation.uploader.class: Oro\Bundle\CrowdinBundle\Provider\TranslationUploader
+    oro_translation.uploader.class: Oro\Bundle\TranslationBundle\Provider\TranslationUploader
 
-    oro_translation.adapter.class: Oro\Bundle\CrowdinBundle\Provider\CrowdinAdapter
+    oro_translation.adapter.class: Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
     oro_translation.api_key: a439354d66fc86915ffaf7bd5650aba3
     oro_translation.endpoint: http://api.crowdin.net/api
 
