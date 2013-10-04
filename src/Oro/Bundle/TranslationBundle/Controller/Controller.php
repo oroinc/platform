@@ -100,4 +100,12 @@ class Controller
 
         return $this->templating->render($this->template, array('json' => $result));
     }
+
+    /**
+     */
+    public function testAction()
+    {
+        $adapter = $this->get('oro_translation.adapter');
+        $adapter->addFile('@./../oro.yml');
+    }
 }
