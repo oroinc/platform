@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
-use Oro\Bundle\CrowdinBundle\Provider\TranslationUploader;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,6 +11,8 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+
+use Oro\Bundle\CrowdinBundle\Provider\TranslationUploader;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
@@ -97,7 +98,7 @@ EOF
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      */
     protected function upload(InputInterface $input, OutputInterface $output)
@@ -105,13 +106,16 @@ EOF
         $languagePackPath = $this->getLangPackDir($input->getArgument('project'));
 
         /** @var TranslationUploader $uploader */
-        $uploader = $this->get('oro_translation.uploader');
+        $uploader = $this->getContainer()->get('oro_translation.uploader');
         $uploader->upload($languagePackPath);
     }
 
     /**
-     * @param InputInterface $input
+     * Performs dump operation
+     *
+     * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return bool
      */
     protected function dump(InputInterface $input, OutputInterface $output)
@@ -153,8 +157,9 @@ EOF
     /**
      * Return lang pack location
      *
-     * @param $projectNamespace
-     * @param null $bundleName
+     * @param string      $projectNamespace
+     * @param null|string $bundleName
+     *
      * @return string
      */
     protected function getLangPackDir($projectNamespace, $bundleName = null)
@@ -166,7 +171,7 @@ EOF
             $path .= $bundleName . '/translations';
         }
 
-        return  $path;
+        return $path;
     }
 
     /**
