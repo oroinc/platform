@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CrowdinBundle\Provider;
 
-
 use Symfony\Component\Finder\Finder;
 
 class TranslationUploader
@@ -29,14 +28,19 @@ class TranslationUploader
 
     /**
      * Upload translations
+     *
+     * @param string $dir
      */
-    public function upload()
+    public function upload($dir)
     {
         // compile file list to be uploaded
         $files = array();
 
-        die();
-        $finder = Finder::create()->files()->name('*.yml')->in(__DIR__);
+        $finder = Finder::create()->files()->name('*.yml')->in($dir);
+
+        foreach ($finder->files() as $splFileInfo) {
+
+        }
 
         $results = $this->adapter->upload($files);
     }

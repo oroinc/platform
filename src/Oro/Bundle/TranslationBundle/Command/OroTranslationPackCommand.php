@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
+use Oro\Bundle\CrowdinBundle\Provider\TranslationUploader;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -79,8 +79,8 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // check presence of action
-        if ($input->getOption('dump') !== true) {
-            $output->writeln('<info>You must choose action: e.g --dump</info>');
+        if ($input->getOption('dump') !== true && $input->getOption('upload') !== true) {
+            $output->writeln('<info>You must choose action: e.g --dump or --upload</info>');
 
             return 1;
         }
@@ -103,9 +103,10 @@ EOF
     protected function upload(InputInterface $input, OutputInterface $output)
     {
         $languagePackPath = $this->getLangPackDir($input->getArgument('project'));
-        $finder = Finder::create()->files()->name('*.yml')->in($languagePackPath);
 
-
+        /** @var TranslationUploader $uploader */
+        $uploader = $this->get('oro_translation.uploader');
+        $uploader->upload($languagePackPath);
     }
 
     /**
@@ -125,9 +126,7 @@ EOF
         foreach ($bundles as $bundle) {
             $namespaceParts = explode('\\', $bundle->getNamespace());
             if ($namespaceParts && reset($namespaceParts) === $projectNamespace) {
-                $bundleLanguagePackPath = $container->getParameter('kernel.root_dir')
-                    . '/Resources/language-pack/' . $projectNamespace . '/' . $bundle->getName()
-                    . '/translations';
+                $bundleLanguagePackPath = $this->getLangPackDir($projectNamespace, $bundle->getName());
 
                 if (!is_dir($bundleLanguagePackPath)) {
                     $this->createDirectory($bundleLanguagePackPath);
