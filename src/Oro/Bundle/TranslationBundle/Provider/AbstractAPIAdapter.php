@@ -9,19 +9,16 @@ abstract class AbstractAPIAdapter
      */
     protected $apiKey;
 
+    /** @var  \Closure|null */
+    protected $progressCallback = null;
+
     /**
      * @var string endpoint URL
      */
     protected $endpoint;
 
-    /**
-     * @var string
-     */
-    protected $projectId;
-
-    public function __construct($projectId, $apiKey, $endpoint)
+    public function __construct($apiKey, $endpoint)
     {
-        $this->projectId = $projectId;
         $this->apiKey    = $apiKey;
         $this->endpoint  = $endpoint;
     }
@@ -29,11 +26,12 @@ abstract class AbstractAPIAdapter
     /**
      * Upload source files to translation service
      *
-     * @param $files file list with translations
+     * @param string $files file list with translations
+     * @param string $mode 'update' or 'add'
      *
      * @return mixed
      */
-    abstract public function upload($files);
+    abstract public function upload($files, $mode = 'add');
 
     /**
      * Perform request
@@ -48,15 +46,20 @@ abstract class AbstractAPIAdapter
      */
     protected function request($uri, $data = array(), $method = 'GET')
     {
+        $requestParams = array(
+            CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
+            CURLOPT_RETURNTRANSFER => true,
+        );
+
+        if ($method == 'POST') {
+            $requestParams[CURLOPT_POST] = true;
+            $requestParams[CURLOPT_POSTFIELDS] = $data;
+        }
+
         $ch = curl_init();
         curl_setopt_array(
             $ch,
-            array(
-                CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST           => true,
-                CURLOPT_POSTFIELDS     => $data,
-            )
+            $requestParams
         );
 
         $result = curl_exec($ch);
@@ -67,5 +70,25 @@ abstract class AbstractAPIAdapter
         curl_close($ch);
 
         return $result;
+    }
+
+    /**
+     * Notify progress status
+     */
+    public function notifyProgress()
+    {
+        if (is_callable($this->progressCallback)) {
+            call_user_func($this->progressCallback, func_get_args());
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param \Closure $progressCallback
+     */
+    public function setProgressCallback(\Closure $progressCallback)
+    {
+        $this->progressCallback = $progressCallback;
     }
 }

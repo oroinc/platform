@@ -42,6 +42,13 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         self::DEFAULT_ADAPTER
                     ),
                     new InputOption(
+                        'upload-mode',
+                        'm',
+                        InputOption::VALUE_OPTIONAL,
+                        'Uploader mode: add or update',
+                        'add'
+                    ),
+                    new InputOption(
                         'output-format',
                         null,
                         InputOption::VALUE_OPTIONAL,
@@ -99,14 +106,33 @@ EOF
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
+     * @return bool
      */
     protected function upload(InputInterface $input, OutputInterface $output)
     {
-        $languagePackPath = $this->getLangPackDir($input->getArgument('project'));
+        $projectId = $input->getArgument('project');
+        $languagePackPath = $this->getLangPackDir($projectId);
+
+        /** @var  $adapter */
+        $adapter = $this->getContainer()->get(sprintf('oro_translation.uploader.%s_adapter', self::DEFAULT_ADAPTER));
+        if (!$adapter) {
+            return false;
+        }
+
+        // TODO: remove _test suffix before merge or change it to something else
+        $adapter->setProjectId(strtolower($projectId).'-test');
 
         /** @var TranslationUploader $uploader */
         $uploader = $this->getContainer()->get('oro_translation.uploader');
-        $uploader->upload($languagePackPath);
+        $uploader->setAdapter($adapter);
+
+        $uploader->upload(
+            $languagePackPath,
+            $input->getOption('upload-mode'),
+            function ($logItem) use ($output) {
+                $output->writeln(implode(', ', $logItem));
+            }
+        );
     }
 
     /**
@@ -165,8 +191,8 @@ EOF
      */
     protected function getLangPackDir($projectNamespace, $bundleName = null)
     {
-        $path = $this->getContainer()->getParameter('kernel.root_dir') .
-            '/Resources/language-pack/' . $projectNamespace . '/';
+        $path = $this->getContainer()->getParameter('kernel.root_dir')
+            . '/Resources/language-pack/' . $projectNamespace . '/';
 
         if (!is_null($bundleName)) {
             $path .= $bundleName . '/translations';
