@@ -24,9 +24,9 @@ services:
         class: %oro_translation.uploader.class%
         arguments:
             - %kernel.bundles%
-            - @oro_translation.crowdin_adapter
+#            - @oro_translation.uploader.crowdin_adapter
 
-    oro_translation.crowdin_adapter:
+    oro_translation.uploader.crowdin_adapter:
         class: %oro_translation.adapter.class%
         arguments:
             - %oro_translation.api_key%

@@ -21,7 +21,7 @@ class TranslationUploader
      * @param array $bundles
      * @param AbstractAPIAdapter $adapter
      */
-    public function __construct($bundles, AbstractAPIAdapter $adapter)
+    public function __construct($bundles, AbstractAPIAdapter $adapter = null)
     {
         $this->adapter = $adapter;
         $this->bundles = $bundles;
