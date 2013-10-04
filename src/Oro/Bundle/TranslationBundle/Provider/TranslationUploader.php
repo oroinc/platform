@@ -26,11 +26,12 @@ class TranslationUploader
      * Upload translations
      *
      * @param string $dir
+     * @param string $mode add or update
      * @param callable $progressCallback
      *
      * @return mixed
      */
-    public function upload($dir, \Closure $progressCallback = null)
+    public function upload($dir, $mode = 'add', \Closure $progressCallback = null)
     {
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
 
@@ -44,7 +45,7 @@ class TranslationUploader
             $this->adapter->setProgressCallback($progressCallback);
         }
 
-        return $this->adapter->upload($files);
+        return $this->adapter->upload($files, $mode);
     }
 
     /**

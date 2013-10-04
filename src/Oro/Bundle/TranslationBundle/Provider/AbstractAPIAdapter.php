@@ -27,10 +27,11 @@ abstract class AbstractAPIAdapter
      * Upload source files to translation service
      *
      * @param string $files file list with translations
+     * @param string $mode 'update' or 'add'
      *
      * @return mixed
      */
-    abstract public function upload($files);
+    abstract public function upload($files, $mode = 'add');
 
     /**
      * Perform request

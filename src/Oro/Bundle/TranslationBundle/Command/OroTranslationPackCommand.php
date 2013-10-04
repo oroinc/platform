@@ -42,6 +42,13 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         self::DEFAULT_ADAPTER
                     ),
                     new InputOption(
+                        'upload-mode',
+                        'm',
+                        InputOption::VALUE_OPTIONAL,
+                        'Uploader mode: add or update',
+                        'add'
+                    ),
+                    new InputOption(
                         'output-format',
                         null,
                         InputOption::VALUE_OPTIONAL,
@@ -121,6 +128,7 @@ EOF
 
         $uploader->upload(
             $languagePackPath,
+            $input->getOption('upload-mode'),
             function ($logItem) use ($output) {
                 $output->writeln(implode(', ', $logItem));
             }
