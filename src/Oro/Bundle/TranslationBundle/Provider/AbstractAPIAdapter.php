@@ -1,7 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CrowdinBundle\Provider;
-
+namespace Oro\Bundle\TranslationBundle\Provider;
 
 abstract class AbstractAPIAdapter
 {
@@ -23,14 +22,15 @@ abstract class AbstractAPIAdapter
     public function __construct($projectId, $apiKey, $endpoint)
     {
         $this->projectId = $projectId;
-        $this->apiKey = $apiKey;
-        $this->endpoint = $endpoint;
+        $this->apiKey    = $apiKey;
+        $this->endpoint  = $endpoint;
     }
 
     /**
      * Upload source files to translation service
      *
      * @param $files file list with translations
+     *
      * @return mixed
      */
     abstract public function upload($files);
@@ -38,9 +38,10 @@ abstract class AbstractAPIAdapter
     /**
      * Perform request
      *
-     * @param $uri
-     * @param array $data
+     * @param        $uri
+     * @param array  $data
      * @param string $method
+     *
      * @throws \Exception
      *
      * @return boolean
@@ -51,10 +52,10 @@ abstract class AbstractAPIAdapter
         curl_setopt_array(
             $ch,
             array(
-                CURLOPT_URL => $this->endpoint . $uri . '?key=' . $this->apiKey,
+                CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
                 CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_POSTFIELDS => $data,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $data,
             )
         );
 

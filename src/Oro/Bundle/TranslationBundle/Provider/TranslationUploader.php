@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Oro\Bundle\CrowdinBundle\Provider\AbstractAPIAdapter;
 use Symfony\Component\Finder\Finder;
+
+use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 
 class TranslationUploader
 {
@@ -13,7 +14,7 @@ class TranslationUploader
     protected $adapter;
 
     /**
-     * @param array $bundles
+     * @param array              $bundles
      * @param AbstractAPIAdapter $adapter
      */
     public function __construct($bundles, AbstractAPIAdapter $adapter = null)

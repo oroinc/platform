@@ -12,7 +12,7 @@ use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\CrowdinBundle\Provider\TranslationUploader;
+use Oro\Bundle\TranslationBundle\Provider\TranslationUploader;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
@@ -62,7 +62,6 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                     ),
                 )
             )
-            ->setDescription('Performs operations with translation pack')
             ->setHelp(
                 <<<EOF
 The <info>%command.name%</info> command extract translation files for each bundle in
@@ -122,6 +121,8 @@ EOF
     {
         $projectNamespace = $input->getArgument('project');
         $defaultLocale    = $input->getArgument('default-locale');
+
+        $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
 
         $container = $this->getContainer();
         $bundles   = $container->get('kernel')->getBundles();
