@@ -68,7 +68,7 @@ The <info>%command.name%</info> command extract translation files for each bundl
 specified vendor namespace(project) and creates language pack that's placed at
 %kernel.root_dir%/Resources/language-pack
 
-    <info>php %command.full_name% --dump OroCRM</info>
+    <info>php %command.full_name% --dump Or oCRM</info>
 EOF
             );
     }
@@ -200,12 +200,12 @@ EOF
         $bundleViewsPath = $bundle->getPath() . '/Resources/views/';
 
         $container = $this->getContainer();
-        $extractor = $container->get('translation.extractor');
         $loader    = $container->get('translation.loader');
 
         $currentCatalogue   = new MessageCatalogue($defaultLocale);
         $extractedCatalogue = new MessageCatalogue($defaultLocale);
         if (is_dir($bundleViewsPath)) {
+            $extractor = $container->get('translation.extractor');
             $extractor->extract($bundleViewsPath, $extractedCatalogue);
         }
         if (is_dir($bundleTransPath)) {
