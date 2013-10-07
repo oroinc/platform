@@ -18,6 +18,9 @@ class OroTranslationPackCommand extends ContainerAwareCommand
 {
     const DEFAULT_ADAPTER = 'crowdin';
 
+    /** @var string */
+    protected $path;
+
     /**
      * {@inheritdoc}
      */
@@ -56,6 +59,13 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         'yml'
                     ),
                     new InputOption(
+                        'path',
+                        null,
+                        InputOption::VALUE_OPTIONAL,
+                        'Path where dump will be placed(or upload will take files from), relative to %kernel.root_dir%',
+                        '/Resources/language-pack/'
+                    ),
+                    new InputOption(
                         'dump',
                         null,
                         InputOption::VALUE_NONE,
@@ -75,7 +85,8 @@ The <info>%command.name%</info> command extract translation files for each bundl
 specified vendor namespace(project) and creates language pack that's placed at
 %kernel.root_dir%/Resources/language-pack
 
-    <info>php %command.full_name% --dump Or oCRM</info>
+    <info>php %command.full_name% --dump OroCRM</info>
+    <info>php %command.full_name% --upload OroCRM</info>
 EOF
             );
     }
@@ -92,6 +103,9 @@ EOF
             return 1;
         }
 
+        $this->path = $this->getContainer()->getParameter('kernel.root_dir')
+            . str_replace('//', '/', $input->getOption('path') . '/');
+
         if ($input->getOption('dump') === true) {
             $this->dump($input, $output);
         }
@@ -106,21 +120,20 @@ EOF
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return bool
      */
     protected function upload(InputInterface $input, OutputInterface $output)
     {
-        $projectId = $input->getArgument('project');
+        $projectId        = $input->getArgument('project');
         $languagePackPath = $this->getLangPackDir($projectId);
 
         /** @var  $adapter */
-        $adapter = $this->getContainer()->get(sprintf('oro_translation.uploader.%s_adapter', self::DEFAULT_ADAPTER));
-        if (!$adapter) {
-            return false;
-        }
+        $adapter = $this->getContainer()->get(
+            sprintf('oro_translation.uploader.%s_adapter', $input->getArgument('adapter'))
+        );
 
-        // TODO: remove _test suffix before merge or change it to something else
-        $adapter->setProjectId(strtolower($projectId).'-test');
+        $adapter->setProjectId(strtolower($projectId));
 
         /** @var TranslationUploader $uploader */
         $uploader = $this->getContainer()->get('oro_translation.uploader');
@@ -191,8 +204,7 @@ EOF
      */
     protected function getLangPackDir($projectNamespace, $bundleName = null)
     {
-        $path = $this->getContainer()->getParameter('kernel.root_dir')
-            . '/Resources/language-pack/' . $projectNamespace . '/';
+        $path = $this->path . $projectNamespace . '/';
 
         if (!is_null($bundleName)) {
             $path .= $bundleName . '/translations';
