@@ -27,12 +27,14 @@ class OroTranslationExtension extends Extension
 
         $container->setParameter('oro_translation.js_translation.domains', $config['js_translation']['domains']);
 
-        foreach ($config['api'] as $serviceId => $params) {
-            foreach ($params as $key => $value) {
-                $container->setParameter(
-                    sprintf('oro_translation.api.%s.%s', $serviceId, $key),
-                    $value
-                );
+        if (!empty($config['api'])) {
+            foreach ($config['api'] as $serviceId => $params) {
+                foreach ($params as $key => $value) {
+                    $container->setParameter(
+                        sprintf('oro_translation.api.%s.%s', $serviceId, $key),
+                        $value
+                    );
+                }
             }
         }
     }

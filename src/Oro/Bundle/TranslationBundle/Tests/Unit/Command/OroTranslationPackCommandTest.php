@@ -147,6 +147,46 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $tester->execute($input);
     }
 
+    public function testUpload()
+    {
+        $kernel = new TestKernel();
+        $kernel->boot();
+
+        $adapterMock = $this->getMock(
+            'Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter',
+            array(),
+            array('some-api-key', 'http://service-url.tld/api/')
+        );
+
+        $uploaderMock = $this->getMock(
+            'Oro\Bundle\TranslationBundle\Provider\TranslationUploader',
+            array(),
+            array($adapterMock)
+        );
+
+        $uploaderMock->expects($this->once())
+            ->method('setAdapter')
+            ->with($adapterMock);
+
+        $uploaderMock->expects($this->once())
+            ->method('upload');
+
+        $kernel->getContainer()->set('oro_translation.uploader.crowdin_adapter', $adapterMock);
+        $kernel->getContainer()->set('oro_translation.uploader', $uploaderMock);
+
+        $app         = new Application($kernel);
+        $commandMock = $this->getCommandMock();
+        $app->add($commandMock);
+
+        $command = $app->find('oro:translation:pack');
+        $command->setApplication($app);
+
+        $tester = new CommandTester($command);
+        $input  = array('command' => $command->getName(), '--upload' => true, 'project' => 'SomeProject');
+
+        $tester->execute($input);
+    }
+
     /**
      * @return array
      */
