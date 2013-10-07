@@ -132,6 +132,8 @@ class StepExecution
 
     /**
      * @var array
+     *
+     * @ORM\Column(name="reader_warnings", type="array", nullable=true)
      */
     private $readerWarnings = array();
 
@@ -253,11 +255,11 @@ class StepExecution
     /**
      * Add a reader warning
      *
-     * @param ItemReaderInterface $reader
-     * @param string              $message
-     * @param mixed               $data
+     * @param string $reader
+     * @param string $message
+     * @param mixed  $data
      */
-    public function addReaderWarning(ItemReaderInterface $reader, $message, $data)
+    public function addReaderWarning($reader, $message, $data)
     {
         $this->readerWarnings[] = array(
             'reader' => $reader,
@@ -438,23 +440,12 @@ class StepExecution
     /**
      * Accessor for the execution context information of the enclosing job.
      *
-     * @return JobExecution that was used to start this step execution.
+     * @return the that was used to start this step execution.
      *
      */
     public function getJobExecution()
     {
         return $this->jobExecution;
-    }
-
-    /**
-     * @param JobExecution $jobExecution
-     * @return StepExecution
-     */
-    public function setJobExecution(JobExecution $jobExecution)
-    {
-        $this->jobExecution = $jobExecution;
-
-        return $this;
     }
 
     /**
@@ -468,7 +459,7 @@ class StepExecution
 
     /**
      * Add a failure exception
-     * @param \Exception $e
+     * @param Exception $e
      *
      * @return $this
      */
@@ -495,29 +486,6 @@ class StepExecution
                 $this->failureExceptions
             )
         );
-    }
-
-    /**
-     * Get errors
-     *
-     * @return array
-     */
-    public function getErrors()
-    {
-        return $this->errors;
-    }
-
-    /**
-     * Add an error
-     *
-     * @param string $errorMessage
-     * @return $this
-     */
-    public function addError($errorMessage)
-    {
-        $this->errors[] = $errorMessage;
-
-        return $this;
     }
 
     /**
