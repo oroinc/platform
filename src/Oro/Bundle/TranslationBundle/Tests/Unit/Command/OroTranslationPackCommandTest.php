@@ -158,6 +158,21 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCreateDirectory()
+    {
+        $dirPath = sys_get_temp_dir() . '/testDir';
+        $cmd     = $this->getCommandMock();
+
+        $class  = new \ReflectionClass($cmd);
+        $method = $class->getMethod('createDirectory');
+        $method->setAccessible(true);
+
+        $method->invokeArgs($cmd, array($dirPath));
+
+        $this->assertTrue(is_dir($dirPath));
+        rmdir($dirPath);
+    }
+
     /**
      * Prepares command mock
      * asText mocked by default in case when we don't need to mock anything

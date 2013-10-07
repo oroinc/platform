@@ -10,7 +10,7 @@ class TestKernel extends Kernel
 {
     public function __construct()
     {
-        parent::__construct('test', true);
+        parent::__construct('test_stub_env', true);
     }
 
     public function init()
@@ -19,17 +19,7 @@ class TestKernel extends Kernel
 
     public function getRootDir()
     {
-        return sys_get_temp_dir() . '/' . Kernel::VERSION;
-    }
-
-    public function getCacheDir()
-    {
-        return sys_get_temp_dir() . '/' . Kernel::VERSION . '/oro-tranlation/cache/' . $this->environment;
-    }
-
-    public function getLogDir()
-    {
-        return sys_get_temp_dir() . '/' . Kernel::VERSION . '/oro-tranlation/logs';
+        return sys_get_temp_dir() . '/translation-test-stub-cache';
     }
 
     public function registerBundles()
