@@ -6,8 +6,6 @@ parameters:
     oro_translation.uploader.class: Oro\Bundle\TranslationBundle\Provider\TranslationUploader
 
     oro_translation.adapter.class: Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
-    oro_translation.api_key: 5f70cfb8c3735597df1c2879505ac05a
-    oro_translation.endpoint: http://api.crowdin.net/api
 
 services:
     oro_translation.controller:
@@ -28,5 +26,5 @@ services:
     oro_translation.uploader.crowdin_adapter:
         class: %oro_translation.adapter.class%
         arguments:
-            - %oro_translation.api_key%
-            - %oro_translation.endpoint%
+            - %oro_translation.api.crowdin.key%
+            - %oro_translation.api.crowdin.endpoint%

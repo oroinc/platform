@@ -45,6 +45,12 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         self::DEFAULT_ADAPTER
                     ),
                     new InputOption(
+                        'project-id',
+                        'i',
+                        InputOption::VALUE_OPTIONAL,
+                        'API project ID, by default equal to project name'
+                    ),
+                    new InputOption(
                         'upload-mode',
                         'm',
                         InputOption::VALUE_OPTIONAL,
@@ -62,7 +68,7 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         'path',
                         null,
                         InputOption::VALUE_OPTIONAL,
-                        'Path where dump will be placed(or upload will take files from), relative to %kernel.root_dir%',
+                        'Dump destination (or upload source), relative to %kernel.root_dir%',
                         '/Resources/language-pack/'
                     ),
                     new InputOption(
@@ -111,6 +117,13 @@ EOF
         }
 
         if ($input->getOption('upload') === true) {
+            $projectName = $input->getArgument('project');
+            $projectId = $input->getOption('project-id');
+
+            if (!$projectId) {
+                $input->setOption('project-id', strtolower($projectName));
+            }
+
             $this->upload($input, $output);
         }
 
@@ -125,15 +138,15 @@ EOF
      */
     protected function upload(InputInterface $input, OutputInterface $output)
     {
-        $projectId        = $input->getArgument('project');
-        $languagePackPath = $this->getLangPackDir($projectId);
+        $projectName        = $input->getArgument('project');
+        $languagePackPath = $this->getLangPackDir($projectName);
 
         /** @var  $adapter */
         $adapter = $this->getContainer()->get(
             sprintf('oro_translation.uploader.%s_adapter', $input->getArgument('adapter'))
         );
 
-        $adapter->setProjectId(strtolower($projectId));
+        $adapter->setProjectId($input->getOption('project-id'));
 
         /** @var TranslationUploader $uploader */
         $uploader = $this->getContainer()->get('oro_translation.uploader');

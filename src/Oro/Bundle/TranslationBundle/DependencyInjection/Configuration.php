@@ -29,6 +29,16 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('api')
+                    ->children()
+                        ->arrayNode('crowdin')
+                            ->children()
+                                ->scalarNode('key')->end()
+                                ->scalarNode('endpoint')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
         return $treeBuilder;
     }

@@ -51,7 +51,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
                 'POST'
             );
         } catch (\Exception $e) {
-            //$this->notifyProgress($e->getMessage());
+            $this->notifyProgress($e->getMessage());
             return false;
         }
 
@@ -71,9 +71,9 @@ class CrowdinAdapter extends AbstractAPIAdapter
 
             $i++;
             $this->notifyProgress(
-                sprintf('%0.2f%%', $i*100 / count($dirs)),
+                sprintf('%0.2f%%', $i*100 / count($dirs)) .
                 sprintf(
-                    $result ? 'Directory <info>%s</info> created' : 'Directory <info>%s</info> already exists',
+                    $result ? ' Directory <info>%s</info> created' : '',
                     $dir
                 )
             );
