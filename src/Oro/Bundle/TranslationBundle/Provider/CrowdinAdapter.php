@@ -4,6 +4,9 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 class CrowdinAdapter extends AbstractAPIAdapter
 {
+    /** Crowdin folder exists */
+    const DIR_ALREADY_EXISTS = 13;
+
     /**
      * @var string
      */
@@ -14,7 +17,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
      *
      * @param string $remotePath Path in remove API service
      * @param string $file
-     * @param string $mode 'add' or 'update'
+     * @param string $mode       'add' or 'update'
      *
      * @return mixed array with xml strings
      */
@@ -23,7 +26,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
         $result = $this->request(
             sprintf('/project/%s/%s-file', $this->projectId, $mode),
             array(
-                sprintf('files[%s]', $remotePath) => '@'.$file,
+                sprintf('files[%s]', $remotePath) => '@' . $file,
             ),
             'POST'
         );
@@ -38,18 +41,13 @@ class CrowdinAdapter extends AbstractAPIAdapter
      */
     public function addDirectory($dir)
     {
-        try {
-            $this->request(
-                '/project/'.$this->projectId.'/add-directory',
-                array(
-                    'name' => $dir,
-                ),
-                'POST'
-            );
-        } catch (\Exception $e) {
-            $this->notifyProgress($e->getMessage());
-            return false;
-        }
+        $this->request(
+            '/project/' . $this->projectId . '/add-directory',
+            array(
+                'name' => $dir,
+            ),
+            'POST'
+        );
 
         return true;
     }
@@ -57,22 +55,31 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * @param array $dirs
      *
+     * @throws \Exception
      * @return $this
      */
     public function createDirectories($dirs)
     {
         $i = 0;
         foreach ($dirs as $dir) {
-            $result = $this->addDirectory($dir);
+            try {
+                $i++;
+                $this->addDirectory($dir);
 
-            $i++;
-            $this->notifyProgress(
-                sprintf('%0.2f%%', $i*100 / count($dirs)) .
-                sprintf(
-                    $result ? ' Directory <info>%s</info> created' : '',
-                    $dir
-                )
-            );
+                $this->notifyProgress(
+                    sprintf('%0.2f%%', $i * 100 / count($dirs)) .
+                    sprintf(' Directory <info>%s</info> created', $dir)
+                );
+            } catch (\Exception $e) {
+                if ($e->getCode() !== self::DIR_ALREADY_EXISTS) {
+                    throw $e;
+                }
+
+                $this->notifyProgress(
+                    sprintf('%0.2f%%', $i * 100 / count($dirs)) .
+                    sprintf(' Directory <info>%s</info> already exists, skipping...', $dir)
+                );
+            }
         }
 
         return $this;
@@ -87,21 +94,25 @@ class CrowdinAdapter extends AbstractAPIAdapter
     public function uploadFiles($files, $mode)
     {
         $results = array();
-        $failed = array();
-        $i = 0;
+        $failed  = array();
+        $i       = 0;
 
         foreach ($files as $apiPath => $filePath) {
             try {
                 $results[] = $this->addFile($apiPath, $filePath, $mode);
-                $message = sprintf('File <info>%s</info> uploaded', $apiPath);
+                $message   = sprintf('File <info>%s</info> uploaded', $apiPath);
             } catch (\Exception $e) {
                 $failed[$filePath] = $e->getMessage();
-                $message = sprintf('File <info>%s</info> upload failed!', $apiPath);
+                $message           = sprintf(
+                    'File <info>%s</info> upload failed: <error>%s</error>',
+                    $apiPath,
+                    $e->getMessage()
+                );
             }
 
             $i++;
             $this->notifyProgress(
-                sprintf('%0.2f%%', $i*100 / count($files)),
+                sprintf('%0.2f%%', $i * 100 / count($files)),
                 $message
             );
         }
@@ -142,8 +153,8 @@ class CrowdinAdapter extends AbstractAPIAdapter
             $currentDir = array();
             foreach ($_dirs as $dir) {
                 $currentDir[] = $dir;
-                $path = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $currentDir);
-                $dirs[$path] = $path;
+                $path         = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $currentDir);
+                $dirs[$path]  = $path;
             }
         }
 

@@ -36,7 +36,7 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
     {
         $mode = 'add';
         $files = array(
-            '/some/path/to/file.yml' => '/api/path/test.yml',
+            'some/path/to/file.yml' => 'api/path/test.yml',
         );
 
         $dirs = array('/some', '/some/path', '/some/path/to');
