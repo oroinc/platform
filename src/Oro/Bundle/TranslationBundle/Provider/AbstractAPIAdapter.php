@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Symfony\Component\DependencyInjection\SimpleXMLElement;
-
 abstract class AbstractAPIAdapter
 {
     /**

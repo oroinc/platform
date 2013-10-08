@@ -93,14 +93,16 @@ class CrowdinAdapter extends AbstractAPIAdapter
         foreach ($files as $apiPath => $filePath) {
             try {
                 $results[] = $this->addFile($apiPath, $filePath, $mode);
+                $message = sprintf('File <info>%s</info> uploaded', $apiPath);
             } catch (\Exception $e) {
                 $failed[$filePath] = $e->getMessage();
+                $message = sprintf('File <info>%s</info> upload failed!', $apiPath);
             }
 
             $i++;
             $this->notifyProgress(
                 sprintf('%0.2f%%', $i*100 / count($files)),
-                sprintf('File <info>%s</info> uploaded', $apiPath)
+                $message
             );
         }
 
@@ -136,7 +138,6 @@ class CrowdinAdapter extends AbstractAPIAdapter
         $dirs = array();
         foreach ($files as $apiPath => $filePath) {
             $_dirs = explode(DIRECTORY_SEPARATOR, dirname($apiPath));
-            array_shift($_dirs);
 
             $currentDir = array();
             foreach ($_dirs as $dir) {
