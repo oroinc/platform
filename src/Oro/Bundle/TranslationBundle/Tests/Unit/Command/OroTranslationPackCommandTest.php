@@ -158,6 +158,9 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             array('some-api-key', 'http://service-url.tld/api/')
         );
 
+        $adapterMock->expects($this->once())
+            ->method('setProjectId');
+
         $uploaderMock = $this->getMock(
             'Oro\Bundle\TranslationBundle\Provider\TranslationUploader',
             array(),

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Symfony\Component\DependencyInjection\SimpleXMLElement;
+
 abstract class AbstractAPIAdapter
 {
     /**
@@ -42,7 +44,7 @@ abstract class AbstractAPIAdapter
      *
      * @throws \Exception
      *
-     * @return boolean
+     * @return \SimpleXMLElement
      */
     protected function request($uri, $data = array(), $method = 'GET')
     {

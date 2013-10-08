@@ -4,9 +4,6 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 class CrowdinAdapter extends AbstractAPIAdapter
 {
-    /** Crowdin folder exists */
-    const DIR_ALREADY_EXISTS = 13;
-
     /**
      * @var string
      */
@@ -17,7 +14,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
      *
      * @param string $remotePath Path in remove API service
      * @param string $file
-     * @param $mode
+     * @param string $mode 'add' or 'update'
      *
      * @return mixed array with xml strings
      */
@@ -37,13 +34,12 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * @param string $dir
      *
-     * @throws \Exception
      * @return bool
      */
     public function addDirectory($dir)
     {
         try {
-            $result = $this->request(
+            $this->request(
                 '/project/'.$this->projectId.'/add-directory',
                 array(
                     'name' => $dir,
@@ -83,8 +79,8 @@ class CrowdinAdapter extends AbstractAPIAdapter
     }
 
     /**
-     * @param $files
-     * @param $mode
+     * @param string $files
+     * @param string $mode 'add' or 'update'
      *
      * @return array
      */
@@ -124,7 +120,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
             throw new \Exception($message, (int)$result->code);
         }
 
-        return true;
+        return $result;
     }
 
     /**
@@ -140,10 +136,13 @@ class CrowdinAdapter extends AbstractAPIAdapter
         $dirs = array();
         foreach ($files as $apiPath => $filePath) {
             $_dirs = explode(DIRECTORY_SEPARATOR, dirname($apiPath));
-            $currentDir = '';
+            array_shift($_dirs);
+
+            $currentDir = array();
             foreach ($_dirs as $dir) {
-                $currentDir .= '/' . $dir;
-                $dirs[$currentDir] = $currentDir;
+                $currentDir[] = $dir;
+                $path = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $currentDir);
+                $dirs[$path] = $path;
             }
         }
 
