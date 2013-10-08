@@ -27,6 +27,11 @@ class CrowdinAdapter extends AbstractAPIAdapter
             sprintf('/project/%s/%s-file', $this->projectId, $mode),
             array(
                 sprintf('files[%s]', $remotePath) => '@' . $file,
+                sprintf('export_patterns[%s]', $remotePath) => preg_replace(
+                    '#\.[\w_]{2,5}\.(\w+)$#',
+                    '.%locale_with_underscore%.$1',
+                    $remotePath
+                ),
             ),
             'POST'
         );
