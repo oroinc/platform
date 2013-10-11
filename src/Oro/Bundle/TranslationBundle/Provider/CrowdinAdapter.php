@@ -158,7 +158,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
             $currentDir = array();
             foreach ($_dirs as $dir) {
                 $currentDir[] = $dir;
-                $path         = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $currentDir);
+                $path         = implode('/', $currentDir); // crowdin understand only "/" as directory separator :)
                 $dirs[$path]  = $path;
             }
         }

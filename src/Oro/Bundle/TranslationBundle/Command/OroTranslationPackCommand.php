@@ -217,10 +217,10 @@ EOF
      */
     protected function getLangPackDir($projectNamespace, $bundleName = null)
     {
-        $path = $this->path . $projectNamespace . '/';
+        $path = $this->path . $projectNamespace . DIRECTORY_SEPARATOR;
 
         if (!is_null($bundleName)) {
-            $path .= $bundleName . '/translations';
+            $path .= $bundleName . DIRECTORY_SEPARATOR . 'translations';
         }
 
         return $path;

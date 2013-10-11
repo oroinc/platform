@@ -37,7 +37,9 @@ class TranslationUploader
         /** $file \SplFileInfo */
         $files = array();
         foreach ($finder->files() as $file) {
-            $files[ str_replace($dir, '', (string)$file) ] = (string)$file;
+            // crowdin understand only "/" as directory separator :)
+            $apiPath = str_replace(array($dir, DIRECTORY_SEPARATOR), array('', '/'), (string)$file);
+            $files[ $apiPath ] = (string)$file;
         }
 
         if (!is_null($progressCallback)) {
