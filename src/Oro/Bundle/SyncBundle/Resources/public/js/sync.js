@@ -3,6 +3,7 @@ define(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/messenger'],
 function ($, _, Backbone, __, messenger) {
     'use strict';
     var service,
+        subscriptions = [],
 
         /**
          * Oro.Synchronizer - saves provided sync service internally and
@@ -23,28 +24,20 @@ function ($, _, Backbone, __, messenger) {
                 throw new Error('Synchronization service does not fit requirements');
             }
             service = serv;
-            var onConnectionEstablished = function(){
+            var onConnection = function (){
                 messenger.notificationFlashMessage('success', __('sync.connection.established'));
             };
-            service.on('connection_lost', function(data){
+            service.on('connection_lost', function (data){
                 data = data || {};
                 var attempt = data.retries || 0;
                 messenger.notificationMessage('error',
                     __('sync.connection.lost', data, attempt), {flash: Boolean(attempt)});
-                service.off('connection_established', onConnectionEstablished)
-                    .once('connection_established', onConnectionEstablished);
+                service.off(null, onConnection).once('connection_established', onConnection);
             });
-            return sync;
-        },
-
-        /**
-         * Checks if backend synchronization service is defined, if not - throws Error
-         * @throws Error
-         */
-        checkService = function() {
-            if (_.isUndefined(service)) {
-                throw new Error('Synchronization service is not defined');
+            while (subscriptions.length) {
+                service.subscribe.apply(service, subscriptions.shift());
             }
+            return sync;
         },
 
         /**
@@ -55,7 +48,7 @@ function ($, _, Backbone, __, messenger) {
             if (model.id) {
                 // saves bound function in order to have same callback in unsubscribeModel call
                 model['[[SetCallback]]'] = (model['[[SetCallback]]'] || _.bind(model.set, model));
-                service.subscribe(_.result(model, 'url'), model['[[SetCallback]]']);
+                sync.subscribe(_.result(model, 'url'), model['[[SetCallback]]']);
                 model.on('remove', unsubscribeModel);
             }
         },
@@ -70,7 +63,7 @@ function ($, _, Backbone, __, messenger) {
                 if (_.isFunction(model['[[SetCallback]]'])) {
                     args.push(model['[[SetCallback]]']);
                 }
-                service.unsubscribe.apply(service, args);
+                sync.unsubscribe.apply(service, args);
             }
         },
 
@@ -79,8 +72,8 @@ function ($, _, Backbone, __, messenger) {
             error: function (collection) {
                 _.each(collection.models, unsubscribeModel);
             },
-            reset: function(collection, options) {
-                _.each(options.previousModels, function(model) {
+            reset: function (collection, options) {
+                _.each(options.previousModels, function (model) {
                     model.urlRoot = collection.url;
                     unsubscribeModel(model);
                 });
@@ -95,7 +88,6 @@ function ($, _, Backbone, __, messenger) {
      * @returns {oro.sync}
      */
     sync.keepRelevant = function (obj) {
-        checkService();
         if (obj instanceof Backbone.Collection) {
             _.each(obj.models, subscribeModel);
             obj.on(events);
@@ -112,7 +104,6 @@ function ($, _, Backbone, __, messenger) {
      * @returns {oro.sync}
      */
     sync.stopTracking = function (obj) {
-        checkService();
         if (obj instanceof Backbone.Collection) {
             _.each(obj.models, unsubscribeModel);
             obj.off(events);
@@ -125,17 +116,45 @@ function ($, _, Backbone, __, messenger) {
     /**
      * Makes service to give a try to connect to server
      */
-    sync.reconnect = function() {
+    sync.reconnect = function () {
         service.connect();
     };
 
     /**
-     * Fetches sync service
+     * Subscribes to listening server messages of a channel
      *
-     * @returns {oro.sync.Wamp}
+     * Safe wrapper over service which provides server connection
+     *
+     * @param {string} channel name of a channel
+     * @param {Function} callback
      */
-    sync.getService = function() {
-        return service;
+    sync.subscribe = function () {
+        var args = _.toArray(arguments);
+        if (service) {
+            service.subscribe.apply(service, args);
+        } else {
+            subscriptions.push(args)
+        }
+    };
+
+    /**
+     * Unsubscribes from listening server messages of a channel
+     *
+     * Safe wrapper over service which provides server connection
+     *
+     * @param {string} channel name of a channel
+     * @param {Function?} callback
+     */
+    sync.unsubscribe = function (channel, callback) {
+        var cleaner, args = _.toArray(arguments);
+        if (service) {
+            service.unsubscribe.apply(service, args);
+        } else {
+            cleaner = !callback ?
+                function (args) { return channel === args[0] } :
+                function (args) { return channel === args[0] && callback === args[1] };
+            subscriptions = _.reject(subscriptions, cleaner);
+        }
     };
 
     return sync;

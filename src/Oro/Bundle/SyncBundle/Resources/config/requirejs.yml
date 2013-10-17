@@ -22,10 +22,8 @@ config:
                 - 'cryptojs/pbkdf2'
             exports: 'ab'
     map:
-        '*':
+        'autobahn':
             'when': 'oro/when-setup'
-        'oro/when-setup':
-            'when': 'when'
     paths:
         'cryptojs/core': 'bundles/orosync/lib/cryptojs/core-min.js'
         'cryptojs/enc-base64': 'bundles/orosync/lib/cryptojs/enc-base64-min.js'
