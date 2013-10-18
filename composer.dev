@@ -4,8 +4,8 @@
     "homepage": "https://github.com/orocrm/platform.git",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.3,!=5.3.8",
-        "symfony/symfony": "v2.3.6",
+        "php": ">=5.3.3",
+        "symfony/symfony": "v2.3.4",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.2.*",
         "doctrine/data-fixtures": "@dev",
@@ -34,7 +34,7 @@
         "besimple/soap-bundle": "dev-master#57a05d5c82f1401e9ab2aa2e89f94d72e602d2c9",
         "ddeboer/data-import": "dev-master",
         "stof/doctrine-extensions-bundle": "dev-master",
-        "escapestudios/wsse-authentication-bundle": "2.1.x-dev",
+        "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
         "liip/imagine-bundle": "dev-master",
         "leafo/lessphp": "dev-master",
         "willdurand/expose-translation-bundle": "0.2.*@dev",
@@ -45,11 +45,11 @@
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "dev-master",
         "lexik/maintenance-bundle": "dev-master",
-        "sylius/flow-bundle": "dev-master"
+        "sylius/flow-bundle": "0.1.*"
     },
     "minimum-stability": "dev",
     "autoload": {
-        "psr-0": {
+        "psr-0": { 
               "Oro\\Bundle": "src/"
         }
     }
