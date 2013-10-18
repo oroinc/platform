@@ -156,6 +156,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
          * @param {String} encodedStateData
          */
         defaultAction: function(page, encodedStateData) {
+            this.beforeAction();
             this.beforeDefaultAction();
             this.encodedStateData = encodedStateData;
             this.url = page;
@@ -166,6 +167,21 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
                 this.loadPage();
             }
             this.skipAjaxCall = false;
+        },
+
+        /**
+         * Before any navigation changes triggers event
+         */
+        beforeAction: function() {
+            mediator.trigger("hash_navigation_request:before", this);
+        },
+
+        /**
+         * Shows that content changing is in a process
+         * @returns {boolean}
+         */
+        isInAction: function() {
+            return this.loadingMask.displayed;
         },
 
         beforeDefaultAction: function() {
@@ -413,7 +429,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
          */
         showOutdatedMessage: function(url) {
             //this.clearCacheTimer();
-            if (this.useCache && this.url === url) {
+            if (this.url === url) {
                 if (!this.notificationMessage) {
                     var message = __("Content of the page is outdated, please %click here% to refresh the page");
                     this.outdatedMessage = message.replace(/%(.*)%/,"<span class='page-refresh'>$1</span>");
