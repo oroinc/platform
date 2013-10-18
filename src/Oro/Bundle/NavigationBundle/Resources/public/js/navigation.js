@@ -141,7 +141,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
 
         formState: '',
 
-        cacheTimer: null,
+//        cacheTimer: null,
 
         confirmModal: null,
 
@@ -243,7 +243,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
                     widgetManager.resetWidgets();
                     this.tempCache = cacheData;
                     this.handleResponse(cacheData, {fromCache: true});
-                    this.validatePageCache(cacheData);
+                    //this.validatePageCache(cacheData);
                     this.afterRequest();
                 } else {
                     var pageUrl = this.baseUrl + this.url;
@@ -315,7 +315,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
             }
         },
 
-        initCacheTimer: function() {
+        /*initCacheTimer: function() {
             this.clearCacheTimer();
             this.cacheTimer = setInterval(_.bind(function() {
                 var cacheData = this.getCachedData();
@@ -332,18 +332,18 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
                     }
                 }
             }, this), 5000);
-        },
+        },*/
 
-        clearCacheTimer: function() {
+        /*clearCacheTimer: function() {
             clearInterval(this.cacheTimer);
-        },
+        },*/
 
         /**
          * Validate page cache comparing cached content md5 with the one from server
          *
          * @param cacheData
          */
-        validateMd5Request: function(cacheData) {
+        /*validateMd5Request: function(cacheData) {
             var pageUrl = this.baseUrl + this.url;
             var url = this.url;
             var params = {};
@@ -361,7 +361,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
                     }
                 }, this)
             });
-        },
+        },*/
 
         /**
          * Validate grid state based on grid collection
@@ -369,7 +369,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
          * @param cacheData
          * @return true if grid cache is found and false otherwise
          */
-        validateGridStates: function(cacheData) {
+        /*validateGridStates: function(cacheData) {
             if (cacheData.states) {
                 var formState = cacheData.states.getObjectCache('form');
                 var girdState = cacheData.states.getObjectCache('grid');
@@ -379,9 +379,9 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
                     var cachedCollection = girdState['collection'];
                     var url = this.url;
                     var options = {ignoreSaveStateInUrl: true};
-                    /**
+                    / **
                      * Comparing cached collection with fetched from server
-                     */
+                     * /
                     options.success = _.bind(function () {
                         if (!_.isEqual(cachedCollection.toJSON(),collection.toJSON())) {
                             this.showOutdatedMessage(url);
@@ -394,17 +394,17 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
             }
 
             return false;
-        },
+        },*/
 
         /**
          * Validate page cache to check if its up to date. Comparing grid state(if any) and content md5
          *
          * @param cacheData
          */
-        validatePageCache: function(cacheData) {
+        /*validatePageCache: function(cacheData) {
             this.validateGridStates(cacheData);
             this.validateMd5Request(cacheData);
-        },
+        },*/
 
         /**
          * Show "refresh page" message
@@ -412,7 +412,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
          * @param url
          */
         showOutdatedMessage: function(url) {
-            this.clearCacheTimer();
+            //this.clearCacheTimer();
             if (this.useCache && this.url === url) {
                 if (!this.notificationMessage) {
                     var message = __("Content of the page is outdated, please %click here% to refresh the page");
@@ -761,7 +761,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
             this.loadingMask.show();
             this.gridRoute = ''; //clearing grid router
             this.tempCache = '';
-            clearInterval(this.cacheTimer);
+//            clearInterval(this.cacheTimer);
             if (this.notificationMessage) {
                 this.notificationMessage.close();
             }
@@ -777,7 +777,7 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
          */
         afterRequest: function() {
             this.formState = '';
-            this.initCacheTimer();
+            //this.initCacheTimer();
         },
 
         /**
