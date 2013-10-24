@@ -37,6 +37,7 @@ class AclConfigurationPass implements CompilerPassInterface
         $this->configureDefaultAclVoter($container);
     }
 
+
     /**
      * @param ContainerBuilder $container
      */
