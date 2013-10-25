@@ -35,7 +35,7 @@
 		"besimple/soap-bundle": "dev-master#57a05d5c82f1401e9ab2aa2e89f94d72e602d2c9",
 		"ddeboer/data-import": "dev-master#257df19c0a48e821197a8c51bf4f06bdd4ff4faa",
 		"stof/doctrine-extensions-bundle": "dev-master#6e8dc798687963ffc4e4e0dfa687b361699855a9",
-		"escapestudios/wsse-authentication-bundle": "2.1.x-dev#45a37e57e3cb69e2e0a68cabd53465f9c918d33a",
+		"escapestudios/wsse-authentication-bundle": "2.1.x-dev#408ae53315674582f715da56bc37498dbfd696ea",
 		"liip/imagine-bundle": "dev-master#51e28873a5a831cead026181faa898f8091f813e",
 		"leafo/lessphp": "dev-master#6e8e724fc7edcedc83a52cd18acc5b72f7dd3c40",
 		"willdurand/expose-translation-bundle": "0.2.1",
