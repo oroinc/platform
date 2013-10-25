@@ -9,7 +9,9 @@
         "symfony/symfony": ">=2.1",
         "genemu/form-bundle": "2.1.*",
         "oro/search-bundle": "dev-master",
-        "oro/user-bundle": "dev-master"
+        "oro/user-bundle": "dev-master",
+        "oro/requirejs-bundle": "dev-master",
+        "oro/ui": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\FormBundle": "" }

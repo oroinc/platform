@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Metadata\MetadataFactory;
 
@@ -20,7 +19,6 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 
@@ -46,11 +44,6 @@ class ConfigManager
      * @var MetadataFactory
      */
     protected $metadataFactory;
-
-    /**
-     * @var ServiceLink
-     */
-    protected $emLink;
 
     /**
      * @var EventDispatcher
@@ -98,21 +91,20 @@ class ConfigManager
     protected $configChangeSets;
 
     /**
-     * @param MetadataFactory $metadataFactory
-     * @param EventDispatcher $eventDispatcher
-     * @param ServiceLink     $providerBagLink
-     * @param ServiceLink     $emLink
-     * @param ServiceLink     $securityLink
+     * @param MetadataFactory    $metadataFactory
+     * @param EventDispatcher    $eventDispatcher
+     * @param ServiceLink        $providerBagLink
+     * @param ConfigModelManager $modelManager
+     * @param AuditManager       $auditManager
      */
     public function __construct(
         MetadataFactory $metadataFactory,
         EventDispatcher $eventDispatcher,
         ServiceLink $providerBagLink,
-        ServiceLink $emLink,
-        ServiceLink $securityLink
+        ConfigModelManager $modelManager,
+        AuditManager $auditManager
     ) {
         $this->metadataFactory = $metadataFactory;
-        $this->emLink          = $emLink;
         $this->eventDispatcher = $eventDispatcher;
 
         $this->providerBag      = $providerBagLink;
@@ -121,8 +113,8 @@ class ConfigManager
         $this->originalConfigs  = new ArrayCollection;
         $this->configChangeSets = new ArrayCollection;
 
-        $this->modelManager = new ConfigModelManager($emLink);
-        $this->auditManager = new AuditManager($this, $securityLink);
+        $this->modelManager = $modelManager;
+        $this->auditManager = $auditManager;
     }
 
     /**
@@ -210,8 +202,8 @@ class ConfigManager
         }
 
         $result = $this->cache->getConfigurable($className, $fieldName);
-        if ($result === null) {
-            $result = (bool)$this->modelManager->findModel($className, $fieldName);
+        if ($result == null) {
+            $result = (bool) $this->modelManager->findModel($className, $fieldName);
 
             $this->cache->setConfigurable($result, $className, $fieldName);
         }
