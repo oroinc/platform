@@ -1,3 +1,27 @@
+CHANGELOG for 1.0.0-beta2
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-beta2 versions.
+
+* 1.0.0-beta2 (2013-10-28)
+ * Minimum PHP version: PHP 5.4.4
+ * Installer enhancements
+ * Automatic bundles distribution for application
+ * Routes declaration on Bundles level
+ * System Help and Tooltips
+ * RequireJS optimizer utilization
+ * ACL Caching
+
+CHANGELOG for 1.0.0-beta1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-beta1 versions.
+
+* 1.0.0-beta1 (2013-09-30)
+ * New ACL implementation
+ * Emails synchronization via IMAP
+ * Custom entities and fields in usage
+ * Managing relations between entities
+ * Grid views
+
 CHANGELOG for 1.0.0-alpha6
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-alpha6 versions.
