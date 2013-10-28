@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"require": 
 	{
-		"php": ">=5.3.3",
+		"php": ">=5.4.4",
 		"symfony/symfony": "v2.3.4",
 		"doctrine/orm": "2.3.x-dev#08e636368471c4232e83be0abf2f31b35336d641",
 		"doctrine/doctrine-bundle": "dev-master#2ed46398aae1b7699f6fe7467faf54493b4f2a24",
