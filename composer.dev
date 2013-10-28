@@ -4,7 +4,7 @@
     "homepage": "https://github.com/orocrm/platform.git",
     "license": "MIT",
     "require": {
-        "php": ">=5.3.8",
+        "php": ">=5.4.4",
         "symfony/symfony": "v2.3.4",
         "doctrine/orm": ">=2.2.3,<2.4-dev",
         "doctrine/doctrine-bundle": "1.2.*",
@@ -45,11 +45,11 @@
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "dev-master",
         "lexik/maintenance-bundle": "dev-master",
-        "sylius/flow-bundle": "0.1.*"
+        "sylius/flow-bundle": "dev-master"
     },
     "minimum-stability": "dev",
     "autoload": {
-        "psr-0": { 
+        "psr-0": {
               "Oro\\Bundle": "src/"
         }
     }
