@@ -1,0 +1,3 @@
+oro_sidebar_homepage:
+    path:  /hello/{name}
+    defaults: { _controller: OroSidebarBundle:Default:index }

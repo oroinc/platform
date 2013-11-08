@@ -1,0 +1,148 @@
+<style>
+    .sidebar {
+        background-color: #353E49;
+        top: 66px;
+        bottom: 0;
+        width: 35px;
+        position: absolute;
+    }
+
+    .sidebar-maximized {
+        width: 200px;
+    }
+
+    .sidebar-left {
+        left: 0;
+        padding-right: 5px;
+    }
+
+    .sidebar-right {
+        right: 0;
+        padding-left: 5px;
+    }
+
+    .sidebar-resize {
+        background-color: #444;
+        border-left: 1px solid #333;
+        height: 100%;
+        position: absolute;
+        width: 5px;
+    }
+
+    .sidebar-left .sidebar-resize {
+        right: 0;
+    }
+
+    .sidebar-right .sidebar-resize {
+        left: 0;
+    }
+
+    .sidebar-add {
+        width: 30px;
+        height: 30px;
+    }
+
+    .sidebar-add img {
+        height: 16px;
+        width: 16px;
+        margin: 7px;
+    }
+
+    .sidebar-toggle {
+        background-color: #111;
+        width: 100%;
+        height: 15px;
+        position: absolute;
+        bottom: 0;
+    }
+
+    .sidebar-widget, .sidebar-icon {
+        background-color: #353E49;
+        margin-bottom: 2px;
+        width: 100%;
+    }
+
+    .sidebar-icon {
+        height: 30px;
+    }
+
+    .sidebar-icon img {
+        height: 16px;
+        width: 16px;
+        margin: 7px;
+    }
+
+    .sidebar-widget-header {
+        background-color: #2D333B;
+        border: 1px solid #444;
+        color: #fff;
+        font-weight: bolder;
+    }
+
+    .sidebar-widget-header img {
+        height: 16px;
+        width: 16px;
+    }
+
+    .sidebar-widget-content {
+        border-left: 2px solid #444;
+        border-right: 2px solid #444;
+        border-bottom: 2px solid #444;
+        color: #fff;
+    }
+</style>
+
+<script type="text/javascript">
+    window.SIDEBARS_BOOTSTRAP = [
+        {
+            sidebar: {},
+            widgets: [
+                { title: 'Hello world', settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' } },
+                { title: 'Twitter', settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' } },
+                { title: 'Facebook', settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' } },
+                { title: 'Google+', settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' } },
+            ]
+        },
+        {
+            sidebar: {},
+            widgets: [
+                { title: 'Mews', settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' } },
+                { title: 'Other', settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' } },
+                { title: 'Settings', settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' } },
+            ]
+        }
+    ];
+</script>
+<script type="text/javascript">
+    require(['jquery', 'oro/model/sidebar', 'oro/view/sidebar', 'oro/constants'],
+            function($, SidebarModel, SidebarView, Constants) {
+        'use strict';
+
+        $(function () {
+            var leftSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP[0].sidebar, {
+                position: Constants.SIDEBAR_LEFT
+            });
+
+            var rightSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP[1].sidebar, {
+                position: Constants.SIDEBAR_RIGHT
+            });
+
+            var leftSidebarView = new SidebarView({
+                model: leftSidebar,
+                el: '#sidebar-left',
+                $main: $('#main')
+            });
+
+            var rightSidebarView = new SidebarView({
+                model: rightSidebar,
+                el: '#sidebar-right',
+                $main: $('#main')
+            });
+
+            leftSidebar.widgets.reset(SIDEBARS_BOOTSTRAP[0].widgets);
+            rightSidebar.widgets.reset(SIDEBARS_BOOTSTRAP[1].widgets);
+
+            //$('.sidebar').draggable();
+        });
+    });
+</script>

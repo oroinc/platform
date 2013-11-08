@@ -1,0 +1,3 @@
+css:
+  'sidebar':
+      - 'bundles/orosidebar/css/sidebar.css'

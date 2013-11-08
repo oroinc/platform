@@ -1,0 +1,13 @@
+config:
+    paths:
+        'oro/constants': 'bundles/orosidebar/js/constants.js'
+        'oro/model/sidebar': 'bundles/orosidebar/js/model/sidebar.js'
+        'oro/model/widget': 'bundles/orosidebar/js/model/widget.js'
+        'oro/view/sidebar': 'bundles/orosidebar/js/view/sidebar.js'
+        'oro/view/widget': 'bundles/orosidebar/js/view/widget.js'
+        'oro/view/icon': 'bundles/orosidebar/js/view/icon.js'
+        'oro/collection/widget': 'bundles/orosidebar/js/collection/widget.js'
+        'oro/template/sidebar': 'bundles/orosidebar/js/template/sidebar.html'
+        'oro/template/widgetMin': 'bundles/orosidebar/js/template/widgetMin.html'
+        'oro/template/widgetMax': 'bundles/orosidebar/js/template/widgetMax.html'
+        'oro/template/icon': 'bundles/orosidebar/js/template/icon.html'
