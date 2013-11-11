@@ -48,8 +48,14 @@ config:
     map:
         '*':
             'jquery': 'oro/jquery-setup'
+            'jquery-ui': 'oro/jquery-ui-datepicker-l10n'
+            'jquery-ui-timepicker': 'oro/jquery-ui-timepicker-l10n'
         'oro/jquery-setup':
             'jquery': 'jquery'
+        'oro/jquery-ui-datepicker-l10n':
+            'jquery-ui': 'jquery-ui'
+        'oro/jquery-ui-timepicker-l10n':
+            'jquery-ui-timepicker': 'jquery-ui-timepicker'
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
@@ -73,10 +79,13 @@ config:
         'oro/error': 'bundles/oroui/js/error.js'
         'oro/init-layout': 'bundles/oroui/js/init-layout.js'
         'oro/jquery-setup': 'bundles/oroui/js/jquery-setup.js'
+        'oro/jquery-ui-datepicker-l10n': 'bundles/oroui/js/jquery-ui-datepicker-l10n.js'
+        'oro/jquery-ui-timepicker-l10n': 'bundles/oroui/js/jquery-ui-timepicker-l10n.js'
         'oro/layout': 'bundles/oroui/js/layout.js'
         'oro/mediator': 'bundles/oroui/js/mediator.js'
         'oro/messenger': 'bundles/oroui/js/messenger.js'
         'oro/modal': 'bundles/oroui/js/modal.js'
+        'oro/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oro/registry': 'bundles/oroui/js/registry.js'
         'oro/widget-manager': 'bundles/oroui/js/widget-manager.js'
         'oro/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
