@@ -1,11 +1,17 @@
 <div class="sidebar-widget-header">
-    <span>-</span>
+    <a href="#" class="sidebar-widget-header-toggle">
+        <i class="icon-chevron-down icon-white"></i>
+    </a>
     <img src="<%= href %>" alt="<%= title %>"/>
     <span><%= title %></span>
-    &nbsp;
-    <span class="sidebar-widget-settings">S</span>
-    &nbsp;
-    <span class="sidebar-widget-remove">R</span>
+    <span class="sidebar-widget-header-wrap">
+        <a href="#" class="sidebar-widget-settings">
+            <i class="icon-cog icon-white"></i>
+        </a>
+        <a href="#" class="sidebar-widget-remove">
+            <i class="icon-remove icon-white"></i>
+        </a>
+    </span>
 </div>
 <div class="sidebar-widget-content">
     <span><%= settings.content %></span>

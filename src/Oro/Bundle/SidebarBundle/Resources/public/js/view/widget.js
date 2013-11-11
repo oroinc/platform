@@ -8,7 +8,7 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
         templateMax: _.template(WidgetMaxTemplate),
 
         events: {
-            'click .sidebar-widget-header': 'onClickHeader',
+            'click .sidebar-widget-header-toggle': 'onClickToggle',
             'click .sidebar-widget-settings': 'onClickSettings',
             'click .sidebar-widget-remove': 'onClickRemove',
             'mouseleave': 'onHoverOut'
@@ -32,18 +32,23 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
             return this;
         },
 
-        onClickHeader: function () {
+        onClickToggle: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
             this.model.toggleState();
         },
 
         onClickSettings: function (e) {
             e.stopPropagation();
+            e.preventDefault();
 
             Backbone.trigger('setupWidget', this.model.cid);
         },
 
         onClickRemove: function (e) {
             e.stopPropagation();
+            e.preventDefault();
 
             Backbone.trigger('removeWidget', this.model.cid);
         },

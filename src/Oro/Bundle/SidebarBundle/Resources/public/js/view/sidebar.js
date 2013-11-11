@@ -6,8 +6,8 @@ define(['jquery', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/ico
         template: _.template(SidebarTemplate),
 
         events: {
-            'click .sidebar-add': 'onAddClick',
-            'click .sidebar-toggle': 'onToggleClick'
+            'click .sidebar-add': 'onClickAdd',
+            'click .sidebar-toggle': 'onClickToggle'
         },
 
         initialize: function () {
@@ -34,7 +34,10 @@ define(['jquery', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/ico
             Backbone.on('setupWidget', this.onSetupWidget, this);
         },
 
-        onAddClick: function () {
+        onClickAdd: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
             var widget = new WidgetModel({
                 title: Date.now().toString(),
                 settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' }
@@ -43,7 +46,10 @@ define(['jquery', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/ico
             this.model.widgets.push(widget);
         },
 
-        onToggleClick: function () {
+        onClickToggle: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
             this.model.toggleState();
         },
 
