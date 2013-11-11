@@ -4,8 +4,8 @@ define(['backbone', 'oro/constants'], function (Backbone, Constants) {
     var WidgetModel = Backbone.Model.extend({
         defaults: {
             title: '',
-            href: '#',
             settings: {
+                icon: '#',
                 content: ''
             }
         },
@@ -13,6 +13,7 @@ define(['backbone', 'oro/constants'], function (Backbone, Constants) {
         initialize: function () {
             this.state = Constants.WIDGET_MINIMIZED;
             this.stateSnapshot = this.state;
+            this.isDragged = false;
         },
 
         toggleState: function () {

@@ -7,7 +7,7 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/icon'],
         template: _.template(IconTemplate),
 
         events: {
-            'mouseenter': 'onHoverIn'
+            'click': 'onClick'
         },
 
         initialize: function () {
@@ -16,11 +16,19 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/icon'],
 
         render: function () {
             this.$el.html(this.template(this.model.toJSON()));
+            this.$el.attr('data-cid', this.model.cid);
 
             return this;
         },
 
-        onHoverIn: function (e) {
+        onClick: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            if (this.model.isDragged) {
+                return;
+            }
+
             var cord = this.$el.offset();
 
             Backbone.trigger('showWidgetHover', this.model.cid, cord);

@@ -1,5 +1,5 @@
-define(['jquery', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/icon', 'oro/view/widget', 'text!oro/template/sidebar'],
-    function ($, Backbone, Constants, WidgetModel, IconView, WidgetView, SidebarTemplate) {
+define(['jquery', 'jquery-ui', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/icon', 'oro/view/widget', 'text!oro/template/sidebar'],
+    function ($, _jqueryUI, Backbone, Constants, WidgetModel, IconView, WidgetView, SidebarTemplate) {
     'use strict';
 
     var SidebarView = Backbone.View.extend({
@@ -34,6 +34,93 @@ define(['jquery', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/ico
             Backbone.on('setupWidget', this.onSetupWidget, this);
         },
 
+        render: function () {
+            var view = this;
+            var model = view.model;
+
+            view.$el.html(view.template(model.toJSON()));
+
+            if (model.state === Constants.SIDEBAR_MAXIMIZED) {
+                view.$el.addClass('sidebar-maximized');
+            } else {
+                view.$el.removeClass('sidebar-maximized');
+            }
+
+            view.options.$main.css(view.padding, view.$el.width() + 'px');
+
+            if (model.state === Constants.SIDEBAR_MINIMIZED) {
+                return view.renderIcons();
+            } else {
+                return view.renderWidgets();
+            }
+
+            return view;
+        },
+
+        renderIcons: function () {
+            var view = this;
+            var $content = view.$el.find('.sidebar-content');
+
+            _.each(view.iconViews, function (iconView) {
+                iconView.render().delegateEvents();
+
+                $content.append(iconView.$el);
+
+                $content.sortable({
+                    revert: true,
+                    axis: 'y',
+                    containment: 'parent',
+                    start: function(event, ui) {
+                        var cid = ui.item.data('cid');
+                        view.onIconDragStart(cid);
+                    },
+                    stop: function(event, ui) {
+                        var cid = ui.item.data('cid');
+                        view.onIconDragStop(cid);
+
+                        view.reorderWidgets();
+                    }
+                });
+            });
+
+            return view;
+        },
+
+        onIconDragStart: function (cid) {
+            var widget = this.model.widgets.get(cid);
+            if (widget) {
+                widget.isDragged = true;
+            }
+        },
+
+        onIconDragStop: function (cid) {
+            var widget = this.model.widgets.get(cid);
+            if (widget) {
+                widget.isDragged = false;
+            }
+        },
+
+        reorderWidgets: function () {
+            var view = this;
+            var $content = view.$el.find('.sidebar-content');
+
+            var ids = $content.sortable('toArray', { attribute: 'data-cid' });
+
+            console.log('Widget order:', ids);
+        },
+
+        renderWidgets: function () {
+            var view = this;
+            var $content = view.$el.find('.sidebar-content');
+
+            _.each(view.widgetViews, function (widgetView) {
+                widgetView.render().delegateEvents();
+                $content.append(widgetView.$el);
+            });
+
+            return view;
+        },
+
         onClickAdd: function (e) {
             e.stopPropagation();
             e.preventDefault();
@@ -51,36 +138,6 @@ define(['jquery', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/ico
             e.preventDefault();
 
             this.model.toggleState();
-        },
-
-        render: function () {
-            var view = this;
-
-            this.$el.html(this.template(this.model.toJSON()));
-
-            if (this.model.state === Constants.SIDEBAR_MAXIMIZED) {
-                this.$el.addClass('sidebar-maximized');
-            } else {
-                this.$el.removeClass('sidebar-maximized');
-            }
-
-            this.options.$main.css(this.padding, this.$el.width() + 'px');
-
-            var $content = this.$el.find('.sidebar-content');
-
-            if (this.model.state === Constants.SIDEBAR_MINIMIZED) {
-                _.each(this.iconViews, function (iconView) {
-                    iconView.render().delegateEvents();
-                    $content.append(iconView.$el);
-                });
-            } else {
-                _.each(this.widgetViews, function (widgetView) {
-                    widgetView.render().delegateEvents();
-                    $content.append(widgetView.$el);
-                });
-            }
-
-            return this;
         },
 
         onWidgetsReset: function () {
@@ -189,12 +246,11 @@ define(['jquery', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/ico
             }
 
             var settings = widget.get('settings');
-
             settings.content += ' ' + Date.now();
 
             widget.set({ settings: settings }, { silent: true });
             widget.trigger('change');
-        }
+        },
     });
 
     return SidebarView;
