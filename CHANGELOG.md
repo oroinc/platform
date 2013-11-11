@@ -1,3 +1,15 @@
+CHANGELOG for 1.0.0-beta3
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-beta3 versions.
+
+* 1.0.0-beta3 (2013-11-11)
+ * Upgrade the Symfony framework to version 2.3.6
+ * Oro Calendar
+ * Email Communication
+ * Removed bundle dependencies on application
+ * One-to-many and many-to-many relations between extended/custom entities
+ * Localizations and Internationalization of input and output
+
 CHANGELOG for 1.0.0-beta2
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-beta2 versions.
