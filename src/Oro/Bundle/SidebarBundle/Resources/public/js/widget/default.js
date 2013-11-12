@@ -14,5 +14,13 @@ define(['jquery', 'backbone'], function ($, Backbone) {
         }
     });
 
+    DefaultView.defaults = {
+        title: 'Default',
+        icon: '#',
+        settings: function () {
+            return {};
+        }
+    };
+
     return DefaultView;
 });

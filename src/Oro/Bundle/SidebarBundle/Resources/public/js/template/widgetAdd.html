@@ -1,0 +1,13 @@
+<div title="Add widget">
+    <p>Select widget to add:</p>
+    <div class="sidebar-widgetadd-widgets">
+        <ol>
+            <% _.each(obj.widgets, function (widget) { %>
+            <li class="ui-state-default" data-moduleid="<%= widget.module %>">
+                <img src="<%= widget.icon %>"/>
+                <span><%= widget.title %></span>
+            </li>
+            <% }); %>
+        </ol>
+    </div>
+</div>

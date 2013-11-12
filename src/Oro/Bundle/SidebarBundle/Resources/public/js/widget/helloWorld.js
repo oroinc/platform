@@ -14,5 +14,15 @@ define(['jquery', 'backbone'], function ($, Backbone) {
         }
     });
 
+    HelloWorldView.defaults = {
+        title: 'Hello world',
+        icon: 'http://i214.photobucket.com/albums/cc237/xFlyer/gmail-pencil16.png',
+        settings: function () {
+            return {
+                content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
+            };
+        }
+    };
+
     return HelloWorldView;
 });

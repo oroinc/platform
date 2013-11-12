@@ -114,6 +114,42 @@
         border-bottom: 5px solid #444;
         color: #fff;
     }
+
+    /*.sidebar-widgetadd*/
+
+    .sidebar-widgetadd {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .sidebar-widgetadd-widgets {
+        overflow-x: hidden;
+        overflow-y: scroll;
+        height: 180px;
+    }
+
+    .sidebar-widgetadd-widgets ol {
+        list-style-type: none;
+        margin: 0;
+    }
+
+    .sidebar-widgetadd-widgets li {
+        padding: 10px;
+    }
+
+    .sidebar-widgetadd-widgets .ui-selecting {
+        background: #353E49;
+        color: white;
+    }
+
+    .sidebar-widgetadd-widgets .ui-selected {
+        background: #2D333B;
+        color: white;
+    }
 </style>
 
 <script type="text/javascript">
@@ -130,7 +166,17 @@
                             title: 'Hello world',
                             icon: iconGmail,
                             module: 'oro/widget/helloWorld'
-                        }
+                        },
+                        {
+                            title: 'Foo',
+                            icon: iconSkype,
+                            module: 'oro/widget/helloWorld'
+                        },
+                        {
+                            title: 'Bar',
+                            icon: iconRss,
+                            module: 'oro/widget/helloWorld'
+                        },
                     ]
                 },
                 widgets: [

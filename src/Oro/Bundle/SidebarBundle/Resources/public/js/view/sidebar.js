@@ -10,11 +10,11 @@ define(function (require) {
 
     var IconView = require('oro/view/icon');
     var WidgetView = require('oro/view/widget');
+    var WidgetAddView = require('oro/view/widgetAdd');
 
     var SidebarTemplate = require('text!oro/template/sidebar');
     var WidgetRemoveDialogTemplate = require('text!oro/template/widgetRemoveDialog');
     var WidgetSetupDialogTemplate = require('text!oro/template/widgetSetupDialog');
-    var WidgetAddDialogTemplate = require('text!oro/template/widgetAddDialog');
 
     var SidebarView = Backbone.View.extend({
         template: _.template(SidebarTemplate),
@@ -25,27 +25,29 @@ define(function (require) {
         },
 
         initialize: function () {
-            this.iconViews = {};
-            this.hoverViews = {};
-            this.widgetViews = {};
+            var view = this;
 
-            this.padding = this.model.position === Constants.SIDEBAR_LEFT ? 'padding-left' : 'padding-right';
+            view.iconViews = {};
+            view.hoverViews = {};
+            view.widgetViews = {};
 
-            this.model.on('change', this.render, this);
+            view.padding = view.model.position === Constants.SIDEBAR_LEFT ? 'padding-left' : 'padding-right';
 
-            this.model.widgets.on('reset', this.onWidgetsReset, this);
-            this.model.widgets.on('reset', this.render, this);
+            view.listenTo(view.model, 'change', view.render);
 
-            this.model.widgets.on('add', this.onWidgetAdded, this);
-            this.model.widgets.on('add', this.render, this);
+            view.listenTo(view.model.widgets, 'reset', view.onWidgetsReset);
+            view.listenTo(view.model.widgets, 'reset', view.render);
 
-            this.model.widgets.on('remove', this.onWidgetRemoved, this);
-            this.model.widgets.on('remove', this.render, this);
+            view.listenTo(view.model.widgets, 'add', view.onWidgetAdded);
+            view.listenTo(view.model.widgets, 'add', view.render);
 
-            Backbone.on('showWidgetHover', this.onShowWidgetHover, this);
-            Backbone.on('hideWidgetHover', this.onHideWidgetHover, this);
-            Backbone.on('removeWidget', this.onRemoveWidget, this);
-            Backbone.on('setupWidget', this.onSetupWidget, this);
+            view.listenTo(view.model.widgets, 'remove', view.onWidgetRemoved);
+            view.listenTo(view.model.widgets, 'remove', view.render);
+
+            view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
+            view.listenTo(Backbone, 'hideWidgetHover', view.onHideWidgetHover);
+            view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
+            view.listenTo(Backbone, 'setupWidget', view.onSetupWidget);
         },
 
         render: function () {
@@ -100,6 +102,18 @@ define(function (require) {
             return view;
         },
 
+        renderWidgets: function () {
+            var view = this;
+            var $content = view.$el.find('.sidebar-content');
+
+            _.each(view.widgetViews, function (widgetView) {
+                widgetView.render().delegateEvents();
+                $content.append(widgetView.$el);
+            });
+
+            return view;
+        },
+
         onIconDragStart: function (cid) {
             var widget = this.model.widgets.get(cid);
             if (widget) {
@@ -123,44 +137,18 @@ define(function (require) {
             console.log('Widget order:', ids);
         },
 
-        renderWidgets: function () {
-            var view = this;
-            var $content = view.$el.find('.sidebar-content');
-
-            _.each(view.widgetViews, function (widgetView) {
-                widgetView.render().delegateEvents();
-                $content.append(widgetView.$el);
-            });
-
-            return view;
-        },
-
         onClickAdd: function (e) {
+            var view = this;
+            var model = view.model;
+
             e.stopPropagation();
             e.preventDefault();
 
-            var $dialog = $(WidgetAddDialogTemplate).dialog({
-                modal: true,
-                resizable: false,
-                height: 150,
-                buttons: {
-                    'Add': function () {
-                        var widget = new WidgetModel({
-                            title: Date.now().toString(),
-                            settings: {
-                                content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
-                            }
-                        });
-
-                        this.model.widgets.push(widget);
-
-                        $dialog.dialog('close');
-                    },
-                    Cancel: function () {
-                        $dialog.dialog('close');
-                    }
-                }
+            var widgetAddView = new WidgetAddView({
+                model: model
             });
+
+            widgetAddView.render();
         },
 
         onClickToggle: function (e) {

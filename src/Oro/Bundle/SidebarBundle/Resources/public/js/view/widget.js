@@ -15,7 +15,8 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
         },
 
         initialize: function () {
-            this.model.on('change', this.render, this);
+            var view = this;
+            view.listenTo(view.model, 'change', view.render);
         },
 
         render: function () {
