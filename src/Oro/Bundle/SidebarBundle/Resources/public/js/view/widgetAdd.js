@@ -62,7 +62,7 @@ define(function (require) {
                 }
             });
 
-            return this;
+            return view;
         },
 
         close: function () {

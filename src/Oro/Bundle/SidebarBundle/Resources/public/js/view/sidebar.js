@@ -11,9 +11,10 @@ define(function (require) {
     var IconView = require('oro/view/icon');
     var WidgetView = require('oro/view/widget');
     var WidgetAddView = require('oro/view/widgetAdd');
+    var WidgetRemoveView = require('oro/view/widgetRemove');
 
     var SidebarTemplate = require('text!oro/template/sidebar');
-    var WidgetRemoveDialogTemplate = require('text!oro/template/widgetRemoveDialog');
+
     var WidgetSetupDialogTemplate = require('text!oro/template/widgetSetupDialog');
 
     var SidebarView = Backbone.View.extend({
@@ -259,20 +260,12 @@ define(function (require) {
                 return;
             }
 
-            var $dialog = $(WidgetRemoveDialogTemplate).dialog({
-                modal: true,
-                resizable: false,
-                height: 150,
-                buttons: {
-                    'Remove': function () {
-                        model.widgets.remove(widget);
-                        $dialog.dialog('close');
-                    },
-                    Cancel: function () {
-                        $dialog.dialog('close');
-                    }
-                }
+            var widgetRemoveView = new WidgetRemoveView({
+                model: model,
+                widget: widget
             });
+
+            widgetRemoveView.render();
         },
 
         onSetupWidget: function (cid) {
