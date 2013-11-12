@@ -1,5 +1,6 @@
 datagrid:
     users-grid:
+        extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
         source:
@@ -16,7 +17,7 @@ datagrid:
                     - u.updated
                     - u.enabled
                 from:
-                    - { table: OroUserBundle:User, alias: u }
+                    - { table: %oro_user.entity.class%, alias: u }
         columns:
             username:
                 label: oro.user.grid.users.columns.username

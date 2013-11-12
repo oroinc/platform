@@ -45,9 +45,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             ->findOneBy(array('name' => 'Main'));
 
         if (!$admin) {
-
             $admin = $userManager->createUser();
-
             $admin
                 ->setUsername('admin')
                 ->addRole($role)
