@@ -4,10 +4,9 @@ define(['backbone', 'oro/constants'], function (Backbone, Constants) {
     var WidgetModel = Backbone.Model.extend({
         defaults: {
             title: '',
-            settings: {
-                icon: '#',
-                content: ''
-            }
+            icon: '#',
+            module: 'oro/widget/default',
+            settings: {}
         },
 
         initialize: function () {

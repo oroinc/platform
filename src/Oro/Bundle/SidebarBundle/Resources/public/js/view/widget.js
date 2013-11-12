@@ -19,17 +19,30 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
         },
 
         render: function () {
+            var view = this;
+            var model = view.model;
             var template = null;
 
-            if (this.model.state === Constants.WIDGET_MINIMIZED) {
-                template = this.templateMin;
+            if (model.state === Constants.WIDGET_MINIMIZED) {
+                template = view.templateMin;
             } else {
-                template = this.templateMax;
+                template = view.templateMax;
             }
 
-            this.$el.html(template(this.model.toJSON()));
+            view.$el.html(template(model.toJSON()));
 
-            return this;
+            if (model.state === Constants.WIDGET_MAXIMIZED) {
+                requirejs([model.get('module')], function (WidgetView) {
+                    var $widgetContent = view.$el.find('.sidebar-widget-content');
+                    var widgetView = new WidgetView({
+                        model: model
+                    });
+                    widgetView.setElement($widgetContent);
+                    widgetView.render();
+                });
+            }
+
+            return view;
         },
 
         onClickToggle: function (e) {

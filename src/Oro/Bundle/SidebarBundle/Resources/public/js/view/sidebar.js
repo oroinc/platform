@@ -127,7 +127,9 @@ define(['jquery', 'jquery-ui', 'backbone', 'oro/constants', 'oro/model/widget', 
 
             var widget = new WidgetModel({
                 title: Date.now().toString(),
-                settings: { content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.' }
+                settings: {
+                    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
+                }
             });
 
             this.model.widgets.push(widget);
@@ -250,7 +252,7 @@ define(['jquery', 'jquery-ui', 'backbone', 'oro/constants', 'oro/model/widget', 
 
             widget.set({ settings: settings }, { silent: true });
             widget.trigger('change');
-        },
+        }
     });
 
     return SidebarView;

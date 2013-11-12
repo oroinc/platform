@@ -7,7 +7,16 @@ config:
         'oro/view/widget': 'bundles/orosidebar/js/view/widget.js'
         'oro/view/icon': 'bundles/orosidebar/js/view/icon.js'
         'oro/collection/widget': 'bundles/orosidebar/js/collection/widget.js'
-        'oro/template/sidebar': 'bundles/orosidebar/js/template/sidebar.html?noext'
-        'oro/template/widgetMin': 'bundles/orosidebar/js/template/widgetMin.html?noext'
-        'oro/template/widgetMax': 'bundles/orosidebar/js/template/widgetMax.html?noext'
-        'oro/template/icon': 'bundles/orosidebar/js/template/icon.html?noext'
+        'oro/template/sidebar': 'bundles/orosidebar/js/template/sidebar.html'
+        'oro/template/widgetMin': 'bundles/orosidebar/js/template/widgetMin.html'
+        'oro/template/widgetMax': 'bundles/orosidebar/js/template/widgetMax.html'
+        'oro/template/icon': 'bundles/orosidebar/js/template/icon.html'
+        'oro/widget/default': 'bundles/orosidebar/js/widget/default.js'
+        'oro/widget/helloWorld': 'bundles/orosidebar/js/widget/helloWorld.js'
+
+build:
+    paths:
+        'oro/template/sidebar': 'empty:'
+        'oro/template/widgetMin': 'empty:'
+        'oro/template/widgetMax': 'empty:'
+        'oro/template/icon': 'empty:'
