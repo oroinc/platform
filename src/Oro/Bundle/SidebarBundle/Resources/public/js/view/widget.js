@@ -33,9 +33,9 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
             view.$el.html(template(model.toJSON()));
 
             if (model.state === Constants.WIDGET_MAXIMIZED) {
-                requirejs([model.get('module')], function (WidgetView) {
+                requirejs([model.get('module')], function (Widget) {
                     var $widgetContent = view.$el.find('.sidebar-widget-content');
-                    var widgetView = new WidgetView({
+                    var widgetView = new Widget.ContentView({
                         model: model
                     });
                     widgetView.setElement($widgetContent);

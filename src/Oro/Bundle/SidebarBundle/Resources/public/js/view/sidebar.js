@@ -12,10 +12,9 @@ define(function (require) {
     var WidgetView = require('oro/view/widget');
     var WidgetAddView = require('oro/view/widgetAdd');
     var WidgetRemoveView = require('oro/view/widgetRemove');
+    var WidgetSetupView = require('oro/view/widgetSetup');
 
     var SidebarTemplate = require('text!oro/template/sidebar');
-
-    var WidgetSetupDialogTemplate = require('text!oro/template/widgetSetupDialog');
 
     var SidebarView = Backbone.View.extend({
         template: _.template(SidebarTemplate),
@@ -274,25 +273,11 @@ define(function (require) {
                 return;
             }
 
-            var $dialog = $(WidgetSetupDialogTemplate).dialog({
-                modal: true,
-                resizable: false,
-                height: 150,
-                buttons: {
-                    'Save': function () {
-                        var settings = widget.get('settings');
-                        settings.content += ' ' + Date.now();
-
-                        widget.set({ settings: settings }, { silent: true });
-                        widget.trigger('change');
-
-                        $dialog.dialog('close');
-                    },
-                    Cancel: function () {
-                        $dialog.dialog('close');
-                    }
-                }
+            var widgetSetupView = new WidgetSetupView({
+                model: widget
             });
+
+            widgetSetupView.render();
         },
     });
 

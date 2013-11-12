@@ -43,12 +43,12 @@ define(function (require) {
 
                         var moduleId = $(selected).closest('li').data('moduleid');
 
-                        requirejs([moduleId], function (WidgetView) {
+                        requirejs([moduleId], function (Widget) {
                             var widget = new WidgetModel({
-                                title: WidgetView.defaults.title,
-                                icon: WidgetView.defaults.icon,
+                                title: Widget.defaults.title,
+                                icon: Widget.defaults.icon,
                                 module: moduleId,
-                                settings: WidgetView.defaults.settings()
+                                settings: Widget.defaults.settings()
                             });
 
                             model.widgets.push(widget);

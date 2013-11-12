@@ -4,7 +4,6 @@ define(function (require) {
     var $ = require('jquery');
     var Backbone = require('backbone');
 
-    var Constants = require('oro/constants');
     var WidgetRemoveTemplate = require('text!oro/template/widgetRemove');
 
     var WidgetRemoveView = Backbone.View.extend({
@@ -20,8 +19,6 @@ define(function (require) {
             var view = this;
             var model = view.model;
             var widget = view.options.widget;
-
-            var selected = null;
 
             view.$el.html(view.template(view.model.toJSON()));
 
