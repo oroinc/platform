@@ -195,6 +195,7 @@ define(function (require) {
 
             var widgetView = this.widgetViews[cid];
             if (widgetView) {
+                widgetView.contentView.remove();
                 widgetView.remove();
                 delete this.widgetViews[cid];
             }
@@ -207,6 +208,7 @@ define(function (require) {
 
             var hoverView = this.hoverViews[cid];
             if (hoverView) {
+                hoverView.contentView.remove();
                 hoverView.remove();
                 delete this.hoverViews[cid];
             }
@@ -245,6 +247,7 @@ define(function (require) {
             var hoverView = this.hoverViews[cid];
             if (hoverView) {
                 hoverView.model.restoreState();
+                hoverView.contentView.remove();
                 hoverView.remove();
                 delete this.hoverViews[cid];
             }

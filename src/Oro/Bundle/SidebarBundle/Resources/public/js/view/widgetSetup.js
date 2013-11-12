@@ -7,11 +7,6 @@ define(function (require) {
     var WidgetSetupView = Backbone.View.extend({
         className: 'sidebar-widgetsetup',
 
-        initialize: function () {
-            var view = this;
-            view.listenTo(view.model, 'change', view.render);
-        },
-
         render: function () {
             var view = this;
             var model = view.model;
@@ -25,21 +20,20 @@ define(function (require) {
                 view.setupView.render();
                 view.$el.append(view.setupView.$el);
 
+                var modelSnapshot = JSON.stringify(model);
+
                 view.$dialog = view.$el.dialog({
                     modal: true,
                     resizable: false,
                     height: 300,
                     buttons: {
                         'Save': function () {
-                            var settings = model.get('settings');
-                            settings.content += ' ' + Date.now();
-
-                            model.set({ settings: settings }, { silent: true });
-                            model.trigger('change');
-
                             view.close();
                         },
                         Cancel: function () {
+                            model.set(JSON.parse(modelSnapshot), { silent: true });
+                            model.trigger('change');
+
                             view.close();
                         }
                     }

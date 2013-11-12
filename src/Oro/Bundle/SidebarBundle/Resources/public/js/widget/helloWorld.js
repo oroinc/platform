@@ -17,26 +17,42 @@ define(['jquery', 'backbone'], function ($, Backbone) {
         template: _.template('<span><%= settings.content %></span>'),
 
         initialize: function () {
-            this.model.on('change', this.render, this);
+            var view = this;
+            view.listenTo(view.model, 'change', view.render);
         },
 
         render: function () {
-            this.$el.html(this.template(this.model.toJSON()));
-            return this;
+            var view = this;
+            view.$el.html(view.template(view.model.toJSON()));
+            return view;
         }
     });
 
     helloWorld.SetupView = Backbone.View.extend({
-        template: _.template('<span>Hello world setup</span>'),
+        template: _.template('<textarea style="width: 250px; height: 150px;"><%= settings.content %></textarea>'),
 
-        initialize: function () {
-            this.model.on('change', this.render, this);
+        events: {
+            'keyup textarea': 'onKeyup'
         },
 
         render: function () {
-            this.$el.html(this.template(this.model.toJSON()));
-            return this;
-        }
+            var view = this;
+            view.$el.html(view.template(view.model.toJSON()));
+            return view;
+        },
+
+        onKeyup: function (e) {
+            var view = this;
+            var model = view.model;
+
+            var content = view.$el.find('textarea').val();
+
+            var settings = model.get('settings');
+            settings.content = content;
+
+            model.set({ settings: settings }, { silent: true });
+            model.trigger('change');
+        },
     });
 
     return helloWorld;
