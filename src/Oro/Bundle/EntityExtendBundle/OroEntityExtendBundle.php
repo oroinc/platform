@@ -117,6 +117,7 @@ class OroEntityExtendBundle extends Bundle
             $env     = $this->kernel->getEnvironment();
 
             $process = new Process($console . ' oro:entity-extend:dump' . ' --env ' . $env);
+            $process->setTimeout(100000);
             $process->run();
         }
 

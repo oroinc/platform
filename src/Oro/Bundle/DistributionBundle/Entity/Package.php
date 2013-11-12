@@ -78,8 +78,9 @@ class Package
      */
     public function addBundle(Bundle $bundle)
     {
-        if (!in_array($bundle, $this->bundles)) {
-            $this->bundles[] = $bundle;
+        $hash=spl_object_hash($bundle);
+        if (!isset($this->bundles[$hash])) {
+            $this->bundles[$hash] = $bundle;
         }
     }
 
@@ -88,6 +89,6 @@ class Package
      */
     public function getBundles()
     {
-        return $this->bundles;
+        return array_values($this->bundles);
     }
 }

@@ -104,7 +104,6 @@ class PackageTest extends \PHPUnit_Framework_TestCase
         return [
             ['setVersion', '2.0'],
             ['setDescription', 'My package'],
-            ['setName', 'my/package'],
         ];
     }
 }
