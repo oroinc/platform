@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\BusinessEntitiesBundle\Model;
+namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Class BaseCustomerEntity
  *
- * @package Oro\Bundle\BusinessEntitiesBundle\Model
+ * @package Oro\Bundle\BusinessEntitiesBundle\Entity
  *
  * @ORM\MappedSuperclass
  */
