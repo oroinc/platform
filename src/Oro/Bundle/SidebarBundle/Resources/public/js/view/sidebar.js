@@ -1,6 +1,20 @@
-define(['jquery', 'jquery-ui', 'backbone', 'oro/constants', 'oro/model/widget', 'oro/view/icon', 'oro/view/widget', 'text!oro/template/sidebar'],
-    function ($, _jqueryUI, Backbone, Constants, WidgetModel, IconView, WidgetView, SidebarTemplate) {
+define(function (require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _jqueryUI = require('jquery-ui');
+    var Backbone = require('backbone');
+
+    var Constants = require('oro/constants');
+    var WidgetModel = require('oro/model/widget');
+
+    var IconView = require('oro/view/icon');
+    var WidgetView = require('oro/view/widget');
+
+    var SidebarTemplate = require('text!oro/template/sidebar');
+    var WidgetRemoveDialogTemplate = require('text!oro/template/widgetRemoveDialog');
+    var WidgetSetupDialogTemplate = require('text!oro/template/widgetSetupDialog');
+    var WidgetAddDialogTemplate = require('text!oro/template/widgetAddDialog');
 
     var SidebarView = Backbone.View.extend({
         template: _.template(SidebarTemplate),
@@ -125,14 +139,28 @@ define(['jquery', 'jquery-ui', 'backbone', 'oro/constants', 'oro/model/widget', 
             e.stopPropagation();
             e.preventDefault();
 
-            var widget = new WidgetModel({
-                title: Date.now().toString(),
-                settings: {
-                    content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
+            var $dialog = $(WidgetAddDialogTemplate).dialog({
+                modal: true,
+                resizable: false,
+                height: 150,
+                buttons: {
+                    'Add': function () {
+                        var widget = new WidgetModel({
+                            title: Date.now().toString(),
+                            settings: {
+                                content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
+                            }
+                        });
+
+                        this.model.widgets.push(widget);
+
+                        $dialog.dialog('close');
+                    },
+                    Cancel: function () {
+                        $dialog.dialog('close');
+                    }
                 }
             });
-
-            this.model.widgets.push(widget);
         },
 
         onClickToggle: function (e) {
@@ -235,10 +263,28 @@ define(['jquery', 'jquery-ui', 'backbone', 'oro/constants', 'oro/model/widget', 
         },
 
         onRemoveWidget: function (cid) {
-            var widget = this.model.widgets.get(cid);
-            if (widget) {
-                this.model.widgets.remove(widget);
+            var view = this;
+            var model = view.model;
+
+            var widget = model.widgets.get(cid);
+            if (!widget) {
+                return;
             }
+
+            var $dialog = $(WidgetRemoveDialogTemplate).dialog({
+                modal: true,
+                resizable: false,
+                height: 150,
+                buttons: {
+                    'Remove': function () {
+                        model.widgets.remove(widget);
+                        $dialog.dialog('close');
+                    },
+                    Cancel: function () {
+                        $dialog.dialog('close');
+                    }
+                }
+            });
         },
 
         onSetupWidget: function (cid) {
@@ -247,12 +293,26 @@ define(['jquery', 'jquery-ui', 'backbone', 'oro/constants', 'oro/model/widget', 
                 return;
             }
 
-            var settings = widget.get('settings');
-            settings.content += ' ' + Date.now();
+            var $dialog = $(WidgetSetupDialogTemplate).dialog({
+                modal: true,
+                resizable: false,
+                height: 150,
+                buttons: {
+                    'Save': function () {
+                        var settings = widget.get('settings');
+                        settings.content += ' ' + Date.now();
 
-            widget.set({ settings: settings }, { silent: true });
-            widget.trigger('change');
-        }
+                        widget.set({ settings: settings }, { silent: true });
+                        widget.trigger('change');
+
+                        $dialog.dialog('close');
+                    },
+                    Cancel: function () {
+                        $dialog.dialog('close');
+                    }
+                }
+            });
+        },
     });
 
     return SidebarView;
