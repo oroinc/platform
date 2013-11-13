@@ -326,4 +326,25 @@ class BaseCustomerEntity
     {
         return $this->description;
     }
+
+    /**
+     * @param array $data
+     */
+    public function fillFromArray(array $data)
+    {
+        foreach ($data as $itemName => $item) {
+            $method = preg_replace_callback(
+                '/_([a-z])/',
+                function ($string) {
+                    return strtoupper($string[1]);
+                },
+                $itemName
+            );
+            $method = 'set' . $method;
+
+            if (method_exists($this, $method)) {
+                $this->$method($item);
+            }
+        }
+    }
 }
