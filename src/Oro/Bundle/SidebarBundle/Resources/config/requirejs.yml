@@ -16,7 +16,6 @@ config:
         'oro/template/icon': 'bundles/orosidebar/js/template/icon.html'
         'oro/template/widgetRemove': 'bundles/orosidebar/js/template/widgetRemove.html'
         'oro/template/widgetAdd': 'bundles/orosidebar/js/template/widgetAdd.html'
-        'oro/widget/default': 'bundles/orosidebar/js/widget/default.js'
         'oro/widget/helloWorld': 'bundles/orosidebar/js/widget/helloWorld.js'
 
 build:
