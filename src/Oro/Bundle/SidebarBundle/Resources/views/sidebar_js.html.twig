@@ -30,7 +30,7 @@
 
     .sidebar-resize {
         background-color: #444;
-        border-left: 1px solid #333;
+        border: 1px solid #333;
         height: 100%;
         position: absolute;
         width: 5px;
@@ -45,6 +45,7 @@
     }
 
     .sidebar-add {
+        border: 1px solid #222;
         display: block;
         width: 30px;
         height: 30px;
@@ -53,7 +54,8 @@
     .sidebar-add i {
         height: 16px;
         width: 16px;
-        margin: 7px;
+        margin-left: 8px;
+        margin-top: 8px;
     }
 
     .sidebar-toggle {
@@ -89,9 +91,10 @@
 
     .sidebar-widget-header {
         background-color: #2D333B;
-        border: 1px solid #444;
+        border: 1px solid #222;
         color: #fff;
         font-weight: bolder;
+        padding: 5px;
     }
 
     .sidebar-widget-header img {
@@ -105,13 +108,13 @@
 
     .sidebar-widget-header-wrap {
         position: absolute;
-        right: 0;
+        right: 5px;
     }
 
     .sidebar-widget-content {
-        border-left: 5px solid #444;
-        border-right: 5px solid #444;
-        border-bottom: 5px solid #444;
+        border-left: 5px solid #2D333B;
+        border-right: 5px solid #2D333B;
+        border-bottom: 5px solid #2D333B;
         color: #fff;
     }
 
@@ -153,8 +156,6 @@
 </style>
 
 <script type="text/javascript">
-    var iconGmail = 'http://i214.photobucket.com/albums/cc237/xFlyer/gmail-pencil16.png';
-    var iconSkype = 'http://i214.photobucket.com/albums/cc237/xFlyer/Skype-icon.png';
     var iconRss = 'http://i50.photobucket.com/albums/f322/aldemirsilva/bluefeedicon.gif';
 
     window.SIDEBARS_BOOTSTRAP = {
@@ -164,87 +165,45 @@
                     widgets: [
                         {
                             title: 'Hello world',
-                            icon: iconGmail,
-                            module: 'oro/widget/helloWorld'
-                        },
-                        {
-                            title: 'Foo',
-                            icon: iconSkype,
+                            icon: iconRss,
                             module: 'oro/widget/helloWorld'
                         },
                         {
                             title: 'Bar',
                             icon: iconRss,
                             module: 'oro/widget/helloWorld'
-                        },
+                        }
                     ]
                 },
                 widgets: [
                     {
                         title: 'Hello world',
-                        icon: iconGmail,
-                        module: 'oro/widget/helloWorld',
-                        settings: {
-                            content: 'Hello, World!!!'
-                        }
-                    },
-                    {
-                        title: 'Twitter',
-                        icon: iconSkype,
-                        module: 'oro/widget/helloWorld',
-                        settings: {
-                            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
-                        }
-                    },
-                    {
-                        title: 'Facebook',
                         icon: iconRss,
                         module: 'oro/widget/helloWorld',
                         settings: {
-                            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
-                        }
-                    },
-                    {
-                        title: 'Google+',
-                        icon: iconGmail,
-                        module: 'oro/widget/helloWorld',
-                        settings: {
-                            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
+                            content: 'Hello, World!!!'
                         }
                     }
                 ]
             },
             {
                 sidebar: {
-                    sidebar: {
-                        widgets: [
-                            {
-                                title: 'Hello world',
-                                icon: iconGmail,
-                                module: 'oro/widget/helloWorld'
-                            }
-                        ]
-                    }
+                    widgets: [
+                        {
+                            title: 'Hello world',
+                            icon: iconRss,
+                            module: 'oro/widget/helloWorld'
+                        },
+                        {
+                            title: 'Foo',
+                            icon: iconRss,
+                            module: 'oro/widget/helloWorld'
+                        }
+                    ]
                 },
                 widgets: [
                     {
                         title: 'Mews',
-                        icon: iconGmail,
-                        module: 'oro/widget/helloWorld',
-                        settings: {
-                            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
-                        }
-                    },
-                    {
-                        title: 'Other',
-                        icon: iconSkype,
-                        module: 'oro/widget/helloWorld',
-                        settings: {
-                            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
-                        }
-                    },
-                    {
-                        title: 'Settings',
                         icon: iconRss,
                         module: 'oro/widget/helloWorld',
                         settings: {
@@ -262,13 +221,11 @@
         'use strict';
 
         $(function () {
-            var leftSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP.sidebars[0].sidebar, {
-                position: Constants.SIDEBAR_LEFT
-            });
+            var leftSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP.sidebars[0].sidebar);
+            leftSidebar.position = Constants.SIDEBAR_LEFT;
 
-            var rightSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP.sidebars[1].sidebar, {
-                position: Constants.SIDEBAR_RIGHT
-            });
+            var rightSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP.sidebars[1].sidebar);
+            rightSidebar.position = Constants.SIDEBAR_RIGHT;
 
             var leftSidebarView = new SidebarView({
                 model: leftSidebar,

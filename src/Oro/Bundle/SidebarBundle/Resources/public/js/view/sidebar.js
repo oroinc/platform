@@ -31,7 +31,7 @@ define(function (require) {
             view.hoverViews = {};
             view.widgetViews = {};
 
-            view.padding = view.model.position === Constants.SIDEBAR_LEFT ? 'padding-left' : 'padding-right';
+            view.padding = view.model.position === Constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
 
             view.listenTo(view.model, 'change', view.render);
 

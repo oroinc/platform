@@ -5,7 +5,7 @@ define(['jquery', 'backbone'], function ($, Backbone) {
 
     helloWorld.defaults = {
         title: 'Hello world',
-        icon: 'http://i214.photobucket.com/albums/cc237/xFlyer/gmail-pencil16.png',
+        icon: 'http://i50.photobucket.com/albums/f322/aldemirsilva/bluefeedicon.gif',
         settings: function () {
             return {
                 content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
