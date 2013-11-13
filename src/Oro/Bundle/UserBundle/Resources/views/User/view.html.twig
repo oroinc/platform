@@ -2,12 +2,9 @@
 {% import 'OroTagBundle::macros.html.twig' as _tag %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroEmailBundle::macros.html.twig' as Email %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
-{% set gridId = 'users-email-grid' %}
-{% block head_script %}
-    {{ parent() }}
-    {% placeholder prepare_grid with {'datagrid': datagrid, 'selector': '#' ~ gridId} %}
-{% endblock %}
+{% set gridName = 'users-email-grid' %}
 
 {% set fullname = entity|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
@@ -115,6 +112,65 @@
     ]
     %}
 
+    {#
+      EntityExtend fields START
+    #}
+    {% set additional = [ ] %}
+    {% set additional_fields = [ ] %}
+    {% macro attibuteRow(title, value) %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% macro attribute_data(value) %}
+          <div class="clearfix-oro">
+              <p class="control-label">{{ value|raw }}</p>
+          </div>
+        {% endmacro %}
+        {{ UI.renderAttribute(title, _self.attribute_data(value)) }}
+    {% endmacro %}
+    {% if dynamic|length %}
+        {% for label, item in dynamic %}
+            {% if item is iterable %}
+                {% set data = '' %}
+                {% for value in item.values %}
+                    {% if value.link is defined and value.link != false  %}
+                        {% set data = data ~ '<a href="' ~ value.link ~ '">' ~ value.title ~ '</a>' %}
+                    {% else %}
+                        {% set data = data ~ value.title %}
+                    {% endif %}
+                    {% if not loop.last %}
+                        {% set data = data ~ ', ' %}
+                    {% endif %}
+                {% endfor %}
+                {% set item = data %}
+          {% endif %}
+
+          {% set additional = additional|merge([_self.attibuteRow(label|trans, item)]) %}
+      {% endfor %}
+
+      {% if additional|length %}
+          {% set col = 2 %}
+          {% set attributes = {} %}
+          {% set half = (additional|length / col)|ceil %}
+
+          {% for value in additional %}
+              {% set attributes = attributes | merge([value]) %}
+              {% if loop.index % half == 0  and not loop.last %}
+                  {% set additional_fields = additional_fields|merge([{'title' : null, 'data' : attributes}]) %}
+                  {% set attributes = {} %}
+              {% endif %}
+          {% endfor %}
+
+          {% set additional_fields = additional_fields|merge([{'title' : null, 'data' : attributes}]) %}
+      {% endif %}
+
+      {% set dataBlocks = dataBlocks|merge([ {
+          'title': 'Additional Information',
+          'subblocks': additional_fields
+      }] ) %}
+    {% endif %}
+    {#
+      EntityExtend fields END
+    #}
+
     {% if resource_granted('oro_email_view') %}
         {% set dataBlocks = dataBlocks|merge
             (
@@ -124,7 +180,10 @@
                             {
                                 'title': '',
                                 'useSpan': false,
-                                'data': [UI.gridBlock(gridId), Email.renderJs()]
+                                'data': [
+                                    dataGrid.renderGrid(gridName, {userId: entity.id}, { cssClass: 'inner-grid' }),
+                                    Email.renderJs()
+                                ]
                             }
                         ]
                     }]
