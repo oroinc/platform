@@ -1,6 +1,8 @@
 parameters:
     oro_distribution.routing_loader.class:            Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
     oro_distribution.package_manager.class:           Oro\Bundle\DistributionBundle\Manager\PackageManager
+    oro_distribution.composer.class:                  Composer\Composer
+    oro_distribution.composer.io.class:               Composer\IO\NullIO
 
 services:
     oro_distribution.routing_loader:
@@ -13,3 +15,15 @@ services:
 
     oro_distribution.package_manager:
         class: %oro_distribution.package_manager.class%
+        arguments: [@oro_distribution.composer]
+
+    oro_distribution.composer.io:
+        class: %oro_distribution.composer.io.class%
+        public: false
+
+    oro_distribution.composer:
+        class: %oro_distribution.composer.class%
+        public: false
+        factory_class: Composer\Factory
+        factory_method: create
+        arguments: [@oro_distribution.composer.io]

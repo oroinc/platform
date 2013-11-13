@@ -2,44 +2,50 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Manager;
 
+use Composer\Composer;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
-use Oro\Bundle\DistributionBundle\Repository\PackageRepository;
-use Oro\Bundle\DistributionBundle\Storage\PackageStorage;
+use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 
 class PackageManagerTest extends \PHPUnit_Framework_TestCase
 {
+    use MockHelperTrait;
     /**
      * @test
      */
     public function shouldBeConstructedWithRepositoryAndStorage()
     {
-        new PackageManager($this->createRepositoryMock(), $this->createStorageMock());
+        new PackageManager($this->createComposerMock());
     }
     /**
      * @test
      */
     public function shouldReturnInstalledPackages()
     {
-        $manager = new PackageManager($this->createRepositoryMock(), $this->createStorageMock());
-        $installedPackages = $manager->getInstalled();
+        $composerMock=$this->createComposerMock();
+        $repositoryManagerMock=$this->createConstructorLessMock('Composer\Repository\RepositoryManager');
+        $localRepositoryMock=$this->createConstructorLessMock('Composer\Repository\WritableRepositoryInterface');
 
-        $this->assertInternalType('array', $installedPackages);
-        $this->assertCount(4, $installedPackages);
+        $composerMock->expects($this->once())
+            ->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManagerMock));
+
+        $repositoryManagerMock->expects($this->once())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepositoryMock));
+
+        $localRepositoryMock->expects($this->once())
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue($installedPackages = [rand(), rand()]));
+
+        $manager = new PackageManager($composerMock);
+        $this->assertEquals($installedPackages, $manager->getInstalled());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PackageRepository
+     * @return \PHPUnit_Framework_MockObject_MockObject|Composer
      */
-    public function createRepositoryMock()
+    protected function createComposerMock()
     {
-        return $this->getMock('Oro\Bundle\DistributionBundle\Repository\PackageRepository');
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PackageStorage
-     */
-    public function createStorageMock()
-    {
-        return $this->getMock('Oro\Bundle\DistributionBundle\Storage\PackageStorage');
+        return $this->createConstructorLessMock('Composer\Composer');
     }
 }

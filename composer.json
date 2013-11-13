@@ -46,7 +46,8 @@
         "mtdowling/cron-expression": "1.0.*",
         "jdare/clank-bundle": "dev-master",
         "lexik/maintenance-bundle": "dev-master",
-        "sylius/flow-bundle": "dev-master"
+        "sylius/flow-bundle": "dev-master",
+        "composer/composer": "1.0.*@dev"
     },
     "minimum-stability": "dev",
     "autoload": {

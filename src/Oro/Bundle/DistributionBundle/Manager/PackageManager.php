@@ -1,42 +1,23 @@
 <?php
 namespace Oro\Bundle\DistributionBundle\Manager;
 
-use Oro\Bundle\DistributionBundle\Entity\Package;
-use Oro\Bundle\DistributionBundle\Repository\PackageRepository;
-use Oro\Bundle\DistributionBundle\Storage\PackageStorage;
+use Composer\Composer;
+use Composer\Package\PackageInterface;
 
 class PackageManager
 {
-    /**
-     * @var PackageRepository
-     */
-    protected $repository;
+    protected $composer;
 
-    /**
-     * @var PackageStorage
-     */
-    protected $storage;
-
-    /**
-     * @param PackageRepository $repository
-     * @param PackageStorage $storage
-     */
-    public function __construct(PackageRepository $repository, PackageStorage $storage)
+    public function __construct(Composer $composer)
     {
-        $this->repository = $repository;
-        $this->storage = $storage;
+        $this->composer = $composer;
     }
 
     /**
-     * @return Package[]
+     * @return PackageInterface[]
      */
     public function getInstalled()
     {
-        return [
-            new Package(),
-            new Package(),
-            new Package(),
-            new Package()
-        ];
+        return $this->composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages();
     }
 }
