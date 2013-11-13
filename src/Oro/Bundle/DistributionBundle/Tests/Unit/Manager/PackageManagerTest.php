@@ -42,6 +42,15 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function shouldReturnAvailablePackages()
+    {
+        $manager = new PackageManager($this->createComposerMock());
+        $this->assertEmpty($manager->getAvailable());
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Composer
      */
     protected function createComposerMock()
