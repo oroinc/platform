@@ -5,6 +5,7 @@
         bottom: 0;
         width: 35px;
         position: absolute;
+        z-index: 10;
 
         -webkit-touch-callout: none;
         -webkit-user-select: none;
@@ -154,77 +155,19 @@
         color: white;
     }
 </style>
-
-<script type="text/javascript">
-    var iconRss = 'http://i50.photobucket.com/albums/f322/aldemirsilva/bluefeedicon.gif';
-
-    window.SIDEBARS_BOOTSTRAP = {
-        sidebars: [
-            {
-                sidebar: {
-                    widgets: [
-                        {
-                            title: 'Hello world',
-                            icon: iconRss,
-                            module: 'oro/widget/helloWorld'
-                        },
-                        {
-                            title: 'Bar',
-                            icon: iconRss,
-                            module: 'oro/widget/helloWorld'
-                        }
-                    ]
-                },
-                widgets: [
-                    {
-                        title: 'Hello world',
-                        icon: iconRss,
-                        module: 'oro/widget/helloWorld',
-                        settings: {
-                            content: 'Hello, World!!!'
-                        }
-                    }
-                ]
-            },
-            {
-                sidebar: {
-                    widgets: [
-                        {
-                            title: 'Hello world',
-                            icon: iconRss,
-                            module: 'oro/widget/helloWorld'
-                        },
-                        {
-                            title: 'Foo',
-                            icon: iconRss,
-                            module: 'oro/widget/helloWorld'
-                        }
-                    ]
-                },
-                widgets: [
-                    {
-                        title: 'Mews',
-                        icon: iconRss,
-                        module: 'oro/widget/helloWorld',
-                        settings: {
-                            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
-                        }
-                    }
-                ]
-            }
-        ]
-    };
-</script>
 <script type="text/javascript">
     require(['jquery', 'oro/model/sidebar', 'oro/view/sidebar', 'oro/constants'],
             function($, SidebarModel, SidebarView, Constants) {
         'use strict';
 
         $(function () {
-            var leftSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP.sidebars[0].sidebar);
+            var leftSidebarData = $('#sidebar-left').data('models');
+            var rightSidebarData = $('#sidebar-right').data('models');
+
+            var leftSidebar = new SidebarModel(leftSidebarData.sidebar);
             leftSidebar.position = Constants.SIDEBAR_LEFT;
 
-            var rightSidebar = new SidebarModel(SIDEBARS_BOOTSTRAP.sidebars[1].sidebar);
+            var rightSidebar = new SidebarModel(rightSidebarData.sidebar);
             rightSidebar.position = Constants.SIDEBAR_RIGHT;
 
             var leftSidebarView = new SidebarView({
@@ -239,8 +182,8 @@
                 $main: $('#main')
             });
 
-            leftSidebar.widgets.reset(SIDEBARS_BOOTSTRAP.sidebars[0].widgets);
-            rightSidebar.widgets.reset(SIDEBARS_BOOTSTRAP.sidebars[1].widgets);
+            leftSidebar.widgets.reset(leftSidebarData.widgets);
+            rightSidebar.widgets.reset(rightSidebarData.widgets);
         });
     });
 </script>

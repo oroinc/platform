@@ -1,2 +1,28 @@
-<div id="sidebar-right" class="sidebar sidebar-right">
+{% set models = {
+    "sidebar": {
+        "widgets": [
+            {
+                "title": "Hello world",
+                "icon": "http://i50.photobucket.com/albums/f322/aldemirsilva/bluefeedicon.gif",
+                "module": "oro/widget/helloWorld"
+            },
+            {
+                "title": "Foo",
+                "icon": "http://i50.photobucket.com/albums/f322/aldemirsilva/bluefeedicon.gif",
+                "module": "oro/widget/helloWorld"
+            }
+        ]
+    },
+    "widgets": [
+        {
+            "title": "News",
+            "icon": "http://i50.photobucket.com/albums/f322/aldemirsilva/bluefeedicon.gif",
+            "module": "oro/widget/helloWorld",
+            "settings": {
+                "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar."
+            }
+        }
+    ]
+} %}
+<div id="sidebar-right" class="sidebar sidebar-right" data-models="{{ models|json_encode }}">
 </div>

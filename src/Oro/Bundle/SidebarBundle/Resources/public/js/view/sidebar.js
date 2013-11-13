@@ -3,7 +3,10 @@ define(function (require) {
 
     var $ = require('jquery');
     var _jqueryUI = require('jquery-ui');
+    var _ = require('underscore');
     var Backbone = require('backbone');
+
+    var Modal = require('oro/modal');
 
     var Constants = require('oro/constants');
     var WidgetModel = require('oro/model/widget');
@@ -11,7 +14,6 @@ define(function (require) {
     var IconView = require('oro/view/icon');
     var WidgetView = require('oro/view/widget');
     var WidgetAddView = require('oro/view/widgetAdd');
-    var WidgetRemoveView = require('oro/view/widgetRemove');
     var WidgetSetupView = require('oro/view/widgetSetup');
 
     var SidebarTemplate = require('text!oro/template/sidebar');
@@ -262,12 +264,20 @@ define(function (require) {
                 return;
             }
 
-            var widgetRemoveView = new WidgetRemoveView({
-                model: model,
-                widget: widget
+            var modal = new Modal({
+                content: 'The widget will be removed.'
             });
 
-            widgetRemoveView.render();
+            modal.on('ok', function () {
+                model.widgets.remove(widget);
+                modal.off();
+            });
+
+            modal.on('cancel', function () {
+                modal.off();
+            });
+
+            modal.open();
         },
 
         onSetupWidget: function (cid) {

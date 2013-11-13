@@ -5,7 +5,7 @@ define(['backbone', 'oro/constants'], function (Backbone, Constants) {
         defaults: {
             title: '',
             icon: '#',
-            module: 'oro/widget/default',
+            module: '',
             settings: {}
         },
 
