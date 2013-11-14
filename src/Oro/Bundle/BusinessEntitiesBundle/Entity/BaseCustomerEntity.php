@@ -108,6 +108,14 @@ class BaseCustomerEntity
     }
 
     /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
      * @param string $prefix
      *
      * @return $this
@@ -328,6 +336,10 @@ class BaseCustomerEntity
     }
 
     /**
+     * Fill customer properties from assoc array
+     * with 'sample_key' keys notation
+     * transforming them to customer method names 'setSampleKey'
+     *
      * @param array $data
      */
     public function fillFromArray(array $data)

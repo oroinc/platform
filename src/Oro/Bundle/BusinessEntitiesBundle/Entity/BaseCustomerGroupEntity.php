@@ -38,6 +38,17 @@ class BaseCustomerGroupEntity
     }
 
     /**
+     * @param int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      *
      * @return $this
@@ -55,5 +66,17 @@ class BaseCustomerGroupEntity
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Customer groups doesn't have code,
+     * but it's for compatibility with CustomerNormalizer
+     *
+     * @param $code
+     * @return $this
+     */
+    public function setCode($code)
+    {
+        return $this;
     }
 }
