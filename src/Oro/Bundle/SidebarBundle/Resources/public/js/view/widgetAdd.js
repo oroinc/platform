@@ -45,7 +45,8 @@ define(function (require) {
                         title: Widget.defaults.title,
                         icon: Widget.defaults.icon,
                         module: moduleId,
-                        settings: Widget.defaults.settings()
+                        settings: Widget.defaults.settings(),
+                        order: model.widgets.length
                     });
 
                     model.widgets.push(widget);

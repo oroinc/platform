@@ -3,6 +3,7 @@ define(['backbone', 'oro/constants'], function (Backbone, Constants) {
 
     var WidgetModel = Backbone.Model.extend({
         defaults: {
+            order: 0,
             title: '',
             icon: '#',
             module: '',

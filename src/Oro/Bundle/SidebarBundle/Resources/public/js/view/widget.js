@@ -31,6 +31,7 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
             }
 
             view.$el.html(template(model.toJSON()));
+            view.$el.attr('data-cid', model.cid);
 
             if (model.state === Constants.WIDGET_MAXIMIZED) {
                 requirejs([model.get('module')], function (Widget) {

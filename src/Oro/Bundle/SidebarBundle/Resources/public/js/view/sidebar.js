@@ -77,28 +77,32 @@ define(function (require) {
 
         renderIcons: function () {
             var view = this;
+            var model = view.model;
             var $content = view.$el.find('.sidebar-content');
 
-            _.each(view.iconViews, function (iconView) {
+            model.widgets.each(function (widget) {
+                var iconView = view.iconViews[widget.cid];
+                if (!iconView) {
+                    return;
+                }
                 iconView.render().delegateEvents();
-
                 $content.append(iconView.$el);
+            });
 
-                $content.sortable({
-                    revert: true,
-                    axis: 'y',
-                    containment: 'parent',
-                    start: function(event, ui) {
-                        var cid = ui.item.data('cid');
-                        view.onIconDragStart(cid);
-                    },
-                    stop: function(event, ui) {
-                        var cid = ui.item.data('cid');
-                        view.onIconDragStop(cid);
+            $content.sortable({
+                revert: true,
+                axis: 'y',
+                containment: 'parent',
+                start: function(event, ui) {
+                    var cid = ui.item.data('cid');
+                    view.onIconDragStart(cid);
+                },
+                stop: function(event, ui) {
+                    var cid = ui.item.data('cid');
+                    view.onIconDragStop(cid);
 
-                        view.reorderWidgets();
-                    }
-                });
+                    view.reorderWidgets();
+                }
             });
 
             return view;
@@ -106,11 +110,32 @@ define(function (require) {
 
         renderWidgets: function () {
             var view = this;
+            var model = view.model;
             var $content = view.$el.find('.sidebar-content');
 
-            _.each(view.widgetViews, function (widgetView) {
+            model.widgets.each(function (widget) {
+                var widgetView = view.widgetViews[widget.cid];
+                if (!widgetView) {
+                    return;
+                }
                 widgetView.render().delegateEvents();
                 $content.append(widgetView.$el);
+            });
+
+            $content.sortable({
+                revert: true,
+                axis: 'y',
+                containment: 'parent',
+                start: function(event, ui) {
+                    var cid = ui.item.data('cid');
+                    view.onIconDragStart(cid);
+                },
+                stop: function(event, ui) {
+                    var cid = ui.item.data('cid');
+                    view.onIconDragStop(cid);
+
+                    view.reorderWidgets();
+                }
             });
 
             return view;
@@ -135,8 +160,14 @@ define(function (require) {
             var $content = view.$el.find('.sidebar-content');
 
             var ids = $content.sortable('toArray', { attribute: 'data-cid' });
+            var widgetOrder = _.object(ids, _.range(ids.length));
 
-            console.log('Widget order:', ids);
+            view.model.widgets.each(function (widget) {
+                var order = widgetOrder[widget.cid];
+                widget.set({ order: order }, { silent: true });
+            });
+
+            view.model.widgets.sort();
         },
 
         onClickAdd: function (e) {

@@ -16,10 +16,13 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/icon'],
         },
 
         render: function () {
-            this.$el.html(this.template(this.model.toJSON()));
-            this.$el.attr('data-cid', this.model.cid);
+            var view = this;
+            var model = view.model;
 
-            return this;
+            view.$el.html(view.template(model.toJSON()));
+            view.$el.attr('data-cid', model.cid);
+
+            return view;
         },
 
         onClick: function (e) {
