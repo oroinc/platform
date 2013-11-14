@@ -12,12 +12,6 @@ function(_, Backbone, __) {
      * @extends Backbone.BootstrapModal
      */
     return Backbone.BootstrapModal.extend({
-        /** @property {String} */
-        className: 'modal oro-modal-danger',
-
-        /** @property {String} */
-        okButtonClass: 'btn-danger',
-
         /** @property {Object} */
         template: _.template('\
             <% if (title) { %>\

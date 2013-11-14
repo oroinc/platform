@@ -11,6 +11,12 @@ function(_, __, Modal) {
      * @extends oro.Modal
      */
     return Modal.extend({
+        /** @property {String} */
+        className: 'modal oro-modal-danger',
+
+        /** @property {String} */
+        okButtonClass: 'btn-danger',
+
         /**
          * @param {Object} options
          */
