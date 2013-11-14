@@ -35,10 +35,10 @@ class PackageManager
     public function getAvailable()
     {
         $packages = [];
-        /** @var RepositoryInterface $repos */
-        $repos = $this->composer->getRepositoryManager()->getRepositories();
+        /** @var RepositoryInterface[] $repositories */
+        $repositories = $this->composer->getRepositoryManager()->getRepositories();
 
-        foreach($repos as $repo) {
+        foreach ($repositories as $repo) {
             if ($repo instanceof ComposerRepository) {
                 $packages = array_merge($packages, $repo->getProviderNames());
             } else {
@@ -46,9 +46,8 @@ class PackageManager
             }
         }
 
-        return array_diff($packages, $this->getFlatListInstalledPackage());
+        return array_values(array_diff($packages, $this->getFlatListInstalledPackage()));
     }
-
 
 
     /**
@@ -57,7 +56,7 @@ class PackageManager
     protected function getFlatListInstalledPackage()
     {
         $packages = [];
-        foreach($this->getInstalled() as $package) {
+        foreach ($this->getInstalled() as $package) {
             $packages[] = $package->getPrettyName();
         }
 
