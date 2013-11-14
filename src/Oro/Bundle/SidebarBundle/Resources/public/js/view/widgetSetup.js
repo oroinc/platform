@@ -1,15 +1,14 @@
 define(function (require) {
     'use strict';
 
-    var $ = require('jquery');
-    var Backbone = require('backbone');
+    var Modal = require('oro/modal');
 
-    var WidgetSetupView = Backbone.View.extend({
-        className: 'sidebar-widgetsetup',
-
-        render: function () {
+    var WidgetSetupView = Modal.extend({
+        initialize: function(options) {
             var view = this;
             var model = view.model;
+
+            options.content = '<div class="sidebar-widgetsetup"></div>';
 
             var moduleId = model.get('module');
 
@@ -18,37 +17,15 @@ define(function (require) {
                     model: model
                 });
                 view.setupView.render();
-                view.$el.append(view.setupView.$el);
-
-                var modelSnapshot = JSON.stringify(model);
-
-                view.$dialog = view.$el.dialog({
-                    modal: true,
-                    resizable: false,
-                    height: 300,
-                    buttons: {
-                        'Save': function () {
-                            view.close();
-                        },
-                        Cancel: function () {
-                            model.set(JSON.parse(modelSnapshot), { silent: true });
-                            model.trigger('change');
-
-                            view.close();
-                        }
-                    }
-                });
+                view.$el.find('.sidebar-widgetsetup').append(view.setupView.$el);
             });
 
-            return view;
-        },
+            Modal.prototype.initialize.apply(this, arguments);
 
-        close: function () {
-            var view = this;
-            view.$dialog.dialog('close');
-            view.setupView.remove();
-            view.remove();
-        }
+            view.once('ok cancel', function () {
+                view.setupView.remove();
+            });
+        },
     });
 
     return WidgetSetupView;

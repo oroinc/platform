@@ -286,11 +286,18 @@ define(function (require) {
                 return;
             }
 
+            var widgetSnapshot = JSON.stringify(widget);
+
             var widgetSetupView = new WidgetSetupView({
                 model: widget
             });
 
-            widgetSetupView.render();
+            widgetSetupView.on('cancel', function () {
+                widget.set(JSON.parse(widgetSnapshot), { silent: true });
+                widget.trigger('change');
+            });
+
+            widgetSetupView.open();
         },
     });
 
