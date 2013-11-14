@@ -1,19 +1,18 @@
 oro_menu_config:
     items:
-        customers_tab:
-            label: 'Customers'
-            uri: '#'
-            extras:
-                position: 10
         channels_submenu:
             label: 'Channels'
             uri: '#'
             extras:
                 position: 50
+        channels_list:
+            label: 'Configuration'
+            route: 'oro_integration_channel_index'
 
     tree:
         application_menu:
             children:
-                customers_tab:
+                channels_submenu:
                     children:
-                        channels_submenu: ~
+                        channels_list: ~
+

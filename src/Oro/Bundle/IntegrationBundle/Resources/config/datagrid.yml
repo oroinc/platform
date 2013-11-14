@@ -1,0 +1,6 @@
+datagrid:
+    channels-grid:
+        source:
+            type: orm
+            acl_resource:
+
