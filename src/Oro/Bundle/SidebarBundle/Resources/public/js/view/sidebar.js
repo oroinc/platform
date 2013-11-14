@@ -6,7 +6,7 @@ define(function (require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
 
-    var Modal = require('oro/modal');
+    var DeleteConfirmation = require('oro/delete-confirmation');
 
     var Constants = require('oro/constants');
     var WidgetModel = require('oro/model/widget');
@@ -150,7 +150,7 @@ define(function (require) {
                 model: model
             });
 
-            widgetAddView.render();
+            widgetAddView.open();
         },
 
         onClickToggle: function (e) {
@@ -264,8 +264,8 @@ define(function (require) {
                 return;
             }
 
-            var modal = new Modal({
-                content: 'The widget will be removed.'
+            var modal = new DeleteConfirmation({
+                content: 'The widget will be removed'
             });
 
             modal.on('ok', function () {
