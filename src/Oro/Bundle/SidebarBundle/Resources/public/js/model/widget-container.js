@@ -1,7 +1,7 @@
-define(['backbone', 'oro/constants'], function (Backbone, Constants) {
+define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
     'use strict';
 
-    var WidgetModel = Backbone.Model.extend({
+    var WidgetContainerModel = Backbone.Model.extend({
         defaults: {
             order: 0,
             title: '',
@@ -11,19 +11,19 @@ define(['backbone', 'oro/constants'], function (Backbone, Constants) {
         },
 
         initialize: function () {
-            this.state = Constants.WIDGET_MINIMIZED;
+            this.state = constants.WIDGET_MINIMIZED;
             this.stateSnapshot = this.state;
             this.isDragged = false;
         },
 
         toggleState: function () {
             switch (this.state) {
-                case Constants.WIDGET_MINIMIZED:
-                    this.state = Constants.WIDGET_MAXIMIZED;
+                case constants.WIDGET_MINIMIZED:
+                    this.state = constants.WIDGET_MAXIMIZED;
                     break;
 
-                case Constants.WIDGET_MAXIMIZED:
-                    this.state = Constants.WIDGET_MINIMIZED;
+                case constants.WIDGET_MAXIMIZED:
+                    this.state = constants.WIDGET_MINIMIZED;
                     break;
             }
 
@@ -39,5 +39,5 @@ define(['backbone', 'oro/constants'], function (Backbone, Constants) {
         }
     });
 
-    return WidgetModel;
+    return WidgetContainerModel;
 });

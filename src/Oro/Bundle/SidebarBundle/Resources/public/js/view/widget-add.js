@@ -3,8 +3,8 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var WidgetAddTemplate = require('text!oro/template/widgetAdd');
-    var WidgetModel = require('oro/model/widget');
+    var WidgetAddTemplate = require('text!oro/sidebar/template/widget-add');
+    var WidgetContainerModel = require('oro/sidebar/model/widget-container');
 
     var Modal = require('oro/modal');
 
@@ -41,7 +41,7 @@ define(function (require) {
                 var moduleId = $(selected).closest('li').data('moduleid');
 
                 requirejs([moduleId], function (Widget) {
-                    var widget = new WidgetModel({
+                    var widget = new WidgetContainerModel({
                         title: Widget.defaults.title,
                         icon: Widget.defaults.icon,
                         module: moduleId,
@@ -50,6 +50,8 @@ define(function (require) {
                     });
 
                     model.widgets.push(widget);
+
+                    widget.save();
 
                     view.close();
                 });

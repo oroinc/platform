@@ -8,15 +8,14 @@ define(function (require) {
 
     var DeleteConfirmation = require('oro/delete-confirmation');
 
-    var Constants = require('oro/constants');
-    var WidgetModel = require('oro/model/widget');
+    var constants = require('oro/sidebar/constants');
 
-    var IconView = require('oro/view/icon');
-    var WidgetView = require('oro/view/widget');
-    var WidgetAddView = require('oro/view/widgetAdd');
-    var WidgetSetupView = require('oro/view/widgetSetup');
+    var IconView = require('oro/sidebar/view/icon');
+    var WidgetContainerView = require('oro/sidebar/view/widget-container');
+    var WidgetAddView = require('oro/sidebar/view/widget-add');
+    var WidgetSetupView = require('oro/sidebar/view/widget-setup');
 
-    var SidebarTemplate = require('text!oro/template/sidebar');
+    var SidebarTemplate = require('text!oro/sidebar/template/sidebar');
 
     var SidebarView = Backbone.View.extend({
         template: _.template(SidebarTemplate),
@@ -33,7 +32,7 @@ define(function (require) {
             view.hoverViews = {};
             view.widgetViews = {};
 
-            view.padding = view.model.position === Constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
+            view.padding = view.model.position === constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
 
             view.listenTo(view.model, 'change', view.render);
 
@@ -58,7 +57,7 @@ define(function (require) {
 
             view.$el.html(view.template(model.toJSON()));
 
-            if (model.state === Constants.SIDEBAR_MAXIMIZED) {
+            if (model.state === constants.SIDEBAR_MAXIMIZED) {
                 view.$el.addClass('sidebar-maximized');
             } else {
                 view.$el.removeClass('sidebar-maximized');
@@ -66,7 +65,7 @@ define(function (require) {
 
             view.options.$main.css(view.padding, view.$el.width() + 'px');
 
-            if (model.state === Constants.SIDEBAR_MINIMIZED) {
+            if (model.state === constants.SIDEBAR_MINIMIZED) {
                 return view.renderIcons();
             } else {
                 return view.renderWidgets();
@@ -165,6 +164,7 @@ define(function (require) {
             view.model.widgets.each(function (widget) {
                 var order = widgetOrder[widget.cid];
                 widget.set({ order: order }, { silent: true });
+                widget.save();
             });
 
             view.model.widgets.sort();
@@ -195,7 +195,7 @@ define(function (require) {
             var view = this;
 
             this.model.widgets.each(function (widget) {
-                var widgetView = new WidgetView({
+                var widgetView = new WidgetContainerView({
                     model: widget
                 });
 
@@ -210,7 +210,7 @@ define(function (require) {
         },
 
         onWidgetAdded: function (widget) {
-            var widgetView = new WidgetView({
+            var widgetView = new WidgetContainerView({
                 model: widget
             });
 
@@ -228,7 +228,9 @@ define(function (require) {
 
             var widgetView = this.widgetViews[cid];
             if (widgetView) {
-                widgetView.contentView.remove();
+                if (widgetView.contentView) {
+                    widgetView.contentView.remove();
+                }
                 widgetView.remove();
                 delete this.widgetViews[cid];
             }
@@ -254,9 +256,9 @@ define(function (require) {
             }
 
             widget.snapshotState();
-            widget.state = Constants.WIDGET_MAXIMIZED;
+            widget.state = constants.WIDGET_MAXIMIZED;
 
-            var hoverView = new WidgetView({
+            var hoverView = new WidgetContainerView({
                 model: widget
             });
 
@@ -300,7 +302,8 @@ define(function (require) {
             });
 
             modal.on('ok', function () {
-                model.widgets.remove(widget);
+                //model.widgets.remove(widget);
+                widget.destroy();
                 modal.off();
             });
 
@@ -321,6 +324,10 @@ define(function (require) {
 
             var widgetSetupView = new WidgetSetupView({
                 model: widget
+            });
+
+            widgetSetupView.on('cancel', function () {
+                widget.save();
             });
 
             widgetSetupView.on('cancel', function () {

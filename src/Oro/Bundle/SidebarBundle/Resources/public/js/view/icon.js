@@ -1,5 +1,5 @@
-define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/icon'],
-    function ($, Backbone, Constants, IconTemplate) {
+define(['jquery', 'backbone', 'text!oro/sidebar/template/icon'],
+    function ($, Backbone, IconTemplate) {
         'use strict';
 
     var IconView = Backbone.View.extend({

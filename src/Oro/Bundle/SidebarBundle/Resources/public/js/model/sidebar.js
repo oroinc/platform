@@ -1,23 +1,25 @@
-define(['backbone', 'oro/constants', 'oro/collection/widget'],
-    function (Backbone, Constants, WidgetCollection) {
+define(['backbone', 'oro/sidebar/constants', 'oro/sidebar/collection/widget-container'],
+    function (Backbone, constants, WidgetContainerCollection) {
     'use strict';
 
     var SidebarModel = Backbone.Model.extend({
-        initialize: function () {
-            this.widgets = new WidgetCollection();
+        urlRoot: 'bundles/orosidebar/api/sidebar',
 
-            this.position = Constants.SIDEBAR_LEFT;
-            this.state = Constants.SIDEBAR_MINIMIZED;
+        initialize: function () {
+            this.widgets = new WidgetContainerCollection();
+
+            this.position = constants.SIDEBAR_LEFT;
+            this.state = constants.SIDEBAR_MINIMIZED;
         },
 
         toggleState: function () {
             switch (this.state) {
-                case Constants.SIDEBAR_MINIMIZED:
-                    this.state = Constants.SIDEBAR_MAXIMIZED;
+                case constants.SIDEBAR_MINIMIZED:
+                    this.state = constants.SIDEBAR_MAXIMIZED;
                     break;
 
-                case Constants.SIDEBAR_MAXIMIZED:
-                    this.state = Constants.SIDEBAR_MINIMIZED;
+                case constants.SIDEBAR_MAXIMIZED:
+                    this.state = constants.SIDEBAR_MINIMIZED;
                     break;
             }
 

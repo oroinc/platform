@@ -1,5 +1,5 @@
-define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 'text!oro/template/widgetMax'],
-    function ($, Backbone, Constants, WidgetMinTemplate, WidgetMaxTemplate) {
+define(['jquery', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/template/widget-min', 'text!oro/sidebar/template/widget-max'],
+    function ($, Backbone, constants, WidgetMinTemplate, WidgetMaxTemplate) {
     'use strict';
 
     var WidgetView = Backbone.View.extend({
@@ -24,7 +24,7 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
             var model = view.model;
             var template = null;
 
-            if (model.state === Constants.WIDGET_MINIMIZED) {
+            if (model.state === constants.WIDGET_MINIMIZED) {
                 template = view.templateMin;
             } else {
                 template = view.templateMax;
@@ -33,7 +33,7 @@ define(['jquery', 'backbone', 'oro/constants', 'text!oro/template/widgetMin', 't
             view.$el.html(template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
 
-            if (model.state === Constants.WIDGET_MAXIMIZED) {
+            if (model.state === constants.WIDGET_MAXIMIZED) {
                 requirejs([model.get('module')], function (Widget) {
                     var $widgetContent = view.$el.find('.sidebar-widget-content');
                     if (!view.contentView) {

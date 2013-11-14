@@ -174,8 +174,8 @@
     }
 </style>
 <script type="text/javascript">
-    require(['jquery', 'oro/model/sidebar', 'oro/view/sidebar', 'oro/constants'],
-            function($, SidebarModel, SidebarView, Constants) {
+    require(['jquery', 'oro/sidebar/model/sidebar', 'oro/sidebar/view/sidebar', 'oro/sidebar/constants'],
+            function($, SidebarModel, SidebarView, constants) {
         'use strict';
 
         $(function () {
@@ -183,10 +183,10 @@
             var rightSidebarData = $('#sidebar-right').data('models');
 
             var leftSidebar = new SidebarModel(leftSidebarData.sidebar);
-            leftSidebar.position = Constants.SIDEBAR_LEFT;
+            leftSidebar.position = constants.SIDEBAR_LEFT;
 
             var rightSidebar = new SidebarModel(rightSidebarData.sidebar);
-            rightSidebar.position = Constants.SIDEBAR_RIGHT;
+            rightSidebar.position = constants.SIDEBAR_RIGHT;
 
             var leftSidebarView = new SidebarView({
                 model: leftSidebar,
