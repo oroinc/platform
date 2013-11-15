@@ -10,18 +10,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Table(name="oro_integration_channel")
  * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string", length=30)
- *
  * @Config(
  *  routeName="oro_integration_channel_index",
  *  defaultValues={
  *      "entity"={"label"="Integration Channel", "plural_label"="Integration Channels"},
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="user_owner_id"
- *      },
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""
@@ -29,7 +21,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  }
  * )
  */
-abstract class Channel
+class Channel
 {
     /**
      * @var integer
@@ -43,9 +35,16 @@ abstract class Channel
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(name="name", type="string", length=255)
      */
     protected $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="type", type="string", length=255)
+     */
+    protected $type;
 
     /**
      * @var ArrayCollection|Transport[]
@@ -96,6 +95,26 @@ abstract class Channel
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
