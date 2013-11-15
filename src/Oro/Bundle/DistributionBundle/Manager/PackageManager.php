@@ -32,7 +32,7 @@ class PackageManager
      */
     public function getInstalled()
     {
-        return $this->composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages();
+        return $this->getLocalRepository()->getCanonicalPackages();
     }
 
     /**
@@ -41,18 +41,20 @@ class PackageManager
     public function getAvailable()
     {
         $packages = [];
-        /** @var RepositoryInterface[] $repositories */
-        $repositories = $this->composer->getRepositoryManager()->getRepositories();
+        $repositories = $this->getRepositories();
 
         foreach ($repositories as $repo) {
-            if ($repo instanceof ComposerRepository) {
+            if ($repo instanceof ComposerRepository && $repo->hasProviders()) {
                 $packages = array_merge($packages, $repo->getProviderNames());
             } else {
-                $packages = array_merge($packages, $repo->getPackages());
+                /** @var PackageInterface $package */
+                foreach ($repo->getPackages() as $package) {
+                    $packages[] = $package->getPrettyName();
+                }
             }
         }
 
-        return array_values(array_diff($packages, $this->getFlatListInstalledPackage()));
+        return array_values(array_unique(array_diff($packages, $this->getFlatListInstalledPackage())));
     }
 
 
@@ -82,14 +84,11 @@ class PackageManager
      * @return PackageInterface
      * @throws \RuntimeException
      */
-    public function getPreferredPackage($packageName, $version)
+    public function getPreferredPackage($packageName, $version = null)
     {
         $pool = new Pool();
-        $pool->addRepository(
-            new CompositeRepository(
-                $this->composer->getRepositoryManager()->getRepositories()
-            )
-        );
+        $pool->addRepository(new CompositeRepository($this->getRepositories()));
+
         $constraint = null;
         if ($version) {
             $constraint = (new VersionParser())->parseConstraints($version);
@@ -125,7 +124,7 @@ class PackageManager
         $requirementLinks = $package->getRequires();
         foreach ($requirementLinks as $link) {
             if (!preg_match(PlatformRepository::PLATFORM_PACKAGE_REGEX, $link->getTarget())) {
-                $requirements[]=$link->getTarget();
+                $requirements[] = $link->getTarget();
             }
         }
 
@@ -138,6 +137,22 @@ class PackageManager
      */
     public function isPackageInstalled($packageName)
     {
-        return (bool)$this->composer->getRepositoryManager()->getLocalRepository()->findPackages($packageName);
+        return (bool)$this->getLocalRepository()->findPackages($packageName);
+    }
+
+    /**
+     * @return \Composer\Repository\WritableRepositoryInterface
+     */
+    protected function getLocalRepository()
+    {
+        return $this->composer->getRepositoryManager()->getLocalRepository();
+    }
+
+    /**
+     * @return RepositoryInterface[]
+     */
+    protected function getRepositories()
+    {
+        return $this->composer->getRepositoryManager()->getRepositories();
     }
 }

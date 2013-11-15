@@ -55,55 +55,102 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $repositoryManagerMock = $this->createRepositoryManagerMock();
         $localRepositoryMock = $this->createLocalRepositoryMock();
 
-        $composerRepositoryMock = $this->createConstructorLessMock('Composer\Repository\ComposerRepository');
+        $composerRepositoryMock = $this->createComposerRepositoryMock();
+        $composerRepositoryWithoutProvidersMock = $this->createComposerRepositoryMock();
         $anyRepositoryExceptComposerRepositoryMock = $this->createConstructorLessMock(
             'Composer\Repository\ArrayRepository'
         );
-        $canonicalPackageMock1 = $this->createCanonicalPackageMock();
-        $canonicalPackageMock2 = $this->createCanonicalPackageMock();
+
+        $installedPackageMock1 = $this->createCanonicalPackageMock();
+        $installedPackageMock2 = $this->createCanonicalPackageMock();
         $installedPackageNames = ['name1', 'name2'];
-        $getProviderNamesReturnValue = ['name3', 'name4'];
-        $getPackagesReturnValue = ['name1', 'name5'];
+
+        $availableProviderNames = ['name3', 'name4'];
+        $availablePackageMock1 = $this->createCanonicalPackageMock();
+        $availablePackageMock2 = $this->createCanonicalPackageMock();
+        $availablePackageMock3 = $this->createCanonicalPackageMock();
+        $availablePackageMock4 = $this->createCanonicalPackageMock();
+        $availablePackageNames = ['name1', 'name5', 'name4', 'name6'];
+
 
         $composerMock->expects($this->exactly(2))
             ->method('getRepositoryManager')
             ->will($this->returnValue($repositoryManagerMock));
 
-        // installed packages configuration
         $repositoryManagerMock->expects($this->once())
             ->method('getRepositories')
-            ->will($this->returnValue([$composerRepositoryMock, $anyRepositoryExceptComposerRepositoryMock]));
+            ->will(
+                $this->returnValue(
+                    [
+                        $composerRepositoryMock,
+                        $composerRepositoryWithoutProvidersMock,
+                        $anyRepositoryExceptComposerRepositoryMock
+                    ]
+                )
+            )
+        ;
 
+        // Fetch already installed packages
         $repositoryManagerMock->expects($this->once())
             ->method('getLocalRepository')
             ->will($this->returnValue($localRepositoryMock));
 
         $localRepositoryMock->expects($this->once())
             ->method('getCanonicalPackages')
-            ->will($this->returnValue([$canonicalPackageMock1, $canonicalPackageMock2]));
+            ->will($this->returnValue([$installedPackageMock1, $installedPackageMock2]));
 
-        $canonicalPackageMock1->expects($this->once())
+        $installedPackageMock1->expects($this->once())
             ->method('getPrettyName')
             ->will($this->returnValue($installedPackageNames[0]));
 
-        $canonicalPackageMock2->expects($this->once())
+        $installedPackageMock2->expects($this->once())
             ->method('getPrettyName')
             ->will($this->returnValue($installedPackageNames[1]));
 
         // available packages configuration
+        // from composer repo
+        $composerRepositoryMock->expects($this->once())
+            ->method('hasProviders')
+            ->will($this->returnValue(true));
+
         $composerRepositoryMock->expects($this->once())
             ->method('getProviderNames')
-            ->will($this->returnValue($getProviderNamesReturnValue));
+            ->will($this->returnValue($availableProviderNames));
+
+        // from composer repo without providers
+        $availablePackageMock1->expects($this->once())
+            ->method('getPrettyName')
+            ->will($this->returnValue($availablePackageNames[0]));
+
+        $availablePackageMock2->expects($this->once())
+            ->method('getPrettyName')
+            ->will($this->returnValue($availablePackageNames[1]));
+
+        $composerRepositoryWithoutProvidersMock->expects($this->once())
+            ->method('hasProviders')
+            ->will($this->returnValue(false));
+
+        $composerRepositoryWithoutProvidersMock->expects($this->once())
+            ->method('getPackages')
+            ->will($this->returnValue([$availablePackageMock1, $availablePackageMock2]));
+
+        // from not composer repository
+        $availablePackageMock3->expects($this->once())
+            ->method('getPrettyName')
+            ->will($this->returnValue($availablePackageNames[2]));
+
+        $availablePackageMock4->expects($this->once())
+            ->method('getPrettyName')
+            ->will($this->returnValue($availablePackageNames[3]));
 
         $anyRepositoryExceptComposerRepositoryMock->expects($this->once())
             ->method('getPackages')
-            ->will($this->returnValue($getPackagesReturnValue));
-
+            ->will($this->returnValue([$availablePackageMock3, $availablePackageMock4]));
 
         $manager = new PackageManager($composerMock);
 
         $this->assertEquals(
-            ['name3', 'name4', 'name5'],
+            ['name3', 'name4', 'name5', 'name6'],
             $manager->getAvailable()
         );
     }
@@ -138,5 +185,13 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     protected function createCanonicalPackageMock()
     {
         return $this->createConstructorLessMock('Composer\Package\PackageInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createComposerRepositoryMock()
+    {
+        return $this->createConstructorLessMock('Composer\Repository\ComposerRepository');
     }
 }
