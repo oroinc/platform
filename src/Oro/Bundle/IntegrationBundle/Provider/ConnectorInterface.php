@@ -15,8 +15,9 @@ interface ConnectorInterface
     public function connect();
 
     /**
-     * @param string|null $oneWay sync direction, default - initial sync, pull, if null - two way sync
+     * Called by objects with ReaderInterface
+     *
      * @return mixed
      */
-    public function sync($oneWay = self::SYNC_DIRECTION_PULL);
+    public function read();
 }
