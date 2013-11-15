@@ -17,6 +17,9 @@ function (Backbone, constants, WidgetContainerCollection) {
             this.state = constants.SIDEBAR_MINIMIZED;
         },
 
+        /**
+         * Toggles state of sidebar between minimized and maximized
+         */
         toggleState: function () {
             switch (this.state) {
                 case constants.SIDEBAR_MINIMIZED:

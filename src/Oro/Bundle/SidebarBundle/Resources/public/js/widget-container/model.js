@@ -21,6 +21,9 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
             this.isDragged = false;
         },
 
+        /**
+         * Toggles state of widget container between minimized and maximized
+         */
         toggleState: function () {
             switch (this.state) {
                 case constants.WIDGET_MINIMIZED:
@@ -35,10 +38,16 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
             this.trigger('change');
         },
 
+        /**
+         * Saves state of widget container
+         */
         snapshotState: function () {
             this.stateSnapshot = this.state;
         },
 
+        /**
+         * Restores state of widget container
+         */
         restoreState: function () {
             this.state = this.stateSnapshot;
         }
