@@ -1,10 +1,10 @@
 define(['jquery', 'backbone', 'text!oro/sidebar/widget-container/icon-template'],
-    function ($, Backbone, IconTemplate) {
+    function ($, Backbone, iconTemplate) {
         'use strict';
 
     var IconView = Backbone.View.extend({
         className: 'sidebar-icon',
-        template: _.template(IconTemplate),
+        template: _.template(iconTemplate),
 
         events: {
             'click': 'onClick'

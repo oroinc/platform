@@ -1,11 +1,11 @@
 placeholders:
     right_panel:
         items:
-            right_panel2:
+            right_panel:
                 order: 200
     left_panel:
         items:
-            left_panel2:
+            left_panel:
                 order: 200
     scripts_after:
         items:
@@ -13,9 +13,9 @@ placeholders:
                 order: 300
 
 items:
-    right_panel2:
+    right_panel:
         template: OroSidebarBundle::right_panel.html.twig
-    left_panel2:
+    left_panel:
         template: OroSidebarBundle::left_panel.html.twig
     sidebar_js:
         template: OroSidebarBundle::sidebar_js.html.twig

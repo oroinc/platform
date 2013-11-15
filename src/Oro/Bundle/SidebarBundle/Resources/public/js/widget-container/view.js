@@ -1,12 +1,12 @@
 define(['jquery', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/widget-container/widget-min-template',
     'text!oro/sidebar/widget-container/widget-max-template'],
-function ($, Backbone, constants, WidgetMinTemplate, WidgetMaxTemplate) {
+function ($, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
     'use strict';
 
     var WidgetView = Backbone.View.extend({
         className: 'sidebar-widget',
-        templateMin: _.template(WidgetMinTemplate),
-        templateMax: _.template(WidgetMaxTemplate),
+        templateMin: _.template(widgetMinTemplate),
+        templateMax: _.template(widgetMaxTemplate),
 
         events: {
             'click .sidebar-widget-header-toggle': 'onClickToggle',

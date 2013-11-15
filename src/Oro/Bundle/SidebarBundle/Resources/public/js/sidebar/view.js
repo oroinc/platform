@@ -15,10 +15,10 @@ define(function (require) {
     var WidgetAddView = require('oro/sidebar/widget-container/widget-add-view');
     var WidgetSetupView = require('oro/sidebar/widget-container/widget-setup-view');
 
-    var SidebarTemplate = require('text!oro/sidebar/sidebar/template');
+    var sidebarTemplate = require('text!oro/sidebar/sidebar/template');
 
     var SidebarView = Backbone.View.extend({
-        template: _.template(SidebarTemplate),
+        template: _.template(sidebarTemplate),
 
         events: {
             'click .sidebar-add': 'onClickAdd',

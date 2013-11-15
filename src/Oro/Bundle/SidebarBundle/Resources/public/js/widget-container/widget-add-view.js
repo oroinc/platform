@@ -3,7 +3,7 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var WidgetAddTemplate = require('text!oro/sidebar/widget-container/widget-add-template');
+    var widgetAddTemplate = require('text!oro/sidebar/widget-container/widget-add-template');
     var WidgetContainerModel = require('oro/sidebar/widget-container/model');
 
     var Modal = require('oro/modal');
@@ -13,7 +13,7 @@ define(function (require) {
             var view = this;
             var model = view.model;
 
-            options.content = _.template(WidgetAddTemplate, model.toJSON());
+            options.content = _.template(widgetAddTemplate, model.toJSON());
 
             Modal.prototype.initialize.apply(this, arguments);
         },
