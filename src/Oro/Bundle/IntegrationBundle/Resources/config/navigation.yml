@@ -8,6 +8,8 @@ oro_menu_config:
         channels_list:
             label: 'Configuration'
             route: 'oro_integration_channel_index'
+            extras:
+                routes: 'oro_integration_channel_*'
 
     tree:
         application_menu:
@@ -16,3 +18,7 @@ oro_menu_config:
                     children:
                         channels_list: ~
 
+oro_titles:
+    oro_integration_channel_index:  ~
+    oro_integration_channel_update: %%channel.name%%
+    oro_integration_channel_create: Create Channel

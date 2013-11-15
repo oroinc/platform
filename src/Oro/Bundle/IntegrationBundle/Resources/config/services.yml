@@ -1,0 +1,36 @@
+parameters:
+    oro_integration.channel.entity.class:                                 Oro\Bundle\IntegrationBundle\Entity\Channel
+
+    oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
+    oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
+
+    oro_integration.manager.channel_type.class:                           Oro\Bundle\IntegrationBundle\Manager\ChannelTypeManager
+services:
+    oro_integration.channel.manager.api:
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        arguments:
+            - %oro_integration.channel.entity.class%
+            - @doctrine.orm.entity_manager
+
+    oro_integration.form.channel:
+        class:                        Symfony\Component\Form\Form
+        factory_method:               createNamed
+        factory_service:              form.factory
+        arguments:                    ["oro_integration_channel_form", "oro_integration_channel_form", null]
+
+    oro_integration.form.type.channel:
+        class: %oro_integration.form.type.channel.class%
+        arguments:
+            - @oro_integration.manager.channel_type
+        tags:
+             - { name: form.type, alias: oro_integration_channel_form }
+
+    oro_integration.form.handler.channel:
+        class:                        %oro_integration.form.handler.channel.class%
+        scope:                        request
+        arguments:                    [@request, @oro_integration.form.channel, @doctrine.orm.entity_manager]
+
+    oro_integration.manager.channel_type:
+        class: %oro_integration.manager.channel_type.class%
+        arguments:
+            - []
