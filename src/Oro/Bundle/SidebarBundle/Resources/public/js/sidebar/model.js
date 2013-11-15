@@ -1,5 +1,5 @@
-define(['backbone', 'oro/sidebar/constants', 'oro/sidebar/collection/widget-container'],
-    function (Backbone, constants, WidgetContainerCollection) {
+define(['backbone', 'oro/sidebar/constants', 'oro/sidebar/widget-container/collection'],
+function (Backbone, constants, WidgetContainerCollection) {
     'use strict';
 
     var SidebarModel = Backbone.Model.extend({

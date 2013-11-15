@@ -3,8 +3,8 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var WidgetAddTemplate = require('text!oro/sidebar/template/widget-add');
-    var WidgetContainerModel = require('oro/sidebar/model/widget-container');
+    var WidgetAddTemplate = require('text!oro/sidebar/widget-container/widget-add-template');
+    var WidgetContainerModel = require('oro/sidebar/widget-container/model');
 
     var Modal = require('oro/modal');
 

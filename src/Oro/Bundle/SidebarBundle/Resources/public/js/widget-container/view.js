@@ -1,5 +1,6 @@
-define(['jquery', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/template/widget-min', 'text!oro/sidebar/template/widget-max'],
-    function ($, Backbone, constants, WidgetMinTemplate, WidgetMaxTemplate) {
+define(['jquery', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/widget-container/widget-min-template',
+    'text!oro/sidebar/widget-container/widget-max-template'],
+function ($, Backbone, constants, WidgetMinTemplate, WidgetMaxTemplate) {
     'use strict';
 
     var WidgetView = Backbone.View.extend({

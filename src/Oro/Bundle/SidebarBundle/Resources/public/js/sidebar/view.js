@@ -10,12 +10,12 @@ define(function (require) {
 
     var constants = require('oro/sidebar/constants');
 
-    var IconView = require('oro/sidebar/view/icon');
-    var WidgetContainerView = require('oro/sidebar/view/widget-container');
-    var WidgetAddView = require('oro/sidebar/view/widget-add');
-    var WidgetSetupView = require('oro/sidebar/view/widget-setup');
+    var IconView = require('oro/sidebar/widget-container/icon-view');
+    var WidgetContainerView = require('oro/sidebar/widget-container/view');
+    var WidgetAddView = require('oro/sidebar/widget-container/widget-add-view');
+    var WidgetSetupView = require('oro/sidebar/widget-container/widget-setup-view');
 
-    var SidebarTemplate = require('text!oro/sidebar/template/sidebar');
+    var SidebarTemplate = require('text!oro/sidebar/sidebar/template');
 
     var SidebarView = Backbone.View.extend({
         template: _.template(SidebarTemplate),
@@ -262,15 +262,15 @@ define(function (require) {
                 model: widget
             });
 
-
             var widgetWidth = 200;
-
             this.$el.append(hoverView.render().$el);
             hoverView.$el.css('position', 'fixed');
             hoverView.$el.width(widgetWidth);
 
-            if ((cord.left + widgetWidth) > document.width) {
-                cord.left = document.width - widgetWidth;
+            var windowWidth = $(window).width();
+
+            if ((cord.left + widgetWidth) > windowWidth) {
+                cord.left = windowWidth - widgetWidth;
             }
 
             hoverView.$el.offset(cord);

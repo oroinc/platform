@@ -2,29 +2,25 @@ config:
     paths:
         'oro/sidebar/constants': 'bundles/orosidebar/js/constants.js'
 
-        'oro/sidebar/model/sidebar': 'bundles/orosidebar/js/model/sidebar.js'
-        'oro/sidebar/model/widget-container': 'bundles/orosidebar/js/model/widget-container.js'
+        'oro/sidebar/sidebar/model': 'bundles/orosidebar/js/sidebar/model.js'
+        'oro/sidebar/sidebar/template': 'bundles/orosidebar/js/sidebar/template.html'
+        'oro/sidebar/sidebar/view': 'bundles/orosidebar/js/sidebar/view.js'
 
-        'oro/sidebar/view/sidebar': 'bundles/orosidebar/js/view/sidebar.js'
-        'oro/sidebar/view/widget-container': 'bundles/orosidebar/js/view/widget-container.js'
-        'oro/sidebar/view/icon': 'bundles/orosidebar/js/view/icon.js'
-        'oro/sidebar/view/widget-add': 'bundles/orosidebar/js/view/widget-add.js'
-        'oro/sidebar/view/widget-setup': 'bundles/orosidebar/js/view/widget-setup.js'
-
-        'oro/sidebar/collection/widget-container': 'bundles/orosidebar/js/collection/widget-container.js'
-
-        'oro/sidebar/template/sidebar': 'bundles/orosidebar/js/template/sidebar.html'
-        'oro/sidebar/template/widget-min': 'bundles/orosidebar/js/template/widget-min.html'
-        'oro/sidebar/template/widget-max': 'bundles/orosidebar/js/template/widget-max.html'
-        'oro/sidebar/template/icon': 'bundles/orosidebar/js/template/icon.html'
-        'oro/sidebar/template/widget-add': 'bundles/orosidebar/js/template/widget-add.html'
-
+        'oro/sidebar/widget-container/model': 'bundles/orosidebar/js/widget-container/model.js'
+        'oro/sidebar/widget-container/collection': 'bundles/orosidebar/js/widget-container/collection.js'
+        'oro/sidebar/widget-container/icon-template': 'bundles/orosidebar/js/widget-container/icon-template.html'
+        'oro/sidebar/widget-container/widget-min-template': 'bundles/orosidebar/js/widget-container/widget-min-template.html'
+        'oro/sidebar/widget-container/widget-max-template': 'bundles/orosidebar/js/widget-container/widget-max-template.html'
+        'oro/sidebar/widget-container/widget-add-template': 'bundles/orosidebar/js/widget-container/widget-add-template.html'
+        'oro/sidebar/widget-container/view': 'bundles/orosidebar/js/widget-container/view.js'
+        'oro/sidebar/widget-container/icon-view': 'bundles/orosidebar/js/widget-container/icon-view.js'
+        'oro/sidebar/widget-container/widget-add-view': 'bundles/orosidebar/js/widget-container/widget-add-view.js'
+        'oro/sidebar/widget-container/widget-setup-view': 'bundles/orosidebar/js/widget-container/widget-setup-view.js'
         'oro/sidebar/widget/hello-world': 'bundles/orosidebar/js/widget/hello-world.js'
-
 build:
     paths:
-        'oro/sidebar/template/sidebar': 'empty:'
-        'oro/sidebar/template/widget-min': 'empty:'
-        'oro/sidebar/template/widget-max': 'empty:'
-        'oro/sidebar/template/icon': 'empty:'
-        'oro/sidebar/template/widget-add': 'empty:'
+        'oro/sidebar/sidebar/template': 'empty:'
+        'oro/sidebar/widget-container/icon-template': 'empty:'
+        'oro/sidebar/widget-container/widget-min-template': 'empty:'
+        'oro/sidebar/widget-container/widget-max-template': 'empty:'
+        'oro/sidebar/widget-container/widget-add-template': 'empty:'

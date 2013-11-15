@@ -3,7 +3,7 @@ define(function (require) {
 
     var _ = require('underscore');
     var Backbone = require('backbone');
-    var WidgetContainerModel = require('oro/sidebar/model/widget-container');
+    var WidgetContainerModel = require('oro/sidebar/widget-container/model');
 
     var WidgetContainerCollection = Backbone.Collection.extend({
         url: 'bundles/orosidebar/api/widget-container',

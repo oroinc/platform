@@ -1,4 +1,4 @@
-define(['jquery', 'backbone', 'text!oro/sidebar/template/icon'],
+define(['jquery', 'backbone', 'text!oro/sidebar/widget-container/icon-template'],
     function ($, Backbone, IconTemplate) {
         'use strict';
 
