@@ -1,6 +1,9 @@
 define(['jquery', 'backbone'], function ($, Backbone) {
     'use strict';
 
+    /**
+     * @export  oro/sidebar/widget/hello-world
+     */
     var helloWorld = {};
 
     helloWorld.defaults = {

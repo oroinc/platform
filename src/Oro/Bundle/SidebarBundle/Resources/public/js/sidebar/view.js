@@ -6,6 +6,7 @@ define(function (require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
 
+    var __ = require('oro/translator');
     var DeleteConfirmation = require('oro/delete-confirmation');
 
     var constants = require('oro/sidebar/constants');
@@ -17,6 +18,11 @@ define(function (require) {
 
     var sidebarTemplate = require('text!oro/sidebar/sidebar/template');
 
+    /**
+     * @export  oro/sidebar/sidebar/view
+     * @class oro.sidebar.sidebar.View
+     * @extends Backbone.View
+     */
     var SidebarView = Backbone.View.extend({
         template: _.template(sidebarTemplate),
 
@@ -298,7 +304,7 @@ define(function (require) {
             }
 
             var modal = new DeleteConfirmation({
-                content: 'The widget will be removed'
+                content: __('The widget will be removed')
             });
 
             modal.on('ok', function () {

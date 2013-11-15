@@ -2,6 +2,11 @@ define(['jquery', 'backbone', 'text!oro/sidebar/widget-container/icon-template']
     function ($, Backbone, iconTemplate) {
         'use strict';
 
+    /**
+     * @export  oro/sidebar/widget-controller/icon-view
+     * @class oro.sidebar.widget-controller.IconView
+     * @extends Backbone.View
+     */
     var IconView = Backbone.View.extend({
         className: 'sidebar-icon',
         template: _.template(iconTemplate),

@@ -3,6 +3,11 @@ define(['jquery', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/widget-
 function ($, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
     'use strict';
 
+    /**
+     * @export  oro/sidebar/widget-controller/view
+     * @class oro.sidebar.widget-controller.View
+     * @extends Backbone.View
+     */
     var WidgetView = Backbone.View.extend({
         className: 'sidebar-widget',
         templateMin: _.template(widgetMinTemplate),

@@ -2,6 +2,11 @@ define(['backbone', 'oro/sidebar/constants', 'oro/sidebar/widget-container/colle
 function (Backbone, constants, WidgetContainerCollection) {
     'use strict';
 
+    /**
+     * @export  oro/sidebar/sidebar/model
+     * @class oro.sidebar.sidebar.Model
+     * @extends Backbone.Model
+     */
     var SidebarModel = Backbone.Model.extend({
         urlRoot: 'bundles/orosidebar/api/sidebar',
 

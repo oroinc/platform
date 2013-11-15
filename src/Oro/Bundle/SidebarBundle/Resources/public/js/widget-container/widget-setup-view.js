@@ -3,6 +3,11 @@ define(function (require) {
 
     var Modal = require('oro/modal');
 
+    /**
+     * @export  oro/sidebar/widget-controller/widget-setup-view
+     * @class oro.sidebar.widget-controller.WidgetSetupView
+     * @extends oro.Modal
+     */
     var WidgetSetupView = Modal.extend({
         initialize: function(options) {
             var view = this;
