@@ -16,7 +16,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Table(name="oro_email")
  * @ORM\Entity
- * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository")
  * @ORM\HasLifecycleCallbacks
  *
  *  @Config(
@@ -24,7 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      "entity"={"label"="Email", "plural_label"="Emails"},
  *      "security"={
  *          "type"="ACL",
- *          "permissions"="VIEW",
+ *          "permissions"="VIEW;CREATE",
  *          "group_name"=""
  *      }
  *  }

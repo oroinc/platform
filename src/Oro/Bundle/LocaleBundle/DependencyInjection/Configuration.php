@@ -14,6 +14,11 @@ use Symfony\Component\Intl\Intl;
  */
 class Configuration implements ConfigurationInterface
 {
+    const DEFAULT_LOCALE   = 'en';
+    const DEFAULT_LANGUAGE = 'en';
+    const DEFAULT_COUNTRY  = 'US';
+    const DEFAULT_CURRENCY = 'USD';
+
     /**
      * {@inheritDoc}
      */
@@ -69,18 +74,42 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('locale_data')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('default_locale')
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('currency_code')
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('phone_prefix')
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('currency_data')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('symbol')
+                                ->cannotBeEmpty()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
-        $date = new \DateTime('now');
+        // null values set as default for language, country and currency because
+        // their values will be calculated by Extension based on chosen locale
         SettingsBuilder::append(
             $rootNode,
             array(
+                'locale'   => array('value' => '%locale%'),
                 'language' => array('value' => null),
-                'locale' => array('value' => '%locale%'),
-                'country' => array('value' => null),
-                'timezone' => array('value' => $date->getTimezone()->getName()),
-                'default_currency' => array('value' => 'USD'),
-                'name_format' => array('value' => null)
+                'country'  => array('value' => null),
+                'currency' => array('value' => null),
+                'timezone' => array('value' => date_default_timezone_get()),
+                'format_address_by_address_country' => array('value' => true, 'type' => 'boolean'),
             )
         );
 

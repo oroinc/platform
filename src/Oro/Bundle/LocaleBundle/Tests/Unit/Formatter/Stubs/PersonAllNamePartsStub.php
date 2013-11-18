@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Test\Unit\Formatter\Stubs;
+namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs;
 
 use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 use Oro\Bundle\LocaleBundle\Model\LastNameInterface;

@@ -7,62 +7,62 @@ oro_system_configuration:
         locale_settings:
             title: 'Localization options'
 
-        locale_options:
-            title: 'Formatting options'
-
     fields:
-        oro_locale.language:
-            type: locale
+        oro_locale.locale:
+            type: oro_locale
             priority: 70
             options:
-                label: 'Language'
-                required: true
-                constraints:
-                    - NotBlank: ~
-
-        oro_locale.locale:
-            type: locale
-            priority: 60
-            options:
                 label: 'Locale'
-                required: true
-                constraints:
-                    - NotBlank: ~
-
-        oro_locale.timezone:
-            type: timezone
-            priority: 50
-            options:
-                label: 'Timezone'
+                tooltip: oro.locale.form.tooltip.locale
                 required: true
                 constraints:
                     - NotBlank: ~
 
         oro_locale.country:
-              type: country
-              priority: 40
-              options:
-                  label: 'Country'
-                  required: true
-                  constraints:
-                      - NotBlank: ~
-
-        oro_locale.default_currency:
-            type: currency
-            priority: 30
+            type: oro_locale_country
+            priority: 60
             options:
-                label: 'Default currency'
+                label: 'Location'
+                tooltip: oro.locale.form.tooltip.location
                 required: true
                 constraints:
                     - NotBlank: ~
 
-        oro_locale.name_format:
-            type: oro_name_format
+        oro_locale.format_address_by_address_country:
+            type: oro_config_checkbox
+            priority: 50
+            options:
+                label: 'Format address by address country'
+                tooltip: oro.locale.form.tooltip.format_address_by_address_country
+                required: true
+
+        oro_locale.language:
+            type: oro_locale
+            priority: 40
+            options:
+                label: 'Language'
+                tooltip: oro.locale.form.tooltip.language
+                required: true
+                constraints:
+                    - NotBlank: ~
+
+        oro_locale.timezone:
+            type: oro_locale_timezone
+            priority: 30
+            options:
+                label: 'Timezone'
+                tooltip: oro.locale.form.tooltip.timezone
+                required: true
+                constraints:
+                    - NotBlank: ~
+
+        oro_locale.currency:
+            type: oro_currency
             priority: 20
             options:
-                label: 'Name format'
+                label: 'Currency'
+                tooltip: oro.locale.form.tooltip.currency
                 required: true
-                #tooltip: 'Available variables:<br> %%firstname%%, %%lastname%%'
                 constraints:
                     - NotBlank: ~
 
@@ -78,12 +78,9 @@ oro_system_configuration:
                                     locale_settings:
                                         priority: 100
                                         children:
-                                            - oro_locale.language
-                                            - oro_locale.country
-                                            - oro_locale.default_currency
-                                            - oro_locale.timezone
-                                    locale_options:
-                                        priority: 50
-                                        children:
                                             - oro_locale.locale
-                                            - oro_locale.name_format
+                                            - oro_locale.country
+                                            - oro_locale.format_address_by_address_country
+                                            - oro_locale.language
+                                            - oro_locale.timezone
+                                            - oro_locale.currency
