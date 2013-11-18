@@ -2,7 +2,8 @@ parameters:
     oro_distribution.routing_loader.class:            Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
     oro_distribution.package_manager.class:           Oro\Bundle\DistributionBundle\Manager\PackageManager
     oro_distribution.composer.class:                  Composer\Composer
-    oro_distribution.composer.io.class:               Composer\IO\NullIO
+    oro_distribution.composer.io.class:               Composer\IO\BufferIO
+    oro_distribution.composer.installer.class:        Composer\Installer
 
 services:
     oro_distribution.routing_loader:
@@ -15,11 +16,17 @@ services:
 
     oro_distribution.package_manager:
         class: %oro_distribution.package_manager.class%
-        arguments: [@oro_distribution.composer]
+        arguments: [@oro_distribution.composer, @oro_distribution.composer.installer]
 
     oro_distribution.composer.io:
         class: %oro_distribution.composer.io.class%
+
+    oro_distribution.composer.installer:
+        class: %oro_distribution.composer.installer.class%
         public: false
+        factory_class: Composer\Installer
+        factory_method: create
+        arguments: [@oro_distribution.composer.io, @oro_distribution.composer]
 
     oro_distribution.composer:
         class: %oro_distribution.composer.class%
@@ -27,3 +34,4 @@ services:
         factory_class: Composer\Factory
         factory_method: create
         arguments: [@oro_distribution.composer.io]
+

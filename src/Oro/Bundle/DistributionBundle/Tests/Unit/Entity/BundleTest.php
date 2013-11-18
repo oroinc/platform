@@ -22,8 +22,8 @@ class BundleTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldAllowToSetProperty($setter, $value)
     {
-        $package = new Bundle();
-        $package->{$setter}($value);
+        $bundle = new Bundle();
+        $bundle->{$setter}($value);
     }
 
     /**
@@ -33,10 +33,10 @@ class BundleTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldReturnValueThatWasSetBefore($getter, $setter, $value)
     {
-        $package = new Bundle();
-        $package->{$setter}($value);
+        $bundle = new Bundle();
+        $bundle->{$setter}($value);
 
-        $this->assertEquals($value, $package->{$getter}());
+        $this->assertEquals($value, $bundle->{$getter}());
     }
 
 

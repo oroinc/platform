@@ -4,6 +4,8 @@ namespace Oro\Bundle\DistributionBundle\Manager;
 use Composer\Composer;
 use Composer\DependencyResolver\DefaultPolicy;
 use Composer\DependencyResolver\Pool;
+use Composer\Installer;
+use Composer\Json\JsonFile;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
 use Composer\Package\Version\VersionParser;
@@ -20,11 +22,18 @@ class PackageManager
     protected $composer;
 
     /**
-     * @param Composer $composer
+     * @var Installer
      */
-    public function __construct(Composer $composer)
+    protected $installer;
+
+    /**
+     * @param Composer $composer
+     * @param Installer $installer
+     */
+    public function __construct(Composer $composer, Installer $installer)
     {
         $this->composer = $composer;
+        $this->installer = $installer;
     }
 
     /**
@@ -57,36 +66,15 @@ class PackageManager
         return array_values(array_unique(array_diff($packages, $this->getFlatListInstalledPackage())));
     }
 
-
     /**
-     * @return array
-     */
-    protected function getFlatListInstalledPackage()
-    {
-        $packages = [];
-        foreach ($this->getInstalled() as $package) {
-            $packages[] = $package->getPrettyName();
-        }
-
-        return $packages;
-    }
-
-    /**
-     */
-    public function install($packageName, $version = null)
-    {
-
-    }
-
-    /**
-     * @param $packageName
-     * @param $version
+     * @param string $packageName
+     * @param mixed $version
      * @return PackageInterface
      * @throws \RuntimeException
      */
     public function getPreferredPackage($packageName, $version = null)
     {
-        $pool = new Pool();
+        $pool = new Pool('dev');
         $pool->addRepository(new CompositeRepository($this->getRepositories()));
 
         $constraint = null;
@@ -117,6 +105,10 @@ class PackageManager
         return $package;
     }
 
+    /**
+     * @param PackageInterface $package
+     * @return string[]
+     */
     public function getRequirements(PackageInterface $package)
     {
         $requirements = [];
@@ -132,12 +124,46 @@ class PackageManager
     }
 
     /**
-     * @param $packageName
+     * @param string $packageName
      * @return bool
      */
     public function isPackageInstalled($packageName)
     {
         return (bool)$this->getLocalRepository()->findPackages($packageName);
+    }
+
+    /**
+     * @param PackageInterface $package
+     * @param string $configPath
+     */
+    public function addToComposerJsonFile(PackageInterface $package, $configPath = './composer.json')
+    {
+        $composerFile = new JsonFile($configPath);
+        $composerData = $composerFile->read();
+        $composerData['require'][$package->getName()] = $package->getPrettyVersion();
+
+        $composerFile->write($composerData);
+        $this->updateRootPackage($composerData['require']);
+    }
+
+    /**
+     * @param PackageInterface $package
+     * @return bool
+     */
+    public function install(PackageInterface $package)
+    {
+        $this->installer
+            ->setDryRun(false)
+            ->setVerbose(false)
+            ->setPreferSource(false)
+            ->setPreferDist(true)
+            ->setDevMode(false)
+            ->setRunScripts(true)
+            ->setUpdate(true)
+            ->setUpdateWhitelist([$package->getName()])
+            ->setOptimizeAutoloader(true);
+
+        return $this->installer->run();
     }
 
     /**
@@ -154,5 +180,34 @@ class PackageManager
     protected function getRepositories()
     {
         return $this->composer->getRepositoryManager()->getRepositories();
+    }
+
+    /**
+     * @param array $require
+     */
+    protected function updateRootPackage(array $require = [])
+    {
+        $rootPackage = $this->composer->getPackage();
+        $rootPackage->setRequires(
+            (new VersionParser())->parseLinks(
+                $rootPackage->getName(),
+                $rootPackage->getPrettyVersion(),
+                'requires',
+                $require
+            )
+        );
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFlatListInstalledPackage()
+    {
+        $packages = [];
+        foreach ($this->getInstalled() as $package) {
+            $packages[] = $package->getPrettyName();
+        }
+
+        return $packages;
     }
 }
