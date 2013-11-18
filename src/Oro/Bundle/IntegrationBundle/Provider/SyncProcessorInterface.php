@@ -5,8 +5,8 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 interface SyncProcessorInterface
 {
     /**
-     * @param $batchData
+     * @param $channelId
      * @return mixed
      */
-    public function process($batchData);
+    public function process($channelId);
 }

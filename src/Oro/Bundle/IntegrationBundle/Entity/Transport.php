@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 /**
  * Class Transport
@@ -56,4 +57,9 @@ abstract class Transport
     {
         return $this->channel;
     }
+
+    /**
+     * @return ParameterBag
+     */
+    abstract public function getSettingsBag();
 }
