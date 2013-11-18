@@ -30,6 +30,11 @@ abstract class Connector
     protected $channel;
 
     /**
+     * @var Transport
+     */
+    protected $transport;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -55,5 +60,13 @@ abstract class Connector
     public function getChannel()
     {
         return $this->channel;
+    }
+
+    /**
+     * @return Transport
+     */
+    public function getTransport()
+    {
+        return $this->transport;
     }
 }

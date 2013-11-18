@@ -1,7 +1,9 @@
 <?php
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
+
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
@@ -14,10 +16,11 @@ class SOAPTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function init(array $settings)
+    public function init(ParameterBag $settings)
     {
-        if (!empty($settings['wsdl_url'])) {
-            $this->client = $this->getSoapClient($settings['wsdl_url']);
+        $wsdlUrl = $settings->get('wsdl_url');
+        if ($wsdlUrl) {
+            $this->client = $this->getSoapClient($wsdlUrl);
             return true;
         }
 

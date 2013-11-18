@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Connector;
 
 abstract class AbstractConnector implements ConnectorInterface
 {
     /** @var TransportInterface */
     protected $transport;
 
-    /** @var Channel */
-    protected $channel = null;
+    /** @var Connector */
+    protected $connectorEntity = null;
 
     /** @var bool */
     protected $isConnected = false;
@@ -28,11 +28,15 @@ abstract class AbstractConnector implements ConnectorInterface
      */
     public function connect()
     {
-        if (is_null($this->channel)) {
-            throw new \Exception('There\'s no configured channel in connector');
+        if (is_null($this->connectorEntity)) {
+            throw new \Exception('There\'s no connector entity specified in connector');
         }
 
-        $this->isConnected = $this->transport->init($this->channel->getSettings());
+        $transportSettings = $this->connectorEntity
+            ->getTransport()
+            ->getSettingsBag();
+
+        $this->isConnected = $this->transport->init($transportSettings);
 
         return $this->isConnected;
     }
@@ -54,13 +58,10 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * @param Channel $channel
-     * @return $this
+     * @param Connector $connector
      */
-    public function setChannel(Channel $channel)
+    public function setConnectorEntity(Connector $connector)
     {
-        $this->channel = $channel;
-
-        return $this;
+        $this->connectorEntity = $connector;
     }
 }

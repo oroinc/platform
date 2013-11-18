@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 interface TransportInterface
 {
     /**
-     * @param array $settings
+     * @param ParameterBag $settings
      * @return mixed
      */
-    public function init(array $settings);
+    public function init(ParameterBag $settings);
 
     /**
      * @param string $action
