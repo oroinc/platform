@@ -8,7 +8,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 /**
@@ -71,7 +70,7 @@ class ChannelController extends Controller
         if ($this->get('oro_integration.form.handler.channel')->process($channel)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro_integration.controller.channel.message.saved')
+                $this->get('translator')->trans('oro.integration.controller.channel.message.saved')
             );
 
             return $this->get('oro_ui.router')->actionRedirect(
