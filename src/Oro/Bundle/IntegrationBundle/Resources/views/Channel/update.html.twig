@@ -1,21 +1,21 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% if form.vars.value.id %}
-    {% oro_title_set({params : {"%channel.name%": form.vars.value.label} }) %}
+    {% oro_title_set({params : {"%channel.name%": form.vars.value.name } }) %}
 {% endif %}
-{% set formAction = form.vars.value.id ? path('orocrm_magento_customer_update', { id: form.vars.value.id }) : path('oro_integration_channel_create') %}
+{% set formAction = form.vars.value.id ? path('oro_integration_channel_update', { id: form.vars.value.id }) : path('oro_integration_channel_create') %}
 
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('oro_integration_channel_delete') %}
         {{
             UI.deleteButton({
-                'dataUrl': path('oro_integration_channel_delete', {'id': form.vars.value.id}),
+                'dataUrl': path('oro_api_delete_channel', {'id': form.vars.value.id}),
                 'dataRedirect': path('oro_integration_channel_index'),
                 'aCss': 'no-hash remove-button',
                 'id': 'btn-remove-channel',
                 'dataId': form.vars.value.id,
                 'dataMessage': 'Are you sure you want to delete this channel?'|trans,
-                'successMessage': 'Contact group deleted'|trans,
+                'successMessage': 'Channel deleted'|trans,
                 'title': 'Delete Group',
                 'label': 'Delete'
             })
