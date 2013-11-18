@@ -1,6 +1,7 @@
 <?php
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
@@ -20,7 +21,7 @@ class SOAPTransport implements TransportInterface
             return true;
         }
 
-        return false;
+        throw new InvalidConfigurationException("SOAP Transport require 'wsdl_url' option to be defined.");
     }
 
     /**

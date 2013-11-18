@@ -64,6 +64,13 @@ class Channel
      */
     protected $connectors;
 
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="type", type="text")
+     */
+    protected $settings;
+
     public function __construct()
     {
         $this->transports = new ArrayCollection();
@@ -190,4 +197,25 @@ class Channel
     {
         return $this->connectors;
     }
+
+
+    /**
+     * @return mixed
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
+
+    /**
+     * @param $settings
+     * @return $this
+     */
+    public function setSettings($settings)
+    {
+        $this->settings = $settings;
+
+        return $this;
+    }
+
 }
