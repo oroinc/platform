@@ -59,9 +59,12 @@ abstract class AbstractConnector implements ConnectorInterface
 
     /**
      * @param Connector $connector
+     * @return $this
      */
     public function setConnectorEntity(Connector $connector)
     {
         $this->connectorEntity = $connector;
+
+        return $this;
     }
 }

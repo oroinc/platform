@@ -31,6 +31,8 @@ abstract class Connector
 
     /**
      * @var Transport
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport", inversedBy="connectors")
      */
     protected $transport;
 
