@@ -30,16 +30,17 @@
 }
 
 .sidebar-resize {
-    background-color: #555;
-    border-left: 1px solid #555555;
-    border-right: 1px solid #505050;
+    background-color: #676C71;
+    border-left: 1px solid #525458;
+    border-right: 1px solid #343536;
     height: 100%;
     position: absolute;
-    width: 7px;
+    width: 5px;
     z-index: 11;
 }
 
 .sidebar-resize a {
+    position: absolute;
     height: 100%;
     width: 100%;
 }
@@ -80,17 +81,32 @@
     bottom: 0;
 }
 
+.sidebar-toggle a {
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    bottom: 0;
+}
+
+.sidebar-left .sidebar-toggle a {
+    right: 9px;
+}
+
+.sidebar-right .sidebar-toggle a {
+    left: 1px;
+}
+
 .sidebar-toggle i {
     position: absolute;
     bottom: 0;
 }
 
 .sidebar-left .sidebar-toggle i {
-    right: 9px;
+    right: 0px;
 }
 
 .sidebar-right .sidebar-toggle i {
-    left: 1px;
+    left: 0px;
 }
 
 .sidebar-widget, .sidebar-icon {
@@ -129,13 +145,18 @@
     width: 16px;
 }
 
-.sidebar-widget-header a, a.sidebar-toggle, a.sidebar-add {
+.sidebar-widget-header a, .sidebar-toggle a, .sidebar-add a {
     color: #fff;
 }
 
 .sidebar-widget-header-wrap {
     position: absolute;
-    right: 9px;
+    right: 13px;
+}
+
+.sidebar-widget-header-toggle > i {
+    height: 16px;
+    width: 16px;
 }
 
 .sidebar-widget-content {

@@ -25,17 +25,15 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
          * Toggles state of widget container between minimized and maximized
          */
         toggleState: function () {
-            switch (this.state) {
-                case constants.WIDGET_MINIMIZED:
-                    this.state = constants.WIDGET_MAXIMIZED;
-                    break;
+            var model = this;
 
-                case constants.WIDGET_MAXIMIZED:
-                    this.state = constants.WIDGET_MINIMIZED;
-                    break;
+            if (model.state === constants.WIDGET_MINIMIZED) {
+                model.state = constants.WIDGET_MAXIMIZED;
+            } else {
+                model.state = constants.WIDGET_MINIMIZED;
             }
 
-            this.trigger('change');
+            model.trigger('change');
         },
 
         /**

@@ -36,5 +36,10 @@ define(function () {
      */
     constants.WIDGET_MAXIMIZED = 'WIDGET_MAXIMIZED';
 
+    /**
+     * Maximized on hover widget
+     */
+    constants.WIDGET_MAXIMIZED_HOVER = 'WIDGET_MAXIMIZED_HOVER';
+
     return constants;
 });

@@ -32,7 +32,7 @@ define(['jquery', 'backbone'], function ($, Backbone) {
     });
 
     helloWorld.SetupView = Backbone.View.extend({
-        template: _.template('<h3>Hello world settings</h3><textarea style="width: 250px; height: 150px;"><%= settings.content %></textarea>'),
+        template: _.template('<h3>Hello world settings</h3><textarea style="width: 400px; height: 150px;"><%= settings.content %></textarea>'),
 
         events: {
             'keyup textarea': 'onKeyup'

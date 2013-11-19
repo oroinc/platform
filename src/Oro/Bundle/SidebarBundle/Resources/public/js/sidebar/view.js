@@ -28,31 +28,32 @@ define(function (require) {
 
         events: {
             'click .sidebar-add': 'onClickAdd',
-            'click .sidebar-toggle': 'onClickToggle'
+            'click .sidebar-resize a': 'onClickToggle',
+            'click .sidebar-toggle a': 'onClickToggle'
         },
 
         initialize: function () {
             var view = this;
+            var model = view.model;
 
             view.iconViews = {};
             view.hoverViews = {};
             view.widgetViews = {};
 
-            view.padding = view.model.position === constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
+            view.padding = model.position === constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
 
-            view.listenTo(view.model, 'change', view.render);
+            view.listenTo(model, 'change', view.render);
 
-            view.listenTo(view.model.widgets, 'reset', view.onWidgetsReset);
-            view.listenTo(view.model.widgets, 'reset', view.render);
+            view.listenTo(model.widgets, 'reset', view.onWidgetsReset);
+            view.listenTo(model.widgets, 'reset', view.render);
 
-            view.listenTo(view.model.widgets, 'add', view.onWidgetAdded);
-            view.listenTo(view.model.widgets, 'add', view.render);
+            view.listenTo(model.widgets, 'add', view.onWidgetAdded);
+            view.listenTo(model.widgets, 'add', view.render);
 
-            view.listenTo(view.model.widgets, 'remove', view.onWidgetRemoved);
-            view.listenTo(view.model.widgets, 'remove', view.render);
+            view.listenTo(model.widgets, 'remove', view.onWidgetRemoved);
+            view.listenTo(model.widgets, 'remove', view.render);
 
             view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
-            view.listenTo(Backbone, 'hideWidgetHover', view.onHideWidgetHover);
             view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
             view.listenTo(Backbone, 'setupWidget', view.onSetupWidget);
         },
@@ -72,9 +73,9 @@ define(function (require) {
             view.options.$main.css(view.padding, view.$el.width() + 'px');
 
             if (model.state === constants.SIDEBAR_MINIMIZED) {
-                return view.renderIcons();
+                view.renderIcons();
             } else {
-                return view.renderWidgets();
+                view.renderWidgets();
             }
 
             return view;
@@ -256,20 +257,24 @@ define(function (require) {
         },
 
         onShowWidgetHover: function (cid, cord) {
-            var widget = this.model.widgets.get(cid);
+            var view = this;
+
+            view.hideAllWidgetHovers();
+
+            var widget = view.model.widgets.get(cid);
             if (!widget) {
                 return;
             }
 
             widget.snapshotState();
-            widget.state = constants.WIDGET_MAXIMIZED;
+            widget.state = constants.WIDGET_MAXIMIZED_HOVER;
 
             var hoverView = new WidgetContainerView({
                 model: widget
             });
 
             var widgetWidth = 200;
-            this.$el.append(hoverView.render().$el);
+            view.$el.append(hoverView.render().$el);
             hoverView.$el.css('position', 'fixed');
             hoverView.$el.width(widgetWidth);
 
@@ -281,10 +286,10 @@ define(function (require) {
 
             hoverView.$el.offset(cord);
 
-            this.hoverViews[cid] = hoverView;
+            view.hoverViews[cid] = hoverView;
         },
 
-        onHideWidgetHover: function (cid) {
+        hideWidgetHover: function (cid) {
             var hoverView = this.hoverViews[cid];
             if (hoverView) {
                 hoverView.model.restoreState();
@@ -292,6 +297,15 @@ define(function (require) {
                 hoverView.remove();
                 delete this.hoverViews[cid];
             }
+        },
+
+        hideAllWidgetHovers: function () {
+            var view = this;
+            var model = view.model;
+
+            model.widgets.each(function (widget) {
+                view.hideWidgetHover(widget.cid);
+            });
         },
 
         onRemoveWidget: function (cid) {
@@ -303,21 +317,31 @@ define(function (require) {
                 return;
             }
 
-            var modal = new DeleteConfirmation({
-                content: __('The widget will be removed')
-            });
+            switch (widget.state) {
 
-            modal.on('ok', function () {
-                //model.widgets.remove(widget);
-                widget.destroy();
-                modal.off();
-            });
+            case constants.WIDGET_MAXIMIZED_HOVER:
+                view.hideWidgetHover(cid);
+                break;
 
-            modal.on('cancel', function () {
-                modal.off();
-            });
+            case constants.WIDGET_MAXIMIZED:
+                var modal = new DeleteConfirmation({
+                    content: __('The widget will be removed')
+                });
 
-            modal.open();
+                modal.on('ok', function () {
+                    //model.widgets.remove(widget);
+                    widget.destroy();
+                    modal.off();
+                });
+
+                modal.on('cancel', function () {
+                    modal.off();
+                });
+
+                modal.open();
+
+                break;
+            }
         },
 
         onSetupWidget: function (cid) {

@@ -16,8 +16,7 @@ function ($, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
         events: {
             'click .sidebar-widget-header-toggle': 'onClickToggle',
             'click .sidebar-widget-settings': 'onClickSettings',
-            'click .sidebar-widget-remove': 'onClickRemove',
-            'mouseleave': 'onHoverOut'
+            'click .sidebar-widget-remove': 'onClickRemove'
         },
 
         initialize: function () {
@@ -39,7 +38,7 @@ function ($, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
             view.$el.html(template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
 
-            if (model.state === constants.WIDGET_MAXIMIZED) {
+            if (model.state !== constants.WIDGET_MINIMIZED) {
                 requirejs([model.get('module')], function (Widget) {
                     var $widgetContent = view.$el.find('.sidebar-widget-content');
                     if (!view.contentView) {
@@ -74,10 +73,6 @@ function ($, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
             e.preventDefault();
 
             Backbone.trigger('removeWidget', this.model.cid);
-        },
-
-        onHoverOut: function () {
-            Backbone.trigger('hideWidgetHover', this.model.cid);
         }
     });
 
