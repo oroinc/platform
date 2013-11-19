@@ -32,7 +32,7 @@ abstract class Connector
     /**
      * @var Transport
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport", inversedBy="connectors")
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport")
      */
     protected $transport;
 
@@ -62,6 +62,17 @@ abstract class Connector
     public function getChannel()
     {
         return $this->channel;
+    }
+
+    /**
+     * @param mixed $transport
+     * @return $this
+     */
+    public function setTransport($transport)
+    {
+        $this->transport = $transport;
+
+        return $this;
     }
 
     /**
