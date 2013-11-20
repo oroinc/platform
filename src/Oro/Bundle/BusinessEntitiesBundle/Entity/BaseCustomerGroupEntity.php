@@ -67,16 +67,4 @@ class BaseCustomerGroupEntity
     {
         return $this->name;
     }
-
-    /**
-     * Customer groups doesn't have code,
-     * but it's for compatibility with CustomerNormalizer
-     *
-     * @param $code
-     * @return $this
-     */
-    public function setCode($code)
-    {
-        return $this;
-    }
 }
