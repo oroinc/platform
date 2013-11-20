@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\DistributionBundle\Command;
 
+use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\DialogHelper;
@@ -32,39 +33,36 @@ class InstallPackageCommand extends ContainerAwareCommand
         $packageName = $input->getArgument('package');
         $packageVersion = $input->getArgument('version');
         $forceDependenciesInstalling = $input->getOption('force');
+        $verbose = $input->getOption('verbose');
 
         /** @var PackageManager $manager */
         $manager = $this->getContainer()->get('oro_distribution.package_manager');
 
-        if ($manager->isPackageInstalled($packageName)) {
-            throw new \RuntimeException(sprintf('Package %s has been already installed. Try to update', $packageName));
+        if($manager->isPackageInstalled($packageName)) {
+            return $output->writeln(sprintf('<error>%s has been already installed. Try to update it</error>', $packageName));
         }
-        $package = $manager->getPreferredPackage($packageName, $packageVersion);
-        $requirements = $manager->getRequirements($package);
-        if ($requirements) {
+
+        if(!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName, $packageVersion)) {
             $output->writeln(sprintf("Package requires: \n%s", implode("\n", $requirements)));
 
-            if (!$forceDependenciesInstalling) {
-                /** @var DialogHelper $dialog */
-                $dialog = $this->getHelperSet()->get('dialog');
-                if (!$dialog->askConfirmation($output, 'Do you want to install all them? (yes/no) ')) {
-                    $output->writeln('<comment>Process aborted</comment>');
-                    return 1;
-                }
-            }
-        }
-        $manager->addToComposerJsonFile($package);
-        $output->writeln('composer.json has been dumped');
-
-        if ($manager->install($package)) {
-            $output->writeln(sprintf('%s has been installed!', $packageName));
-        } else {
-            $output->writeln(sprintf('<error>%s can\'t be installed!</error>', $packageName));
-            if ($input->getOption('verbose')) {
-                $output->writeln($this->getContainer()->get('oro_distribution.composer.io')->getOutput());
+            /** @var DialogHelper $dialog */
+            $dialog = $this->getHelperSet()->get('dialog');
+            /** @var DialogHelper $dialog */
+            if (!$dialog->askConfirmation($output, 'Do you want to install all them? (yes/no) ')) {
+                return $output->writeln('<comment>Process aborted</comment>');
             }
         }
 
+        try {
+            $manager->install($packageName, $packageVersion);
+        } catch (\Exception $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            if ($verbose && $e instanceof VerboseException) {
+                $output->writeln(sprintf('<comment>%s</comment>', $e->getVerboseMessage()));
+            }
+        }
+
+        $output->writeln(sprintf('%s has been installed!', $packageName));
         return 0;
     }
 }
