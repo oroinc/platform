@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -14,8 +15,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Form\Type\TransportSelectType;
-
-use OroCRM\Bundle\MagentoBundle\Entity\MagentoSoapTransport;
 
 /**
  * @Route("/transport")
@@ -29,51 +28,65 @@ class TransportController extends Controller
      */
     public function listAction(Channel $channel)
     {
+        $registry = $this->get('oro_integration.manager.types_registry');
+
+        $channelType = $channel->getType();
+        $transports  = $channel->getTransports()->map(
+            function (Transport $transport) use ($registry, $channelType) {
+                return [
+                    'id'    => $transport->getId(),
+                    'label' => $transport->getLabel(),
+                    'type'  => $registry->getTransportTypeBySettingEntity($transport, $channelType)->getLabel()
+                ];
+            }
+        );
+
         return [
-            'channel' => $channel
+            'transports' => $transports
         ];
     }
 
     /**
-     * @Route("/prepare/{channelType}", requirements={"channelType"="\w+"}))
+     * @Route("/prepare/{channelType}/{channelId}", requirements={"channelType"="\w+", "channelId"="\d+"}))
      * @AclAncestor("oro_integration_channel_update")
      * @Template()
      */
-    public function prepareAction($channelType, Request $request)
+    public function prepareAction($channelType, $channelId, Request $request)
     {
-        $form = $this->getForm($channelType);
+        $isPost = false;
+        $form   = $this->getForm($channelType);
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
             if ($form->isValid()) {
-                $url = $this->generateUrl(
-                    'oro_integration_transport_create',
-                    [
-                        'channelType'      => $channelType,
-                        'transportType'    => $form->get(TransportSelectType::TYPE_FIELD)->getData(),
-                        '_widgetContainer' => $request->get('_widgetContainer'),
-                        '_wid'             => $request->get('_wid'),
-                    ]
-                );
-
-                return $this->redirect($url);
+                $isPost = true;
             }
         }
 
         return [
-            'form'        => $form->createView(),
-            'channelType' => $channelType
+            'form'          => $form->createView(),
+            'channelType'   => $channelType,
+            'channelId'     => $channelId,
+            'isPost'        => $isPost,
+            'transportType' => $isPost ? $form->get(TransportSelectType::TYPE_FIELD)->getData() : null
         ];
     }
 
     /**
-     * @Route("/create/{transportType}/{channelType}", requirements={"transportType"="\w+", "channelType"="\w+"}))
+     * @Route(
+     *      "/create/{transportType}/{channelType}/{id}",
+     *      requirements={"transportType"="\w+", "channelType"="\w+", "id"="\d+"})
+     * )
      * @AclAncestor("oro_integration_channel_update")
      * @Template("OroIntegrationBundle:Transport:update.html.twig")
      */
-    public function createAction($transportType, $channelType)
+    public function createAction($transportType, $channelType, Channel $channel)
     {
-        // @TODO find transport by type
-        $transport = new MagentoSoapTransport();
+        $registry = $this->get('oro_integration.manager.types_registry');
+
+        $entityName = $registry->getTransportType($channelType, $transportType)->getSettingsEntityFQCN();
+        /** @var Transport $transport */
+        $transport = new $entityName();
+        $transport->setChannel($channel);
 
         return $this->update($transport, $transportType, $channelType);
     }
@@ -81,16 +94,32 @@ class TransportController extends Controller
     /**
      * @Route("/update/{id}", requirements={"id"="\d+"}))
      * @AclAncestor("oro_integration_channel_update")
-     * @Template
+     * @Template()
      */
     public function updateAction(Transport $transport)
     {
         $registry = $this->get('oro_integration.manager.types_registry');
-        // @TODO get types by entity
-        $transportType = '';
-        $channelType   = '';
+
+        $channelType   = $transport->getChannel()->getType();
+        $transportType = $registry->getTransportTypeBySettingEntity($transport, $channelType, true);
 
         return $this->update($transport, $transportType, $channelType);
+    }
+
+    /**
+     * @Route("/delete/{id}", requirements={"id"="\d+"}))
+     * @AclAncestor("oro_integration_channel_update")
+     * @param Transport $transport
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    public function deleteAction(Transport $transport)
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        $em->remove($transport);
+        $em->flush();
+
+        return new JsonResponse(null, 204);
     }
 
     /**

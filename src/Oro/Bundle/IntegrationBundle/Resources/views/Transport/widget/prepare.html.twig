@@ -1,22 +1,35 @@
 <div class="widget-content">
-    {% if not form.vars.valid %}
-        <div class="alert alert-error">
-            <div class="message">
-                {{ form_errors(form) }}
+    {% if not isPost %}
+        {% if not form.vars.valid %}
+            <div class="alert alert-error">
+                <div class="message">
+                    {{ form_errors(form) }}
+                </div>
             </div>
-        </div>
-    {% endif %}
+        {% endif %}
 
-    <form id="{{ form.vars.name }}"
-          action="{{ path('oro_integration_transport_prepare', { channelType: channelType }) }}" method="POST"
-          class="form-register form-dialog">
-        {{ JSFV(form) }}
-        <fieldset class="form-horizontal">
-            {{ form_widget(form) }}
-            <div class="widget-actions form-actions" style="display: none;">
-                <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                <button class="btn btn-primary" type="submit">{{ 'Continue'|trans }}</button>
-            </div>
-        </fieldset>
-    </form>
+        <form id="{{ form.vars.name }}"
+              action="{{ path('oro_integration_transport_prepare', { channelType: channelType, channelId: channelId }) }}" method="POST"
+              class="form-register form-dialog">
+            {{ JSFV(form) }}
+            <fieldset class="form-horizontal">
+                {{ form_widget(form) }}
+                <div class="widget-actions form-actions" style="display: none;">
+                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                    <button class="btn btn-primary" type="submit">{{ 'Continue'|trans }}</button>
+                </div>
+            </fieldset>
+        </form>
+    {% else %}
+        <script type="text/javascript">
+            // do redirect to create action
+            require(['oro/widget-manager'],
+            function(widgetManager) {
+                widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                    widget.setUrl({{ path('oro_integration_transport_create', { channelType: channelType, id: channelId, transportType: transportType })|json_encode|raw }});
+                    widget.loadContent();
+                });
+            });
+        </script>
+    {% endif %}
 </div>

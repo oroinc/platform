@@ -6,6 +6,10 @@
                 widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                     messenger.notificationFlashMessage('success', __('Transport successfully saved!'));
                     widget.remove();
+
+                    widgetManager.getWidgetInstanceByAlias('transport_list', function(widget) {
+                        widget.loadContent();
+                    });
                 });
             });
         </script>
@@ -22,7 +26,7 @@
 
         {% set action = form.vars.value.id
             ? path('oro_integration_transport_update', { id: form.vars.value.id })
-            : path('oro_integration_transport_create', { channelType: app.request.get('channelType'), transportType: app.request.get('transportType')})
+            : path('oro_integration_transport_create', { channelType: app.request.get('channelType'), transportType: app.request.get('transportType'), id:  app.request.get('id')})
         %}
         <form id="{{ form.vars.name }}" action="{{ action }}" method="post" class="form-register form-dialog">
             <fieldset class="form-horizontal">

@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportTypeInterface;
 
@@ -116,5 +118,34 @@ class TypesRegistry
         }
 
         return $this->transportTypes[$channelType]->get($transportType);
+    }
+
+    /**
+     * @param Transport $transportEntity
+     * @param string    $channelType
+     * @param bool      $typeNameOnly
+     *
+     * @throws \LogicException
+     * @return string|TransportTypeInterface
+     */
+    public function getTransportTypeBySettingEntity(Transport $transportEntity, $channelType, $typeNameOnly = false)
+    {
+        $class = ClassUtils::getClass($transportEntity);
+        $types = $this->getRegisteredTransportTypes($channelType)->filter(
+            function (TransportTypeInterface $transport) use ($transportEntity, $class) {
+                return $transport->getSettingsEntityFQCN() === $class;
+            }
+        );
+        $keys  = $types->getKeys();
+        $key   = reset($keys);
+
+        if ($key === false) {
+            throw new \LogicException(sprintf('Transport not found for channel type "%s".', $channelType));
+        }
+        if ($typeNameOnly) {
+            return $key;
+        }
+
+        return $types->first();
     }
 }
