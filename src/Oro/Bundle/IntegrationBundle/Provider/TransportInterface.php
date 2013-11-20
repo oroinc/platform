@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-interface TransportInterface
+interface TransportInterface extends TransportTypeInterface
 {
     /**
      * @param ParameterBag $settings

@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 /**
  * @package Oro\Bundle\IntegrationBundle
  */
-class SOAPTransport implements TransportInterface
+abstract class SOAPTransport implements TransportInterface
 {
     /** @var \SoapClient */
     protected $client;

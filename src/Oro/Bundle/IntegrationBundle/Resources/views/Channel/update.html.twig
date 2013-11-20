@@ -1,19 +1,21 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% if form.vars.value.id %}
-    {% oro_title_set({params : {"%channel.name%": form.vars.value.name } }) %}
+
+{% set entity = form.vars.value %}
+{% if entity.id %}
+    {% oro_title_set({params : {"%channel.name%": entity.name } }) %}
 {% endif %}
-{% set formAction = form.vars.value.id ? path('oro_integration_channel_update', { id: form.vars.value.id }) : path('oro_integration_channel_create') %}
+{% set formAction = entity.id ? path('oro_integration_channel_update', { id: entity.id }) : path('oro_integration_channel_create') %}
 
 {% block navButtons %}
-    {% if form.vars.value.id and resource_granted('oro_integration_channel_delete') %}
+    {% if entity.id and resource_granted('oro_integration_channel_delete') %}
         {{
             UI.deleteButton({
-                'dataUrl': path('oro_api_delete_channel', {'id': form.vars.value.id}),
+                'dataUrl': path('oro_api_delete_channel', {'id': entity.id}),
                 'dataRedirect': path('oro_integration_channel_index'),
                 'aCss': 'no-hash remove-button',
                 'id': 'btn-remove-channel',
-                'dataId': form.vars.value.id,
+                'dataId': entity.id,
                 'dataMessage': 'Are you sure you want to delete this channel?'|trans,
                 'successMessage': 'Channel deleted'|trans,
                 'title': 'Delete Channel',
@@ -29,12 +31,12 @@
 
 {% block pageHeader %}
     {% set title = 'Create Channel'|trans %}
-    {% if form.vars.value.id %}
+    {% if entity.id %}
         {% set breadcrumbs = {
-            'entity':      form.vars.value,
+            'entity':      entity,
             'indexPath':   path('oro_integration_channel_index'),
             'indexLabel': 'Channel',
-            'entityTitle': form.vars.value.name|default('N/A')
+            'entityTitle': entity.name|default('N/A')
             }
         %}
         {{ parent() }}
@@ -43,38 +45,29 @@
     {% endif %}
 {% endblock pageHeader %}
 
+{% block stats %}{% endblock %}
+
 {% block content_data %}
     {% set id = 'channel' %}
 
-    {% set dataBlocks = [{
-        'title': 'General',
-        'class': 'active',
-        'subblocks': [
-            {
-                'title': 'Basic Information',
-                'data':  [ form_widget(form) ]
-            }
-        ]
-        }]
-    %}
-    {% if form.vars.value.id %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': '',
-            'subblocks': [{
-                'title' : '',
-                'useSpan': false,
-                'data' : [ _self.renderAdditionalData(form.vars.value) ]
-            }]
-        }]) %}
+    {% set formErrors = form_errors(form)? form_errors(form) : null %}
+    {% if formErrors is defined and formErrors | length%}
+        <div class="customer-info-actions container-fluid well-small alert-wrap">
+            <div class="alert alert-error">
+                <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                {{ formErrors|raw }}
+            </div>
+        </div>
     {% endif %}
 
-    {% set data = {
-            'formErrors': form_errors(form)? form_errors(form) : null,
-            'dataBlocks': dataBlocks,
-        }
-    %}
-    {{ parent() }}
+    <form id="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
+          method="post" data-collect="true" class="scrollable-substructure">
 
+        {{ form_widget(form) }}
+    </form>
+    {% if entity.id %}
+        {{ _self.renderAdditionalData(entity) }}
+    {% endif %}
 {% endblock content_data %}
 
 {% macro renderAdditionalData(entity) %}
@@ -102,8 +95,7 @@
                     var clickHandler = function (e) {
                         e.preventDefault();
 
-                        var $el = $(e.currentTarget),
-                                url = $el.attr('href');
+                        var url = $(e.currentTarget).attr('href');
 
                         new DialogWidget({
                             url: url,
@@ -121,6 +113,8 @@
                     widgetCreateHandler = function (widget) {
                         var viewLink = $($('#add-transport-link-template').html());
                         widget.addAction('add', 'default', viewLink);
+                        // @TODO fix BAP-2363
+                        viewLink.on('click', clickHandler);
                         widget.once('widget:add:action:default:add', function(action) {
                             action.on('click', clickHandler);
                         });
@@ -177,14 +171,101 @@
             </script>
         </div>
         <div class="span6 contact-info-col">
-            {#{{#}
-            {#oro_widget_render({#}
-            {#'widgetType': 'block',#}
-            {#'url': path('oro_workflow_widget_workflow_items', {entityClass: oro_class_name(form.vars.value), entityId: form.vars.value.id}),#}
-            {#'title': 'Transports',#}
-            {#'alias': 'bind_workflow_items'#}
-            {#})#}
-            {#}}#}
+            {{
+                oro_widget_render({
+                    'widgetType': 'block',
+                    'url': path('oro_integration_connector_list', { id: entity.id }),
+                    'title': 'Connectors',
+                    'alias': 'connector_list'
+                })
+            }}
+            <script type="text/html" id="add-connector-link-template">
+                <a href="{{ path('oro_integration_connector_prepare', { channelType: entity.type, channelId: entity.id }) }}" class="btn btn-small no-hash">
+                    <i class="icon-plus"></i>
+                    {{ 'Add connector'|trans }}
+                </a>
+            </script>
+            <script type="text/javascript">
+                require(['jquery', 'oro/widget-manager', 'oro/dialog-widget', 'oro/delete-confirmation', 'oro/navigation', 'oro/messenger'],
+                function ($, widgetManager, DialogWidget, DeleteConfirmation, Navigation, messenger) {
+
+                    var clickHandler = function (e) {
+                        e.preventDefault();
+
+                        var url = $(e.currentTarget).attr('href');
+
+                        new DialogWidget({
+                            url: url,
+                            title: {{ 'Add connector'|trans|json_encode|raw }},
+                            stateEnabled: false,
+                            incrementalPosition: false,
+                            dialogOptions: {
+                                modal: true,
+                                resizable: false,
+                                width: 475,
+                                autoResize: true
+                            }
+                        }).render();
+                    },
+                    widgetCreateHandler = function (widget) {
+                        var viewLink = $($('#add-connector-link-template').html());
+                        widget.addAction('add', 'default', viewLink);
+                        // @TODO fix BAP-2363
+                        viewLink.on('click', clickHandler);
+                        widget.once('widget:add:action:default:add', function(action) {
+                            action.on('click', clickHandler);
+                        });
+                    };
+
+                    widgetManager.getWidgetInstanceByAlias('connector_list', function (widget) {
+                        widgetCreateHandler(widget);
+
+                        widget.on('renderComplete', function($el) {
+                            // @TODO remove this after BAP-2371
+                            widgetCreateHandler(widget);
+
+                            $el.find('a.update-connector-link').on('click', clickHandler);
+                            $el.find('a.delete-connector-link').on('click', function (e) {
+                                var confirm,
+                                    el = $(this),
+                                    message = el.data('message');
+
+                                confirm = new DeleteConfirmation({content: message});
+                                confirm.on('ok', function () {
+                                    var navigation = Navigation.getInstance();
+                                    if (navigation) {
+                                        navigation.loadingMask.show();
+                                    }
+
+                                    $.ajax({
+                                        url: el.attr('href'),
+                                        type: 'DELETE',
+                                        success: function (data) {
+                                            if (navigation) {
+                                                navigation.loadingMask.hide();
+                                            }
+                                            el.trigger('removesuccess');
+                                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
+                                            widget.loadContent();
+                                        },
+                                        error: function () {
+                                            if (navigation) {
+                                                navigation.loadingMask.hide();
+                                            }
+                                            messenger.notificationMessage(
+                                                    'error',
+                                                    el.data('error-message') || __('Unexpected error occured. Please contact system administrator.')
+                                            );
+                                        }
+                                    });
+                                });
+                                confirm.open();
+                                return false;
+                            });
+                        });
+                    });
+                });
+            </script>
         </div>
     </div>
 </div>

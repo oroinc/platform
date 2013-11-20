@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorTypeInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportTypeInterface;
 
 class TypesRegistry
@@ -16,6 +17,9 @@ class TypesRegistry
 
     /** @var array|ArrayCollection[] */
     protected $transportTypes = [];
+
+    /** @var array|ArrayCollection[] */
+    protected $connectorTypes = [];
 
     public function __construct()
     {
@@ -147,5 +151,49 @@ class TypesRegistry
         }
 
         return $types->first();
+    }
+
+    /**
+     * Register connector for channel type
+     *
+     * @param string                 $typeName
+     * @param string                 $channelTypeName
+     * @param ConnectorTypeInterface $type
+     *
+     * @throws \LogicException
+     * @return $this
+     */
+    public function addConnectorType($typeName, $channelTypeName, ConnectorTypeInterface $type)
+    {
+        if (!isset($this->connectorTypes[$channelTypeName])) {
+            $this->connectorTypes[$channelTypeName] = new ArrayCollection();
+        }
+
+        if ($this->connectorTypes[$channelTypeName]->containsKey($typeName)) {
+            throw new \LogicException(sprintf(
+                'Trying to redeclare connector type "%s" for "%s" channel type.',
+                $typeName,
+                $channelTypeName
+            ));
+        }
+
+        $this->connectorTypes[$channelTypeName]->set($typeName, $type);
+
+        return $this;
+    }
+
+    public function getConnectorType($channelType)
+    {
+        if (!isset($this->transportTypes[$channelType])) {
+            throw new \LogicException(sprintf('Connectors not found for channel "%s".', $channelType));
+        } elseif (!$this->transportTypes[$channelType]->containsKey($transportType)) {
+            throw new \LogicException(sprintf(
+                'Transports type "%s"  not found for channel "%s".',
+                $transportType,
+                $channelType
+            ));
+        }
+
+        return $this->transportTypes[$channelType]->get($transportType);
     }
 }
