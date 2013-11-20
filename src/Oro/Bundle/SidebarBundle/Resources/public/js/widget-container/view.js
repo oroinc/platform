@@ -1,6 +1,9 @@
-define(['jquery', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/widget-container/widget-min-template',
-    'text!oro/sidebar/widget-container/widget-max-template'],
-function ($, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
+/*jslint nomen: true, vars: true*/
+/*global define, requirejs*/
+
+define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/widget-container/widget-min-template',
+    'text!oro/sidebar/widget-container/widget-max-template'
+    ], function ($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
     'use strict';
 
     /**

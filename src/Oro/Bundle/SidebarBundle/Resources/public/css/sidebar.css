@@ -167,28 +167,3 @@
     color: #fff;
     padding: 5px;
 }
-
-.sidebar-widgetadd-widgets {
-    overflow-x: hidden;
-    overflow-y: scroll;
-    height: 180px;
-}
-
-.sidebar-widgetadd-widgets ol {
-    list-style-type: none;
-    margin: 0;
-}
-
-.sidebar-widgetadd-widgets li {
-    padding: 10px;
-}
-
-.sidebar-widgetadd-widgets .ui-selecting {
-    background: #353E49;
-    color: white;
-}
-
-.sidebar-widgetadd-widgets .ui-selected {
-    background: #2D333B;
-    color: white;
-}

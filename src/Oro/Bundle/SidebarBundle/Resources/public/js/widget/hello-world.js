@@ -1,4 +1,7 @@
-define(['jquery', 'backbone'], function ($, Backbone) {
+/*jslint nomen: true, vars: true*/
+/*global define*/
+
+define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     'use strict';
 
     /**
@@ -55,7 +58,7 @@ define(['jquery', 'backbone'], function ($, Backbone) {
 
             model.set({ settings: settings }, { silent: true });
             model.trigger('change');
-        },
+        }
     });
 
     return helloWorld;

@@ -1,6 +1,9 @@
-define(['jquery', 'backbone', 'text!oro/sidebar/widget-container/icon-template'],
-    function ($, Backbone, iconTemplate) {
-        'use strict';
+/*jslint nomen: true, vars: true*/
+/*global define*/
+
+define(['jquery', 'underscore', 'backbone', 'text!oro/sidebar/widget-container/icon-template'
+    ], function ($, _, Backbone, iconTemplate) {
+    'use strict';
 
     /**
      * @export  oro/sidebar/widget-controller/icon-view

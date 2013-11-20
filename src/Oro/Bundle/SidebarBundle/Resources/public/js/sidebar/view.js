@@ -1,3 +1,6 @@
+/*jslint browser: true, nomen: true, vars: true*/
+/*global define*/
+
 define(function (require) {
     'use strict';
 
@@ -27,7 +30,7 @@ define(function (require) {
         template: _.template(sidebarTemplate),
 
         events: {
-            'click .sidebar-add': 'onClickAdd',
+            'click .sidebar-add a': 'onClickAdd',
             'click .sidebar-resize a': 'onClickToggle',
             'click .sidebar-toggle a': 'onClickToggle'
         },
@@ -99,11 +102,11 @@ define(function (require) {
                 revert: true,
                 axis: 'y',
                 containment: 'parent',
-                start: function(event, ui) {
+                start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
                 },
-                stop: function(event, ui) {
+                stop: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStop(cid);
 
@@ -132,11 +135,11 @@ define(function (require) {
                 revert: true,
                 axis: 'y',
                 containment: 'parent',
-                start: function(event, ui) {
+                start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
                 },
-                stop: function(event, ui) {
+                stop: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStop(cid);
 
@@ -259,12 +262,12 @@ define(function (require) {
         onShowWidgetHover: function (cid, cord) {
             var view = this;
 
-            view.hideAllWidgetHovers();
-
             var widget = view.model.widgets.get(cid);
             if (!widget) {
                 return;
             }
+
+            view.hideAllWidgetHovers();
 
             widget.snapshotState();
             widget.state = constants.WIDGET_MAXIMIZED_HOVER;
@@ -282,6 +285,13 @@ define(function (require) {
 
             if ((cord.left + widgetWidth) > windowWidth) {
                 cord.left = windowWidth - widgetWidth;
+            }
+
+            var sidebarWidth = view.$el.width();
+            if (view.model.position === constants.SIDEBAR_LEFT) {
+                cord.left += sidebarWidth;
+            } else {
+                cord.left -= sidebarWidth;
             }
 
             hoverView.$el.offset(cord);
@@ -366,7 +376,7 @@ define(function (require) {
             });
 
             widgetSetupView.open();
-        },
+        }
     });
 
     return SidebarView;

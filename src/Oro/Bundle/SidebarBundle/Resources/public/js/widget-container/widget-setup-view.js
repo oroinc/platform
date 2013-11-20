@@ -1,3 +1,6 @@
+/*jslint nomen: true, vars: true*/
+/*global define, requirejs*/
+
 define(function (require) {
     'use strict';
 
@@ -9,7 +12,10 @@ define(function (require) {
      * @extends oro.Modal
      */
     var WidgetSetupView = Modal.extend({
-        initialize: function(options) {
+        /** @property {String} */
+        className: 'modal oro-modal-normal',
+
+        initialize: function (options) {
             var view = this;
             var model = view.model;
 
@@ -30,7 +36,7 @@ define(function (require) {
             view.once('ok cancel', function () {
                 view.setupView.remove();
             });
-        },
+        }
     });
 
     return WidgetSetupView;

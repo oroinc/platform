@@ -1,12 +1,17 @@
+/*jslint nomen: true, vars: true*/
+/*global define, requirejs*/
+
 define(function (require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
 
     var widgetAddTemplate = require('text!oro/sidebar/widget-container/widget-add-template');
     var WidgetContainerModel = require('oro/sidebar/widget-container/model');
 
     var Modal = require('oro/modal');
+    var DialogWidget = require('oro/dialog-widget');
 
     /**
      * @export  oro/sidebar/widget-controller/widget-add-view
@@ -14,7 +19,10 @@ define(function (require) {
      * @extends oro.Modal
      */
     var WidgetAddView = Modal.extend({
-        initialize: function(options) {
+        /** @property {String} */
+        className: 'modal oro-modal-normal',
+
+        initialize: function (options) {
             var view = this;
             var model = view.model;
 

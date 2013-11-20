@@ -1,3 +1,5 @@
+/*global define*/
+
 define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
     'use strict';
 
@@ -26,6 +28,10 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
          */
         toggleState: function () {
             var model = this;
+
+            if (model.state === constants.WIDGET_MAXIMIZED_HOVER) {
+                return;
+            }
 
             if (model.state === constants.WIDGET_MINIMIZED) {
                 model.state = constants.WIDGET_MAXIMIZED;
