@@ -3,7 +3,8 @@
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
+
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Class Transport
