@@ -57,10 +57,85 @@
         ]
         }]
     %}
+    {% if form.vars.value.id %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': '',
+            'subblocks': [{
+                'title' : '',
+                'useSpan': false,
+                'data' : [ _self.renderAdditionalData(form.vars.value) ]
+            }]
+        }]) %}
+    {% endif %}
+
     {% set data = {
             'formErrors': form_errors(form)? form_errors(form) : null,
             'dataBlocks': dataBlocks,
         }
     %}
     {{ parent() }}
+
 {% endblock content_data %}
+
+{% macro renderAdditionalData(entity) %}
+<div class="contact-info-col-set well-small dark-bg">
+    <div class="row-fluid well-small-bottom clearfix">
+        <div class="span6 contact-info-col">
+            {{
+                oro_widget_render({
+                    'widgetType': 'block',
+                    'url': path('oro_integration_transport_list', { id: entity.id }),
+                    'title': 'Transports',
+                    'alias': 'transport_list'
+                })
+            }}
+            <script type="text/html" id="add-transport-link-template">
+                <a href="{{ path('oro_integration_transport_prepare', { channelType: entity.type }) }}" class="btn btn-small no-hash">
+                    <i class="icon-plus"></i>
+                    {{ 'Add transport'|trans }}
+                </a>
+            </script>
+            <script type="text/javascript">
+                require(['jquery', 'oro/widget-manager', 'oro/dialog-widget'],
+                function ($, widgetManager, DialogWidget) {
+                    widgetManager.getWidgetInstanceByAlias('transport_list', function (widget) {
+                        var viewLink = $($('#add-transport-link-template').html());
+                        widget.addAction('add', 'default', viewLink);
+                        widget.once('widget:add:action:default:add', function(action) {
+                            action.on('click', function (e) {
+                                e.preventDefault();
+
+                                var $el = $(e.currentTarget),
+                                    url = $el.attr('href');
+
+                                new DialogWidget({
+                                    url: url,
+                                    title: {{ 'Add transport'|trans|json_encode|raw }},
+                                    stateEnabled: false,
+                                    incrementalPosition: false,
+                                    dialogOptions: {
+                                        modal: true,
+                                        resizable: false,
+                                        width: 475,
+                                        autoResize: true
+                                    }
+                                }).render();
+                            });
+                        });
+                    });
+                });
+            </script>
+        </div>
+        <div class="span6 contact-info-col">
+            {#{{#}
+            {#oro_widget_render({#}
+            {#'widgetType': 'block',#}
+            {#'url': path('oro_workflow_widget_workflow_items', {entityClass: oro_class_name(form.vars.value), entityId: form.vars.value.id}),#}
+            {#'title': 'Transports',#}
+            {#'alias': 'bind_workflow_items'#}
+            {#})#}
+            {#}}#}
+        </div>
+    </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,32 @@
+<style type="text/css">
+    .widget-content.widget-transports-list {
+        margin: 20px 15px;
+    }
+    .widget-content.widget-transports-list  .no-results {
+        text-align: center;
+    }
+</style>
+<div class="widget-content widget-transports-list">
+    <table class="table-hover table table-bordered table-condensed">
+        <colgroup>
+            <col />
+            <col width="20px" />
+        </colgroup>
+        <thead>
+        <tr>
+            <th>
+                {% trans %}Type{% endtrans %}
+            </th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+            {% for transport in channel.transports %}
+            {% else %}
+                <tr>
+                    <td colspan="2" class="no-results">{% trans %}There is no configured transport yet{% endtrans %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

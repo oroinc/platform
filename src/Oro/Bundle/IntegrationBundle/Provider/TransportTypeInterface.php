@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-interface ChannelTypeInterface
+interface TransportTypeInterface
 {
     /**
      * Returns label for UI
@@ -10,4 +10,8 @@ interface ChannelTypeInterface
      * @return string
      */
     public function getLabel();
+
+    public function getSettingsFormType();
+
+    public function getSettingsEntityFQCN();
 }

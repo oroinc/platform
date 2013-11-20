@@ -2,9 +2,10 @@ parameters:
     oro_integration.channel.entity.class:                                 Oro\Bundle\IntegrationBundle\Entity\Channel
 
     oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
+    oro_integration.form.type.transport_select.class:                     Oro\Bundle\IntegrationBundle\Form\Type\TransportSelectType
     oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
 
-    oro_integration.manager.channel_type.class:                           Oro\Bundle\IntegrationBundle\Manager\ChannelTypeManager
+    oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
 services:
     oro_integration.channel.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -21,16 +22,23 @@ services:
     oro_integration.form.type.channel:
         class: %oro_integration.form.type.channel.class%
         arguments:
-            - @oro_integration.manager.channel_type
+            - @oro_integration.manager.types_registry
         tags:
              - { name: form.type, alias: oro_integration_channel_form }
+
+    oro_integration.form.type.transport_select:
+        class: %oro_integration.form.type.transport_select.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+        tags:
+             - { name: form.type, alias: oro_integration_transport_select_form }
 
     oro_integration.form.handler.channel:
         class:                        %oro_integration.form.handler.channel.class%
         scope:                        request
         arguments:                    [@request, @oro_integration.form.channel, @doctrine.orm.entity_manager]
 
-    oro_integration.manager.channel_type:
-        class: %oro_integration.manager.channel_type.class%
+    oro_integration.manager.types_registry:
+        class: %oro_integration.manager.types_registry.class%
         arguments:
             - []

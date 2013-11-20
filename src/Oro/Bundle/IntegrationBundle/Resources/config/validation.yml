@@ -9,3 +9,12 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
                 max: 255
         type:
             - NotBlank: ~
+
+OroCRM\Bundle\MagentoBundle\Entity\MagentoSoapTransport:
+    properties:
+        wsdlUrl:
+          - NotBlank: ~
+        apiUser:
+          - NotBlank: ~
+        apiKey:
+          - NotBlank: ~
