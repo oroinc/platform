@@ -97,14 +97,16 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdate()
     {
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_notification_emailnotification_index', array('_format' =>'json')),
-            array('emailnotification[_pager][_page]' => 1, 'emailnotification[_pager][_per_page]' => 1)
+        $result = ToolsAPI::getEntityGrid(
+            $this->client,
+            'email-notification-grid',
+            array(
+                'email-notification-grid[_pager][_page]' => 1,
+                'email-notification-grid[_pager][_per_page]' => 1
+            )
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
 
+        ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
         $result = reset($result['data']);
 
@@ -147,14 +149,17 @@ class ControllersTest extends WebTestCase
      */
     public function testDelete()
     {
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_notification_emailnotification_index', array('_format' =>'json')),
-            array('emailnotification[_pager][_page]' => 1, 'emailnotification[_pager][_per_page]' => 1)
-        );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
 
+        $result = ToolsAPI::getEntityGrid(
+            $this->client,
+            'email-notification-grid',
+            array(
+                'email-notification-grid[_pager][_page]' => 1,
+                'email-notification-grid[_pager][_per_page]' => 1
+            )
+        );
+
+        ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
         $result = reset($result['data']);
 
