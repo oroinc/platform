@@ -20,7 +20,8 @@ abstract class SOAPTransport implements TransportInterface
     {
         $wsdlUrl = $settings->get('wsdl_url');
         if ($wsdlUrl) {
-            $this->client = $this->getSoapClient($wsdlUrl);
+            $isDebug = $settings->get('debug', false);
+            $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
             return true;
         }
 
@@ -30,17 +31,39 @@ abstract class SOAPTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function call($action, $params = [])
+    public function call($action, array $params = [])
     {
         return $this->client->__soapCall($action, $params);
     }
 
     /**
      * @param string $wsdl_url
+     * @param bool $isDebug
      * @return \SoapClient
      */
-    protected function getSoapClient($wsdl_url)
+    protected function getSoapClient($wsdl_url, $isDebug = false)
     {
-        return new \SoapClient($wsdl_url);
+        $options = [];
+        if ($isDebug) {
+            $options['trace'] = true;
+        }
+
+        return new \SoapClient($wsdl_url, $options);
+    }
+
+    /**
+     * @return string last SOAP response
+     */
+    public function getLastResponse()
+    {
+        return $this->client->__getLastResponse();
+    }
+
+    /**
+     * @return string last SOAP request
+     */
+    public function getLastRequest()
+    {
+        $this->client->__getLastRequest();
     }
 }

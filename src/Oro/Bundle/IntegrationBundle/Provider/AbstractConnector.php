@@ -54,6 +54,8 @@ abstract class AbstractConnector implements ConnectorInterface
             $this->connect();
         }
 
+        $params = is_array($params) ? $params : [$params];
+
         return $this->transport->call($action, $params);
     }
 

@@ -17,5 +17,5 @@ interface TransportInterface extends TransportTypeInterface
      * @param array $params
      * @return mixed
      */
-    public function call($action, $params = []);
+    public function call($action, array $params = []);
 }
