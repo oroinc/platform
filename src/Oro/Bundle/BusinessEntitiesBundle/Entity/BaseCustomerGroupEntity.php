@@ -38,6 +38,17 @@ class BaseCustomerGroupEntity
     }
 
     /**
+     * @param int $id
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * @param string $name
      *
      * @return $this

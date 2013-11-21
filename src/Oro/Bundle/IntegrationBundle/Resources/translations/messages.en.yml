@@ -1,0 +1,12 @@
+oro:
+    integration:
+        datagrid:
+            column:
+                name: Name
+            action:
+                update: Update
+                delete: Delete
+        controller:
+            channel:
+                message:
+                    saved: Channel succesfully saved

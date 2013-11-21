@@ -32,7 +32,7 @@ the writer.
 
 ### Reader
 
-Reads data from some source. In terms of import it can ba a CSV file with imported data. In terms of export the source
+Reads data from some source. In terms of import it can be a CSV file with imported data. In terms of export the source
 is a Doctrine entity, it's repository or more sophisticated query builder.
 
 ### Processor
