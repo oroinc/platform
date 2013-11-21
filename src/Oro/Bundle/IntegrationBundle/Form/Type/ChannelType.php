@@ -67,7 +67,7 @@ class ChannelType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class' => 'Oro\Bundle\IntegrationBundle\Entity\Channel',
+                'data_class' => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
                 'intention'  => 'channel',
             )
         );

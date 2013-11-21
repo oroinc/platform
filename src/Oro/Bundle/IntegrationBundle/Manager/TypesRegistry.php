@@ -73,11 +73,13 @@ class TypesRegistry
         }
 
         if ($this->transportTypes[$channelTypeName]->containsKey($typeName)) {
-            throw new \LogicException(sprintf(
-                'Trying to redeclare transport type "%s" for "%s" channel type.',
-                $typeName,
-                $channelTypeName
-            ));
+            throw new \LogicException(
+                sprintf(
+                    'Trying to redeclare transport type "%s" for "%s" channel type.',
+                    $typeName,
+                    $channelTypeName
+                )
+            );
         }
 
         $this->transportTypes[$channelTypeName]->set($typeName, $type);
@@ -114,11 +116,13 @@ class TypesRegistry
         if (!isset($this->transportTypes[$channelType])) {
             throw new \LogicException(sprintf('Transports not found for channel "%s".', $channelType));
         } elseif (!$this->transportTypes[$channelType]->containsKey($transportType)) {
-            throw new \LogicException(sprintf(
-                'Transports type "%s"  not found for channel "%s".',
-                $transportType,
-                $channelType
-            ));
+            throw new \LogicException(
+                sprintf(
+                    'Transports type "%s"  not found for channel "%s".',
+                    $transportType,
+                    $channelType
+                )
+            );
         }
 
         return $this->transportTypes[$channelType]->get($transportType);
@@ -170,11 +174,13 @@ class TypesRegistry
         }
 
         if ($this->connectorTypes[$channelTypeName]->containsKey($typeName)) {
-            throw new \LogicException(sprintf(
-                'Trying to redeclare connector type "%s" for "%s" channel type.',
-                $typeName,
-                $channelTypeName
-            ));
+            throw new \LogicException(
+                sprintf(
+                    'Trying to redeclare connector type "%s" for "%s" channel type.',
+                    $typeName,
+                    $channelTypeName
+                )
+            );
         }
 
         $this->connectorTypes[$channelTypeName]->set($typeName, $type);
@@ -187,11 +193,13 @@ class TypesRegistry
         if (!isset($this->transportTypes[$channelType])) {
             throw new \LogicException(sprintf('Connectors not found for channel "%s".', $channelType));
         } elseif (!$this->transportTypes[$channelType]->containsKey($transportType)) {
-            throw new \LogicException(sprintf(
-                'Transports type "%s"  not found for channel "%s".',
-                $transportType,
-                $channelType
-            ));
+            throw new \LogicException(
+                sprintf(
+                    'Transports type "%s"  not found for channel "%s".',
+                    $transportType,
+                    $channelType
+                )
+            );
         }
 
         return $this->transportTypes[$channelType]->get($transportType);

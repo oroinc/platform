@@ -25,8 +25,9 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.button({'path' : path('oro_integration_channel_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
-    {{ UI.saveAndStayButton('orocrm_contact_group_update') }}
-    {{ UI.saveAndCloseButton() }}
+    {{ UI.saveAndStayButton('oro_integration_channel_update') }}
+    {{ UI.buttonType({'type': 'button', 'class': 'btn-success', 'label': 'Save and Close', 'action': 'save'}) }}
+
 {% endblock navButtons %}
 
 {% block pageHeader %}
@@ -48,7 +49,7 @@
 {% block stats %}{% endblock %}
 
 {% block content_data %}
-    {% set id = 'channel' %}
+    {{ JSFV(form) }}
 
     {% set formErrors = form_errors(form)? form_errors(form) : null %}
     {% if formErrors is defined and formErrors | length%}
@@ -64,6 +65,7 @@
           method="post" data-collect="true" class="scrollable-substructure">
 
         {{ form_widget(form) }}
+        <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
     </form>
     {% if entity.id %}
         {{ _self.renderAdditionalData(entity) }}
@@ -71,202 +73,126 @@
 {% endblock content_data %}
 
 {% macro renderAdditionalData(entity) %}
-<div class="contact-info-col-set well-small dark-bg">
-    <div class="row-fluid well-small-bottom clearfix">
-        <div class="span6 contact-info-col">
-            {{
-                oro_widget_render({
-                    'widgetType': 'block',
-                    'url': path('oro_integration_transport_list', { id: entity.id }),
-                    'title': 'Transports',
-                    'alias': 'transport_list'
-                })
-            }}
-            <script type="text/html" id="add-transport-link-template">
-                <a href="{{ path('oro_integration_transport_prepare', { channelType: entity.type, channelId: entity.id }) }}" class="btn btn-small no-hash">
-                    <i class="icon-plus"></i>
-                    {{ 'Add transport'|trans }}
-                </a>
-            </script>
-            <script type="text/javascript">
-                require(['jquery', 'oro/widget-manager', 'oro/dialog-widget', 'oro/delete-confirmation', 'oro/navigation', 'oro/messenger'],
-                function ($, widgetManager, DialogWidget, DeleteConfirmation, Navigation, messenger) {
-
-                    var clickHandler = function (e) {
-                        e.preventDefault();
-
-                        var url = $(e.currentTarget).attr('href');
-
-                        new DialogWidget({
-                            url: url,
-                            title: {{ 'Add transport'|trans|json_encode|raw }},
-                            stateEnabled: false,
-                            incrementalPosition: false,
-                            dialogOptions: {
-                                modal: true,
-                                resizable: false,
-                                width: 475,
-                                autoResize: true
-                            }
-                        }).render();
-                    },
-                    widgetCreateHandler = function (widget) {
-                        var viewLink = $($('#add-transport-link-template').html());
-                        widget.addAction('add', 'default', viewLink);
-                        // @TODO fix BAP-2363
-                        viewLink.on('click', clickHandler);
-                        widget.once('widget:add:action:default:add', function(action) {
-                            action.on('click', clickHandler);
-                        });
-                    };
-
-                    widgetManager.getWidgetInstanceByAlias('transport_list', function (widget) {
-                        widgetCreateHandler(widget);
-
-                        widget.on('renderComplete', function($el) {
-                            // @TODO remove this after BAP-2371
-                            widgetCreateHandler(widget);
-
-                            $el.find('a.update-transport-link').on('click', clickHandler);
-                            $el.find('a.delete-transport-link').on('click', function (e) {
-                                var confirm,
-                                    el = $(this),
-                                    message = el.data('message');
-
-                                confirm = new DeleteConfirmation({content: message});
-                                confirm.on('ok', function () {
-                                    var navigation = Navigation.getInstance();
-                                    if (navigation) {
-                                        navigation.loadingMask.show();
-                                    }
-
-                                    $.ajax({
-                                        url: el.attr('href'),
-                                        type: 'DELETE',
-                                        success: function (data) {
-                                            if (navigation) {
-                                                navigation.loadingMask.hide();
-                                            }
-                                            el.trigger('removesuccess');
-                                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
-                                            widget.loadContent();
-                                        },
-                                        error: function () {
-                                            if (navigation) {
-                                                navigation.loadingMask.hide();
-                                            }
-                                            messenger.notificationMessage(
-                                                'error',
-                                                el.data('error-message') || __('Unexpected error occured. Please contact system administrator.')
-                                            );
-                                        }
-                                    });
-                                });
-                                confirm.open();
-                                return false;
-                            });
-                        });
-                    });
-                });
-            </script>
-        </div>
-        <div class="span6 contact-info-col">
-            {{
-                oro_widget_render({
-                    'widgetType': 'block',
-                    'url': path('oro_integration_connector_list', { id: entity.id }),
-                    'title': 'Connectors',
-                    'alias': 'connector_list'
-                })
-            }}
-            <script type="text/html" id="add-connector-link-template">
-                <a href="{{ path('oro_integration_connector_prepare', { channelType: entity.type, channelId: entity.id }) }}" class="btn btn-small no-hash">
-                    <i class="icon-plus"></i>
-                    {{ 'Add connector'|trans }}
-                </a>
-            </script>
-            <script type="text/javascript">
-                require(['jquery', 'oro/widget-manager', 'oro/dialog-widget', 'oro/delete-confirmation', 'oro/navigation', 'oro/messenger'],
-                function ($, widgetManager, DialogWidget, DeleteConfirmation, Navigation, messenger) {
-
-                    var clickHandler = function (e) {
-                        e.preventDefault();
-
-                        var url = $(e.currentTarget).attr('href');
-
-                        new DialogWidget({
-                            url: url,
-                            title: {{ 'Add connector'|trans|json_encode|raw }},
-                            stateEnabled: false,
-                            incrementalPosition: false,
-                            dialogOptions: {
-                                modal: true,
-                                resizable: false,
-                                width: 475,
-                                autoResize: true
-                            }
-                        }).render();
-                    },
-                    widgetCreateHandler = function (widget) {
-                        var viewLink = $($('#add-connector-link-template').html());
-                        widget.addAction('add', 'default', viewLink);
-                        // @TODO fix BAP-2363
-                        viewLink.on('click', clickHandler);
-                        widget.once('widget:add:action:default:add', function(action) {
-                            action.on('click', clickHandler);
-                        });
-                    };
-
-                    widgetManager.getWidgetInstanceByAlias('connector_list', function (widget) {
-                        widgetCreateHandler(widget);
-
-                        widget.on('renderComplete', function($el) {
-                            // @TODO remove this after BAP-2371
-                            widgetCreateHandler(widget);
-
-                            $el.find('a.update-connector-link').on('click', clickHandler);
-                            $el.find('a.delete-connector-link').on('click', function (e) {
-                                var confirm,
-                                    el = $(this),
-                                    message = el.data('message');
-
-                                confirm = new DeleteConfirmation({content: message});
-                                confirm.on('ok', function () {
-                                    var navigation = Navigation.getInstance();
-                                    if (navigation) {
-                                        navigation.loadingMask.show();
-                                    }
-
-                                    $.ajax({
-                                        url: el.attr('href'),
-                                        type: 'DELETE',
-                                        success: function (data) {
-                                            if (navigation) {
-                                                navigation.loadingMask.hide();
-                                            }
-                                            el.trigger('removesuccess');
-                                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
-                                            widget.loadContent();
-                                        },
-                                        error: function () {
-                                            if (navigation) {
-                                                navigation.loadingMask.hide();
-                                            }
-                                            messenger.notificationMessage(
-                                                    'error',
-                                                    el.data('error-message') || __('Unexpected error occured. Please contact system administrator.')
-                                            );
-                                        }
-                                    });
-                                });
-                                confirm.open();
-                                return false;
-                            });
-                        });
-                    });
-                });
-            </script>
+    <div class="contact-info-col-set well-small dark-bg">
+        <div class="row-fluid well-small-bottom clearfix">
+            <div class="span6 contact-info-col">
+                {{
+                    oro_widget_render({
+                        'widgetType': 'block',
+                        'url': path('oro_integration_transport_list', { id: entity.id }),
+                        'title': 'Transports',
+                        'alias': 'transport_list'
+                    })
+                }}
+                <script type="text/html" id="add-transport-link-template">
+                    <a href="{{ path('oro_integration_transport_prepare', { channelType: entity.type, channelId: entity.id }) }}" class="btn btn-small no-hash">
+                        <i class="icon-plus"></i>
+                        {{ 'Add transport'|trans }}
+                    </a>
+                </script>
+                {{ _self.renderWidgetJS('transport') }}
+            </div>
+            <div class="span6 contact-info-col">
+                {{
+                    oro_widget_render({
+                        'widgetType': 'block',
+                        'url': path('oro_integration_connector_list', { id: entity.id }),
+                        'title': 'Connectors',
+                        'alias': 'connector_list'
+                    })
+                }}
+                <script type="text/html" id="add-connector-link-template">
+                    <a href="{{ path('oro_integration_connector_prepare', { channelType: entity.type, channelId: entity.id }) }}" class="btn btn-small no-hash">
+                        <i class="icon-plus"></i>
+                        {{ 'Add connector'|trans }}
+                    </a>
+                </script>
+                {{ _self.renderWidgetJS('connector') }}
+            </div>
         </div>
     </div>
-</div>
+{% endmacro %}
+
+{% macro renderWidgetJS(type) %}
+    <script type="text/javascript">
+        require(['jquery', 'oro/widget-manager', 'oro/dialog-widget', 'oro/delete-confirmation', 'oro/navigation', 'oro/messenger'],
+        function ($, widgetManager, DialogWidget, DeleteConfirmation, Navigation, messenger) {
+
+            var clickHandler = function (e) {
+                e.preventDefault();
+
+                var url = $(e.currentTarget).attr('href');
+
+                new DialogWidget({
+                    url: url,
+                    title: {{ ('Add ' ~ type)|trans|json_encode|raw }},
+                    stateEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: {
+                        modal: true,
+                        resizable: false,
+                        width: 475,
+                        autoResize: true
+                    }
+                }).render();
+            },
+            widgetCreateHandler = function (widget) {
+                var viewLink = $($('#add-{{ type }}-link-template').html());
+                widget.addAction('add', 'default', viewLink);
+                // @TODO fix BAP-2363
+                viewLink.on('click', clickHandler);
+                widget.once('widget:add:action:default:add', function(action) {
+                    action.on('click', clickHandler);
+                });
+            };
+
+            widgetManager.getWidgetInstanceByAlias('{{ type }}_list', function (widget) {
+                widgetCreateHandler(widget);
+
+                widget.on('renderComplete', function($el) {
+                    // @TODO remove this after BAP-2371
+                    widgetCreateHandler(widget);
+
+                    $el.find('a.update-{{ type }}-link').on('click', clickHandler);
+                    $el.find('a.delete-{{ type }}-link').on('click', function (e) {
+                        var confirm,
+                            el = $(this),
+                            message = el.data('message');
+
+                        confirm = new DeleteConfirmation({content: message});
+                        confirm.on('ok', function () {
+                            var navigation = Navigation.getInstance();
+                            if (navigation) {
+                                navigation.loadingMask.show();
+                            }
+
+                            $.ajax({
+                                url: el.attr('href'),
+                                type: 'DELETE',
+                                success: function (data) {
+                                    if (navigation) {
+                                        navigation.loadingMask.hide();
+                                    }
+                                    el.trigger('removesuccess');
+                                    messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
+                                    widget.loadContent();
+                                },
+                                error: function () {
+                                    if (navigation) {
+                                        navigation.loadingMask.hide();
+                                    }
+                                    messenger.notificationMessage(
+                                            'error',
+                                            el.data('error-message') || __('Unexpected error occured. Please contact system administrator.')
+                                    );
+                                }
+                            });
+                        });
+                        confirm.open();
+                        return false;
+                    });
+                });
+            });
+        });
+    </script>
 {% endmacro %}
