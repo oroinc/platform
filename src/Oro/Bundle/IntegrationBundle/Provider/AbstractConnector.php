@@ -45,7 +45,8 @@ abstract class AbstractConnector implements ConnectorInterface
      * Used to get/send data from/to remote channel using transport
      *
      * @param string $action
-     * @param array $params
+     * @param array  $params
+     *
      * @return mixed
      */
     protected function call($action, $params = [])
@@ -61,6 +62,7 @@ abstract class AbstractConnector implements ConnectorInterface
 
     /**
      * @param Connector $connector
+     *
      * @return $this
      */
     public function setConnectorEntity(Connector $connector)

@@ -20,8 +20,9 @@ abstract class SOAPTransport implements TransportInterface
     {
         $wsdlUrl = $settings->get('wsdl_url');
         if ($wsdlUrl) {
-            $isDebug = $settings->get('debug', false);
+            $isDebug      = $settings->get('debug', false);
             $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
+
             return true;
         }
 
@@ -38,7 +39,8 @@ abstract class SOAPTransport implements TransportInterface
 
     /**
      * @param string $wsdl_url
-     * @param bool $isDebug
+     * @param bool   $isDebug
+     *
      * @return \SoapClient
      */
     protected function getSoapClient($wsdl_url, $isDebug = false)

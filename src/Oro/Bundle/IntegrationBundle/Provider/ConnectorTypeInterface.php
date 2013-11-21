@@ -24,4 +24,20 @@ interface ConnectorTypeInterface
      * @return string
      */
     public function getSettingsEntityFQCN();
+
+    /**
+     * Returns entity name that will be used for matching "import processor"
+     *
+     * @return string
+     */
+    public function getImportEntityFQCN();
+
+    /**
+     * Returns job name for import
+     *
+     * @param bool $isValidationOnly
+     *
+     * @return string
+     */
+    public function getImportJobName($isValidationOnly = false);
 }

@@ -236,7 +236,7 @@ class TypesRegistry
      * @param bool      $typeNameOnly
      *
      * @throws \LogicException
-     * @return string|TransportTypeInterface
+     * @return string|ConnectorTypeInterface
      */
     public function getConnectorTypeBySettingEntity(Connector $connectorEntity, $channelType, $typeNameOnly = false)
     {
