@@ -3,10 +3,10 @@
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorTypeInterface;
@@ -39,7 +39,8 @@ abstract class AbstractConnectorSettingFormType extends AbstractType
                         ->setParameter('channel', $channel);
                 },
                 'property'      => 'label',
-                'empty_value'   => 'Choose configured transport'
+                'empty_value'   => 'Choose configured transport',
+                'constraints'   => new NotBlank()
             ]
         );
     }
