@@ -18,10 +18,10 @@
             <th>
                 {% trans %}Label{% endtrans %}
             </th>
-            <th>
+            <th {% if transports|length == 0 %}colspan="2"{% endif %}>
                 {% trans %}Type{% endtrans %}
             </th>
-            <th></th>
+            {% if transports|length > 0 %}<th></th>{% endif %}
         </tr>
         </thead>
         <tbody>

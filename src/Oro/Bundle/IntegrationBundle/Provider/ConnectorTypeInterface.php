@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-interface TransportTypeInterface
+interface ConnectorTypeInterface
 {
     /**
      * Returns label for UI
@@ -12,14 +12,14 @@ interface TransportTypeInterface
     public function getLabel();
 
     /**
-     * Returns form type name needed to setup transport
+     * Returns form type name needed to setup connector
      *
      * @return string
      */
     public function getSettingsFormType();
 
     /**
-     * Returns entity name needed to store transport settings
+     * Returns entity name needed to store connector settings
      *
      * @return string
      */

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-interface ConnectorInterface
+interface ConnectorInterface extends ConnectorTypeInterface
 {
     const SYNC_DIRECTION_PULL = 'pull';
     const SYNC_DIRECTION_PUSH = 'push';

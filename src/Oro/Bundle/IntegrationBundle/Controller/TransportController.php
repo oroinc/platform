@@ -165,7 +165,7 @@ class TransportController extends Controller
     protected function getForm($channelType)
     {
         $form = $this->get('form.factory')->create(
-            'oro_integration_transport_select_form',
+            TransportSelectType::NAME,
             null,
             [TransportSelectType::TYPE_OPTION => $channelType]
         );
