@@ -10,7 +10,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Provider\TransportTypeInterface;
 
 abstract class AbstractSelectType extends AbstractType
 {
@@ -32,7 +31,7 @@ abstract class AbstractSelectType extends AbstractType
     {
         $types   = $this->getTypesArray($options);
         $values  = $types->map(
-            function (TransportTypeInterface $type) {
+            function ($type) {
                 return $type->getLabel();
             }
         )->toArray();
@@ -44,7 +43,8 @@ abstract class AbstractSelectType extends AbstractType
             [
                 'label'       => 'Type',
                 'choices'     => $choices,
-                'constraints' => new NotBlank()
+                'constraints' => new NotBlank(),
+                'empty_value' => 'Choose a type'
             ]
         );
     }

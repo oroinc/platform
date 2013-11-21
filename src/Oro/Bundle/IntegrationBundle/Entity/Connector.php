@@ -65,10 +65,11 @@ abstract class Connector
     }
 
     /**
-     * @param mixed $transport
+     * @param Transport $transport
+     *
      * @return $this
      */
-    public function setTransport($transport)
+    public function setTransport(Transport $transport)
     {
         $this->transport = $transport;
 

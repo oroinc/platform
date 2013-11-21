@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\IntegrationBundle\Entity\Connector;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorTypeInterface;
@@ -129,6 +130,23 @@ class TypesRegistry
     }
 
     /**
+     * Returns registered connectors for channel by type
+     *
+     * @param string $channelType
+     *
+     * @return ArrayCollection
+     * @throws \LogicException
+     */
+    public function getRegisteredConnectorsTypes($channelType)
+    {
+        if ($this->channelTypes->containsKey($channelType)) {
+            return $this->connectorTypes[$channelType];
+        }
+
+        throw  new \LogicException(sprintf('Channel type "%s" not found.', $channelType));
+    }
+
+    /**
      * @param Transport $transportEntity
      * @param string    $channelType
      * @param bool      $typeNameOnly
@@ -188,20 +206,56 @@ class TypesRegistry
         return $this;
     }
 
-    public function getConnectorType($channelType)
+    /**
+     * @param string $channelType
+     * @param string $type
+     *
+     * @return ConnectorTypeInterface
+     * @throws \LogicException
+     */
+    public function getConnectorType($channelType, $type)
     {
-        if (!isset($this->transportTypes[$channelType])) {
+        if (!isset($this->connectorTypes[$channelType])) {
             throw new \LogicException(sprintf('Connectors not found for channel "%s".', $channelType));
-        } elseif (!$this->transportTypes[$channelType]->containsKey($transportType)) {
+        } elseif (!$this->connectorTypes[$channelType]->containsKey($type)) {
             throw new \LogicException(
                 sprintf(
-                    'Transports type "%s"  not found for channel "%s".',
-                    $transportType,
+                    'Connector type "%s"  not found for channel "%s".',
+                    $type,
                     $channelType
                 )
             );
         }
 
-        return $this->transportTypes[$channelType]->get($transportType);
+        return $this->connectorTypes[$channelType]->get($type);
+    }
+
+    /**
+     * @param Connector $connectorEntity
+     * @param string    $channelType
+     * @param bool      $typeNameOnly
+     *
+     * @throws \LogicException
+     * @return string|TransportTypeInterface
+     */
+    public function getConnectorTypeBySettingEntity(Connector $connectorEntity, $channelType, $typeNameOnly = false)
+    {
+        $class = ClassUtils::getClass($connectorEntity);
+        $types = $this->getRegisteredConnectorsTypes($channelType)->filter(
+            function (ConnectorTypeInterface $connector) use ($connectorEntity, $class) {
+                return $connector->getSettingsEntityFQCN() === $class;
+            }
+        );
+        $keys  = $types->getKeys();
+        $key   = reset($keys);
+
+        if ($key === false) {
+            throw new \LogicException(sprintf('Connector not found for channel type "%s".', $channelType));
+        }
+        if ($typeNameOnly) {
+            return $key;
+        }
+
+        return $types->first();
     }
 }

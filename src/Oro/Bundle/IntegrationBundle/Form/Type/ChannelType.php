@@ -41,7 +41,7 @@ class ChannelType extends AbstractType
         $builder->add('name', 'text', ['required' => true]);
 
         /**
-         * Remove type field to deny change "channel type" if channel saved
+         * Disable type field to deny change "channel type" if channel saved
          */
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
@@ -54,7 +54,8 @@ class ChannelType extends AbstractType
                 }
 
                 if ($data instanceof Channel && $data->getId()) {
-                    $form->remove(self::TYPE_FIELD_NAME);
+                    $options = $form->get(self::TYPE_FIELD_NAME)->getConfig()->getOptions();
+                    $form->add(self::TYPE_FIELD_NAME, 'choice', array_merge($options, ['disabled' => true]));
                 }
             }
         );
