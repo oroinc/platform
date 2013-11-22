@@ -113,8 +113,8 @@ class StepExecutionProxyContext implements ContextInterface
 
     /**
      * {@inheritdoc}
-
-        return $errors;
+     *
+     * return $errors;
      */
     public function getUpdateCount()
     {
