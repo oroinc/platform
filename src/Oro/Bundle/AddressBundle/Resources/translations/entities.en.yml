@@ -6,12 +6,17 @@ country:
     AE: 'United Arab Emirates'
     AF: Afghanistan
     AG: 'Antigua and Barbuda'
+    AI: Anguilla
     AL: Albania
     AM: Armenia
     AO: Angola
+    AQ: Antarctica
     AR: Argentina
+    AS: 'American Samoa'
     AT: Austria
     AU: Australia
+    AW: Aruba
+    AX: 'Aland Islands'
     AZ: Azerbaijan
     BA: Bosnia-Herzegovina
     BB: Barbados
@@ -22,20 +27,26 @@ country:
     BH: Bahrain
     BI: Burundi
     BJ: Benin
+    BL: 'Saint Barthelemy'
+    BM: Bermuda
     BN: 'Brunei Darussalam'
     BO: Bolivia
+    BQ: 'Bonaire, Saint Eustatius and Saba '
     BR: Brazil
     BS: Bahamas
     BT: Bhutan
+    BV: 'Bouvet Island'
     BW: Botswana
     BY: Belarus
     BZ: Belize
     CA: Canada
+    CC: 'Cocos Islands'
     CD: 'The Democratic Republic of Congo'
     CF: 'Central African Republic'
-    CG: Congo
+    CG: 'Republic of the Congo'
     CH: Switzerland
     CI: 'Cote D''ivoire'
+    CK: 'Cook Islands'
     CL: Chile
     CM: Cameroon
     CN: China
@@ -43,6 +54,8 @@ country:
     CR: 'Costa Rica'
     CU: Cuba
     CV: 'Cape Verde'
+    CW: Curacao
+    CX: 'Christmas Island'
     CY: Cyprus
     CZ: 'Czech Republic'
     DE: Germany
@@ -60,21 +73,31 @@ country:
     ET: Ethiopia
     FI: Finland
     FJ: Fiji
+    FK: 'Falkland Islands'
     FM: 'Federated States of Micronesia'
+    FO: 'Faroe Islands'
     FR: France
     GA: Gabon
     GB: 'United Kingdom'
     GD: Grenada
     GE: Georgia
+    GF: 'French Guiana'
+    GG: Guernsey
     GH: Ghana
+    GI: Gibraltar
     GL: Greenland
     GM: Gambia
     GN: Guinea
+    GP: Guadeloupe
     GQ: 'Equatorial Guinea'
     GR: Greece
+    GS: 'South Georgia and the South Sandwich Islands'
     GT: Guatemala
+    GU: Guam
     GW: Guinea-Bissau
     GY: Guyana
+    HK: 'Hong Kong'
+    HM: 'Heard Island and McDonald Islands'
     HN: Honduras
     HR: Croatia
     HT: Haiti
@@ -82,11 +105,14 @@ country:
     ID: Indonesia
     IE: Ireland
     IL: Israel
+    IM: 'Isle of Man'
     IN: India
+    IO: 'British Indian Ocean Territory'
     IQ: Iraq
     IR: Iran
     IS: Iceland
     IT: Italy
+    JE: Jersey
     JM: Jamaica
     JO: Jordan
     JP: Japan
@@ -98,11 +124,13 @@ country:
     KN: 'Saint Kitts and Nevis'
     KP: 'North Korea'
     KR: 'South Korea'
+    XK: Kosovo
     KW: Kuwait
     KY: 'Cayman Islands'
     KZ: Kazakhstan
     LA: Laos
     LB: Lebanon
+    LC: 'Saint Lucia'
     LI: Liechtenstein
     LK: 'Sri Lanka'
     LR: Liberia
@@ -112,15 +140,21 @@ country:
     LV: Latvia
     LY: Libya
     MA: Morocco
+    MC: Monaco
     MD: Moldova
     ME: Montenegro
+    MF: 'Saint Martin'
     MG: Madagascar
     MH: 'Marshall Islands'
     MK: Macedonia
     ML: Mali
     MM: Myanmar
     MN: Mongolia
+    MO: Macao
+    MP: 'Northern Mariana Islands'
+    MQ: Martinique
     MR: Mauritania
+    MS: Montserrat
     MT: Malta
     MU: Mauritius
     MV: Maldives
@@ -129,25 +163,34 @@ country:
     MY: Malaysia
     MZ: Mozambique
     NA: Namibia
+    NC: 'New Caledonia'
     NE: Niger
+    NF: 'Norfolk Island'
     NG: Nigeria
     NI: Nicaragua
     NL: Netherlands
     NO: Norway
     NP: Nepal
     NR: Nauru
+    NU: Niue
     NZ: 'New Zealand'
     OM: Oman
     PA: Panama
     PE: Peru
+    PF: 'French Polynesia'
     PG: 'Papua New Guinea'
     PH: Phillipines
     PK: Pakistan
     PL: Poland
+    PM: 'Saint Pierre and Miquelon'
+    PN: Pitcairn
+    PR: 'Puerto Rico'
+    PS: 'Palestinian Territory'
     PT: Portugal
     PW: Palau
     PY: Paraguay
     QA: Qatar
+    RE: Reunion
     RO: Romania
     RS: Serbia
     RU: Russia
@@ -156,9 +199,12 @@ country:
     SB: 'Solomon Islands'
     SC: Seychelles
     SD: Sudan
+    SS: 'South Sudan'
     SE: Sweden
     SG: Singapore
+    SH: 'Saint Helena'
     SI: Slovenia
+    SJ: 'Svalbard and Jan Mayen'
     SK: Slovakia
     SL: 'Sierra Leone'
     SM: 'San Marino'
@@ -167,12 +213,16 @@ country:
     SR: Suriname
     ST: 'Sao Tome and Principe'
     SV: 'El Salvador'
+    SX: 'Sint Maarten'
     SY: Syria
     SZ: Swaziland
+    TC: 'Turks and Caicos Islands'
     TD: Chad
+    TF: 'French Southern Territories'
     TG: Togo
     TH: Thailand
     TJ: Tajikistan
+    TK: Tokelau
     TL: 'Timor Leste'
     TM: Turkmenistan
     TN: Tunisia
@@ -184,15 +234,21 @@ country:
     TZ: Tanzania
     UA: Ukraine
     UG: Uganda
+    UM: 'United States Minor Outlying Islands'
     US: 'United States'
     UY: Uruguay
     UZ: Uzbekistan
+    VA: Vatican
     VC: 'Saint Vincent and the Grenadines'
     VE: Venezuela
+    VG: 'British Virgin Islands'
+    VI: 'U.S. Virgin Islands'
     VN: 'Viet Nam'
     VU: Vanuatu
+    WF: 'Wallis and Futuna'
     WS: Samoa
     YE: Yemen
+    YT: Mayotte
     ZA: 'South Africa'
     ZM: Zambia
     ZW: Zimbabwe
@@ -205,6 +261,8 @@ country:
     PS: 'Palestinian Territory, Occupied'
     SH: 'Saint Helena, Ascension and Tristan da Cunha'
     UM: 'United States Minor Outlying Islands'
+    CS: 'Serbia and Montenegro'
+    AN: 'Netherlands Antilles'
 region:
     AD.02: Canillo
     AD.03: Encamp
@@ -799,6 +857,7 @@ region:
     CH.AI: 'Appenzell Innerrhoden'
     CH.AR: 'Appenzell Ausserrhoden'
     CH.BE: Bern
+    CH.BS: Basel-City
     CH.BL: Basel-Landschaft
     CH.BS: Basel-Stadt
     CH.FR: Fribourg

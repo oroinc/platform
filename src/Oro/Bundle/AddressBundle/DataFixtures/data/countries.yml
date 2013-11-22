@@ -14966,9 +14966,6 @@ TW:
         TW.na3:
             combinedCode: TW.na3
             code: na3
-        TW.nan:
-            combinedCode: TW.nan
-            code: nan
         TW.NAN:
             combinedCode: TW.NAN
             code: NAN
