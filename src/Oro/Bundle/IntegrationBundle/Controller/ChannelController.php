@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
+use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -9,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/channel")

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -47,27 +46,19 @@ class Channel
     protected $type;
 
     /**
-     * @var ArrayCollection|Transport[]
+     * @var Transport
      *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport",
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport",
      *     mappedBy="channel", cascade={"all"}, orphanRemoval=true
      * )
      */
-    protected $transports;
+    protected $transport;
 
     /**
-     * @var ArrayCollection|Connector[]
-     *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Connector",
-     *     mappedBy="channel", cascade={"all"}, orphanRemoval=true
-     * )
+     * @var []
+     * @ORM\Column(name="connectors", type="array")
      */
     protected $connectors;
-
-    public function __construct()
-    {
-        $this->transports = new ArrayCollection();
-    }
 
     /**
      * @return integer
@@ -122,69 +113,36 @@ class Channel
      *
      * @return $this
      */
-    public function addTransport(Transport $transport)
+    public function setTransport(Transport $transport)
     {
-        if (!$this->transports->contains($transport)) {
-            $this->transports->add($transport);
-            $transport->setChannel($this);
-        }
+        $this->transport = $transport;
+        $transport->setChannel($this);
 
         return $this;
     }
 
     /**
-     * @param Transport $transport
+     * @return Transport
+     */
+    public function getTransport()
+    {
+        return $this->transport;
+    }
+
+    /**
+     * @param [] $connectors
      *
      * @return $this
      */
-    public function removeTransport(Transport $transport)
+    public function setConnectors($connectors)
     {
-        if ($this->transports->contains($transport)) {
-            $this->transports->removeElement($transport);
-        }
+        $this->connectors = $connectors;
 
         return $this;
     }
 
     /**
-     * @return ArrayCollection|Transport[]
-     */
-    public function getTransports()
-    {
-        return $this->transports;
-    }
-
-    /**
-     * @param Connector $connector
-     *
-     * @return $this
-     */
-    public function addConnector(Connector $connector)
-    {
-        if (!$this->connectors->contains($connector)) {
-            $this->connectors->add($connector);
-            $connector->setChannel($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Connector $connector
-     *
-     * @return $this
-     */
-    public function removeConnector(Connector $connector)
-    {
-        if ($this->connectors->contains($connector)) {
-            $this->connectors->removeElement($connector);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return ArrayCollection|Connector[]
+     * @return []
      */
     public function getConnectors()
     {

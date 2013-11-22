@@ -32,13 +32,6 @@ abstract class Transport
     protected $channel;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="label", type="string", length=255)
-     */
-    protected $label;
-
-    /**
      * @return mixed
      */
     public function getId()
@@ -64,26 +57,6 @@ abstract class Transport
     public function getChannel()
     {
         return $this->channel;
-    }
-
-    /**
-     * @param string $label
-     *
-     * @return $this
-     */
-    public function setLabel($label)
-    {
-        $this->label = $label;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getLabel()
-    {
-        return $this->label;
     }
 
     /**

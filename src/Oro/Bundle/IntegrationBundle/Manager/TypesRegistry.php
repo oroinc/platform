@@ -94,15 +94,14 @@ class TypesRegistry
      * @param string $channelType
      *
      * @return ArrayCollection
-     * @throws \LogicException
      */
     public function getRegisteredTransportTypes($channelType)
     {
-        if ($this->channelTypes->containsKey($channelType)) {
-            return $this->transportTypes[$channelType];
+        if (!isset($this->transportTypes[$channelType])) {
+            $this->transportTypes[$channelType] = new ArrayCollection();
         }
 
-        throw  new \LogicException(sprintf('Channel type "%s" not found.', $channelType));
+        return $this->transportTypes[$channelType];
     }
 
     /**
@@ -135,15 +134,14 @@ class TypesRegistry
      * @param string $channelType
      *
      * @return ArrayCollection
-     * @throws \LogicException
      */
     public function getRegisteredConnectorsTypes($channelType)
     {
-        if ($this->channelTypes->containsKey($channelType)) {
-            return $this->connectorTypes[$channelType];
+        if (!isset($this->connectorTypes[$channelType])) {
+            $this->connectorTypes[$channelType] = new ArrayCollection();
         }
 
-        throw  new \LogicException(sprintf('Channel type "%s" not found.', $channelType));
+        return $this->connectorTypes[$channelType];
     }
 
     /**

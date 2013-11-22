@@ -1,0 +1,13 @@
+{% block oro_integration_channel_form_widget %}
+    {{ form_row(form.type) }}
+    {{ form_row(form.name) }}
+
+    {{ form_row(form.transportType) }}
+    {% if (form.transport is defined) %}
+        {{ form_widget(form.transport) }}
+    {% endif %}
+
+    {{ form_row(form.connectors) }}
+
+    {{ form_rest(form) }}
+{% endblock %}

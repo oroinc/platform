@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface;
 
@@ -30,35 +29,68 @@ class ChannelType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $keys    = $this->registry->getRegisteredChannelTypes()->getKeys();
-        $values  = $this->registry->getRegisteredChannelTypes()->map(
+        $builder->add(
+            self::TYPE_FIELD_NAME,
+            'choice',
+            ['required' => true, 'choices' => $this->getAvailableTypesChoices(), 'label' => 'Type']
+        );
+        $builder->add('name', 'text', ['required' => true, 'label' => 'Name']);
+
+        // add connectors
+        $builder->add(
+            'connectors',
+            'choice',
+            [
+                'label'    => 'Connectors',
+                'expanded' => true,
+                'multiple' => true,
+                'choices'  => [
+                    'magento_customer_connector' => 'Customer connector'
+                ]
+            ]
+        );
+
+        // add transport type selector
+        $builder->add(
+            'transportType',
+            'choice',
+            [
+                'label'    => 'Transport type',
+                'choices'  => [
+                    'magento_soap' => 'SOAP API v2'
+                ],
+                'mapped'   => false
+            ]
+        );
+        $builder->add('transport', 'orocrm_magento_soap_transport_setting_form_type');
+    }
+
+    /**
+     * Collect available types
+     *
+     * @return array
+     */
+    protected function getAvailableTypesChoices()
+    {
+        $registry = $this->registry;
+        $types    = $registry->getRegisteredChannelTypes();
+        $types    = $types->partition(
+            function ($key, ChannelTypeInterface $type) use ($registry) {
+                return !($registry->getRegisteredConnectorsTypes($key)->isEmpty()
+                    || $registry->getRegisteredTransportTypes($key)->isEmpty());
+            }
+        );
+
+        /** @var ArrayCollection $types */
+        $types  = $types[0];
+        $keys   = $types->getKeys();
+        $values = $types->map(
             function (ChannelTypeInterface $type) {
                 return $type->getLabel();
             }
         )->toArray();
-        $choices = array_combine($keys, $values);
-        $builder->add(self::TYPE_FIELD_NAME, 'choice', ['required' => true, 'choices' => $choices]);
-        $builder->add('name', 'text', ['required' => true]);
 
-        /**
-         * Disable type field to deny change "channel type" if channel saved
-         */
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                $form = $event->getForm();
-
-                if ($data === null) {
-                    return;
-                }
-
-                if ($data instanceof Channel && $data->getId()) {
-                    $options = $form->get(self::TYPE_FIELD_NAME)->getConfig()->getOptions();
-                    $form->add(self::TYPE_FIELD_NAME, 'choice', array_merge($options, ['disabled' => true]));
-                }
-            }
-        );
+        return array_combine($keys, $values);
     }
 
     /**

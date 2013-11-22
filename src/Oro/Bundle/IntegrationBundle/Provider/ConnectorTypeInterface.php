@@ -12,20 +12,6 @@ interface ConnectorTypeInterface
     public function getLabel();
 
     /**
-     * Returns form type name needed to setup connector
-     *
-     * @return string
-     */
-    public function getSettingsFormType();
-
-    /**
-     * Returns entity name needed to store connector settings
-     *
-     * @return string
-     */
-    public function getSettingsEntityFQCN();
-
-    /**
      * Returns entity name that will be used for matching "import processor"
      *
      * @return string
