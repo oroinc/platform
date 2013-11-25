@@ -4,6 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\Manager;
 
 use Composer\Composer;
 use Composer\Installer;
+use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
 use Composer\IO\NullIO;
 use Composer\Package\Link;
@@ -16,6 +17,7 @@ use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryManager;
 use Composer\Repository\WritableArrayRepository;
 use Composer\Installer\InstallationManager;
+use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
@@ -260,8 +262,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepositories')
             ->will($this->returnValue([$localRepository]));
 
-        // root package (project composer.json)
-        $rootPackageMock = $this->createRootPackageMock();
+        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        $rootPackageMock = $composer->getPackage();
         $rootPackageMock->expects($this->once())
             ->method('setRequires');
         $rootPackageMock->expects($this->once())
@@ -273,7 +275,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getPackage')
             ->will($this->returnValue($rootPackageMock));
 
-        $composerInstaller = $this->prepareInstallerMock($newPackage);
+        $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), true);
         $manager = $this->createPackageManager($composer, $composerInstaller, null, null, $tempComposerJson);
         $manager->install($newPackage->getName());
 
@@ -425,7 +427,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getInstallationManager')
             ->will($this->returnValue($installationManager));
 
-        // Uninstallation
+        // Uninstalling
         $installationManager->expects($this->exactly(count($packageNamesToBeRemoved)))
             ->method('uninstall')
             ->with(
@@ -522,9 +524,219 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function shouldReturnListOfAvailableUpdates()
+    {
+        $expectedUpdates = [
+            new PackageUpdate('vendor1/package1', 'v1 (asdf)', 'v1 (ffff)'),
+            new PackageUpdate('vendor2/package2', 'v1 (asss)', 'v1 (dddd)'),
+        ];
+        $package1 = $this->createPackageMock();
+        $package1->expects($this->any())->method('getName')->will($this->returnValue('vendor1/package1'));
+        $package1->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
+        $package1->expects($this->any())->method('getSourceReference')->will($this->returnValue('asdf'));
+
+        $updatedPackage1 = $this->createPackageMock();
+        $updatedPackage1->expects($this->any())->method('getName')->will($this->returnValue('vendor1/package1'));
+        $updatedPackage1->expects($this->any())->method('getNames')->will($this->returnValue(['vendor1/package1']));
+        $updatedPackage1->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
+        $updatedPackage1->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
+        $updatedPackage1->expects($this->any())->method('getVersion')->will($this->returnValue('1.0.0.0'));
+        $updatedPackage1->expects($this->any())->method('getSourceReference')->will($this->returnValue('ffff'));
+
+        $package2 = $this->createPackageMock();
+        $package2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $package2->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
+        $package2->expects($this->any())->method('getSourceReference')->will($this->returnValue('asss'));
+
+        $updatedPackage2 = $this->createPackageMock();
+        $updatedPackage2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $updatedPackage2->expects($this->any())->method('getNames')->will($this->returnValue(['vendor2/package2']));
+        $updatedPackage2->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
+        $updatedPackage2->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
+        $updatedPackage2->expects($this->any())->method('getVersion')->will($this->returnValue('1.0.0.0'));
+        $updatedPackage2->expects($this->any())->method('getSourceReference')->will($this->returnValue('dddd'));
+
+        $package3 = $this->getPackage('vendor3/package3', 'v1');
+
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = new WritableArrayRepository([$package1, $package2, $package3]);
+        $repository = new ArrayRepository([$updatedPackage1, $updatedPackage2, clone $package3]);
+        $composer->expects($this->any())->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        $repositoryManager->expects($this->any())
+            ->method('getRepositories')
+            ->will($this->returnValue([$repository]));
+
+        $manager = $this->createPackageManager($composer);
+
+        $this->assertEquals($expectedUpdates, $manager->getAvailableUpdates());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldUpdatePackage()
+    {
+        $packageName = 'vendor1/package1';
+
+        $package1 = $this->createPackageMock();
+        $package1->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $package1->expects($this->any())->method('getSourceReference')->will($this->returnValue('asdf'));
+
+        $updatedPackage1 = $this->createPackageMock();
+        $updatedPackage1->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $updatedPackage1->expects($this->any())->method('getSourceReference')->will($this->returnValue('ffff'));
+
+        $package2 = $this->createPackageMock();
+        $package2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $package2->expects($this->any())->method('getSourceReference')->will($this->returnValue('asss'));
+
+        $updatedPackage2 = $this->createPackageMock();
+        $updatedPackage2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $updatedPackage2->expects($this->any())->method('getSourceReference')->will($this->returnValue('dddd'));
+
+        $package3 = $this->getPackage('vendor3/package3', 'v1');
+        $removedPackage = $this->getPackage('removed/removed', 'v1');
+        $newInstalledPackage = $this->getPackage('new/package', 'v1');
+
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = $this->createConstructorLessMock('Composer\Repository\WritableRepositoryInterface');
+
+        $composer->expects($this->any())->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        $localRepository->expects($this->at(0))
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue([$package1, $package2, $removedPackage, $package3]));
+        $localRepository->expects($this->at(1))
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue([$updatedPackage1, $updatedPackage2, $package3, $newInstalledPackage]));
+        $runner = $this->createScriptRunnerMock();
+        $runner->expects($this->once())
+            ->method('install')
+            ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
+        $runner->expects($this->exactly(2))
+            ->method('update')
+            ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
+        $runner->expects($this->once())
+            ->method('uninstall')
+            ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
+
+        $composerInstaller = $this->prepareInstallerMock($packageName, true);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner);
+        $manager->update($packageName);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \Oro\Bundle\DistributionBundle\Exception\VerboseException
+     * @expectedExceptionMessage vendor1/package1 can't be updated
+     *
+     */
+    public function throwsExceptionIfDoInstallReturnsFalse()
+    {
+        $packageName = 'vendor1/package1';
+
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = new WritableArrayRepository();
+
+        $composer->expects($this->any())->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+
+        $composerInstaller = $this->prepareInstallerMock($packageName, false);
+
+        $manager = $this->createPackageManager($composer, $composerInstaller, new BufferIO());
+        $manager->update($packageName);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnTrueIfUpdateIsAvailable()
+    {
+        $packageName = 'vendor1/package1';
+
+        $package = $this->createPackageMock();
+        $package->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $package->expects($this->any())->method('getSourceReference')->will($this->returnValue('asdf'));
+
+        $updatedPackage = $this->createPackageMock();
+        $updatedPackage->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $updatedPackage->expects($this->any())->method('getNames')->will($this->returnValue([$packageName]));
+        $updatedPackage->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
+        $updatedPackage->expects($this->any())->method('getVersion')->will($this->returnValue('1.0.0.0'));
+
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = new WritableArrayRepository([$package]);
+
+        $repository = new ArrayRepository([$updatedPackage]);
+
+        $composer->expects($this->any())->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        $repositoryManager->expects($this->any())
+            ->method('getRepositories')
+            ->will($this->returnValue([$repository]));
+
+        $manager=$this->createPackageManager($composer);
+        $this->assertTrue($manager->isUpdateAvailable($packageName));
+
+    }
+
+    /**
+     * @test
+     */
+    public function shouldReturnFalseIfThereAreNoUpdatesForPackage()
+    {
+        $packageName = 'vendor1/package1';
+
+        $package = $this->createPackageMock();
+        $package->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $package->expects($this->any())->method('getNames')->will($this->returnValue([$packageName]));
+        $package->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
+        $package->expects($this->any())->method('getVersion')->will($this->returnValue('1.0.0.0'));
+
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = new WritableArrayRepository([$package]);
+
+        $repository = new ArrayRepository([clone $package]);
+
+        $composer->expects($this->any())->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        $repositoryManager->expects($this->any())
+            ->method('getRepositories')
+            ->will($this->returnValue([$repository]));
+
+        $manager=$this->createPackageManager($composer);
+        $this->assertFalse($manager->isUpdateAvailable($packageName));
+    }
+
+    /**
      * @param string $name
      * @param string $version
      * @param string $class
+     *
      * @return PackageInterface
      */
     protected function getPackage($name, $version, $class = 'Composer\Package\Package')
@@ -542,7 +754,16 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createComposerMock()
     {
-        return $this->createConstructorLessMock('Composer\Composer');
+        $composer = $this->createConstructorLessMock('Composer\Composer');
+        $rootPackage = $this->createRootPackageMock();
+        $composer->expects($this->any())
+            ->method('getPackage')
+            ->will($this->returnValue($rootPackage));
+        $rootPackage->expects($this->any())
+            ->method('getPreferStable')
+            ->will($this->returnValue(true));
+
+        return $composer;
     }
 
     /**
@@ -642,10 +863,12 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param PackageInterface $package
+     * @param string $packageName
+     * @param bool $runReturnValue
+     *
      * @return Installer|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function prepareInstallerMock($package)
+    protected function prepareInstallerMock($packageName, $runReturnValue)
     {
         $composerInstaller = $this->createComposerInstallerMock();
         $composerInstaller->expects($this->once())->method('setDryRun')->with($this->equalTo(false))->will(
@@ -670,7 +893,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $this->returnSelf()
         );
         $composerInstaller->expects($this->once())->method('setUpdateWhitelist')->with(
-            $this->equalTo([$package->getName()])
+            $this->equalTo([$packageName])
         )->will($this->returnSelf());
         $composerInstaller->expects($this->once())->method('setOptimizeAutoloader')->with(
             $this->equalTo(true)
@@ -679,7 +902,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $this->equalTo(true)
         )->will($this->returnSelf());
 
-        $composerInstaller->expects($this->once())->method('run')->will($this->returnValue(true));
+        $composerInstaller->expects($this->once())->method('run')->will($this->returnValue($runReturnValue));
         return $composerInstaller;
     }
 

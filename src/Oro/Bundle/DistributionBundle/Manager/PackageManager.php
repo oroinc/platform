@@ -15,6 +15,7 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 
@@ -53,8 +54,13 @@ class PackageManager
      * @param Runner $scriptRunner
      * @param string $pathToComposerJson
      */
-    public function __construct(Composer $composer, Installer $installer, IOInterface $composerIO, Runner $scriptRunner, $pathToComposerJson = null)
-    {
+    public function __construct(
+        Composer $composer,
+        Installer $installer,
+        IOInterface $composerIO,
+        Runner $scriptRunner,
+        $pathToComposerJson = null
+    ) {
         $this->composer = $composer;
         $this->installer = $installer;
         $this->composerIO = $composerIO;
@@ -101,13 +107,13 @@ class PackageManager
      */
     public function getPreferredPackage($packageName, $version = null)
     {
-        $pool = new Pool('dev');
-        $pool->addRepository(new CompositeRepository($this->getRepositories()));
+        $pool = $this->createPool();
 
         $constraint = null;
         if ($version) {
             $constraint = (new VersionParser())->parseConstraints($version);
         }
+        /** @var PackageInterface[] $packages */
         $packages = $pool->whatProvides($packageName, $constraint);
         $totalPackages = count($packages);
         if (!$totalPackages) {
@@ -125,7 +131,10 @@ class PackageManager
                 }
                 $packageIDs[$index] = $package->getId();
             }
-            $preferredPackageID = (new DefaultPolicy())->selectPreferedPackages($pool, [], $packageIDs)[0];
+            $preferredPackageID = (new DefaultPolicy(
+                $this->composer->getPackage()->getPreferStable()
+            ))->selectPreferedPackages($pool, [], $packageIDs)[0];
+
             $package = $pool->literalToPackage($preferredPackageID);
         }
 
@@ -175,36 +184,17 @@ class PackageManager
         $previousInstalled = $this->getFlatListInstalledPackage();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->addToComposerJsonFile($package);
-        if ($this->doInstall($package)) {
+        if ($this->doInstall($package->getName())) {
             foreach ($this->getInstalled() as $installedPackage) {
                 if (!in_array($installedPackage->getName(), $previousInstalled)) {
                     $this->scriptRunner->install($installedPackage);
                 }
             }
         } else {
-            throw new VerboseException(sprintf('%s can\'t be installed!', $packageName), $this->composerIO->getOutput());
+            throw new VerboseException(
+                sprintf('%s can\'t be installed!', $packageName), $this->composerIO->getOutput()
+            );
         }
-    }
-
-    /**
-     * @param PackageInterface $package
-     *
-     * @return bool
-     */
-    public function doInstall(PackageInterface $package)
-    {
-        $this->installer
-            ->setDryRun(false)
-            ->setVerbose(false)
-            ->setPreferSource(false)
-            ->setPreferDist(true)
-            ->setDevMode(false)
-            ->setRunScripts(true)
-            ->setUpdate(true)
-            ->setUpdateWhitelist([$package->getName()])
-            ->setOptimizeAutoloader(true);
-
-        return $this->installer->run();
     }
 
     /**
@@ -245,7 +235,7 @@ class PackageManager
         $this->removeFromComposerJson($packageNames);
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
-        foreach($packageNames as $name){
+        foreach ($packageNames as $name) {
             $package = $this->findPackage($name);
             $this->scriptRunner->uninstall($package);
             $installationManager->uninstall(
@@ -253,6 +243,211 @@ class PackageManager
                 new UninstallOperation($package)
             );
         }
+    }
+
+    /**
+     * @return PackageUpdate[]
+     */
+    public function getAvailableUpdates()
+    {
+        $localRepository = $this->getLocalRepository();
+        $updates = [];
+        foreach ($localRepository->getCanonicalPackages() as $package) {
+            if ($update = $this->getPackageUpdate($package)) {
+                $updates[] = $update;
+            }
+        }
+
+        return $updates;
+    }
+
+    /**
+     * @param string $packageName
+     *
+     * @return bool
+     */
+    public function isUpdateAvailable($packageName)
+    {
+        $package = $this->findPackage($packageName);
+
+        return (bool)$this->getPackageUpdate($package);
+    }
+
+
+    /**
+     * @param string $packageName
+     * @throws VerboseException
+     */
+    public function update($packageName)
+    {
+        $previousInstalled = $this->getInstalled();
+
+        if ($this->doInstall($packageName)) {
+            list($installedPackages, $updatedPackages, $uninstalledPackages) = $this->getChangeSet($previousInstalled);
+            array_map(
+                function (PackageInterface $p) {
+                    $this->scriptRunner->install($p);
+                },
+                $installedPackages
+            );
+
+            $fetchPreviousInstalledPackageVersion = function ($packageName) use ($previousInstalled) {
+                foreach ($previousInstalled as $p) {
+                    if ($p->getName() == $packageName) {
+
+                        return $p->getVersion();
+                    }
+                }
+
+                return '';
+            };
+            array_map(
+                function (PackageInterface $p) use ($fetchPreviousInstalledPackageVersion) {
+                    $previousInstalledPackageVersion = $fetchPreviousInstalledPackageVersion($p->getName());
+                    $this->scriptRunner->update($p, $previousInstalledPackageVersion);
+                },
+                $updatedPackages
+            );
+            array_map(
+                function (PackageInterface $p) {
+                    $this->scriptRunner->uninstall($p);
+                },
+                $uninstalledPackages
+            );
+
+        } else {
+            throw new VerboseException(
+                sprintf('%s can\'t be updated!', $packageName), $this->composerIO->getOutput()
+            );
+        }
+    }
+
+    /**
+     * @param string $packageName
+     *
+     * @return bool
+     */
+    protected function doInstall($packageName)
+    {
+        $this->installer
+            ->setDryRun(false)
+            ->setVerbose(false)
+            ->setPreferSource(false)
+            ->setPreferDist(true)
+            ->setDevMode(false)
+            ->setRunScripts(true)
+            ->setUpdate(true)
+            ->setUpdateWhitelist([$packageName])
+            ->setOptimizeAutoloader(true);
+
+        return $this->installer->run();
+    }
+
+    /**
+     * @param PackageInterface[] $previousInstalled
+     *
+     * @return array - [$installed, $updated, $uninstalled]
+     */
+    protected function getChangeSet(array $previousInstalled)
+    {
+        $currentlyInstalled = $this->getInstalled();
+        $allPackages = array_unique(array_merge($previousInstalled, $currentlyInstalled), SORT_REGULAR);
+
+        $isExist = function (PackageInterface $p, array $arrayOfPackages, callable $equalsCallback) {
+            foreach ($arrayOfPackages as $pi) {
+                if ($equalsCallback($p, $pi)) {
+
+                    return true;
+                }
+            }
+
+            return false;
+        };
+        $equalsByName = function (PackageInterface $p1, PackageInterface $p2) {
+
+            return $p1->getName() == $p2->getName();
+        };
+        $equalsBySourceReference = function (PackageInterface $p1, PackageInterface $p2) {
+
+            return $p1->getSourceReference() == $p2->getSourceReference();
+        };
+
+        $justInstalled = [];
+        $justUpdated = [];
+        $justUninstalled = [];
+        foreach ($allPackages as $p) {
+            if ($isExist($p, $currentlyInstalled, $equalsByName)
+                && !$isExist($p, $previousInstalled, $equalsByName)
+            ) {
+
+                $justInstalled[] = $p;
+
+            } elseif (!$isExist($p, $currentlyInstalled, $equalsByName)
+                && $isExist($p, $previousInstalled, $equalsByName)
+            ) {
+
+                $justUninstalled[] = $p;
+
+            } elseif ($isExist($p, $currentlyInstalled, $equalsByName)
+                && $isExist($p, $previousInstalled, $equalsByName)
+                && $isExist($p, $currentlyInstalled, $equalsBySourceReference)
+                && !$isExist($p, $previousInstalled, $equalsBySourceReference)
+            ) {
+
+                $justUpdated[] = $p;
+
+            }
+        }
+
+        return [$justInstalled, $justUpdated, $justUninstalled];
+    }
+
+    /**
+     * @param PackageInterface $package
+     *
+     * @return null|PackageUpdate
+     */
+    protected function getPackageUpdate(PackageInterface $package)
+    {
+        $preferredPackage = $this->getPreferredPackage(
+            $package->getName(),
+            $this->getPackagePrettyConstraint($package)
+        );
+        if ($package->getSourceReference() !== $preferredPackage->getSourceReference()) {
+            $versionString = '%s (%s)';
+
+            return new PackageUpdate(
+                $package->getName(),
+                sprintf(
+                    $versionString,
+                    $package->getPrettyVersion(),
+                    substr($package->getSourceReference(), 0, 7)
+                ),
+                sprintf(
+                    $versionString,
+                    $preferredPackage->getPrettyVersion(),
+                    substr($preferredPackage->getSourceReference(), 0, 7)
+                )
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * @param PackageInterface $package
+     *
+     * @return string
+     */
+    protected function getPackagePrettyConstraint(PackageInterface $package)
+    {
+        /** @var Link[] $links */
+        $links = $this->composer->getPackage()->getRequires();
+        if (isset($links[$package->getName()])) {
+            return $links[$package->getName()]->getPrettyConstraint();
+        }
+
+        return $package->getPrettyVersion();
     }
 
     /**
@@ -334,10 +529,21 @@ class PackageManager
     {
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
-        foreach($packageNames as $name){
+        foreach ($packageNames as $name) {
             unset($composerData['require'][$name]);
         }
 
         $composerFile->write($composerData);
+    }
+
+    /**
+     * @return Pool
+     */
+    protected function createPool()
+    {
+        $pool = new Pool('dev');
+        $pool->addRepository(new CompositeRepository($this->getRepositories()));
+
+        return $pool;
     }
 }
