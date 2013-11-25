@@ -58,6 +58,34 @@ class TypesRegistry
     }
 
     /**
+     * Collect available types for choice field
+     *
+     * @return array
+     */
+    public function getAvailableChannelTypesChoiceList()
+    {
+        $registry = $this;
+        $types    = $registry->getRegisteredChannelTypes();
+        $types    = $types->partition(
+            function ($key, ChannelTypeInterface $type) use ($registry) {
+                return !($registry->getRegisteredConnectorsTypes($key)->isEmpty()
+                    || $registry->getRegisteredTransportTypes($key)->isEmpty());
+            }
+        );
+
+        /** @var ArrayCollection $types */
+        $types  = $types[0];
+        $keys   = $types->getKeys();
+        $values = $types->map(
+            function (ChannelTypeInterface $type) {
+                return $type->getLabel();
+            }
+        )->toArray();
+
+        return array_combine($keys, $values);
+    }
+
+    /**
      * Register transport for channel type
      *
      * @param string                 $typeName
@@ -89,22 +117,6 @@ class TypesRegistry
     }
 
     /**
-     * Returns registered transports for channel by type
-     *
-     * @param string $channelType
-     *
-     * @return ArrayCollection
-     */
-    public function getRegisteredTransportTypes($channelType)
-    {
-        if (!isset($this->transportTypes[$channelType])) {
-            $this->transportTypes[$channelType] = new ArrayCollection();
-        }
-
-        return $this->transportTypes[$channelType];
-    }
-
-    /**
      * @param string $channelType
      * @param string $transportType
      *
@@ -129,19 +141,39 @@ class TypesRegistry
     }
 
     /**
-     * Returns registered connectors for channel by type
+     * Returns registered transports for channel by type
      *
      * @param string $channelType
      *
      * @return ArrayCollection
      */
-    public function getRegisteredConnectorsTypes($channelType)
+    public function getRegisteredTransportTypes($channelType)
     {
-        if (!isset($this->connectorTypes[$channelType])) {
-            $this->connectorTypes[$channelType] = new ArrayCollection();
+        if (!isset($this->transportTypes[$channelType])) {
+            $this->transportTypes[$channelType] = new ArrayCollection();
         }
 
-        return $this->connectorTypes[$channelType];
+        return $this->transportTypes[$channelType];
+    }
+
+    /**
+     * Collect available types for choice field
+     *
+     * @param string $channelType
+     *
+     * @return array
+     */
+    public function getAvailableTransportTypesChoiceList($channelType)
+    {
+        $types  = $this->getRegisteredTransportTypes($channelType);
+        $keys   = $types->getKeys();
+        $values = $types->map(
+            function (TransportTypeInterface $type) {
+                return $type->getLabel();
+            }
+        )->toArray();
+
+        return array_combine($keys, $values);
     }
 
     /**
@@ -229,31 +261,67 @@ class TypesRegistry
     }
 
     /**
-     * @param Connector $connectorEntity
-     * @param string    $channelType
-     * @param bool      $typeNameOnly
+     * Returns registered connectors for channel by type
      *
-     * @throws \LogicException
-     * @return string|ConnectorTypeInterface
+     * @param string $channelType
+     *
+     * @return ArrayCollection
      */
-    public function getConnectorTypeBySettingEntity(Connector $connectorEntity, $channelType, $typeNameOnly = false)
+    public function getRegisteredConnectorsTypes($channelType)
     {
-        $class = ClassUtils::getClass($connectorEntity);
-        $types = $this->getRegisteredConnectorsTypes($channelType)->filter(
-            function (ConnectorTypeInterface $connector) use ($connectorEntity, $class) {
-                return $connector->getSettingsEntityFQCN() === $class;
-            }
-        );
-        $keys  = $types->getKeys();
-        $key   = reset($keys);
-
-        if ($key === false) {
-            throw new \LogicException(sprintf('Connector not found for channel type "%s".', $channelType));
-        }
-        if ($typeNameOnly) {
-            return $key;
+        if (!isset($this->connectorTypes[$channelType])) {
+            $this->connectorTypes[$channelType] = new ArrayCollection();
         }
 
-        return $types->first();
+        return $this->connectorTypes[$channelType];
     }
+
+    /**
+     * Collect available types for choice field
+     *
+     * @param string $channelType
+     *
+     * @return array
+     */
+    public function getAvailableConnectorsTypesChoiceList($channelType)
+    {
+        $types  = $this->getRegisteredConnectorsTypes($channelType);
+        $keys   = $types->getKeys();
+        $values = $types->map(
+            function (ConnectorTypeInterface $type) {
+                return $type->getLabel();
+            }
+        )->toArray();
+
+        return array_combine($keys, $values);
+    }
+//
+//    /**
+//     * @param Connector $connectorEntity
+//     * @param string    $channelType
+//     * @param bool      $typeNameOnly
+//     *
+//     * @throws \LogicException
+//     * @return string|ConnectorTypeInterface
+//     */
+//    public function getConnectorTypeBySettingEntity(Connector $connectorEntity, $channelType, $typeNameOnly = false)
+//    {
+//        $class = ClassUtils::getClass($connectorEntity);
+//        $types = $this->getRegisteredConnectorsTypes($channelType)->filter(
+//            function (ConnectorTypeInterface $connector) use ($connectorEntity, $class) {
+//                return $connector->getSettingsEntityFQCN() === $class;
+//            }
+//        );
+//        $keys  = $types->getKeys();
+//        $key   = reset($keys);
+//
+//        if ($key === false) {
+//            throw new \LogicException(sprintf('Connector not found for channel type "%s".', $channelType));
+//        }
+//        if ($typeNameOnly) {
+//            return $key;
+//        }
+//
+//        return $types->first();
+//    }
 }

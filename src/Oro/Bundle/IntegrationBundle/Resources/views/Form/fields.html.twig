@@ -1,8 +1,25 @@
+{#
+    Edit channel form
+    Custom renderer needed due to this form should be modified
+    dynamically via ajax depends on type and transportType fields value
+#}
 {% block oro_integration_channel_form_widget %}
     {{ form_row(form.type) }}
     {{ form_row(form.name) }}
 
     {{ form_row(form.transportType) }}
+    {# hide control if less then two choices exist #}
+    {% if form.transportType.vars.choices|length < 2 %}
+        <script type="text/javascript">
+            require(['jquery'], function ($) {
+                "use strict";
+
+                $(function () {
+                    $('#{{ form.transportType.vars.id }}').parents('.control-group').hide();
+                });
+            });
+        </script>
+    {% endif %}
     {% if (form.transport is defined) %}
         {{ form_widget(form.transport) }}
     {% endif %}
