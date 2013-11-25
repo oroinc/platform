@@ -73,7 +73,18 @@ class PackageManager
      */
     public function getInstalled()
     {
-        return $this->getLocalRepository()->getCanonicalPackages();
+        $packages = [];
+
+        $notificationUrl = new \ReflectionProperty('Composer\Package\Package', 'notificationUrl');
+        $notificationUrl->setAccessible(true);
+
+        foreach($this->getLocalRepository()->getCanonicalPackages() as $package) {
+            if ('https://packagist.org/downloads/' != $notificationUrl->getValue($package)) {
+                $packages[] = $package;
+            }
+        }
+
+        return $packages;
     }
 
     /**
@@ -84,8 +95,15 @@ class PackageManager
         $packages = [];
         $repositories = $this->getRepositories();
 
+        $url = new \ReflectionProperty('Composer\Repository\ComposerRepository', 'url');
+        $url->setAccessible(true);
+
         foreach ($repositories as $repo) {
             if ($repo instanceof ComposerRepository && $repo->hasProviders()) {
+                // Dirty hack to filter the packages from packagist.org
+                if ('http://packagist.org' == $url->getValue($repo)) {
+                    continue;
+                }
                 $packages = array_merge($packages, $repo->getProviderNames());
             } else {
                 /** @var PackageInterface $package */
@@ -170,7 +188,7 @@ class PackageManager
      */
     public function isPackageInstalled($packageName)
     {
-        return (bool)$this->findPackage($packageName);
+        return (bool)$this->findInstalledPackage($packageName);
     }
 
     /**
@@ -183,7 +201,7 @@ class PackageManager
     {
         $previousInstalled = $this->getFlatListInstalledPackage();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
-        $this->addToComposerJsonFile($package);
+        $this->addToComposerJsonFile($package, $packageVersion);
         if ($this->doInstall($package->getName())) {
             foreach ($this->getInstalled() as $installedPackage) {
                 if (!in_array($installedPackage->getName(), $previousInstalled)) {
@@ -236,7 +254,7 @@ class PackageManager
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
         foreach ($packageNames as $name) {
-            $package = $this->findPackage($name);
+            $package = $this->findInstalledPackage($name);
             $this->scriptRunner->uninstall($package);
             $installationManager->uninstall(
                 $localRepository,
@@ -250,9 +268,8 @@ class PackageManager
      */
     public function getAvailableUpdates()
     {
-        $localRepository = $this->getLocalRepository();
         $updates = [];
-        foreach ($localRepository->getCanonicalPackages() as $package) {
+        foreach ($this->getInstalled() as $package) {
             if ($update = $this->getPackageUpdate($package)) {
                 $updates[] = $update;
             }
@@ -268,7 +285,7 @@ class PackageManager
      */
     public function isUpdateAvailable($packageName)
     {
-        $package = $this->findPackage($packageName);
+        $package = $this->findInstalledPackage($packageName);
 
         return (bool)$this->getPackageUpdate($package);
     }
@@ -500,7 +517,7 @@ class PackageManager
      *
      * @return PackageInterface|bool
      */
-    protected function findPackage($packageName)
+    protected function findInstalledPackage($packageName)
     {
         $found = $this->getLocalRepository()->findPackages($packageName);
         if (!$found) {
@@ -512,11 +529,11 @@ class PackageManager
     /**
      * @param PackageInterface $package
      */
-    protected function addToComposerJsonFile(PackageInterface $package)
+    protected function addToComposerJsonFile(PackageInterface $package, $version = null)
     {
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
-        $composerData['require'][$package->getName()] = $package->getPrettyVersion();
+        $composerData['require'][$package->getName()] = $version?: $package->getPrettyVersion();
 
         $composerFile->write($composerData);
         $this->updateRootPackage($composerData['require']);

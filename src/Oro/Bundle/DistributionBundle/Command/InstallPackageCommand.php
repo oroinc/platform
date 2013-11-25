@@ -60,6 +60,7 @@ class InstallPackageCommand extends ContainerAwareCommand
             if ($verbose && $e instanceof VerboseException) {
                 $output->writeln(sprintf('<comment>%s</comment>', $e->getVerboseMessage()));
             }
+            return 1;
         }
 
         $output->writeln(sprintf('%s has been installed!', $packageName));
