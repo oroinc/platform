@@ -4,16 +4,16 @@ function(Backbone) {
     'use strict';
 
     /**
-     * @export  oro/query-designer/column/model
-     * @class   oro.queryDesigner.column.Model
+     * @export  oro/query-designer/filter/model
+     * @class   oro.queryDesigner.filter.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
         defaults: {
             id : null,
-            name : null,
-            label: null,
-            sorting: null
+            index : null,
+            columnName : null,
+            criterion: null
         }
     });
 });

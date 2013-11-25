@@ -28,7 +28,7 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
 
         /** @property {Object} */
         selectors: {
-            itemContainer:  '.column-container',
+            itemContainer:  '.item-container',
             cancelButton:   '.cancel-button',
             saveButton:     '.save-button',
             addButton:      '.add-button',
@@ -38,29 +38,30 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         /** @property */
-        columnSelectOptGroupTemplate: _.template('<optgroup label="<%- label %>"'
-            + '><%= options %>'
-            + '</optgroup>'
+        columnSelectOptGroupTemplate: _.template(
+            '<optgroup label="<%- label %>">' +
+                '<%= options %>' +
+            '</optgroup>'
         ),
 
         /** @property */
-        columnSelectOptionTemplate: _.template('<option value="<%- name %>"'
-            + '<% _.each(_.omit(obj, ["name"]), function (val, key) { %> data-<%- key.replace(/_/g,"-") %>="<%- val %>"<% }) %>'
-            + '><%- label %>'
-            + '</option>'
+        columnSelectOptionTemplate: _.template(
+            '<option value="<%- name %>"<% _.each(_.omit(obj, ["name"]), function (val, key) { %> data-<%- key.replace(/_/g,"-") %>="<%- val %>"<% }) %>>' +
+                '<%- label %>' +
+            '</option>'
         ),
 
         /** @property {jQuery} */
         form: null,
 
         /** @property {Array} */
-        fieldNames: [],
+        fieldNames: null,
 
         /** @property {jQuery} */
         columnSelector: null,
 
         /** @property {Array} */
-        fieldLabelGetters: [],
+        fieldLabelGetters: null,
 
         /** @property */
         itemTemplate: null,
@@ -96,12 +97,36 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             return this;
         },
 
+        initForm: function () {
+            this.form = $(this.options.itemFormSelector);
+            this.columnSelector = this.form.find(this.selectors.columnSelector);
+
+            var onAdd = _.bind(function (e) {
+                e.preventDefault();
+                this.handleAddModel();
+            }, this);
+            this.$el.find(this.selectors.addButton).on('click', onAdd);
+
+            var onSave = _.bind(function (e) {
+                e.preventDefault();
+                var id = $(e.currentTarget).data('id');
+                this.handleSaveModel(id);
+            }, this);
+            this.$el.find(this.selectors.saveButton).on('click', onSave);
+
+            var onCancel = _.bind(function (e) {
+                e.preventDefault();
+                this.handleCancelButton();
+            }, this);
+            this.$el.find(this.selectors.cancelButton).on('click', onCancel);
+        },
+
         getCollection: function() {
             return this.options.collection;
         },
 
         getContainer: function() {
-            return $(this.selectors.itemContainer);
+            return this.$el.find(this.selectors.itemContainer);
         },
 
         getColumnSelector: function () {
@@ -113,8 +138,12 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             this.getCollection().reset();
         },
 
+        initModel: function (model, index) {
+            model.set('id', _.uniqueId('designer'));
+        },
+
         addModel: function(model) {
-            model.set('id', _.uniqueId('column'));
+            this.initModel(model, this.getCollection().size());
             this.getCollection().add(model);
         },
 
@@ -123,22 +152,14 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         onModelAdded: function(model) {
-            var data = model.toJSON();
-            _.each(data, _.bind(function (value, name) {
-                data[name] = this.getFieldLabel(name, value);
-            }, this));
-            var item = $(this.itemTemplate(data));
+            var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
             this.bindItemActions(item);
             this.getContainer().append(item);
             this.trigger('collection:change');
         },
 
         onModelChanged: function(model) {
-            var data = model.toJSON();
-            _.each(data, _.bind(function (value, name) {
-                data[name] = this.getFieldLabel(name, value);
-            }, this));
-            var item = $(this.itemTemplate(data));
+            var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
             this.bindItemActions(item);
             this.getContainer().find('[data-id="' + model.id + '"]').outerHTML(item);
             this.trigger('collection:change');
@@ -152,13 +173,9 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         onResetCollection: function () {
             this.getContainer().empty();
             this.resetForm();
-            this.getCollection().each(_.bind(function (model) {
-                model.set('id', _.uniqueId('column'));
-                var data = model.toJSON();
-                _.each(data, _.bind(function (value, name) {
-                    data[name] = this.getFieldLabel(name, value);
-                }, this));
-                var item = $(this.itemTemplate(data));
+            this.getCollection().each(_.bind(function (model, index) {
+                this.initModel(model, index);
+                var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
                 this.bindItemActions(item);
                 this.getContainer().append(item);
             }, this));
@@ -166,6 +183,7 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         handleAddModel: function() {
+            this.beforeFormSubmit();
             var model = this.createNewModel();
             if (this.validateFormData()) {
                 var data = this.getFormData();
@@ -176,6 +194,7 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         handleSaveModel: function(modelId) {
+            this.beforeFormSubmit();
             var model = this.getCollection().get(modelId);
             if (this.validateFormData()) {
                 model.set(this.getFormData());
@@ -212,11 +231,28 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         getSelectColumnSelectorContent: function (columns) {
             var fields = '';
             var relations = '';
+            var isRelationsWithFields = false;
             _.each(columns, _.bind(function (column) {
                 if (_.isUndefined(column['related_entity_name'])) {
                     fields += this.columnSelectOptionTemplate(column);
                 } else {
-                    relations += this.columnSelectOptionTemplate(column);
+                    if (!_.isUndefined(column['related_entity_fields'])) {
+                        isRelationsWithFields = true;
+                        var relatedFields = '';
+                        _.each(column['related_entity_fields'], _.bind(function (relatedColumn) {
+                            relatedColumn = _.clone(relatedColumn);
+                            relatedColumn['name'] =
+                                column['name'] + ',' +
+                                column['related_entity_name'] + '::' + relatedColumn['name'];
+                            relatedFields += this.columnSelectOptionTemplate(relatedColumn);
+                        }, this));
+                        relations += this.columnSelectOptGroupTemplate({
+                            label: column['label'],
+                            options: relatedFields
+                        });
+                    } else {
+                        relations += this.columnSelectOptionTemplate(column);
+                    }
                 }
             }, this));
 
@@ -230,35 +266,23 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
                     options: fields
                 });
             }
-            result += this.columnSelectOptGroupTemplate({
-                label: this.options.relatedLabel,
-                options: relations
-            });
+            if (isRelationsWithFields) {
+                result += relations;
+            } else {
+                result += this.columnSelectOptGroupTemplate({
+                    label: this.options.relatedLabel,
+                    options: relations
+                });
+            }
             return result;
         },
 
-        initForm: function () {
-            this.form = $(this.options.itemFormSelector);
-            this.columnSelector = this.form.find(this.selectors.columnSelector);
-
-            var onAdd = _.bind(function (e) {
-                e.preventDefault();
-                this.handleAddModel();
-            }, this);
-            this.$el.find(this.selectors.addButton).on('click', onAdd);
-
-            var onSave = _.bind(function (e) {
-                e.preventDefault();
-                var id = $(e.currentTarget).data('id');
-                this.handleSaveModel(id);
-            }, this);
-            this.$el.find(this.selectors.saveButton).on('click', onSave);
-
-            var onCancel = _.bind(function (e) {
-                e.preventDefault();
-                this.handleCancelButton();
-            }, this);
-            this.$el.find(this.selectors.cancelButton).on('click', onCancel);
+        prepareItemTemplateData: function (model) {
+            var data = model.toJSON();
+            _.each(data, _.bind(function (value, name) {
+                data[name] = this.getFieldLabel(name, value);
+            }, this));
+            return data;
         },
 
         toggleFormButtons: function (modelId) {
@@ -311,20 +335,31 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             this.toggleFormButtons(null);
         },
 
+        beforeFormSubmit: function () {
+        },
+
         validateFormData: function () {
             var isValid = true;
-            this.iterateFormData(function (name, el) {
+            this.iterateFormData(_.bind(function (name, el) {
                 FormValidation.removeFieldErrors(el);
-                if (el.is('[required]')) {
-                    var value = el.val();
-                    if (typeof(value) == 'undefined' || null === value || '' === value) {
-                        FormValidation.addFieldErrors(el, __('This value should not be blank.'));
-                        isValid = false;
-                    }
+                var msg = this.validateFormField(name, el);
+                if (!_.isNull(msg)) {
+                    FormValidation.addFieldErrors(el, __('This value should not be blank.'));
+                    isValid = false;
                 }
-            });
+            }, this));
 
             return isValid;
+        },
+
+        validateFormField: function (name, el) {
+            if (el.is('[required]')) {
+                var value = el.val();
+                if ('' === value) {
+                    return __('This value should not be blank.');
+                }
+            }
+            return null;
         },
 
         getFormData: function () {
@@ -367,7 +402,10 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         addFieldLabelGetter: function (callback) {
-            this.fieldLabelGetters.unshift(_.bind(callback, this));
+            if (_.isNull(this.fieldLabelGetters)) {
+                this.fieldLabelGetters = [];
+            }
+            this.fieldLabelGetters.unshift(callback);
         },
 
         getFieldLabel: function (name, value) {
@@ -376,7 +414,7 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             if (field.length == 1) {
                 for (var i = 0; i < this.fieldLabelGetters.length; i++) {
                     var callback = this.fieldLabelGetters[i];
-                    result = callback(field, name, value);
+                    result = callback.call(this, field, name, value);
                     if (result !== null) {
                         break;
                     }
@@ -397,35 +435,54 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
 
         getColumnFieldLabel: function (field, name, value) {
             if (field.attr('name') == this.columnSelector.attr('name')) {
-                var columnLabel = null;
-                if (this.columnSelector.get(0).tagName.toLowerCase() == 'select') {
-                    columnLabel = this.columnSelector
-                        .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
-                        .data('label');
-                } else {
-                    columnLabel = value;
+                if (value == '') {
+                    return '';
                 }
+
                 var columns = [];
-                _.each(value.split(','), _.bind(function (item, index) {
-                    var entity = null;
-                    var name = null;
-                    if (index == 0) {
-                        entity = this.options.entityName;
-                        name = item;
-                    } else {
-                        var pair = item.split('::');
-                        entity = pair[0];
-                        name = pair[1];
-                    }
-                    entity = this.options.findEntity(entity);
+                var chain = value.split(',');
+                if (_.size(chain) > 1) {
                     columns.push({
-                        entity: entity,
-                        label: columnLabel
+                        entity: this.options.findEntity(this.options.entityName),
+                        label: this.getColumnGroupLabel(value)
                     });
-                }, this));
+                    var lastValue = chain[0];
+                    _.each(_.rest(chain), _.bind(function (item) {
+                        lastValue += ',' + item;
+                        columns.push({
+                            entity: this.options.findEntity(item.split('::')[0]),
+                            label: this.getColumnLabel(lastValue)
+                        });
+                    }, this));
+                } else {
+                    columns.push({
+                        entity: this.options.findEntity(this.options.entityName),
+                        label: this.getColumnLabel(chain[0])
+                    });
+                }
+
                 return this.columnChainTemplate(columns);
             }
             return null;
+        },
+
+        getColumnLabel: function (value) {
+            if (this.columnSelector.get(0).tagName.toLowerCase() == 'select') {
+                return this.columnSelector
+                    .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
+                    .data('label');
+            }
+            return value;
+        },
+
+        getColumnGroupLabel: function (value) {
+            if (this.columnSelector.get(0).tagName.toLowerCase() == 'select') {
+                return this.columnSelector
+                    .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
+                    .parent()
+                    .attr('label');
+            }
+            return value;
         }
     });
 });

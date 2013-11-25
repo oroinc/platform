@@ -17,6 +17,9 @@ class FilterType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder
+            ->add('criterion', 'text', array('required' => true));
+
         $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
@@ -32,6 +35,7 @@ class FilterType extends AbstractType
                             'required'        => true,
                             'entity'          => $form->getConfig()->getOption('entity'),
                             'with_relations'  => true,
+                            'deep_level'      => 1,
                             'auto_initialize' => false
                         )
                     )
