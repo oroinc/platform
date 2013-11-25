@@ -28,6 +28,7 @@ abstract class Transport
      * @var Channel
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel", inversedBy="transports")
+     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $channel;
 

@@ -113,10 +113,12 @@ class Channel
      *
      * @return $this
      */
-    public function setTransport(Transport $transport)
+    public function setTransport(Transport $transport = null)
     {
         $this->transport = $transport;
-        $transport->setChannel($this);
+        if ($transport !== null) {
+            $transport->setChannel($this);
+        }
 
         return $this;
     }

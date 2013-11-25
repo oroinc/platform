@@ -26,11 +26,17 @@ class ChannelFormSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SET_DATA => 'preSet',
-            FormEvents::PRE_SUBMIT   => 'preSubmit'
+            FormEvents::PRE_SET_DATA  => 'preSet',
+            FormEvents::POST_SET_DATA => 'postSet',
+            FormEvents::PRE_SUBMIT    => 'preSubmit'
         ];
     }
 
+    /**
+     * Modifies form based on data that comes from DB
+     *
+     * @param FormEvent $event
+     */
     public function preSet(FormEvent $event)
     {
         $form = $event->getForm();
@@ -61,14 +67,77 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         $transportModifier = $this->getTransportModifierClosure($type, $transportType);
         $transportModifier($form);
 
-        $form->get('transportType')->setData($transportType);
         $data->setType($type);
         $event->setData($data);
     }
 
+    /**
+     * Set not mapped field
+     *
+     * @param FormEvent $event
+     */
+    public function postSet(FormEvent $event)
+    {
+        $form = $event->getForm();
+        /** @var Channel $data */
+        $data = $event->getData();
+
+        if ($data === null) {
+            return;
+        }
+
+        $typeChoices = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
+        $firstChoice = reset($typeChoices);
+        if ($transport = $data->getTransport()) {
+            $transportType = $this->registry->getTransportTypeBySettingEntity($transport, $data->getType(), true);
+        } else {
+            $transportType = $firstChoice;
+        }
+        $form->get('transportType')->setData($transportType);
+    }
+
+    /**
+     * Modifies form based on submitted data
+     *
+     * @param FormEvent $event
+     */
     public function preSubmit(FormEvent $event)
     {
+        $form = $event->getForm();
 
+        /** @var Channel $originalData */
+        $originalData = $form->getData();
+        $data         = $event->getData();
+
+        if (!empty($data['type'])) {
+            $type                  = $data['type'];
+            $transportTypeModifier = $this->getTransportTypeModifierClosure($type);
+            $transportTypeModifier($form);
+
+            $connectorsModifier = $this->getConnectorsModifierClosure($type);
+            $connectorsModifier($form);
+
+            /*
+             * If transport type changed we have to modify ViewData(it's already saved entity)
+             * due to it's not matched the 'data_class' option of newly added form type
+             */
+            if ($transport = $originalData->getTransport()) {
+                $transportType = $this->registry->getTransportTypeBySettingEntity(
+                    $transport,
+                    $originalData->getType(),
+                    true
+                );
+                if ($transportType !== $data['transportType']) {
+                    /** @var Channel $setEntity */
+                    $setEntity = $form->getViewData();
+                    $setEntity->setTransport(null);
+                }
+            }
+
+
+            $transportModifier = $this->getTransportModifierClosure($type, $data['transportType']);
+            $transportModifier($form);
+        }
     }
 
     /**

@@ -22,45 +22,51 @@ class TypesPass implements CompilerPassInterface
         if ($manager) {
             $channels = $container->findTaggedServiceIds(self::CHANNEL_TYPES_TAG_NAME);
             foreach ($channels as $serviceId => $tags) {
-                $tagAttrs = reset($tags);
-                if (!isset($tagAttrs['type'])) {
-                    throw new \LogicException(sprintf('Could not retrieve type attribute for "%s"', $serviceId));
+                $ref = new Reference($serviceId);
+                foreach ($tags as $tagAttrs) {
+                    if (!isset($tagAttrs['type'])) {
+                        throw new \LogicException(sprintf('Could not retrieve type attribute for "%s"', $serviceId));
+                    }
+                    $manager->addMethodCall('addChannelType', [$tagAttrs['type'], $ref]);
                 }
-                $manager->addMethodCall('addChannelType', [$tagAttrs['type'], new Reference($serviceId)]);
             }
 
             $transports = $container->findTaggedServiceIds(self::TRANSPORT_TYPES_TAG_NAME);
             foreach ($transports as $serviceId => $tags) {
-                $tagAttrs = reset($tags);
-                if (!isset($tagAttrs['type'])) {
-                    throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
-                } elseif (!isset($tagAttrs['channel_type'])) {
-                    throw new \LogicException(sprintf(
-                        'Could not retrieve "channel_type" attribute for "%s"',
-                        $serviceId
-                    ));
+                $ref = new Reference($serviceId);
+                foreach ($tags as $tagAttrs) {
+                    if (!isset($tagAttrs['type'])) {
+                        throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
+                    } elseif (!isset($tagAttrs['channel_type'])) {
+                        throw new \LogicException(sprintf(
+                            'Could not retrieve "channel_type" attribute for "%s"',
+                            $serviceId
+                        ));
+                    }
+                    $manager->addMethodCall(
+                        'addTransportType',
+                        [$tagAttrs['type'], $tagAttrs['channel_type'], $ref]
+                    );
                 }
-                $manager->addMethodCall(
-                    'addTransportType',
-                    [$tagAttrs['type'], $tagAttrs['channel_type'], new Reference($serviceId)]
-                );
             }
 
             $connectors = $container->findTaggedServiceIds(self::CONNECTOR_TYPES_TAG_NAME);
             foreach ($connectors as $serviceId => $tags) {
-                $tagAttrs = reset($tags);
-                if (!isset($tagAttrs['type'])) {
-                    throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
-                } elseif (!isset($tagAttrs['channel_type'])) {
-                    throw new \LogicException(sprintf(
-                        'Could not retrieve "channel_type" attribute for "%s"',
-                        $serviceId
-                    ));
+                $ref = new Reference($serviceId);
+                foreach ($tags as $tagAttrs) {
+                    if (!isset($tagAttrs['type'])) {
+                        throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
+                    } elseif (!isset($tagAttrs['channel_type'])) {
+                        throw new \LogicException(sprintf(
+                            'Could not retrieve "channel_type" attribute for "%s"',
+                            $serviceId
+                        ));
+                    }
+                    $manager->addMethodCall(
+                        'addConnectorType',
+                        [$tagAttrs['type'], $tagAttrs['channel_type'], $ref]
+                    );
                 }
-                $manager->addMethodCall(
-                    'addConnectorType',
-                    [$tagAttrs['type'], $tagAttrs['channel_type'], new Reference($serviceId)]
-                );
             }
         }
     }
