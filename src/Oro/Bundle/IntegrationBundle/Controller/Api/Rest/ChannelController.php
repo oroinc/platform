@@ -4,15 +4,12 @@ namespace Oro\Bundle\IntegrationBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\RestBundle\Routing\ClassResourceInterface;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
