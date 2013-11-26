@@ -57,7 +57,6 @@ class BaseCustomerEntityTest extends \PHPUnit_Framework_TestCase
             'phone'       => ['phone', self::TEST_STRING . 'phone', self::TEST_STRING . 'phone'],
             'vat'         => ['vat', self::TEST_STRING . 'vat', self::TEST_STRING . 'vat'],
             'description' => ['description', self::TEST_STRING . 'description', self::TEST_STRING . 'description'],
-
         ];
     }
 }

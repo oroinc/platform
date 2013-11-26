@@ -37,6 +37,11 @@ abstract class Transport
      */
     abstract public function getSettingsBag();
 
+    /**
+     * Simple toString implementation for DataAudit needs
+     *
+     * @return string
+     */
     public function __toString()
     {
         return (string)$this->getId();

@@ -5,7 +5,6 @@ namespace Oro\Bundle\IntegrationBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\IntegrationBundle\Entity\Connector;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorTypeInterface;
@@ -295,33 +294,4 @@ class TypesRegistry
 
         return array_combine($keys, $values);
     }
-//
-//    /**
-//     * @param Connector $connectorEntity
-//     * @param string    $channelType
-//     * @param bool      $typeNameOnly
-//     *
-//     * @throws \LogicException
-//     * @return string|ConnectorTypeInterface
-//     */
-//    public function getConnectorTypeBySettingEntity(Connector $connectorEntity, $channelType, $typeNameOnly = false)
-//    {
-//        $class = ClassUtils::getClass($connectorEntity);
-//        $types = $this->getRegisteredConnectorsTypes($channelType)->filter(
-//            function (ConnectorTypeInterface $connector) use ($connectorEntity, $class) {
-//                return $connector->getSettingsEntityFQCN() === $class;
-//            }
-//        );
-//        $keys  = $types->getKeys();
-//        $key   = reset($keys);
-//
-//        if ($key === false) {
-//            throw new \LogicException(sprintf('Connector not found for channel type "%s".', $channelType));
-//        }
-//        if ($typeNameOnly) {
-//            return $key;
-//        }
-//
-//        return $types->first();
-//    }
 }
