@@ -16,9 +16,13 @@
             {% if fieldValue.old.timestamp is defined %}
                 <s>{{ fieldValue.old|oro_format_datetime }}</s>
             {% else %}
-                <s>{{ fieldValue.old|default('') }}</s>
+                <s>{% if fieldValue.old is iterable  %}{{ fieldValue.old|join(', ') }}{% else %}{{ fieldValue.old|default('') }}{% endif %}</s>
             {% endif %}
-            {{ fieldValue.new.timestamp is defined ? fieldValue.new|oro_format_datetime : fieldValue.new|default('') }}
+            {{
+                fieldValue.new.timestamp is defined
+                    ? fieldValue.new|oro_format_datetime
+                    : ( fieldValue.new is iterable ? fieldValue.new|join(', ') : fieldValue.new|default(''))
+            }}
         </li>
     {% endif %}
 {% endfor %}

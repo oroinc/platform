@@ -46,7 +46,7 @@ class ChannelHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->form->submit($this->request, false);
+            $this->form->submit($this->request);
 
             if (!$this->request->get(self::UPDATE_MARKER, false) && $this->form->isValid()) {
                 $this->em->persist($entity);

@@ -107,13 +107,13 @@ define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'o
             data.push({name: this.UPDATE_MARKER, value: 1});
 
             $.post(url, data, function (res) {
-                var formContent = res.content || false;
-                if (formContent) {
-                    $('#container').replace(formContent);
+                var formContent = $(res).find($form.selector);
+                if (formContent.length) {
+                    $form.replaceWith(formContent);
                     // trigger hash navigation event for processing UI decorators
                     mediator.trigger("hash_navigation_request:complete", this);
                 }
-            }, 'json');
+            });
         },
 
         /**

@@ -23,8 +23,10 @@ services:
         class: %oro_integration.form.type.channel.class%
         arguments:
             - @oro_integration.manager.types_registry
+        calls:
+            - [setRequest, [@?request=]]
         tags:
-             - { name: form.type, alias: oro_integration_channel_form }
+            - { name: form.type, alias: oro_integration_channel_form }
 
     oro_integration.form.type.transport_select:
         class: %oro_integration.form.type.transport_select.class%

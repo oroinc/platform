@@ -49,7 +49,7 @@ class Channel
      * @var Transport
      *
      * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Transport",
-     *     mappedBy="channel", cascade={"all"}, orphanRemoval=true
+     *     cascade={"all"}, orphanRemoval=true
      * )
      */
     protected $transport;
@@ -116,7 +116,6 @@ class Channel
     public function setTransport(Transport $transport)
     {
         $this->transport = $transport;
-        $transport->setChannel($this);
 
         return $this;
     }
@@ -134,7 +133,6 @@ class Channel
      */
     public function clearTransport()
     {
-        $this->transport->clearChannel();
         $this->transport = null;
 
         return $this;

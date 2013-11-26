@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -19,6 +20,8 @@ class ChannelType extends AbstractType
 
     /** @var TypesRegistry */
     protected $registry;
+    /** @var bool */
+    protected $isUpdateOnly = false;
 
     public function __construct(TypesRegistry $registry)
     {
@@ -51,7 +54,7 @@ class ChannelType extends AbstractType
                 'label'       => 'Transport type',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
-                'constraints' => new NotBlank()
+                'constraints' => new NotBlank(['groups' => 'Submit'])
             ]
         );
 
@@ -64,6 +67,7 @@ class ChannelType extends AbstractType
                 'expanded' => true,
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
+                'required' => false,
             ]
         );
     }
@@ -73,11 +77,20 @@ class ChannelType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $isUpdateOnly = $this->isUpdateOnly;
         $resolver->setDefaults(
-            array(
-                'data_class' => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
-                'intention'  => 'channel',
-            )
+            [
+                'data_class'        => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
+                'intention'         => 'channel',
+                'validation_groups' => function () use ($isUpdateOnly) {
+                    $groups = ['Default'];
+                    if (!$isUpdateOnly) {
+                        $groups[] = 'Submit';
+                    }
+
+                    return $groups;
+                }
+            ]
         );
     }
 
@@ -87,5 +100,21 @@ class ChannelType extends AbstractType
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * Setter for request data
+     *
+     * @param Request $request
+     *
+     * @return $this
+     */
+    public function setRequest(Request $request = null)
+    {
+        if ($request !== null) {
+            $this->isUpdateOnly = $request->get(ChannelHandler::UPDATE_MARKER, false);
+        }
+
+        return $this;
     }
 }

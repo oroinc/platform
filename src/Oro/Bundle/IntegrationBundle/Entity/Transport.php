@@ -25,14 +25,6 @@ abstract class Transport
     protected $id;
 
     /**
-     * @var Channel
-     *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel", inversedBy="transport")
-     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", onDelete="CASCADE")
-     */
-    protected $channel;
-
-    /**
      * @return mixed
      */
     public function getId()
@@ -41,37 +33,12 @@ abstract class Transport
     }
 
     /**
-     * @param Channel $channel
-     *
-     * @return $this
-     */
-    public function setChannel(Channel $channel)
-    {
-        $this->channel = $channel;
-
-        return $this;
-    }
-
-    /**
-     * @return Channel
-     */
-    public function getChannel()
-    {
-        return $this->channel;
-    }
-
-    /**
-     * @return $this
-     */
-    public function clearChannel()
-    {
-        $this->channel = null;
-
-        return $this;
-    }
-
-    /**
      * @return ParameterBag
      */
     abstract public function getSettingsBag();
+
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

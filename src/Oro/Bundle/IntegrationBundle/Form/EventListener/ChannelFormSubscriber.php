@@ -143,6 +143,8 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
             $transportModifier = $this->getTransportModifierClosure($type, $data['transportType']);
             $transportModifier($form);
+
+            $event->setData($data);
         }
     }
 
