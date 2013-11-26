@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -9,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 
 /**
  * @Route("/channel")
@@ -38,11 +40,10 @@ class ChannelController extends Controller
      *      permission="CREATE",
      *      class="OroIntegrationBundle:Channel"
      * )
-     * @Template("OroIntegrationBundle:Channel:update.html.twig")
      */
     public function createAction()
     {
-        return $this->update(new Channel());
+        return $this->renderTemplate($this->update(new Channel()));
     }
 
     /**
@@ -53,11 +54,10 @@ class ChannelController extends Controller
      *      permission="EDIT",
      *      class="OroIntegrationBundle:Channel"
      * )
-     * @Template()
      */
     public function updateAction(Channel $channel)
     {
-        return $this->update($channel);
+        return $this->renderTemplate($this->update($channel));
     }
 
     /**
@@ -87,5 +87,25 @@ class ChannelController extends Controller
         return [
             'form' => $this->get('oro_integration.form.channel')->createView()
         ];
+    }
+
+    /**
+     * Render needed template
+     *
+     * @param array $context
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    protected function renderTemplate($context)
+    {
+        $isUpdateHandler = $this->get('request')->get(ChannelHandler::UPDATE_MARKER, false);
+        $template        = 'OroIntegrationBundle:Channel:update.html.twig';
+        if ($isUpdateHandler !== false) {
+            $contentBlock = $this->get('twig')->loadTemplate($template)->renderBlock('page_container', $context);
+
+            return new JsonResponse(['content' => $contentBlock]);
+        } else {
+            return $this->render($template, $context);
+        }
     }
 }

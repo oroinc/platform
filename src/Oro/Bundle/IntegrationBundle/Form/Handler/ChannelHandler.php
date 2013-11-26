@@ -11,6 +11,8 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelHandler
 {
+    const UPDATE_MARKER = 'formUpdateMarker';
+
     /** @var Request */
     protected $request;
 
@@ -44,9 +46,9 @@ class ChannelHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->form->submit($this->request);
+            $this->form->submit($this->request, false);
 
-            if ($this->form->isValid()) {
+            if (!$this->request->get(self::UPDATE_MARKER, false) && $this->form->isValid()) {
                 $this->em->persist($entity);
                 $this->em->flush();
 

@@ -27,7 +27,7 @@ abstract class Transport
     /**
      * @var Channel
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel", inversedBy="transports")
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel", inversedBy="transport")
      * @ORM\JoinColumn(name="channel_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $channel;
@@ -58,6 +58,16 @@ abstract class Transport
     public function getChannel()
     {
         return $this->channel;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearChannel()
+    {
+        $this->channel = null;
+
+        return $this;
     }
 
     /**

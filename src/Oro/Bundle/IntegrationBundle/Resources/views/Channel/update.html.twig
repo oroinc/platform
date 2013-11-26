@@ -52,13 +52,14 @@
 
 {% block content_data %}
     {% set id = 'channel-update' %}
+    {% set formData = form_widget(form) %}
 
     {% set dataBlocks = [{
             'title': 'General',
             'class': 'active',
             'subblocks': [{
                 'title': 'Basic Information',
-                'data':  [form_widget(form)]
+                'data':  [formData]
             }]
         }]
     %}

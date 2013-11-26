@@ -117,6 +117,12 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             $connectorsModifier = $this->getConnectorsModifierClosure($type);
             $connectorsModifier($form);
 
+            // value that was set on postSet is replaced by null from request
+            $typeChoices           = array_keys($form->get('transportType')->getConfig()->getOption('choices'));
+            $firstChoice           = reset($typeChoices);
+            $data['transportType'] = isset($data['transportType'])
+                ? $data['transportType'] : $firstChoice;
+
             /*
              * If transport type changed we have to modify ViewData(it's already saved entity)
              * due to it's not matched the 'data_class' option of newly added form type
@@ -127,13 +133,13 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                     $originalData->getType(),
                     true
                 );
-                if ($transportType !== $data['transportType']) {
+                // second condition cover case when we have same name for few channel types
+                if ($transportType !== $data['transportType'] || $originalData->getType() !== $data['type']) {
                     /** @var Channel $setEntity */
                     $setEntity = $form->getViewData();
-                    $setEntity->setTransport(null);
+                    $setEntity->clearTransport();
                 }
             }
-
 
             $transportModifier = $this->getTransportModifierClosure($type, $data['transportType']);
             $transportModifier($form);

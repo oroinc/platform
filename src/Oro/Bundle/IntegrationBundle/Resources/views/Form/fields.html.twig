@@ -22,8 +22,22 @@
 
             $(function () {
                 var options = {
-                    typeSelector: $('#{{ form.type.vars.id }}'),
-                    transportTypeSelector: $('#{{ form.transportType.vars.id }}')
+                    formSelector:          '#{{ form.vars.id }}',
+                    typeSelector:          '#{{ form.type.vars.id }}',
+                    transportTypeSelector: '#{{ form.transportType.vars.id }}',
+                    fieldsSets:            {
+                        type:          [
+                            {{ form.type.vars.full_name|json_encode|raw }},
+                            {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form._token.vars.full_name|json_encode|raw }}
+                        ],
+                        transportType: [
+                            {{ form.type.vars.full_name|json_encode|raw }},
+                            {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form.transportType.vars.full_name|json_encode|raw }},
+                            {{ form._token.vars.full_name|json_encode|raw }}
+                        ]
+                    }
                 };
 
                 new ChannelView(options);

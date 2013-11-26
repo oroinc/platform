@@ -38,10 +38,12 @@ class TypesPass implements CompilerPassInterface
                     if (!isset($tagAttrs['type'])) {
                         throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
                     } elseif (!isset($tagAttrs['channel_type'])) {
-                        throw new \LogicException(sprintf(
-                            'Could not retrieve "channel_type" attribute for "%s"',
-                            $serviceId
-                        ));
+                        throw new \LogicException(
+                            sprintf(
+                                'Could not retrieve "channel_type" attribute for "%s"',
+                                $serviceId
+                            )
+                        );
                     }
                     $manager->addMethodCall(
                         'addTransportType',
@@ -57,10 +59,12 @@ class TypesPass implements CompilerPassInterface
                     if (!isset($tagAttrs['type'])) {
                         throw new \LogicException(sprintf('Could not retrieve "type" attribute for "%s"', $serviceId));
                     } elseif (!isset($tagAttrs['channel_type'])) {
-                        throw new \LogicException(sprintf(
-                            'Could not retrieve "channel_type" attribute for "%s"',
-                            $serviceId
-                        ));
+                        throw new \LogicException(
+                            sprintf(
+                                'Could not retrieve "channel_type" attribute for "%s"',
+                                $serviceId
+                            )
+                        );
                     }
                     $manager->addMethodCall(
                         'addConnectorType',
