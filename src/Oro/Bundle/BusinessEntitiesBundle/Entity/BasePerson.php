@@ -5,13 +5,13 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class BaseCustomerEntity
+ * Class BasePerson
  *
  * @package Oro\Bundle\BusinessEntitiesBundle\Entity
  *
  * @ORM\MappedSuperclass
  */
-class BaseCustomerEntity
+class BasePerson
 {
     /**
      * @var int
@@ -79,25 +79,18 @@ class BaseCustomerEntity
     protected $email;
 
     /**
-     * @var string
+     * @var \DateTime $createdAt
      *
-     * @ORM\Column(name="phone", type="string", length=255, nullable=true)
+     * @ORM\Column(type="datetime")
      */
-    protected $phone;
+    protected $createdAt;
 
     /**
-     * @var string
+     * @var \DateTime $updatedAt
      *
-     * @ORM\Column(name="vat", type="string", length=255, nullable=true)
+     * @ORM\Column(type="datetime")
      */
-    protected $vat;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=true)
-     */
-    protected $description;
+    protected $updatedAt;
 
     /**
      * @return int
@@ -276,62 +269,44 @@ class BaseCustomerEntity
     }
 
     /**
-     * @param string $phone
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
      *
      * @return $this
      */
-    public function setPhone($phone)
+    public function setCreatedAt($createdAt)
     {
-        $this->phone = $phone;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     /**
-     * @return string
+     * Get contact last update date/time
+     *
+     * @return \DateTime
      */
-    public function getPhone()
+    public function getUpdatedAt()
     {
-        return $this->phone;
+        return $this->updatedAt;
     }
 
     /**
-     * @param string $vat
+     * @param \DateTime updatedAt
      *
      * @return $this
      */
-    public function setVat($vat)
+    public function setUpdatedAt($updatedAt)
     {
-        $this->vat = $vat;
+        $this->updatedAt = $updatedAt;
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVat()
-    {
-        return $this->vat;
-    }
-
-    /**
-     * @param string $description
-     *
-     * @return $this
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
     }
 }

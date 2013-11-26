@@ -5,13 +5,13 @@ namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class BaseCustomerGroupEntity
+ * Class BasePersonGroup
  *
  * @package Oro\Bundle\BusinessEntitiesBundle\Entity
  *
  * @ORM\MappedSuperclass
  */
-class BaseCustomerGroupEntity
+class BasePersonGroup
 {
     /**
      * @var int
@@ -39,6 +39,7 @@ class BaseCustomerGroupEntity
 
     /**
      * @param int $id
+     *
      * @return $this
      */
     public function setId($id)

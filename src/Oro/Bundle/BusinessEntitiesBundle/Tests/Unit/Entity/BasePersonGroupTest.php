@@ -2,18 +2,19 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCustomerGroupEntity;
+use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePersonGroup;
 
-class BaseCustomerGroupEntityTest extends \PHPUnit_Framework_TestCase
+class BasePersonGroupTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_NAME = 'testGroupName';
+    const TEST_ID   = 123;
 
-    /** @var BaseCustomerGroupEntity */
+    /** @var BasePersonGroup */
     protected $entity;
 
     public function setUp()
     {
-        $this->entity = new BaseCustomerGroupEntity();
+        $this->entity = new BasePersonGroup();
     }
 
     public function tearDown()
@@ -43,7 +44,7 @@ class BaseCustomerGroupEntityTest extends \PHPUnit_Framework_TestCase
     public function getSetDataProvider()
     {
         return [
-            'id'   => ['id'],
+            'id'   => ['id', self::TEST_ID, self::TEST_ID],
             'name' => ['name', self::TEST_NAME, self::TEST_NAME],
         ];
     }
