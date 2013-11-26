@@ -878,7 +878,6 @@ function($, _, Backbone, __, app, mediator, messenger, registry,
                         if (!options.fromCache && !options.skipCache) {
                             this.savePageToCache(data);
                         }
-                        debugger;
                         this.clearContainer();
                         var content = data.content;
                         this.selectorCached.container.html(content);

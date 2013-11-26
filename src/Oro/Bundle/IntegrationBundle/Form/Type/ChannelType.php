@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 class ChannelType extends AbstractType

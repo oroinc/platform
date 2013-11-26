@@ -2,25 +2,26 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Entity\Connector;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 abstract class AbstractConnector implements ConnectorInterface
 {
     /** @var TransportInterface */
     protected $transport;
 
-    /** @var Connector */
-    protected $connectorEntity = null;
+    /** @var Transport */
+    protected $transportSettings;
 
     /** @var bool */
     protected $isConnected = false;
 
     /**
-     * @param TransportInterface $transport
+     * {@inheritdoc}
      */
-    public function __construct(TransportInterface $transport)
+    public function configure(TransportInterface $realTransport, Transport $transportSettings)
     {
-        $this->transport = $transport;
+        $this->transport         = $realTransport;
+        $this->transportSettings = $transportSettings;
     }
 
     /**
@@ -28,14 +29,11 @@ abstract class AbstractConnector implements ConnectorInterface
      */
     public function connect()
     {
-        if (is_null($this->connectorEntity)) {
-            throw new \Exception('There\'s no connector entity specified in connector');
+        if (!($this->transport && $this->transportSettings)) {
+            throw new \LogicException('Connector does not configured correctly');
         }
 
-        $transportSettings = $this->connectorEntity
-            ->getTransport()
-            ->getSettingsBag();
-
+        $transportSettings = $this->transportSettings->getSettingsBag();
         $this->isConnected = $this->transport->init($transportSettings);
 
         return $this->isConnected;
@@ -58,17 +56,5 @@ abstract class AbstractConnector implements ConnectorInterface
         $params = is_array($params) ? $params : [$params];
 
         return $this->transport->call($action, $params);
-    }
-
-    /**
-     * @param Connector $connector
-     *
-     * @return $this
-     */
-    public function setConnectorEntity(Connector $connector)
-    {
-        $this->connectorEntity = $connector;
-
-        return $this;
     }
 }
