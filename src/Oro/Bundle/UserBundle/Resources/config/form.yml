@@ -123,6 +123,11 @@ services:
         tags:
             - { name: form.type, alias: oro_user_select }
 
+    oro_user.form.type.user_acl_select:
+        class: Oro\Bundle\UserBundle\Form\Type\UserACLSelectType
+        tags:
+            - { name: form.type, alias: oro_user_acl_select }
+
     oro_user.form.type.user_multiselect:
         class: %oro_user.form.type.user_multiselect.class%
         arguments:

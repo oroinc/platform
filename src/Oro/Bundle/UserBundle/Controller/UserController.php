@@ -53,6 +53,30 @@ class UserController extends Controller
     }
 
     /**
+     * @Route("/users/acl", name="oro_user_acl_list")
+     */
+    public function aclUsers()
+    {
+        $searchString = $this->getRequest()->get('query');
+        $em = $this->getDoctrine()->getManager();
+        $queryBuilder = $em->createQueryBuilder()
+            ->select(['users.id', 'users.username', 'users.firstName', 'users.middleName', 'users.lastName'])
+            ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
+            ->where('users.firstName like :searchString')
+            ->orWhere('users.lastName like :searchString')
+            ->orWhere('users.username like :searchString')
+            ->setParameter('searchString', $searchString . '%');
+        $result = $queryBuilder->getQuery()->getArrayResult();
+
+        return new JsonResponse(
+            [
+                'results' => $result,
+                'more' => false
+            ]
+        );
+    }
+
+    /**
      * @Route("/profile/edit", name="oro_user_profile_update")
      * @Template("OroUserBundle:User:update.html.twig")
      */

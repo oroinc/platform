@@ -99,6 +99,17 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
+    # Autocomplete user search handler
+    oro_user.autocomplete.user.search_acl_handler:
+        class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @liip_imagine.cache.manager
+            - %oro_user.entity.class%
+            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: acl_users, acl_resource: oro_user_user_view }
+
     # Autocomplete search handler
     oro_user.autocomplete.user.search_handler:
         class: %oro_user.autocomplete.user.search_handler%

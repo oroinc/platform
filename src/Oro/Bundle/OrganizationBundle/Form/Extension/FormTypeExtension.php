@@ -154,6 +154,39 @@ class FormTypeExtension extends AbstractTypeExtension
         }
         $entity = $event->getData();
 
+        /*$user = $this->securityContext->getToken()->getUser();
+        if (!$user || is_string($user)) {
+            return;
+        }
+
+        if (!is_object($entity)) {
+            $permission = 'CREATE';
+            $dataClassName = $form->getConfig()->getDataClass();
+        } else {
+            $permission = 'ASSIGN';
+            $dataClassName = get_class($entity);
+        }
+
+        $metadata = $this->ownershipMetadataProvider->getMetadata($dataClassName);
+        if ($metadata->hasOwner()) {
+            if (!method_exists($dataClassName, 'getOwner')) {
+                throw new \LogicException(
+                    sprintf('Method getOwner must be implemented for %s entity.', $dataClassName)
+                );
+            }
+
+            $this->assignIsGranted = $this->securityFacade->isGranted($permission, 'entity:' . $dataClassName);
+
+            if ($metadata->isUserOwned() && $this->assignIsGranted) {
+                $this->addUserOwnerField($builder);
+            } elseif ($metadata->isBusinessUnitOwned()) {
+                $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
+            } elseif ($metadata->isOrganizationOwned()) {
+                $this->addOrganizationOwnerField($builder, $user);
+            }
+        }*/
+
+
         if (is_object($entity)
             && $entity->getId()
             && $form->has($this->fieldName)
@@ -187,7 +220,7 @@ class FormTypeExtension extends AbstractTypeExtension
         if ($this->assignIsGranted) {
             $builder->add(
                 $this->fieldName,
-                'oro_user_select',
+                'oro_user_acl_select',
                 array(
                     'required' => true,
                     'constraints' => array(new NotBlank())
