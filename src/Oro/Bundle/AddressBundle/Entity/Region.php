@@ -70,6 +70,17 @@ class Region implements Translatable
     }
 
     /**
+     * @param string $combinedCode
+     * @return $this
+     */
+    public function setCombinedCode($combinedCode)
+    {
+        $this->combinedCode = $combinedCode;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer
