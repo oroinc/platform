@@ -15,8 +15,12 @@ class UserACLSelectType extends AbstractType
                     'placeholder' => 'oro.user.form.choose_user',
                     'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
                     'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                    'extra_config' => 'acl_user_autocomplete',
+                    'data_class_name' => '',
+                    'permission' => 'CREATE',
                 ),
-                'autocomplete_alias' => 'acl_users'
+                'autocomplete_alias' => 'acl_users',
+
             )
         );
     }

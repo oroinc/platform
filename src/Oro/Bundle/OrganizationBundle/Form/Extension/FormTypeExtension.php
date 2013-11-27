@@ -131,8 +131,13 @@ class FormTypeExtension extends AbstractTypeExtension
                 array($this, 'postSetData')
             );
 
+            $builder->addEventListener(
+                FormEvents::PRE_SET_DATA,
+                array($this, 'preSetData')
+            );
+
             if ($metadata->isUserOwned() && $this->assignIsGranted) {
-                $this->addUserOwnerField($builder);
+                $this->addUserOwnerField($builder, $dataClassName);
             } elseif ($metadata->isBusinessUnitOwned()) {
                 $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
             } elseif ($metadata->isOrganizationOwned()) {
@@ -153,39 +158,6 @@ class FormTypeExtension extends AbstractTypeExtension
             return;
         }
         $entity = $event->getData();
-
-        /*$user = $this->securityContext->getToken()->getUser();
-        if (!$user || is_string($user)) {
-            return;
-        }
-
-        if (!is_object($entity)) {
-            $permission = 'CREATE';
-            $dataClassName = $form->getConfig()->getDataClass();
-        } else {
-            $permission = 'ASSIGN';
-            $dataClassName = get_class($entity);
-        }
-
-        $metadata = $this->ownershipMetadataProvider->getMetadata($dataClassName);
-        if ($metadata->hasOwner()) {
-            if (!method_exists($dataClassName, 'getOwner')) {
-                throw new \LogicException(
-                    sprintf('Method getOwner must be implemented for %s entity.', $dataClassName)
-                );
-            }
-
-            $this->assignIsGranted = $this->securityFacade->isGranted($permission, 'entity:' . $dataClassName);
-
-            if ($metadata->isUserOwned() && $this->assignIsGranted) {
-                $this->addUserOwnerField($builder);
-            } elseif ($metadata->isBusinessUnitOwned()) {
-                $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
-            } elseif ($metadata->isOrganizationOwned()) {
-                $this->addOrganizationOwnerField($builder, $user);
-            }
-        }*/
-
 
         if (is_object($entity)
             && $entity->getId()
@@ -209,9 +181,46 @@ class FormTypeExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param FormBuilderInterface $builder
+     * Process form after data is set and remove/disable owner field depending on permissions
+     *
+     * @param FormEvent $event
      */
-    protected function addUserOwnerField(FormBuilderInterface $builder)
+    public function preSetData(FormEvent $event)
+    {
+         $form = $event->getForm();
+         if ($form->getParent()) {
+             return;
+         }
+         $entity = $event->getData();
+
+         if (is_object($entity)
+             && $entity->getId()
+             && $form->has($this->fieldName)
+         ) {
+             $owner = $form->get($this->fieldName)->getData();
+             $permission = 'ASSIGN';
+             $dataClassName = get_class($entity);
+             $metadata = $this->ownershipMetadataProvider->getMetadata($dataClassName);
+             if ($metadata->hasOwner()) {
+                 if (!method_exists($dataClassName, 'getOwner')) {
+                     throw new \LogicException(
+                         sprintf('Method getOwner must be implemented for %s entity.', $dataClassName)
+                     );
+                 }
+
+                 if ($metadata->isUserOwned()) {
+                     $form->remove($this->fieldName);
+                     $this->addUserOwnerField($form, $dataClassName, $permission, $owner);
+                 }
+             }
+         }
+    }
+
+
+    /**
+     * @param FormBuilderInterface|FormInterface $builder
+     */
+    protected function addUserOwnerField($builder, $dataClass, $permission = "CREATE", $data = null)
     {
         /**
          * Showing user owner box for entities with owner type USER if assign permission is
@@ -223,7 +232,19 @@ class FormTypeExtension extends AbstractTypeExtension
                 'oro_user_acl_select',
                 array(
                     'required' => true,
-                    'constraints' => array(new NotBlank())
+                    'constraints' => array(new NotBlank()),
+                    'autocomplete_alias' => 'acl_users',
+                    'data' => $data,
+
+                    'configs' => [
+                        'width' => '400px',
+                        'placeholder' => 'oro.user.form.choose_user',
+                        'result_template_twig' => 'OroUserBundle:User:Autocomplete/result.html.twig',
+                        'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                        'extra_config' => 'acl_user_autocomplete',
+                        'permission' => $permission,
+                        'data_class_name' => str_replace('\\', '_', $dataClass),
+                    ]
                 )
             );
         }

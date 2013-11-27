@@ -106,7 +106,11 @@ services:
             - @doctrine.orm.entity_manager
             - @liip_imagine.cache.manager
             - %oro_user.entity.class%
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - @oro_entity_config.link.security_context
+            - @?security.acl.voter.basic_permissions
+        calls:
+            - [ setNameFormatter, [@oro_locale.formatter.name] ]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: acl_users, acl_resource: oro_user_user_view }
 

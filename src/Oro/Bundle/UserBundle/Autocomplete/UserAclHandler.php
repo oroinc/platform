@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
+use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
 
 class UserAclHandler implements SearchHandlerInterface
 {
@@ -15,27 +20,62 @@ class UserAclHandler implements SearchHandlerInterface
 
     protected $fields;
 
-    public function __construct($em, $cache, $className, $fields)
+    protected $nameFormatter;
+
+    /**
+     * @var AclVoter
+     */
+    protected $aclVoter;
+
+    /**
+     * @var OwnershipConditionDataBuilder
+     */
+    protected $builder;
+
+    protected $securityContextLink;
+
+    public function __construct($em, $cache, $className, $fields, ServiceLink $securityContextLink, AclVoter $aclVoter = null)
     {
         $this->em = $em;
         $this->cache = $cache;
         $this->className = $className;
-        $this->fields = $this->fields;
+        $this->fields = $fields;
+        $this->aclVoter = $aclVoter;
+        $this->securityContextLink = $securityContextLink;
     }
 
     public function search($query, $page, $perPage)
     {
+
+        list ($search, $entityClass, $permission) = explode(';', $query);
+        $entityClass = str_replace('_', '\\', $entityClass);
+
+        $observer = new OneShotIsGrantedObserver();
+        $this->aclVoter->addOneShotIsGrantedObserver($observer);
+        $isGranted = $this->getSecurityContext()->isGranted($permission, 'entity:' . $entityClass);
+
+        if ($isGranted) {
+            $accessLevel = $observer->getAccessLevel();
+        }
+
         $queryBuilder = $this->em->createQueryBuilder()
-            ->select(['users.id', 'users.username', 'users.firstName', 'users.middleName', 'users.lastName'])
+            ->select(['users'])
             ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
             ->where('users.firstName like :searchString')
             ->orWhere('users.lastName like :searchString')
             ->orWhere('users.username like :searchString')
-            ->setParameter('searchString', $query . '%');
-        $result = $queryBuilder->getQuery()->getResult();
+            ->setParameter('searchString', $search . '%')
+
+        ;
+        $results = $queryBuilder->getQuery()->getResult();
+
+        $resultsData = [];
+        foreach ($results as $user) {
+            $resultsData[] = $this->convertItem($user);
+        }
 
         return [
-            'results' => $result,
+            'results' => $resultsData,
             'more' => false
         ];
     }
@@ -50,8 +90,20 @@ class UserAclHandler implements SearchHandlerInterface
         return $this->className;
     }
 
+    /**
+     * @param NameFormatter $nameFormatter
+     */
+    public function setNameFormatter(NameFormatter $nameFormatter)
+    {
+        $this->nameFormatter = $nameFormatter;
+    }
+
     public function convertItem($user)
     {
+        $result = [];
+        foreach($this->fields as $field) {
+            $result[$field] = $this->getPropertyValue($field, $user);
+        }
         $result['avatar'] = null;
 
         $imagePath = $this->getPropertyValue('imagePath', $user);
@@ -59,7 +111,10 @@ class UserAclHandler implements SearchHandlerInterface
             $result['avatar'] = $this->cache->getBrowserPath($imagePath, UserSearchHandler::IMAGINE_AVATAR_FILTER);
         }
 
-        $result['fullName'] = $user['firstName'] . $user['lastName'];
+        if (!$this->nameFormatter) {
+            throw new \RuntimeException('Name formatter must be configured');
+        }
+        $result['fullName'] = $this->nameFormatter->format($user);
 
         return $result;
     }
@@ -86,4 +141,12 @@ class UserAclHandler implements SearchHandlerInterface
 
         return $result;
     }
-} 
+
+    /**
+     * @return SecurityContextInterface
+     */
+    protected function getSecurityContext()
+    {
+        return $this->securityContextLink->getService();
+    }
+}
