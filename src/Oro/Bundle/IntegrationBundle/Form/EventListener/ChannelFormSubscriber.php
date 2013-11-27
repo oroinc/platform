@@ -94,6 +94,15 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             $transportType = $firstChoice;
         }
         $form->get('transportType')->setData($transportType);
+
+        // populate empty transport type in case when default values from empty entity should be mapped to form
+        if (!$transport = $data->getTransport()) {
+            $transport = $this->registry->getTransportType($form->get('type')->getData(), $transportType)
+                ->getSettingsEntityFQCN();
+            if (class_exists($transport)) {
+                $form->get('transport')->setData(new $transport);
+            }
+        }
     }
 
     /**
@@ -138,6 +147,13 @@ class ChannelFormSubscriber implements EventSubscriberInterface
                     /** @var Channel $setEntity */
                     $setEntity = $form->getViewData();
                     $setEntity->clearTransport();
+
+                    // populate new transport in case when default values from empty entity should be mapped to form
+                    $transport = $this->registry->getTransportType($type, $transportType)
+                        ->getSettingsEntityFQCN();
+                    if (class_exists($transport)) {
+                        $data['transport'] = new $transport;
+                    }
                 }
             }
 
@@ -234,7 +250,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             }
 
             $formType = $registry->getTransportType($channelType, $transportType)->getSettingsFormType();
-            $form->add('transport', $formType);
+            $form->add('transport', $formType, ['required' => true]);
         };
     }
 }
