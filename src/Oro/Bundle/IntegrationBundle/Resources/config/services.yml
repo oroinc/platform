@@ -5,6 +5,8 @@ parameters:
     oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
 
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
+    oro_integration.import.api_reader.class:                              Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader
+
 services:
     oro_integration.channel.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
