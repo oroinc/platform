@@ -2,24 +2,50 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
+/**
+ * Autocomplite search handler for users with ACL access level protection
+ *
+ * Class UserAclHandler
+ * @package Oro\Bundle\UserBundle\Autocomplete
+ */
 class UserAclHandler implements SearchHandlerInterface
 {
 
+    /**
+     * @var ObjectManager
+     */
     protected $em;
 
+    /**
+     * @var CacheManager
+     */
     protected $cache;
 
     protected $className;
 
+    /**
+     * @var array
+     */
     protected $fields;
 
+    /**
+     * @var NameFormatter
+     */
     protected $nameFormatter;
 
     /**
@@ -32,18 +58,46 @@ class UserAclHandler implements SearchHandlerInterface
      */
     protected $builder;
 
+    /**
+     * @var ServiceLink
+     */
     protected $securityContextLink;
 
-    public function __construct($em, $cache, $className, $fields, ServiceLink $securityContextLink, AclVoter $aclVoter = null)
-    {
+    /**
+     * @var OwnerTreeProvider
+     */
+    protected $treeProvider;
+
+    /**
+     * @param ObjectManager $em
+     * @param CacheManager $cache
+     * @param $className
+     * @param $fields
+     * @param ServiceLink $securityContextLink
+     * @param OwnerTreeProvider $treeProvider
+     * @param AclVoter $aclVoter
+     */
+    public function __construct(
+        ObjectManager $em,
+        CacheManager $cache,
+        $className,
+        $fields,
+        ServiceLink $securityContextLink,
+        OwnerTreeProvider $treeProvider,
+        AclVoter $aclVoter = null
+    ) {
         $this->em = $em;
         $this->cache = $cache;
         $this->className = $className;
         $this->fields = $fields;
         $this->aclVoter = $aclVoter;
         $this->securityContextLink = $securityContextLink;
+        $this->treeProvider = $treeProvider;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function search($query, $page, $perPage)
     {
 
@@ -55,23 +109,17 @@ class UserAclHandler implements SearchHandlerInterface
         $isGranted = $this->getSecurityContext()->isGranted($permission, 'entity:' . $entityClass);
 
         if ($isGranted) {
-            $accessLevel = $observer->getAccessLevel();
-        }
+            $user = $this->getSecurityContext()->getToken()->getUser();
+            $queryBuilder = $this->getSearchQueryBuilder($search);
+            $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user);
+            $results = $queryBuilder->getQuery()->getResult();
 
-        $queryBuilder = $this->em->createQueryBuilder()
-            ->select(['users'])
-            ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
-            ->where('users.firstName like :searchString')
-            ->orWhere('users.lastName like :searchString')
-            ->orWhere('users.username like :searchString')
-            ->setParameter('searchString', $search . '%')
-
-        ;
-        $results = $queryBuilder->getQuery()->getResult();
-
-        $resultsData = [];
-        foreach ($results as $user) {
-            $resultsData[] = $this->convertItem($user);
+            $resultsData = [];
+            foreach ($results as $user) {
+                $resultsData[] = $this->convertItem($user);
+            }
+        } else {
+            $resultsData = [];
         }
 
         return [
@@ -80,11 +128,17 @@ class UserAclHandler implements SearchHandlerInterface
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getProperties()
     {
         return $this->fields;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getEntityName()
     {
         return $this->className;
@@ -98,6 +152,9 @@ class UserAclHandler implements SearchHandlerInterface
         $this->nameFormatter = $nameFormatter;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function convertItem($user)
     {
         $result = [];
@@ -140,6 +197,60 @@ class UserAclHandler implements SearchHandlerInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Get search users query builder
+     *
+     * @param $search
+     * @return QueryBuilder
+     */
+    protected function getSearchQueryBuilder($search)
+    {
+        return $this->em->createQueryBuilder()
+            ->select(['users'])
+            ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
+            ->where('users.firstName like :searchString')
+            ->orWhere('users.lastName like :searchString')
+            ->orWhere('users.username like :searchString')
+            ->setParameter('searchString', $search . '%');
+    }
+
+    /**
+     * Add ACL Check condition to the Query Builder
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param $accessLevel
+     * @param UserInterface $user
+     */
+    protected function addAcl(QueryBuilder $queryBuilder, $accessLevel, UserInterface $user)
+    {
+        if ($accessLevel == AccessLevel::BASIC_LEVEL) {
+            $queryBuilder->andWhere($queryBuilder->expr()->in('users.id', [$user->getId()]));
+        } elseif ($accessLevel !== AccessLevel::SYSTEM_LEVEL) {
+            if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
+                $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($user->getId());
+            } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
+                $buIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($user->getId());
+                $resultBuIds = array_merge($buIds, []);
+                foreach ($buIds as $buId) {
+                    $diff = array_diff($this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId), $resultBuIds);
+                    if (!empty($diff)) {
+                        $resultBuIds = array_merge($resultBuIds, $diff);
+                    }
+                }
+            } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
+                $resultBuIds = [];
+                foreach ($this->treeProvider->getTree()->getUserOrganizationIds($user->getId()) as $orgId) {
+                    $buIds = $this->treeProvider->getTree()->getOrganizationBusinessUnitIds($orgId);
+                    if (!empty($buIds)) {
+                        $resultBuIds = array_merge($resultBuIds, $buIds);
+                    }
+                }
+            }
+            $queryBuilder->join('users.owner', 'bu')
+                ->andWhere($queryBuilder->expr()->in('bu.id', $resultBuIds));
+        }
     }
 
     /**
