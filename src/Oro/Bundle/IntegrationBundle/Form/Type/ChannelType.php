@@ -79,16 +79,17 @@ class ChannelType extends AbstractType
         $isUpdateOnly = $this->isUpdateOnly;
         $resolver->setDefaults(
             [
-                'data_class'        => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
-                'intention'         => 'channel',
-                'validation_groups' => function () use ($isUpdateOnly) {
+                'data_class'         => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
+                'intention'          => 'channel',
+                'validation_groups'  => function () use ($isUpdateOnly) {
                     $groups = ['Default'];
                     if (!$isUpdateOnly) {
                         $groups[] = 'Submit';
                     }
 
                     return $groups;
-                }
+                },
+                'cascade_validation' => true
             ]
         );
     }
