@@ -110,6 +110,7 @@ define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'o
                 var formContent = $(res).find($form.selector);
                 if (formContent.length) {
                     $form.replaceWith(formContent);
+                    formContent.validate({});
                     // trigger hash navigation event for processing UI decorators
                     mediator.trigger("hash_navigation_request:complete", this);
                 }
