@@ -102,10 +102,14 @@ class BasePerson
 
     /**
      * @param int $id
+     *
+     * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -233,7 +237,7 @@ class BasePerson
      *
      * @return $this
      */
-    public function setBirthday(\DateTime $birthday)
+    public function setBirthday($birthday)
     {
         $this->birthday = $birthday;
 

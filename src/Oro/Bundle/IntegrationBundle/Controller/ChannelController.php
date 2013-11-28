@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -9,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 
 /**
  * @Route("/channel")
@@ -78,9 +80,28 @@ class ChannelController extends Controller
                 ['route' => 'oro_integration_channel_index']
             );
         }
+        $form = $this->getForm();
 
         return [
-            'form' => $this->get('oro_integration.form.channel')->createView()
+            'form' => $form->createView()
         ];
+    }
+
+    /**
+     * Returns form instance
+     *
+     * @return FormInterface
+     */
+    protected function getForm()
+    {
+        $isUpdateOnly = $this->get('request')->get(ChannelHandler::UPDATE_MARKER, false);
+
+        $form = $this->get('oro_integration.form.channel');
+        if ($isUpdateOnly) {
+            $form = $this->get('form.factory')
+                ->createNamed('oro_integration_channel_form', 'oro_integration_channel_form', $form->getData());
+        }
+
+        return $form;
     }
 }
