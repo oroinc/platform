@@ -28,7 +28,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
         return [
             FormEvents::PRE_SET_DATA  => 'preSet',
             FormEvents::POST_SET_DATA => 'postSet',
-            FormEvents::PRE_SUBMIT    => 'preSubmit'
+            FormEvents::PRE_SUBMIT    => 'preSubmit',
         ];
     }
 

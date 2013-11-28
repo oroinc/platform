@@ -53,7 +53,7 @@ class ChannelType extends AbstractType
                 'label'       => 'Transport type',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
-                'constraints' => new NotBlank(['groups' => 'Submit'])
+                'constraints' => new NotBlank()
             ]
         );
 
@@ -82,9 +82,9 @@ class ChannelType extends AbstractType
                 'data_class'         => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
                 'intention'          => 'channel',
                 'validation_groups'  => function () use ($isUpdateOnly) {
-                    $groups = ['Default'];
+                    $groups = [];
                     if (!$isUpdateOnly) {
-                        $groups[] = 'Submit';
+                        $groups[] = 'Default';
                     }
 
                     return $groups;

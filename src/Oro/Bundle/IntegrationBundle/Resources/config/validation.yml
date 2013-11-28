@@ -3,10 +3,9 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
         - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: name
     properties:
         name:
-            - NotBlank: { groups: [ Submit ] }
+            - NotBlank: ~
             - Length:
                 min: 3
                 max: 255
-                groups: [ Submit ]
         type:
             - NotBlank: ~

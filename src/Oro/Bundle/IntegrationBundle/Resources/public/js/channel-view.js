@@ -1,7 +1,7 @@
 /* global define */
-define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'oro/delete-confirmation'],
-    function ($, Backbone, _, __, mediator, DeleteConfirmation) {
-        "use strict";
+define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'oro/navigation', 'oro/delete-confirmation'],
+function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
+    "use strict";
 
     /**
      * @export  oro/integration/channel-view
@@ -94,6 +94,11 @@ define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'o
         processChange: function ($el) {
             this.memoizeValue($el);
 
+            var navigation = Navigation.getInstance();
+            if (navigation) {
+                navigation.loadingMask.show();
+            }
+
             var $form = $(this.options.formSelector),
                 data = $form.serializeArray(),
                 url = $form.attr('action'),
@@ -106,7 +111,7 @@ define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'o
             });
             data.push({name: this.UPDATE_MARKER, value: 1});
 
-            $.post(url, data, function (res) {
+            $.post(url, data,function (res) {
                 var formContent = $(res).find($form.selector);
                 if (formContent.length) {
                     $form.replaceWith(formContent);
@@ -114,7 +119,11 @@ define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'o
                     // trigger hash navigation event for processing UI decorators
                     mediator.trigger("hash_navigation_request:complete", this);
                 }
-            });
+            }).always(function () {
+                    if (navigation) {
+                        navigation.loadingMask.hide();
+                    }
+                });
         },
 
         /**
