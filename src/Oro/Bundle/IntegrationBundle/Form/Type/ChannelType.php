@@ -4,12 +4,10 @@ namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
 
 class ChannelType extends AbstractType
@@ -19,8 +17,6 @@ class ChannelType extends AbstractType
 
     /** @var TypesRegistry */
     protected $registry;
-    /** @var bool */
-    protected $isUpdateOnly = false;
 
     public function __construct(TypesRegistry $registry)
     {
@@ -76,19 +72,10 @@ class ChannelType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $isUpdateOnly = $this->isUpdateOnly;
         $resolver->setDefaults(
             [
                 'data_class'         => 'Oro\\Bundle\\IntegrationBundle\\Entity\\Channel',
                 'intention'          => 'channel',
-                'validation_groups'  => function () use ($isUpdateOnly) {
-                    $groups = [];
-                    if (!$isUpdateOnly) {
-                        $groups[] = 'Default';
-                    }
-
-                    return $groups;
-                },
                 'cascade_validation' => true
             ]
         );
@@ -100,21 +87,5 @@ class ChannelType extends AbstractType
     public function getName()
     {
         return self::NAME;
-    }
-
-    /**
-     * Setter for request data
-     *
-     * @param Request $request
-     *
-     * @return $this
-     */
-    public function setRequest(Request $request = null)
-    {
-        if ($request !== null) {
-            $this->isUpdateOnly = $request->get(ChannelHandler::UPDATE_MARKER, false);
-        }
-
-        return $this;
     }
 }

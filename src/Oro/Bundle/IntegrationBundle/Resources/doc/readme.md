@@ -4,7 +4,7 @@ Table of content
 -----------------
 - [Overview](#overview)
 - [Channel type definition](#channel-type-definition)
-- [Transport definition](#trasport-definition)
+- [Transport definition](#transport-definition)
 - [Connector definition](#connector-definition)
 ##Overview
 Integration bundle provides abstraction for channels, transports and connectors. Those objects are responsible for integration between application and third party applications or services (e.g. ECommerce stores, ERP systems etc..).
@@ -48,5 +48,4 @@ To define you own connector developer should create class that will implement `O
         class: %acme.demo_integration.provider.prestashop_product.connector.class%
         tags:
             - { name: oro_integration.connector, type: product, channel_type: presta_shop }
-
 ```

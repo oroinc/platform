@@ -116,14 +116,16 @@ function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
                 if (formContent.length) {
                     $form.replaceWith(formContent);
                     formContent.validate({});
+
                     // trigger hash navigation event for processing UI decorators
+                    navigation.processClicks(formContent.find('a'));
                     mediator.trigger("hash_navigation_request:complete", this);
                 }
             }).always(function () {
-                    if (navigation) {
-                        navigation.loadingMask.hide();
-                    }
-                });
+                if (navigation) {
+                    navigation.loadingMask.hide();
+                }
+            });
         },
 
         /**
