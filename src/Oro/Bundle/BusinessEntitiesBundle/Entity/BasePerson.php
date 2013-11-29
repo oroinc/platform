@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Oro\Bundle\AddressBundle\Entity\AbstractTypedAddress;
-use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 /**
  * Class BasePerson
@@ -94,16 +91,6 @@ class BasePerson
      * @ORM\Column(type="datetime")
      */
     protected $updatedAt;
-
-    /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\AddressBundle\Entity\AbstractAddress",
-     *     mappedBy="owner", cascade={"all"}, orphanRemoval=true
-     * )
-     * @ORM\OrderBy({"primary" = "DESC"})
-     */
-    protected $addresses;
 
     /**
      * @return int
@@ -325,165 +312,5 @@ class BasePerson
         $this->updatedAt = $updatedAt;
 
         return $this;
-    }
-
-    /**
-     * Set addresses.
-     *
-     * This method could not be named setAddresses because of bug CRM-253.
-     *
-     * @param Collection|AbstractTypedAddress[] $addresses
-     * @return $this
-     */
-    public function resetAddresses($addresses)
-    {
-        $this->addresses->clear();
-
-        foreach ($addresses as $address) {
-            $this->addAddress($address);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Add address
-     *
-     * @param AbstractTypedAddress $address
-     * @return $this
-     */
-    public function addAddress(AbstractTypedAddress $address)
-    {
-        if (!$this->addresses->contains($address)) {
-            $this->addresses->add($address);
-            $address->setOwner($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Remove address
-     *
-     * @param AbstractTypedAddress $address
-     * @return $this
-     */
-    public function removeAddress(AbstractTypedAddress $address)
-    {
-        if ($this->addresses->contains($address)) {
-            $this->addresses->removeElement($address);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get addresses
-     *
-     * @return Collection|AbstractTypedAddress[]
-     */
-    public function getAddresses()
-    {
-        return $this->addresses;
-    }
-
-    /**
-     * Gets primary address if it's available.
-     *
-     * @return AbstractTypedAddress|null
-     */
-    public function getPrimaryAddress()
-    {
-        $result = null;
-
-        foreach ($this->getAddresses() as $address) {
-            if ($address->isPrimary()) {
-                $result = $address;
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Gets primary address if it's available
-     *
-     * @param AbstractTypedAddress $address
-     * @return $this
-     */
-    public function setPrimaryAddress(AbstractTypedAddress $address)
-    {
-        if ($this->hasAddress($address)) {
-            $address->setPrimary(true);
-            foreach ($this->getAddresses() as $otherAddress) {
-                if (!$address->isEqual($otherAddress)) {
-                    $otherAddress->setPrimary(false);
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets address type if it's available.
-     *
-     * @param AbstractTypedAddress $address
-     * @param AddressType    $addressType
-     * @return $this
-     */
-    public function setAddressType(AbstractTypedAddress $address, AddressType $addressType)
-    {
-        if ($this->hasAddress($address)) {
-            $address->addType($addressType);
-            foreach ($this->getAddresses() as $otherAddress) {
-                if (!$address->isEqual($otherAddress)) {
-                    $otherAddress->removeType($addressType);
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param AbstractTypedAddress $address
-     * @return bool
-     */
-    public function hasAddress(AbstractTypedAddress $address)
-    {
-        return $this->getAddresses()->contains($address);
-    }
-
-    /**
-     * Gets one address that has specified type.
-     *
-     * @param AddressType $type
-     * @return AbstractTypedAddress|null
-     */
-    public function getAddressByType(AddressType $type)
-    {
-        return $this->getAddressByTypeName($type->getName());
-    }
-
-    /**
-     * Gets one address that has specified type name.
-     *
-     * @param string $typeName
-     * @return AbstractTypedAddress|null
-     */
-    public function getAddressByTypeName($typeName)
-    {
-        $result = null;
-
-        foreach ($this->getAddresses() as $address) {
-            if ($address->hasTypeWithName($typeName)) {
-                $result = $address;
-                break;
-            }
-        }
-
-        return $result;
     }
 }
