@@ -1,11 +1,13 @@
 <?php
+
 namespace Oro\Bundle\AddressBundle\Form\EventListener;
+
+use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
@@ -128,8 +130,14 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
                 )
             );
 
-            // do not allow saving text state in case when state was checked from list
-            unset($data['state_text']);
+            if (!$form->getData()
+                || ($form->getData() && !$form->getData()->getRegionText())
+                || !empty($data['state'])
+            ) {
+                // do not allow saving text state in case when state was checked from list
+                // except when in base data state text existed
+                unset($data['state_text']);
+            }
         } else {
             // do not allow saving state select in case when state was filled as text
             unset($data['state']);
