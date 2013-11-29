@@ -2,18 +2,21 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-class TransportTest extends \PHPUnit_Framework_TestCase
+class ChannelTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_ID = 123;
+    const TEST_STRING = 'testString';
 
-    /** @var Transport|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var array */
+    protected static $testConnectors = ['customer', 'product'];
+
+    /** @var Channel */
     protected $entity;
 
     public function setUp()
     {
-        $this->entity = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Entity\Transport');
+        $this->entity = new Channel();
     }
 
     public function tearDown()
@@ -21,15 +24,44 @@ class TransportTest extends \PHPUnit_Framework_TestCase
         unset($this->entity);
     }
 
-    public function testEntityMethods()
+    /**
+     * @dataProvider  getSetDataProvider
+     *
+     * @param string $property
+     * @param mixed  $value
+     * @param mixed  $expected
+     */
+    public function testSetGet($property, $value = null, $expected = null)
     {
-        $this->assertNull($this->entity->getId());
+        if ($value !== null) {
+            call_user_func_array([$this->entity, 'set' . ucfirst($property)], [$value]);
+        }
 
-        /** @var \ReflectionProperty $reflectionProperty */
-        $reflectionProperty = new \ReflectionProperty($this->entity, 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->entity, self::TEST_ID);
+        $this->assertEquals($expected, call_user_func_array([$this->entity, 'get' . ucfirst($property)], []));
+    }
 
-        $this->assertEquals(self::TEST_ID, (string)$this->entity);
+    /**
+     * @return array
+     */
+    public function getSetDataProvider()
+    {
+        return [
+            'id'         => ['id'],
+            'name'       => ['name', self::TEST_STRING, self::TEST_STRING],
+            'type'       => ['type', self::TEST_STRING, self::TEST_STRING],
+            'connectors' => ['connectors', self::$testConnectors, self::$testConnectors]
+        ];
+    }
+
+    public function testTransportRelation()
+    {
+        $transport = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Entity\Transport');
+        $this->assertAttributeEmpty('transport', $this->entity);
+
+        $this->entity->setTransport($transport);
+        $this->assertSame($transport, $this->entity->getTransport());
+
+        $this->entity->clearTransport();
+        $this->assertAttributeEmpty('transport', $this->entity);
     }
 }
