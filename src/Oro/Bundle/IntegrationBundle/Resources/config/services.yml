@@ -7,6 +7,8 @@ parameters:
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
     oro_integration.import.api_reader.class:                              Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader
 
+    oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
+
 services:
     oro_integration.channel.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -36,3 +38,12 @@ services:
         class: %oro_integration.manager.types_registry.class%
         arguments:
             - []
+
+    # sync processor
+    oro_integration.sync.processor:
+        class: %oro_integration.sync.processor.class%
+        arguments:
+          - @doctrine.orm.entity_manager
+          - @oro_importexport.processor.registry
+          - @oro_importexport.job_executor
+          - @oro_integration.manager.types_registry
