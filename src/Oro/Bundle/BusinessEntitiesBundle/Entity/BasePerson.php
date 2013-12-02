@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
+use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 /**
  * Class BasePerson
@@ -79,6 +84,16 @@ class BasePerson
     protected $email;
 
     /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(targetEntity="Oro\Bundle\AddressBundle\Entity\AbstractAddress",
+     *     mappedBy="owner", cascade={"all"}, orphanRemoval=true
+     * )
+     * @ORM\OrderBy({"primary" = "DESC"})
+     */
+    protected $addresses;
+
+    /**
      * @var \DateTime $createdAt
      *
      * @ORM\Column(type="datetime")
@@ -91,6 +106,14 @@ class BasePerson
      * @ORM\Column(type="datetime")
      */
     protected $updatedAt;
+
+    /**
+     * init addresses with empty collection
+     */
+    public function __construct()
+    {
+        $this->addresses = new ArrayCollection();
+    }
 
     /**
      * @return int
@@ -312,5 +335,83 @@ class BasePerson
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    /**
+     * Set addresses.
+     *
+     * This method could not be named setAddresses because of bug CRM-253.
+     *
+     * @param Collection|AbstractAddress[] $addresses
+     * @return BasePerson
+     */
+    public function resetAddresses($addresses)
+    {
+        $this->addresses->clear();
+
+        foreach ($addresses as $address) {
+            $this->addAddress($address);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add address
+     *
+     * @param AbstractAddress $address
+     * @return BasePerson
+     */
+    public function addAddress(AbstractAddress $address)
+    {
+        if (!$this->addresses->contains($address)) {
+            $this->addresses->add($address);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove address
+     *
+     * @param AbstractAddress $address
+     * @return BasePerson
+     */
+    public function removeAddress(AbstractAddress $address)
+    {
+        if ($this->addresses->contains($address)) {
+            $this->addresses->removeElement($address);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get addresses
+     *
+     * @return Collection|AbstractAddress[]
+     */
+    public function getAddresses()
+    {
+        return $this->addresses;
+    }
+
+    /**
+     * @param AbstractAddress $address
+     * @return bool
+     */
+    public function hasAddress(AbstractAddress $address)
+    {
+        return $this->getAddresses()->contains($address);
+    }
+
+    /**
+     * Clone relations
+     */
+    public function __clone()
+    {
+        if ($this->addresses) {
+            $this->addresses = clone $this->addresses;
+        }
     }
 }

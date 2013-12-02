@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Reader;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 
@@ -14,6 +15,9 @@ class ApiReaderTest extends \PHPUnit_Framework_TestCase
     /** @var ContextInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $context;
 
+    /** @var ContextRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    protected $contextRegistry;
+
     /** @var ConnectorInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $connector;
 
@@ -22,16 +26,21 @@ class ApiReaderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->reader = $this->getMock(
+        $this->contextRegistry = $this->getMock(
             'Oro\Bundle\ImportExportBundle\Context\ContextRegistry',
-            ['getContext', 'setStepExecution']
+            ['setStepExecution']
         );
-        $this->reader->expects($this->once())
-            ->method('getContext')
-            ->will($this->returnValue($this->context));
+
+        $this->reader = $this->getMock(
+            'Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader',
+            ['getContext'],
+            [$this->contextRegistry]
+        );
+
+        $this->reader->
 
         $this->logger = '';
-        $this->connector = '';
+        $this->connector = $this->getMock('Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface');
 
         $this->context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $this->context->expects($this->at(0))
@@ -61,8 +70,11 @@ class ApiReaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testRead($isDataNull)
     {
-        $this->markTestIncomplete();
-        //$this->reader->read();
+        $this->reader->expects($this->once())
+            ->method('getContext')
+            ->will($this->returnValue($this->context));
+
+        $this->reader->read();
     }
 
     /**
