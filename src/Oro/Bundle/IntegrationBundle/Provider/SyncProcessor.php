@@ -170,10 +170,9 @@ class SyncProcessor implements SyncProcessorInterface
         }
 
         return [
-            'success'      => $jobResult->isSuccessful(),
+            'success'      => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
             'message'      => $message,
             'exceptions'   => $jobResult->getFailureExceptions(),
-            'isSuccessful' => $jobResult->isSuccessful() && isset($counts['process']) && $counts['process'] > 0,
             'counts'       => $counts,
             'errors'       => $errorsAndExceptions,
         ];
