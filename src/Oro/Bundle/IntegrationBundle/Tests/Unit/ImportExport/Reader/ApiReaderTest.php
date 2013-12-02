@@ -31,15 +31,10 @@ class ApiReaderTest extends \PHPUnit_Framework_TestCase
             ['setStepExecution']
         );
 
-        $this->reader = $this->getMock(
-            'Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader',
-            ['getContext'],
-            [$this->contextRegistry]
-        );
-
-        $this->reader->
-
-        $this->logger = '';
+        $self = $this;
+        $this->logger = function ($item) use ($self) {
+            $self->assertTrue(!empty($item));
+        };
         $this->connector = $this->getMock('Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface');
 
         $this->context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
@@ -52,8 +47,10 @@ class ApiReaderTest extends \PHPUnit_Framework_TestCase
             ->with('connector')
             ->will($this->returnValue($this->connector));
 
-        $this->reader->setStepExecution(
-            $this->getMock('Oro\Bundle\BatchBundle\Entity\StepExecution', [], [], '', false)
+        $this->reader = $this->getMock(
+            'Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader',
+            ['getContext'],
+            [$this->contextRegistry]
         );
     }
 
@@ -66,13 +63,31 @@ class ApiReaderTest extends \PHPUnit_Framework_TestCase
      * Test reading
      *
      * @dataProvider  getTestData
-     * @param boolean $isDataNull
+     * @param $isValidData
      */
-    public function testRead($isDataNull)
+    public function testRead($isValidData)
     {
-        $this->reader->expects($this->once())
+        $this->reader->expects(
+            $isValidData ? $this->exactly(2) : $this->once()
+        )
             ->method('getContext')
             ->will($this->returnValue($this->context));
+        $this->reader->setStepExecution(
+            $this->getMock('Oro\Bundle\BatchBundle\Entity\StepExecution', [], [], '', false)
+        );
+
+        $data = $isValidData ? ['name' => 'Test Customer'] : null;
+
+        $this->connector->expects($this->once())
+            ->method('read')
+            ->will($this->returnValue($data));
+
+        if ($isValidData) {
+            $this->context->expects($this->once())
+                ->method('incrementReadCount');
+            $this->context->expects($this->once())
+                ->method('incrementReadOffset');
+        }
 
         $this->reader->read();
     }

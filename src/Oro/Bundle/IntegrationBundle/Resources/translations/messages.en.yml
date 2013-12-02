@@ -13,3 +13,5 @@ oro:
         channel_type:
             simple:
                 label: Simple
+        transport:
+            simple: Simple

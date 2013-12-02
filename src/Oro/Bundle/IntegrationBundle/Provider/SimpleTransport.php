@@ -13,7 +13,7 @@ class SimpleTransport implements TransportInterface
      */
     public function getLabel()
     {
-        return 'bla';
+        return 'oro.integration.transport.simple';
     }
 
     /**

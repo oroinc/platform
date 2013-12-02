@@ -47,7 +47,7 @@ class ApiReader extends AbstractReader implements ReaderInterface, StepExecution
         // batch counter/boundaries to the next ones
 
         if (is_callable($this->loggerClosure)) {
-            $this->loggerClosure("Reading item...");
+            call_user_func($this->loggerClosure, "Reading item...");
         }
 
         return $data;
