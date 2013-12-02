@@ -111,7 +111,7 @@ Build configuration starts in ```app/config.yml```
     oro_require_js:
         build_path: "js/oro.min.js"     # relative path from document root folder to project built
         building_timeout: 3600
-        js_engine: "java -Xss10m -Xms256m -Xmx512m -cp %kernel.root_dir%/Resources/java/js.jar org.mozilla.javascript.tools.shell.Main"
+        js_engine: "node"               # can be configured to use other engine, e.g. Rhino
         build:                          # build.js's common options
             optimize: "uglify2"
             preserveLicenseComments: true
