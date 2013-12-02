@@ -9,6 +9,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 
 class SyncProcessor implements SyncProcessorInterface
@@ -100,13 +101,27 @@ class SyncProcessor implements SyncProcessorInterface
             $result = $this->processImport($mode, $jobName, $configuration);
             $this->log($result);
 
-            if ($mode == ProcessorRegistry::TYPE_IMPORT) {
-                $transport = $channel->getTransport();
-                $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
-                $this->em->persist($transport);
-                $this->em->getRepository(ClassUtils::getClass($transport));
-            }
+            // save last sync datetime
+            $this->saveLastSyncDate($mode, $channel->getTransport());
         }
+    }
+
+    /**
+     * @param string $mode
+     * @param Transport $transport
+     * @return bool
+     */
+    protected function saveLastSyncDate($mode, Transport $transport)
+    {
+        if ($mode != ProcessorRegistry::TYPE_IMPORT) {
+            return false;
+        }
+
+        $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->em->persist($transport);
+        $this->em->flush($transport);
+
+        return true;
     }
 
     /**
