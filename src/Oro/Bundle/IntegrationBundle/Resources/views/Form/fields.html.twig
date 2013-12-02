@@ -14,7 +14,9 @@
     {% endif %}
 
     {% if (form.connectors is defined) %}
-        {{ form_row(form.connectors) }}
+        <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
+            {{ form_row(form.connectors) }}
+        </div>
     {% endif %}
 
     {{ form_rest(form) }}
