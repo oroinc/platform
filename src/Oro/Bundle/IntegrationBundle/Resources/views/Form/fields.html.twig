@@ -13,7 +13,9 @@
         {{ form_widget(form.transport) }}
     {% endif %}
 
-    {{ form_row(form.connectors) }}
+    {% if (form.connectors is defined) %}
+        {{ form_row(form.connectors) }}
+    {% endif %}
 
     {{ form_rest(form) }}
     <script type="text/javascript">

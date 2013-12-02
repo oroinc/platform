@@ -67,8 +67,7 @@ class TypesRegistry
         $types    = $registry->getRegisteredChannelTypes();
         $types    = $types->partition(
             function ($key, ChannelTypeInterface $type) use ($registry) {
-                return !($registry->getRegisteredConnectorsTypes($key)->isEmpty()
-                    || $registry->getRegisteredTransportTypes($key)->isEmpty());
+                return !$registry->getRegisteredTransportTypes($key)->isEmpty();
             }
         );
 

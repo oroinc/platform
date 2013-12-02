@@ -10,3 +10,6 @@ oro:
             channel:
                 message:
                     saved: Channel succesfully saved
+        channel_type:
+            simple:
+                label: Simple

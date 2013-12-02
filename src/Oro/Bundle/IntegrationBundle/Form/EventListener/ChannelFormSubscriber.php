@@ -220,8 +220,11 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             }
 
             $choices = $registry->getAvailableConnectorsTypesChoiceList($type);
-
-            $form->add('connectors', 'choice', array_merge($config, ['choices' => $choices]));
+            if (!empty($choices)) {
+                $form->add('connectors', 'choice', array_merge($config, ['choices' => $choices]));
+            } else {
+                $form->remove('connectors');
+            }
         };
     }
 
