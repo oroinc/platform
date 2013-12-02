@@ -34,7 +34,9 @@ abstract class SOAPTransport implements TransportInterface
      */
     public function call($action, array $params = [])
     {
-        return $this->client->__soapCall($action, $params);
+        $result = $this->client->__soapCall($action, $params);
+
+        return $result;
     }
 
     /**
@@ -66,6 +68,6 @@ abstract class SOAPTransport implements TransportInterface
      */
     public function getLastRequest()
     {
-        $this->client->__getLastRequest();
+        return $this->client->__getLastRequest();
     }
 }
