@@ -85,6 +85,10 @@ class SyncProcessor implements SyncProcessorInterface
             /** @var ConnectorInterface $realConnector */
             $realConnector->configure($realTransport, $channel->getTransport());
 
+
+            // @TODO fix saving
+            // save last sync datetime
+            $this->saveLastSyncDate($mode, $channel->getTransport());
             $configuration = [
                 $mode => [
                     'processorAlias' => $processorAlias,
@@ -99,30 +103,23 @@ class SyncProcessor implements SyncProcessorInterface
             ];
             $result = $this->processImport($mode, $jobName, $configuration);
             $this->log($result);
-
-            // save last sync datetime
-            $this->saveLastSyncDate($mode, $channel->getTransport());
         }
     }
 
     /**
      * @param string $mode
      * @param Transport $transport
-     * @return bool
      */
     protected function saveLastSyncDate($mode, Transport $transport)
     {
         if ($mode != ProcessorRegistry::TYPE_IMPORT) {
-            return false;
+            return;
         }
 
         // merge to uow due to object has changed hash after serialization/deserialization in job context
         $this->em->merge($transport);
         $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($transport);
-        $this->em->flush();
-
-        return true;
     }
 
     /**
