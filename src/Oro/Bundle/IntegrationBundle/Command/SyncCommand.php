@@ -46,7 +46,26 @@ class SyncCommand extends ContainerAwareCommand
         $force     = $input->getOption('force');
 
         $closure = function ($context) use ($output) {
-            $output->writeln(var_export($context, true));
+            $context = $context[0]; // first arg
+            $isSuccess  = $context['success'] === true;
+            if ($isSuccess) {
+
+            } else {
+                $output->writeln('There was some errors:');
+                foreach ($context['errors'] as $error) {
+                    $output->writeln($error);
+                }
+            }
+            $output->writeln(
+                sprintf(
+                    "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
+                    $context['counts']['read'],
+                    $context['counts']['process'],
+                    $context['counts']['update'],
+                    $context['counts']['add'],
+                    $context['counts']['delete']
+                )
+            );
         };
 
         $this->getContainer()

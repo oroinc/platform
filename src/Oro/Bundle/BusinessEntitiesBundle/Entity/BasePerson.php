@@ -345,7 +345,7 @@ class BasePerson
      * @param Collection|AbstractAddress[] $addresses
      * @return BasePerson
      */
-    public function resetAddresses(array $addresses)
+    public function resetAddresses($addresses)
     {
         $this->addresses->clear();
 
