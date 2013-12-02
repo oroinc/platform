@@ -24,8 +24,8 @@ class SyncCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName('orocrm:magento:sync')
-            ->setDescription('Sync magento entities (currently only import customers)')
+            ->setName('oro:integration:sync')
+            ->setDescription('Sync entities (currently only importing magento customers)')
             ->addArgument('channelId', InputArgument::REQUIRED, 'Channel identification name')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Do actual import, readonly otherwise');
     }
