@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 class Translator extends BaseTranslator
@@ -27,13 +28,13 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
-        $fallbackCatalogues = array();
+        $fallbackCatalogues   = array();
         $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $fallbackCatalogues[] = $catalogue;
         }
 
-        $domains = array_flip($domains);
+        $domains      = array_flip($domains);
         $translations = array();
         for ($i = count($fallbackCatalogues) - 1; $i >= 0; $i--) {
             $localeTranslations = $fallbackCatalogues[$i]->all();
@@ -49,6 +50,27 @@ class Translator extends BaseTranslator
                 }
             }
         }
+
+        /**
+         * Retrieve label from config
+         */
+
+        /** @var ConfigProvider */
+        $configManager      = $this->container->get('oro_entity_config.provider.entity');
+        $messages           = isset ($translations['messages']) ? $translations['messages'] : [];
+        $configTranslations = array_filter(
+            $messages,
+            function ($message) {
+                return preg_match('/^\%(.*)\%$/', $message);
+            }
+        );
+
+        foreach ($configTranslations as $key => $alias) {
+            //$config = $configManager->getConfigByAlias($alias);
+
+            $translations['messages'][$key] = 'qwerty';
+        }
+
 
         return $translations;
     }
