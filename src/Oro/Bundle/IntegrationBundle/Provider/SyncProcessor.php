@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -117,9 +116,11 @@ class SyncProcessor implements SyncProcessorInterface
             return false;
         }
 
+        // merge to uow due to object has changed hash after serialization/deserialization in job context
+        $this->em->merge($transport);
         $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->em->persist($transport);
-        $this->em->flush($transport);
+        $this->em->flush();
 
         return true;
     }
