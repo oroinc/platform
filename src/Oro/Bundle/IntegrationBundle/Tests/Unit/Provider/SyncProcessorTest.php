@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SyncProcessor */
-    protected $processor;
+    /** @var Channel|\PHPUnit_Framework_MockObject_MockObject */
+    protected $channel;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -38,13 +38,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->registry = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-
-        $this->processor = new SyncProcessor(
-            $this->em,
-            $this->processorRegistry,
-            $this->jobExecutor,
-            $this->registry
-        );
+        $this->channel = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
     }
 
     /**
@@ -56,14 +50,46 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Return mocked sync processor
+     *
+     * @param array $mockedMethods
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getSyncProcessor($mockedMethods = [])
+    {
+        return $this->getMock(
+            'Oro\Bundle\IntegrationBundle\Provider\SyncProcessor',
+            $mockedMethods,
+            [
+                $this->em,
+                $this->processorRegistry,
+                $this->jobExecutor,
+                $this->registry
+            ]
+        );
+    }
+
+    /**
      * Test process method
      */
     public function testProcess()
     {
-        $this->markTestSkipped('To be finished');
         $channelName = 'testChannel';
         $force = false;
 
-        $this->processor->process($channelName, $force);
+        $connectors = [];
+
+        $this->channel->expects($this->once())
+            ->method('getConnectors')
+            ->will($this->returnValue($connectors));
+
+        $processor = $this->getSyncProcessor(['getChannelByName', 'log', 'processImport']);
+        $processor->expects($this->once())
+            ->method('getChannelByName')
+            ->with($channelName)
+            ->will($this->returnValue($this->channel));
+
+        $this->assertInstanceOf('Oro\Bundle\IntegrationBundle\Provider\SyncProcessorInterface', $processor);
+        $processor->process($channelName, $force);
     }
 }

@@ -24,7 +24,6 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
 
         $this->transport = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
         $this->realTransport = $this->getMock('Oro\Bundle\IntegrationBundle\Provider\TransportInterface');
-
     }
 
     /**
@@ -51,9 +50,6 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
             ->method('init')
             ->with($params)
             ->will($this->returnValue(true));
-
-        //$result = $this->connector->connect();
-        //$this->assertTrue($result);
 
         $this->realTransport->expects($this->once())
             ->method('call');

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -53,6 +54,7 @@ class SyncProcessor implements SyncProcessorInterface
      */
     public function process($channelName, $force = false)
     {
+        /** @var Channel $channel */
         $channel    = $this->getChannelByName($channelName);
         $connectors = $channel->getConnectors();
 
@@ -95,8 +97,15 @@ class SyncProcessor implements SyncProcessorInterface
                     //'logger'         => $this->loggingClosure,
                 ],
             ];
-            $result        = $this->processImport($mode, $jobName, $configuration);
+            $result = $this->processImport($mode, $jobName, $configuration);
             $this->log($result);
+
+            if ($mode == ProcessorRegistry::TYPE_IMPORT) {
+                $transport = $channel->getTransport();
+                $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
+                $this->em->persist($transport);
+                $this->em->getRepository(ClassUtils::getClass($transport));
+            }
         }
     }
 

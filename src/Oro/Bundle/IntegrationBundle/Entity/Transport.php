@@ -25,6 +25,13 @@ abstract class Transport
     protected $id;
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    protected $lastSyncDate;
+
+    /**
      * @return mixed
      */
     public function getId()
@@ -36,4 +43,23 @@ abstract class Transport
      * @return ParameterBag
      */
     abstract public function getSettingsBag();
+
+    /**
+     * @param \DateTime $lastSyncDate
+     * @return $this
+     */
+    public function setLastSyncDate($lastSyncDate)
+    {
+        $this->lastSyncDate = $lastSyncDate;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getLastSyncDate()
+    {
+        return $this->lastSyncDate;
+    }
 }
