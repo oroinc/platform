@@ -1,0 +1,3 @@
+css:
+    'report':
+        - '@OroReportBundle/Resources/public/css/report.css'
