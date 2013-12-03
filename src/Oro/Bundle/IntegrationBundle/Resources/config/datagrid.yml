@@ -30,9 +30,16 @@ datagrid:
         sorters:
             columns:
                 name: { data_name: c.name }
+                type: { data_name: c.type }
         filters:
             columns:
                 name: { data_name: c.name, type: string }
+                type:
+                    data_name: c.type
+                    type: choice
+                    options:
+                        field_options:
+                            choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList() }
         actions:
             update:
                 type:         navigate

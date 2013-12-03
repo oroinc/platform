@@ -85,10 +85,6 @@ class SyncProcessor implements SyncProcessorInterface
             /** @var ConnectorInterface $realConnector */
             $realConnector->configure($realTransport, $channel->getTransport());
 
-
-            // @TODO fix saving
-            // save last sync datetime
-            $this->saveLastSyncDate($mode, $channel->getTransport());
             $configuration = [
                 $mode => [
                     'processorAlias' => $processorAlias,
@@ -102,6 +98,8 @@ class SyncProcessor implements SyncProcessorInterface
                 ],
             ];
             $result = $this->processImport($mode, $jobName, $configuration);
+            // save last sync datetime
+            $this->saveLastSyncDate($mode, $channel->getTransport());
             $this->log($result);
         }
     }
@@ -117,9 +115,13 @@ class SyncProcessor implements SyncProcessorInterface
         }
 
         // merge to uow due to object has changed hash after serialization/deserialization in job context
-        $this->em->merge($transport);
-        $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
-        $this->em->persist($transport);
+        // {@link} http://doctrine-orm.readthedocs.org/en/2.0.x/reference/working-with-objects.html#merging-entities
+        if ($this->em->isOpen()) {
+            $transport = $this->em->merge($transport);
+            $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
+            $this->em->persist($transport);
+            $this->em->flush();
+        }
     }
 
     /**
