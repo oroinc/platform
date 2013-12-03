@@ -78,7 +78,12 @@ class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, Seri
             $item = $this->converter->convertToImportFormat($item);
         }
 
-        $object = $this->serializer->deserialize($item, $this->context->getOption('entityName'), null);
+        $object = $this->serializer->deserialize(
+            $item,
+            $this->context->getOption('entityName'),
+            null,
+            $this->context->getConfiguration()
+        );
 
         if ($this->strategy) {
             $object = $this->strategy->process($object);
