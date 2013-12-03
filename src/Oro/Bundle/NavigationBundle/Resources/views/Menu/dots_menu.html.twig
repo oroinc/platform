@@ -22,8 +22,11 @@
 
     {% endif %}
         <script type="text/javascript">
-            require(['jquery'],
-            function($) {
+            require(['jquery', 'oro/layout'], function ($, layout) {
+                if (layout.isMobile()) {
+                    return;
+                }
+
                 function trueWidthPinBar(){
                     $('div.list-bar li').each(function(){
                         var _tempWidth = "auto";
