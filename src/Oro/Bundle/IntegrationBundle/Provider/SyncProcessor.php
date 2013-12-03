@@ -89,7 +89,7 @@ class SyncProcessor implements SyncProcessorInterface
                 $mode => [
                     'processorAlias' => $processorAlias,
                     'entityName'     => $realConnector->getImportEntityFQCN(),
-                    'channelName'    => $channelName,
+                    'channel'        => $channel,
                     'batchSize'      => self::DEFAULT_BATCH_SIZE,
                     'maxEmptyRanges' => self::DEFAULT_EMPTY_RANGES_COUNT,
                     'connector'      => $realConnector
