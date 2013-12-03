@@ -27,7 +27,7 @@ class SyncCommand extends ContainerAwareCommand
             ->setName('oro:integration:sync')
             ->setDescription('Sync entities (currently only importing magento customers)')
             ->addArgument('channelId', InputArgument::REQUIRED, 'Channel identification name')
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Do actual import, readonly otherwise');
+            ->addOption('run', null, InputOption::VALUE_NONE, 'Do actual import, readonly otherwise');
     }
 
     /**
@@ -43,7 +43,7 @@ class SyncCommand extends ContainerAwareCommand
         $output->writeln($this->getDescription());
 
         $channelId = $input->getArgument('channelId');
-        $force     = $input->getOption('force');
+        $force     = $input->getOption('run');
 
         $closure = function ($context) use ($output) {
             $context = $context[0]; // first arg

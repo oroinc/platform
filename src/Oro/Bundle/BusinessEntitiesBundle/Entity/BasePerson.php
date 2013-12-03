@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
-use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 /**
  * Class BasePerson
