@@ -420,4 +420,30 @@ class Workflow
 
         return $transitions;
     }
+
+    /**
+     * Get passed latest steps from step with minimum order to step with maximum order.
+     *
+     * @param WorkflowItem $workflowItem
+     * @return Collection
+     */
+    public function getPassedStepsByWorkflowItem(WorkflowItem $workflowItem)
+    {
+        $transitionRecords = $workflowItem->getTransitionRecords();
+        $minStepIdx = count($transitionRecords) - 1;
+        $minStep = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepToName());
+        $steps = array($minStep);
+        $minStepIdx--;
+        while ($minStepIdx > -1) {
+            $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepToName());
+            if ($step->getOrder() <= $minStep->getOrder()) {
+                $minStepIdx--;
+                $minStep = $step;
+                $steps[] = $step;
+            } else {
+                break;
+            }
+        }
+        return new ArrayCollection(array_reverse($steps));
+    }
 }
