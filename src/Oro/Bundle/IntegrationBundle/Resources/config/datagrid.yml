@@ -7,11 +7,16 @@ datagrid:
                 select:
                     - c.id
                     - c.name
+                    - c.type
                 from:
                     - { table: %oro_integration.channel.entity.class%, alias: c }
         columns:
             name:
                 label: oro.integration.datagrid.column.name
+            type:
+                label: oro.integration.datagrid.column.type
+                frontend_type:  select
+                choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()
         properties:
             id: ~
             update_link:

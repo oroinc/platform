@@ -1,12 +1,7 @@
 oro_menu_config:
     items:
-        channels_submenu:
-            label: 'Channels'
-            uri: '#'
-            extras:
-                position: 50
         channels_list:
-            label: 'Configuration'
+            label: 'Channels'
             route: 'oro_integration_channel_index'
             extras:
                 routes: 'oro_integration_channel_*'
@@ -14,7 +9,7 @@ oro_menu_config:
     tree:
         application_menu:
             children:
-                channels_submenu:
+                system_tab:
                     children:
                         channels_list: ~
 
