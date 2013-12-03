@@ -13,6 +13,7 @@ parameters:
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
     oro_email.entity.cache.clearer.class:         Oro\Bundle\EmailBundle\Cache\EntityCacheClearer
     oro_email.direct_mailer.class:                Oro\Bundle\EmailBundle\Mailer\DirectMailer
+    oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -212,3 +213,10 @@ services:
     oro_email.emailtemplate.datagrid_helper:
         class: %oro_email.emailtemplate.datagrid_helper.class%
         arguments: [%oro_config.entities%]
+
+    oro_email.mailer.processor:
+        class: %oro_email.mailer.processor.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_email.email.entity.builder=
+            - @oro_email.direct_mailer
