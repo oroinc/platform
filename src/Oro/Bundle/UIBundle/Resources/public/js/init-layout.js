@@ -181,7 +181,8 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 if (!layout.isMobile()) {
                     content.css('overflow', 'auto');
                 } else {
-                    content.css('overflow-x', 'hidden');
+                    content.css('overflow', 'hidden');
+                    content.last().css('overflow-y', 'scroll');
                 }
 
                 $('.scrollable-substructure').css({
@@ -327,6 +328,4 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         e.preventDefault();
         $(this).parents('*[data-content]').remove();
     });
-
-    console.log(layout.isMobile() ? 'Mobile' : 'Desktop', 'layout');
 });
