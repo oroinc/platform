@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
+use JMS\JobQueueBundle\Entity\Job;
+
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 
 /**
  * Class SyncCommand
@@ -14,9 +17,17 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
  *
  * @package Oro\Bundle\IntegrationBundle\Command
  */
-class SyncCommand extends ContainerAwareCommand
+class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     const SYNC_PROCESSOR = 'oro_integration.sync.processor';
+
+    /**
+     * {@internaldoc}
+     */
+    public function getDefaultDefinition()
+    {
+        return '0 1 * * *';
+    }
 
     /**
      * Console command configuration
@@ -24,10 +35,8 @@ class SyncCommand extends ContainerAwareCommand
     public function configure()
     {
         $this
-            ->setName('oro:integration:sync')
-            ->setDescription('Sync entities (currently only importing magento customers)')
-            ->addArgument('channelId', InputArgument::REQUIRED, 'Channel identification name')
-            ->addOption('run', null, InputOption::VALUE_NONE, 'Do actual import, readonly otherwise');
+            ->setName('oro:cron:integration:sync')
+            ->setDescription('Sync entities (currently only importing magento customers)');
     }
 
     /**
@@ -42,12 +51,9 @@ class SyncCommand extends ContainerAwareCommand
     {
         $output->writeln($this->getDescription());
 
-        $channelId = $input->getArgument('channelId');
-        $force     = $input->getOption('run');
-
         $closure = function ($context) use ($output) {
-            $context = $context[0]; // first arg
-            $isSuccess  = $context['success'] === true;
+            $context   = $context[0]; // first arg
+            $isSuccess = $context['success'] === true;
             if ($isSuccess) {
 
             } else {
@@ -68,11 +74,48 @@ class SyncCommand extends ContainerAwareCommand
             );
         };
 
-        $this->getContainer()
-            ->get(self::SYNC_PROCESSOR)
-            ->setLogClosure($closure)
-            ->process($channelId, $force);
+        if ($this->isJobRunning()) {
+            $output->writeln('Job already running. Exit.');
+
+            return 0;
+        }
+
+        $channels = $this->getContainer()->get('doctrine.orm.entity_manager')
+            ->getRepository('OroIntegrationBundle:Channel')
+            ->getConfiguredChannelsForSync();
+
+        /** @var Channel $channel */
+        foreach ($channels as $channel) {
+            $output->writeln(sprintf('Run sync for "%s" channel.', $channel->getName()));
+
+            $this->getContainer()
+                ->get(self::SYNC_PROCESSOR)
+                ->setLogClosure($closure)
+                ->process($channel->getName(), true);
+        }
 
         $output->writeln('Completed');
+    }
+
+    /**
+     * Check that job is not running (from previous schedule)
+     *
+     * @return bool
+     */
+    protected function isJobRunning()
+    {
+        $qb = $this->getContainer()->get('doctrine.orm.entity_manager')
+            ->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j');
+
+        $running = $qb
+            ->select('count(j.id)')
+            ->andWhere('j.command=:commandName')
+            ->andWhere($qb->expr()->in('j.state', [Job::STATE_RUNNING]))
+            ->setParameter('commandName', $this->getName())
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $running > 1;
     }
 }
