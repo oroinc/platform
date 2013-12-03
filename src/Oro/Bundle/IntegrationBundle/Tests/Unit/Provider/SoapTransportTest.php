@@ -15,7 +15,13 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->transport = $this->getMockForAbstractClass(
-            'Oro\Bundle\IntegrationBundle\Provider\SOAPTransport', [], '', true, true, true, ['getSoapClient']
+            'Oro\Bundle\IntegrationBundle\Provider\SOAPTransport',
+            [],
+            '',
+            true,
+            true,
+            true,
+            ['getSoapClient']
         );
 
         $this->soapClientMock = $this->getMockBuilder('\SoapClient')
