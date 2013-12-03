@@ -155,5 +155,26 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
         });
     };
 
+    /**
+     * Are we currently on mobile
+     */
+    layout.isMobile = (function () {
+        var width = null;
+
+        $(function () {
+            if (!width) {
+                width = window.innerWidth;
+            }
+        });
+
+        return function () {
+            if (!width) {
+                width = window.innerWidth;
+            }
+
+            return width < 960;
+        };
+    }());
+
     return layout;
 });

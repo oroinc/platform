@@ -323,4 +323,6 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         e.preventDefault();
         $(this).parents('*[data-content]').remove();
     });
+
+    console.log(layout.isMobile() ? 'Mobile' : 'Desktop', 'layout');
 });
