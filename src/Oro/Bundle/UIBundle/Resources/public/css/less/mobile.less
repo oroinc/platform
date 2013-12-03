@@ -1,12 +1,24 @@
 @media only screen and (max-width: 979px) {
   body {
-    min-width: 100%;
+    min-width: inherit;
   }
 
   .container,
   .navbar-static-top .container,
   .navbar-fixed-top .container,
   .navbar-fixed-bottom .container {
-    width: 100%;
+    width: auto;
+  }
+
+  .form-horizontal .control-group {
+    max-width: auto;
+  }
+
+  .form-horizontal .control-group label.control-label {
+    width: auto;
+  }
+
+  .form-horizontal .control-group .controls {
+    margin-left: 0px;
   }
 }

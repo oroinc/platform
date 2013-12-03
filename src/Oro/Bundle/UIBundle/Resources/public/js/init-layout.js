@@ -178,7 +178,11 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         var initializeContent = function () {
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
-                content.css('overflow', 'auto');
+                if (!layout.isMobile()) {
+                    content.css('overflow', 'auto');
+                } else {
+                    content.css('overflow-x', 'hidden');
+                }
 
                 $('.scrollable-substructure').css({
                     'padding-bottom': '0px',
