@@ -5,7 +5,7 @@
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
             {% block head_style %}
                 <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
                {% placeholder head_style %}
