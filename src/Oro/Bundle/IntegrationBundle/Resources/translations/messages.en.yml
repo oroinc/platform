@@ -3,6 +3,7 @@ oro:
         datagrid:
             column:
                 name: Name
+                type: Type
             action:
                 update: Update
                 delete: Delete
