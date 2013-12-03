@@ -54,7 +54,6 @@ class Translator extends BaseTranslator
         /**
          * Retrieve label from config
          */
-
         /** @var ConfigProvider */
         $configManager      = $this->container->get('oro_entity_config.provider.entity');
         $messages           = isset ($translations['messages']) ? $translations['messages'] : [];
@@ -67,8 +66,7 @@ class Translator extends BaseTranslator
 
         foreach ($configTranslations as $key => $alias) {
             //$config = $configManager->getConfigByAlias($alias);
-
-            $translations['messages'][$key] = 'qwerty';
+            //$translations['messages'][$key] = 'qwerty';
         }
 
 
