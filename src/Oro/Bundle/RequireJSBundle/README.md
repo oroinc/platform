@@ -120,12 +120,6 @@ Build configuration starts in ```app/config.yml```
 
 See details for [```oro_require_js.build```][example.build.js] options.
 
-It's recommended to use [NodeJS](http://nodejs.org/) for ```oro_require_js.js_engine```, instead of [Rhino](https://developer.mozilla.org/en/docs/Rhino) (JS-engine written on Java, used by default). Build process will go much faster.
-Just make sure you have NodeJS installed and then set:
-
-    oro_require_js:
-        js_engine: node
-
 Beside general build-configuration, you can set bundle specific options inside ```%BundleName%\Resources\config\requirejs.yml``` file, root section ```build```.
 
     build:
