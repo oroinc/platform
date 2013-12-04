@@ -102,6 +102,8 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
             return;
         }
 
+        $('.scrollspy .responsive-section:nth-of-type(1) .scrollspy-title').css('display', 'none');
+
         container.find('[data-spy="scroll"]').each(function () {
             var $spy = $(this);
             $spy.scrollspy($spy.data());
