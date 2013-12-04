@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 class TargetType extends AbstractType
 {
@@ -37,7 +38,6 @@ class TargetType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        //$builder->addEventSubscriber(new TargetSubscriber($this->configManager));
         $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSetData'));
     }
 

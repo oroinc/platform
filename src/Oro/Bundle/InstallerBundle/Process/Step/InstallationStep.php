@@ -2,12 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
-
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
+use Oro\Bundle\InstallerBundle\InstallerEvents;
 
 class InstallationStep extends AbstractStep
 {
@@ -17,25 +13,13 @@ class InstallationStep extends AbstractStep
 
         switch ($this->getRequest()->query->get('action')) {
             case 'fixtures':
-                $loader = new ContainerAwareLoader($this->container);
-
-                foreach ($this->get('kernel')->getBundles() as $bundle) {
-                    if (is_dir($path = $bundle->getPath() . '/DataFixtures/Demo')) {
-                        $loader->loadFromDirectory($path);
-                    }
-                }
-
-                $executor = new ORMExecutor($this->getDoctrine()->getManager());
-
-                $executor->execute($loader->getFixtures(), true);
-
-                return $this->getRequest()->isXmlHttpRequest()
-                    ? new JsonResponse(array('result' => true))
-                    : $this->redirect('');
+                return $this->handleAjaxAction('oro:demo:fixtures:load');
             case 'search':
                 return $this->handleAjaxAction('oro:search:create-index');
             case 'navigation':
                 return $this->handleAjaxAction('oro:navigation:init');
+            case 'js-routing':
+                return $this->handleAjaxAction('fos:js-routing:dump', array('--target' => 'js/routes.js'));
             case 'localization':
                 return $this->handleAjaxAction('oro:localization:dump');
             case 'assets':
@@ -48,6 +32,18 @@ class InstallationStep extends AbstractStep
                 return $this->handleAjaxAction('oro:translation:dump');
             case 'requirejs':
                 return $this->handleAjaxAction('oro:requirejs:build');
+            case 'finish':
+                $this->get('event_dispatcher')->dispatch(InstallerEvents::FINISH);
+                // everything was fine - update installed flag in parameters.yml
+                $dumper = $this->get('oro_installer.yaml_persister');
+                $params = $dumper->parse();
+                $params['system']['installed'] = date('c');
+                $dumper->dump($params);
+                // launch 'cache:clear' to set installed flag in DI container
+                // suppress warning: ini_set(): A session is active. You cannot change the session
+                // module's ini settings at this time
+                error_reporting(E_ALL ^ E_WARNING);
+                return $this->handleAjaxAction('cache:clear');
         }
 
         return $this->render(

@@ -11,16 +11,15 @@ Table of Contents
    - [Attribute](#attribute)
    - [Condition](#condition)
    - [Condition Factory](#condition-factory)
-   - [Post Action](#post-action)
-   - [Post Action Factory](#post-action-factory)
+   - [Action](#action)
+   - [Action Factory](#action-factory)
  - [Entity Assemblers](#entity-assemblers)
    - [Workflow Assembler](#workflow-assembler)
    - [Step Assembler](#step-assembler)
    - [Transition Assembler](#transition-assembler)
    - [Attribute Assembler](#attribute-assembler)
    - [Condition Assembler](#condition-assembler)
-   - [Post Action Assembler](#post-action-assembler)
-   - [Post Action Assembler](#post-action-assembler)
+   - [Action Assembler](#action-assembler)
  - [Database Entities](#database-entities)
    - [Workflow Definition](#workflow-definition)
    - [Workflow Definition Repository](#workflow-definition-repository)
@@ -28,8 +27,12 @@ Table of Contents
    - [Workflow Item Repository](#workflow-item-repository)
    - [Workflow Bind Entity](#workflow-bind-entity)
  - [Support Entities](#support-entities)
+   - [Workflow Manager](#workflow-manager)
    - [Workflow Data](#workflow-data)
    - [Workflow Result](#workflow-result)
+   - [Step Manager](#step-manager)
+   - [Transition Manager](#transition-manager)
+   - [Attribute Manager](#attribute-manager)
    - [Context Accessor](#context-accessor)
    - [Entity Binder](#entity-binder)
    - [Workflow Configuration](#workflow-configuration)
@@ -50,21 +53,23 @@ Oro\Bundle\WorkflowBundle\Model\Workflow
 **Description:**
 Encapsulates all logic of workflow, contains lists of steps, attributes and transitions. Create instance of
 Workflow Item, performs transition if it's allowed, gets allowed transitions and start transitions.
-Delegates operations with aggregated domain models to corresponding managers, such as StepManager, TransitionManager
-and AttributeManager
+Delegates operations with aggregated domain models to corresponding managers, such as Step Manager, Transition Manager
+and Attribute Manager
 
 **Methods:**
 * **transit(WorkflowItem, Transition)** - performs transit with name transitionName for specified WorkflowItem;
-* **isTransitionAllowed(WorkflowItem, Transition)** - calculates whether transition is allowed for specified WorkflowItem;
-* **start(data, Transition)** - returns new instance of Workflow Item and processes it's start transition.
-* **getAllowedStartTransitions(data)** - returns a list of allowed start transitions
-* **getAllowedTransitions(WorkflowItem)** - returns a list of allowed transitions
-* **getTransition(transitionName)** - gets Transition by name
-* **getTransitions(transitionName)** - gets all transitions
-* **getBindEntityAttributes()** - gets list of Attributes of bound entities
-* **getManagedEntityAttributes()** - gets list of Attributes of managed entities
-* **getAttributes()** - gets list of all Attributes
-* **getOrderedSteps()** - gets ordered list of all Steps
+* **isTransitionAllowed(WorkflowItem, Transition)** - calculates whether transition is allowed
+for specified WorkflowItem;
+* **isTransitionAvailable(WorkflowItem, transition, errors)** - check whether transitions available for showing
+for specified WorkflowItem;
+* **start(data, Transition)** - returns new instance of Workflow Item and processes it's start transition;
+* **getTransitionsByWorkflowItem(WorkflowItem)** - returns a list of allowed transitions;
+* **getManagedEntityAttributes()** - gets list of Attributes of managed entities;
+* **createWorkflowItem(array data)** - create WorkflowItem instance and initialize it with passed data.
+* **getStepManager()** - get instance of embedded Step Manager;
+* **getAttributeManager()** - get instance of embedded Attribute Manager;
+* **getTransitionManager()** - get instance of embedded Transition Manager;
+* **bindEntities(workflowItem)** - bind all managed entities of specified worklfow item.
 
 Workflow Registry
 -----------------
@@ -98,11 +103,16 @@ Transition
 Oro\Bundle\WorkflowBundle\Model\Transition
 
 **Description:**
-Encapsulates transition parameters, contains condition and post action, has next step property.
+Encapsulates transition parameters, contains init action, condition and post action, has next step property.
 
 **Methods:**
-* **isAllowed(WorkflowItem)** - calculates whether this transition allowed for WorkflowItem;
-* **transit(WorkflowItem)** - performs transition for WorkflowItem.
+* **isPreConditionAllowed(WorkflowItem, errors)** - check whether preconditions allowed
+and optionally returns list of errors;
+* **isAllowed(WorkflowItem, errors)** - calculates whether this transition allowed for WorkflowItem
+and optionally returns list of errors;
+* **isAvailable(WorkflowItem, errors)** - check whether this transition should be shown;
+* **transit(WorkflowItem)** - performs transition for WorkflowItem;
+* **hasForm()** - if transition has form or not.
 
 Attribute
 ---------
@@ -135,28 +145,28 @@ Creates instances of Transition Conditions based on type (alias) and options.
 **Methods:**
 * **create(type, options)** - creates specific instance of Transition Condition.
 
-Post Action
+Action
 -----------
 **Interface:**
-Oro\Bundle\WorkflowBundle\Model\PostAction\PostActionInterface
+Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface
 
 **Description:**
-Basic interface for Transition Post Actions. Detailed description
+Basic interface for Transition Actions. Detailed description
 
 **Methods:**
-* **initialize(options)** - initialize specific post action based on input options;
-* **execute(context)** - execute specific post action for current context (usually context is WorkflowItem).
+* **initialize(options)** - initialize specific action based on input options;
+* **execute(context)** - execute specific action for current context (usually context is WorkflowItem instance).
 
-Post Action Factory
+Action Factory
 -------------------
 **Class:**
-Oro\Bundle\WorkflowBundle\Model\PostAction\PostActionFactory
+Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory
 
 **Description:**
-Creates instances of Transition Post Actions based on type (alias) and options.
+Creates instances of Transition Actions based on type (alias) and options.
 
 **Methods:**
-* **create(type, options)** - creates specific instance of Transition Post Action.
+* **create(type, options)** - creates specific instance of Transition Action.
 
 Entity Assemblers
 =================
@@ -191,7 +201,7 @@ Oro\Bundle\WorkflowBundle\Model\TransitionAssembler
 
 **Description:**
 Creates instances of Transitions based on transition configuration, transition definition configuration and list of
-Step entities. Uses Condition Factory and Post Action Factory to create configurable conditions and post actions.
+Step entities. Uses Condition Factory and Action Factory to create configurable conditions and actions.
 
 **Methods:**
 * **assemble(configuration, definitionsConfiguration, steps)** - assemble and returns list of Transitions.
@@ -218,16 +228,16 @@ Recursively walks through Condition configuration and creates instance of approp
 **Methods:**
 assemble(configuration) - assemble configuration and returns root Condition instance.
 
-Post Action Assembler
+Action Assembler
 ---------------------
 **Class:**
-Oro\Bundle\WorkflowBundle\Model\PostAction\PostActionAssembler
+Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler
 
 **Description:**
-Walks through Post Action configuration and creates instance of appropriate Post Actions using Post Action Factory.
+Walks through Action configuration and creates instance of appropriate Actions using Action Factory.
 
 **Methods:**
-* **assemble(configuration)** - assemble configuration and returns instance of list Post Action.
+* **assemble(configuration)** - assemble configuration and returns instance of list Action.
 
 Database Entities
 =================
@@ -257,7 +267,7 @@ Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
 
 **Description:**
 Specific instance of Workflow, contains state of workflow - data as instance of WorkflowData,
-temporary storage of result of last applied transition post actions as instance of WorkflowResult, current step name,
+temporary storage of result of last applied transition actions as instance of WorkflowResult, current step name,
 list of related entities as list of WorkflowBindEntity entities, log of all applied transitions as list of
 WorkflowTransitionRecord entities.
 
@@ -285,6 +295,36 @@ of Workflow.
 
 Support Entities
 ================
+
+Workflow Manager
+----------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Model\WorkflowManager
+
+**Description:**
+Main entry point for client to work with workflows. Provides lots of useful methods that should be used in controllers
+and specific implementations.
+
+**Methods:**
+* **getStartTransitions(workflow)** - returns list of start transition of specified workflow;
+* **isStartTransitionAvailable(workflow, transition, entity, errors)** - check whether specified start transition
+is allowed for current workflow, optionally returns list of errors;
+* **getTransitionsByWorkflowItem(WorkflowItem)** - get list of all possible (allowed and not allowed) transitions
+for specified WorkflowItem;
+* **isTransitionAvailable(WorkflowItem, transition, errors)** - check if current transition is allowed for
+specified workflow item, optionally returns list of errors;
+* **startWorkflow(workflow, entity, transition, data)** - start workflow for input entity using start transition
+and workflow data as array;
+* **transit(WorkflowItem, transition)** - perform transition for specified workflow item;
+* **getApplicableWorkflows(entity, workflowItems, workflowName)** - returns list of workflows that can be started
+for specified entity;
+* **getWorkflowItemsByEntity(entity, workflowName, workflowType)** - get list of all workflow items by input entity;
+* **isAllManagedEntitiesSpecified(WorkflowItem)** - returns "false" if some of required managed entities
+are not specified;
+* **getWorkflowData(Workflow, entity, data)** - get array filled with calculated workflow data based on
+input entity and data;
+* **getWorkflow(workflowIdentifier)** - get workflow instance by workflow name, workflow instance of workflow item.
+
 Workflow Data
 -------------
 **Class:**
@@ -299,8 +339,46 @@ Workflow Result
 Oro\Bundle\WorkflowBundle\Model\WorkflowResult
 
 **Description:**
-Container of results of last applied transition post actions. This data is not persistable so it can be used only once
+Container of results of last applied transition actions. This data is not persistable so it can be used only once
 right after successful transition.
+
+Step Manager
+-----------
+**Class:**
+Oro\Bundle\WorkflowBundle\Model\StepManager
+
+**Description:**
+StepManaged is a container for steps, is provides getters, setters and list of additional functions applicable to steps.
+
+**Methods:**
+* **getOrderedSteps()** - get list of steps sorted by rendering order.
+
+Transition Manager
+-----------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Model\TransitionManager
+
+**Description:**
+TransitionManager is a container for transitions, is provides getters, setters
+and list of additional functions applicable to transitions.
+
+**Methods:**
+* **extractTransition(transition)** - converts transition name to transition instance;
+* **getStartTransitions()** - get list of start transitions.
+
+Attribute Manager
+----------------
+**Class:**
+Oro\Bundle\WorkflowBundle\Model\AttributeManager
+
+**Description:**
+AttributeManager is a container for attributes, is provides getters, setters
+and list of additional functions applicable to attributes.
+
+**Methods:**
+* **getManagedEntityAttributes()** - git list of attributes that contain managed entities;
+* **getBindEntityAttributes()** - git list of attributes that should be bound;
+* **getBindEntityAttributeNames()** - git list of the names of attributes that should be bound.
 
 Context Accessor
 ----------------
@@ -308,7 +386,7 @@ Context Accessor
 Oro\Bundle\WorkflowBundle\Model\ContextAccessor
 
 **Description:**
-Context is used in post action and conditions and thereby it's usually an instance of Workflow Item.
+Context is used in action and conditions and thereby it's usually an instance of Workflow Item.
 This class is a simple helper that encapsulates logic of accessing properties of context using
 Symfony\Component\PropertyAccess\PropertyAccessor.
 
