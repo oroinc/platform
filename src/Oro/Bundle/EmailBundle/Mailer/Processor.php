@@ -51,6 +51,7 @@ class Processor
      */
     public function process(Email $model, $originName = InternalEmailOrigin::BAP)
     {
+        $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
         $message = $this->mailer->createMessage();
         $message->setDate($messageDate->getTimestamp());
@@ -80,6 +81,20 @@ class Processor
         $email->setEmailBody($emailBody);
         $this->emailEntityBuilder->getBatch()->persist($this->em);
         $this->em->flush();
+    }
+
+    /**
+     * @param Email $model
+     * @throws \InvalidArgumentException
+     */
+    protected function assertModel(Email $model)
+    {
+        if (!$model->getFrom()) {
+            throw new \InvalidArgumentException('Sender can not be empty');
+        }
+        if (!$model->getTo()) {
+            throw new \InvalidArgumentException('Recipient can not be empty');
+        }
     }
 
     /**
