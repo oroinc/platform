@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle\Translation;
 
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Symfony\Component\Translation\Translator;
 
 class ConfigTranslator implements LoaderInterface
 {
@@ -37,21 +38,44 @@ class ConfigTranslator implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
+        $resource = $resource;
+
+
         //Load on the db for the specified local
-        $language = $this->languageRepository->getLanguage($locale);
+        //$language = $this->languageRepository->getLanguage($locale);
 
-        $translations = $this->transaltionRepository->getTranslations($language, $domain);
+        //$translations = $this->transaltionRepository->getTranslations($language, $domain);
 
-        $catalogue = new MessageCatalogue($locale);
+        //$catalogue = new MessageCatalogue($locale);
 
         /** @ var $translation Frtrains\CommonbBundle\Entity\LanguageTranslation */
         /*foreach($translations as $translation){
             $catalogue->set($translation->getLanguageToken()->getToken(), $translation->getTranslation(), $domain);
         }*/
 
-        return $catalogue;
+        //return $catalogue;
     }
 
+    /**
+     * Retrieve all locale-domain combinations and add them as a resource to the translator.
+     *
+     * @param Translator $translator
+     *
+     * @throws \RuntimeException
+     */
+    public function registerResources(Translator $translator)
+    {
+        /*
+        $stmt = $this->getResourcesStatement();
+        if (false === $stmt->execute()) {
+            throw new \RuntimeException('Could not fetch translation data from database.');
+        }
+        $stmt->bindColumn('locale', $locale);
+        $stmt->bindColumn('domain', $domain);
+        */
 
 
+        $translator->addResource('pdo', $this, $locale, $domain);
+
+    }
 }

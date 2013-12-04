@@ -66,7 +66,7 @@ class Translator extends BaseTranslator
 
         foreach ($configTranslations as $key => $alias) {
             //$config = $configManager->getConfigByAlias($alias);
-            //$translations['messages'][$key] = 'qwerty';
+            $translations['messages'][$key] = 'qwerty';
         }
 
 
