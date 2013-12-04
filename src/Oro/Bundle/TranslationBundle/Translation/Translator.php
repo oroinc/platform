@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 class Translator extends BaseTranslator
@@ -50,25 +49,6 @@ class Translator extends BaseTranslator
                 }
             }
         }
-
-        /**
-         * Retrieve label from config
-         */
-        /** @var ConfigProvider */
-        $configManager      = $this->container->get('oro_entity_config.provider.entity');
-        $messages           = isset ($translations['messages']) ? $translations['messages'] : [];
-        $configTranslations = array_filter(
-            $messages,
-            function ($message) {
-                return preg_match('/^\%(.*)\%$/', $message);
-            }
-        );
-
-        foreach ($configTranslations as $key => $alias) {
-            //$config = $configManager->getConfigByAlias($alias);
-            $translations['messages'][$key] = 'qwerty';
-        }
-
 
         return $translations;
     }
