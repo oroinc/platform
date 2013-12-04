@@ -43,27 +43,29 @@ class Processor
     }
 
     /**
-     * Process email model
+     * Process email model sending.
      *
      * @param Email $model
+     * @param string $originName
      * @throws \Swift_SwiftException
      */
-    public function process(Email $model)
+    public function process(Email $model, $originName = InternalEmailOrigin::BAP)
     {
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $message     = $this->mailer->createMessage();
+        $message = $this->mailer->createMessage();
         $message->setDate($messageDate->getTimestamp());
         $message->setFrom($this->getAddresses($model->getFrom()));
         $message->setTo($this->getAddresses($model->getTo()));
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), 'text/plain');
-        $sent = $this->mailer->send($message);
-        if (!$sent) {
+
+        if (!$this->mailer->send($message)) {
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
-        $origin = $this->em->getRepository('OroEmailBundle:InternalEmailOrigin')
-            ->findOneBy(array('name' => InternalEmailOrigin::BAP));
+        $origin = $this->em
+            ->getRepository('OroEmailBundle:InternalEmailOrigin')
+            ->findOneBy(array('name' => $originName));
         $this->emailEntityBuilder->setOrigin($origin);
         $email = $this->emailEntityBuilder->email(
             $model->getSubject(),
