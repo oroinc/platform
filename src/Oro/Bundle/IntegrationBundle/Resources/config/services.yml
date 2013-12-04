@@ -11,6 +11,8 @@ parameters:
     oro_integration.provider.channel_type.simple.class:                   Oro\Bundle\IntegrationBundle\Provider\SimpleChannelType
     oro_integration.provider.simple_transport.class:                      Oro\Bundle\IntegrationBundle\Provider\SimpleTransport
 
+    oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
+
 services:
     oro_integration.channel.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -41,13 +43,21 @@ services:
         arguments:
             - []
 
+    # job executor
+    oro_integration.job_executor:
+        class: %oro_integration.job_executor.class%
+        arguments:
+            - @oro_batch.connectors
+            - @oro_importexport.context_registry
+            - @doctrine
+
     # sync processor
     oro_integration.sync.processor:
         class: %oro_integration.sync.processor.class%
         arguments:
           - @doctrine.orm.entity_manager
           - @oro_importexport.processor.registry
-          - @oro_importexport.job_executor
+          - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
 
     oro_integration.provider.channel_type.simple:
@@ -59,5 +69,4 @@ services:
         class: %oro_integration.provider.simple_transport.class%
         tags:
             - { name: oro_integration.transport, type: simple, channel_type: simple }
-
 
