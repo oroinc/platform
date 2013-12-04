@@ -1,0 +1,8 @@
+query_designer:
+    filters:
+        filter1:
+            applicable: [{type: text}]
+        filter3:
+            type:       number
+        filter4:
+            query_type: [type2]

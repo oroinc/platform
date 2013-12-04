@@ -1,0 +1,16 @@
+query_designer:
+    filters:
+        filter1:
+            applicable: [{type: string}]
+            type:       string
+            query_type: ~
+        filter2:
+            applicable: [{entity: TestEntity, field: TestField}]
+            type:       string
+        filter3:
+            applicable: [{type: integer}]
+            type:       integer
+        filter4:
+            applicable: [{type: boolean}]
+            type:       boolean
+            query_type: ['type1']

@@ -1,17 +1,21 @@
-query-designer:
+query_designer:
     filters:
         string:
             applicable: [{type: string}, {type: text}]
             type:       string
+            query_type: ~
         number:
             applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
             type:       number
+            query_type: ~
         date:
             applicable: [{type: date}]
             type:       date
+            query_type: ~
         datetime:
             applicable: [{type: datetime}]
             type:       datetime
         boolean:
             applicable: [{type: boolean}]
             type:       boolean
+            query_type: ~

@@ -4,8 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Processor;
 
 class Manager
 {
@@ -26,7 +24,7 @@ class Manager
         SystemAwareResolver $resolver
     ) {
         $resolver->resolve($config);
-        $this->config = ConfigurationObject::create($config['query-designer']);
+        $this->config = ConfigurationObject::create($config);
     }
 
     /**
@@ -36,11 +34,6 @@ class Manager
      */
     public function getMetadata()
     {
-        $this->validateConfiguration(
-            new Configuration(array_keys($this->filters)),
-            $this->config->toArray()
-        );
-
         $filtersMetadata = [];
         $filters         = $this->getFilters();
         foreach ($filters as $filter) {
@@ -121,23 +114,5 @@ class Manager
         $filter->init($name, $config);
 
         return $filter;
-    }
-
-    /**
-     * Validate configuration
-     *
-     * @param ConfigurationInterface $configuration
-     * @param array                  $config
-     *
-     * @return array
-     */
-    protected function validateConfiguration(ConfigurationInterface $configuration, $config)
-    {
-        $processor = new Processor();
-
-        return $processor->processConfiguration(
-            $configuration,
-            $config
-        );
     }
 }
