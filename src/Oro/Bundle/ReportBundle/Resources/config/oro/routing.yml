@@ -1,0 +1,11 @@
+oro_report:
+    resource:     "@OroReportBundle/Controller"
+    type:         annotation
+    prefix:       /report
+
+oro_report_api:
+    resource:     "@OroReportBundle/Resources/config/oro/routing_api.yml"
+    type: rest
+    prefix: api/rest/{version}
+    defaults:
+        version:  latest
