@@ -57,4 +57,14 @@ abstract class AbstractConnector implements ConnectorInterface
 
         return $this->transport->call($action, $params);
     }
+
+    /**
+     * Does not allow to serialize
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [];
+    }
 }

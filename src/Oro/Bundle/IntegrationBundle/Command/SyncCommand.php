@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Command;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
@@ -35,7 +36,7 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
     public function configure()
     {
         $this
-            ->setName('oro:cron:integration:sync')
+            ->setName('oro:cron:channels:sync')
             ->setDescription('Sync entities (currently only importing magento customers)');
     }
 
@@ -86,12 +87,23 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
 
         /** @var Channel $channel */
         foreach ($channels as $channel) {
-            $output->writeln(sprintf('Run sync for "%s" channel.', $channel->getName()));
+            try {
+                $output->writeln(sprintf('Run sync for "%s" channel.', $channel->getName()));
 
-            $this->getContainer()
-                ->get(self::SYNC_PROCESSOR)
-                ->setLogClosure($closure)
-                ->process($channel->getName(), true);
+                $this->getContainer()
+                    ->get(self::SYNC_PROCESSOR)
+                    ->setLogClosure($closure)
+                    ->process($channel->getName(), true);
+            } catch (\Exception $e) {
+                //process another channel even in case if exception thrown
+                if ($output instanceof ConsoleOutputInterface) {
+                    $this->getApplication()->renderException($e, $output->getErrorOutput());
+                } else {
+                    $this->getApplication()->renderException($e, $output);
+                }
+
+                continue;
+            }
         }
 
         $output->writeln('Completed');

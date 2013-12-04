@@ -97,7 +97,7 @@ class SyncProcessor implements SyncProcessorInterface
                     //'logger'         => $this->loggingClosure,
                 ],
             ];
-            $result        = $this->processImport($mode, $jobName, $configuration);
+            $result = $this->processImport($mode, $jobName, $configuration);
             // save last sync datetime
             $this->saveLastSyncDate($mode, $channel->getTransport());
             $this->log($result);
