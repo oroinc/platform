@@ -26,61 +26,56 @@ abstract class AbstractQueryDesignerType extends AbstractType
                     'constraints' => array(
                         new FilterLogicConstraint(),
                     ),
-                    'required' => false,
-                    'mapped' => false
+                    'required'    => false,
+                    'mapped'      => false
                 )
             );
 
         $factory = $builder->getFormFactory();
+        $that    = $this;
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($factory) {
+            function (FormEvent $event) use ($that, $factory) {
                 $form = $event->getForm();
                 /** @var AbstractQueryDesigner $data */
                 $data = $event->getData();
+                if ($data) {
+                    $entity = $data->getEntity();
+                } else {
+                    $entity = null;
+                }
+                $that->addFields($form, $factory, $entity);
+            }
+        );
 
-                $form->add(
-                    $factory->createNamed(
-                        'column',
-                        'oro_query_designer_column',
-                        null,
-                        array(
-                            'mapped'             => false,
-                            'column_choice_type' => $form->getConfig()->getOption('column_column_choice_type'),
-                            'entity'             => $data ? $data->getEntity() : null,
-                            'auto_initialize'    => false
-                        )
-                    )
-                );
-                $form->add(
-                    $factory->createNamed(
-                        'filter',
-                        'oro_query_designer_filter',
-                        null,
-                        array(
-                            'mapped'             => false,
-                            'column_choice_type' => $form->getConfig()->getOption('filter_column_choice_type'),
-                            'entity'             => $data ? $data->getEntity() : null,
-                            'auto_initialize'    => false
-                        )
-                    )
-                );
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($that, $factory) {
+                $form = $event->getForm();
+                /** @var AbstractQueryDesigner $data */
+                $data = $event->getData();
+                if ($data) {
+                    $entity = $data['entity'];
+                } else {
+                    $entity = null;
+                }
+                $that->addFields($form, $factory, $entity);
             }
         );
 
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
             function (FormEvent $event) {
-                $form = $event->getForm();
+                $form        = $event->getForm();
                 $filterLogic = $form['filters_logic']->getData();
-                $definition = $form['definition']->getData();
+                $definition  = $form['definition']->getData();
 
                 $definition = json_decode($definition);
 
                 $digits = [];
                 preg_match_all('!\d+!', $filterLogic, $digits);
-                if (isset($digits[0])) {
-                    $maxDigit = max($digits[0]);
+                if (isset($digits[0]) && !empty($digits[0])) {
+                    $maxDigit     = max($digits[0]);
                     $filtersCount = count($definition->filters);
 
                     if ($maxDigit > $filtersCount) {
@@ -91,7 +86,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
                         );
                     }
 
-                    for ($i = 1; $i<=$filtersCount; $i++) {
+                    for ($i = 1; $i <= $filtersCount; $i++) {
                         if (!in_array($i, $digits[0])) {
                             $form['filters_logic']->addError(
                                 new FormError(
@@ -117,5 +112,42 @@ abstract class AbstractQueryDesignerType extends AbstractType
                 'column_column_choice_type' => 'oro_entity_field_choice',
                 'filter_column_choice_type' => 'oro_entity_field_choice'
             );
+    }
+
+    /**
+     * Adds column and filters sub forms
+     *
+     * @param $form
+     * @param $factory
+     * @param null $entity
+     */
+    protected function addFields($form, $factory, $entity = null)
+    {
+        $form->add(
+            $factory->createNamed(
+                'column',
+                'oro_query_designer_column',
+                null,
+                array(
+                    'mapped'             => false,
+                    'column_choice_type' => $form->getConfig()->getOption('column_column_choice_type'),
+                    'entity'             => $entity ? $entity : null,
+                    'auto_initialize'    => false
+                )
+            )
+        );
+        $form->add(
+            $factory->createNamed(
+                'filter',
+                'oro_query_designer_filter',
+                null,
+                array(
+                    'mapped'             => false,
+                    'column_choice_type' => $form->getConfig()->getOption('filter_column_choice_type'),
+                    'entity'             => $entity ? $entity : null,
+                    'auto_initialize'    => false
+                )
+            )
+        );
     }
 }

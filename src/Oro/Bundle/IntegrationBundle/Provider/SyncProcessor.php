@@ -5,11 +5,11 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 
 class SyncProcessor implements SyncProcessorInterface
 {
@@ -22,7 +22,7 @@ class SyncProcessor implements SyncProcessorInterface
     /** @var ProcessorRegistry */
     protected $processorRegistry;
 
-    /** @var JobExecutor */
+    /** @var Executor */
     protected $jobExecutor;
 
     /** @var TypesRegistry */
@@ -34,13 +34,13 @@ class SyncProcessor implements SyncProcessorInterface
     /**
      * @param EntityManager     $em
      * @param ProcessorRegistry $processorRegistry
-     * @param JobExecutor       $jobExecutor
+     * @param Executor          $jobExecutor
      * @param TypesRegistry     $registry
      */
     public function __construct(
         EntityManager $em,
         ProcessorRegistry $processorRegistry,
-        JobExecutor $jobExecutor,
+        Executor $jobExecutor,
         TypesRegistry $registry
     ) {
         $this->em                = $em;
@@ -97,7 +97,7 @@ class SyncProcessor implements SyncProcessorInterface
                     //'logger'         => $this->loggingClosure,
                 ],
             ];
-            $result = $this->processImport($mode, $jobName, $configuration);
+            $result        = $this->processImport($mode, $jobName, $configuration);
             // save last sync datetime
             $this->saveLastSyncDate($mode, $channel->getTransport());
             $this->log($result);
@@ -105,7 +105,7 @@ class SyncProcessor implements SyncProcessorInterface
     }
 
     /**
-     * @param string $mode
+     * @param string    $mode
      * @param Transport $transport
      */
     protected function saveLastSyncDate($mode, Transport $transport)
@@ -170,11 +170,11 @@ class SyncProcessor implements SyncProcessorInterface
         }
 
         return [
-            'success'      => $jobResult->isSuccessful() && empty($counts['errors']),
-            'message'      => $message,
-            'exceptions'   => $jobResult->getFailureExceptions(),
-            'counts'       => $counts,
-            'errors'       => $errorsAndExceptions,
+            'success'    => $jobResult->isSuccessful() && empty($counts['errors']),
+            'message'    => $message,
+            'exceptions' => $jobResult->getFailureExceptions(),
+            'counts'     => $counts,
+            'errors'     => $errorsAndExceptions,
         ];
     }
 
