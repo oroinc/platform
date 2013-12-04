@@ -78,13 +78,9 @@ class SendEmail extends AbstractAction
     protected function executeAction($context)
     {
         $email = new Email();
-        $email->setFrom(
-            $this->contextAccessor->getValue($context, $this->getEmailAddress($this->options['from']))
-        );
+        $email->setFrom($this->getEmailAddress($context, $this->options['from']));
         $email->setTo(
-            array(
-                $this->contextAccessor->getValue($context, $this->getEmailAddress($this->options['to']))
-            )
+            array($this->getEmailAddress($context, $this->options['to']))
         );
         $email->setSubject(
             $this->contextAccessor->getValue($context, $this->options['subject'])
@@ -99,16 +95,21 @@ class SendEmail extends AbstractAction
     /**
      * Get email address prepared for sending.
      *
+     * @param mixed $context
      * @param string|array $data
      * @return string
      */
-    protected function getEmailAddress($data)
+    protected function getEmailAddress($context, $data)
     {
         $name = null;
-        $emailAddress = $data;
+        $emailAddress = $this->contextAccessor->getValue($context, $data);
+
         if (is_array($data)) {
-            $emailAddress = $data['email'];
+            $emailAddress = $this->contextAccessor->getValue($context, $data['email']);
+
             if (array_key_exists('name', $data)) {
+                $data['name'] = $this->contextAccessor->getValue($context, $data['name']);
+
                 if (is_object($data['name'])) {
                     $name = $this->nameFormatter->format($data['name']);
                 } else {
