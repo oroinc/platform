@@ -1,0 +1,36 @@
+{% extends 'OroDistributionBundle::base.html.twig' %}
+
+{% block title %}List of available updates{% endblock %}
+
+{% block body %}
+
+    <table class="table">
+        <col width="30%" valign="top"/>
+        <col width="30%" valign="top"/>
+        <col width="30%" valign="top"/>
+        <col width="10%" valign="top"/>
+        <thead>
+        <tr>
+            <th>Package name</th>
+            <th>Installed version</th>
+            <th>Up to date version</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for update in updates %}
+            <tr>
+                <td>{{ update.packageName }}</td>
+                <td>{{ update.currentVersionString }}</td>
+                <td>{{ update.upToDateVersionString }}</td>
+                <td><a href="#" class="ajax update">Update</a></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4"><em>Nothing to update</em></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

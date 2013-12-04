@@ -6,6 +6,7 @@ parameters:
     oro_distribution.composer.io.class:                    Composer\IO\BufferIO
     oro_distribution.composer.installer.class:             Composer\Installer
     oro_distribution.composer.installation_manager.class:  Composer\Installer\InstallationManager
+    oro_distribution.composer_json:                        %kernel.root_dir%/../composer.json
 
 services:
     oro_distribution.routing_loader:
@@ -23,7 +24,7 @@ services:
           - @oro_distribution.composer.installer
           - @oro_distribution.composer.io
           - @oro_distribution.script_runner
-          - %kernel.root_dir%/../composer.json
+          - %oro_distribution.composer_json%
 
     oro_distribution.script_runner:
         class: %oro_distribution.script_runner.class%
@@ -45,7 +46,7 @@ services:
         class: %oro_distribution.composer.class%
         factory_class: Composer\Factory
         factory_method: create
-        arguments: [@oro_distribution.composer.io]
+        arguments: [@oro_distribution.composer.io, %oro_distribution.composer_json%]
 
     oro_distribution.composer.installation_manager:
         class: %oro_distribution.composer.installation_manager.class%

@@ -1,0 +1,35 @@
+{% extends 'OroDistributionBundle::base.html.twig' %}
+
+{% block title %}List of installed packages{% endblock %}
+
+{% block body %}
+
+    <table class="table">
+        <col width="50%" valign="top"/>
+        <col width="25%" valign="top"/>
+        <col width="25%" valign="top"/>
+        <thead>
+        <tr>
+            <th>Package name</th>
+            <th>Package version</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for package in packages %}
+            <tr>
+                <td>{{ package.prettyName }}</td>
+                <td>{{ package.prettyVersion }}</td>
+                <td><a href="#" class="ajax uninstall" data-params='{"packageName": "{{ package.prettyName }}" }'>Uninstall</a></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3"><em>Nothing installed</em></td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endblock %}
+

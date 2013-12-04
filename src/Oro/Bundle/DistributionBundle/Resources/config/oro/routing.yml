@@ -1,0 +1,3 @@
+oro_distribution_bundle:
+    resource: "@OroDistributionBundle/Controller"
+    type: annotation

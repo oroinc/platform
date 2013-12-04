@@ -1,0 +1,31 @@
+{% extends 'OroDistributionBundle::base.html.twig' %}
+
+{% block title %}List of available packages{% endblock %}
+
+{% block body %}
+
+    <table class="table">
+        <col width="75%" valign="top"/>
+        <col width="25%" valign="top"/>
+        <thead>
+        <tr>
+            <th>Package name</th>
+            <th>&nbsp;</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for package in packages %}
+            <tr>
+                <td>{{ package }}</td>
+                <td><a href="#" class="ajax install">Install</a></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="2"><em>Nothing available</em></td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endblock %}
