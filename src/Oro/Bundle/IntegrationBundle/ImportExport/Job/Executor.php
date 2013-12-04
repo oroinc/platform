@@ -30,29 +30,24 @@ class Executor extends JobExecutor
         $jobResult = new JobResult();
         $jobResult->setSuccessful(false);
 
-        //$this->entityManager->beginTransaction();
         try {
             $job = $this->jobRegistry->getJob($jobInstance);
             if (!$job) {
                 throw new RuntimeException(sprintf('Can\'t find job "%s"', $jobName));
             }
 
-            // TODO: Refactor whole logic of job execution to perform actions in transactions
             $job->execute($jobExecution);
 
             $failureExceptions = $this->collectFailureExceptions($jobExecution);
 
             if ($jobExecution->getStatus()->getValue() == BatchStatus::COMPLETED && !$failureExceptions) {
-                //$this->entityManager->commit();
                 $jobResult->setSuccessful(true);
             } else {
-                $this->entityManager->rollback();
                 foreach ($failureExceptions as $failureException) {
                     $jobResult->addFailureException($failureException);
                 }
             }
         } catch (\Exception $exception) {
-            //$this->entityManager->rollback();
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
         }

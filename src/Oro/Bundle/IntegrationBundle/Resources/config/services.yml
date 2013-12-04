@@ -12,6 +12,7 @@ parameters:
     oro_integration.provider.simple_transport.class:                      Oro\Bundle\IntegrationBundle\Provider\SimpleTransport
 
     oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
+    oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
 
 services:
     oro_integration.channel.manager.api:
@@ -50,6 +51,13 @@ services:
             - @oro_batch.connectors
             - @oro_importexport.context_registry
             - @doctrine
+
+    # writer
+    oro_integration.writer.persistent_batch_writer:
+        class: %oro_integration.writer.persistent_batch_writer.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_importexport.writer.entity_detach_fixer
 
     # sync processor
     oro_integration.sync.processor:
