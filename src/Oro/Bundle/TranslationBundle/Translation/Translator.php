@@ -27,13 +27,13 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
-        $fallbackCatalogues   = array();
+        $fallbackCatalogues = array();
         $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $fallbackCatalogues[] = $catalogue;
         }
 
-        $domains      = array_flip($domains);
+        $domains = array_flip($domains);
         $translations = array();
         for ($i = count($fallbackCatalogues) - 1; $i >= 0; $i--) {
             $localeTranslations = $fallbackCatalogues[$i]->all();

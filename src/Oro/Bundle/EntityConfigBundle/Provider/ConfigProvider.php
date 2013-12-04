@@ -147,14 +147,6 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @param string $alias
-     */
-    public function getConfigByAlias($alias)
-    {
-        $alias = $alias;
-    }
-
-    /**
      * Creates an instance if Config class which stores configuration data for an object
      * which is represented by the given id.
      * The returned object is initialized with data specified $values argument.

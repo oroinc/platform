@@ -7,8 +7,7 @@ parameters:
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
 
-    oro_entity.translation.config_translator.class: Oro\Bundle\EntityBundle\Translation\ConfigTranslator
-    oro_entity.extractor.php_code_extractor.class:  Oro\Bundle\EntityBundle\Extractor\PhpCodeExtractor
+    oro_entity.translation.config_translator.class:                Oro\Bundle\EntityBundle\Translation\ConfigTranslator
 
 services:
     oro_entity.listener.navigation_listener:
@@ -70,7 +69,6 @@ services:
             - @oro_entity.entity_provider
 
     oro_entity.translation.config_translator.loader:
-    #translation.loader.entity:
         class: %oro_entity.translation.config_translator.class%
         arguments:
             - @oro_entity_config.config_manager
@@ -79,9 +77,3 @@ services:
             - [ registerResources, [ @translator ] ]
         tags:
             - { name: translation.loader, alias: php }
-
-#    oro_entity.extractor.php_code_extractor:
-#        class: %oro_entity.extractor.php_code_extractor.class%
-#        arguments: [@service_container]
-#        tags:
-#            - { name: translation.extractor, alias: oro_entity_php_extractor }
