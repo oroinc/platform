@@ -76,19 +76,11 @@ class ConfigTranslator implements LoaderInterface
             $entityFields = $entityProvider->getIds($entity->getClassName());
             foreach ($entityFields as $field) {
                 $value = $entityProvider->getConfigById($field)->get('label');
+
                 if ($value != Inflector::tableize($field->getFieldName())) {
-
-                    $class = $field->getClassName();
-                    // example: OroCRM\Bundle\ContactBundle\Entity\Contact
-
-                    $class = str_replace(['Bundle', 'Entity'], '', $class);
-                    // example: OroCRM\\Contact\Entity\Contact
-
-                    $class = str_replace('\\\\', '\\', $class);
-                    // example: OroCRM\Contact\Entity\Contact
-
+                    $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $field->getClassName());
                     $classArray = explode('\\', $class);
-                    $keyArray = [];
+                    $keyArray   = [];
 
                     foreach ($classArray as $item) {
                         if (!in_array(Inflector::camelize($item), $keyArray)) {
