@@ -3,19 +3,20 @@ query_designer:
         string:
             applicable: [{type: string}, {type: text}]
             type:       string
-            query_type: ~
+            query_type: [all]
         number:
             applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
             type:       number
-            query_type: ~
+            query_type: [all]
         date:
             applicable: [{type: date}]
             type:       date
-            query_type: ~
+            query_type: [all]
         datetime:
             applicable: [{type: datetime}]
             type:       datetime
+            query_type: [all]
         boolean:
             applicable: [{type: boolean}]
             type:       boolean
-            query_type: ~
+            query_type: [all]

@@ -64,28 +64,28 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $compiler->process($container);
 
         $expected = [
-            'filters' => [
+            'filters'    => [
                 'filter1' => [
                     'applicable' => [
                         ['type' => 'string'],
                         ['type' => 'text'],
                     ],
                     'type'       => 'string',
-                    'query_type' => []
+                    'query_type' => ['all']
                 ],
                 'filter2' => [
                     'applicable' => [
                         ['entity' => 'TestEntity', 'field' => 'TestField']
                     ],
                     'type'       => 'string',
-                    'query_type' => []
+                    'query_type' => ['all']
                 ],
                 'filter3' => [
                     'applicable' => [
                         ['type' => 'integer']
                     ],
                     'type'       => 'number',
-                    'query_type' => []
+                    'query_type' => ['all']
                 ],
                 'filter4' => [
                     'applicable' => [
@@ -94,6 +94,17 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     'type'       => 'boolean',
                     'query_type' => ['type1', 'type2']
                 ],
+            ],
+            'aggregates' => [
+                'aggregate1' => [
+                    'applicable' => [
+                        ['type' => 'integer'],
+                        ['type' => 'smallint'],
+                        ['type' => 'float'],
+                    ],
+                    'function'   => ['MIN', 'MAX', 'COUNT'],
+                    'query_type' => ['type1']
+                ]
             ]
         ];
 

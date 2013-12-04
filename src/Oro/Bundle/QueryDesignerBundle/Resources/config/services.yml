@@ -9,6 +9,7 @@ services:
         arguments:
             - []
             - @oro_querydesigner.provider.resolver
+            - @translator
 
     oro_querydesigner.provider.resolver:
         class: %oro_querydesigner.provider.resolver.class%

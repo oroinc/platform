@@ -3,14 +3,21 @@ query_designer:
         filter1:
             applicable: [{type: string}]
             type:       string
-            query_type: ~
+            query_type: [all]
         filter2:
             applicable: [{entity: TestEntity, field: TestField}]
             type:       string
+            query_type: [all]
         filter3:
             applicable: [{type: integer}]
             type:       integer
+            query_type: [all]
         filter4:
             applicable: [{type: boolean}]
             type:       boolean
-            query_type: ['type1']
+            query_type: [type1]
+    aggregates:
+        aggregate1:
+            applicable: [{type: integer}, {type: smallint}]
+            function:   [MIN, MAX]
+            query_type: [type1]
