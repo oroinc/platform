@@ -63,7 +63,8 @@ class ConfigTranslator implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $messages = [];
+        $messages               = [];
+        $translatorMessagesKeys = array_keys($this->translator->getTranslations()['messages']);
 
         /** @var MessageCatalogue $catalogue */
         $catalogue = new MessageCatalogue($locale);
@@ -75,21 +76,23 @@ class ConfigTranslator implements LoaderInterface
         foreach ($configEntities as $entity) {
             $entityFields = $entityProvider->getIds($entity->getClassName());
             foreach ($entityFields as $field) {
-                $value = $entityProvider->getConfigById($field)->get('label');
+                $value      = $entityProvider->getConfigById($field)->get('label');
+                $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $field->getClassName());
+                $classArray = explode('\\', $class);
+                $keyArray   = [];
 
-                if ($value != Inflector::tableize($field->getFieldName())) {
-                    $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $field->getClassName());
-                    $classArray = explode('\\', $class);
-                    $keyArray   = [];
-
-                    foreach ($classArray as $item) {
-                        if (!in_array(Inflector::camelize($item), $keyArray)) {
-                            $keyArray[] = Inflector::camelize($item);
-                        }
+                foreach ($classArray as $item) {
+                    if (!in_array(Inflector::camelize($item), $keyArray)) {
+                        $keyArray[] = Inflector::camelize($item);
                     }
-                    $keyArray[] = Inflector::tableize($field->getFieldName());
+                }
+                $keyArray[] = Inflector::tableize($field->getFieldName());
 
-                    $messages[implode('.', $keyArray)] = $value;
+                $key = implode('.', $keyArray);
+                if ($value != Inflector::tableize($field->getFieldName())
+                    || !in_array($key, $translatorMessagesKeys)
+                ) {
+                    $messages[$key] = $value;
                 }
             }
         }
