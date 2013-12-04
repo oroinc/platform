@@ -6,6 +6,12 @@ use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 abstract class AbstractConnector implements ConnectorInterface
 {
+    const ENTITY_NAME     = null;
+    const CONNECTOR_LABEL = null;
+
+    const JOB_VALIDATE_IMPORT = null;
+    const JOB_IMPORT          = null;
+
     /** @var TransportInterface */
     protected $transport;
 
@@ -56,6 +62,36 @@ abstract class AbstractConnector implements ConnectorInterface
         $params = is_array($params) ? $params : [$params];
 
         return $this->transport->call($action, $params);
+    }
+
+    /**
+     * Returns entity name that will be used for matching "import processor"
+     *
+     * @return string
+     */
+    public function getImportEntityFQCN()
+    {
+        return static::ENTITY_NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return static::CONNECTOR_LABEL;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImportJobName($isValidationOnly = false)
+    {
+        if ($isValidationOnly) {
+            return static::JOB_VALIDATE_IMPORT;
+        }
+
+        return static::JOB_IMPORT;
     }
 
     /**
