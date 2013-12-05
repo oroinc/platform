@@ -99,6 +99,7 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
 
     layout.initScrollspy = function (container) {
         if (layout.isMobile()) {
+            layout.replaceScrollspyWithCollapse(container);
             return;
         }
 
@@ -110,6 +111,33 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
             $(this).scrollspy('refresh');
             $('.scrollspy-nav ul.nav li').removeClass('active');
             $('.scrollspy-nav ul.nav li:first').addClass('active');
+        });
+    };
+
+    layout.replaceScrollspyWithCollapse = function (container) {
+        container.find('[data-spy="scroll"]').each(function () {
+            var $spy = $(this);
+            $spy.addClass('accordion');
+
+            $spy.find('.responsive-section').each(function () {
+                var $section = $(this);
+                $section.removeClass('responsive-section').addClass('accordion-group');
+
+                var blockId = $section.find('.scrollspy-nav-target').attr('id');
+                var sel = '#' + blockId + ' + .row-fluid';
+                var href = '#' + blockId + ' + .accordion-body';
+
+                $(sel).removeClass('row-fluid').addClass('accordion-body collapse');
+
+                var $toggle = $section.find('.scrollspy-title');
+                var $link = $('<a class="accordion-toggle" data-toggle="collapse"></a>')
+                    .data('parent', '[data-spy="scroll"]').attr('href', href);
+                $toggle.wrap($link);
+            });
+
+            $spy.find('.collapse').first().addClass('in');
+
+            $spy.collapse();
         });
     };
 
@@ -188,7 +216,7 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
                 width = window.innerWidth;
             }
 
-            return width < 960;
+            return width < 980;
         };
     }());
 
