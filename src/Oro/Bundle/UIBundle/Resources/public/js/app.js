@@ -161,22 +161,8 @@ define(['jquery', 'underscore'], function ($, _) {
         /**
          * Are we currently on mobile
          */
-        isMobile: (function () {
-            var width = null;
-
-            $(function () {
-                if (!width) {
-                    width = window.innerWidth;
-                }
-            });
-
-            return function () {
-                if (!width) {
-                    width = window.innerWidth;
-                }
-
-                return width < 980;
-            };
-        }()),
+        isMobile: function () {
+            return $('body').hasClass('mobile-version');
+        },
     };
 });
