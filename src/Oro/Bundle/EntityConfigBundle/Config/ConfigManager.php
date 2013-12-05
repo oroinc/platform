@@ -92,11 +92,12 @@ class ConfigManager
     protected $configChangeSets;
 
     /**
-     * @param MetadataFactory $metadataFactory
-     * @param EventDispatcher $eventDispatcher
-     * @param ServiceLink $providerBagLink
+     * @param MetadataFactory    $metadataFactory
+     * @param EventDispatcher    $eventDispatcher
+     * @param ServiceLink        $providerBagLink
      * @param ConfigModelManager $modelManager
-     * @param AuditManager $auditManager
+     * @param AuditManager       $auditManager
+     * @param Container          $container
      */
     public function __construct(
         MetadataFactory $metadataFactory,
@@ -207,7 +208,7 @@ class ConfigManager
 
         $result = $this->cache->getConfigurable($className, $fieldName);
         if ($result === false) {
-            $result = (bool)$this->modelManager->findModel($className, $fieldName) ? : null;
+            $result = (bool) $this->modelManager->findModel($className, $fieldName) ? : null;
 
             $this->cache->setConfigurable($result, $className, $fieldName);
         }
