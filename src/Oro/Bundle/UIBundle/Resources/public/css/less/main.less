@@ -4,7 +4,14 @@
 @import "mixins";
 @import "layout";
 @import "oro";
+
+// @TODO move out inclusion address.less
 @import "../../../oroaddress/css/less/address";
+
+// desktop resolution
+@media only screen and (min-width: 980px) {
+  @import "desktop/main";
+}
 // mobile resolution
 @media only screen and (max-width: 979px) {
   @import "mobile/main";
