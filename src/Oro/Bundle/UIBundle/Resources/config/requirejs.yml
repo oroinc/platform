@@ -96,3 +96,4 @@ config:
         'oro/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
         'oro/buttons-widget': 'bundles/oroui/js/widget/buttons-widget.js'
+        'oro/scrollspy': 'bundles/oroui/js/scrollspy.js'

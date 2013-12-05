@@ -14,8 +14,8 @@ require(['oro/mediator'], function (mediator) {
 });
 
 require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
-    'oro/delete-confirmation', 'oro/messenger', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger) {
+    'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 
     /* ============================================================
@@ -178,7 +178,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         var initializeContent = function () {
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
-                if (!layout.isMobile()) {
+                if (!app.isMobile()) {
                     content.css('overflow', 'auto');
                 } else {
                     content.css('overflow', 'hidden');
@@ -203,7 +203,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 el.height(anchorTop - el.position().top - debugBarHeight);
             });
 
-            layout.adjustScrollspy();
+            scrollspy.adjust();
         };
 
         var tries = 0;
