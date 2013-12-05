@@ -1,3 +1,15 @@
+CHANGELOG for 1.0.0-beta5
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-beta5 versions.
+
+* 1.0.0-beta5 (2013-12-05)
+ * ACL management in scope of organization and business unit
+ * "Option Set" Field Type for Entity Field
+ * Form validation improvements
+ * Tabs implementation on entity view pages
+ * Eliminated registry js-component
+ * Implemented responsive markup on most pages
+
 CHANGELOG for 1.0.0-beta4
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-beta4 versions.

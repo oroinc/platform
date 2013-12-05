@@ -96,7 +96,12 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('doctrine:schema:create', $input, $output)
             ->runCommand('oro:entity-config:init', $input, $output)
             ->runCommand('oro:entity-extend:init', $input, $output)
-            ->runCommand('oro:entity-extend:update-config', $input, $output)
+            ->runCommand(
+                'oro:entity-extend:update-config',
+                $input,
+                $output,
+                array('--process-isolation' => true)
+            )
             ->runCommand(
                 'doctrine:schema:update',
                 $input,
@@ -118,6 +123,11 @@ class InstallCommand extends ContainerAwareCommand
             ->get('doctrine.orm.entity_manager')
             ->getRepository('OroUserBundle:Role')
             ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
+
+        $businessUnit = $container
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->findOneBy(array('name' => 'Main'));
 
         $passValidator = function ($value) {
             if (strlen(trim($value)) < 2) {
@@ -149,7 +159,9 @@ class InstallCommand extends ContainerAwareCommand
             ->setLastName($userLastName)
             ->setPlainPassword($userPassword)
             ->setEnabled(true)
-            ->addRole($role);
+            ->addRole($role)
+            ->setOwner($businessUnit)
+            ->addBusinessUnit($businessUnit);
 
         $container->get('oro_user.manager')->updateUser($user);
 
@@ -181,6 +193,7 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->runCommand('oro:search:create-index', $input, $output)
             ->runCommand('oro:navigation:init', $input, $output)
+            ->runCommand('fos:js-routing:dump', $input, $output, array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump', $input, $output)
             ->runCommand('assets:install', $input, $output)
             ->runCommand('assetic:dump', $input, $output)
