@@ -71,17 +71,17 @@
                                         {% placeholder application_menu %}
                                     {% endblock application_menu %}
                                  </div>
+                                <ul class="nav pull-right user-menu">
                                 {% block user_menu %}
-                                    <ul class="nav pull-right user-menu">
-                                        {% placeholder user_menu %}
-                                        {# Disabled notification icon till it will be implemented
-                                        {% block notifications %}
-                                        <li class="divider-vertical small-divider"></li>
-                                        <li><a class="notifications" href="#"><i class="icon-bullhorn"></i><span class="badge badge-important">1</span></a></li>
-                                        {% endblock notifications %}
-                                        #}
-                                    </ul>
+                                    {% placeholder user_menu %}
+                                    {# Disabled notification icon till it will be implemented
+                                    {% block notifications %}
+                                    <li class="divider-vertical small-divider"></li>
+                                    <li><a class="notifications" href="#"><i class="icon-bullhorn"></i><span class="badge badge-important">1</span></a></li>
+                                    {% endblock notifications %}
+                                    #}
                                 {% endblock %}
+                                </ul>
                             </div>
                         </div>
                     </div>
