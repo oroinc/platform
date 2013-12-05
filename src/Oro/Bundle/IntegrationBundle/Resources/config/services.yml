@@ -14,6 +14,8 @@ parameters:
     oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
     oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
 
+    oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
+
 services:
     oro_integration.channel.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -78,3 +80,5 @@ services:
         tags:
             - { name: oro_integration.transport, type: simple, channel_type: simple }
 
+    oro_integration.logger.strategy:
+        class: %oro_integration.logger.strategy.class%

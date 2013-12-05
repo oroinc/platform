@@ -13,8 +13,7 @@ use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 
 class SyncProcessor implements SyncProcessorInterface
 {
-    const DEFAULT_BATCH_SIZE         = 15;
-    const DEFAULT_EMPTY_RANGES_COUNT = 2; // doesn't affect anything yet
+    const DEFAULT_BATCH_SIZE = 15;
 
     /** @var EntityManager */
     protected $em;
@@ -27,9 +26,6 @@ class SyncProcessor implements SyncProcessorInterface
 
     /** @var TypesRegistry */
     protected $registry;
-
-    /** @var \Closure */
-    protected $loggingClosure;
 
     /**
      * @param EntityManager     $em
@@ -52,10 +48,9 @@ class SyncProcessor implements SyncProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process($channelName, $force = false)
+    public function process(Channel $channel, $isValidationOnly = false)
     {
         /** @var Channel $channel */
-        $channel    = $this->getChannelByName($channelName);
         $connectors = $channel->getConnectors();
 
         foreach ($connectors as $connector) {
@@ -63,44 +58,33 @@ class SyncProcessor implements SyncProcessorInterface
                 $realConnector = $this->registry->getConnectorType($channel->getType(), $connector);
             } catch (\Exception $e) {
                 // log and continue
-                $this->log($e->getMessage());
+                /** @TODO log here */
                 continue;
             }
-            if ($force) {
-                $mode    = ProcessorRegistry::TYPE_IMPORT;
-                $jobName = $realConnector->getImportJobName();
-            } else {
-                $mode    = ProcessorRegistry::TYPE_IMPORT_VALIDATION;
-                $jobName = $realConnector->getImportJobName(true);
-            }
+            $mode    = $isValidationOnly ? ProcessorRegistry::TYPE_IMPORT_VALIDATION : ProcessorRegistry::TYPE_IMPORT;
+            $jobName = $realConnector->getImportJobName($isValidationOnly);
 
             $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
                 ProcessorRegistry::TYPE_IMPORT,
                 $realConnector->getImportEntityFQCN()
             );
-            $processorAlias   = reset($processorAliases);
-
-            $realTransport = $this->registry
+            $realTransport    = $this->registry
                 ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
             /** @var ConnectorInterface $realConnector */
             $realConnector->configure($realTransport, $channel->getTransport());
 
             $configuration = [
                 $mode => [
-                    'processorAlias' => $processorAlias,
+                    'processorAlias' => reset($processorAliases),
                     'entityName'     => $realConnector->getImportEntityFQCN(),
                     'channel'        => $channel,
                     'batchSize'      => self::DEFAULT_BATCH_SIZE,
-                    'maxEmptyRanges' => self::DEFAULT_EMPTY_RANGES_COUNT,
                     'connector'      => $realConnector
-                    // @TODO allow to pass logger here
-                    //'logger'         => $this->loggingClosure,
                 ],
             ];
-            $result = $this->processImport($mode, $jobName, $configuration);
+            $this->processImport($mode, $jobName, $configuration);
             // save last sync datetime
             $this->saveLastSyncDate($mode, $channel->getTransport());
-            $this->log($result);
         }
     }
 
@@ -168,6 +152,7 @@ class SyncProcessor implements SyncProcessorInterface
                 100
             );
         }
+        /** @TODO log here */
 
         return [
             'success'    => $jobResult->isSuccessful() && empty($counts['errors']),
@@ -176,52 +161,5 @@ class SyncProcessor implements SyncProcessorInterface
             'counts'     => $counts,
             'errors'     => $errorsAndExceptions,
         ];
-    }
-
-    /**
-     * Get channel entity by it's name
-     *
-     * @param string $channelName
-     *
-     * @throws \Exception
-     * @return Channel
-     */
-    protected function getChannelByName($channelName)
-    {
-        /** @var $item Channel */
-        $channel = $this->em
-            ->getRepository('OroIntegrationBundle:Channel')
-            ->findOneBy(['name' => $channelName]);
-
-        if (!$channel) {
-            throw new \Exception(sprintf('Channel \'%s\' not found', $channelName));
-        }
-
-        return $channel;
-    }
-
-    /**
-     * @param callable $closure
-     *
-     * @return $this
-     */
-    public function setLogClosure(\Closure $closure)
-    {
-        $this->loggingClosure = $closure;
-
-        return $this;
-    }
-
-    /**
-     * @return callable
-     */
-    public function log()
-    {
-        $context = func_get_args();
-
-        if (is_callable($this->loggingClosure)) {
-            $closure = $this->loggingClosure;
-            $closure($context);
-        }
     }
 }

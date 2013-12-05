@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 
 /**
@@ -37,7 +38,7 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
     {
         $this
             ->setName('oro:cron:channels:sync')
-            ->setDescription('Sync entities (currently only importing magento customers)');
+            ->setDescription('Runs synchronization for each configured channel');
     }
 
     /**
@@ -50,33 +51,12 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln($this->getDescription());
-
-        $closure = function ($context) use ($output) {
-            $context   = $context[0]; // first arg
-            $isSuccess = $context['success'] === true;
-            if ($isSuccess) {
-
-            } else {
-                $output->writeln('There was some errors:');
-                foreach ($context['errors'] as $error) {
-                    $output->writeln($error);
-                }
-            }
-            $output->writeln(
-                sprintf(
-                    "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
-                    $context['counts']['read'],
-                    $context['counts']['process'],
-                    $context['counts']['update'],
-                    $context['counts']['add'],
-                    $context['counts']['delete']
-                )
-            );
-        };
+        $strategy = $this->getContainer()
+            ->get('oro_integration.logger.strategy');
+        $strategy->setLogger(new OutputLogger($output));
 
         if ($this->isJobRunning()) {
-            $output->writeln('Job already running. Exit.');
+            $strategy->warning('Job already running. Terminating....');
 
             return 0;
         }
@@ -92,25 +72,23 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
 
                 $this->getContainer()
                     ->get(self::SYNC_PROCESSOR)
-                    ->setLogClosure($closure)
-                    ->process($channel->getName(), true);
+                    ->process($channel);
             } catch (\Exception $e) {
-                //process another channel even in case if exception thrown
                 if ($output instanceof ConsoleOutputInterface) {
                     $this->getApplication()->renderException($e, $output->getErrorOutput());
                 } else {
                     $this->getApplication()->renderException($e, $output);
                 }
 
+                //process another channel even in case if exception thrown
                 continue;
             }
         }
-
-        $output->writeln('Completed');
+        $strategy->info('Completed');
     }
 
     /**
-     * Check that job is not running (from previous schedule)
+     * Check is job running (from previous schedule)
      *
      * @return bool
      */
