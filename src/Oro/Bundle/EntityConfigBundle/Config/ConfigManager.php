@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -91,18 +92,19 @@ class ConfigManager
     protected $configChangeSets;
 
     /**
-     * @param MetadataFactory    $metadataFactory
-     * @param EventDispatcher    $eventDispatcher
-     * @param ServiceLink        $providerBagLink
+     * @param MetadataFactory $metadataFactory
+     * @param EventDispatcher $eventDispatcher
+     * @param ServiceLink $providerBagLink
      * @param ConfigModelManager $modelManager
-     * @param AuditManager       $auditManager
+     * @param AuditManager $auditManager
      */
     public function __construct(
         MetadataFactory $metadataFactory,
         EventDispatcher $eventDispatcher,
         ServiceLink $providerBagLink,
         ConfigModelManager $modelManager,
-        AuditManager $auditManager
+        AuditManager $auditManager,
+        Container $container
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->eventDispatcher = $eventDispatcher;
@@ -112,6 +114,8 @@ class ConfigManager
         $this->persistConfigs   = new \SplObjectStorage();
         $this->originalConfigs  = new ArrayCollection;
         $this->configChangeSets = new ArrayCollection;
+
+        $this->container        = $container;
 
         $this->modelManager = $modelManager;
         $this->auditManager = $auditManager;
@@ -203,7 +207,7 @@ class ConfigManager
 
         $result = $this->cache->getConfigurable($className, $fieldName);
         if ($result === false) {
-            $result = (bool) $this->modelManager->findModel($className, $fieldName) ? : null;
+            $result = (bool)$this->modelManager->findModel($className, $fieldName) ? : null;
 
             $this->cache->setConfigurable($result, $className, $fieldName);
         }
@@ -357,6 +361,16 @@ class ConfigManager
                 $model = $this->modelManager->getModelByConfigId($config->getId());
 
                 $models[$config->getId()->toString()] = $model;
+            }
+
+            if ($changedValues = $this->configChangeSets->getValues()) {
+                foreach ($changedValues as $properties) {
+                    if (in_array('label', array_keys($properties))) {
+                        $cacheDir = $this->container->getParameter('kernel.cache_dir') . '/translations/';
+                        array_map('unlink', glob($cacheDir . 'catalogue*.*'));
+                        break;
+                    }
+                }
             }
 
             //TODO::refactoring
@@ -552,7 +566,7 @@ class ConfigManager
 
             // set missing values with default ones
             $hasChanges = false;
-            $config = $provider->getConfig($className);
+            $config     = $provider->getConfig($className);
             foreach ($defaultValues as $code => $value) {
                 if (!$config->has($code)) {
                     $config->set($code, $value);
@@ -627,7 +641,7 @@ class ConfigManager
 
             // set missing values with default ones
             $hasChanges = false;
-            $config = $provider->getConfig($className, $fieldName);
+            $config     = $provider->getConfig($className, $fieldName);
             foreach ($defaultValues as $code => $value) {
                 if (!$config->has($code)) {
                     $config->set($code, $value);

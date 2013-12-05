@@ -35,6 +35,7 @@ services:
             - @oro_entity_config.link.provider_bag
             - @oro_entity_config.config_model_manager
             - @oro_entity_config.config_audit_mamanger
+            - @service_container
         calls:
             - [setCache, [@oro_entity_config.cache.cache]]
 
