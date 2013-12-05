@@ -89,9 +89,7 @@ class SyncProcessor implements SyncProcessorInterface
                     'connector'      => $realConnector
                 ],
             ];
-            $this->processImport($mode, $jobName, $configuration);
-            // save last sync datetime
-            $this->saveLastSyncDate($mode, $channel->getTransport());
+            $this->processImport($mode, $jobName, $configuration, $channel);
         }
     }
 
@@ -116,13 +114,14 @@ class SyncProcessor implements SyncProcessorInterface
     }
 
     /**
-     * @param string $mode import or validation (dry run, readonly)
-     * @param string $jobName
-     * @param array  $configuration
+     * @param string  $mode import or validation (dry run, readonly)
+     * @param string  $jobName
+     * @param array   $configuration
+     * @param Channel $channel
      *
      * @return array
      */
-    public function processImport($mode, $jobName, $configuration)
+    public function processImport($mode, $jobName, $configuration, Channel $channel)
     {
         $jobResult = $this->jobExecutor->executeJob($mode, $jobName, $configuration);
 
@@ -155,12 +154,15 @@ class SyncProcessor implements SyncProcessorInterface
         }
         $isSuccess = $jobResult->isSuccessful() && empty($counts['errors']);
         if (!$isSuccess) {
-            $this->logger->error('Errors was occurred:');
+            $this->logger->error('Errors were occurred:');
             $this->logger->error(
                 implode(PHP_EOL, $errorsAndExceptions),
                 ['exceptions' => $jobResult->getFailureExceptions()]
             );
         } else {
+            /** @TODO FIXME save date for each connector */
+            // save last sync datetime
+            $this->saveLastSyncDate($mode, $channel->getTransport());
             $this->logger->info(
                 sprintf(
                     "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
