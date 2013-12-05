@@ -13,9 +13,9 @@ use Doctrine\Common\Util\ClassUtils;
 use FOS\Rest\Util\Codes;
 
 abstract class RestController extends RestGetController implements
-     FormAwareInterface,
-     FormHandlerAwareInterface,
-     RestApiCrudInterface
+    FormAwareInterface,
+    FormHandlerAwareInterface,
+    RestApiCrudInterface
 {
     /**
      * Edit entity
@@ -71,6 +71,10 @@ abstract class RestController extends RestGetController implements
         $entity = $this->getManager()->find($id);
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        }
+
+        if (!$this->get('oro_security.security_facade')->isGranted('DELETE', $entity)) {
+            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         }
 
         $em = $this->getManager()->getObjectManager();
