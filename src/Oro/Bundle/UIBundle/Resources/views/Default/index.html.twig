@@ -190,6 +190,13 @@
                     </div>
                 </div>
             {% endblock main %}
+            {% block footer %}
+                <footer id="footer" class="footer">
+                      <div class="alert">
+                          Version: {{ constant('Oro\\Bundle\\PlatformBundle\\OroPlatformBundle::VERSION') }}
+                      </div>
+                </footer>
+            {% endblock footer %}
         </div>
     </div>
     {% placeholder before_body_end %}

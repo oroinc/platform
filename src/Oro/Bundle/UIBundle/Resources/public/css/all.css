@@ -6,8 +6,9 @@
 #top-page{
     width: 100%;
 }
+.footer,footer,
 #footer{
-    display: table-footer-group;
+    display: block;
     width: 100%;
 }
 #footer-frame{
