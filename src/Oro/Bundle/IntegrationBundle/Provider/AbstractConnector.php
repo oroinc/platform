@@ -95,12 +95,29 @@ abstract class AbstractConnector implements ConnectorInterface
     }
 
     /**
-     * Does not allow to serialize
+     * Does not allow to serialize (serialize to empty array)
      *
      * @return array
      */
     public function __sleep()
     {
         return [];
+    }
+
+    /**
+     * @param $object
+     * @return array
+     */
+    protected function objectToArray($object)
+    {
+        if (!is_object($object) && !is_array($object)) {
+            return $object;
+        }
+
+        if (is_object($object)) {
+            $object = get_object_vars($object);
+        }
+
+        return array_map([$this, 'objectToArray'], $object);
     }
 }
