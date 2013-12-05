@@ -1,7 +1,5 @@
-/*jshint browser: true*/
-/*jslint browser: true, nomen: true, todo: true, vars: true*/
 /*global define*/
-
+/*jshint browser: true*/
 define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui-timepicker'], function ($, __) {
     'use strict';
 
@@ -38,13 +36,7 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
         container = $(container || document.body);
         this.styleForm(container);
 
-        container.find('[data-spy="scroll"]').each(function () {
-            var $spy = $(this);
-            $spy.scrollspy($spy.data());
-            $spy = $(this).scrollspy('refresh');
-            $('.scrollspy-nav ul.nav li').removeClass('active');
-            $('.scrollspy-nav ul.nav li:first').addClass('active');
-        });
+        layout.initScrollspy(container);
 
         container.find('[data-toggle="tooltip"]').tooltip();
 
@@ -105,7 +97,25 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
         }
     };
 
+    layout.initScrollspy = function (container) {
+        if (layout.isMobile()) {
+            return;
+        }
+
+        container.find('[data-spy="scroll"]').each(function () {
+            var $spy = $(this);
+            $spy.scrollspy($spy.data());
+            $(this).scrollspy('refresh');
+            $('.scrollspy-nav ul.nav li').removeClass('active');
+            $('.scrollspy-nav ul.nav li:first').addClass('active');
+        });
+    };
+
     layout.adjustScrollspy = function () {
+        if (layout.isMobile()) {
+            return;
+        }
+
         $('[data-spy="scroll"]').each(function () {
             var $spy = $(this);
             var spyHeight = $spy.innerHeight();
@@ -139,6 +149,10 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
     };
 
     layout.scrollspyTop = function () {
+        if (layout.isMobile()) {
+            return;
+        }
+
         $('[data-spy="scroll"]').each(function () {
             var $spy = $(this);
             var targetSelector = $spy.data('target');
