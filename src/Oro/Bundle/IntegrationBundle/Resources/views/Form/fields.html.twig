@@ -1,0 +1,51 @@
+{#
+    Edit channel form
+    Custom renderer needed due to this form should be modified
+    dynamically via ajax depends on type and transportType fields value
+#}
+{% block oro_integration_channel_form_widget %}
+    {{ form_row(form.type) }}
+    {{ form_row(form.name) }}
+
+    {{ form_row(form.transportType) }}
+
+    {% if (form.transport is defined) %}
+        {{ form_widget(form.transport) }}
+    {% endif %}
+
+    {% if (form.connectors is defined) %}
+        <div {% if form.connectors.vars.choices is empty %}{{ 'class="hide"' }}{% endif %}>
+            {{ form_row(form.connectors) }}
+        </div>
+    {% endif %}
+
+    {{ form_rest(form) }}
+    <script type="text/javascript">
+        require(['oro/integration/channel-view'], function (ChannelView) {
+            "use strict";
+
+            $(function () {
+                var options = {
+                    formSelector:          '#{{ form.vars.id }}',
+                    typeSelector:          '#{{ form.type.vars.id }}',
+                    transportTypeSelector: '#{{ form.transportType.vars.id }}',
+                    fieldsSets:            {
+                        type:          [
+                            {{ form.type.vars.full_name|json_encode|raw }},
+                            {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form._token.vars.full_name|json_encode|raw }}
+                        ],
+                        transportType: [
+                            {{ form.type.vars.full_name|json_encode|raw }},
+                            {{ form.name.vars.full_name|json_encode|raw }},
+                            {{ form.transportType.vars.full_name|json_encode|raw }},
+                            {{ form._token.vars.full_name|json_encode|raw }}
+                        ]
+                    }
+                };
+
+                new ChannelView(options);
+            });
+        });
+    </script>
+{% endblock %}

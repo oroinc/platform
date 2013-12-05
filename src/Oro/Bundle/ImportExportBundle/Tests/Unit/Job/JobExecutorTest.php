@@ -17,6 +17,11 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $managerRegistry;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $jobRegistry;
 
     /**
@@ -34,6 +39,9 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->managerRegistry = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->jobRegistry = $this->getMockBuilder('Oro\Bundle\BatchBundle\Connector\ConnectorRegistry')
             ->disableOriginalConstructor()
             ->getMock();
@@ -41,7 +49,10 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->executor = new JobExecutor($this->entityManager, $this->jobRegistry, $this->contextRegistry);
+        $this->managerRegistry->expects($this->any())->method('getManager')
+            ->will($this->returnValue($this->entityManager));
+
+        $this->executor = new JobExecutor($this->jobRegistry, $this->contextRegistry, $this->managerRegistry);
     }
 
     public function testExecuteJobUnknownJob()

@@ -7,14 +7,17 @@
     {% endif %}
 
     {% if country_field is not defined or country_field is empty %}
-        {% set country_field = "#" ~ id|replace({'_state': '_country'}) %}
+        {% set country_field = name|replace({'state': 'country'}) %}
     {% endif %}
+    {% set country_field = form.parent[country_field] %}
 
     {% if state_text_field is not defined or state_text_field is empty %}
-        {% set state_text_field = "#" ~ id ~ "_text" %}
+        {% set state_text_field = name ~ "_text" %}
     {% endif %}
+    {% set state_text_field = form.parent[state_text_field] %}
 
     {{ form_widget(form) }}
+    {% set showSelect = (choices is not empty and state_text_field.vars.value is empty) %}
 
     <script type="text/javascript">
         require(['jquery', 'oro/region/view', 'oro/region/collection'],
@@ -22,23 +25,23 @@
             $(function() {
                 /** @type oro.region.View */
                 new RegionView({
-                    el: $('{{ country_field }}'),
+                    el: $('#{{ country_field.vars.id }}'),
                     target: $('#{{ id }}'),
-                    simpleEl: $('{{ state_text_field }}'),
+                    simpleEl: $('#{{ state_text_field.vars.id }}'),
                     collection: new RegionCollection(),
-                    showSelect: {{ (choices is not empty)|json_encode }}
+                    showSelect: {{ showSelect|json_encode }}
                 });
             });
         });
     </script>
 
     <style type="text/css">
-        {% if choices %}
+        {% if showSelect %}
             #{{ id }} {
                 display: block;
             }
 
-            {{ state_text_field }} {
+            #{{ state_text_field.vars.id }} {
                 display: none;
             }
         {% else %}
@@ -46,7 +49,7 @@
                 display: none;
             }
 
-            {{ state_text_field }} {
+            #{{ state_text_field.vars.id }} {
                 display: block;
             }
         {% endif %}
