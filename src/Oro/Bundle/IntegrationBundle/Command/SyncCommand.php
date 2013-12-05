@@ -68,7 +68,7 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
         /** @var Channel $channel */
         foreach ($channels as $channel) {
             try {
-                $output->writeln(sprintf('Run sync for "%s" channel.', $channel->getName()));
+                $strategy->notice(sprintf('Run sync for "%s" channel.', $channel->getName()));
 
                 $this->getContainer()
                     ->get(self::SYNC_PROCESSOR)
@@ -84,7 +84,7 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
                 continue;
             }
         }
-        $strategy->info('Completed');
+        $strategy->notice('Completed');
     }
 
     /**

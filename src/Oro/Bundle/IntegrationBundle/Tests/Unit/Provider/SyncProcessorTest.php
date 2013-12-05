@@ -21,6 +21,9 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $log;
+
     /**
      * Setup test obj and mock
      */
@@ -40,6 +43,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->registry = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
         $this->channel = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->log = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
     }
 
     /**
@@ -47,7 +51,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
-        unset($this->em, $this->processorRegistry, $this->registry, $this->jobExecutor, $this->processor);
+        unset($this->em, $this->processorRegistry, $this->registry, $this->jobExecutor, $this->processor, $this->log);
     }
 
     /**
@@ -65,7 +69,8 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
                 $this->em,
                 $this->processorRegistry,
                 $this->jobExecutor,
-                $this->registry
+                $this->registry,
+                $this->log
             ]
         );
     }
