@@ -132,6 +132,12 @@
                     transitionsWidget.render();
                 })();
                 {% endfor %}
+
+                widget.on('workflowItemRemoved', function() {
+                    widgetManager.getWidgetInstanceByAlias('workflow_entity_buttons', function(buttonsWidget) {
+                        buttonsWidget.loadContent();
+                    });
+                });
             });
         });
     </script>

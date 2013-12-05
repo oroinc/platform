@@ -23,6 +23,14 @@
     {% endif %}
 {% endblock %}
 
+{% block text_workflow_view_attribute_value %}
+    {% if value is not empty %}
+        {{ value|nl2br }}
+    {% else %}
+        N/A
+    {% endif %}
+{% endblock %}
+
 {% block date_workflow_view_attribute_value %}
     {% if value is not empty %}
         {{ value|oro_format_date }}
