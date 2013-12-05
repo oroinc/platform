@@ -77,19 +77,21 @@ class SendEmail extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $email = new Email();
-        $email->setFrom($this->getEmailAddress($context, $this->options['from']));
-        $email->setTo(
-            array($this->getEmailAddress($context, $this->options['to']))
-        );
-        $email->setSubject(
+        $emailModel = new Email();
+        $emailModel->setFrom($this->getEmailAddress($context, $this->options['from']));
+        $emailModel->setTo((array)$this->getEmailAddress($context, $this->options['to']));
+        $emailModel->setSubject(
             $this->contextAccessor->getValue($context, $this->options['subject'])
         );
-        $email->setBody(
+        $emailModel->setBody(
             $this->contextAccessor->getValue($context, $this->options['body'])
         );
 
-        $this->emailProcessor->process($email);
+        $email = $this->emailProcessor->process($emailModel);
+
+        if (array_key_exists('attribute', $this->options)) {
+            $this->contextAccessor->setValue($context, $this->options['attribute'], $email);
+        }
     }
 
     /**

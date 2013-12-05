@@ -215,7 +215,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
 
         $model = $this->createEmailModel($data);
-        $this->emailProcessor->process($model);
+        $this->assertSame($email, $this->emailProcessor->process($model));
     }
 
     public function messageDataProvider()

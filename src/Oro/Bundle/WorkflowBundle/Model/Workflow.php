@@ -436,7 +436,7 @@ class Workflow
         $minStepIdx--;
         while ($minStepIdx > -1) {
             $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepToName());
-            if ($step->getOrder() <= $minStep->getOrder()) {
+            if ($step->getOrder() < $minStep->getOrder()) {
                 $minStepIdx--;
                 $minStep = $step;
                 $steps[] = $step;

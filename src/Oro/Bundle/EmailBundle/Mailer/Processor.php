@@ -47,6 +47,7 @@ class Processor
      *
      * @param Email $model
      * @param string $originName
+     * @return \Oro\Bundle\EmailBundle\Entity\Email
      * @throws \Swift_SwiftException
      */
     public function process(Email $model, $originName = InternalEmailOrigin::BAP)
@@ -81,6 +82,8 @@ class Processor
         $email->setEmailBody($emailBody);
         $this->emailEntityBuilder->getBatch()->persist($this->em);
         $this->em->flush();
+
+        return $email;
     }
 
     /**
