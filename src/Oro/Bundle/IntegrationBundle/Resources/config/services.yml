@@ -69,6 +69,7 @@ services:
           - @oro_importexport.processor.registry
           - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
+          - @oro_integration.logger.strategy
 
     oro_integration.provider.channel_type.simple:
         class: %oro_integration.provider.channel_type.simple.class%

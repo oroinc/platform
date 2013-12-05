@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 
@@ -27,22 +28,28 @@ class SyncProcessor implements SyncProcessorInterface
     /** @var TypesRegistry */
     protected $registry;
 
+    /** @var LoggerStrategy */
+    protected $logger;
+
     /**
      * @param EntityManager     $em
      * @param ProcessorRegistry $processorRegistry
      * @param Executor          $jobExecutor
      * @param TypesRegistry     $registry
+     * @param LoggerStrategy    $logger
      */
     public function __construct(
         EntityManager $em,
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
-        TypesRegistry $registry
+        TypesRegistry $registry,
+        LoggerStrategy $logger
     ) {
         $this->em                = $em;
         $this->processorRegistry = $processorRegistry;
         $this->jobExecutor       = $jobExecutor;
         $this->registry          = $registry;
+        $this->logger            = $logger;
     }
 
     /**
@@ -58,7 +65,7 @@ class SyncProcessor implements SyncProcessorInterface
                 $realConnector = $this->registry->getConnectorType($channel->getType(), $connector);
             } catch (\Exception $e) {
                 // log and continue
-                /** @TODO log here */
+                $this->logger->error($e->getMessage());
                 continue;
             }
             $mode    = $isValidationOnly ? ProcessorRegistry::TYPE_IMPORT_VALIDATION : ProcessorRegistry::TYPE_IMPORT;
@@ -119,12 +126,6 @@ class SyncProcessor implements SyncProcessorInterface
     {
         $jobResult = $this->jobExecutor->executeJob($mode, $jobName, $configuration);
 
-        if ($jobResult->isSuccessful()) {
-            $message = 'oro_importexport.import.import_success';
-        } else {
-            $message = 'oro_importexport.import.import_error';
-        }
-
         /** @var ContextInterface $contexts */
         $context = $jobResult->getContext();
 
@@ -152,14 +153,24 @@ class SyncProcessor implements SyncProcessorInterface
                 100
             );
         }
-        /** @TODO log here */
-
-        return [
-            'success'    => $jobResult->isSuccessful() && empty($counts['errors']),
-            'message'    => $message,
-            'exceptions' => $jobResult->getFailureExceptions(),
-            'counts'     => $counts,
-            'errors'     => $errorsAndExceptions,
-        ];
+        $isSuccess = $jobResult->isSuccessful() && empty($counts['errors']);
+        if (!$isSuccess) {
+            $this->logger->error('Errors was occurred:');
+            $this->logger->error(
+                implode(PHP_EOL, $errorsAndExceptions),
+                ['exceptions' => $jobResult->getFailureExceptions()]
+            );
+        } else {
+            $this->logger->info(
+                sprintf(
+                    "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
+                    $counts['read'],
+                    $counts['process'],
+                    $counts['update'],
+                    $counts['add'],
+                    $counts['delete']
+                )
+            );
+        }
     }
 }
