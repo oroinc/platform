@@ -4,8 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Translation\Translator;
 
 class Manager
 {
@@ -16,38 +15,45 @@ class Manager
     protected $filters = [];
 
     /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
      * Constructor
      *
      * @param array               $config
      * @param SystemAwareResolver $resolver
+     * @param Translator          $translator
      */
     public function __construct(
         array $config,
-        SystemAwareResolver $resolver
+        SystemAwareResolver $resolver,
+        Translator $translator
     ) {
         $resolver->resolve($config);
-        $this->config = ConfigurationObject::create($config['query-designer']);
+        $this->config     = ConfigurationObject::create($config);
+        $this->translator = $translator;
     }
 
     /**
-     * Returns metadata
+     * Returns metadata for the given query type
      *
+     * @param string $queryType The query type
      * @return array
      */
-    public function getMetadata()
+    public function getMetadata($queryType)
     {
-        $this->validateConfiguration(
-            new Configuration(array_keys($this->filters)),
-            $this->config->toArray()
-        );
-
         $filtersMetadata = [];
-        $filters         = $this->getFilters();
+        $filters         = $this->getFilters($queryType);
         foreach ($filters as $filter) {
             $filtersMetadata[] = $filter->getMetadata();
         }
 
-        return ['filters' => $filtersMetadata];
+        return [
+            'filters'    => $filtersMetadata,
+            'aggregates' => $this->getMetadataForAggregates($queryType)
+        ];
     }
 
     /**
@@ -72,7 +78,7 @@ class Manager
      */
     public function createFilter($name, array $params = null)
     {
-        $config = null;
+        $config        = null;
         $filtersConfig = $this->config->offsetGet('filters');
         foreach ($filtersConfig as $filterName => $attr) {
             if ($filterName === $name) {
@@ -92,16 +98,20 @@ class Manager
     }
 
     /**
-     * Returns all available filters
+     * Returns all available filters for the given query type
      *
+     * @param string $queryType The query type
      * @return FilterInterface[]
      */
-    protected function getFilters()
+    protected function getFilters($queryType)
     {
         $filters       = [];
         $filtersConfig = $this->config->offsetGet('filters');
         foreach ($filtersConfig as $name => $attr) {
-            $filters[$name] = $this->getFilterObject($name, $attr);
+            if ($this->isItemAllowedForQueryType($attr, $queryType)) {
+                unset($attr['query_type']);
+                $filters[$name] = $this->getFilterObject($name, $attr);
+            }
         }
 
         return $filters;
@@ -124,20 +134,48 @@ class Manager
     }
 
     /**
-     * Validate configuration
+     * Returns all available aggregate functions for the given query type
      *
-     * @param ConfigurationInterface $configuration
-     * @param array                  $config
-     *
-     * @return array
+     * @param string $queryType The query type
+     * @return FilterInterface[]
      */
-    protected function validateConfiguration(ConfigurationInterface $configuration, $config)
+    protected function getMetadataForAggregates($queryType)
     {
-        $processor = new Processor();
+        $aggregates       = [];
+        $aggregatesConfig = $this->config->offsetGet('aggregates');
+        foreach ($aggregatesConfig as $name => $attr) {
+            if ($this->isItemAllowedForQueryType($attr, $queryType)) {
+                unset($attr['query_type']);
+                $functions = [];
+                foreach ($attr['function'] as $function) {
+                    $functions[] = [
+                        'name'  => $function,
+                        'label' => $this->translator->trans('oro.querydesigner.aggregates.' . $function),
+                    ];
+                }
+                $attr['function']  = $functions;
+                $aggregates[$name] = $attr;
+            }
+        }
 
-        return $processor->processConfiguration(
-            $configuration,
-            $config
-        );
+        return $aggregates;
+    }
+
+    /**
+     * Checks if an item can be used for the given query type
+     *
+     * @param array  $item      An item to check
+     * @param string $queryType The query type
+     * @return bool true if the item can be used for the given query type; otherwise, false.
+     */
+    protected function isItemAllowedForQueryType(&$item, $queryType)
+    {
+        foreach ($item['query_type'] as $itemQueryType) {
+            if ($itemQueryType === 'all' || $itemQueryType === $queryType) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -7,6 +7,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const ROOT_NODE_NAME = 'query_designer';
+
     /** @var array */
     protected $types;
 
@@ -25,31 +27,83 @@ class Configuration implements ConfigurationInterface
     {
         $builder = new TreeBuilder();
 
-        $builder->root('filters')
-            ->prototype('array')
-                ->ignoreExtraKeys()
-                ->children()
-                    ->arrayNode('applicable')
-                        ->requiresAtLeastOneElement()
-                        ->prototype('array')
-                            ->children()
-                                ->scalarNode('type')    // field type
-                                    ->cannotBeEmpty()
+        $builder->root(self::ROOT_NODE_NAME)
+            ->children()
+                ->arrayNode('filters')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->ignoreExtraKeys()
+                        ->children()
+                            ->arrayNode('applicable')
+                                ->requiresAtLeastOneElement()
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('type')                // field type
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->scalarNode('entity')              // entity name
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->scalarNode('field')               // field name
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->booleanNode('identifier')         // primary key
+                                        ->end()
+                                    ->end()
                                 ->end()
-                                ->scalarNode('entity')  // entity name
-                                    ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('type')
+                                ->isRequired()
+                                ->validate()
+                                ->ifNotInArray($this->types)
+                                    ->thenInvalid('Invalid filter type "%s"')
                                 ->end()
-                                ->scalarNode('field')   // field name
+                            ->end()
+                            ->arrayNode('query_type')
+                                ->isRequired()
+                                ->requiresAtLeastOneElement()
+                                ->prototype('scalar')
                                     ->cannotBeEmpty()
                                 ->end()
                             ->end()
                         ->end()
                     ->end()
-                    ->scalarNode('type')
-                        ->isRequired()
-                        ->validate()
-                        ->ifNotInArray($this->types)
-                            ->thenInvalid('Invalid filter type "%s"')
+                ->end()
+                ->arrayNode('aggregates')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->ignoreExtraKeys()
+                        ->children()
+                            ->arrayNode('applicable')
+                                ->requiresAtLeastOneElement()
+                                ->prototype('array')
+                                    ->children()
+                                        ->scalarNode('type')                // field type
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->scalarNode('entity')              // entity name
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->scalarNode('field')               // field name
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        ->booleanNode('identifier')         // primary key
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('function')
+                                ->prototype('scalar')
+                                    ->cannotBeEmpty()
+                                ->end()
+                            ->end()
+                            ->arrayNode('query_type')
+                                ->isRequired()
+                                ->requiresAtLeastOneElement()
+                                ->prototype('scalar')
+                                    ->cannotBeEmpty()
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()

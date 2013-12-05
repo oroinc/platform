@@ -105,7 +105,7 @@ class ReportController extends Controller
             'entity'   => $entity,
             'form'     => $this->get('oro_report.form.report')->createView(),
             'entities' => $this->get('oro_report.entity_provider')->getEntities(),
-            'metadata' => $this->get('oro_querydesigner.querydesigner.manager')->getMetadata()
+            'metadata' => $this->get('oro_querydesigner.querydesigner.manager')->getMetadata('report')
         );
     }
 }
