@@ -57,6 +57,20 @@ class BaseProduct
     protected $price;
 
     /**
+     * @var \DateTime $createdAt
+     *
+     * @ORM\Column(type="datetime", name="created_at")
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime $updatedAt
+     *
+     * @ORM\Column(type="datetime", name="updated_at")
+     */
+    protected $updatedAt;
+
+    /**
      * @param int $id
      *
      * @return $this
@@ -174,5 +188,47 @@ class BaseProduct
     public function getPrice()
     {
         return $this->price;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     *
+     * @return $this
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Get contact last update date/time
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime updatedAt
+     *
+     * @return $this
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 }
