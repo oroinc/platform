@@ -153,6 +153,19 @@
     </div>
 {% endmacro %}
 
+{% macro query_designer_grouping_form(form, attr) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
+    <div{{ UI.attributes(attr) }}>
+        {{ form_row(form.columnNames, {
+            'label': 'oro.querydesigner.form.grouping_columns'|trans,
+            'attr': {
+                'data-purpose': 'column-selector'
+            }
+        }) }}
+    </div>
+{% endmacro %}
+
 {% macro query_designer_column_chain_template(id) %}
-    <script type="text/html" id="{{ id }}"><% _.each(obj, function (column, index, list) { %><% if (!_.isUndefined(column.entity.icon) && !_.isNull(column.entity.icon) && column.entity.icon != '') { %><i class="<%= column.entity.icon %> hide-text"></i><% } else { %>&#32;<% } %><%= column.entity.label %>&nbsp;<b><%= column.label %></b>&nbsp;<% if (index < list.length - 1) { %>><% } %><% }) %></script>
+    <script type="text/html" id="{{ id }}"><% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b>&nbsp;<% if (index < list.length - 1) { %>><% } %><% }) %></script>
 {% endmacro %}

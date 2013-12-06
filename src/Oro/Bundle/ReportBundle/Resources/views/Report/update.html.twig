@@ -100,6 +100,7 @@
                     'title': 'Columns'|trans,
                     'spanClass': 'report-columns responsive-cell',
                     'data': [
+                        QD.query_designer_grouping_form(form.grouping, {'id': 'report-grouping-form'}),
                         QD.query_designer_column_form(form.column, {'id': 'report-column-form'}),
                         QD.query_designer_column_list(),
                         QD.query_designer_column_template('report-column-row')
@@ -146,23 +147,20 @@
                     el: '.report-designer',
                     entityName: entityChoice.val(),
                     storageElementSelector: '#oro_report_form_definition',
+                    columnChainTemplateSelector: '#report-column-chain-template',
+                    fieldsLabel: {{ 'oro.entity.form.entity_fields'|trans|json_encode|raw }},
+                    relatedLabel: {{ 'oro.entity.form.entity_related'|trans|json_encode|raw }},
+                    findEntity: findEntity,
                     columnsOptions: {
                         el: '.report-columns',
+                        groupingFormSelector: '#report-grouping-form',
                         itemTemplateSelector: '#report-column-row',
-                        itemFormSelector: '#report-column-form',
-                        columnChainTemplateSelector: '#report-column-chain-template',
-                        fieldsLabel: {{ 'oro.entity.form.entity_fields'|trans|json_encode|raw }},
-                        relatedLabel: {{ 'oro.entity.form.entity_related'|trans|json_encode|raw }},
-                        findEntity: findEntity
+                        itemFormSelector: '#report-column-form'
                     },
                     filtersOptions: {
                         el: '.report-filters',
                         itemTemplateSelector: '#report-filter-row',
-                        itemFormSelector: '#report-filter-form',
-                        columnChainTemplateSelector: '#report-column-chain-template',
-                        fieldsLabel: {{ 'oro.entity.form.entity_fields'|trans|json_encode|raw }},
-                        relatedLabel: {{ 'oro.entity.form.entity_related'|trans|json_encode|raw }},
-                        findEntity: findEntity
+                        itemFormSelector: '#report-filter-form'
                     }
                 };
                 var designer = new QueryDesigner(options);

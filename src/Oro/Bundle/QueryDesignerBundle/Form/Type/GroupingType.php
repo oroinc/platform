@@ -8,19 +8,15 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class ColumnType extends AbstractType
+class GroupingType extends AbstractType
 {
-    const NAME = 'oro_query_designer_column';
+    const NAME = 'oro_query_designer_grouping';
 
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add('label', 'text', array('required' => true))
-            ->add('sorting', 'oro_sorting_choice', array('required' => false));
-
         $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
@@ -29,16 +25,17 @@ class ColumnType extends AbstractType
 
                 $form->add(
                     $factory->createNamed(
-                        'name',
+                        'columnNames',
                         $form->getConfig()->getOption('column_choice_type'),
                         null,
                         array(
-                            'required'           => true,
+                            'required'           => false,
                             'entity'             => $form->getConfig()->getOption('entity'),
                             'skip_load_entities' => true,
                             'with_relations'     => true,
                             'deep_level'         => 1,
-                            'auto_initialize'    => false
+                            'auto_initialize'    => false,
+                            'multiple'           => true
                         )
                     )
                 );
@@ -54,8 +51,8 @@ class ColumnType extends AbstractType
         $resolver->setDefaults(
             array(
                 'entity'             => null,
-                'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Column',
-                'intention'          => 'query_designer_column',
+                'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Grouping',
+                'intention'          => 'query_designer_grouping',
                 'column_choice_type' => 'oro_entity_field_choice'
             )
         );

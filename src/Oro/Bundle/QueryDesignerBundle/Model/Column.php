@@ -20,6 +20,11 @@ class Column
     protected $sorting;
 
     /**
+     * @var string
+     */
+    protected $aggregate;
+
+    /**
      * Get column name
      *
      * @return string
@@ -82,5 +87,28 @@ class Column
             $sorting = null;
         }
         $this->sorting = $sorting;
+    }
+
+    /**
+     * Get aggregation type.
+     *
+     * @return string|null
+     */
+    public function getAggregate()
+    {
+        return $this->aggregate;
+    }
+
+    /**
+     * Get aggregation type.
+     *
+     * @param string|null $aggregate
+     */
+    public function setAggregate($aggregate = null)
+    {
+        if ($aggregate !== null && empty($aggregate)) {
+            $aggregate = null;
+        }
+        $this->aggregate = $aggregate;
     }
 }
