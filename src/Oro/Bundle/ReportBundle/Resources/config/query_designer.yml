@@ -1,0 +1,10 @@
+query_designer:
+    aggregates:
+        identifier:
+            applicable: [{identifier: true}]
+            function:   [COUNT]
+            query_type: [report]
+        number:
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
+            function:   [SUM, MIN, MAX, AVG, COUNT]
+            query_type: [report]
