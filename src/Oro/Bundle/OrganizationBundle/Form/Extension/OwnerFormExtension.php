@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormEvent;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -134,11 +135,6 @@ class OwnerFormExtension extends AbstractTypeExtension
             );
         }
 
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            array($this, 'preSetData')
-        );
-
         /**
          * TODO: Implement object-based assign check after access levels are supported
          */
@@ -146,8 +142,13 @@ class OwnerFormExtension extends AbstractTypeExtension
 
         $defaultOwner = null;
 
+        $builder->addEventListener(
+            FormEvents::PRE_SET_DATA,
+            array($this, 'preSetData')
+        );
+
         if ($metadata->isUserOwned() && $this->isAssignGranted) {
-            $this->addUserOwnerField($builder);
+            $this->addUserOwnerField($builder, $dataClassName);
             $defaultOwner = $user;
         } elseif ($metadata->isBusinessUnitOwned()) {
             $this->addBusinessUnitOwnerField($builder, $user, $dataClassName);
@@ -208,9 +209,11 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
     }
 
-
     /**
-     * @param FormBuilderInterface|FormInterface $builder
+     * @param FormBuilderInterface|FormInterface  $builder
+     * @param $dataClass
+     * @param string $permission
+     * @param null $data
      */
     protected function addUserOwnerField($builder, $dataClass, $permission = "CREATE", $data = null)
     {
@@ -242,20 +245,6 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addUserOwnerField(FormBuilderInterface $builder)
-    {
-        $builder->add(
-            $this->fieldName,
-            'oro_user_select',
-            array(
-                'required' => true,
-                'constraints' => array(new NotBlank())
-            )
-        );
-    }
 
     /**
      * @param FormBuilderInterface $builder
