@@ -3,7 +3,7 @@
 	"description": "Business Application Platform (BAP)",
 	"homepage": "https://github.com/orocrm/platform.git",
 	"license": "MIT",
-	"require": 
+	"require":
 	{
 		"php": ">=5.4.4",
 		"symfony/symfony": "v2.3.6",
@@ -40,7 +40,6 @@
 		"liip/imagine-bundle": "dev-master#61597fc20329ccce762b07c89f6ba2d8fa0f4c09",
 		"leafo/lessphp": "dev-master#bc4f33b4bfc889018ebe53611050729641b82dc6",
 		"willdurand/expose-translation-bundle": "0.2.1",
-		"apy/jsfv-bundle": "dev-master#ecd74cfce030aeb1812277250318aacdd5483631",
 		"genemu/form-bundle": "dev-master#156089856016abde934b92961724b9aa728b7eae",
 		"zendframework/zend-mail": "2.1.5",
 		"a2lix/translation-form-bundle": "1.x-dev#6388ad72a88c3c15e2eaee6c56ba046a60b47556",
@@ -50,9 +49,9 @@
 		"sylius/flow-bundle": "dev-master#2de453578954f781dbc45bd9f1466e4103f642f1"
 	},
 	"minimum-stability": "dev",
-	"autoload": 
+	"autoload":
 	{
-		"psr-0": 
+		"psr-0":
 		{
 			"Oro\\Bundle": "src/"
 		}
