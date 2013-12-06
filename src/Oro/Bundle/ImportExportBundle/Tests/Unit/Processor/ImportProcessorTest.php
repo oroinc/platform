@@ -42,6 +42,9 @@ class ImportProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getOption', 'addFailureException')
             ->with('entityName')
             ->will($this->returnValue('\stdClass'));
+        $this->context->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue([]));
 
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')
             ->getMockForAbstractClass();

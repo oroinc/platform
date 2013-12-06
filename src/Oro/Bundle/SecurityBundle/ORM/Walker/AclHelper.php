@@ -74,7 +74,8 @@ class AclHelper
 
             // We have access level check conditions. So mark query for acl walker.
             if (!$conditionStorage->isEmpty()) {
-                $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS,
+                $query->setHint(
+                    Query::HINT_CUSTOM_TREE_WALKERS,
                     array_merge(
                         $query->getHints(),
                         array(self::ORO_ACL_WALKER)
@@ -112,7 +113,12 @@ class AclHelper
         } else {
             // we have request with only many where conditions
             $subQueryAcl = [];
-            foreach ($conditionalExpression->conditionalFactors as $factorId => $expression) {
+            if (isset($conditionalExpression->conditionalFactors)) {
+                $factors = $conditionalExpression->conditionalFactors;
+            } else {
+                $factors = $conditionalExpression->conditionalTerms;
+            }
+            foreach ($factors as $factorId => $expression) {
                 if (isset($expression->simpleConditionalExpression->subselect)
                     && $expression->simpleConditionalExpression->subselect instanceof Subselect
                 ) {
@@ -186,7 +192,9 @@ class AclHelper
                         );
                     } else {
                         $condition = $this->processJoinAssociationPathExpression(
-                            $identificationVariableDeclaration, $joinKey, $permission
+                            $identificationVariableDeclaration,
+                            $joinKey,
+                            $permission
                         );
                     }
                     if ($condition) {
@@ -209,12 +217,16 @@ class AclHelper
      * @param $permission
      * @return JoinAssociationCondition
      */
-    protected function processJoinAssociationPathExpression(IdentificationVariableDeclaration $declaration, $key, $permission)
-    {
+    protected function processJoinAssociationPathExpression(
+        IdentificationVariableDeclaration $declaration,
+        $key,
+        $permission
+    ) {
         /** @var Join $join */
         $join = $declaration->joins[$key];
 
-        $joinParentEntityAlias = $join->joinAssociationDeclaration->joinAssociationPathExpression->identificationVariable;
+        $joinParentEntityAlias = $join->joinAssociationDeclaration
+            ->joinAssociationPathExpression->identificationVariable;
         $joinParentClass = $this->entityAliases[$joinParentEntityAlias];
         $metadata = $this->em->getClassMetadata($joinParentClass);
 
@@ -235,12 +247,16 @@ class AclHelper
                 list($entityField, $value) = $resultData;
             }
 
+            $joinConditions = isset($associationMapping['joinColumns'])
+                ? $associationMapping['joinColumns']
+                : $associationMapping['mappedBy'];
+
             return new JoinAssociationCondition(
                 $join->joinAssociationDeclaration->aliasIdentificationVariable,
                 $entityField,
                 $value,
                 $targetEntity,
-                isset($associationMapping['joinColumns']) ? $associationMapping['joinColumns'] : $associationMapping['mappedBy']
+                $joinConditions
             );
         }
     }
@@ -270,13 +286,9 @@ class AclHelper
                 list($entityField, $value) = $resultData;
             }
             if ($isJoin) {
-                return new JoinAclCondition(
-                    $entityAlias, $entityField, $value
-                );
+                return new JoinAclCondition($entityAlias, $entityField, $value);
             } else {
-                return new AclCondition(
-                    $entityAlias, $entityField, $value
-                );
+                return new AclCondition($entityAlias, $entityField, $value);
             }
         }
 

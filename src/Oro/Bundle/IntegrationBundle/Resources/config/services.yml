@@ -1,0 +1,85 @@
+parameters:
+    oro_integration.channel.entity.class:                                 Oro\Bundle\IntegrationBundle\Entity\Channel
+
+    oro_integration.form.type.channel.class:                              Oro\Bundle\IntegrationBundle\Form\Type\ChannelType
+    oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
+
+    oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
+    oro_integration.import.api_reader.class:                              Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader
+
+    oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
+    oro_integration.provider.channel_type.simple.class:                   Oro\Bundle\IntegrationBundle\Provider\SimpleChannelType
+    oro_integration.provider.simple_transport.class:                      Oro\Bundle\IntegrationBundle\Provider\SimpleTransport
+
+    oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
+    oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
+
+    oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
+
+services:
+    oro_integration.channel.manager.api:
+        class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+        arguments:
+            - %oro_integration.channel.entity.class%
+            - @doctrine.orm.entity_manager
+
+    oro_integration.form.channel:
+        class:                        Symfony\Component\Form\Form
+        factory_method:               createNamed
+        factory_service:              form.factory
+        arguments:                    ["oro_integration_channel_form", "oro_integration_channel_form", null]
+
+    oro_integration.form.type.channel:
+        class: %oro_integration.form.type.channel.class%
+        arguments:
+            - @oro_integration.manager.types_registry
+        tags:
+            - { name: form.type, alias: oro_integration_channel_form }
+
+    oro_integration.form.handler.channel:
+        class:                        %oro_integration.form.handler.channel.class%
+        scope:                        request
+        arguments:                    [@request, @oro_integration.form.channel, @doctrine.orm.entity_manager]
+
+    oro_integration.manager.types_registry:
+        class: %oro_integration.manager.types_registry.class%
+        arguments:
+            - []
+
+    # job executor
+    oro_integration.job_executor:
+        class: %oro_integration.job_executor.class%
+        arguments:
+            - @oro_batch.connectors
+            - @oro_importexport.context_registry
+            - @doctrine
+
+    # writer
+    oro_integration.writer.persistent_batch_writer:
+        class: %oro_integration.writer.persistent_batch_writer.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_importexport.writer.entity_detach_fixer
+
+    # sync processor
+    oro_integration.sync.processor:
+        class: %oro_integration.sync.processor.class%
+        arguments:
+          - @doctrine.orm.entity_manager
+          - @oro_importexport.processor.registry
+          - @oro_integration.job_executor
+          - @oro_integration.manager.types_registry
+          - @oro_integration.logger.strategy
+
+    oro_integration.provider.channel_type.simple:
+        class: %oro_integration.provider.channel_type.simple.class%
+        tags:
+            - { name: oro_integration.channel, type: simple }
+
+    oro_integration.provider.simple_transport:
+        class: %oro_integration.provider.simple_transport.class%
+        tags:
+            - { name: oro_integration.transport, type: simple, channel_type: simple }
+
+    oro_integration.logger.strategy:
+        class: %oro_integration.logger.strategy.class%

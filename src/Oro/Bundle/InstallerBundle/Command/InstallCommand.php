@@ -79,6 +79,7 @@ class InstallCommand extends ContainerAwareCommand
 
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function setupStep(InputInterface $input, OutputInterface $output)
     {
@@ -96,7 +97,12 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('doctrine:schema:create', $input, $output)
             ->runCommand('oro:entity-config:init', $input, $output)
             ->runCommand('oro:entity-extend:init', $input, $output)
-            ->runCommand('oro:entity-extend:update-config', $input, $output)
+            ->runCommand(
+                'oro:entity-extend:update-config',
+                $input,
+                $output,
+                array('--process-isolation' => true)
+            )
             ->runCommand(
                 'doctrine:schema:update',
                 $input,
@@ -188,6 +194,7 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->runCommand('oro:search:create-index', $input, $output)
             ->runCommand('oro:navigation:init', $input, $output)
+            ->runCommand('fos:js-routing:dump', $input, $output, array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump', $input, $output)
             ->runCommand('assets:install', $input, $output)
             ->runCommand('assetic:dump', $input, $output)

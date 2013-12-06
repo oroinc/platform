@@ -71,12 +71,19 @@ class AclWalker extends TreeWalkerAdapter
 
             foreach ($subRequests as $subRequest) {
                 /** @var SubRequestAclConditionStorage $subRequest */
-                $subselect = $AST
+                $conditionalExpression = $AST
                     ->whereClause
-                    ->conditionalExpression
-                    ->conditionalFactors[$subRequest->getFactorId()]
-                    ->simpleConditionalExpression
-                    ->subselect;
+                    ->conditionalExpression;
+
+                if (isset($conditionalExpression->conditionalFactors)) {
+                    $subselect = $conditionalExpression->conditionalFactors[$subRequest->getFactorId()]
+                        ->simpleConditionalExpression
+                        ->subselect;
+                } else {
+                    $subselect = $conditionalExpression->conditionalTerms[$subRequest->getFactorId()]
+                        ->simpleConditionalExpression
+                        ->subselect;
+                }
 
                 if (!is_null($subRequest->getWhereConditions()) && count($subRequest->getWhereConditions())) {
                     $this->addAclToWhereClause($subselect, $subRequest->getWhereConditions());
@@ -151,7 +158,9 @@ class AclWalker extends TreeWalkerAdapter
 
         $conditionalFactors = [];
 
-        $joinConditionsArray = is_array($condition->getJoinConditions()) ? $condition->getJoinConditions() : array($condition->getJoinConditions());
+        $joinConditionsArray = is_array($condition->getJoinConditions())
+            ? $condition->getJoinConditions()
+            : array($condition->getJoinConditions());
         foreach ($joinConditionsArray as $joinCondition) {
             $rightExpression = new ArithmeticExpression();
             $pathExpression = new PathExpression(
@@ -166,7 +175,10 @@ class AclWalker extends TreeWalkerAdapter
             $conditionalFactors[] = $factor;
         }
         $conditionalFactors[] = $this->getConditionalFactor($condition);
-        $associationDeclaration = new RangeVariableDeclaration($condition->getEntityClass(), $condition->getEntityAlias());
+        $associationDeclaration = new RangeVariableDeclaration(
+            $condition->getEntityClass(),
+            $condition->getEntityAlias()
+        );
 
         $newJoin = new Join($join->joinType, $associationDeclaration);
         $newJoin->conditionalExpression = new ConditionalTerm($conditionalFactors);
@@ -201,10 +213,17 @@ class AclWalker extends TreeWalkerAdapter
                     );
                 } else {
                     // 'where' part has more than one condition
-                    $AST->whereClause->conditionalExpression->conditionalFactors = array_merge(
-                        $AST->whereClause->conditionalExpression->conditionalFactors,
-                        $aclConditionalFactors
-                    );
+                    if (isset($AST->whereClause->conditionalExpression->conditionalFactors)) {
+                        $AST->whereClause->conditionalExpression->conditionalFactors = array_merge(
+                            $AST->whereClause->conditionalExpression->conditionalFactors,
+                            $aclConditionalFactors
+                        );
+                    } else {
+                        $AST->whereClause->conditionalExpression->conditionalTerms = array_merge(
+                            $AST->whereClause->conditionalExpression->conditionalTerms,
+                            $aclConditionalFactors
+                        );
+                    }
                 }
             }
         }
