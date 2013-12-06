@@ -2,15 +2,23 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
+use Oro\Bundle\IntegrationBundle\Guesser\TransportGuesser;
 
-abstract class AbstractConnector implements ConnectorInterface
+abstract class AbstractConnector extends AbstractReader implements ConnectorInterface
 {
     const ENTITY_NAME     = null;
     const CONNECTOR_LABEL = null;
 
     const JOB_VALIDATE_IMPORT = null;
     const JOB_IMPORT          = null;
+
+    /** @var TransportGuesser */
+    protected $transportGuesser;
 
     /** @var TransportInterface */
     protected $transport;
@@ -22,12 +30,64 @@ abstract class AbstractConnector implements ConnectorInterface
     protected $isConnected = false;
 
     /**
+     * @param ContextRegistry  $contextRegistry
+     * @param TransportGuesser $transportGuesser
+     */
+    public function __construct(ContextRegistry $contextRegistry, TransportGuesser $transportGuesser)
+    {
+        parent::__construct($contextRegistry);
+        $this->transportGuesser = $transportGuesser;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function configure(TransportInterface $realTransport, Transport $transportSettings)
+    public function read()
     {
-        $this->transport         = $realTransport;
-        $this->transportSettings = $transportSettings;
+        // read peace of data, skipping empty
+        do {
+            $data = $this->doRead();
+        } while ($data === false);
+
+        if (is_null($data)) {
+            return null; // no data anymore
+        }
+
+        $context = $this->getContext();
+        $context->incrementReadCount();
+        $context->incrementReadOffset();
+
+        // connectors should know how to advance
+        // batch counter/boundaries to the next ones
+        return $data;
+    }
+
+    /**
+     * Should be overridden in descendant classes
+     *
+     * Should return
+     *     null in case when no more data to read
+     *     false if just current batch is empty
+     *     data if read
+     *
+     * @return mixed
+     */
+    abstract protected function doRead();
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeFromContext(ContextInterface $context)
+    {
+        /** @var Channel $channel */
+        $channel = $context->getOption('channel');
+
+        if (!$channel) {
+            throw new \LogicException('Connector instance does not configured properly.');
+        }
+
+        $this->transport         = $this->transportGuesser->guess($channel);
+        $this->transportSettings = $channel->getTransport();
     }
 
     /**
@@ -102,22 +162,5 @@ abstract class AbstractConnector implements ConnectorInterface
     public function __sleep()
     {
         return [];
-    }
-
-    /**
-     * @param $object
-     * @return array
-     */
-    protected function objectToArray($object)
-    {
-        if (!is_object($object) && !is_array($object)) {
-            return $object;
-        }
-
-        if (is_object($object)) {
-            $object = get_object_vars($object);
-        }
-
-        return array_map([$this, 'objectToArray'], $object);
     }
 }

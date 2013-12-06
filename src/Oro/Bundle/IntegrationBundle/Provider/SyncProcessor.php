@@ -75,18 +75,12 @@ class SyncProcessor implements SyncProcessorInterface
                 ProcessorRegistry::TYPE_IMPORT,
                 $realConnector->getImportEntityFQCN()
             );
-            $realTransport    = $this->registry
-                ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
-            /** @var ConnectorInterface $realConnector */
-            $realConnector->configure($realTransport, $channel->getTransport());
-
             $configuration = [
                 $mode => [
                     'processorAlias' => reset($processorAliases),
                     'entityName'     => $realConnector->getImportEntityFQCN(),
                     'channel'        => $channel,
-                    'batchSize'      => self::DEFAULT_BATCH_SIZE,
-                    'connector'      => $realConnector
+                    'batchSize'      => self::DEFAULT_BATCH_SIZE
                 ],
             ];
             $this->processImport($mode, $jobName, $configuration, $channel);
