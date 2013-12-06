@@ -63,6 +63,8 @@ class SyncProcessor implements SyncProcessorInterface
         foreach ($connectors as $connector) {
             try {
                 $realConnector = $this->registry->getConnectorType($channel->getType(), $connector);
+                $realTransport = $this->registry
+                    ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
             } catch (\Exception $e) {
                 // log and continue
                 $this->logger->error($e->getMessage());
@@ -75,18 +77,13 @@ class SyncProcessor implements SyncProcessorInterface
                 ProcessorRegistry::TYPE_IMPORT,
                 $realConnector->getImportEntityFQCN()
             );
-            $realTransport    = $this->registry
-                ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
-            /** @var ConnectorInterface $realConnector */
-            $realConnector->configure($realTransport, $channel->getTransport());
-
-            $configuration = [
+            $configuration    = [
                 $mode => [
                     'processorAlias' => reset($processorAliases),
                     'entityName'     => $realConnector->getImportEntityFQCN(),
                     'channel'        => $channel,
-                    'batchSize'      => self::DEFAULT_BATCH_SIZE,
-                    'connector'      => $realConnector
+                    'transport'      => $realTransport,
+                    'batchSize'      => self::DEFAULT_BATCH_SIZE
                 ],
             ];
             $this->processImport($mode, $jobName, $configuration, $channel);

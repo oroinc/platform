@@ -29,7 +29,6 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->markTestSkipped('asd');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->setMethods(array('createQueryBuilder'))
@@ -37,7 +36,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processorRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
 
-        $this->jobExecutor = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Job\JobExecutor')
+        $this->jobExecutor = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor')
             ->disableOriginalConstructor()
             ->getMock();
 
