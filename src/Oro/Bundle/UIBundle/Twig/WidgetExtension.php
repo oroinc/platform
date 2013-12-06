@@ -45,7 +45,7 @@ class WidgetExtension extends \Twig_Extension
      */
     public function render(Twig_Environment $environment, array $options = array())
     {
-        $optionsHash = spl_object_hash((object)$options);
+        $optionsHash = md5(json_encode($options));
         if (!empty($this->rendered[$optionsHash])) {
             return '';
         }
