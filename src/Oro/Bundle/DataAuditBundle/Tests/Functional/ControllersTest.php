@@ -120,12 +120,12 @@ class ControllersTest extends WebTestCase
         $result['new'] = $this->clearResult($result['new']);
 
         foreach ($result['old'] as $auditRecord) {
-            $auditValue = explode(': ', $auditRecord, 2);
+            $auditValue = explode(':', $auditRecord, 2);
             $this->assertEmpty(trim($auditValue[1]));
         }
 
         foreach ($result['new'] as $auditRecord) {
-            $auditValue = explode(': ', $auditRecord, 2);
+            $auditValue = explode(':', $auditRecord, 2);
             $key = trim($auditValue[0]);
             $value = trim($auditValue[1]);
             if ($key == 'birthday') {
