@@ -7,7 +7,7 @@ use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
-use Oro\Bundle\IntegrationBundle\Guesser\TransportGuesser;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 
 abstract class AbstractConnector extends AbstractReader implements ConnectorInterface
 {
@@ -16,9 +16,6 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
 
     const JOB_VALIDATE_IMPORT = null;
     const JOB_IMPORT          = null;
-
-    /** @var TransportGuesser */
-    protected $transportGuesser;
 
     /** @var TransportInterface */
     protected $transport;
@@ -29,14 +26,17 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
     /** @var bool */
     protected $isConnected = false;
 
+    /** @var LoggerStrategy */
+    protected $logger;
+
     /**
-     * @param ContextRegistry  $contextRegistry
-     * @param TransportGuesser $transportGuesser
+     * @param ContextRegistry $contextRegistry
+     * @param LoggerStrategy  $logger
      */
-    public function __construct(ContextRegistry $contextRegistry, TransportGuesser $transportGuesser)
+    public function __construct(ContextRegistry $contextRegistry, LoggerStrategy $logger)
     {
         parent::__construct($contextRegistry);
-        $this->transportGuesser = $transportGuesser;
+        $this->logger = $logger;
     }
 
     /**
@@ -80,13 +80,13 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
     protected function initializeFromContext(ContextInterface $context)
     {
         /** @var Channel $channel */
-        $channel = $context->getOption('channel');
+        $channel         = $context->getOption('channel');
+        $this->transport = $context->getOption('transport');
 
-        if (!$channel) {
+        if (!$channel || !$this->transport) {
             throw new \LogicException('Connector instance does not configured properly.');
         }
 
-        $this->transport         = $this->transportGuesser->guess($channel);
         $this->transportSettings = $channel->getTransport();
     }
 

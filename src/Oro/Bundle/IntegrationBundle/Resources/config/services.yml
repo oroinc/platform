@@ -15,8 +15,6 @@ parameters:
 
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
 
-    oro_integration.guesser.transport_guesser.class:                      Oro\Bundle\IntegrationBundle\Guesser\TransportGuesser
-
 services:
     oro_integration.channel.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -84,8 +82,3 @@ services:
 
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%
-
-    oro_integration.guesser.transport_guesser:
-        class: %oro_integration.guesser.transport_guesser.class%
-        arguments:
-            - @oro_integration.manager.types_registry
