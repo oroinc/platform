@@ -14,7 +14,7 @@ use Oro\Bundle\AddressBundle\Entity\Country;
  * Region
  *
  * @ORM\Table("oro_dictionary_region", indexes={
- *      @ORM\Index(name="name_idx", columns={"name"})
+ *      @ORM\Index(name="region_name_idx", columns={"name"})
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
@@ -67,6 +67,17 @@ class Region implements Translatable
     public function __construct($combinedCode)
     {
         $this->combinedCode = $combinedCode;
+    }
+
+    /**
+     * @param string $combinedCode
+     * @return $this
+     */
+    public function setCombinedCode($combinedCode)
+    {
+        $this->combinedCode = $combinedCode;
+
+        return $this;
     }
 
     /**

@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oro/integration/channel-view': 'bundles/orointegration/js/channel-view.js'
