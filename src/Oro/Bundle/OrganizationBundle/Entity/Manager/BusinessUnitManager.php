@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class BusinessUnitManager
@@ -15,9 +16,19 @@ class BusinessUnitManager
      */
     private $em;
 
-    public function __construct(EntityManager $em)
+    /**
+     * @var AclHelper
+     */
+    private $aclHelper;
+
+    /**
+     * @param EntityManager $em
+     * @param AclHelper $aclHelper
+     */
+    public function __construct(EntityManager $em, AclHelper $aclHelper)
     {
         $this->em = $em;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -53,6 +64,14 @@ class BusinessUnitManager
     public function getBusinessUnit(array $criteria = array(), array $orderBy = null)
     {
         return $this->getBusinessUnitRepo()->findOneBy($criteria, $orderBy);
+    }
+
+    public function getUserBusinessUnits($permission)
+    {
+        return $this->aclHelper->apply(
+            $this->getBusinessUnitRepo()->createQueryBuilder('bu')->select('bu.id'),
+            $permission
+        )->getArrayResult();
     }
 
     /**

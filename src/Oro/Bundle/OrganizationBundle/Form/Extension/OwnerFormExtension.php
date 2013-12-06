@@ -8,6 +8,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -221,7 +222,7 @@ class OwnerFormExtension extends AbstractTypeExtension
          * Showing user owner box for entities with owner type USER if assign permission is
          * granted.
          */
-        if ($this->assignIsGranted) {
+        if ($this->isAssignGranted) {
             $builder->add(
                 $this->fieldName,
                 'oro_user_acl_select',
@@ -230,7 +231,6 @@ class OwnerFormExtension extends AbstractTypeExtension
                     'constraints' => array(new NotBlank()),
                     'autocomplete_alias' => 'acl_users',
                     'data' => $data,
-
                     'configs' => [
                         'width' => '400px',
                         'placeholder' => 'oro.user.form.choose_user',
@@ -251,7 +251,7 @@ class OwnerFormExtension extends AbstractTypeExtension
      * @param User $user
      * @param string $className
      */
-    protected function addBusinessUnitOwnerField(FormBuilderInterface $builder, User $user, $className)
+    protected function addBusinessUnitOwnerField(FormBuilderInterface $builder, User $user, $className, $permission = "CREATE")
     {
         /**
          * Owner field is required for all entities except business unit
@@ -285,7 +285,8 @@ class OwnerFormExtension extends AbstractTypeExtension
                         'label' => $this->fieldLabel,
                         'configs'     => array(
                             'is_translate_option' => false,
-                            'is_safe'             => true
+                            'is_safe'             => true,
+                            'user_business_units' => $this->businessUnitManager->getUserBUIds($permission)
                         )
                     ),
                     $validation
