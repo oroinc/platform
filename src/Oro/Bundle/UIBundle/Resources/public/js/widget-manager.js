@@ -68,20 +68,6 @@ function(mediator) {
          */
         removeWidget: function(wid) {
             delete this.widgets[wid];
-        },
-
-        /**
-         * Check where manager knows about widget with specified alias
-         *
-         * @param {string} alias Widget alias
-         * @return {boolean}
-         */
-        hasWidgetAlias: function(alias) {
-            if (!this.aliases.hasOwnProperty(alias)) {
-                return false;
-            }
-
-            return this.widgets.hasOwnProperty(this.aliases[alias]);
         }
     };
 
