@@ -1,0 +1,18 @@
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set pageTitle = 'Channels' %}
+{% set gridName = 'channels-grid' %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_integration_channel_create') %}
+        {{
+            UI.addButton({
+                'path' : path('oro_integration_channel_create'),
+                'title' : 'Create channel',
+                'label' : 'Create channel'
+            })
+        }}
+    {% endif %}
+{% endblock %}
