@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Translation;
+namespace Oro\Bundle\EntityConfigBundle\Translation;
 
 use Doctrine\Common\Inflector\Inflector;
 
@@ -78,7 +78,7 @@ class ConfigTranslator implements LoaderInterface
             foreach ($entityFields as $field) {
                 $value      = $entityProvider->getConfigById($field)->get('label');
                 $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $field->getClassName());
-                $classArray = explode('\\', $class);
+                $classArray = explode('\\', strtolower($class));
                 $keyArray   = [];
 
                 foreach ($classArray as $item) {

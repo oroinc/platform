@@ -71,6 +71,7 @@ oro_entity_config:
             items:
                 label:
                     options:
+                        translatable:       true
                         priority:           10
                     constraints:
                         - NotBlank:         ~
@@ -86,7 +87,8 @@ oro_entity_config:
                         filterable:         false
                         show_filter:        false
                     form:
-                        type:               text
+                        #type:               text
+                        type:               oro_entity_config_label_type
                         options:
                             block:          entity
                             required:       true

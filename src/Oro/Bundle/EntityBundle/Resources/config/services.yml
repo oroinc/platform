@@ -7,8 +7,6 @@ parameters:
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
 
-    oro_entity.translation.config_translator.class:                Oro\Bundle\EntityBundle\Translation\ConfigTranslator
-
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
@@ -67,13 +65,3 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @doctrine
             - @oro_entity.entity_provider
-
-    oro_entity.translation.config_translator.loader:
-        class: %oro_entity.translation.config_translator.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @translator
-        calls:
-            - [ registerResources, [ @translator ] ]
-        tags:
-            - { name: translation.loader, alias: php }
