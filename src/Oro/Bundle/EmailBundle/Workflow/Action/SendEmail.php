@@ -51,15 +51,19 @@ class SendEmail extends AbstractAction
         if (empty($options['from'])) {
             throw new InvalidParameterException('From parameter is required');
         }
-        if (is_array($options['from']) && !array_key_exists('email', $options['from'])) {
-            throw new InvalidParameterException('From email parameter is required');
-        }
+        $this->assertEmailAddressOption($options['from']);
 
         if (empty($options['to'])) {
             throw new InvalidParameterException('To parameter is required');
         }
-        if (is_array($options['to']) && !array_key_exists('email', $options['to'])) {
-            throw new InvalidParameterException('To email parameter is required');
+        if (!is_array($options['to'])
+            || array_key_exists('name', $options['to'])
+            || array_key_exists('email', $options['to'])
+        ) {
+            $options['to'] = array($options['to']);
+        }
+        foreach ($options['to'] as $to) {
+            $this->assertEmailAddressOption($to);
         }
 
         if (empty($options['subject'])) {
@@ -72,6 +76,13 @@ class SendEmail extends AbstractAction
         $this->options = $options;
     }
 
+    protected function assertEmailAddressOption($option)
+    {
+        if (is_array($option) && array_key_exists('name', $option) && !array_key_exists('email', $option)) {
+            throw new InvalidParameterException('Email parameter is required');
+        }
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -79,7 +90,13 @@ class SendEmail extends AbstractAction
     {
         $emailModel = new Email();
         $emailModel->setFrom($this->getEmailAddress($context, $this->options['from']));
-        $emailModel->setTo((array)$this->getEmailAddress($context, $this->options['to']));
+        $to = array();
+        foreach ($this->options['to'] as $email) {
+            if ($email) {
+                $to[] = $this->getEmailAddress($context, $email);
+            }
+        }
+        $emailModel->setTo($to);
         $emailModel->setSubject(
             $this->contextAccessor->getValue($context, $this->options['subject'])
         );
