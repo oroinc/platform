@@ -13,6 +13,7 @@ function(Backbone) {
             id : null,
             name : null,
             label: null,
+            aggregate: null,
             sorting: null
         }
     });

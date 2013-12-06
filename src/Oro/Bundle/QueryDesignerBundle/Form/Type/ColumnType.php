@@ -19,6 +19,7 @@ class ColumnType extends AbstractType
     {
         $builder
             ->add('label', 'text', array('required' => true))
+            ->add('aggregate', 'oro_aggregate_choice', array('required' => false))
             ->add('sorting', 'oro_sorting_choice', array('required' => false));
 
         $factory = $builder->getFormFactory();

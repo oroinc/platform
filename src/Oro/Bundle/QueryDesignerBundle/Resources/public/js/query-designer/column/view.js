@@ -1,6 +1,8 @@
 /* global define */
-define(['oro/query-designer/abstract-view', 'oro/query-designer/column/collection', 'oro/query-designer/grouping/view'],
-function(AbstractView, ColumnCollection, GroupingView) {
+define(['oro/query-designer/abstract-view', 'oro/query-designer/column/collection',
+    'oro/query-designer/grouping/view', 'oro/query-designer/aggregate-manager'],
+function(AbstractView, ColumnCollection,
+         GroupingView, AggregateManager) {
     'use strict';
 
     /**
@@ -20,6 +22,19 @@ function(AbstractView, ColumnCollection, GroupingView) {
         /** @property {oro.queryDesigner.grouping.View} */
         groupingColumnsSelector: null,
 
+        /** @property {oro.queryDesigner.AggregateManager} */
+        aggregateManager: null,
+
+        /** @property {jQuery} */
+        sortingSelector: null,
+
+        initialize: function() {
+            AbstractView.prototype.initialize.apply(this, arguments);
+
+            this.addFieldLabelGetter(this.getAggregateFieldLabel);
+            this.addFieldLabelGetter(this.getSortingFieldLabel);
+        },
+
         initForm: function() {
             AbstractView.prototype.initForm.apply(this, arguments);
 
@@ -34,16 +49,33 @@ function(AbstractView, ColumnCollection, GroupingView) {
                 this.trigger('grouping:change');
             }, this));
 
-            // try to guess a label when a column changed
+            this.aggregateManager = new AggregateManager({
+                el: this.$el.find('[data-purpose="aggregate-selector"]')
+            });
+
             this.columnSelector.$el.on('change', _.bind(function (e) {
                 if (!_.isUndefined(e.added)) {
-                    var labelEl = this.findFormField('label');
-                    if (labelEl.val() == ''
-                        || (!_.isUndefined(e.removed) && !_.isUndefined(e.removed.text) && labelEl.val() == e.removed.text)) {
-                        labelEl.val(e.added.text);
+                    // try to guess a label when a column changed
+                    var label = this.form.find('[data-purpose="label"]');
+                    if (label.val() == ''
+                        || (!_.isUndefined(e.removed) && !_.isUndefined(e.removed.text) && label.val() == e.removed.text)) {
+                        label.val(e.added.text);
                     }
                 }
+                // adjust aggregate selector
+                var $el = $(e.currentTarget);
+                var value = $el.val();
+                var criteria = {};
+                if (!_.isNull(value) && value != '') {
+                    criteria = _.extend(
+                        {field: value, entity: this.options.entityName},
+                        $el.find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]').data()
+                    );
+                }
+                this.aggregateManager.setActiveAggregate(criteria);
             }, this));
+
+            this.sortingSelector = this.form.find('[data-purpose="sorting-selector"]');
         },
 
         changeEntity: function (entityName) {
@@ -62,6 +94,25 @@ function(AbstractView, ColumnCollection, GroupingView) {
 
         setGroupingColumns: function (columns) {
             this.groupingColumnsSelector.setGroupingColumns(columns);
+        },
+
+        getAggregateFieldLabel: function (field, name, value) {
+            if (field.attr('name') == this.aggregateManager.$el.attr('name')) {
+                if (_.isNull(value) || value == '') {
+                    return '';
+                }
+                return this.aggregateManager.getAggregateFunctionLabel(value);
+            }
+            return null;
+        },
+
+        getSortingFieldLabel: function (field, name, value) {
+            if (field.attr('name') == this.sortingSelector.attr('name')) {
+                if (_.isNull(value) || value == '') {
+                    return '';
+                }
+            }
+            return null;
         }
     });
 });

@@ -4,6 +4,7 @@ oro:
             column:
                 column:         Column
                 label:          Label
+                aggregate:      Function
                 sorting:        Sorting
                 actions:        Actions
             filter:
@@ -25,6 +26,8 @@ oro:
             grouping_columns:   Grouping Columns
             column:             Column
             label:              Label
+            aggregate:          Function
+            choose_aggregate:   None
             sorting:            Sorting
             choose_sorting:     None
             sorting_asc:        Asc

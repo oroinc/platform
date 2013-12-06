@@ -1,6 +1,7 @@
 config:
     paths:
         'oro/query-designer': 'bundles/oroquerydesigner/js/query-designer.js'
+        'oro/query-designer/aggregate-manager': 'bundles/oroquerydesigner/js/query-designer/aggregate-manager.js'
         'oro/query-designer/filter-manager': 'bundles/oroquerydesigner/js/query-designer/filter-manager.js'
         'oro/query-designer/filter-builder': 'bundles/oroquerydesigner/js/query-designer/filter-builder.js'
         'oro/query-designer/abstract-view': 'bundles/oroquerydesigner/js/query-designer/abstract-view.js'

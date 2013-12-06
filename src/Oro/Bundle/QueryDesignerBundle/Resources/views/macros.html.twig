@@ -85,6 +85,7 @@
             <tr>
                 <th class="name-column"><span>{{ 'oro.querydesigner.datagrid.column.column'|trans }}</span></th>
                 <th class="label-column"><span>{{ 'oro.querydesigner.datagrid.column.label'|trans }}</span></th>
+                <th class="aggregate-column"><span>{{ 'oro.querydesigner.datagrid.column.aggregate'|trans }}</span></th>
                 <th class="sorting-column"><span>{{ 'oro.querydesigner.datagrid.column.sorting'|trans }}</span></th>
                 <th class="action-column"><span>{{ 'oro.querydesigner.datagrid.column.actions'|trans }}</span></th>
             </tr>
@@ -100,6 +101,7 @@
         <tr data-id="<%= id %>">
             <td class="name-cell"><%= name %></td>
             <td class="label-cell"><%= label %></td>
+            <td class="aggregate-cell"><%= aggregate %></td>
             <td class="sorting-cell"><%= sorting %></td>
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
@@ -127,13 +129,22 @@
         {{ form_row(form.label, {
             'label': 'oro.querydesigner.form.label'|trans,
             'attr': {
-                'class': 'label-text'
+                'class': 'label-text',
+                'data-purpose': 'label'
+            }
+        }) }}
+        {{ form_row(form.aggregate, {
+            'label': 'oro.querydesigner.form.aggregate'|trans,
+            'attr': {
+                'class': 'aggregate-selector',
+                'data-purpose': 'aggregate-selector'
             }
         }) }}
         {{ form_row(form.sorting, {
             'label': 'oro.querydesigner.form.sorting'|trans,
             'attr': {
-                'class': 'sorting-selector'
+                'class': 'sorting-selector',
+                'data-purpose': 'sorting-selector'
             }
         }) }}
         {{ UI.clientButton({
