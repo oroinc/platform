@@ -26,9 +26,9 @@ class BaseOrder
     /**
      * @var integer
      *
-     * @ORM\Column(name="original_id", type="integer")
+     * @ORM\Column(name="origin_id", type="integer")
      */
-    protected $originalId;
+    protected $originId;
 
     /**
      * @var ArrayCollection
@@ -261,13 +261,13 @@ class BaseOrder
     }
 
     /**
-     * @param int $originalId
+     * @param int $originId
      *
      * @return $this
      */
-    public function setOriginalId($originalId)
+    public function setOriginId($originId)
     {
-        $this->originalId = $originalId;
+        $this->originId = $originId;
 
         return $this;
     }
@@ -275,9 +275,9 @@ class BaseOrder
     /**
      * @return int
      */
-    public function getOriginalId()
+    public function getOriginId()
     {
-        return $this->originalId;
+        return $this->originId;
     }
 
     /**
