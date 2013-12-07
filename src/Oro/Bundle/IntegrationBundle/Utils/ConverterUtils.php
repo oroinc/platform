@@ -21,6 +21,6 @@ class ConverterUtils
             $object = get_object_vars($object);
         }
 
-        return array_map(['ConverterUtils', 'objectToArray'], $object);
+        return array_map(['Oro\Bundle\IntegrationBundle\Utils\ConverterUtils', 'objectToArray'], $object);
     }
 }
