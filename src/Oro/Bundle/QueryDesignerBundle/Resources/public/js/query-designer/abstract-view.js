@@ -335,6 +335,21 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation,
             return new modelClass();
         },
 
+        getFieldApplicableConditions: function (item) {
+            var result = {
+                entity: this.options.entityName,
+                field: item.val()
+            };
+            var chain = result.field.split(',');
+            if (_.size(chain) > 1) {
+                var field = _.last(chain).split('::');
+                result.entity = _.first(field);
+                result.field = _.last(field);
+            }
+            _.extend(result, _.pick(item.data(), ['type', 'identifier']));
+            return result;
+        },
+
         addFieldLabelGetter: function (callback) {
             if (_.isNull(this.fieldLabelGetters)) {
                 this.fieldLabelGetters = [];

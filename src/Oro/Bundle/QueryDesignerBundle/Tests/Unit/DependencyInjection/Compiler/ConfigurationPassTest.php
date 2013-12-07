@@ -95,6 +95,12 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     'query_type' => ['type1', 'type2']
                 ],
             ],
+            'grouping'   => [
+                'exclude' => [
+                    ['type' => 'text'],
+                    ['type' => 'array']
+                ]
+            ],
             'aggregates' => [
                 'aggregate1' => [
                     'applicable' => [
@@ -102,7 +108,11 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                         ['type' => 'smallint'],
                         ['type' => 'float'],
                     ],
-                    'function'   => ['MIN', 'MAX', 'COUNT'],
+                    'functions'  => [
+                        ['name' => 'min', 'expr' => 'MIN($column)'],
+                        ['name' => 'max', 'expr' => 'MAX($column)'],
+                        ['name' => 'count', 'expr' => 'COUNT($column)'],
+                    ],
                     'query_type' => ['type1']
                 ]
             ]

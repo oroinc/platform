@@ -6,7 +6,11 @@ query_designer:
             type:       number
         filter4:
             query_type: [type2]
+
+    grouping:
+        exclude: [{type: array}]
+
     aggregates:
         aggregate1:
             applicable: [{type: float}]
-            function:   [COUNT]
+            functions:  [{name: count, expr: COUNT($column)}]

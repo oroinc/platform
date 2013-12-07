@@ -25,9 +25,11 @@
     max-width: none;
 }
 .form-horizontal .query-designer-form input.label-text {
-    width: 140px;
+    width: 90px;
 }
-.form-horizontal .query-designer-form .aggregate-selector .controls select,
+.form-horizontal .query-designer-form .aggregate-selector .controls select {
+    width: 120px;
+}
 .form-horizontal .query-designer-form .sorting-selector .controls select {
     width: 50px;
 }
@@ -67,11 +69,17 @@
 .query-designer-grid-container {
     font-size: 13px;
 }
+.query-designer-grid-container .grid .label-column,
+.query-designer-grid-container .grid .label-cell {
+    width: 150px;
+}
 .query-designer-grid-container .grid .aggregate-column,
-.query-designer-grid-container .grid .aggregate-cell
+.query-designer-grid-container .grid .aggregate-cell {
+    width: 140px;
+}
 .query-designer-grid-container .grid .sorting-column,
 .query-designer-grid-container .grid .sorting-cell {
-    width: 100px;
+    width: 60px;
 }
 .query-designer-grid-container .grid .label-cell {
     text-transform: uppercase;

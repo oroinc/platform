@@ -52,6 +52,7 @@ class Manager
 
         return [
             'filters'    => $filtersMetadata,
+            'grouping'   => $this->getMetadataForGrouping(),
             'aggregates' => $this->getMetadataForAggregates($queryType)
         ];
     }
@@ -134,10 +135,20 @@ class Manager
     }
 
     /**
+     * Returns grouping metadata
+     *
+     * @return array
+     */
+    protected function getMetadataForGrouping()
+    {
+        return $this->config->offsetGet('grouping');
+    }
+
+    /**
      * Returns all available aggregate functions for the given query type
      *
      * @param string $queryType The query type
-     * @return FilterInterface[]
+     * @return array
      */
     protected function getMetadataForAggregates($queryType)
     {
@@ -147,13 +158,14 @@ class Manager
             if ($this->isItemAllowedForQueryType($attr, $queryType)) {
                 unset($attr['query_type']);
                 $functions = [];
-                foreach ($attr['function'] as $function) {
+                foreach ($attr['functions'] as $function) {
                     $functions[] = [
-                        'name'  => $function,
-                        'label' => $this->translator->trans('oro.querydesigner.aggregates.' . $function),
+                        'name'  => $function['name'],
+                        'label' => $this->translator
+                                ->trans(sprintf('oro.query_designer.aggregates.%s.%s', $name, $function['name'])),
                     ];
                 }
-                $attr['function']  = $functions;
+                $attr['functions'] = $functions;
                 $aggregates[$name] = $attr;
             }
         }

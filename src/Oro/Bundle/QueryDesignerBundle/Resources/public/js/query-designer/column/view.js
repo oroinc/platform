@@ -65,14 +65,12 @@ function(AbstractView, ColumnCollection,
                 // adjust aggregate selector
                 var $el = $(e.currentTarget);
                 var value = $el.val();
-                var criteria = {};
-                if (!_.isNull(value) && value != '') {
-                    criteria = _.extend(
-                        {field: value, entity: this.options.entityName},
-                        $el.find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]').data()
-                    );
-                }
-                this.aggregateManager.setActiveAggregate(criteria);
+                this.aggregateManager.setActiveAggregate(
+                    (_.isNull(value) || value == '')
+                        ? {}
+                        : this.getFieldApplicableConditions(
+                            $el.find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]'))
+                );
             }, this));
 
             this.sortingSelector = this.form.find('[data-purpose="sorting-selector"]');

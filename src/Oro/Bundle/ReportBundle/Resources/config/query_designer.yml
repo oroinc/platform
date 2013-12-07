@@ -1,10 +1,22 @@
 query_designer:
     aggregates:
-        identifier:
-            applicable: [{identifier: true}]
-            function:   [COUNT]
+        string:
+            applicable: [{type: string}]
+            functions:
+                - { name: Count, expr: COUNT($column) }
             query_type: [report]
         number:
             applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
-            function:   [SUM, MIN, MAX, AVG, COUNT]
+            functions:
+                - { name: Count, expr: COUNT($column) }
+                - { name: Sum,   expr: SUM($column) }
+                - { name: Min,   expr: MIN($column) }
+                - { name: Max,   expr: MAX($column) }
+                - { name: Avg,   expr: AVG($column) }
+            query_type: [report]
+
+        identifier:
+            applicable: [{identifier: true}]
+            functions:
+                - { name: Count, expr: COUNT($column) }
             query_type: [report]

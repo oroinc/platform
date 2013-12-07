@@ -17,7 +17,7 @@ class AggregateChoiceType extends AbstractType
         $resolver->setDefaults(
             array(
                 'choices'     => array(),
-                'empty_value' => 'oro.querydesigner.form.choose_aggregate',
+                'empty_value' => 'oro.query_designer.form.choose_aggregate',
                 'empty_data'  => ''
             )
         );

@@ -1,4 +1,16 @@
 oro:
+    query_designer:
+        aggregates:
+            string:
+                Count:              Count
+            identifier:
+                Count:              Count
+            number:
+                Sum:                Sum
+                Min:                Min
+                Max:                Max
+                Avg:                Average
+                Count:              Count
     report:
         form:
             choose_report_type:    Choose a report type...

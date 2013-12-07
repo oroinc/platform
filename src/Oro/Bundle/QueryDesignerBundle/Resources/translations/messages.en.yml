@@ -1,5 +1,5 @@
 oro:
-    querydesigner:
+    query_designer:
         datagrid:
             column:
                 column:         Column
@@ -35,9 +35,3 @@ oro:
             condition:          Condition
             filter_logic:       Filter Logic
             filter_logic_tooltip: Example: 1 AND (2 OR 3)
-        aggregates:
-            COUNT:              Count
-            SUM:                Sum
-            MIN:                Min
-            MAX:                Max
-            AVG:                Average

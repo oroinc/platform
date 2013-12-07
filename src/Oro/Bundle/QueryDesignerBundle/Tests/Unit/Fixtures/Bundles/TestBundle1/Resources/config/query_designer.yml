@@ -16,8 +16,14 @@ query_designer:
             applicable: [{type: boolean}]
             type:       boolean
             query_type: [type1]
+
+    grouping:
+        exclude: [{type: text}]
+
     aggregates:
         aggregate1:
             applicable: [{type: integer}, {type: smallint}]
-            function:   [MIN, MAX]
+            functions:
+                - {name: min, expr: MIN($column)}
+                - {name: max, expr: MAX($column)}
             query_type: [type1]

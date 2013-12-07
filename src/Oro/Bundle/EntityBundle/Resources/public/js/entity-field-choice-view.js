@@ -15,7 +15,8 @@ function(_, Backbone) {
         options: {
             fieldsLabel: null,
             relatedLabel: null,
-            findEntity: null
+            findEntity: null,
+            exclude: undefined // function (criteria) { return true/false }
         },
 
         /** @property */
@@ -35,6 +36,13 @@ function(_, Backbone) {
         initialize: function() {
             if (!_.isNull(this.options.findEntity)) {
                 this.$el.data('entity-field-util').findEntity = this.options.findEntity;
+            }
+            if (!_.isUndefined(this.options.exclude)) {
+                this.$el.find('option').each(_.partial(function (that) {
+                    if (that.options.exclude(that.getFieldApplicableConditions($(this), that.$el.data('entity')))) {
+                        $(this).remove();
+                    }
+                }, this));
             }
         },
 
@@ -63,17 +71,23 @@ function(_, Backbone) {
             var isRelationsWithFields = false;
             _.each(fields, _.bind(function (field) {
                 if (_.isUndefined(field['related_entity_name'])) {
-                    sFields += this.optionTemplate(field);
+                    if (_.isUndefined(this.options.exclude)
+                        || !this.options.exclude(this._getFieldApplicableConditions(field, this.$el.data('entity')))) {
+                        sFields += this.optionTemplate(field);
+                    }
                 } else {
                     if (!_.isUndefined(field['related_entity_fields'])) {
                         isRelationsWithFields = true;
                         var sRelatedFields = '';
-                        _.each(field['related_entity_fields'], _.bind(function (relatedField) {
-                            relatedField = _.clone(relatedField);
+                        _.each(field['related_entity_fields'], _.bind(function (srcRelatedField) {
+                            var relatedField = _.clone(srcRelatedField);
                             relatedField['name'] =
                                 field['name'] + ',' +
                                 field['related_entity_name'] + '::' + relatedField['name'];
-                            sRelatedFields += this.optionTemplate(relatedField);
+                            if (_.isUndefined(this.options.exclude)
+                                || !this.options.exclude(this._getFieldApplicableConditions(srcRelatedField, field['related_entity_name']))) {
+                                sRelatedFields += this.optionTemplate(relatedField);
+                            }
                         }, this));
                         sRelations += this.optGroupTemplate({
                             label: field['label'],
@@ -104,6 +118,30 @@ function(_, Backbone) {
                 });
             }
             return result;
+        },
+
+        getFieldApplicableConditions: function ($el, entity) {
+            var result = {
+                entity: entity,
+                field: $el.val()
+            };
+            var chain = result.field.split(',');
+            if (_.size(chain) > 1) {
+                var field = _.last(chain).split('::');
+                result.entity = _.first(field);
+                result.field = _.last(field);
+            }
+            _.extend(result, _.pick($el.data(), ['type', 'identifier']));
+            return result;
+        },
+
+        _getFieldApplicableConditions: function (field, entity) {
+            return _.extend({
+                    entity: entity,
+                    field: field.name
+                },
+                _.pick(field, ['type', 'identifier'])
+            );
         }
     });
 });

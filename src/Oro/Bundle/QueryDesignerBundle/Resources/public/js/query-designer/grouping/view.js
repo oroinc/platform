@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/entity-field-choice-view', 'jquery-ui'],
-function(_, Backbone, EntityFieldChoiceView) {
+define(['underscore', 'backbone', 'oro/app', 'oro/entity-field-choice-view', 'jquery-ui'],
+function(_, Backbone, app, EntityFieldChoiceView) {
     'use strict';
 
     var $ = Backbone.$;
@@ -27,12 +27,22 @@ function(_, Backbone, EntityFieldChoiceView) {
         /** @property {oro.EntityFieldChoiceView} */
         columnSelector: null,
 
+        /**
+         * @property {Array}
+         */
+        grouping: null,
+
         initialize: function() {
+            var metadata = this.$el.closest('[data-metadata]').data('metadata');
+            metadata = _.extend({grouping: {exclude: []}}, metadata);
+            this.grouping = metadata.grouping;
+
             this.columnSelector = new EntityFieldChoiceView({
                 el: this.$el.find(this.selectors.columnSelector),
                 fieldsLabel: this.options.fieldsLabel,
                 relatedLabel: this.options.relatedLabel,
-                findEntity: this.options.findEntity
+                findEntity: this.options.findEntity,
+                exclude: _.bind(this.isFieldAllowedForGrouping, this)
             });
             this.columnSelector.$el.select2("container").find("ul.select2-choices").sortable({
                 cursor: 'move',
@@ -53,6 +63,19 @@ function(_, Backbone, EntityFieldChoiceView) {
 
         updateColumnSelector: function (columns) {
             this.columnSelector.changeEntity(this.options.entityName, columns);
+        },
+
+        isFieldAllowedForGrouping: function (criteria) {
+            var matched = _.find(this.grouping.exclude, function(exclude) {
+                var res = true;
+                _.each(exclude, function (val, key) {
+                    if (!_.has(criteria, key) || !app.isEqualsLoosely(val, criteria[key])) {
+                        res = false;
+                    }
+                });
+                return res;
+            });
+            return !_.isUndefined(matched);
         },
 
         getGroupingColumns: function () {

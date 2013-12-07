@@ -82,6 +82,22 @@ define(['jquery', 'underscore', 'backbone', 'oro/app'],
                     });
                 }
 
+                if (!_.isNull(foundAggregateName) && foundAggregateName !== this.activeAggregateName) {
+                    var emptyItem = this.$el.find('option[value=""]');
+                    this.$el.empty();
+                    if (emptyItem.length > 0) {
+                        this.$el.append(this.optionTemplate({name: '', label: emptyItem.text()}));
+                    }
+                    var content = '';
+                    _.each(this.aggregates[foundAggregateName].functions, function (func) {
+                        content += this.optionTemplate(func);
+                    }, this);
+                    if (content != '') {
+                        this.$el.append(content);
+                    }
+                    this.activeAggregateName = foundAggregateName;
+                }
+
                 if (this.isVisible) {
                     if (_.isNull(foundAggregateName)) {
                         this._getContainer().hide();
@@ -93,27 +109,9 @@ define(['jquery', 'underscore', 'backbone', 'oro/app'],
                         this.isVisible = true;
                     }
                 }
-
-                if (!_.isNull(foundAggregateName) && foundAggregateName !== this.activeAggregateName) {
-                    var emptyItem = this.$el.find('option[value=""]');
-                    this.$el.empty();
-                    if (emptyItem.length > 0) {
-                        this.$el.append(this.optionTemplate({name: '', label: emptyItem.text()}));
-                    }
-                    var content = '';
-                    _.each(this.aggregates[foundAggregateName].function, function (val) {
-                        content += this.optionTemplate(val);
-                    }, this);
-                    if (content != '') {
-                        this.$el.append(content);
-                    }
-                    this.activeAggregateName = foundAggregateName;
-                }
-
-                if (_.isUndefined(criteria.data)) {
+                if (this.isVisible) {
                     this.$el.val('');
-                } else {
-                    this.$el.val(criteria.data);
+                    this.$el.trigger('change')
                 }
             },
 
@@ -126,7 +124,7 @@ define(['jquery', 'underscore', 'backbone', 'oro/app'],
             getAggregateFunctionLabel: function (functionName) {
                 var result = functionName;
                 _.every(this.aggregates, function(aggregate) {
-                    var func = _.findWhere(aggregate.function, {name: functionName});
+                    var func = _.findWhere(aggregate.functions, {name: functionName});
                     if (!_.isUndefined(func)) {
                         result = func.label;
                         return false;

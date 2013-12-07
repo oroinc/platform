@@ -49,11 +49,7 @@ function(_, __, AbstractView, FilterCollection, filterBuilder) {
                     if (_.isNull(this.filterManager) && !_.isUndefined(console)) {
                         console.error('Cannot choose a filer because the filter manager was not initialized yet.');
                     } else {
-                        var criteria = _.extend(
-                            {field: e.added.id, entity: this.options.entityName},
-                            $(e.added.element).data()
-                        );
-                        this.filterManager.setActiveFilter(criteria);
+                        this.filterManager.setActiveFilter(this.getFieldApplicableConditions($(e.added.element)));
                     }
                 }
             }, this));

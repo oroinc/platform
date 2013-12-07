@@ -11,7 +11,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Configuration;
 
 class ConfigurationPass implements CompilerPassInterface
 {
-    const MANAGER_SERVICE_ID = 'oro_querydesigner.querydesigner.manager';
+    const MANAGER_SERVICE_ID = 'oro_query_designer.query_designer.manager';
     const TAG_NAME           = 'oro_filter.extension.orm_filter.filter';
     const CONFIG_FILE_NAME   = 'query_designer.yml';
 
