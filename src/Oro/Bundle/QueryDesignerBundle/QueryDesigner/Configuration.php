@@ -137,6 +137,12 @@ class Configuration implements ConfigurationInterface
                                             ->isRequired()
                                             ->cannotBeEmpty()
                                         ->end()
+                                        // function return type
+                                        // if this attribute is not specified the return type
+                                        // is equal to the type of a field this function is applied
+                                        ->scalarNode('return_type')
+                                            ->cannotBeEmpty()
+                                        ->end()
                                         // function expression
                                         ->scalarNode('expr')
                                             ->isRequired()
@@ -197,6 +203,12 @@ class Configuration implements ConfigurationInterface
                                         // function name
                                         ->scalarNode('name')
                                             ->isRequired()
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // function return type
+                                        // if this attribute is not specified the return type
+                                        // is equal to the type of a field this function is applied
+                                        ->scalarNode('return_type')
                                             ->cannotBeEmpty()
                                         ->end()
                                         // function expression

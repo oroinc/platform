@@ -4,9 +4,10 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
 
-class Manager
+class Manager implements FunctionProviderInterface
 {
     /** @var ConfigurationObject */
     protected $config;
@@ -97,6 +98,30 @@ class Manager
         }
 
         return $this->getFilterObject($name, $config);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunction($name, $groupName, $groupType)
+    {
+        $result    = null;
+        $functions = $this->config->offsetGetByPath(sprintf('[%s][%s][functions]', $groupType, $groupName));
+        if ($functions !== null) {
+            foreach ($functions as $function) {
+                if ($function['name'] === $name) {
+                    $result = $function;
+                    break;
+                }
+            }
+        }
+        if ($result === null) {
+            throw new InvalidConfigurationException(
+                sprintf('The function "%s:%s:%s" was not found.', $groupType, $groupName, $name)
+            );
+        }
+
+        return $result;
     }
 
     /**

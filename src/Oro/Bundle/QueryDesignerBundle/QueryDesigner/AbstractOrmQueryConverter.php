@@ -20,10 +20,12 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     /**
      * Constructor
      *
-     * @param ManagerRegistry       $doctrine
+     * @param FunctionProviderInterface $functionProvider
+     * @param ManagerRegistry           $doctrine
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
     {
+        parent::__construct($functionProvider);
         $this->doctrine = $doctrine;
     }
 

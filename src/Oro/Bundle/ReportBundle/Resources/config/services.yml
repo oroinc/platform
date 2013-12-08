@@ -8,6 +8,7 @@ services:
     oro_report.datagrid.configuration.provider:
         class: %oro_report.datagrid.configuration.provider.class%
         arguments:
+            - @oro_query_designer.query_designer.manager
             - @doctrine
         tags:
             - { name: oro_datagrid.configuration.provider }

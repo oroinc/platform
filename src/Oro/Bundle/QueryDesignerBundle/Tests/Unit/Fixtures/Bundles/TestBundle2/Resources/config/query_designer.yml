@@ -18,4 +18,4 @@ query_designer:
     aggregates:
         aggregate1:
             applicable: [{type: float}]
-            functions:  [{name: Count, expr: COUNT($column)}]
+            functions:  [{name: Count, expr: COUNT($column), return_type: integer}]

@@ -24,7 +24,7 @@ query_designer:
         converter1:
             applicable: [{type: string}]
             functions:
-                - {name: Func1, expr: FUNC1($column)}
+                - {name: Func1, expr: FUNC1($column), return_type: string}
             query_type: [type1]
 
     aggregates:

@@ -91,9 +91,15 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
                     delete value.id;
                     delete value.index;
                 });
+                var groupingColumns = [];
+                _.each(this.columnsView.getGroupingColumns(), function (name) {
+                    groupingColumns.push({
+                        name: name
+                    });
+                });
                 var data = {
                     columns: columns,
-                    grouping_columns: this.columnsView.getGroupingColumns(),
+                    grouping_columns: groupingColumns,
                     filters: filters,
                     filters_logic: this.filtersView.getFiltersLogic()
                 };
@@ -142,10 +148,18 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
             this.columnsView = new ColumnView(columnsOptions);
             this.columnsView.render();
             delete this.options.columnsOptions;
-            this.columnsView.setGroupingColumns(data['grouping_columns']);
+
+
+            var groupingColumnNames = [];
+            _.each(data['grouping_columns'], function (column) {
+                groupingColumnNames.push(column['name']);
+            });
+            this.columnsView.setGroupingColumns(groupingColumnNames);
+
             if (!_.isUndefined(data['columns']) && !_.isEmpty(data['columns'])) {
                 this.columnsView.getCollection().reset(data['columns']);
             }
+
             this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
             this.listenTo(this.columnsView, 'grouping:change', _.bind(this.updateStorage, this));
         },

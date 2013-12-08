@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractOrmQueryConverter;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 
 class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
 {
@@ -21,6 +22,11 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
      * @var array
      */
     protected $selectColumns;
+
+    /**
+     * @var array
+     */
+    protected $groupingColumns;
 
     /**
      * @var array
@@ -53,11 +59,12 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
     /**
      * Constructor
      *
-     * @param ManagerRegistry $doctrine
+     * @param FunctionProviderInterface $functionProvider
+     * @param ManagerRegistry           $doctrine
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
     {
-        parent::__construct($doctrine);
+        parent::__construct($functionProvider, $doctrine);
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -82,6 +89,7 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
     protected function doConvert(AbstractQueryDesigner $source)
     {
         $this->selectColumns     = [];
+        $this->groupingColumns   = [];
         $this->from              = [];
         $this->innerJoins        = [];
         $this->leftJoins         = [];
@@ -89,6 +97,7 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
         $this->currentFilterPath = '';
         parent::doConvert($source);
         $this->selectColumns     = null;
+        $this->groupingColumns   = null;
         $this->from              = null;
         $this->innerJoins        = null;
         $this->leftJoins         = null;
@@ -116,6 +125,9 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
         $this->config->offsetSetByPath('[source][query_config][column_aliases]', $this->columnAliases);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function addSelectStatement()
     {
         parent::addSelectStatement();
@@ -130,20 +142,37 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
         $tableAlias,
         $fieldName,
         $columnAlias,
-        $columnLabel
+        $columnLabel,
+        $functionExpr,
+        $functionReturnType
     ) {
+        $columnName = sprintf('%s.%s', $tableAlias, $fieldName);
+        if ($functionExpr !== null) {
+            $functionExpr = $this->prepareFunctionExpression(
+                $functionExpr,
+                $tableAlias,
+                $fieldName,
+                $columnName,
+                $columnAlias
+            );
+        }
         $this->selectColumns[] = sprintf(
-            '%s.%s as %s',
-            $tableAlias,
-            $fieldName,
+            '%s as %s',
+            $functionExpr !== null ? $functionExpr : $columnName,
             $columnAlias
         );
 
+        $fieldType = $functionReturnType;
+        if ($fieldType === null) {
+            $fieldType = $this->getFieldType($entityClassName, $fieldName);
+        }
+
+        // Add visible columns
         $this->config->offsetSetByPath(
             sprintf('[columns][%s]', $columnAlias),
             [
                 'label'         => $columnLabel,
-                'frontend_type' => $this->getFrontendFieldType($this->getFieldType($entityClassName, $fieldName))
+                'frontend_type' => $this->getFrontendFieldType($fieldType)
             ]
         );
 
@@ -151,17 +180,21 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
         $this->config->offsetSetByPath(
             sprintf('[sorters][columns][%s]', $columnAlias),
             [
-                'data_name' => sprintf('%s.%s', $tableAlias, $fieldName),
+                'data_name' => $columnAlias
             ]
         );
 
         // Add filters
+        $filter = [
+            'type'             => $this->getFilterType($fieldType),
+            'data_name'        => $columnAlias
+        ];
+        if ($functionExpr !== null) {
+            $filter['filter_by_having'] = true;
+        }
         $this->config->offsetSetByPath(
             sprintf('[filters][columns][%s]', $columnAlias),
-            [
-                'type' => $this->getFilterType($this->getFieldType($entityClassName, $fieldName)),
-                'data_name' => sprintf('%s.%s', $tableAlias, $fieldName),
-            ]
+            $filter
         );
     }
 
@@ -292,6 +325,29 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
             '%s%d]',
             substr($this->currentFilterPath, 0, $start + 1),
             intval($index) + 1
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addGroupByStatement()
+    {
+        parent::addGroupByStatement();
+        if (!empty($this->groupingColumns)) {
+            $this->config->offsetSetByPath('[source][query][groupBy]', implode(', ', $this->groupingColumns));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addGroupByColumn($tableAlias, $fieldName)
+    {
+        $this->groupingColumns[] = sprintf(
+            '%s.%s',
+            $tableAlias,
+            $fieldName
         );
     }
 

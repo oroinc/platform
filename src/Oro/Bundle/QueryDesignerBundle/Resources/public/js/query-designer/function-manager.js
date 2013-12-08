@@ -74,7 +74,10 @@ function($, _, Backbone, util) {
 
             var foundGroupKey = null;
             if (!_.isEmpty(foundGroups)) {
-                foundGroupKey = _.flatten(foundGroups).join();
+                foundGroupKey = '';
+                _.each(foundGroups, function (group) {
+                    foundGroupKey += (group.group_type + ':' + group.group_name + ';');
+                });
             }
             if (!_.isNull(foundGroupKey) && foundGroupKey !== this.activeFunctionGroupKey) {
                 util.clearSelect(this.$el);

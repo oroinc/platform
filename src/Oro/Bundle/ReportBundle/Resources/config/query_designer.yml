@@ -3,17 +3,17 @@ query_designer:
         identifier:
             applicable: [{identifier: true}]
             functions:
-                - { name: Count, expr: COUNT($column) }
+                - { name: Count, expr: COUNT($column), return_type: integer }
             query_type: [report]
         string:
             applicable: [{type: string}]
             functions:
-                - { name: Count, expr: COUNT($column) }
+                - { name: Count, expr: COUNT($column), return_type: integer }
             query_type: [report]
         number:
             applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
             functions:
-                - { name: Count, expr: COUNT($column) }
+                - { name: Count, expr: COUNT($column), return_type: integer }
                 - { name: Sum,   expr: SUM($column) }
                 - { name: Avg,   expr: AVG($column) }
                 - { name: Min,   expr: MIN($column) }
