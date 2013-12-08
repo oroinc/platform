@@ -184,8 +184,8 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
 
         // Add filters
         $filter = [
-            'type'             => $this->getFilterType($fieldType),
-            'data_name'        => $columnAlias
+            'type'      => $this->getFilterType($fieldType),
+            'data_name' => $columnAlias
         ];
         if ($functionExpr !== null) {
             $filter['filter_by_having'] = true;
@@ -235,10 +235,15 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
      */
     protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
     {
-        $this->leftJoins[] = [
+        $join = [
             'join'  => sprintf('%s.%s', $joinTableAlias, $joinFieldName),
             'alias' => $joinAlias
         ];
+        if ($this->isInnerJoin($joinTableAlias, $joinFieldName)) {
+            $this->innerJoins[] = $join;
+        } else {
+            $this->leftJoins[] = $join;
+        }
     }
 
     /**

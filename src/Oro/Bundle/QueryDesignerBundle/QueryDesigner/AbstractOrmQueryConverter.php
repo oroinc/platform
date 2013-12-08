@@ -3,7 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
 {
@@ -13,7 +13,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     protected $doctrine;
 
     /**
-     * @var ClassMetadata[]
+     * @var ClassMetadataInfo[]
      */
     protected $classMetadataLocalCache;
 
@@ -42,10 +42,30 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     }
 
     /**
+     * Check whether the given join is INNER JOIN or LEFT JOIN
+     *
+     * @param string $joinTableAlias
+     * @param string $joinFieldName
+     * @return bool true if INNER JOIN; otherwise, false
+     */
+    protected function isInnerJoin($joinTableAlias, $joinFieldName)
+    {
+        $metadata = $this->getClassMetadata(
+            $this->getEntityClassName($this->getJoinIdentifierByTableAlias($joinTableAlias))
+        );
+        $nullable = false;
+        foreach ($metadata->getAssociationMapping($joinFieldName)['joinColumns'] as $joinColumn) {
+            $nullable = ($nullable || $joinColumn['nullable']);
+        }
+
+        return !$nullable;
+    }
+
+    /**
      * Returns a metadata for the given entity
      *
      * @param string $className
-     * @return ClassMetadata
+     * @return ClassMetadataInfo
      */
     protected function getClassMetadata($className)
     {
