@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'oro/translator', 'oro/query-designer/abstract-view', 'oro/query-designer/filter/collection', 'oro/query-designer/filter-builder'],
-function(_, __, AbstractView, FilterCollection, filterBuilder) {
+define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/abstract-view', 'oro/query-designer/filter/collection', 'oro/query-designer/filter-builder'],
+function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
     'use strict';
 
     var $ = Backbone.$;

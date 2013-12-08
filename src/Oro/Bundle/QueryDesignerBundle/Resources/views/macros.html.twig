@@ -1,6 +1,6 @@
 {% macro query_designer_filter_list(attr) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container')|trim}) %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-filters-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
             <thead>
@@ -78,7 +78,7 @@
 
 {% macro query_designer_column_list(attr) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container')|trim}) %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
             <thead>

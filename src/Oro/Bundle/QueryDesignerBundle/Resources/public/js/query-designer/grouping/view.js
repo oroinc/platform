@@ -3,8 +3,6 @@ define(['underscore', 'backbone', 'oro/app', 'oro/entity-field-choice-view', 'jq
 function(_, Backbone, app, EntityFieldChoiceView) {
     'use strict';
 
-    var $ = Backbone.$;
-
     /**
      * @export  oro/query-designer/grouping/view
      * @class   oro.queryDesigner.grouping.View
@@ -47,6 +45,8 @@ function(_, Backbone, app, EntityFieldChoiceView) {
             this.columnSelector.$el.select2("container").find("ul.select2-choices").sortable({
                 cursor: 'move',
                 delay : 100,
+                opacity: 0.7,
+                revert: 10,
                 containment: "parent",
                 stop: _.bind(function() {
                     this.trigger('grouping:change');

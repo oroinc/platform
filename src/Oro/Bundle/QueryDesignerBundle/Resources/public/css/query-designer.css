@@ -92,3 +92,6 @@
 .form-horizontal .query-designer-filter-logic-form input[type=text] {
     width: 400px;
 }
+.query-designer-columns-grid-container tbody tr {
+    cursor: default;
+}
