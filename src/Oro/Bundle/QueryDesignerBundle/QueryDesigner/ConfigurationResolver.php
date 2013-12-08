@@ -56,7 +56,7 @@ class ConfigurationResolver
     protected function resolveSystemCall(&$val)
     {
         switch (true) {
-            // static call class:method or class::const
+            // static call class::method or class::const
             case preg_match('/^([^\'"%:\s]+)::([\w\._]+)$/', $val, $match):
                 $class  = $match[1];
                 $method = $match[2];
