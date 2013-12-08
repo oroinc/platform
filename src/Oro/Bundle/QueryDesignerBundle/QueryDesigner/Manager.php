@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Oro\Bundle\QueryDesignerBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
@@ -23,13 +22,13 @@ class Manager implements FunctionProviderInterface
     /**
      * Constructor
      *
-     * @param array               $config
-     * @param SystemAwareResolver $resolver
-     * @param Translator          $translator
+     * @param array                 $config
+     * @param ConfigurationResolver $resolver
+     * @param Translator            $translator
      */
     public function __construct(
         array $config,
-        SystemAwareResolver $resolver,
+        ConfigurationResolver $resolver,
         Translator $translator
     ) {
         $resolver->resolve($config);

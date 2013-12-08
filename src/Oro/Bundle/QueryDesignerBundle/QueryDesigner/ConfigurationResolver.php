@@ -1,20 +1,32 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Provider;
+namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class SystemAwareResolver implements ContainerAwareInterface
+class ConfigurationResolver
 {
+    /**
+     * @var EntityClassResolver
+     */
+    protected $entityClassResolver;
+
     /**
      * @var ContainerInterface
      */
     protected $container;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * Constructor
+     *
+     * @param EntityClassResolver $entityClassResolver
+     * @param ContainerInterface  $container
+     */
+    public function __construct(EntityClassResolver $entityClassResolver, ContainerInterface $container)
     {
-        $this->setContainer($container);
+        $this->entityClassResolver = $entityClassResolver;
+        $this->container           = $container;
     }
 
     /**
@@ -25,32 +37,28 @@ class SystemAwareResolver implements ContainerAwareInterface
         array_walk_recursive(
             $config,
             function (&$val, $key) {
-                $this->resolveSystemCall($val, $key);
+                if ($key === 'entity') {
+                    $val = $this->entityClassResolver->getEntityClass($val);
+                } elseif (is_string($val)) {
+                    $this->resolveSystemCall($val);
+                }
             }
         );
     }
 
     /**
      * Replace static call, service call or constant access notation to value they returned
-     * while building datagrid
      *
      * @param string $val value to be resolved/replaced
-     * @param string $key key from datagrid definition (columns, filters, sorters, etc)
      *
      * @return string
      */
-    protected function resolveSystemCall(&$val, $key)
+    protected function resolveSystemCall(&$val)
     {
-        // resolve only scalar value, if it's not - value was already resolved
-        // this can happen in case of extended grid definitions
-        if (!is_scalar($val)) {
-            return $val;
-        }
-
         switch (true) {
             // static call class:method or class::const
             case preg_match('/^([^\'"%:\s]+)::([\w\._]+)$/', $val, $match):
-                $class = $match[1];
+                $class  = $match[1];
                 $method = $match[2];
                 if (is_callable([$class, $method])) {
                     $val = $class::$method();
@@ -69,16 +77,6 @@ class SystemAwareResolver implements ContainerAwareInterface
             case preg_match('/^@[\w\._]+$/', $val):
                 $val = $this->container->get($val);
                 break;
-            default:
-                break;
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
     }
 }
