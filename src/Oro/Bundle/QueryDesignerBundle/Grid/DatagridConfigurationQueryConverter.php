@@ -110,19 +110,17 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function prepareTableAliases()
+    protected function saveTableAliases($tableAliases)
     {
-        parent::prepareTableAliases();
-        $this->config->offsetSetByPath('[source][query_config][table_aliases]', $this->tableAliases);
+        $this->config->offsetSetByPath('[source][query_config][table_aliases]', $tableAliases);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function prepareColumnAliases()
+    protected function saveColumnAliases($columnAliases)
     {
-        parent::prepareColumnAliases();
-        $this->config->offsetSetByPath('[source][query_config][column_aliases]', $this->columnAliases);
+        $this->config->offsetSetByPath('[source][query_config][column_aliases]', $columnAliases);
     }
 
     /**

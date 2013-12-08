@@ -384,14 +384,20 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
 
         getFieldApplicableConditions: function (item) {
             var result = {
+                parent_entity: null,
                 entity: this.options.entityName,
                 field: item.val()
             };
             var chain = result.field.split(',');
             if (_.size(chain) > 1) {
                 var field = _.last(chain).split('::');
+                result.parent_entity = result.entity;
                 result.entity = _.first(field);
                 result.field = _.last(field);
+                if (_.size(chain) > 2) {
+                    var parentField = chain[_.size(chain) - 2].split('::');
+                    result.parent_entity = _.first(parentField);
+                }
             }
             _.extend(result, _.pick(item.data(), ['type', 'identifier']));
             return result;

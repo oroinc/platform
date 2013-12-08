@@ -12,7 +12,7 @@ function($, _, Backbone, util) {
      */
     return Backbone.View.extend({
         /** @property */
-        optionTemplate: _.template('<option value="<%- name %>" data-group_name="<%- group_name %>" data-group_type="<%- group_type %>">' +
+        optionTemplate: _.template('<option value="<%- name %>" title="<%- title %>" data-group_name="<%- group_name %>" data-group_type="<%- group_type %>">' +
             '<%- label %>' +
         '</option>'),
 
@@ -85,11 +85,32 @@ function($, _, Backbone, util) {
                 var functions = [];
                 _.each(foundGroups, function (foundGroup) {
                     _.each(this[foundGroup.group_type][foundGroup.group_name].functions, function (func) {
-                        if (!_.any(functions, function (val) { return val === func['name']; })) {
-                            functions.push(func['name']);
-                            content += this.optionTemplate(_.extend({}, foundGroup, func));
+                        var existingFuncIndex = -1;
+                        _.any(functions, function (val, index) {
+                            if (val['name'] === func['name']) {
+                                existingFuncIndex = index;
+                                return true;
+                            }
+                            return false;
+                        });
+                        if (existingFuncIndex != -1) {
+                            // override existing function and use its labels if needed
+                            var existingLabel = functions[existingFuncIndex]['label'];
+                            var existingTitle = functions[existingFuncIndex]['title'];
+                            functions[existingFuncIndex] = _.extend({}, foundGroup, func);
+                            if (_.isNull(functions[existingFuncIndex]['label'])) {
+                                functions[existingFuncIndex]['label'] = existingLabel;
+                            }
+                            if (_.isNull(functions[existingFuncIndex]['title'])) {
+                                functions[existingFuncIndex]['title'] = existingTitle;
+                            }
+                        } else {
+                            functions.push(_.extend({}, foundGroup, func));
                         }
                     }, this);
+                }, this);
+                _.each(functions, function (func) {
+                    content += this.optionTemplate(func);
                 }, this);
                 if (content != '') {
                     this.$el.append(content);

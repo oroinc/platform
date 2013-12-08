@@ -185,9 +185,16 @@ class Manager implements FunctionProviderInterface
                 unset($attr['query_type']);
                 $functions = [];
                 foreach ($attr['functions'] as $function) {
+                    $nameText    = empty($function['name_label'])
+                        ? null // if a label is empty it means that this function should inherit a label
+                        : $this->translator->trans($function['name_label']);
+                    $hintText    = empty($function['hint_label'])
+                        ? null // if a label is empty it means that this function should inherit a label
+                        : $this->translator->trans($function['hint_label']);
                     $functions[] = [
                         'name'  => $function['name'],
-                        'label' => $this->translator->trans($function['label']),
+                        'label' => $nameText,
+                        'title' => $hintText,
                     ];
                 }
                 $attr['functions'] = $functions;

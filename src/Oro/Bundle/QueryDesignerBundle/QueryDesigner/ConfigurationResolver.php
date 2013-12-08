@@ -37,7 +37,7 @@ class ConfigurationResolver
         array_walk_recursive(
             $config,
             function (&$val, $key) {
-                if ($key === 'entity') {
+                if ($key === 'entity' || $key === 'parent_entity') {
                     $val = $this->entityClassResolver->getEntityClass($val);
                 } elseif (is_string($val)) {
                     $this->resolveSystemCall($val);
@@ -74,8 +74,8 @@ class ConfigurationResolver
                 $val     = $this->container->get($service)->$method();
                 break;
             // service pass @service
-            case preg_match('/^@[\w\._]+$/', $val):
-                $val = $this->container->get($val);
+            case preg_match('/^@([\w\._]+)$/', $val, $match):
+                $val = $this->container->get($match[1]);
                 break;
         }
     }

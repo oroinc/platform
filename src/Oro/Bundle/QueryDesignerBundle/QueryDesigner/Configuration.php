@@ -114,6 +114,10 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('type')
                                             ->cannotBeEmpty()
                                         ->end()
+                                        // parent entity name
+                                        ->scalarNode('parent_entity')
+                                            ->cannotBeEmpty()
+                                        ->end()
                                         // entity name
                                         ->scalarNode('entity')
                                             ->cannotBeEmpty()
@@ -148,13 +152,25 @@ class Configuration implements ConfigurationInterface
                                             ->isRequired()
                                             ->cannotBeEmpty()
                                         ->end()
-                                        // function label name
+                                        // label name for function name
                                         // usually this attribute sets automatically (see ConfigurationPass class) to
-                                        // [vendor name].query_designer.converters.[converter name].[function name]
+                                        // [vendor name].query_designer.converters.[converter name].[function name].name
                                         // the vendor name is always in lower case
-                                        ->scalarNode('label')
+                                        // if your function overrides existing function (the name of your function
+                                        // is the same as the name of existing function) and you want to use a label
+                                        // of the overridden function set this attribute to true (boolean)
+                                        ->scalarNode('name_label')
                                             ->isRequired()
-                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // label name for function hint
+                                        // usually this attribute sets automatically (see ConfigurationPass class) to
+                                        // [vendor name].query_designer.converters.[converter name].[function name].hint
+                                        // the vendor name is always in lower case
+                                        // if your function overrides existing function (the name of your function
+                                        // is the same as the name of existing function) and you want to use a label
+                                        // of the overridden function set this attribute to true (boolean)
+                                        ->scalarNode('hint_label')
+                                            ->isRequired()
                                         ->end()
                                     ->end()
                                 ->end()
@@ -182,6 +198,10 @@ class Configuration implements ConfigurationInterface
                                         ->scalarNode('type')
                                             ->cannotBeEmpty()
                                         ->end()
+                                        // parent entity name
+                                        ->scalarNode('parent_entity')
+                                            ->cannotBeEmpty()
+                                        ->end()
                                         // entity name
                                         ->scalarNode('entity')
                                             ->cannotBeEmpty()
@@ -216,13 +236,25 @@ class Configuration implements ConfigurationInterface
                                             ->isRequired()
                                             ->cannotBeEmpty()
                                         ->end()
-                                        // function label name
+                                        // label name for function name
                                         // usually this attribute sets automatically (see ConfigurationPass class) to
-                                        // [vendor name].query_designer.aggregates.[aggregate name].[function name]
+                                        // [vendor name].query_designer.aggregates.[converter name].[function name].name
                                         // the vendor name is always in lower case
-                                        ->scalarNode('label')
+                                        // if your function overrides existing function (the name of your function
+                                        // is the same as the name of existing function) and you want to use a label
+                                        // of the overridden function set this attribute to true (boolean)
+                                        ->scalarNode('name_label')
                                             ->isRequired()
-                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // label name for function hint
+                                        // usually this attribute sets automatically (see ConfigurationPass class) to
+                                        // [vendor name].query_designer.aggregates.[converter name].[function name].hint
+                                        // the vendor name is always in lower case
+                                        // if your function overrides existing function (the name of your function
+                                        // is the same as the name of existing function) and you want to use a label
+                                        // of the overridden function set this attribute to true (boolean)
+                                        ->scalarNode('hint_label')
+                                            ->isRequired()
                                         ->end()
                                     ->end()
                                 ->end()

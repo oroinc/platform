@@ -116,12 +116,14 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                             'name'        => 'Func1',
                             'expr'        => 'FUNC1($column)',
                             'return_type' => 'string',
-                            'label'       => 'oro.query_designer.converters.converter1.Func1'
+                            'name_label'  => 'oro.query_designer.converters.converter1.Func1.name',
+                            'hint_label'  => 'oro.query_designer.converters.converter1.Func1.hint',
                         ],
                         [
-                            'name'  => 'Func2',
-                            'expr'  => 'FUNC2($column)',
-                            'label' => 'oro.query_designer.converters.converter1.Func2'
+                            'name'       => 'Func2',
+                            'expr'       => 'FUNC2($column)',
+                            'name_label' => 'oro.query_designer.converters.converter1.Func2.name',
+                            'hint_label' => 'oro.query_designer.converters.converter1.Func2.hint',
                         ],
                     ],
                     'query_type' => ['type1']
@@ -136,20 +138,23 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     ],
                     'functions'  => [
                         [
-                            'name'  => 'Min',
-                            'expr'  => 'MIN($column)',
-                            'label' => 'oro.query_designer.aggregates.aggregate1.Min'
+                            'name'       => 'Min',
+                            'expr'       => 'MIN($column)',
+                            'name_label' => 'oro.query_designer.aggregates.aggregate1.Min.name',
+                            'hint_label' => 'oro.query_designer.aggregates.aggregate1.Min.hint',
                         ],
                         [
-                            'name'  => 'Max',
-                            'expr'  => 'MAX($column)',
-                            'label' => 'oro.query_designer.aggregates.aggregate1.Max'
+                            'name'       => 'Max',
+                            'expr'       => 'MAX($column)',
+                            'name_label' => 'oro.query_designer.aggregates.aggregate1.Max.name',
+                            'hint_label' => 'oro.query_designer.aggregates.aggregate1.Max.hint',
                         ],
                         [
                             'name'        => 'Count',
                             'expr'        => 'COUNT($column)',
                             'return_type' => 'integer',
-                            'label'       => 'oro.query_designer.aggregates.aggregate1.Count'
+                            'name_label'  => 'oro.query_designer.aggregates.aggregate1.Count.name',
+                            'hint_label'  => 'oro.query_designer.aggregates.aggregate1.Count.hint',
                         ],
                     ],
                     'query_type' => ['type1']

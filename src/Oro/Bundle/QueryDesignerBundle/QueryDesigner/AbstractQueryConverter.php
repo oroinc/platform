@@ -7,6 +7,15 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFilterLogicException;
 
 /**
+ * Provides a core functionality to convert a query definition created by the query designer to another format.
+ *
+ * This class operates with 'Join Identifier'. It is a string which unique identifies
+ * each table used in a query.
+ * Examples:
+ *      AcmeBundle\Entity\Order::products
+ *      AcmeBundle\Entity\Order::products,AcmeBundle\Entity\Product::statuses
+ * The join identifier for the root table is empty string.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractQueryConverter
@@ -17,12 +26,12 @@ abstract class AbstractQueryConverter
     /**
      * @var FunctionProviderInterface
      */
-    protected $functionProvider;
+    private $functionProvider;
 
     /**
      * @var string
      */
-    protected $entity;
+    private $entity;
 
     /**
      * @var array
@@ -32,12 +41,12 @@ abstract class AbstractQueryConverter
     /**
      * @var array
      */
-    protected $tableAliases;
+    private $tableAliases;
 
     /**
      * @var array
      */
-    protected $columnAliases;
+    private $columnAliases;
 
     /**
      * Constructor
@@ -47,6 +56,103 @@ abstract class AbstractQueryConverter
     protected function __construct(FunctionProviderInterface $functionProvider)
     {
         $this->functionProvider = $functionProvider;
+    }
+
+    /**
+     * Makes sure that a table identified by $joinByFieldName joined
+     * on the same level as a table identified by $tableAlias.
+     *
+     * For example assume that $tableAlias points to
+     *      table1::orders -> table2::products
+     * and $joinByFieldName is, for example, 'statuses'.
+     * In this case the checked join will be
+     *      table1::orders -> table2::statuses
+     *
+     * @param string $tableAlias      The alias of a table to check
+     * @param string $joinByFieldName The name of a field should be used to check a join
+     * @return string The table alias for the checked join
+     */
+    public function ensureSiblingTableJoined($tableAlias, $joinByFieldName)
+    {
+        $joinId       = $this->getJoinIdentifierByTableAlias($tableAlias);
+        $parentJoinId = $this->getParentJoinIdentifier($joinId);
+        $newJoinId    = $this->buildSiblingJoinIdentifier($parentJoinId, $joinByFieldName);
+
+        return $this->ensureTableJoined($newJoinId);
+    }
+
+    /**
+     * Makes sure that a table identified by the given $joinId exists in the query
+     *
+     * @param string $joinId
+     * $return string The table alias for the given join
+     */
+    public function ensureTableJoined($joinId)
+    {
+        $joinIds = [];
+        foreach (explode(',', $joinId) as $item) {
+            $joinIds[] = empty($joinIds)
+                ? $item
+                : sprintf('%s,%s', $joinIds[count($joinIds) - 1], $item);
+        }
+        $this->addTableAliasesForJoinIdentifiers($joinIds);
+
+        return $this->tableAliases[$joinId];
+    }
+
+    /**
+     * Gets join identifier for the given table alias
+     *
+     * @param $tableAlias
+     * @return string
+     */
+    public function getJoinIdentifierByTableAlias($tableAlias)
+    {
+        $result = null;
+        foreach ($this->tableAliases as $joinId => $alias) {
+            if ($alias === $tableAlias) {
+                $result = $joinId;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Builds join identifier for a table is joined on the same level as a table identified by $joinId.
+     *
+     * @param string $joinId          The join identifier
+     * @param string $joinByFieldName The name of a field should be used to join new table
+     * @return string The join identifier
+     */
+    public function buildSiblingJoinIdentifier($joinId, $joinByFieldName)
+    {
+        if (empty($joinId)) {
+            return sprintf('%s::%s', $this->entity, $joinByFieldName);
+        }
+
+        return sprintf('%s::%s', substr($joinId, 0, strrpos($joinId, '::')), $joinByFieldName);
+    }
+
+    /**
+     * Extracts a parent join identifier
+     *
+     * @param string $joinId
+     * @return string
+     * @throws \LogicException if incorrect join identifier specified
+     */
+    public function getParentJoinIdentifier($joinId)
+    {
+        if (empty($joinId)) {
+            throw new \LogicException('Cannot get parent join identifier for root table.');
+        }
+
+        $lastDelimiter = strrpos($joinId, ',');
+        if (false === $lastDelimiter) {
+            return '';
+        }
+
+        return substr($joinId, 0, $lastDelimiter);
     }
 
     /**
@@ -81,12 +187,16 @@ abstract class AbstractQueryConverter
     {
         $this->prepareTableAliases();
         $this->prepareColumnAliases();
+
         $this->addSelectStatement();
         $this->addFromStatements();
         $this->addJoinStatements();
         $this->addWhereStatement();
         $this->addGroupByStatement();
         $this->addOrderByStatement();
+
+        $this->saveTableAliases($this->tableAliases);
+        $this->saveColumnAliases($this->columnAliases);
     }
 
     /**
@@ -111,6 +221,15 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * Stores all table aliases in the query
+     *
+     * @param array $tableAliases
+     */
+    protected function saveTableAliases($tableAliases)
+    {
+    }
+
+    /**
      * Prepares aliases for columns should be returned by a query
      */
     protected function prepareColumnAliases()
@@ -119,6 +238,15 @@ abstract class AbstractQueryConverter
             $this->columnAliases[$this->buildColumnAliasKey($column)] =
                 sprintf(static::COLUMN_ALIAS_TEMPLATE, count($this->columnAliases) + 1);
         }
+    }
+
+    /**
+     * Stores all column aliases in the query
+     *
+     * @param array $columnAliases
+     */
+    protected function saveColumnAliases($columnAliases)
+    {
     }
 
     /**
@@ -154,13 +282,13 @@ abstract class AbstractQueryConverter
     /**
      * Performs conversion of a single column of SELECT statement
      *
-     * @param string      $entityClassName
-     * @param string      $tableAlias
-     * @param string      $fieldName
-     * @param string      $columnAlias
-     * @param string      $columnLabel
-     * @param string|null $functionExpr
-     * @param string|null $functionReturnType
+     * @param string                        $entityClassName
+     * @param string                        $tableAlias
+     * @param string                        $fieldName
+     * @param string                        $columnAlias
+     * @param string                        $columnLabel
+     * @param string|FunctionInterface|null $functionExpr
+     * @param string|null                   $functionReturnType
      */
     abstract protected function addSelectColumn(
         $entityClassName,
@@ -469,19 +597,13 @@ abstract class AbstractQueryConverter
     }
 
     /**
-     * Extracts a parent join identifier
+     * Gets a root entity of this query
      *
-     * @param string $joinId
      * @return string
      */
-    protected function getParentJoinIdentifier($joinId)
+    protected function getRootEntity()
     {
-        $lastDelimiter = strrpos($joinId, ',');
-        if (false === $lastDelimiter) {
-            return '';
-        }
-
-        return substr($joinId, 0, $lastDelimiter);
+        return $this->entity;
     }
 
     /**
@@ -563,15 +685,28 @@ abstract class AbstractQueryConverter
     /**
      * Prepares the given function expression to use in a query
      *
-     * @param string $functionExpr
-     * @param string $tableAlias
-     * @param string $fieldName
-     * @param string $columnName
-     * @param string $columnAlias
+     * @param string|FunctionInterface $functionExpr
+     * @param string                   $tableAlias
+     * @param string                   $fieldName
+     * @param string                   $columnName
+     * @param string                   $columnAlias
      * @return string
+     * @throws InvalidConfigurationException if incorrect type $functionExpr specified
      */
     protected function prepareFunctionExpression($functionExpr, $tableAlias, $fieldName, $columnName, $columnAlias)
     {
+        if (is_string($functionExpr) && strpos($functionExpr, '@') === 0) {
+            $className = substr($functionExpr, 1);
+            $functionExpr = new $className();
+        }
+        if ($functionExpr instanceof FunctionInterface) {
+            return $functionExpr->getExpression($tableAlias, $fieldName, $columnName, $columnAlias, $this);
+        } elseif (!is_string($functionExpr)) {
+            throw new InvalidConfigurationException(
+                'The function expression must be a string or instance of FunctionInterface'
+            );
+        }
+
         $variables = [
             'column'       => $columnName,
             'column_name'  => $fieldName,
