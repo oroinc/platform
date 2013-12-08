@@ -27,7 +27,7 @@
 .form-horizontal .query-designer-form input.label-text {
     width: 90px;
 }
-.form-horizontal .query-designer-form .aggregate-selector .controls select {
+.form-horizontal .query-designer-form .function-selector .controls select {
     width: 120px;
 }
 .form-horizontal .query-designer-form .sorting-selector .controls select {
@@ -73,8 +73,8 @@
 .query-designer-grid-container .grid .label-cell {
     width: 150px;
 }
-.query-designer-grid-container .grid .aggregate-column,
-.query-designer-grid-container .grid .aggregate-cell {
+.query-designer-grid-container .grid .function-column,
+.query-designer-grid-container .grid .function-cell {
     width: 140px;
 }
 .query-designer-grid-container .grid .sorting-column,

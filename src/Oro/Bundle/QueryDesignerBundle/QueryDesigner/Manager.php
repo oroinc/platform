@@ -53,7 +53,8 @@ class Manager
         return [
             'filters'    => $filtersMetadata,
             'grouping'   => $this->getMetadataForGrouping(),
-            'aggregates' => $this->getMetadataForAggregates($queryType)
+            'converters' => $this->getMetadataForFunctions('converters', $queryType),
+            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType)
         ];
     }
 
@@ -145,32 +146,32 @@ class Manager
     }
 
     /**
-     * Returns all available aggregate functions for the given query type
+     * Returns all available functions for the given query type
      *
+     * @param string $groupType The type of functions' group
      * @param string $queryType The query type
      * @return array
      */
-    protected function getMetadataForAggregates($queryType)
+    protected function getMetadataForFunctions($groupType, $queryType)
     {
-        $aggregates       = [];
-        $aggregatesConfig = $this->config->offsetGet('aggregates');
-        foreach ($aggregatesConfig as $name => $attr) {
+        $result       = [];
+        $groupsConfig = $this->config->offsetGet($groupType);
+        foreach ($groupsConfig as $name => $attr) {
             if ($this->isItemAllowedForQueryType($attr, $queryType)) {
                 unset($attr['query_type']);
                 $functions = [];
                 foreach ($attr['functions'] as $function) {
                     $functions[] = [
                         'name'  => $function['name'],
-                        'label' => $this->translator
-                                ->trans(sprintf('oro.query_designer.aggregates.%s.%s', $name, $function['name'])),
+                        'label' => $this->translator->trans($function['label']),
                     ];
                 }
                 $attr['functions'] = $functions;
-                $aggregates[$name] = $attr;
+                $result[$name]     = $attr;
             }
         }
 
-        return $aggregates;
+        return $result;
     }
 
     /**

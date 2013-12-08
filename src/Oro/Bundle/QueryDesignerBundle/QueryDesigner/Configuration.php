@@ -22,6 +22,8 @@ class Configuration implements ConfigurationInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
@@ -38,16 +40,20 @@ class Configuration implements ConfigurationInterface
                                 ->requiresAtLeastOneElement()
                                 ->prototype('array')
                                     ->children()
-                                        ->scalarNode('type')                // field type
+                                        // field type
+                                        ->scalarNode('type')
                                             ->cannotBeEmpty()
                                         ->end()
-                                        ->scalarNode('entity')              // entity name
+                                        // entity name
+                                        ->scalarNode('entity')
                                             ->cannotBeEmpty()
                                         ->end()
-                                        ->scalarNode('field')               // field name
+                                        // field name
+                                        ->scalarNode('field')
                                             ->cannotBeEmpty()
                                         ->end()
-                                        ->booleanNode('identifier')         // primary key
+                                        // primary key
+                                        ->booleanNode('identifier')
                                         ->end()
                                     ->end()
                                 ->end()
@@ -75,17 +81,83 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('exclude')
                             ->prototype('array')
                                 ->children()
-                                    ->scalarNode('type')                // field type
+                                    // field type
+                                    ->scalarNode('type')
                                         ->cannotBeEmpty()
                                     ->end()
-                                    ->scalarNode('entity')              // entity name
+                                    // entity name
+                                    ->scalarNode('entity')
                                         ->cannotBeEmpty()
                                     ->end()
-                                    ->scalarNode('field')               // field name
+                                    // field name
+                                    ->scalarNode('field')
                                         ->cannotBeEmpty()
                                     ->end()
-                                    ->booleanNode('identifier')         // primary key
+                                    // primary key
+                                    ->booleanNode('identifier')
                                     ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->arrayNode('converters')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->ignoreExtraKeys()
+                        ->children()
+                            ->arrayNode('applicable')
+                                ->requiresAtLeastOneElement()
+                                ->prototype('array')
+                                    ->children()
+                                        // field type
+                                        ->scalarNode('type')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // entity name
+                                        ->scalarNode('entity')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // field name
+                                        ->scalarNode('field')
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // primary key
+                                        ->booleanNode('identifier')
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('functions')
+                                ->requiresAtLeastOneElement()
+                                ->prototype('array')
+                                    ->children()
+                                        // function name
+                                        ->scalarNode('name')
+                                            ->isRequired()
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // function expression
+                                        ->scalarNode('expr')
+                                            ->isRequired()
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // function label name
+                                        // usually this attribute sets automatically (see ConfigurationPass class) to
+                                        // [vendor name].query_designer.converters.[converter name].[function name]
+                                        // the vendor name is always in lower case
+                                        ->scalarNode('label')
+                                            ->isRequired()
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('query_type')
+                                ->isRequired()
+                                ->requiresAtLeastOneElement()
+                                ->prototype('scalar')
+                                    ->cannotBeEmpty()
                                 ->end()
                             ->end()
                         ->end()
@@ -100,16 +172,20 @@ class Configuration implements ConfigurationInterface
                                 ->requiresAtLeastOneElement()
                                 ->prototype('array')
                                     ->children()
-                                        ->scalarNode('type')                // field type
+                                        // field type
+                                        ->scalarNode('type')
                                             ->cannotBeEmpty()
                                         ->end()
-                                        ->scalarNode('entity')              // entity name
+                                        // entity name
+                                        ->scalarNode('entity')
                                             ->cannotBeEmpty()
                                         ->end()
-                                        ->scalarNode('field')               // field name
+                                        // field name
+                                        ->scalarNode('field')
                                             ->cannotBeEmpty()
                                         ->end()
-                                        ->booleanNode('identifier')         // primary key
+                                        // primary key
+                                        ->booleanNode('identifier')
                                         ->end()
                                     ->end()
                                 ->end()
@@ -118,11 +194,21 @@ class Configuration implements ConfigurationInterface
                                 ->requiresAtLeastOneElement()
                                 ->prototype('array')
                                     ->children()
-                                        ->scalarNode('name')                // function name
+                                        // function name
+                                        ->scalarNode('name')
                                             ->isRequired()
                                             ->cannotBeEmpty()
                                         ->end()
-                                        ->scalarNode('expr')                // function expression
+                                        // function expression
+                                        ->scalarNode('expr')
+                                            ->isRequired()
+                                            ->cannotBeEmpty()
+                                        ->end()
+                                        // function label name
+                                        // usually this attribute sets automatically (see ConfigurationPass class) to
+                                        // [vendor name].query_designer.aggregates.[aggregate name].[function name]
+                                        // the vendor name is always in lower case
+                                        ->scalarNode('label')
                                             ->isRequired()
                                             ->cannotBeEmpty()
                                         ->end()

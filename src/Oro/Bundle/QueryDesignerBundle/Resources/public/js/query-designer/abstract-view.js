@@ -1,7 +1,7 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/translator', 'oro/form-validation', 'oro/delete-confirmation',
+define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/util', 'oro/form-validation', 'oro/delete-confirmation',
     'oro/query-designer/column-selector-view', 'jquery-outer-html'],
-function(_, Backbone, __, FormValidation, DeleteConfirmation,
+function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
          ColumnSelectorView) {
     'use strict';
 
@@ -374,7 +374,7 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation,
 
         getSelectFieldLabel: function (field, name, value) {
             if (field.get(0).tagName.toLowerCase() == 'select') {
-                var opt = field.find('option[value="' + value + '"]');
+                var opt = util.findSelectOption(field, value);
                 if (opt.length === 1) {
                     return opt.text();
                 }

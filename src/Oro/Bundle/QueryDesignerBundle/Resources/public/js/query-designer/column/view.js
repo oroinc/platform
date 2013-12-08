@@ -1,8 +1,8 @@
 /* global define */
-define(['oro/query-designer/abstract-view', 'oro/query-designer/column/collection',
-    'oro/query-designer/grouping/view', 'oro/query-designer/aggregate-manager'],
-function(AbstractView, ColumnCollection,
-         GroupingView, AggregateManager) {
+define(['oro/query-designer/util', 'oro/query-designer/abstract-view', 'oro/query-designer/column/collection',
+    'oro/query-designer/grouping/view', 'oro/query-designer/function-manager'],
+function(util, AbstractView, ColumnCollection,
+         GroupingView, FunctionManager) {
     'use strict';
 
     /**
@@ -22,8 +22,8 @@ function(AbstractView, ColumnCollection,
         /** @property {oro.queryDesigner.grouping.View} */
         groupingColumnsSelector: null,
 
-        /** @property {oro.queryDesigner.AggregateManager} */
-        aggregateManager: null,
+        /** @property {oro.queryDesigner.FunctionManager} */
+        functionManager: null,
 
         /** @property {jQuery} */
         sortingSelector: null,
@@ -31,7 +31,7 @@ function(AbstractView, ColumnCollection,
         initialize: function() {
             AbstractView.prototype.initialize.apply(this, arguments);
 
-            this.addFieldLabelGetter(this.getAggregateFieldLabel);
+            this.addFieldLabelGetter(this.getFunctionFieldLabel);
             this.addFieldLabelGetter(this.getSortingFieldLabel);
         },
 
@@ -49,8 +49,8 @@ function(AbstractView, ColumnCollection,
                 this.trigger('grouping:change');
             }, this));
 
-            this.aggregateManager = new AggregateManager({
-                el: this.$el.find('[data-purpose="aggregate-selector"]')
+            this.functionManager = new FunctionManager({
+                el: this.$el.find('[data-purpose="function-selector"]')
             });
 
             this.columnSelector.$el.on('change', _.bind(function (e) {
@@ -62,14 +62,13 @@ function(AbstractView, ColumnCollection,
                         label.val(e.added.text);
                     }
                 }
-                // adjust aggregate selector
+                // adjust function selector
                 var $el = $(e.currentTarget);
                 var value = $el.val();
-                this.aggregateManager.setActiveAggregate(
+                this.functionManager.setActiveFunctions(
                     (_.isNull(value) || value == '')
                         ? {}
-                        : this.getFieldApplicableConditions(
-                            $el.find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]'))
+                        : this.getFieldApplicableConditions(util.findSelectOption($el, value))
                 );
             }, this));
 
@@ -94,12 +93,12 @@ function(AbstractView, ColumnCollection,
             this.groupingColumnsSelector.setGroupingColumns(columns);
         },
 
-        getAggregateFieldLabel: function (field, name, value) {
-            if (field.attr('name') == this.aggregateManager.$el.attr('name')) {
+        getFunctionFieldLabel: function (field, name, value) {
+            if (field.attr('name') == this.functionManager.$el.attr('name')) {
                 if (_.isNull(value) || value == '') {
                     return '';
                 }
-                return this.aggregateManager.getAggregateFunctionLabel(value);
+                return this.functionManager.getFunctionLabel(value['group_type'], value['group_name'], value['name']);
             }
             return null;
         },
@@ -111,6 +110,29 @@ function(AbstractView, ColumnCollection,
                 }
             }
             return null;
+        },
+
+        getFormFieldValue: function (name, field) {
+            if (field.attr('name') == this.functionManager.$el.attr('name')) {
+                var value = field.val();
+                if (value == '') {
+                    return null;
+                }
+                return _.extend({name: value}, util.findSelectOption(field, value).data());
+            }
+            return AbstractView.prototype.getFormFieldValue.apply(this, arguments);
+        },
+
+        setFormFieldValue: function (name, field, value) {
+            if (field.attr('name') == this.functionManager.$el.attr('name')) {
+                if (_.isNull(value) || value == '') {
+                    field.val('');
+                } else {
+                    field.val(value['name']);
+                }
+                return;
+            }
+            AbstractView.prototype.setFormFieldValue.apply(this, arguments);
         }
     });
 });

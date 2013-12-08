@@ -28,7 +28,11 @@ class ConfigurationPass implements CompilerPassInterface
                 $reflection = new \ReflectionClass($bundle);
                 $file       = dirname($reflection->getFilename()) . '/Resources/config/' . self::CONFIG_FILE_NAME;
                 if (is_file($file)) {
-                    $configs[] = Yaml::parse(realpath($file))[Configuration::ROOT_NODE_NAME];
+                    $config = Yaml::parse(realpath($file))[Configuration::ROOT_NODE_NAME];
+                    $vendor = strtolower(substr($bundle, 0, strpos($bundle, '\\')));
+                    $this->updateFunctionLabels($config, 'converters', $vendor);
+                    $this->updateFunctionLabels($config, 'aggregates', $vendor);
+                    $configs[] = $config;
                 }
             }
 
@@ -43,6 +47,34 @@ class ConfigurationPass implements CompilerPassInterface
             $processor = new Processor();
             $config    = $processor->processConfiguration(new Configuration($filterTypes), $configs);
             $managerDef->replaceArgument(0, $config);
+        }
+    }
+
+    /**
+     * Updates a label for all functions for the specified group type
+     *
+     * @param array  $config
+     * @param string $groupType
+     * @param string $vendor
+     */
+    protected function updateFunctionLabels(&$config, $groupType, $vendor)
+    {
+        if (isset($config[$groupType])) {
+            foreach ($config[$groupType] as $groupName => &$group) {
+                if (isset($group['functions'])) {
+                    foreach ($group['functions'] as &$func) {
+                        if (!isset($func['label'])) {
+                            $func['label'] = sprintf(
+                                '%s.query_designer.%s.%s.%s',
+                                $vendor,
+                                $groupType,
+                                $groupName,
+                                $func['name']
+                            );
+                        }
+                    }
+                }
+            }
         }
     }
 }

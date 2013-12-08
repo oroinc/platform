@@ -5,9 +5,9 @@ namespace Oro\Bundle\QueryDesignerBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class AggregateChoiceType extends AbstractType
+class FunctionChoiceType extends AbstractType
 {
-    const NAME = 'oro_aggregate_choice';
+    const NAME = 'oro_function_choice';
 
     /**
      * {@inheritdoc}
@@ -17,7 +17,7 @@ class AggregateChoiceType extends AbstractType
         $resolver->setDefaults(
             array(
                 'choices'     => array(),
-                'empty_value' => 'oro.query_designer.form.choose_aggregate',
+                'empty_value' => 'oro.query_designer.form.choose_function',
                 'empty_data'  => ''
             )
         );

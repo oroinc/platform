@@ -3,14 +3,18 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcess()
     {
-        $bundles    = [new TestBundle1(), new TestBundle2()];
+        $bundles    = [
+            'TestBundle1' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1',
+            'TestBundle2' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2'
+        ];
         $managerDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
@@ -101,6 +105,27 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     ['type' => 'array']
                 ]
             ],
+            'converters' => [
+                'converter1' => [
+                    'applicable' => [
+                        ['type' => 'string'],
+                        ['type' => 'text'],
+                    ],
+                    'functions'  => [
+                        [
+                            'name' => 'Func1',
+                            'expr' => 'FUNC1($column)',
+                            'label' => 'oro.query_designer.converters.converter1.Func1'
+                        ],
+                        [
+                            'name' => 'Func2',
+                            'expr' => 'FUNC2($column)',
+                            'label' => 'oro.query_designer.converters.converter1.Func2'
+                        ],
+                    ],
+                    'query_type' => ['type1']
+                ]
+            ],
             'aggregates' => [
                 'aggregate1' => [
                     'applicable' => [
@@ -109,9 +134,21 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                         ['type' => 'float'],
                     ],
                     'functions'  => [
-                        ['name' => 'min', 'expr' => 'MIN($column)'],
-                        ['name' => 'max', 'expr' => 'MAX($column)'],
-                        ['name' => 'count', 'expr' => 'COUNT($column)'],
+                        [
+                            'name' => 'Min',
+                            'expr' => 'MIN($column)',
+                            'label' => 'oro.query_designer.aggregates.aggregate1.Min'
+                        ],
+                        [
+                            'name' => 'Max',
+                            'expr' => 'MAX($column)',
+                            'label' => 'oro.query_designer.aggregates.aggregate1.Max'
+                        ],
+                        [
+                            'name' => 'Count',
+                            'expr' => 'COUNT($column)',
+                            'label' => 'oro.query_designer.aggregates.aggregate1.Count'
+                        ],
                     ],
                     'query_type' => ['type1']
                 ]

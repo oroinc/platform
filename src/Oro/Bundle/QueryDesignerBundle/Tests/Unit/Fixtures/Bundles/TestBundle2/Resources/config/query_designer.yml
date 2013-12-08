@@ -10,7 +10,12 @@ query_designer:
     grouping:
         exclude: [{type: array}]
 
+    converters:
+        converter1:
+            applicable: [{type: text}]
+            functions:  [{name: Func2, expr: FUNC2($column)}]
+
     aggregates:
         aggregate1:
             applicable: [{type: float}]
-            functions:  [{name: count, expr: COUNT($column)}]
+            functions:  [{name: Count, expr: COUNT($column)}]

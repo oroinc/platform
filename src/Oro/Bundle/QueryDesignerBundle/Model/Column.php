@@ -22,7 +22,7 @@ class Column
     /**
      * @var string
      */
-    protected $aggregate;
+    protected $func;
 
     /**
      * Get column name
@@ -90,25 +90,29 @@ class Column
     }
 
     /**
-     * Get aggregation type.
+     * Get function details.
      *
-     * @return string|null
+     * Note: getFunc name is used instead of getFunction due a problem with JS
+     *
+     * @return array|null
      */
-    public function getAggregate()
+    public function getFunc()
     {
-        return $this->aggregate;
+        return $this->func;
     }
 
     /**
-     * Get aggregation type.
+     * Get function details.
      *
-     * @param string|null $aggregate
+     * Note: setFunc name is used instead of setFunction due a problem with JS
+     *
+     * @param array|null $func
      */
-    public function setAggregate($aggregate = null)
+    public function setFunc($func = null)
     {
-        if ($aggregate !== null && empty($aggregate)) {
-            $aggregate = null;
+        if ($func !== null && empty($func)) {
+            $func = null;
         }
-        $this->aggregate = $aggregate;
+        $this->func = $func;
     }
 }

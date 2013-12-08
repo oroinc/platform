@@ -20,10 +20,17 @@ query_designer:
     grouping:
         exclude: [{type: text}]
 
+    converters:
+        converter1:
+            applicable: [{type: string}]
+            functions:
+                - {name: Func1, expr: FUNC1($column)}
+            query_type: [type1]
+
     aggregates:
         aggregate1:
             applicable: [{type: integer}, {type: smallint}]
             functions:
-                - {name: min, expr: MIN($column)}
-                - {name: max, expr: MAX($column)}
+                - {name: Min, expr: MIN($column)}
+                - {name: Max, expr: MAX($column)}
             query_type: [type1]

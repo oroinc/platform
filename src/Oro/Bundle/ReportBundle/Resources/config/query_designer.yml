@@ -1,5 +1,10 @@
 query_designer:
     aggregates:
+        identifier:
+            applicable: [{identifier: true}]
+            functions:
+                - { name: Count, expr: COUNT($column) }
+            query_type: [report]
         string:
             applicable: [{type: string}]
             functions:
@@ -10,13 +15,7 @@ query_designer:
             functions:
                 - { name: Count, expr: COUNT($column) }
                 - { name: Sum,   expr: SUM($column) }
+                - { name: Avg,   expr: AVG($column) }
                 - { name: Min,   expr: MIN($column) }
                 - { name: Max,   expr: MAX($column) }
-                - { name: Avg,   expr: AVG($column) }
-            query_type: [report]
-
-        identifier:
-            applicable: [{identifier: true}]
-            functions:
-                - { name: Count, expr: COUNT($column) }
             query_type: [report]
