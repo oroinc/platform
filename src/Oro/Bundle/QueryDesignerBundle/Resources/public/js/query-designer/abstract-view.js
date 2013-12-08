@@ -109,6 +109,27 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             this.$el.find(this.selectors.cancelButton).on('click', onCancel);
         },
 
+        initColumnSorting: function () {
+            this.getContainer().sortable({
+                cursor: 'move',
+                delay : 100,
+                opacity: 0.7,
+                revert: 10,
+                axis: 'y',
+                containment: ".query-designer-grid-container",
+                items: 'tr',
+                helper: function (e, ui) {
+                    ui.children().each(function () {
+                        $(this).width($(this).width());
+                    });
+                    return ui;
+                },
+                stop: _.bind(function(e, ui) {
+                    this.syncCollectionWithUi();
+                }, this)
+            }).disableSelection();
+        },
+
         getCollection: function() {
             return this.options.collection;
         },
@@ -253,6 +274,32 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
                 confirm.open();
             }, this);
             item.find(this.selectors.deleteButton).on('click', onDelete);
+        },
+
+        syncCollectionWithUi: function () {
+            var collectionChanged = false;
+            var collection = this.getCollection();
+            _.each(this.getContainer().find('tr'), function (el, index) {
+                var uiId = $(el).data('id');
+                var model = collection.at(index);
+                if (uiId !== model.id) {
+                    var anotherModel = collection.get(uiId);
+                    var anotherIndex = collection.indexOf(anotherModel);
+                    collection.remove(model, {silent: true});
+                    collection.remove(anotherModel, {silent: true});
+                    if (index < anotherIndex) {
+                        collection.add(anotherModel, {silent: true, at: index});
+                        collection.add(model, {silent: true, at: anotherIndex});
+                    } else {
+                        collection.add(model, {silent: true, at: anotherIndex});
+                        collection.add(anotherModel, {silent: true, at: index});
+                    }
+                    collectionChanged = true;
+                }
+            }, this);
+            if (collectionChanged) {
+                this.trigger('collection:change');
+            }
         },
 
         resetForm: function () {
