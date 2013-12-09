@@ -5,7 +5,8 @@
 .container,
 .navbar-static-top .container,
 .navbar-fixed-top .container,
-.navbar-fixed-bottom .container {
+.navbar-fixed-bottom .container,
+.popup-box-errors {
   width: auto;
 }
 
@@ -39,4 +40,17 @@
 .container-fluid {
   padding-right: 10px;
   padding-left: 10px;
+}
+
+&.error-page {
+  #container {
+    position: inherit;
+    .popup-frame {
+      position: inherit;
+    }
+    .popup-holder {
+      position: inherit;
+      margin: 0;
+    }
+  }
 }
