@@ -38,7 +38,7 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
                 if (!is_array($fieldType)) {
                     $typeMap[] = [$fieldName, $fieldType];
                 } else {
-                    $associationMap[] = [$fieldName, [['joinColumns' => $fieldType]]];
+                    $associationMap[] = [$fieldName, ['joinColumns' => [$fieldType]]];
                 }
             }
 
