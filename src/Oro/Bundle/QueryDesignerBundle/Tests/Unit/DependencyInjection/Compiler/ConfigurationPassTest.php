@@ -3,14 +3,18 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\QueryDesignerBundle\DependencyInjection\Compiler\ConfigurationPass;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 
 class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcess()
     {
-        $bundles    = [new TestBundle1(), new TestBundle2()];
+        $bundles    = [
+            'TestBundle1' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1',
+            'TestBundle2' => 'Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2'
+        ];
         $managerDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
@@ -95,6 +99,36 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     'query_type' => ['type1', 'type2']
                 ],
             ],
+            'grouping'   => [
+                'exclude' => [
+                    ['type' => 'text'],
+                    ['type' => 'array']
+                ]
+            ],
+            'converters' => [
+                'converter1' => [
+                    'applicable' => [
+                        ['type' => 'string'],
+                        ['type' => 'text'],
+                    ],
+                    'functions'  => [
+                        [
+                            'name'        => 'Func1',
+                            'expr'        => 'FUNC1($column)',
+                            'return_type' => 'string',
+                            'name_label'  => 'oro.query_designer.converters.converter1.Func1.name',
+                            'hint_label'  => 'oro.query_designer.converters.converter1.Func1.hint',
+                        ],
+                        [
+                            'name'       => 'Func2',
+                            'expr'       => 'FUNC2($column)',
+                            'name_label' => 'oro.query_designer.converters.converter1.Func2.name',
+                            'hint_label' => 'oro.query_designer.converters.converter1.Func2.hint',
+                        ],
+                    ],
+                    'query_type' => ['type1']
+                ]
+            ],
             'aggregates' => [
                 'aggregate1' => [
                     'applicable' => [
@@ -102,7 +136,27 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                         ['type' => 'smallint'],
                         ['type' => 'float'],
                     ],
-                    'function'   => ['MIN', 'MAX', 'COUNT'],
+                    'functions'  => [
+                        [
+                            'name'       => 'Min',
+                            'expr'       => 'MIN($column)',
+                            'name_label' => 'oro.query_designer.aggregates.aggregate1.Min.name',
+                            'hint_label' => 'oro.query_designer.aggregates.aggregate1.Min.hint',
+                        ],
+                        [
+                            'name'       => 'Max',
+                            'expr'       => 'MAX($column)',
+                            'name_label' => 'oro.query_designer.aggregates.aggregate1.Max.name',
+                            'hint_label' => 'oro.query_designer.aggregates.aggregate1.Max.hint',
+                        ],
+                        [
+                            'name'        => 'Count',
+                            'expr'        => 'COUNT($column)',
+                            'return_type' => 'integer',
+                            'name_label'  => 'oro.query_designer.aggregates.aggregate1.Count.name',
+                            'hint_label'  => 'oro.query_designer.aggregates.aggregate1.Count.hint',
+                        ],
+                    ],
                     'query_type' => ['type1']
                 ]
             ]

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid;
 
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
-class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
+class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
 {
     /**
      * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
@@ -15,7 +16,7 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $model = new QueryDesignerModel();
         $model->setDefinition(json_encode([]));
-        new DatagridConfigurationBuilder('test_grid', $model, $this->getDoctrine());
+        new DatagridConfigurationBuilder('test_grid', $model, $this->getFunctionProvider(), $this->getDoctrine());
     }
 
     /**
@@ -26,7 +27,7 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $model = new QueryDesignerModel();
         $model->setDefinition(json_encode(['columns' => []]));
-        new DatagridConfigurationBuilder('test_grid', $model, $this->getDoctrine());
+        new DatagridConfigurationBuilder('test_grid', $model, $this->getFunctionProvider(), $this->getDoctrine());
     }
 
     public function testNoFilters()
@@ -47,7 +48,7 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $model = new QueryDesignerModel();
         $model->setEntity($en);
         $model->setDefinition(json_encode($definition));
-        $builder = new DatagridConfigurationBuilder($gridName, $model, $doctrine);
+        $builder = new DatagridConfigurationBuilder($gridName, $model, $this->getFunctionProvider(), $doctrine);
         $result  = $builder->getConfiguration()->toArray();
 
         $expected = [
@@ -74,12 +75,12 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             'name'    => $gridName,
             'sorters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1']
+                    'c1' => ['data_name' => 'c1']
                 ]
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string']
                 ]
             ]
         ];
@@ -106,7 +107,7 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $model = new QueryDesignerModel();
         $model->setEntity($en);
         $model->setDefinition(json_encode($definition));
-        $builder = new DatagridConfigurationBuilder($gridName, $model, $doctrine);
+        $builder = new DatagridConfigurationBuilder($gridName, $model, $this->getFunctionProvider(), $doctrine);
         $result  = $builder->getConfiguration()->toArray();
 
         $expected = [
@@ -133,12 +134,12 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             'name'    => $gridName,
             'sorters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1']
+                    'c1' => ['data_name' => 'c1']
                 ]
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string']
                 ]
             ]
         ];
@@ -160,7 +161,10 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         ];
         $doctrine   = $this->getDoctrine(
             [
-                $en  => ['column1' => 'string'],
+                $en  => [
+                    'column1' => 'string',
+                    'rc1'     => ['nullable' => true]
+                ],
                 $en1 => ['column2' => 'string'],
             ]
         );
@@ -168,7 +172,7 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $model = new QueryDesignerModel();
         $model->setEntity($en);
         $model->setDefinition(json_encode($definition));
-        $builder = new DatagridConfigurationBuilder($gridName, $model, $doctrine);
+        $builder = new DatagridConfigurationBuilder($gridName, $model, $this->getFunctionProvider(), $doctrine);
         $result  = $builder->getConfiguration()->toArray();
 
         $expected = [
@@ -206,14 +210,14 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             'name'    => $gridName,
             'sorters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1'],
-                    'c2' => ['data_name' => 't2.column2']
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2']
                 ]
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1', 'type' => 'string'],
-                    'c2' => ['data_name' => 't2.column2', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string'],
+                    'c2' => ['data_name' => 'c2', 'type' => 'string']
                 ]
             ]
         ];
@@ -246,7 +250,10 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         ];
         $doctrine   = $this->getDoctrine(
             [
-                $en  => ['column1' => 'string'],
+                $en  => [
+                    'column1' => 'string',
+                    'rc1'     => ['nullable' => true]
+                ],
                 $en1 => ['column2' => 'string'],
             ]
         );
@@ -254,7 +261,7 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $model = new QueryDesignerModel();
         $model->setEntity($en);
         $model->setDefinition(json_encode($definition));
-        $builder = new DatagridConfigurationBuilder($gridName, $model, $doctrine);
+        $builder = new DatagridConfigurationBuilder($gridName, $model, $this->getFunctionProvider(), $doctrine);
         $result  = $builder->getConfiguration()->toArray();
 
         $expected = [
@@ -299,12 +306,104 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             'name'    => $gridName,
             'sorters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1']
+                    'c1' => ['data_name' => 'c1']
                 ]
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string']
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expected, $result);
+    }
+
+    public function testGrouping()
+    {
+        $gridName         = 'test_grid';
+        $en               = 'Acme\Entity\TestEntity';
+        $definition       = [
+            'columns'          => [
+                ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
+                [
+                    'name'    => 'column2',
+                    'label'   => 'lbl2',
+                    'sorting' => '',
+                    'func'    => [
+                        'name'       => 'Count',
+                        'group_name' => 'string',
+                        'group_type' => 'aggregates'
+                    ]
+                ]
+            ],
+            'filters'          => [],
+            'grouping_columns' => [
+                ['name' => 'column1']
+            ],
+        ];
+        $doctrine         = $this->getDoctrine(
+            [
+                $en => ['column1' => 'string'],
+                $en => ['column2' => 'string']
+            ]
+        );
+        $functionProvider = $this->getFunctionProvider(
+            [
+                [
+                    'Count',
+                    'string',
+                    'aggregates',
+                    ['name' => 'Count', 'return_type' => 'integer', 'expr' => 'COUNT($column)']
+                ]
+            ]
+        );
+
+        $model = new QueryDesignerModel();
+        $model->setEntity($en);
+        $model->setDefinition(json_encode($definition));
+        $builder = new DatagridConfigurationBuilder($gridName, $model, $functionProvider, $doctrine);
+        $result  = $builder->getConfiguration()->toArray();
+
+        $expected = [
+            'source'  => [
+                'type'         => 'orm',
+                'query'        => [
+                    'select'  => [
+                        't1.column1 as c1',
+                        'COUNT(t1.column2) as c2'
+                    ],
+                    'from'    => [
+                        ['table' => $en, 'alias' => 't1']
+                    ],
+                    'groupBy' => 't1.column1'
+                ],
+                'query_config' => [
+                    'table_aliases'  => [
+                        '' => 't1'
+                    ],
+                    'column_aliases' => [
+                        'column1'                          => 'c1',
+                        'column2(Count,string,aggregates)' => 'c2'
+                    ],
+                ],
+            ],
+            'columns' => [
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string'],
+                'c2' => ['label' => 'lbl2', 'frontend_type' => 'integer'],
+            ],
+            'name'    => $gridName,
+            'sorters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2'],
+                ],
+                'default' => ['c1' => 'DESC']
+            ],
+            'filters' => [
+                'columns' => [
+                    'c1' => ['data_name' => 'c1', 'type' => 'string'],
+                    'c2' => ['data_name' => 'c2', 'type' => 'number', 'filter_by_having' => true],
                 ]
             ]
         ];
@@ -364,8 +463,15 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         ];
         $doctrine   = $this->getDoctrine(
             [
-                $en  => ['column1' => 'string'],
-                $en1 => ['column2' => 'integer'],
+                $en  => [
+                    'column1' => 'string',
+                    'rc1'     => ['nullable' => true],
+                    'rc2'     => ['nullable' => true]
+                ],
+                $en1 => [
+                    'column2' => 'integer',
+                    'rc4'     => ['nullable' => true]
+                ],
                 $en2 => ['column3' => 'float'],
             ]
         );
@@ -373,7 +479,7 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $model = new QueryDesignerModel();
         $model->setEntity($en);
         $model->setDefinition(json_encode($definition));
-        $builder = new DatagridConfigurationBuilder($gridName, $model, $doctrine);
+        $builder = new DatagridConfigurationBuilder($gridName, $model, $this->getFunctionProvider(), $doctrine);
         $result  = $builder->getConfiguration()->toArray();
 
         $expected = [
@@ -471,9 +577,9 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             ],
             'sorters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1'],
-                    'c2' => ['data_name' => 't2.column2'],
-                    'c3' => ['data_name' => 't4.column3']
+                    'c1' => ['data_name' => 'c1'],
+                    'c2' => ['data_name' => 'c2'],
+                    'c3' => ['data_name' => 'c3']
                 ],
                 'default' => [
                     'c1' => 'DESC',
@@ -483,51 +589,13 @@ class DatagridConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             'name'    => $gridName,
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 't1.column1', 'type' => 'string'],
-                    'c2' => ['data_name' => 't2.column2', 'type' => 'number'],
-                    'c3' => ['data_name' => 't4.column3', 'type' => 'number']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string'],
+                    'c2' => ['data_name' => 'c2', 'type' => 'number'],
+                    'c3' => ['data_name' => 'c3', 'type' => 'number']
                 ]
             ]
         ];
 
         $this->assertEquals($expected, $result);
-    }
-
-    private function getDoctrine(array $config = [])
-    {
-        $doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $emMap = [];
-        foreach ($config as $entity => $fields) {
-            $em      = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $emMap[] = [$entity, $em];
-
-            $typeMap = [];
-            foreach ($fields as $fieldName => $fieldType) {
-                $typeMap[] = [$fieldName, $fieldType];
-            }
-
-            $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-            $metadata->expects($this->any())
-                ->method('getTypeOfField')
-                ->will($this->returnValueMap($typeMap));
-
-            $em->expects($this->any())
-                ->method('getClassMetadata')
-                ->with($entity)
-                ->will($this->returnValue($metadata));
-        }
-
-        if (!empty($emMap)) {
-            $doctrine->expects($this->any())
-                ->method('getManagerForClass')
-                ->will($this->returnValueMap($emMap));
-        }
-
-        return $doctrine;
     }
 }

@@ -44,6 +44,7 @@ services:
     oro_report.form.type.entity_field_choice:
         class: %oro_report.form.type.entity_field_choice.class%
         arguments:
+            - @oro_report.entity_provider
             - @oro_report.entity_field_provider
             - @translator
         tags:

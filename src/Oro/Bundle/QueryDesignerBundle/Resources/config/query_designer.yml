@@ -1,4 +1,7 @@
 query_designer:
+    grouping:
+        exclude: [{type: text}, {type: array}, {type: object}]
+
     filters:
         string:
             applicable: [{type: string}, {type: text}]

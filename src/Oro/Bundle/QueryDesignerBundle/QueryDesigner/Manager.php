@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Oro\Bundle\QueryDesignerBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Symfony\Component\Translation\Translator;
 
-class Manager
+class Manager implements FunctionProviderInterface
 {
     /** @var ConfigurationObject */
     protected $config;
@@ -22,13 +22,13 @@ class Manager
     /**
      * Constructor
      *
-     * @param array               $config
-     * @param SystemAwareResolver $resolver
-     * @param Translator          $translator
+     * @param array                 $config
+     * @param ConfigurationResolver $resolver
+     * @param Translator            $translator
      */
     public function __construct(
         array $config,
-        SystemAwareResolver $resolver,
+        ConfigurationResolver $resolver,
         Translator $translator
     ) {
         $resolver->resolve($config);
@@ -52,7 +52,9 @@ class Manager
 
         return [
             'filters'    => $filtersMetadata,
-            'aggregates' => $this->getMetadataForAggregates($queryType)
+            'grouping'   => $this->getMetadataForGrouping(),
+            'converters' => $this->getMetadataForFunctions('converters', $queryType),
+            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType)
         ];
     }
 
@@ -98,6 +100,30 @@ class Manager
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getFunction($name, $groupName, $groupType)
+    {
+        $result    = null;
+        $functions = $this->config->offsetGetByPath(sprintf('[%s][%s][functions]', $groupType, $groupName));
+        if ($functions !== null) {
+            foreach ($functions as $function) {
+                if ($function['name'] === $name) {
+                    $result = $function;
+                    break;
+                }
+            }
+        }
+        if ($result === null) {
+            throw new InvalidConfigurationException(
+                sprintf('The function "%s:%s:%s" was not found.', $groupType, $groupName, $name)
+            );
+        }
+
+        return $result;
+    }
+
+    /**
      * Returns all available filters for the given query type
      *
      * @param string $queryType The query type
@@ -134,31 +160,49 @@ class Manager
     }
 
     /**
-     * Returns all available aggregate functions for the given query type
+     * Returns grouping metadata
      *
-     * @param string $queryType The query type
-     * @return FilterInterface[]
+     * @return array
      */
-    protected function getMetadataForAggregates($queryType)
+    protected function getMetadataForGrouping()
     {
-        $aggregates       = [];
-        $aggregatesConfig = $this->config->offsetGet('aggregates');
-        foreach ($aggregatesConfig as $name => $attr) {
+        return $this->config->offsetGet('grouping');
+    }
+
+    /**
+     * Returns all available functions for the given query type
+     *
+     * @param string $groupType The type of functions' group
+     * @param string $queryType The query type
+     * @return array
+     */
+    protected function getMetadataForFunctions($groupType, $queryType)
+    {
+        $result       = [];
+        $groupsConfig = $this->config->offsetGet($groupType);
+        foreach ($groupsConfig as $name => $attr) {
             if ($this->isItemAllowedForQueryType($attr, $queryType)) {
                 unset($attr['query_type']);
                 $functions = [];
-                foreach ($attr['function'] as $function) {
+                foreach ($attr['functions'] as $function) {
+                    $nameText    = empty($function['name_label'])
+                        ? null // if a label is empty it means that this function should inherit a label
+                        : $this->translator->trans($function['name_label']);
+                    $hintText    = empty($function['hint_label'])
+                        ? null // if a label is empty it means that this function should inherit a label
+                        : $this->translator->trans($function['hint_label']);
                     $functions[] = [
-                        'name'  => $function,
-                        'label' => $this->translator->trans('oro.querydesigner.aggregates.' . $function),
+                        'name'  => $function['name'],
+                        'label' => $nameText,
+                        'title' => $hintText,
                     ];
                 }
-                $attr['function']  = $functions;
-                $aggregates[$name] = $attr;
+                $attr['functions'] = $functions;
+                $result[$name]     = $attr;
             }
         }
 
-        return $aggregates;
+        return $result;
     }
 
     /**

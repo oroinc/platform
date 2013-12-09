@@ -83,15 +83,18 @@ function($, _) {
                 if ($.isEmptyObject(object)) {
                     return undefined;
                 }
-                var result = '', tpl,
+                var result = '',
                     highlight = function (str) {
-                    return self.highlightSelection(str, query);
-                };
+                        return self.highlightSelection(str, query);
+                    };
                 if (object._html !== undefined) {
                     result = object._html;
                 } else if (jsTemplate) {
                     object.highlight = highlight;
-                    tpl = _.template(jsTemplate);
+                    if (self.config.formatContext !== undefined) {
+                        object.context = self.config.formatContext();
+                    }
+                    var tpl = _.template(jsTemplate);
                     result = tpl(object);
                 } else {
                     result = highlight(self.getTitle(object, self.config.properties));
