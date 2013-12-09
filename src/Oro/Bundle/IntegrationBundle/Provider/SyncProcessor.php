@@ -179,6 +179,6 @@ class SyncProcessor implements SyncProcessorInterface
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
         $channel->addStatus($status);
-        $this->saveChannel($mode, $channel);
+        // $this->saveChannel($mode, $channel);
     }
 }
