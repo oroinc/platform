@@ -63,6 +63,9 @@ class SyncProcessor implements SyncProcessorInterface
         foreach ($connectors as $connector) {
             try {
                 $this->logger->info(sprintf('Start processing "%s" connector', $connector));
+                /**
+                 * @TODO FIXME WARNING use clone here
+                 */
                 $realConnector = $this->registry->getConnectorType($channel->getType(), $connector);
                 $realTransport = $this->registry
                     ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
@@ -179,6 +182,6 @@ class SyncProcessor implements SyncProcessorInterface
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
         $channel->addStatus($status);
-        // $this->saveChannel($mode, $channel);
+        $this->saveChannel($mode, $channel);
     }
 }
