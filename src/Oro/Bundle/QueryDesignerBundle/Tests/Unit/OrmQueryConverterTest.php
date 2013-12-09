@@ -33,14 +33,26 @@ class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
             $emMap[] = [$entity, $em];
 
             $typeMap = [];
+            $associationMap = [];
             foreach ($fields as $fieldName => $fieldType) {
-                $typeMap[] = [$fieldName, $fieldType];
+                if (!is_array($fieldType)) {
+                    $typeMap[] = [$fieldName, $fieldType];
+                } else {
+                    $associationMap[] = [$fieldName, [['joinColumns' => $fieldType]]];
+                }
             }
 
-            $metadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+            $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
+                ->disableOriginalConstructor()
+                ->getMock();
             $metadata->expects($this->any())
                 ->method('getTypeOfField')
                 ->will($this->returnValueMap($typeMap));
+            if (!empty($associationMap)) {
+                $metadata->expects($this->any())
+                    ->method('getAssociationMapping')
+                    ->will($this->returnValueMap($associationMap));
+            }
 
             $em->expects($this->any())
                 ->method('getClassMetadata')

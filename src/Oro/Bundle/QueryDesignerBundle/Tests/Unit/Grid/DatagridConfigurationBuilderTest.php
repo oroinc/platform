@@ -161,7 +161,10 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         ];
         $doctrine   = $this->getDoctrine(
             [
-                $en  => ['column1' => 'string'],
+                $en  => [
+                    'column1' => 'string',
+                    'rc1'     => ['nullable' => true]
+                ],
                 $en1 => ['column2' => 'string'],
             ]
         );
@@ -247,7 +250,10 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         ];
         $doctrine   = $this->getDoctrine(
             [
-                $en  => ['column1' => 'string'],
+                $en  => [
+                    'column1' => 'string',
+                    'rc1'     => ['nullable' => true]
+                ],
                 $en1 => ['column2' => 'string'],
             ]
         );
@@ -457,8 +463,15 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         ];
         $doctrine   = $this->getDoctrine(
             [
-                $en  => ['column1' => 'string'],
-                $en1 => ['column2' => 'integer'],
+                $en  => [
+                    'column1' => 'string',
+                    'rc1'     => ['nullable' => true],
+                    'rc2'     => ['nullable' => true]
+                ],
+                $en1 => [
+                    'column2' => 'integer',
+                    'rc4'     => ['nullable' => true]
+                ],
                 $en2 => ['column3' => 'float'],
             ]
         );

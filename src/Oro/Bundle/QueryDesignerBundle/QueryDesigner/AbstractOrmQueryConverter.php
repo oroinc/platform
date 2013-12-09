@@ -44,18 +44,18 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     /**
      * Check whether the given join is INNER JOIN or LEFT JOIN
      *
-     * @param string $joinTableAlias
+     * @param string $joinAlias
      * @param string $joinFieldName
      * @return bool true if INNER JOIN; otherwise, false
      */
-    protected function isInnerJoin($joinTableAlias, $joinFieldName)
+    protected function isInnerJoin($joinAlias, $joinFieldName)
     {
         $metadata = $this->getClassMetadata(
-            $this->getEntityClassName($this->getJoinIdentifierByTableAlias($joinTableAlias))
+            $this->getEntityClassName($this->getJoinIdentifierByTableAlias($joinAlias))
         );
         $nullable = false;
-        foreach ($metadata->getAssociationMapping($joinFieldName)['joinColumns'] as $joinColumn) {
-            $nullable = ($nullable || $joinColumn['nullable']);
+        foreach ($metadata->getAssociationMapping($joinFieldName) as $mapping) {
+            $nullable = ($nullable || $mapping['joinColumns']['nullable']);
         }
 
         return !$nullable;

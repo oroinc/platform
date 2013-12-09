@@ -239,7 +239,7 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
             'join'  => sprintf('%s.%s', $joinTableAlias, $joinFieldName),
             'alias' => $joinAlias
         ];
-        if ($this->isInnerJoin($joinTableAlias, $joinFieldName)) {
+        if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
             $this->innerJoins[] = $join;
         } else {
             $this->leftJoins[] = $join;
