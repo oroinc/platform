@@ -62,6 +62,7 @@ class SyncProcessor implements SyncProcessorInterface
 
         foreach ($connectors as $connector) {
             try {
+                $this->logger->info(sprintf('Start processing "%s" connector', $connector));
                 $realConnector = $this->registry->getConnectorType($channel->getType(), $connector);
                 $realTransport = $this->registry
                     ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
