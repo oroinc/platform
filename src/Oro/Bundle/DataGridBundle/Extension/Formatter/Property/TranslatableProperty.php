@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Formatter\Property;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
-class TranslateableProperty extends FieldProperty
+class TranslatableProperty extends FieldProperty
 {
     const DOMAIN_KEY = 'domain';
     const LOCALE_KEY = 'locale';
