@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -36,14 +38,20 @@ class JobExecutor
      */
     protected $contextRegistry;
 
+    /**
+     * @var ManagerRegistry
+     */
+    protected $managerRegistry;
+
     public function __construct(
-        EntityManager $entityManager,
         ConnectorRegistry $jobRegistry,
-        ContextRegistry $contextRegistry
+        ContextRegistry $contextRegistry,
+        ManagerRegistry $managerRegistry
     ) {
-        $this->entityManager = $entityManager;
         $this->jobRegistry = $jobRegistry;
         $this->contextRegistry = $contextRegistry;
+        $this->entityManager = $managerRegistry->getManager();
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -90,6 +98,14 @@ class JobExecutor
             $this->entityManager->rollback();
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
+        }
+
+        // EntityManager can be closed when there was an exception in flush method called inside some jobs execution
+        // Can't be implemented right now due to OroEntityManager external dependencies
+        // on ExtendManager and FilterCollection
+        if (!$this->entityManager->isOpen()) {
+            $this->managerRegistry->resetManager();
+            $this->entityManager = $this->managerRegistry->getManager();
         }
 
         // save job instance
