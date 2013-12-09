@@ -89,9 +89,24 @@
 .query-designer-grid-container .grid .index-cell {
     width: 36px;
 }
+.query-designer-grid-container .grid .action-cell {
+    white-space: nowrap;
+}
+.query-designer-grid-container .grid .action-column,
+.query-designer-grid-container .grid .action-cell {
+    width: 60px;
+}
+.query-designer-columns-grid-container .grid .action-column,
+.query-designer-columns-grid-container .grid .action-cell {
+    width: 86px;
+}
 .form-horizontal .query-designer-filter-logic-form input[type=text] {
     width: 400px;
 }
 .query-designer-columns-grid-container tbody tr {
     cursor: default;
+}
+.query-designer-grid-container i.icon-list {
+    cursor: pointer;
+    font-size: 14px;
 }
