@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
@@ -68,6 +68,11 @@ class SyncProcessor implements SyncProcessorInterface
             } catch (\Exception $e) {
                 // log and continue
                 $this->logger->error($e->getMessage());
+                $status = new Status();
+                $status->setCode(Status::STATUS_FAILED)
+                    ->setMessage($e->getMessage())
+                    ->setConnector($connector);
+                $channel->addStatus($status);
                 continue;
             }
             $mode    = $isValidationOnly ? ProcessorRegistry::TYPE_IMPORT_VALIDATION : ProcessorRegistry::TYPE_IMPORT;
@@ -86,15 +91,15 @@ class SyncProcessor implements SyncProcessorInterface
                     'batchSize'      => self::DEFAULT_BATCH_SIZE
                 ],
             ];
-            $this->processImport($mode, $jobName, $configuration, $channel);
+            $this->processImport($connector, $mode, $jobName, $configuration, $channel);
         }
     }
 
     /**
-     * @param string    $mode
-     * @param Transport $transport
+     * @param string  $mode
+     * @param Channel $channel
      */
-    protected function saveLastSyncDate($mode, Transport $transport)
+    protected function saveChannel($mode, Channel $channel)
     {
         if ($mode != ProcessorRegistry::TYPE_IMPORT) {
             return;
@@ -103,22 +108,20 @@ class SyncProcessor implements SyncProcessorInterface
         // merge to uow due to object has changed hash after serialization/deserialization in job context
         // {@link} http://doctrine-orm.readthedocs.org/en/2.0.x/reference/working-with-objects.html#merging-entities
         if ($this->em->isOpen()) {
-            $transport = $this->em->merge($transport);
-            $transport->setLastSyncDate(new \DateTime('now', new \DateTimeZone('UTC')));
-            $this->em->persist($transport);
+            $channel = $this->em->merge($channel);
+            $this->em->persist($channel);
             $this->em->flush();
         }
     }
 
     /**
+     * @param string  $connector
      * @param string  $mode import or validation (dry run, readonly)
      * @param string  $jobName
      * @param array   $configuration
      * @param Channel $channel
-     *
-     * @return array
      */
-    public function processImport($mode, $jobName, $configuration, Channel $channel)
+    public function processImport($connector, $mode, $jobName, $configuration, Channel $channel)
     {
         $jobResult = $this->jobExecutor->executeJob($mode, $jobName, $configuration);
 
@@ -150,26 +153,31 @@ class SyncProcessor implements SyncProcessorInterface
             );
         }
         $isSuccess = $jobResult->isSuccessful() && empty($counts['errors']);
+
+        $status = new Status();
+        $status->setConnector($connector);
         if (!$isSuccess) {
             $this->logger->error('Errors were occurred:');
+            $exceptions = implode(PHP_EOL, $errorsAndExceptions);
             $this->logger->error(
-                implode(PHP_EOL, $errorsAndExceptions),
+                $exceptions,
                 ['exceptions' => $jobResult->getFailureExceptions()]
             );
+            $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         } else {
-            /** @TODO FIXME save date for each connector */
-            // save last sync datetime
-            $this->saveLastSyncDate($mode, $channel->getTransport());
-            $this->logger->info(
-                sprintf(
-                    "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
-                    $counts['read'],
-                    $counts['process'],
-                    $counts['update'],
-                    $counts['add'],
-                    $counts['delete']
-                )
+            $message = sprintf(
+                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
+                $counts['read'],
+                $counts['process'],
+                $counts['update'],
+                $counts['add'],
+                $counts['delete']
             );
+            $this->logger->info($message);
+
+            $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
+        $channel->addStatus($status);
+        $this->saveChannel($mode, $channel);
     }
 }
