@@ -98,6 +98,14 @@
     {% endif %}
 {% endblock %}
 
+{% block datetime_duration_workflow_view_attribute_value %}
+    {% if value is not empty %}
+        {{ value.format('H:i:s') }}
+    {% else %}
+        N/A
+    {% endif %}
+{% endblock %}
+
 {% block ordinal_workflow_view_attribute_value %}
     {% if value is not empty %}
         {{ value|oro_format_ordinal }}
