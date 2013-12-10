@@ -170,6 +170,7 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
             sprintf('[columns][%s]', $columnAlias),
             [
                 'label'         => $columnLabel,
+                'translatable'  => false,
                 'frontend_type' => $this->getFrontendFieldType($fieldType)
             ]
         );
