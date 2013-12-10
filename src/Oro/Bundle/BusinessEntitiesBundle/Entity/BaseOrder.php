@@ -24,13 +24,6 @@ class BaseOrder
     protected $id;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="origin_id", type="integer")
-     */
-    protected $originId;
-
-    /**
      * @var ArrayCollection
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson", cascade={"persist"})
@@ -258,26 +251,6 @@ class BaseOrder
     public function hasAddress(AbstractAddress $address)
     {
         return $this->getAddresses()->contains($address);
-    }
-
-    /**
-     * @param int $originId
-     *
-     * @return $this
-     */
-    public function setOriginId($originId)
-    {
-        $this->originId = $originId;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getOriginId()
-    {
-        return $this->originId;
     }
 
     /**

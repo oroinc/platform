@@ -173,4 +173,14 @@ class Status
     {
         return $this->date;
     }
+
+    /**
+     * Do not serialize
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [];
+    }
 }
