@@ -43,6 +43,9 @@
         {% for key, value in transitionData %}
             data-{{ key }}="{{ value }}"
         {% endfor %}
+        {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
+            data-dialog-options={{ transition.frontendOptions.dialog|json_encode|raw }}
+        {% endif %}
         title="{{ transition.label|trans }}"
         class="btn icons-holder-text no-hash
             {% if not transitionData.enabled %}disabled{% endif %}
