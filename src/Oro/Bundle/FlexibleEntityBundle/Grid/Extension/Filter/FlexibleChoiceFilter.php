@@ -5,6 +5,7 @@ namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\FilterBundle\Filter\ChoiceFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FlexibleEntityBundle\Entity\Attribute;
 use Oro\Bundle\FlexibleEntityBundle\Entity\AttributeOption;
@@ -37,6 +38,25 @@ class FlexibleChoiceFilter extends ChoiceFilter
         );
 
         return true;
+    }
+
+    /**
+     * Get operator string
+     *
+     * @param int $type
+     *
+     * @return string
+     */
+    protected function getOperator($type)
+    {
+        $type = (int)$type;
+
+        $operatorTypes = array(
+            ChoiceFilterType::TYPE_CONTAINS     => 'IN',
+            ChoiceFilterType::TYPE_NOT_CONTAINS => 'NOT IN',
+        );
+
+        return isset($operatorTypes[$type]) ? $operatorTypes[$type] : 'IN';
     }
 
     /**

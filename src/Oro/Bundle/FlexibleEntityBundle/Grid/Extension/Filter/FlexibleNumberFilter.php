@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\NumberFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class FlexibleNumberFilter extends NumberFilter
@@ -29,5 +30,27 @@ class FlexibleNumberFilter extends NumberFilter
         );
 
         return true;
+    }
+
+    /**
+     * Get operator string
+     *
+     * @param int $type
+     *
+     * @return string
+     */
+    public function getOperator($type)
+    {
+        $type = (int)$type;
+
+        $operatorTypes = array(
+            NumberFilterType::TYPE_EQUAL         => '=',
+            NumberFilterType::TYPE_GREATER_EQUAL => '>=',
+            NumberFilterType::TYPE_GREATER_THAN  => '>',
+            NumberFilterType::TYPE_LESS_EQUAL    => '<=',
+            NumberFilterType::TYPE_LESS_THAN     => '<',
+        );
+
+        return isset($operatorTypes[$type]) ? $operatorTypes[$type] : '=';
     }
 }
