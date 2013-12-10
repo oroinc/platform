@@ -47,23 +47,16 @@ datagrid:
             columns:
                 name:
                     data_name: r.name
-                entity:
-                    data_name: r.entity
-                reportType:
-                    data_name: type.label
             default:
                 name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
         filters:
             columns:
                 name:
                     type:      string
-                    data_name: name
-                entity:
-                    type:      string
-                    data_name: entity
+                    data_name: r.name
                 reportType:
                     type: choice
-                    data_name: type.label
+                    data_name: r.type
                     options:
                         field_options:
                             choices: @oro_report.report_manager->getReportTypeChoices
