@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FlexibleEntityBundle\Grid\Extension\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class FlexibleStringFilter extends StringFilter
@@ -29,5 +30,27 @@ class FlexibleStringFilter extends StringFilter
         );
 
         return true;
+    }
+
+    /**
+     * Get operator string
+     *
+     * @param int $type
+     *
+     * @return string
+     */
+    protected function getOperator($type)
+    {
+        $type = (int)$type;
+
+        $operatorTypes = array(
+            TextFilterType::TYPE_CONTAINS     => 'LIKE',
+            TextFilterType::TYPE_NOT_CONTAINS => 'NOT LIKE',
+            TextFilterType::TYPE_EQUAL        => '=',
+            TextFilterType::TYPE_STARTS_WITH  => 'LIKE',
+            TextFilterType::TYPE_ENDS_WITH    => 'LIKE',
+        );
+
+        return isset($operatorTypes[$type]) ? $operatorTypes[$type] : 'LIKE';
     }
 }
