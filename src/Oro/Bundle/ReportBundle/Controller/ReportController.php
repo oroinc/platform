@@ -84,7 +84,7 @@ class ReportController extends Controller
         if ($this->get('oro_report.form.handler.report')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.report.controller.report.saved')
+                $this->get('translator')->trans('Report saved')
             );
 
             return $this->get('oro_ui.router')->actionRedirect(

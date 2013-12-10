@@ -31,9 +31,9 @@ datagrid:
                 params:     [ id ]
         columns:
             name:
-                label:   Name
+                label: oro.report.datagrid.column.name
             entity:
-                label: Entity
+                label: oro.report.datagrid.column.entity
                 type: twig
                 template: OroEntityBundle:Datagrid:Property/entity.html.twig
                 frontend_type: html
@@ -41,7 +41,7 @@ datagrid:
                     entity_provider: @oro_report.entity_provider
             reportType:
                 type: translatable
-                label: Report type
+                label: oro.report.datagrid.column.report_type
                 choices: @oro_report.report_manager->getReportTypeChoices
         sorters:
             columns:

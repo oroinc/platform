@@ -22,7 +22,7 @@
             'id': 'btn-remove-report',
             'dataId': form.vars.value.id,
             'dataMessage': 'Are you sure you want to delete this report?'|trans,
-            'successMessage': 'oro.report.controller.report.deleted'|trans,
+            'successMessage': 'Report deleted'|trans,
             'title': 'Delete report',
             'label': 'Delete'
         })
@@ -70,9 +70,9 @@
                 {
                     'title': '',
                     'data': [
-                        form_row(form.name, {'label': 'Name'|trans}),
+                        form_row(form.name, {'label': 'oro.report.form.name'|trans}),
                         form_row(form.description, {
-                            'label': 'Description'|trans,
+                            'label': 'oro.report.form.description'|trans,
                             'attr': {
                                 'class': 'report-descr'
                             }
@@ -82,8 +82,8 @@
                 {
                     'title': '',
                     'data': [
-                        form_row(form.entity, {'label': 'Entity'|trans}),
-                        form_row(form.type, {'label': 'Type'|trans}),
+                        form_row(form.entity, {'label': 'oro.report.form.entity'|trans}),
+                        form_row(form.type, {'label': 'oro.report.form.type'|trans}),
                         ownerDataBlock.dataBlocks[0].subblocks[0].data[0]
                     ]
                 }
@@ -93,11 +93,11 @@
 
     {% set dataBlocks = dataBlocks|merge(
         [{
-            'title' : 'Designer'|trans,
+            'title' : 'oro.report.form.designer'|trans,
             'content_attr': {'class': 'report-designer', 'data-metadata': metadata|json_encode|raw},
             'subblocks': [
                 {
-                    'title': 'Columns'|trans,
+                    'title': 'oro.report.form.columns'|trans,
                     'spanClass': 'report-columns responsive-cell',
                     'data': [
                         QD.query_designer_grouping_form(form.grouping, {'id': 'report-grouping-form'}),
@@ -107,7 +107,7 @@
                     ]
                 },
                 {
-                    'title': 'Filters'|trans,
+                    'title': 'oro.report.form.filters'|trans,
                     'spanClass': 'report-filters responsive-cell',
                     'data': [
                         QD.query_designer_filter_form(form.filter, form.filters_logic, {'id': 'report-filter-form'}),
