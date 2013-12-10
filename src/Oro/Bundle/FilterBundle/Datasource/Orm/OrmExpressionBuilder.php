@@ -120,10 +120,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function notIn($x, $y, $withParam = false)
     {
-        return $this->expr->orX(
-            $this->isNull($x),
-            $this->expr->notIn($x, $withParam ? ':' . $y : $y)
-        );
+        return $this->expr->notIn($x, $withParam ? ':' . $y : $y);
     }
 
     /**
