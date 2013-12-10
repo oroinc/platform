@@ -25,15 +25,34 @@ oro:
                 Max:
                     name: Max
                     hint: Maximum value
+
     report:
-        form:
-            choose_report_type:    Choose a report type...
-        controller:
-            report:
-                saved:             Report saved
-                deleted:           Report deleted
         type:
             table: Table
+        datagrid:
+            column:
+                name:               Name
+                entity:             Entity
+                report_type:        Report type
+        form:
+            designer:               Designer
+            columns:                Columns
+            filters:                Filters
+            name:                   Name
+            description:            Description
+            entity:                 Entity
+            type:                   Type
+            choose_report_type:     Choose a report type...
+
 "Reports": Reports
+"New Report": New Report
+"Manage Reports - Reports": Manage Reports - Reports
+"Create Report - Reports": Create Report - Reports
+"%report.name% - Edit - Reports": %report.name% - Edit - Reports
+"%report.name% - Reports": %report.name% - Reports
+
+"Edit report": Edit report
 "Delete report": Delete report
 "Are you sure you want to delete this report?": Are you sure you want to delete this report?
+"Report deleted": Report deleted
+"Report saved": Report saved
