@@ -181,7 +181,7 @@
                 'page': page,
                 'per_page': {{ configs.per_page|default(10) }},
                 'name': "{{ configs.autocomplete_alias }}",
-                'query': query + ';' + '{{ configs.data_class_name }}'+ ';' + '{{ configs.permission }}'
+                'query': query + ';' + '{{ configs.data_class_name }}'+ ';' + '{{ configs.permission }}' + ';' + '{{ configs.entity_id }}'
             };
         },
         'results': function (data, page) {

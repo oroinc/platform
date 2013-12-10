@@ -41,7 +41,7 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         ManagerRegistry $managerRegistry,
         $fieldName,
         $fieldLabel,
-        $isAssignGranted = false,
+        &$isAssignGranted = false,
         $defaultOwner = null
     ) {
         $this->managerRegistry = $managerRegistry;

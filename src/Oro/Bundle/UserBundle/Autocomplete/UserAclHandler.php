@@ -101,12 +101,18 @@ class UserAclHandler implements SearchHandlerInterface
     public function search($query, $page, $perPage)
     {
 
-        list ($search, $entityClass, $permission) = explode(';', $query);
+        list ($search, $entityClass, $permission, $entityId) = explode(';', $query);
         $entityClass = str_replace('_', '\\', $entityClass);
+
+        if ($entityId) {
+            $object = $this->em->getRepository($entityClass)->find((int)$entityId);
+        } else {
+            $object = 'entity:' . $entityClass;
+        }
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $isGranted = $this->getSecurityContext()->isGranted($permission, 'entity:' . $entityClass);
+        $isGranted = $this->getSecurityContext()->isGranted($permission, $object);
 
         if ($isGranted) {
             $user = $this->getSecurityContext()->getToken()->getUser();
@@ -158,7 +164,7 @@ class UserAclHandler implements SearchHandlerInterface
     public function convertItem($user)
     {
         $result = [];
-        foreach($this->fields as $field) {
+        foreach ($this->fields as $field) {
             $result[$field] = $this->getPropertyValue($field, $user);
         }
         $result['avatar'] = null;
@@ -234,7 +240,10 @@ class UserAclHandler implements SearchHandlerInterface
                 $buIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($user->getId());
                 $resultBuIds = array_merge($buIds, []);
                 foreach ($buIds as $buId) {
-                    $diff = array_diff($this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId), $resultBuIds);
+                    $diff = array_diff(
+                        $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),
+                        $resultBuIds
+                    );
                     if (!empty($diff)) {
                         $resultBuIds = array_merge($resultBuIds, $diff);
                     }
