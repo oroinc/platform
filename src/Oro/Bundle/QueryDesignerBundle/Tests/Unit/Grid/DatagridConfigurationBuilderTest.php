@@ -70,7 +70,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 ],
             ],
             'columns' => [
-                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string'],
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
             ],
             'name'    => $gridName,
             'sorters' => [
@@ -80,7 +80,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 'c1', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false]
                 ]
             ]
         ];
@@ -129,7 +129,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 ],
             ],
             'columns' => [
-                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string'],
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
             ],
             'name'    => $gridName,
             'sorters' => [
@@ -139,7 +139,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 'c1', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false]
                 ]
             ]
         ];
@@ -204,8 +204,8 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 ],
             ],
             'columns' => [
-                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string'],
-                'c2' => ['label' => 'lbl2', 'frontend_type' => 'string'],
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
+                'c2' => ['label' => 'lbl2', 'frontend_type' => 'string', 'translatable' => false],
             ],
             'name'    => $gridName,
             'sorters' => [
@@ -216,8 +216,8 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 'c1', 'type' => 'string'],
-                    'c2' => ['data_name' => 'c2', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
+                    'c2' => ['data_name' => 'c2', 'type' => 'string', 'translatable' => false]
                 ]
             ]
         ];
@@ -301,7 +301,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 ],
             ],
             'columns' => [
-                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string'],
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
             ],
             'name'    => $gridName,
             'sorters' => [
@@ -311,7 +311,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 'c1', 'type' => 'string']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false]
                 ]
             ]
         ];
@@ -389,8 +389,8 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 ],
             ],
             'columns' => [
-                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string'],
-                'c2' => ['label' => 'lbl2', 'frontend_type' => 'integer'],
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
+                'c2' => ['label' => 'lbl2', 'frontend_type' => 'integer', 'translatable' => false],
             ],
             'name'    => $gridName,
             'sorters' => [
@@ -402,8 +402,13 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
             ],
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 'c1', 'type' => 'string'],
-                    'c2' => ['data_name' => 'c2', 'type' => 'number', 'filter_by_having' => true],
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
+                    'c2' => [
+                        'data_name'        => 'c2',
+                        'type'             => 'number',
+                        'translatable'     => false,
+                        'filter_by_having' => true
+                    ],
                 ]
             ]
         ];
@@ -571,9 +576,9 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                 ],
             ],
             'columns' => [
-                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string'],
-                'c2' => ['label' => 'lbl2', 'frontend_type' => 'integer'],
-                'c3' => ['label' => 'lbl3', 'frontend_type' => 'decimal'],
+                'c1' => ['label' => 'lbl1', 'frontend_type' => 'string', 'translatable' => false],
+                'c2' => ['label' => 'lbl2', 'frontend_type' => 'integer', 'translatable' => false],
+                'c3' => ['label' => 'lbl3', 'frontend_type' => 'decimal', 'translatable' => false],
             ],
             'sorters' => [
                 'columns' => [
@@ -589,9 +594,9 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
             'name'    => $gridName,
             'filters' => [
                 'columns' => [
-                    'c1' => ['data_name' => 'c1', 'type' => 'string'],
-                    'c2' => ['data_name' => 'c2', 'type' => 'number'],
-                    'c3' => ['data_name' => 'c3', 'type' => 'number']
+                    'c1' => ['data_name' => 'c1', 'type' => 'string', 'translatable' => false],
+                    'c2' => ['data_name' => 'c2', 'type' => 'number', 'translatable' => false],
+                    'c3' => ['data_name' => 'c3', 'type' => 'number', 'translatable' => false]
                 ]
             ]
         ];

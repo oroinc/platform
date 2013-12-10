@@ -185,8 +185,9 @@ class DatagridConfigurationQueryConverter extends AbstractOrmQueryConverter
 
         // Add filters
         $filter = [
-            'type'      => $this->getFilterType($fieldType),
-            'data_name' => $columnAlias
+            'type'         => $this->getFilterType($fieldType),
+            'data_name'    => $columnAlias,
+            'translatable' => false,
         ];
         if ($functionExpr !== null) {
             $filter['filter_by_having'] = true;
