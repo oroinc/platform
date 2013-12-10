@@ -45,11 +45,22 @@ define(function (require) {
                 var $link = $('<a class="accordion-toggle" data-toggle="collapse"></a>')
                     .data('parent', '[data-spy="scroll"]').attr('href', href);
                 $toggle.wrap($link);
+                $toggle.prepend('<i class="icon-fixed-width icon-caret-right"></i>');
             });
 
-            $spy.find('.collapse').first().addClass('in');
-
             $spy.collapse();
+
+            $spy.on('shown', function (e) {
+                var $i = $(e.target).prevAll('a.accordion-toggle');
+                $i.find('i').removeClass('icon-caret-right').addClass('icon-caret-down');
+            });
+
+            $spy.on('hidden', function (e) {
+                var $i = $(e.target).prevAll('a.accordion-toggle');
+                $i.find('i').removeClass('icon-caret-down').addClass('icon-caret-right');
+            });
+
+            $spy.find('.collapse').first().collapse('show');
         });
     };
 
