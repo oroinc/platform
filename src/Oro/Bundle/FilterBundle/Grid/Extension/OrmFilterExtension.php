@@ -54,11 +54,12 @@ class OrmFilterExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
-        // validate extension configuration
-        $this->validateConfiguration(
+        // validate extension configuration and pass default values back to config
+        $configuration = $this->validateConfiguration(
             new Configuration(array_keys($this->filters)),
             ['filters' => $config->offsetGetByPath(Configuration::FILTERS_PATH)]
         );
+        $config->offsetSetByPath(Configuration::FILTERS_PATH, $configuration);
     }
 
     /**
@@ -114,7 +115,11 @@ class OrmFilterExtension extends AbstractExtension
             $metadata          = $filter->getMetadata();
             $filtersMetaData[] = array_merge(
                 $metadata,
-                ['label' => $this->translator->trans($metadata['label'])]
+                [
+                    'label' => $metadata[FilterUtility::TRANSLATABLE_KEY]
+                        ? $this->translator->trans($metadata['label'])
+                        : $metadata['label']
+                ]
             );
 
         }
