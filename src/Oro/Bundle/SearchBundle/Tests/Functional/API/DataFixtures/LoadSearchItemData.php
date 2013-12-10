@@ -7,8 +7,6 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-
-use Oro\Bundle\FlexibleEntityBundle\Manager\FlexibleManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 /**
@@ -25,27 +23,11 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
     protected $container;
 
     /**
-     * Flexible entity manager
-     * @var FlexibleManager
-     */
-    protected $manager;
-
-    /**
      * {@inheritDoc}
      */
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
-        $this->manager = $this->container->get('search_item_manager');
-    }
-
-    /**
-     * Get product manager
-     * @return FlexibleManager
-     */
-    protected function getItemManager()
-    {
-        return $this->manager;
     }
 
     /**
@@ -53,8 +35,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
      */
     public function load(ObjectManager $manager)
     {
-        //$this->loadAttributes();
-        $this->loadItems();
+        $this->loadItems($manager);
     }
 
     /**
@@ -67,14 +48,15 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
 
     /**
      * Load items
-     * @return array
+     *
+     * @param ObjectManager $manager
      */
-    public function loadItems()
+    public function loadItems($manager)
     {
         for ($ind= 1; $ind < 10; $ind++) {
             //create item
             /** @var $item Item */
-            $item = $this->getItemManager()->createFlexible();
+            $item = new Item();;
             //string value
             $item->stringValue = 'item' . $ind . '@mail.com';
             $item->integerValue = $ind*1000;
@@ -97,9 +79,9 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             //object
             $item->objectValue = new \stdClass();
 
-            $this->getItemManager()->getStorageManager()->persist($item);
+            $manager->persist($item);
         }
 
-        $this->getItemManager()->getStorageManager()->flush();
+        $manager->flush();
     }
 }
