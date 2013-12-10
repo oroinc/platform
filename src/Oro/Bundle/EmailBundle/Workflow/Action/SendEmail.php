@@ -74,6 +74,8 @@ class SendEmail extends AbstractAction
         }
 
         $this->options = $options;
+
+        return $this;
     }
 
     protected function assertEmailAddressOption($option)

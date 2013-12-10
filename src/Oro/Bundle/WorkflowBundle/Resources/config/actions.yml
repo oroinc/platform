@@ -15,6 +15,7 @@ parameters:
     oro_workflow.action.redirect_to_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\RedirectToWorkflow
     oro_workflow.action.format_string.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatString
     oro_workflow.action.assign_active_user.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
+    oro_workflow.action.format_name.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatName
 
 services:
     oro_workflow.action_factory:
@@ -124,3 +125,11 @@ services:
             - @security.context
         tags:
             - { name: oro_workflow.action, alias: assign_active_user|get_active_user }
+
+    oro_workflow.action.format_name:
+        class: %oro_workflow.action.format_name.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_locale.formatter.name
+        tags:
+            - { name: oro_workflow.action, alias: format_name }

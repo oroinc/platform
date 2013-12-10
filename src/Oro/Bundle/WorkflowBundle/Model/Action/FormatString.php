@@ -18,15 +18,15 @@ class FormatString extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $result = vsprintf($this->getString($context), $this->getArguments($context));
+        $result = strtr($this->getString($context), $this->getArguments($context));
         $this->contextAccessor->setValue($context, $this->options['attribute'], $result);
     }
 
     /**
      * Allowed options:
      *  - attribute - contains property path used to save result string
-     *  - string - string used to format, first argument of vsprintf
-     *  - arguments - array of format parameters, second argument of vsprintf
+     *  - string - string used to format, first argument of strtr
+     *  - arguments - array of format parameters, second argument of strtr
      *
      * {@inheritDoc}
      */
@@ -79,8 +79,8 @@ class FormatString extends AbstractAction
         }
 
         $result = array();
-        foreach ($arguments as $value) {
-            $result[] = $this->contextAccessor->getValue($context, $value);
+        foreach ($arguments as $key => $value) {
+            $result['%' . $key . '%'] = $this->contextAccessor->getValue($context, $value);
         }
 
         return $result;

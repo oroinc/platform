@@ -22,12 +22,12 @@ class FormatStringTest extends \PHPUnit_Framework_TestCase
     /**
      * @var string
      */
-    protected $testString = 'some "%s" test "%s" string';
+    protected $testString = 'some "%param1%" test "%param2%" string';
 
     /**
      * @var array
      */
-    protected $testArguments = array('first', 'second');
+    protected $testArguments = array('param1' => 'first', 'param2' => 'second');
 
     /**
      * @var string

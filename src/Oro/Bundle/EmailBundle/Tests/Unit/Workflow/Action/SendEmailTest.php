@@ -114,7 +114,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
      */
     public function testInitialize($options, $expected)
     {
-        $this->action->initialize($options);
+        $this->assertSame($this->action, $this->action->initialize($options));
         $this->assertAttributeEquals($expected, 'options', $this->action);
     }
 
