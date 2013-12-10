@@ -54,12 +54,17 @@ class OrmFilterExtension extends AbstractExtension
      */
     public function processConfigs(DatagridConfiguration $config)
     {
+        $filters = $config->offsetGetByPath(Configuration::FILTERS_PATH);
         // validate extension configuration and pass default values back to config
-        $configuration = $this->validateConfiguration(
+        $filtersNormalized = $this->validateConfiguration(
             new Configuration(array_keys($this->filters)),
-            ['filters' => $config->offsetGetByPath(Configuration::FILTERS_PATH)]
+            ['filters' => $filters]
         );
-        $config->offsetSetByPath(Configuration::FILTERS_PATH, $configuration);
+        // replace config values by normalized, extra keys passed directly
+        $config->offsetSetByPath(
+            Configuration::FILTERS_PATH,
+            array_replace_recursive($filters, $filtersNormalized)
+        );
     }
 
     /**
