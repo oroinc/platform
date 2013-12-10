@@ -1,0 +1,9 @@
+parameters:
+    oro_theme.registry.class: Oro\Bundle\ThemeBundle\Model\ThemeRegistry
+    oro_themes.settings: ~
+
+services:
+    oro_theme.registry:
+        class: %oro_theme.registry.class%
+        arguments:
+            - %oro_themes.settings%
