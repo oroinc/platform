@@ -56,7 +56,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
         for ($ind= 1; $ind < 10; $ind++) {
             //create item
             /** @var $item Item */
-            $item = new Item();;
+            $item = new Item();
             //string value
             $item->stringValue = 'item' . $ind . '@mail.com';
             $item->integerValue = $ind*1000;
