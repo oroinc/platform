@@ -23,9 +23,6 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
     /** @var Transport */
     protected $transportSettings;
 
-    /** @var bool */
-    protected $isConnected = false;
-
     /** @var LoggerStrategy */
     protected $logger;
 
@@ -82,27 +79,13 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
         /** @var Channel $channel */
         $channel         = $context->getOption('channel');
         $this->transport = $context->getOption('transport');
+        $this->transportSettings = $channel->getTransport();
 
-        if (!$channel || !$this->transport) {
+        if (!$this->transportSettings || !$this->transport) {
             throw new \LogicException('Connector instance does not configured properly.');
         }
 
-        $this->transportSettings = $channel->getTransport();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function connect()
-    {
-        if (!($this->transport && $this->transportSettings)) {
-            throw new \LogicException('Connector does not configured correctly');
-        }
-
-        $transportSettings = $this->transportSettings->getSettingsBag();
-        $this->isConnected = $this->transport->init($transportSettings);
-
-        return $this->isConnected;
+        $this->transport->init($this->transportSettings->getSettingsBag());
     }
 
     /**
@@ -115,10 +98,6 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
      */
     protected function call($action, $params = [])
     {
-        if ($this->isConnected === false) {
-            $this->connect();
-        }
-
         $params = is_array($params) ? $params : [$params];
 
         return $this->transport->call($action, $params);

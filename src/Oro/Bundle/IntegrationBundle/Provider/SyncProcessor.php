@@ -64,10 +64,10 @@ class SyncProcessor implements SyncProcessorInterface
             try {
                 $this->logger->info(sprintf('Start processing "%s" connector', $connector));
                 /**
-                 * @TODO FIXME WARNING use clone here
+                 * Clone object here because it will be modified and changes should not be shared between
                  */
-                $realConnector = $this->registry->getConnectorType($channel->getType(), $connector);
-                $realTransport = $this->registry
+                $realConnector = clone $this->registry->getConnectorType($channel->getType(), $connector);
+                $realTransport = clone $this->registry
                     ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
             } catch (\Exception $e) {
                 // log and continue

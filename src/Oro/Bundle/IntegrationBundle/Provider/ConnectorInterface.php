@@ -8,11 +8,4 @@ interface ConnectorInterface extends ConnectorTypeInterface, StepExecutionAwareI
 {
     const SYNC_DIRECTION_PULL = 'pull';
     const SYNC_DIRECTION_PUSH = 'push';
-
-    /**
-     * Init connection using transport
-     *
-     * @return mixed
-     */
-    public function connect();
 }
