@@ -34,9 +34,11 @@ datagrid:
                 label:   Name
             entity:
                 label: Entity
-                data_name: entity
-                frontend_type: select
-                choices: @oro_entity_config.event_listener.entityconfig_grid_listener->getChoicesName
+                type: twig
+                template: OroEntityBundle:Datagrid:Property/entity.html.twig
+                frontend_type: html
+                context:
+                    entity_provider: @oro_report.entity_provider
             reportType:
                 type: translateable
                 label: Report type
