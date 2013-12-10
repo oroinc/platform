@@ -1,0 +1,90 @@
+@accordionHeadingBackground:               #eaeaea;
+@accordionHeadingBorder:                   #dedede;
+@mainMenuFontColor:                        #444;
+@menuWidth:                                240px;
+
+#main-menu {
+  float: left;
+  position: absolute;
+  width: @menuWidth;
+  margin-left: -@menuWidth;
+  ul {
+    margin-left: 0;
+  }
+  a {
+    display: block;
+    color: @mainMenuFontColor;
+    .title {
+      display: block;
+      padding: 8px 10px;
+      border-bottom: 1px solid lighten(@accordionHeadingBorder, 5%);
+    }
+    .accordion-toggle {
+      padding-left: 15px;
+      background: @accordionHeadingBackground;
+      font-weight: bold;
+      border-bottom-color: @accordionHeadingBorder;
+      border-top: 1px solid #f7f7f7;
+    }
+  }
+  .active>a {
+    font-weight: bold;
+  }
+  .accordion-toggle:before {
+    content: "\f0d7";
+    font-family: FontAwesome;
+    margin: 0 7px 0 -7px;
+    width: 5px;
+    display: inline-block;
+  }
+  .accordion-toggle.collapsed:before {
+    content: "\f0da";
+    margin: 0 5px 0 -5px;
+  }
+  .menu_level_1 {
+    .title {
+      padding-left: 25px;
+    }
+    .accordion-toggle {
+      padding-left: 32px;
+      background: lighten(@accordionHeadingBackground, 3%);
+      border-bottom-color: lighten(@accordionHeadingBorder, 3%);
+    }
+  }
+  .menu_level_2 {
+    .title {
+      padding-left: 42px;
+    }
+    .accordion-toggle {
+      padding-left: 49px;
+      background: lighten(@accordionHeadingBackground, 6%);
+      border-bottom-color: lighten(@accordionHeadingBorder, 6%);
+    }
+  }
+  .menu_level_3 {
+    .title {
+      padding-left: 59px;
+    }
+    .accordion-toggle {
+      padding-left: 66px;
+      background: lighten(@accordionHeadingBackground, 9%);
+      border-bottom-color: lighten(@accordionHeadingBorder, 9%);
+    }
+  }
+  .accordion-group {
+    .border-radius(0);
+    margin-bottom: 0;
+    border: none;
+  }
+  .accordion-body.accordion {
+    margin-bottom: 0;
+  }
+}
+#main-menu.menu-opened {
+  margin-left: 0;
+}
+#main.menu-opened {
+  margin-left: @menuWidth;
+  margin-right: -@menuWidth;
+  border-left: 1px solid darken(@accordionHeadingBorder, 5%);
+}

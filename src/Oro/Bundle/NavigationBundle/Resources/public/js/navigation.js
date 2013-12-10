@@ -943,7 +943,6 @@ define(function (require) {
         disableEmptyLinks: function(selector) {
             $(selector).on('click', function(e) {
                 e.preventDefault();
-                e.stopPropagation();
             });
         },
 

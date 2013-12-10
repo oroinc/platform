@@ -94,23 +94,6 @@
 .form-signin .input-prepend{
     margin-bottom: 10px;
 }
-.logo{
-    font-size: 17px;
-    font-weight: bold;
-    margin: 0;
-    float: left;
-    height: 40px;
-    line-height: 40px;
-}
-.logo a{
-    padding: 0 15px;
-    color: #fff;
-}
-.logo a:focus,
-.logo a:hover{
-    text-decoration: none;
-    color: #fff;
-}
 .wb{
     background-color: #FFF;
 }

@@ -140,6 +140,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
 
+        var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function (e) {
             var $target = $(e.target),
                 clickingTarget = null;
@@ -148,13 +149,11 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             } else {
                 clickingTarget = $target.closest('.dropdown, .oro-drop');
             }
-            clickingTarget.addClass('_currently_clicked');
-            $('.open:not(._currently_clicked)').removeClass('open');
-            clickingTarget.removeClass('_currently_clicked');
+            $(openDropdownsSelector).not(clickingTarget).removeClass('open');
         });
 
         $('#main-menu').mouseover(function () {
-            $('.open').removeClass('open');
+            $(openDropdownsSelector).removeClass('open');
         });
     });
 

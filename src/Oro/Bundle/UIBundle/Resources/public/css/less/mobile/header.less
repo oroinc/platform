@@ -1,0 +1,26 @@
+.icon-menu-bars:before {
+  content: "\f0c9";
+}
+
+#oroplatform-header {
+  .logo {
+    a {
+      text-transform: uppercase;
+      color: #fff;
+    }
+  }
+  .logo, #main-menu-toggle {
+    margin: 0 4px;
+    float: left;
+    font-weight: bold;
+    font-size: 17px;
+    .header-button;
+    &:active > [class^=icon-],
+    &:focus > [class^=icon-] {
+      .header-button-inactive;
+    }
+  }
+  #main-menu-toggle.open > [class^=icon-] {
+    .header-button-active;
+  }
+}

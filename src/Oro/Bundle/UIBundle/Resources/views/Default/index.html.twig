@@ -18,6 +18,9 @@
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
                 <script type="text/javascript">
                     require(['oro/init-layout', 'oro/init-user', 'oro/widget-manager', 'jquery.uniform']);
+                {% if isMobileVersion() %}
+                    require(['oro/mobile/layout'], function (layout) {layout.init();});
+                {% endif %}
                 {% if app.debug %}
                     require(['oro/app'], function(app){app.debug = true;});
                 {% endif %}
@@ -43,7 +46,7 @@
             {% endblock %}
         {% endblock %}
     </head>
-    <body class="{% if isMobile() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
+    <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
     {% placeholder after_body_start %}
     <div id="progressbar">
         <h3>{% trans %}Loading ...{% endtrans %}</h3>
@@ -59,30 +62,28 @@
                     <div class="navbar-inner">
                         <div class="container">
                             {% placeholder header_logo %}
-                            <div class="navbar-responsive-collapse">
-                                {% block navbar %}
-                                <div class="nav pull-left top-search shortcuts">
-                                    {% placeholder navbar %}
-                                </div>
-                                {% endblock navbar %}
-                                <div class="divider-vertical small-divider"></div>
-                                <div id="main-menu">
-                                    {% block application_menu %}
-                                        {% placeholder application_menu %}
-                                    {% endblock application_menu %}
-                                 </div>
-                                <ul class="nav pull-right user-menu">
-                                {% block user_menu %}
-                                    {% placeholder user_menu %}
-                                    {# Disabled notification icon till it will be implemented
-                                    {% block notifications %}
-                                    <li class="divider-vertical small-divider"></li>
-                                    <li><a class="notifications" href="#"><i class="icon-bullhorn"></i><span class="badge badge-important">1</span></a></li>
-                                    {% endblock notifications %}
-                                    #}
-                                {% endblock %}
-                                </ul>
+                            {% block navbar %}
+                            <div class="nav pull-left top-search shortcuts">
+                                {% placeholder navbar %}
                             </div>
+                            {% endblock navbar %}
+                            <div class="divider-vertical small-divider"></div>
+                            <div id="main-menu">
+                                {% block application_menu %}
+                                    {% placeholder application_menu %}
+                                {% endblock application_menu %}
+                            </div>
+                            <ul class="nav pull-right user-menu">
+                            {% block user_menu %}
+                                {% placeholder user_menu %}
+                                {# Disabled notification icon till it will be implemented
+                                {% block notifications %}
+                                <li class="divider-vertical small-divider"></li>
+                                <li><a class="notifications" href="#"><i class="icon-bullhorn"></i><span class="badge badge-important">1</span></a></li>
+                                {% endblock notifications %}
+                                #}
+                            {% endblock %}
+                            </ul>
                         </div>
                     </div>
                     {% placeholder after_navigation %}
@@ -97,7 +98,7 @@
                         {% placeholder left_panel %}
                     {% endblock left_panel %}
                     {% block before_content %}
-                    <div class="container-fluid breadcrumb-pin">
+                    <div class="breadcrumb-pin">
                         <div id="breadcrumb">
                             {% block breadcrumb %}
                                 {% placeholder breadcrumb %}

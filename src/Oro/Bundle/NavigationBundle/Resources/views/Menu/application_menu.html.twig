@@ -1,9 +1,16 @@
 {% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
 
 {% block item %}
+    {% if isDesktopVersion() %}
+        {%- set itemClass = 'dropdown' %}
+        {%- set childrenClass = 'dropdown-menu' %}
+    {% else %}
+        {%- set itemClass = '' %}
+        {%- set childrenClass = '' %}
+    {% endif %}
     {% if item.hasChildren and item.displayChildren %}
-        {%- set classes = classes|merge(['dropdown']) %}
-        {%- set childrenClasses = childrenClasses|merge(['dropdown-menu']) %}
+        {%- set classes = classes|merge([itemClass]) %}
+        {%- set childrenClasses = childrenClasses|merge([childrenClass]) %}
     {% endif %}
     {{ block('item_renderer') }}
 {% endblock %}
