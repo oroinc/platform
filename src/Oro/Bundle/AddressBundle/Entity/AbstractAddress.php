@@ -703,7 +703,10 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
 
     public function isRegionValid(ExecutionContext $context)
     {
-        if ($this->getCountry() && $this->getCountry()->hasRegions() && !$this->state) {
+        if ($this->getCountry() && $this->getCountry()->hasRegions() && !$this->state && !$this->stateText) {
+            // do not allow saving text state in case when state was checked from list
+            // except when in base data state text existed
+            // another way state_text field will be null, logic are placed in form listener
             $propertyPath = $context->getPropertyPath() . '.state';
             $context->addViolationAt(
                 $propertyPath,

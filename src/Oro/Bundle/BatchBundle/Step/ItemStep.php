@@ -154,6 +154,10 @@ class ItemStep extends AbstractStep
         if ($this->writer instanceof AbstractConfigurableStepElement && !empty($config['writer'])) {
             $this->writer->setConfiguration($config['writer']);
         }
+
+        if (!empty($config['batchSize'])) {
+            $this->setBatchSize($config['batchSize']);
+        }
     }
 
     /**
