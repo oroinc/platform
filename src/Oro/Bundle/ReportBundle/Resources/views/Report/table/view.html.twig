@@ -2,7 +2,6 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% oro_title_set({params : {"%report.name%": entity.name} }) %}
-{% set gridName = 'oro_report_table_' ~ entity.id %}
 {% set pageTitle = entity.name %}
 
 {% block navButtons %}
@@ -41,5 +40,15 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {{ dataGrid.renderGrid(gridName) }}
+    {% if gridName is defined %}
+        {{ dataGrid.renderGrid(gridName) }}
+    {% else %}
+        <div class="container-fluid">
+            <div class="grid-container">
+                <div class="no-data">
+                    <span>{{ 'Invalid report configuration'|trans }}</span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 {% endblock content_data %}

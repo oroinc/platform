@@ -24,11 +24,21 @@ class ReportController extends Controller
      */
     public function viewAction(Report $entity)
     {
+        $reportType = strtolower($entity->getType()->getName());
+        $parameters = [
+            'entity' => $entity
+        ];
+
+        if ($reportType === 'table') {
+            $gridName = sprintf('oro_report_table_%d', $entity->getId());
+            if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
+                $parameters['gridName'] = $gridName;
+            }
+        }
+
         return $this->render(
-            sprintf('OroReportBundle:Report:%s/view.html.twig', strtolower($entity->getType()->getName())),
-            array(
-                'entity' => $entity
-            )
+            sprintf('OroReportBundle:Report:%s/view.html.twig', $reportType),
+            $parameters
         );
     }
 
