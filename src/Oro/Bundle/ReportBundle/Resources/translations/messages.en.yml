@@ -56,3 +56,4 @@ oro:
 "Are you sure you want to delete this report?": Are you sure you want to delete this report?
 "Report deleted": Report deleted
 "Report saved": Report saved
+"Invalid report configuration": No data to show. Please go to the edit report page and make sure the report was configured properly.
