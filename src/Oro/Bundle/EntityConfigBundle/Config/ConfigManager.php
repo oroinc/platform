@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -364,16 +366,6 @@ class ConfigManager
                 $models[$config->getId()->toString()] = $model;
             }
 
-            if ($changedValues = $this->configChangeSets->getValues()) {
-                foreach ($changedValues as $properties) {
-                    if (in_array('label', array_keys($properties))) {
-                        $cacheDir = $this->container->getParameter('kernel.cache_dir') . '/translations/';
-                        array_map('unlink', glob($cacheDir . 'catalogue*.*'));
-                        break;
-                    }
-                }
-            }
-
             //TODO::refactoring
             $serializableValues = $this->getProvider($config->getId()->getScope())
                 ->getPropertyConfig()
@@ -593,6 +585,8 @@ class ConfigManager
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
 
             foreach ($this->getProviders() as $provider) {
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues();
+
                 $defaultValues = array();
                 $metadata      = $this->getFieldMetadata($className, $fieldName);
                 if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
@@ -600,6 +594,13 @@ class ConfigManager
                 }
 
                 $fieldId = new FieldConfigId($className, $provider->getScope(), $fieldName, $fieldType);
+
+                foreach ($translatable as $code) {
+                    if (!in_array($code, $defaultValues)) {
+                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, $fieldName);
+                    }
+                }
+
                 $config  = $provider->createConfig($fieldId, $defaultValues);
 
                 $this->localCache->set($config->getId()->toString(), $config);

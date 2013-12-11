@@ -11,7 +11,9 @@ use Symfony\Component\Translation\Translator;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
 class ConfigTranslator implements LoaderInterface
 {
@@ -63,38 +65,18 @@ class ConfigTranslator implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        $messages               = [];
-        $translatorMessagesKeys = array_keys($this->translator->getTranslations()['messages']);
+        $messages = [];
 
         /** @var MessageCatalogue $catalogue */
         $catalogue = new MessageCatalogue($locale);
 
-        /** @var ConfigProvider */
-        $entityProvider = $this->configManager->getProvider('entity');
+        /** @var TranslationRepository $translationRepo */
+        $translationRepo = $this->configManager->getEntityManager()->getRepository(Translation::ENTITY_NAME);
 
-        $configEntities = $entityProvider->getIds();
-        foreach ($configEntities as $entity) {
-            $entityFields = $entityProvider->getIds($entity->getClassName());
-            foreach ($entityFields as $field) {
-                $value      = $entityProvider->getConfigById($field)->get('label');
-                $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $field->getClassName());
-                $classArray = explode('\\', strtolower($class));
-                $keyArray   = [];
-
-                foreach ($classArray as $item) {
-                    if (!in_array(Inflector::camelize($item), $keyArray)) {
-                        $keyArray[] = Inflector::camelize($item);
-                    }
-                }
-                $keyArray[] = Inflector::tableize($field->getFieldName());
-
-                $key = implode('.', $keyArray);
-                if ($value != Inflector::tableize($field->getFieldName())
-                    || !in_array($key, $translatorMessagesKeys)
-                ) {
-                    $messages[$key] = $value;
-                }
-            }
+        /** @var Translation[] $translations */
+        $translations = $translationRepo->findValues($this->translator->getLocale());
+        foreach ($translations as $translation) {
+            $messages[$translation->getKey()] = $translation->getValue();
         }
 
         $catalogue->add($messages);

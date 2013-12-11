@@ -5,43 +5,37 @@ namespace Oro\Bundle\TranslationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class Translation
- * @package Oro\Bundle\TranslationBundle\Entity
- *
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
  * @ORM\Table(name="oro_translation")
  */
 class Translation
 {
+    const ENTITY_NAME = 'OroTranslationBundle:Translation';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Type("integer")
      */
     protected $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     * @Type("string")
+     * @ORM\Column(name="trans_key", type="string", length=255)
      */
     protected $key;
 
     /**
      * @ORM\Column(type="text")
-     * @Type("string")
      */
     protected $value;
 
     /**
      * @ORM\Column(type="string", length=5)
-     * @Type("string")
      */
     protected $locale;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Type("string")
      */
     protected $domain;
 

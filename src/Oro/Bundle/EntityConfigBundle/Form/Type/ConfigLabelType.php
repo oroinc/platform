@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Form\DataTransformer\ConfigLabelTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\Translator;
 
 class ConfigLabelType extends AbstractType
@@ -20,16 +23,38 @@ class ConfigLabelType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /*$builder->add(
-            'label',
-            'text'
-        );*/
+//        parent::buildForm($builder, $options);
 
-        $builder->add(
-            'default',
-            'checkbox'
-        );
+//        $builder->add(
+//            'is_default',
+//            'checkbox',
+//            [
+//                'label' => 'Use default',
+//                'required' => false,
+//                'block' => 'entity',
+//                'subblock' => 'general'
+//            ]
+//        );
+
+//        $builder->add('blabla', 'text');
     }
+
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+//        $resolver->setDefaults(
+//            [
+//                'auto_initialized' => false
+//            ]
+//        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+//    public function getParent()
+//    {
+//        return 'oro_entity_config_type';
+//    }
 
     /**
      * {@inheritdoc}
