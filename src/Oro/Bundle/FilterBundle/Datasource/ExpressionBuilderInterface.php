@@ -147,4 +147,14 @@ interface ExpressionBuilderInterface
      * @return mixed
      */
     public function like($x, $y, $withParam = false);
+
+    /**
+     * Creates a NOT LIKE() comparison expression with the given arguments.
+     *
+     * @param string $x         Field in string format to be inspected by NOT LIKE() comparison.
+     * @param mixed  $y         Argument to be used in NOT LIKE() comparison.
+     * @param bool   $withParam Indicates whether the right expression is a parameter name
+     * @return mixed
+     */
+    public function notLike($x, $y, $withParam = false);
 }

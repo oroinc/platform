@@ -1,0 +1,3 @@
+css:
+    'report':
+        - 'bundles/ororeport/css/report.css'
