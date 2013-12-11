@@ -48,7 +48,7 @@
     {% endblock %}
     {% placeholder scripts_after %}
 </head>
-<body class="{% block bodyClass %}{% endblock %}">
+<body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
     <div id="page">
         <div id="top-page">
             {% set messagesContent %}
