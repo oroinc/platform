@@ -242,9 +242,9 @@ class OwnerFormExtension extends AbstractTypeExtension
             if ($metadata) {
                 $isCorrect = true;
                 if ($metadata->isUserOwned()) {
-                    $isCorrect = $this->businessUnitManager->isUserIsCorrectOwner(
-                        $newOwnerId,
+                    $isCorrect = $this->businessUnitManager->canUserBeSetAsOwner(
                         $this->getCurrentUser(),
+                        $newOwnerId,
                         $this->accessLevel,
                         $this->treeProvider
                     );
@@ -331,7 +331,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                         'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
                         'extra_config' => 'acl_user_autocomplete',
                         'permission' => $permission,
-                        'data_class_name' => str_replace('\\', '_', $dataClass),
+                        'entity_name' => str_replace('\\', '_', $dataClass),
                         'entity_id' => $entityId
                     ]
                 )

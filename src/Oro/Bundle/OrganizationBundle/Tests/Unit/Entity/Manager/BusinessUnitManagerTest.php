@@ -74,7 +74,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testIsUserIsCorrectOwner($accessLevel, $expected, $parameterts = [])
+    public function testCanUserBeSetAsOwner($accessLevel, $expected, $parameterts = [])
     {
         $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
@@ -132,7 +132,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(isset($parameterts['id'])? $parameterts['id'] : 1));
 
-        $result = $this->businessUnitManager->isUserIsCorrectOwner(1, $user, $accessLevel, $treeProvider);
+        $result = $this->businessUnitManager->canUserBeSetAsOwner($user, 1, $accessLevel, $treeProvider);
         $this->assertEquals($expected, $result);
     }
 

@@ -417,7 +417,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getNormData')
             ->will($this->returnValue($this->entityClassName));
         $this->businessUnitManager->expects($this->once())
-            ->method('isUserIsCorrectOwner')
+            ->method('canUserBeSetAsOwner')
             ->will($this->returnValue(false));
         $event = new FormEvent($form, $this->user);
 

@@ -72,23 +72,23 @@ class BusinessUnitManager
     }
 
     /**
-     * Checks if current user can set assigned user as owner on given access level
+     * Checks if user can be set as owner by given user
      *
-     * @param User $assignedUser
      * @param User $currentUser
+     * @param int $userId
      * @param $accessLevel
      * @param OwnerTreeProvider $treeProvider
      * @return bool
      */
-    public function isUserIsCorrectOwner(
-        $assignedUser,
+    public function canUserBeSetAsOwner(
         User $currentUser,
+        $userId,
         $accessLevel,
         OwnerTreeProvider $treeProvider
     ) {
-        if ($accessLevel == AccessLevel::BASIC_LEVEL && $assignedUser == $currentUser->getId()) {
+        if ($accessLevel == AccessLevel::SYSTEM_LEVEL) {
             return true;
-        } elseif ($accessLevel == AccessLevel::SYSTEM_LEVEL) {
+        } elseif ($accessLevel == AccessLevel::BASIC_LEVEL && $userId == $currentUser->getId()) {
             return true;
         } else {
             $resultBuIds = [];
@@ -116,7 +116,7 @@ class BusinessUnitManager
             }
 
             if (!empty($resultBuIds)) {
-                $assignedUser = $this->getUserRepo()->find($assignedUser);
+                $assignedUser = $this->getUserRepo()->find($userId);
                 return (in_array($assignedUser->getOwner()->getId(), $resultBuIds));
             }
         }
