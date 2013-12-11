@@ -29,22 +29,21 @@ class FormListener
         $form = $event->getForm();
         $label = false;
 
-        $className = get_class($form->vars['value']);
-        if (class_exists($className)) {
-            $config = $this->configManager->getProvider('entity')->getConfig($className, 'owner');
-            $label = $config->get('label');
+        if (is_object($form->vars['value'])) {
+            $className = get_class($form->vars['value']);
+            if (class_exists($className)) {
+                $config = $this->configManager->getProvider('entity')->getConfig($className, 'owner');
+                $label = $config->get('label');
+            }
+
+            $ownerField = $environment->render(
+                "OroOrganizationBundle::owner.html.twig",
+                array(
+                    'form' => $form,
+                    'label' => $label
+                )
+            );
         }
-
-        $ownerFieldLabel =
-
-        $ownerField = $environment->render(
-            "OroOrganizationBundle::owner.html.twig",
-            array(
-                'form' => $form,
-                'label' => $label
-            )
-        );
-
 
         /**
          * Setting owner field as last field in first data block
