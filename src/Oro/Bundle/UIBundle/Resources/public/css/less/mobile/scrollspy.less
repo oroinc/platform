@@ -1,25 +1,13 @@
-.scrollspy .accordion-group {
-  border: none;
+h4.accordion-toggle {
+  margin:0;
+  #accordion > .toggle();
 }
-
-.scrollspy-nav, .scrollspy-nav-target {
-  display: none;
+h4.accordion-toggle:before {
+  #accordion > .toggle-before();
 }
-
-.scrollspy .accordion-body > .form-horizontal {
-  margin-top: 10px;
+h4.accordion-toggle.collapsed:before {
+  #accordion > .toggle-collapsed-before();
 }
-
-.scrollspy .accordion-group {
-  margin-bottom: 0px;
-}
-
-.scrollspy-title {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-.scrollspy input {
-  font-size: larger;
-  font-weight: bolder;
+.responsive-section.accordion-group{
+  #accordion > .group();
 }

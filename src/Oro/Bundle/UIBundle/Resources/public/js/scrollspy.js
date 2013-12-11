@@ -29,38 +29,29 @@ define(function (require) {
     scrollspy._replaceWithCollapse = function (container) {
         container.find('[data-spy="scroll"]').each(function () {
             var $spy = $(this);
-            $spy.addClass('accordion');
+            $spy.removeAttr('data-spy').addClass('accordion');
 
-            $spy.find('.responsive-section').each(function () {
-                var $section = $(this);
-                $section.removeClass('responsive-section').addClass('accordion-group');
-
-                var blockId = $section.find('.scrollspy-nav-target').attr('id');
-                var sel = '#' + blockId + ' + .row-fluid';
-                var href = '#' + blockId + ' + .accordion-body';
-
-                $(sel).removeClass('row-fluid').addClass('accordion-body collapse');
-
-                var $toggle = $section.find('.scrollspy-title');
-                var $link = $('<a class="accordion-toggle" data-toggle="collapse"></a>')
-                    .data('parent', '[data-spy="scroll"]').attr('href', href);
-                $toggle.wrap($link);
-                $toggle.prepend('<i class="icon-fixed-width icon-caret-right"></i>');
+            $spy.find('.scrollspy-title').each(function (i) {
+                var $header = $(this),
+                    targetSelector = '#' + $header.next().attr('id') + '+',
+                    $target = $(targetSelector);
+                $header
+                    .removeClass('scrollspy-title')
+                    .addClass('accordion-toggle')
+                    .attr({
+                        'data-toggle': 'collapse',
+                        'data-target': targetSelector
+                    });
+                $header.parent().addClass('accordion-group');
+                $target.addClass('accordion-body collapse');
+                $header.wrap('<div class="accordion-heading"></div>');
+                // first is opened, rest are closed
+                if (i > 0) {
+                    $header.addClass('collapsed')
+                } else {
+                    $target.addClass('in');
+                }
             });
-
-            $spy.collapse();
-
-            $spy.on('shown', function (e) {
-                var $i = $(e.target).prevAll('a.accordion-toggle');
-                $i.find('i').removeClass('icon-caret-right').addClass('icon-caret-down');
-            });
-
-            $spy.on('hidden', function (e) {
-                var $i = $(e.target).prevAll('a.accordion-toggle');
-                $i.find('i').removeClass('icon-caret-down').addClass('icon-caret-right');
-            });
-
-            $spy.find('.collapse').first().collapse('show');
         });
     };
 

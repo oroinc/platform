@@ -1,6 +1,6 @@
 & {
   min-width: inherit;
-  font-size: 18px;
+  font-size: @baseFontSize;
   #page {
     overflow-x: hidden;
   }
@@ -21,7 +21,8 @@
 .form-horizontal .control-group label.control-label {
   float: none;
   text-align: left;
-  width: auto;
+//  something goes wrong after width:auto, font-size starts jumping (+1px)
+//  width: auto;
 }
 
 .form-horizontal .control-group .controls {
@@ -36,14 +37,31 @@
   padding-right: 0px;
 }
 
+.scrollspy-nav, .scrollspy-nav-target {
+  display: none;
+}
+
 .row {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: @contentPadding;
+  margin-right: @contentPadding;
 }
 
 .container-fluid {
-  padding-right: 10px;
-  padding-left: 10px;
+  padding-right: @contentPadding;
+  padding-left: @contentPadding;
+  &> .responsive-section {
+    margin: 0 -@contentPadding;
+    padding-right: @contentPadding;
+  }
+}
+.layout-content .responsive-section{
+  padding: 0;
+  .form-horizontal {
+    padding: @contentPadding * 1.5 0;
+  }
+}
+.container-fluid > .responsive-section .responsive-cell {
+  padding: 0 @contentPadding;
 }
 
 &.error-page {
