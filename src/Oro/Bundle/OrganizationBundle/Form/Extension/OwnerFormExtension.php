@@ -27,6 +27,10 @@ use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
+/**
+ * Class OwnerFormExtension
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OwnerFormExtension extends AbstractTypeExtension
 {
     /**
