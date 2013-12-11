@@ -7,6 +7,15 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFilterLogicException;
 
 /**
+ * Provides a core functionality to convert a query definition created by the query designer to another format.
+ *
+ * This class operates with 'Join Identifier'. It is a string which unique identifies
+ * each table used in a query.
+ * Examples:
+ *      AcmeBundle\Entity\Order::products
+ *      AcmeBundle\Entity\Order::products,AcmeBundle\Entity\Product::statuses
+ * The join identifier for the root table is empty string.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractQueryConverter
@@ -15,9 +24,14 @@ abstract class AbstractQueryConverter
     const TABLE_ALIAS_TEMPLATE  = 't%d';
 
     /**
+     * @var FunctionProviderInterface
+     */
+    private $functionProvider;
+
+    /**
      * @var string
      */
-    protected $entity;
+    private $entity;
 
     /**
      * @var array
@@ -27,12 +41,119 @@ abstract class AbstractQueryConverter
     /**
      * @var array
      */
-    protected $tableAliases;
+    private $tableAliases;
 
     /**
      * @var array
      */
-    protected $columnAliases;
+    private $columnAliases;
+
+    /**
+     * Constructor
+     *
+     * @param FunctionProviderInterface $functionProvider
+     */
+    protected function __construct(FunctionProviderInterface $functionProvider)
+    {
+        $this->functionProvider = $functionProvider;
+    }
+
+    /**
+     * Makes sure that a table identified by $joinByFieldName joined
+     * on the same level as a table identified by $tableAlias.
+     *
+     * For example assume that $tableAlias points to
+     *      table1::orders -> table2::products
+     * and $joinByFieldName is, for example, 'statuses'.
+     * In this case the checked join will be
+     *      table1::orders -> table2::statuses
+     *
+     * @param string $tableAlias      The alias of a table to check
+     * @param string $joinByFieldName The name of a field should be used to check a join
+     * @return string The table alias for the checked join
+     */
+    public function ensureSiblingTableJoined($tableAlias, $joinByFieldName)
+    {
+        $joinId       = $this->getJoinIdentifierByTableAlias($tableAlias);
+        $parentJoinId = $this->getParentJoinIdentifier($joinId);
+        $newJoinId    = $this->buildSiblingJoinIdentifier($parentJoinId, $joinByFieldName);
+
+        return $this->ensureTableJoined($newJoinId);
+    }
+
+    /**
+     * Makes sure that a table identified by the given $joinId exists in the query
+     *
+     * @param string $joinId
+     * $return string The table alias for the given join
+     */
+    public function ensureTableJoined($joinId)
+    {
+        $joinIds = [];
+        foreach (explode(',', $joinId) as $item) {
+            $joinIds[] = empty($joinIds)
+                ? $item
+                : sprintf('%s,%s', $joinIds[count($joinIds) - 1], $item);
+        }
+        $this->addTableAliasesForJoinIdentifiers($joinIds);
+
+        return $this->tableAliases[$joinId];
+    }
+
+    /**
+     * Gets join identifier for the given table alias
+     *
+     * @param $tableAlias
+     * @return string
+     */
+    public function getJoinIdentifierByTableAlias($tableAlias)
+    {
+        $result = null;
+        foreach ($this->tableAliases as $joinId => $alias) {
+            if ($alias === $tableAlias) {
+                $result = $joinId;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Builds join identifier for a table is joined on the same level as a table identified by $joinId.
+     *
+     * @param string $joinId          The join identifier
+     * @param string $joinByFieldName The name of a field should be used to join new table
+     * @return string The join identifier
+     */
+    public function buildSiblingJoinIdentifier($joinId, $joinByFieldName)
+    {
+        if (empty($joinId)) {
+            return sprintf('%s::%s', $this->entity, $joinByFieldName);
+        }
+
+        return sprintf('%s::%s', substr($joinId, 0, strrpos($joinId, '::')), $joinByFieldName);
+    }
+
+    /**
+     * Extracts a parent join identifier
+     *
+     * @param string $joinId
+     * @return string
+     * @throws \LogicException if incorrect join identifier specified
+     */
+    public function getParentJoinIdentifier($joinId)
+    {
+        if (empty($joinId)) {
+            throw new \LogicException('Cannot get parent join identifier for root table.');
+        }
+
+        $lastDelimiter = strrpos($joinId, ',');
+        if (false === $lastDelimiter) {
+            return '';
+        }
+
+        return substr($joinId, 0, $lastDelimiter);
+    }
 
     /**
      * Converts a query from the query designer format to a target format
@@ -66,11 +187,16 @@ abstract class AbstractQueryConverter
     {
         $this->prepareTableAliases();
         $this->prepareColumnAliases();
+
         $this->addSelectStatement();
         $this->addFromStatements();
         $this->addJoinStatements();
         $this->addWhereStatement();
+        $this->addGroupByStatement();
         $this->addOrderByStatement();
+
+        $this->saveTableAliases($this->tableAliases);
+        $this->saveColumnAliases($this->columnAliases);
     }
 
     /**
@@ -87,6 +213,20 @@ abstract class AbstractQueryConverter
         foreach ($this->definition['columns'] as $column) {
             $this->addTableAliasesForJoinIdentifiers($this->getJoinIdentifiers($column['name']));
         }
+        if (isset($this->definition['grouping_columns'])) {
+            foreach ($this->definition['grouping_columns'] as $column) {
+                $this->addTableAliasesForJoinIdentifiers($this->getJoinIdentifiers($column['name']));
+            }
+        }
+    }
+
+    /**
+     * Stores all table aliases in the query
+     *
+     * @param array $tableAliases
+     */
+    protected function saveTableAliases($tableAliases)
+    {
     }
 
     /**
@@ -95,9 +235,18 @@ abstract class AbstractQueryConverter
     protected function prepareColumnAliases()
     {
         foreach ($this->definition['columns'] as $column) {
-            $this->columnAliases[$column['name']] =
+            $this->columnAliases[$this->buildColumnAliasKey($column)] =
                 sprintf(static::COLUMN_ALIAS_TEMPLATE, count($this->columnAliases) + 1);
         }
+    }
+
+    /**
+     * Stores all column aliases in the query
+     *
+     * @param array $columnAliases
+     */
+    protected function saveColumnAliases($columnAliases)
+    {
     }
 
     /**
@@ -106,13 +255,26 @@ abstract class AbstractQueryConverter
     protected function addSelectStatement()
     {
         foreach ($this->definition['columns'] as $column) {
-            $fieldName = $this->getFieldName($column['name']);
+            $fieldName          = $this->getFieldName($column['name']);
+            $functionExpr       = null;
+            $functionReturnType = null;
+            if (isset($column['func']) && !empty($column['func'])) {
+                $function           = $this->functionProvider->getFunction(
+                    $column['func']['name'],
+                    $column['func']['group_name'],
+                    $column['func']['group_type']
+                );
+                $functionExpr       = $function['expr'];
+                $functionReturnType = isset($function['return_type']) ? $function['return_type'] : null;
+            }
             $this->addSelectColumn(
                 $this->getEntityClassName($column['name']),
                 $this->getTableAliasForColumn($column['name']),
                 $fieldName,
-                $this->columnAliases[$column['name']],
-                isset($column['label']) ? $column['label'] : $fieldName
+                $this->columnAliases[$this->buildColumnAliasKey($column)],
+                isset($column['label']) ? $column['label'] : $fieldName,
+                $functionExpr,
+                $functionReturnType
             );
         }
     }
@@ -120,18 +282,22 @@ abstract class AbstractQueryConverter
     /**
      * Performs conversion of a single column of SELECT statement
      *
-     * @param string $entityClassName
-     * @param string $tableAlias
-     * @param string $fieldName
-     * @param string $columnAlias
-     * @param string $columnLabel
+     * @param string                        $entityClassName
+     * @param string                        $tableAlias
+     * @param string                        $fieldName
+     * @param string                        $columnAlias
+     * @param string                        $columnLabel
+     * @param string|FunctionInterface|null $functionExpr
+     * @param string|null                   $functionReturnType
      */
     abstract protected function addSelectColumn(
         $entityClassName,
         $tableAlias,
         $fieldName,
         $columnAlias,
-        $columnLabel
+        $columnLabel,
+        $functionExpr,
+        $functionReturnType
     );
 
     /**
@@ -281,10 +447,11 @@ abstract class AbstractQueryConverter
                 sprintf('unknown filter number "%s" at position %d', $token[0][0], $token[0][1] + 1)
             );
         }
-        $filter      = $this->definition['filters'][$filterNumber - 1];
-        $columnName  = $filter['columnName'];
-        $fieldName   = $this->getFieldName($columnName);
-        $columnAlias = isset($this->columnAliases[$columnName]) ? $this->columnAliases[$columnName] : null;
+        $filter         = $this->definition['filters'][$filterNumber - 1];
+        $columnName     = $filter['columnName'];
+        $fieldName      = $this->getFieldName($columnName);
+        $columnAliasKey = $this->buildColumnAliasKey($columnName);
+        $columnAlias    = isset($this->columnAliases[$columnAliasKey]) ? $this->columnAliases[$columnAliasKey] : null;
         $this->addWhereCondition(
             $this->getEntityClassName($columnName),
             $this->getTableAliasForColumn($columnName),
@@ -346,6 +513,29 @@ abstract class AbstractQueryConverter
     );
 
     /**
+     * Performs conversion of GROUP BY statement
+     */
+    protected function addGroupByStatement()
+    {
+        if (isset($this->definition['grouping_columns'])) {
+            foreach ($this->definition['grouping_columns'] as $column) {
+                $this->addGroupByColumn(
+                    $this->getTableAliasForColumn($column['name']),
+                    $this->getFieldName($column['name'])
+                );
+            }
+        }
+    }
+
+    /**
+     * Performs conversion of a single column of GROUP BY statement
+     *
+     * @param string $tableAlias
+     * @param string $fieldName
+     */
+    abstract protected function addGroupByColumn($tableAlias, $fieldName);
+
+    /**
      * Performs conversion of ORDER BY statement
      */
     protected function addOrderByStatement()
@@ -353,7 +543,7 @@ abstract class AbstractQueryConverter
         foreach ($this->definition['columns'] as $column) {
             if (isset($column['sorting']) && $column['sorting'] !== '') {
                 $this->addOrderByColumn(
-                    $this->columnAliases[$column['name']],
+                    $this->columnAliases[$this->buildColumnAliasKey($column)],
                     $column['sorting']
                 );
             }
@@ -407,19 +597,13 @@ abstract class AbstractQueryConverter
     }
 
     /**
-     * Extracts a parent join identifier
+     * Gets a root entity of this query
      *
-     * @param string $joinId
      * @return string
      */
-    protected function getParentJoinIdentifier($joinId)
+    protected function getRootEntity()
     {
-        $lastDelimiter = strrpos($joinId, ',');
-        if (false === $lastDelimiter) {
-            return '';
-        }
-
-        return substr($joinId, 0, $lastDelimiter);
+        return $this->entity;
     }
 
     /**
@@ -470,5 +654,72 @@ abstract class AbstractQueryConverter
         $joinId = $this->getParentJoinIdentifier($joinId);
 
         return $this->tableAliases[$joinId];
+    }
+
+    /**
+     * Builds a string which is used as a key of column aliases array
+     *
+     * @param array|string $column The column definition or name
+     * @return string
+     */
+    protected function buildColumnAliasKey($column)
+    {
+        if (is_string($column)) {
+            return $column;
+        }
+
+        $result = $column['name'];
+        if (isset($column['func']) && !empty($column['func'])) {
+            $result = sprintf(
+                '%s(%s,%s,%s)',
+                $result,
+                $column['func']['name'],
+                $column['func']['group_name'],
+                $column['func']['group_type']
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * Prepares the given function expression to use in a query
+     *
+     * @param string|FunctionInterface $functionExpr
+     * @param string                   $tableAlias
+     * @param string                   $fieldName
+     * @param string                   $columnName
+     * @param string                   $columnAlias
+     * @return string
+     * @throws InvalidConfigurationException if incorrect type $functionExpr specified
+     */
+    protected function prepareFunctionExpression($functionExpr, $tableAlias, $fieldName, $columnName, $columnAlias)
+    {
+        if (is_string($functionExpr) && strpos($functionExpr, '@') === 0) {
+            $className = substr($functionExpr, 1);
+            $functionExpr = new $className();
+        }
+        if ($functionExpr instanceof FunctionInterface) {
+            return $functionExpr->getExpression($tableAlias, $fieldName, $columnName, $columnAlias, $this);
+        } elseif (!is_string($functionExpr)) {
+            throw new InvalidConfigurationException(
+                'The function expression must be a string or instance of FunctionInterface'
+            );
+        }
+
+        $variables = [
+            'column'       => $columnName,
+            'column_name'  => $fieldName,
+            'column_alias' => $columnAlias,
+            'table_alias'  => $tableAlias
+        ];
+
+        return preg_replace_callback(
+            '/\$([\w_]+)/',
+            function ($matches) use (&$variables) {
+                return $variables[$matches[1]];
+            },
+            $functionExpr
+        );
     }
 }

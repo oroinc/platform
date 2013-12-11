@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
@@ -17,6 +18,11 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * })
  * @ORM\Entity
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
+ * @Config(
+ *  defaultValues={
+ *      "entity"={"label"="Country", "plural_label"="Countries"}
+ *  }
+ * )
  */
 class Country implements Translatable
 {
