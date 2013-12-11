@@ -28,5 +28,4 @@ class ConfigLabelTransformer implements DataTransformerInterface
 
         return [];
     }
-
 }

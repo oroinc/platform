@@ -8,8 +8,6 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\CodeHelper;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -37,6 +35,8 @@ use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
+
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**
  * @SuppressWarnings(PHPMD)
