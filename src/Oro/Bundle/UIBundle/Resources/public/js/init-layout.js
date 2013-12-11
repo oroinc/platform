@@ -181,7 +181,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                     content.css('overflow', 'auto');
                 } else {
                     content.css('overflow', 'hidden');
-                    content.last().css('overflow-y', 'scroll');
+                    content.last().css('overflow-y', 'auto');
                 }
 
                 $('.scrollable-substructure').css({
