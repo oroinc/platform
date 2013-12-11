@@ -1,0 +1,24 @@
+{
+    "name": "oro/report-bundle",
+    "type": "symfony-bundle",
+    "description": "Oro Report Bundle",
+    "keywords": ["Oro"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "2.3.*",
+
+        "oro/ui-bundle": "dev-master",
+        "oro/query-designer-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\ReportBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/ReportBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
