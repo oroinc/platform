@@ -51,6 +51,9 @@ define(function (require) {
                 } else {
                     $target.addClass('in');
                 }
+                $target.on('focusin', function () {
+                    $target.collapse('show');
+                });
             });
         });
     };
