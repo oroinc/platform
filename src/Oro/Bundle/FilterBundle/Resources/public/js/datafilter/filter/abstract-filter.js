@@ -195,7 +195,7 @@ function($, _, Backbone, app) {
          * @return {*}
          */
         setValue: function(value) {
-            if (this._isNewValueUpdated(value)) {
+            if (!app.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
                 this.value = app.deepClone(value);
                 this._updateDOMValue();
@@ -225,17 +225,6 @@ function($, _, Backbone, app) {
          */
         _formatDisplayValue: function(value) {
             return value;
-        },
-
-        /**
-         * Checks if new value differs from current value
-         *
-         * @param {*} newValue
-         * @return {Boolean}
-         * @protected
-         */
-        _isNewValueUpdated: function(newValue) {
-            return !app.isEqualsLoosely(this.value, newValue)
         },
 
         /**

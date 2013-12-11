@@ -27,17 +27,19 @@ class ChoiceFilter extends AbstractFilter
             return false;
         }
 
-        $operator  = $this->getOperator($data['type']);
-        $parameter = $ds->generateParameterName($this->getName());
+        $parameterName = $ds->generateParameterName($this->getName());
 
-        if ('IN' == $operator) {
-            $expression = $ds->expr()->in($this->get(FilterUtility::DATA_NAME_KEY), $parameter, true);
-        } else {
-            $expression = $ds->expr()->notIn($this->get(FilterUtility::DATA_NAME_KEY), $parameter, true);
-        }
+        $this->applyFilterToClause(
+            $ds,
+            $this->buildComparisonExpr(
+                $ds,
+                $data['type'],
+                $this->get(FilterUtility::DATA_NAME_KEY),
+                $parameterName
+            )
+        );
 
-        $this->applyFilterToClause($ds, $expression);
-        $ds->setParameter($parameter, $data['value']);
+        $ds->setParameter($parameterName, $data['value']);
 
         return true;
     }
@@ -103,21 +105,25 @@ class ChoiceFilter extends AbstractFilter
     }
 
     /**
-     * Get operator string
+     * Build an expression used to filter data
      *
-     * @param int $type
-     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param int                              $comparisonType
+     * @param string                           $fieldName
+     * @param string                           $parameterName
      * @return string
      */
-    protected function getOperator($type)
-    {
-        $type = (int)$type;
-
-        $operatorTypes = array(
-            ChoiceFilterType::TYPE_CONTAINS     => 'IN',
-            ChoiceFilterType::TYPE_NOT_CONTAINS => 'NOT IN',
-        );
-
-        return isset($operatorTypes[$type]) ? $operatorTypes[$type] : 'IN';
+    protected function buildComparisonExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName,
+        $parameterName
+    ) {
+        switch ($comparisonType) {
+            case ChoiceFilterType::TYPE_NOT_CONTAINS:
+                return $ds->expr()->notIn($fieldName, $parameterName, true);
+            default:
+                return $ds->expr()->in($fieldName, $parameterName, true);
+        }
     }
 }

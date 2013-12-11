@@ -7,7 +7,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
-use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\FilterLogicConstraint;
 
 abstract class AbstractQueryDesignerType extends AbstractType
@@ -109,20 +111,34 @@ abstract class AbstractQueryDesignerType extends AbstractType
     {
         return
             array(
-                'column_column_choice_type' => 'oro_entity_field_choice',
-                'filter_column_choice_type' => 'oro_entity_field_choice'
+                'grouping_column_choice_type' => 'oro_entity_field_choice',
+                'column_column_choice_type'   => 'oro_entity_field_choice',
+                'filter_column_choice_type'   => 'oro_entity_field_choice'
             );
     }
 
     /**
      * Adds column and filters sub forms
      *
-     * @param $form
-     * @param $factory
-     * @param null $entity
+     * @param FormInterface        $form
+     * @param FormFactoryInterface $factory
+     * @param string|null          $entity
      */
     protected function addFields($form, $factory, $entity = null)
     {
+        $form->add(
+            $factory->createNamed(
+                'grouping',
+                'oro_query_designer_grouping',
+                null,
+                array(
+                    'mapped'             => false,
+                    'column_choice_type' => $form->getConfig()->getOption('grouping_column_choice_type'),
+                    'entity'             => $entity ? $entity : null,
+                    'auto_initialize'    => false
+                )
+            )
+        );
         $form->add(
             $factory->createNamed(
                 'column',

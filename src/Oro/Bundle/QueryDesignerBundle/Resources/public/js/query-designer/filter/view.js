@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'oro/translator', 'oro/query-designer/abstract-view', 'oro/query-designer/filter/collection', 'oro/query-designer/filter-builder'],
-function(_, __, AbstractView, FilterCollection, filterBuilder) {
+define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/abstract-view', 'oro/query-designer/filter/collection', 'oro/query-designer/filter-builder'],
+function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
     'use strict';
 
     var $ = Backbone.$;
@@ -21,10 +21,11 @@ function(_, __, AbstractView, FilterCollection, filterBuilder) {
         filterManager: null,
 
         /** @property {jQuery} */
-        filtersLogicEl: null,
+        filtersLogic: null,
 
         initialize: function() {
             AbstractView.prototype.initialize.apply(this, arguments);
+
             this.addFieldLabelGetter(this.getCriterionFieldLabel);
         },
 
@@ -32,7 +33,7 @@ function(_, __, AbstractView, FilterCollection, filterBuilder) {
             AbstractView.prototype.initForm.apply(this, arguments);
 
             this.criterionSelector = this.form.find('[data-purpose="criterion-selector"]');
-            this.filtersLogicEl = this.form.parent().find('[data-purpose="filter-logic"]');
+            this.filtersLogic = this.form.parent().find('[data-purpose="filter-logic"]');
 
             // load filters
             this.criterionSelector.hide();
@@ -43,16 +44,12 @@ function(_, __, AbstractView, FilterCollection, filterBuilder) {
             }, this));
 
             // set criterion selector when a column changed
-            this.getColumnSelector().on('change', _.bind(function (e) {
+            this.columnSelector.$el.on('change', _.bind(function (e) {
                 if (!_.isUndefined(e.added)) {
                     if (_.isNull(this.filterManager) && !_.isUndefined(console)) {
                         console.error('Cannot choose a filer because the filter manager was not initialized yet.');
                     } else {
-                        var criteria = _.extend(
-                            {field: e.added.id, entity: this.options.entityName},
-                            $(e.added.element).data()
-                        );
-                        this.filterManager.setActiveFilter(criteria);
+                        this.filterManager.setActiveFilter(this.getFieldApplicableConditions($(e.added.element)));
                     }
                 }
             }, this));
@@ -79,11 +76,11 @@ function(_, __, AbstractView, FilterCollection, filterBuilder) {
         },
 
         getFiltersLogic: function () {
-            return this.filtersLogicEl.val();
+            return this.filtersLogic.val();
         },
 
         setFiltersLogic: function (str) {
-            this.filtersLogicEl.val(str);
+            this.filtersLogic.val(str);
         },
 
         initModel: function (model, index) {
@@ -93,10 +90,10 @@ function(_, __, AbstractView, FilterCollection, filterBuilder) {
 
         addModel: function(model) {
             AbstractView.prototype.addModel.apply(this, arguments);
-            if (this.filtersLogicEl.val() == '') {
-                this.filtersLogicEl.val(this.filtersLogicEl.val() + model.get('index'));
+            if (this.filtersLogic.val() == '') {
+                this.filtersLogic.val(this.filtersLogic.val() + model.get('index'));
             } else {
-                this.filtersLogicEl.val(this.filtersLogicEl.val() + ' AND ' + model.get('index'));
+                this.filtersLogic.val(this.filtersLogic.val() + ' AND ' + model.get('index'));
             }
         },
 

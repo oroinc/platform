@@ -72,10 +72,6 @@ Provides filtering for boolean values.
 Validated by [BooleanFilterType](./filter_form_types.md#oro_type_boolean_filter-form-type) on backend
 and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterchoicefilter) with predefined set of option (yes/no)
 
-**Additional params:**
-
-`nullable: true|false` - is boolean column nullable or no
-
 ### Choice filter
 
 Provides filtering data using list of predefined choices

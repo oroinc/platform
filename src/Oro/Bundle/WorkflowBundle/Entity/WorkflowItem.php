@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use JMS\Serializer\Annotation as Serializer;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Workflow item
@@ -27,6 +28,11 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
+ * @Config(
+ *  defaultValues={
+ *      "entity"={"label"="Workflow Item", "plural_label"="Workflow Items"}
+ *  }
+ * )
  */
 class WorkflowItem
 {

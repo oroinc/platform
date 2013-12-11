@@ -1,0 +1,36 @@
+query_designer:
+    filters:
+        filter1:
+            applicable: [{type: string}]
+            type:       string
+            query_type: [all]
+        filter2:
+            applicable: [{entity: TestEntity, field: TestField}]
+            type:       string
+            query_type: [all]
+        filter3:
+            applicable: [{type: integer}]
+            type:       integer
+            query_type: [all]
+        filter4:
+            applicable: [{type: boolean}]
+            type:       boolean
+            query_type: [type1]
+
+    grouping:
+        exclude: [{type: text}]
+
+    converters:
+        converter1:
+            applicable: [{type: string}]
+            functions:
+                - {name: Func1, expr: FUNC1($column), return_type: string}
+            query_type: [type1]
+
+    aggregates:
+        aggregate1:
+            applicable: [{type: integer}, {type: smallint}]
+            functions:
+                - {name: Min, expr: MIN($column)}
+                - {name: Max, expr: MAX($column)}
+            query_type: [type1]

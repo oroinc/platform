@@ -20,6 +20,11 @@ class Column
     protected $sorting;
 
     /**
+     * @var string
+     */
+    protected $func;
+
+    /**
      * Get column name
      *
      * @return string
@@ -82,5 +87,32 @@ class Column
             $sorting = null;
         }
         $this->sorting = $sorting;
+    }
+
+    /**
+     * Get function details.
+     *
+     * Note: getFunc name is used instead of getFunction due a problem with JS
+     *
+     * @return array|null
+     */
+    public function getFunc()
+    {
+        return $this->func;
+    }
+
+    /**
+     * Get function details.
+     *
+     * Note: setFunc name is used instead of setFunction due a problem with JS
+     *
+     * @param array|null $func
+     */
+    public function setFunc($func = null)
+    {
+        if ($func !== null && empty($func)) {
+            $func = null;
+        }
+        $this->func = $func;
     }
 }

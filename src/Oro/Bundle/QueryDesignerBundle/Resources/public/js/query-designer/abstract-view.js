@@ -1,7 +1,8 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/translator', 'oro/form-validation', 'oro/delete-confirmation',
-    'jquery-outer-html'],
-function(_, Backbone, __, FormValidation, DeleteConfirmation) {
+define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/util', 'oro/form-validation', 'oro/delete-confirmation',
+    'oro/query-designer/column-selector-view', 'jquery-outer-html'],
+function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
+         ColumnSelectorView) {
     'use strict';
 
     var $ = Backbone.$;
@@ -19,11 +20,9 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             itemTemplateSelector: null,
             itemFormSelector: null,
             columnChainTemplateSelector: null,
-            fieldsLabel: 'Fields',
-            relatedLabel: 'Related',
-            findEntity: function (entityName) {
-                return {name: entityName, label: entityName, plural_label: entityName, icon: null};
-            }
+            fieldsLabel: null,
+            relatedLabel: null,
+            findEntity: null
         },
 
         /** @property {Object} */
@@ -37,27 +36,13 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             columnSelector: '[data-purpose="column-selector"]'
         },
 
-        /** @property */
-        columnSelectOptGroupTemplate: _.template(
-            '<optgroup label="<%- label %>">' +
-                '<%= options %>' +
-            '</optgroup>'
-        ),
-
-        /** @property */
-        columnSelectOptionTemplate: _.template(
-            '<option value="<%- name %>"<% _.each(_.omit(obj, ["name"]), function (val, key) { %> data-<%- key.replace(/_/g,"-") %>="<%- val %>"<% }) %>>' +
-                '<%- label %>' +
-            '</option>'
-        ),
-
         /** @property {jQuery} */
         form: null,
 
         /** @property {Array} */
         fieldNames: null,
 
-        /** @property {jQuery} */
+        /** @property {oro.queryDesigner.ColumnSelectorView} */
         columnSelector: null,
 
         /** @property {Array} */
@@ -66,15 +51,13 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         /** @property */
         itemTemplate: null,
 
-        /** @property */
-        columnChainTemplate: null,
-
         initialize: function() {
             this.options.collection = this.options.collection || new this.collectionClass();
             this.fieldNames = _.without(_.keys((this.createNewModel()).attributes), 'id');
 
             this.itemTemplate = _.template($(this.options.itemTemplateSelector).html());
-            this.columnChainTemplate = _.template($(this.options.columnChainTemplateSelector).html());
+
+            this.initForm();
 
             // prepare field label getters
             this.addFieldLabelGetter(this.getSelectFieldLabel);
@@ -88,7 +71,6 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         render: function() {
-            this.initForm();
             this.getContainer().empty();
             this.getCollection().each(_.bind(function (model) {
                 this.onModelAdded(model);
@@ -99,7 +81,13 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
 
         initForm: function () {
             this.form = $(this.options.itemFormSelector);
-            this.columnSelector = this.form.find(this.selectors.columnSelector);
+            this.columnSelector = new ColumnSelectorView({
+                el: this.form.find(this.selectors.columnSelector),
+                columnChainTemplate: _.template($(this.options.columnChainTemplateSelector).html()),
+                fieldsLabel: this.options.fieldsLabel,
+                relatedLabel: this.options.relatedLabel,
+                findEntity: this.options.findEntity
+            });
 
             var onAdd = _.bind(function (e) {
                 e.preventDefault();
@@ -121,16 +109,33 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             this.$el.find(this.selectors.cancelButton).on('click', onCancel);
         },
 
+        initColumnSorting: function () {
+            this.getContainer().sortable({
+                cursor: 'move',
+                delay : 100,
+                opacity: 0.7,
+                revert: 10,
+                axis: 'y',
+                containment: ".query-designer-grid-container",
+                items: 'tr',
+                helper: function (e, ui) {
+                    ui.children().each(function () {
+                        $(this).width($(this).width());
+                    });
+                    return ui;
+                },
+                stop: _.bind(function(e, ui) {
+                    this.syncCollectionWithUi();
+                }, this)
+            }).disableSelection();
+        },
+
         getCollection: function() {
             return this.options.collection;
         },
 
         getContainer: function() {
             return this.$el.find(this.selectors.itemContainer);
-        },
-
-        getColumnSelector: function () {
-            return this.columnSelector;
         },
 
         changeEntity: function (entityName) {
@@ -215,66 +220,7 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         updateColumnSelector: function (columns) {
-            if (this.columnSelector.get(0).tagName.toLowerCase() == 'select') {
-                var emptyText = this.columnSelector.find('option[value=""]').text();
-                this.columnSelector.empty();
-                this.columnSelector.append(this.columnSelectOptionTemplate({name: '', label: emptyText}));
-                var content = this.getSelectColumnSelectorContent(columns);
-                if (content != '') {
-                    this.columnSelector.append(content);
-                }
-            }
-            this.columnSelector.val('');
-            this.columnSelector.trigger('change');
-        },
-
-        getSelectColumnSelectorContent: function (columns) {
-            var fields = '';
-            var relations = '';
-            var isRelationsWithFields = false;
-            _.each(columns, _.bind(function (column) {
-                if (_.isUndefined(column['related_entity_name'])) {
-                    fields += this.columnSelectOptionTemplate(column);
-                } else {
-                    if (!_.isUndefined(column['related_entity_fields'])) {
-                        isRelationsWithFields = true;
-                        var relatedFields = '';
-                        _.each(column['related_entity_fields'], _.bind(function (relatedColumn) {
-                            relatedColumn = _.clone(relatedColumn);
-                            relatedColumn['name'] =
-                                column['name'] + ',' +
-                                column['related_entity_name'] + '::' + relatedColumn['name'];
-                            relatedFields += this.columnSelectOptionTemplate(relatedColumn);
-                        }, this));
-                        relations += this.columnSelectOptGroupTemplate({
-                            label: column['label'],
-                            options: relatedFields
-                        });
-                    } else {
-                        relations += this.columnSelectOptionTemplate(column);
-                    }
-                }
-            }, this));
-
-            if (relations == '') {
-                return fields;
-            }
-            var result = '';
-            if (fields != '') {
-                result += this.columnSelectOptGroupTemplate({
-                    label: this.options.fieldsLabel,
-                    options: fields
-                });
-            }
-            if (isRelationsWithFields) {
-                result += relations;
-            } else {
-                result += this.columnSelectOptGroupTemplate({
-                    label: this.options.relatedLabel,
-                    options: relations
-                });
-            }
-            return result;
+            this.columnSelector.changeEntity(this.options.entityName, columns);
         },
 
         prepareItemTemplateData: function (model) {
@@ -328,6 +274,32 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
                 confirm.open();
             }, this);
             item.find(this.selectors.deleteButton).on('click', onDelete);
+        },
+
+        syncCollectionWithUi: function () {
+            var collectionChanged = false;
+            var collection = this.getCollection();
+            _.each(this.getContainer().find('tr'), function (el, index) {
+                var uiId = $(el).data('id');
+                var model = collection.at(index);
+                if (uiId !== model.id) {
+                    var anotherModel = collection.get(uiId);
+                    var anotherIndex = collection.indexOf(anotherModel);
+                    collection.remove(model, {silent: true});
+                    collection.remove(anotherModel, {silent: true});
+                    if (index < anotherIndex) {
+                        collection.add(anotherModel, {silent: true, at: index});
+                        collection.add(model, {silent: true, at: anotherIndex});
+                    } else {
+                        collection.add(model, {silent: true, at: anotherIndex});
+                        collection.add(anotherModel, {silent: true, at: index});
+                    }
+                    collectionChanged = true;
+                }
+            }, this);
+            if (collectionChanged) {
+                this.trigger('collection:change');
+            }
         },
 
         resetForm: function () {
@@ -410,6 +382,27 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
             return new modelClass();
         },
 
+        getFieldApplicableConditions: function (item) {
+            var result = {
+                parent_entity: null,
+                entity: this.options.entityName,
+                field: item.val()
+            };
+            var chain = result.field.split(',');
+            if (_.size(chain) > 1) {
+                var field = _.last(chain).split('::');
+                result.parent_entity = result.entity;
+                result.entity = _.first(field);
+                result.field = _.last(field);
+                if (_.size(chain) > 2) {
+                    var parentField = chain[_.size(chain) - 2].split('::');
+                    result.parent_entity = _.first(parentField);
+                }
+            }
+            _.extend(result, _.pick(item.data(), ['type', 'identifier']));
+            return result;
+        },
+
         addFieldLabelGetter: function (callback) {
             if (_.isNull(this.fieldLabelGetters)) {
                 this.fieldLabelGetters = [];
@@ -434,7 +427,7 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
 
         getSelectFieldLabel: function (field, name, value) {
             if (field.get(0).tagName.toLowerCase() == 'select') {
-                var opt = field.find('option[value="' + value + '"]');
+                var opt = util.findSelectOption(field, value);
                 if (opt.length === 1) {
                     return opt.text();
                 }
@@ -443,55 +436,10 @@ function(_, Backbone, __, FormValidation, DeleteConfirmation) {
         },
 
         getColumnFieldLabel: function (field, name, value) {
-            if (field.attr('name') == this.columnSelector.attr('name')) {
-                if (value == '') {
-                    return '';
-                }
-
-                var columns = [];
-                var chain = value.split(',');
-                if (_.size(chain) > 1) {
-                    columns.push({
-                        entity: this.options.findEntity(this.options.entityName),
-                        label: this.getColumnGroupLabel(value)
-                    });
-                    var lastValue = chain[0];
-                    _.each(_.rest(chain), _.bind(function (item) {
-                        lastValue += ',' + item;
-                        columns.push({
-                            entity: this.options.findEntity(item.split('::')[0]),
-                            label: this.getColumnLabel(lastValue)
-                        });
-                    }, this));
-                } else {
-                    columns.push({
-                        entity: this.options.findEntity(this.options.entityName),
-                        label: this.getColumnLabel(chain[0])
-                    });
-                }
-
-                return this.columnChainTemplate(columns);
+            if (field.attr('name') == this.columnSelector.$el.attr('name')) {
+                return this.columnSelector.getLabel(value);
             }
             return null;
-        },
-
-        getColumnLabel: function (value) {
-            if (this.columnSelector.get(0).tagName.toLowerCase() == 'select') {
-                return this.columnSelector
-                    .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
-                    .data('label');
-            }
-            return value;
-        },
-
-        getColumnGroupLabel: function (value) {
-            if (this.columnSelector.get(0).tagName.toLowerCase() == 'select') {
-                return this.columnSelector
-                    .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
-                    .parent()
-                    .attr('label');
-            }
-            return value;
         }
     });
 });
