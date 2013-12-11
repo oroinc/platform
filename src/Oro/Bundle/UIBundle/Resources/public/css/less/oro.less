@@ -246,6 +246,7 @@ label, input, button, select, textarea { font-size:13px;}
   text-align:left;
   line-height:1.2em;
 }
+
 .control-group .controls p.control-label{
   width: auto;
 }
@@ -285,6 +286,28 @@ label, input, button, select, textarea { font-size:13px;}
     }
   }
 }
+.form-horizontal-large{
+  .control-group{
+    max-width: 100%;
+    .controls{
+      margin-left: 240px;
+    }
+    label.control-label {
+      width: 230px;
+      text-align:right;
+    }
+  }
+  .user-fiedset{
+    background: url("../../img/horizontal-divider-lite.png") repeat-x  0 50%;
+    margin-bottom: 22px;
+    span{
+      background-color: #fff;
+      padding: 0 20px 0 0;
+      display: inline-block;
+    }
+  }
+}
+
 input[type='checkbox'] + label { margin-bottom:2px; }
 textarea,
 input[type="text"],
@@ -5051,7 +5074,25 @@ span.validation-faled {
 .input-addon{
   width: 258px;
 }
+/* configuration-header */
 
+.system-configuration-container{
+  background-color: #f1f1f1;
+
+}
+.system-configuration{
+  .input-append{
+    border: 1px solid #ddd;
+  }
+  input[type="text"]{
+    background: none;
+    border: 0;
+
+  }
+  button{
+
+  }
+}
 .responsive-cell .box-type1 .filter-box {
   padding: 5px 20px 5px 130px;
   margin: 5px;

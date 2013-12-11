@@ -8,7 +8,9 @@
 
 {% block content %}
     {{ configUI.renderTitleAndSearch(pageTitle, []) }}
-    {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
+    <div class="custom-layout">
+        {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
+    </div>
 
     <script type="text/javascript">
         /* jshint browser:true, devel:true */

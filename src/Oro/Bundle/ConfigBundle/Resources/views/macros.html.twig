@@ -2,22 +2,28 @@
     Displays title and search form
 #}
 {% macro renderTitleAndSearch(pageTitle, buttons) %}
-    <div class="container-fluid search-header clearfix">
+    <div class="container-fluid search-header configuration-header clearfix">
         <h1>
             {{ pageTitle|trans }}
-            <div class="pull-right">
-                {% if buttons is defined %}
-                    {% for button in buttons %}
-                        {{ button }}
-                    {% endfor %}
-                {% endif %}
-                {#
-                    <form class="form-inline search-form configuration-search-form">
-                        <input type="text" id="search" class="span2 search" name="search" value="Find an Option">
-                    </form>
-                #}
-            </div>
         </h1>
+        <div class="pull-right">
+            <div class="btn-group">
+                <button data-action="save_and_stay" class="btn action-button" type="button">Restore Defaults</button>
+            </div>
+            <div class="btn-group">
+                <button data-action="save_and_stay" class="btn btn-success action-button" type="button">Save Settings</button>
+            </div>
+            {#{% if buttons is defined %}
+                {% for button in buttons %}
+                    {{ button }}
+                {% endfor %}
+            {% endif %}#}
+            {#
+                <form class="form-inline search-form configuration-search-form">
+                    <input type="text" id="search" class="span2 search" name="search" value="Find an Option">
+                </form>
+            #}
+        </div>
     </div>
 {% endmacro %}
 
@@ -34,13 +40,18 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
     <div class="system-configuration-container">
-        {% if activeVTab and form != false %}
-            {# @TODO move back to renderTab macro, when styles will be ready #}
-            <div class="pull-absolute-right">
-                {{ UI.saveAndStayButton() }}
-            </div>
-        {% endif %}
-        <div class="container-fluid">
+        {#
+            need move to top box  "pull-right"
+        #}
+       {#
+           {% if activeVTab and form != false %}
+                &#123;&#35; @TODO move back to renderTab macro, when styles will be ready &#35;&#125;
+                <div class="pull-absolute-right">
+                    {{ UI.saveAndStayButton() }}
+                </div>
+            {% endif %}
+        #}
+        <div class="container-fluid" style="display: none;">
             <ul class="nav nav-tabs">
                 {% if data is iterable %}
                     {% for tab in data %}
@@ -59,13 +70,11 @@
             </ul>
         </div>
         <div class="scrollable-container">
-            <div class="container-fluid">
-                <div class="row-fluid row-fluid-divider">
-                    {% if activeVTab and form != false %}
-                        {{ __.renderVerticalSubmenu(activeTab, activeVTab) }}
-                        {{ __.renderTab(form, path('oro_config_configuration_system', {activeGroup: activeTab.name, activeSubGroup: activeVTab})) }}
-                    {% endif %}
-                </div>
+            <div class="row-fluid-configuration">
+                {% if activeVTab and form != false %}
+                    {{ __.renderVerticalSubmenu(activeTab, activeVTab) }}
+                    {{ __.renderTab(form, path('oro_config_configuration_system', {activeGroup: activeTab.name, activeSubGroup: activeVTab})) }}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -81,7 +90,7 @@
         data.url         - Tab view url
 #}
 {% macro renderTabNavItem(data) %}
-    <li {% if data.isActive %}class="active"{% endif %}>
+    <li {% if data.isActive %}class="active"{% endif %} style="display: none;">
         <a href="{% if data.isActive %}javascript:void(0);{% else %}{{ data.url }}{% endif %}">
             {% if data.icon is defined and data.icon != '' %}<i class="icon {{ data.icon }}"></i>{% endif %}
             {{ data.title|trans }}
@@ -99,10 +108,25 @@
 #}
 {% macro renderVerticalSubmenu(data, activeVTab = false) %}
     {% import _self as __ %}
-    <div class="span2 system-configuration-sidebar">
+    <div class="system-configuration-sidebar">
+        <div class="system-configuration-search">
+            <div class="clearfix">
+                <div class="input-append">
+                    <input type="text" autocomplete="off" value="" name="search" placeholder="Search" class="search">
+                    <button class="btn btn-search" type="submit"><i class="icon-search"></i></button>
+                </div>
+            </div>
+            <div class="clearfix">
+                <ul class="inline small-text">
+                    <li><a href="javascript:void(0)">Expand All</a></li>
+                    <li class="separator">|</li>
+                    <li><a href="javascript:void(0)">Collaps  All</a></li>
+                </ul>
+            </div>
+        </div>
         {% for group in data %}
             {% set groupData = group.toViewData %}
-            <dl>
+            <dl style="display: none;">
                 <dt>
                     <h4>{{ groupData.title|trans }}</h4>
                 </dt>
@@ -121,6 +145,82 @@
                     {% endif %}
                 </dd>
             </dl>
+            <ul class="system-configuration-accordion" id="accordion-nav">
+                <li class="accordion-group">
+                    <div class="accordion-heading">
+                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion-nav" href="#collapse-sidebar1">
+                            System configuration
+                        </a>
+                    </div>
+                    <div id="collapse-sidebar1" class="accordion-body collapse">
+                        <div class="accordion-inner">
+                            System configuration list
+                        </div>
+                    </div>
+                </li>
+                <li class="accordion-group">
+                    <div class="accordion-heading">
+                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion-nav" href="#collapse-sidebar2">
+                            Something configuration
+                        </a>
+                    </div>
+                    <div id="collapse-sidebar2" class="accordion-body collapse">
+                        <div class="accordion-inner">
+                            <ul>
+                                <li><a href="#">Something configuration list</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li class="accordion-group">
+                    <div class="accordion-heading">
+                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion-nav" href="#collapse-sidebar3">
+                            Account Statistics
+                        </a>
+                    </div>
+                    <div id="collapse-sidebar3" class="accordion-body collapse">
+                        <div class="accordion-inner">
+                            <ul class="" id="accordion-nav2">
+                                <li class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion-nav2" href="#collapse-sidebar3_1">
+                                            System configuration
+                                        </a>
+                                    </div>
+                                    <div id="collapse-sidebar3_1" class="accordion-body collapse collapse-inner">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li><a href="#">System configuration default</a></li>
+                                                <li><a href="#">System configuration custom</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="accordion-group">
+                                    <div class="accordion-heading">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion-nav2" href="#collapse-sidebar3_2">
+                                            User Contacts
+                                        </a>
+                                    </div>
+                                    <div id="collapse-sidebar3_2" class="accordion-body collapse collapse-inner">
+                                        <div class="accordion-inner">
+                                           <ul>
+                                               <li><a href="#">Contact Phones</a></li>
+                                               <li><a href="#">Adress Direction</a></li>
+                                           </ul>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class=""><a href="#">Something configuration</a></li>
+                                <li class=""><a href="#">Account Statistics</a></li>
+                                <li class=""><a href="#">Something configuration</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li><a class="" href="#">Desktop settings</a></li>
+                <li><a class="" href="#">Something configuration</a></li>
+            </ul>
         {% endfor %}
     </div>
 {% endmacro %}
@@ -142,7 +242,7 @@
 
     {% set data = oro_form_process(data, form) %}
 
-    <div class="span10 form-container">
+    <div class="system-configuration-content form-container">
         <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post"
               data-collect="true" class="scrollable-substructure">
             <div class="pull-right">
@@ -158,18 +258,54 @@
             {% endif %}
 
             {% for scrollBlock in data.dataBlocks %}
-                <div class="clearfix">
-                    <h4 class="scrollspy-title">{{ scrollBlock.title|trans }}</h4>
 
-                    {% if scrollBlock.description is defined and scrollBlock.description != '' %}
-                        <p>{{ scrollBlock.description }}</p>
-                    {% endif %}
+            <div id="system-configuration-accordion1" class="accordion">
+                <div class="accordion-group">
+                    <div class="accordion-heading">
+                        <div class="accordion-heading">
+                            <ul class="inline small-text pull-right">
+                                <li><a href="javascript:void(0)">Expand All</a></li>
+                                <li class="separator">|</li>
+                                <li><a href="javascript:void(0)">Collaps  All</a></li>
+                            </ul>
+                            <a href="#system-configuration-collapse1" data-parent="#system-configuration-accordion1" data-toggle="collapse" class="accordion-toggle">
+                                {{ scrollBlock.title|trans }}
+                            </a>
+                        </div>
+                        <div class="accordion-body in collapse" id="system-configuration-collapse1" style="height: auto;">
+                            <div class="accordion-inner">
+                                {% if scrollBlock.description is defined and scrollBlock.description != '' %}
+                                    <p>{{ scrollBlock.description }}</p>
+                                {% endif %}
 
-                    {% for subblock in scrollBlock.subblocks %}
-                        {{ __.renderFiedset(subblock) }}
-                    {% endfor %}
+                                {% for subblock in scrollBlock.subblocks %}
+                                    {{ __.renderFiedset(subblock) }}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
             {% endfor %}
+            <div id="accordion2" class="accordion">
+                <div class="accordion-group">
+                    <div class="accordion-heading">
+                        <a href="#system-configuration-collapse2" data-parent="#accordion2" data-toggle="collapse" class="accordion-toggle">
+                            Collapsible Group Item #1
+                        </a>
+                    </div>
+                    <div class="accordion-body in collapse" id="system-configuration-collapse2" style="height: auto;">
+                        <div class="accordion-inner">
+                        <fieldset class="form-horizontal form-horizontal-large">
+                            <h5 class="user-fiedset"><span>Other</span></h5>
+                            <div class="control-group">
+                                <label for="orocrm_account_form_shippingAddress_label" class="control-label">Label</label>
+                                <div class="controls"><input type="text" name="orocrm_account_form[shippingAddress][label]" id="orocrm_account_form_shippingAddress_label"></div></div>
+                        </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="hide">
                 {{ data.hiddenData|raw }}
             </div>
@@ -187,7 +323,7 @@
 #}
 {% macro renderFiedset(block) %}
     {% import _self as __ %}
-    <fieldset class="form-horizontal">
+    <fieldset class="form-horizontal form-horizontal-large">
         <h5 class="user-fiedset">
             <span>{{ block.title|trans }}</span>
         </h5>
