@@ -1,49 +1,57 @@
 <?php
 
-namespace Oro\Bundle\AsseticBundle\Tests\Unit\Parser;
+namespace Oro\Bundle\AsseticBundle\Tests\Unit\Twig;
 
 use \Twig_Token;
 use \Twig_TokenStream;
 
-use Oro\Bundle\AsseticBundle\Parser\AsseticTokenParser;
+use Oro\Bundle\AsseticBundle\Twig\AsseticTokenParser;
 
 class AsseticTokenParserTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $assetsConfiguration;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $assetFactory;
+
     /**
      * @var AsseticTokenParser
      */
     private $parser;
 
-    private $assets;
+    /**
+     * @var string
+     */
+    private $tagName = 'oro_css';
 
-    private $assetsFactory;
-
-    private $tagName;
+    /**
+     * @var string
+     */
+    private $output = 'css/*.css';
 
     public function setUp()
     {
-        $this->assetsFactory = $this->getMockBuilder('Symfony\Bundle\AsseticBundle\Factory\AssetFactory')
+        $this->assetsConfiguration = $this->getMockBuilder('Oro\Bundle\AsseticBundle\AssetsConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assets = array(
-            'compress' => array(
-                array(
-                    'first.css',
-                    'second.css'
-                )
-            ),
-            'uncompress' => array(
-                array(
-                    'third.css',
-                    'fourth.css'
-                )
-            )
-        );
+        $this->assetFactory = $this->getMockBuilder('Symfony\Bundle\AsseticBundle\Factory\AssetFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->tagName = 'oro_css';
 
-        $this->parser = new AsseticTokenParser($this->assets, $this->assetsFactory, $this->tagName, 'css/*.css');
+        $this->parser = new AsseticTokenParser(
+            $this->assetsConfiguration,
+            $this->assetFactory,
+            $this->tagName,
+            $this->output
+        );
     }
 
     public function testGetTag()
@@ -106,16 +114,40 @@ class AsseticTokenParserTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assetsFactory->expects($this->atLeastOnce())
-            ->method('createAsset')
-            ->will($this->returnValue($assert));
+        $this->assetFactory->expects($this->atLeastOnce())->method('createAsset')->will($this->returnValue($assert));
+
+        $this->assetsConfiguration->expects($this->at(0))
+            ->method('getCssFiles')
+            ->with(false)
+            ->will(
+                $this->returnValue(
+                    array('foo.css')
+                )
+            );
+
+        $this->assetsConfiguration->expects($this->at(1))
+            ->method('getCssFiles')
+            ->with(true)
+            ->will(
+                $this->returnValue(
+                    array('bar.css')
+                )
+            );
+
         /**
          * @var \Symfony\Bundle\AsseticBundle\Twig\AsseticNode
          */
         $resultNode = $this->parser->parse($startToken);
 
         $this->assertEquals(31, $resultNode->getLine());
-        $this->assertEquals('oro_css', $resultNode->getNodeTag());
+        $nodes = $resultNode->getIterator()->getArrayCopy();
+        $this->assertCount(2, $nodes);
+
+        $this->assertInstanceOf('Symfony\Bundle\AsseticBundle\Twig\AsseticNode', $nodes[0]);
+        $this->assertEquals('oro_css', $nodes[0]->getNodeTag());
+
+        $this->assertInstanceOf('Oro\Bundle\AsseticBundle\Twig\DebugAsseticNode', $nodes[1]);
+        $this->assertEquals('oro_css', $nodes[1]->getNodeTag());
     }
 
     public function testParseBrokenStream()

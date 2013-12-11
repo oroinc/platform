@@ -4,7 +4,6 @@
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 use Oro\Bundle\ThemeBundle\DependencyInjection\OroThemeExtension;
 use Oro\Bundle\ThemeBundle\Tests\Unit\Fixtures;
