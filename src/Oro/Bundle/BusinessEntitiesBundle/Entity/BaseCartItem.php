@@ -46,35 +46,35 @@ class BaseCartItem
      * Qty
      * @var float
      *
-     * @ORM\Column(name="qty", type="decimal")
+     * @ORM\Column(name="qty", type="float")
      */
     protected $qty;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="price", type="decimal")
+     * @ORM\Column(name="price", type="float")
      */
     protected $price;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="discount_amount", type="decimal")
+     * @ORM\Column(name="discount_amount", type="float")
      */
     protected $discountAmount;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="tax_percent", type="decimal")
+     * @ORM\Column(name="tax_percent", type="float")
      */
     protected $taxPercent;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="weight", type="decimal", nullable=true)
+     * @ORM\Column(name="weight", type="float", nullable=true)
      */
     protected $weight;
 
