@@ -53,6 +53,7 @@ class Configuration implements ConfigurationInterface
                     // just validate type if node exist
                     ->scalarNode(PropertyInterface::FRONTEND_TYPE_KEY)->defaultValue(self::DEFAULT_FRONTEND_TYPE)->end()
                     ->scalarNode('label')->end()
+                    ->booleanNode(PropertyInterface::TRANSLATABLE_KEY)->defaultTrue()->end()
                     ->booleanNode('editable')->defaultFalse()->end()
                     ->booleanNode('renderable')->defaultTrue()->end()
                 ->end()

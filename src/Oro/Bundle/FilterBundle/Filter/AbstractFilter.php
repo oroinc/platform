@@ -81,7 +81,6 @@ abstract class AbstractFilter implements FilterInterface
             // use filter name if label not set
             'label'                    => ucfirst($this->name),
             'choices'                  => $typeView->vars['choices'],
-            FilterUtility::ENABLED_KEY => true,
         ];
 
         $metadata = array_diff_key(
