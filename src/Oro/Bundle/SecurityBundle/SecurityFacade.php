@@ -135,4 +135,22 @@ class SecurityFacade
 
         return $isGranted;
     }
+
+    /**
+     * Get current user id.
+     *
+     * @return int
+     */
+    public function geLoggedUserId()
+    {
+        if (null === $token = $this->securityContext->getToken()) {
+            return 0;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            return 0;
+        }
+
+        return $user->getId();
+    }
 }
