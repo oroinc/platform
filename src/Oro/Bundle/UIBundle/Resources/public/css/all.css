@@ -224,3 +224,34 @@
     to { background-position: 40px 0 }
 }
 /* End: Progress bar */
+.dashboard-widget-content .tab-content {
+    position: relative;
+    overflow: hidden;
+}
+.dashboard-widget-content .nav-tabs {
+    margin-bottom: 0;
+}
+.dashboard-widget-content .nav-tabs > .active > a,
+.dashboard-widget-content .nav-tabs > .active > a:hover,
+.dashboard-widget-content .nav-tabs > .active > a:focus {
+    background-color: #fff;
+}
+.dashboard-widget-content .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+}
+.dashboard-widget-content .grid-container {
+    margin-top: 0;
+}
+.dashboard-widget-content .grid-container {
+    margin-top: 0;
+}
+.dashboard-widget-content .grid-container .grid {
+    border: 0;
+    margin-bottom: 0;
+}
+.dashboard-widget-content .grid-container .no-data {
+    border: 0;
+    margin: 0;
+}
+

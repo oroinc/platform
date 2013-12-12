@@ -1,0 +1,52 @@
+{% extends 'OroUIBundle:Dashboard:widget.html.twig' %}
+
+{% block content %}
+    <ul class="nav nav-tabs">
+        {% for tab in tabs %}
+            <li{% if activeTab == tab.name %} class="active"{% endif %}><a
+                href="javascript:void(0);" class="no-hash tab-button"
+                data-name="{{ tab.name }}" data-url="{{ tab.url }}">{{ tab.label|trans }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="tab-content">
+        <div class="content">
+            {% block tab_content %}
+                {{ activeTabContent|raw }}
+            {% endblock %}
+        </div>
+        <div class="loading-mask"></div>
+    </div>
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'oro/error', 'oro/loading-mask'],
+        function($, _, error, LoadingMask){
+            var $tabContent = $('.{{ widgetContentCssClass }}').find('.tab-content');
+            var loadingMask = new LoadingMask();
+            $tabContent.find('.loading-mask').append(loadingMask.render().$el);
+
+            $(document).on('click', '.{{ widgetName }}-widget-content .tab-button', function (e) {
+                var $el = $(this);
+                var $prevTab = $el.closest('.nav-tabs').find('li.active');
+                var $currentTab = $el.closest('li');
+                $prevTab.removeClass('active');
+                $currentTab.addClass('active');
+
+                loadingMask.show();
+                $.ajax({
+                    url: $el.data('url'),
+                    dataType: 'html',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        loadingMask.hide();
+                        $currentTab.removeClass('active');
+                        $prevTab.addClass('active');
+                        error.dispatch(null, jqXHR);
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        loadingMask.hide();
+                        $tabContent.find('.content').html(data);
+                    }
+                });
+            });
+        });
+    </script>
+    {{ parent() }}
+{% endblock %}
