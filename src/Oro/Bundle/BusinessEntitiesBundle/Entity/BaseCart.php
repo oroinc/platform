@@ -39,7 +39,7 @@ class BaseCart
     /**
      * @var float
      *
-     * @ORM\Column(name="tax_amount", type="float")
+     * @ORM\Column(name="tax_amount", type="float", nullable=true)
      */
     protected $taxAmount;
 
