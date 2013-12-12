@@ -31,21 +31,29 @@
   .nav.top-search {
     .header-dropdown-shortcut {
       .dropdown-menu {
+        left: auto;
+        right: 0px;
         &:before {
-          left: 122px;
+          left: auto;
+          right: 84px;
         }
         &:after {
-          left: 123px;
+          left: auto;
+          right: 85px;
         }
       }
     }
     .header-dropdown-search {
       .dropdown-menu {
+        left: auto;
+        right: 0px;
         &:before {
-          left: 158px;
+          left: auto;
+          right: 48px;
         }
         &:after {
-          left: 159px;
+          left: auto;
+          right: 49px;
         }
       }
     }
@@ -53,11 +61,13 @@
   .nav.user-menu {
     .dropdown {
       .dropdown-menu {
+        left: auto;
+        right: 0px;
         &:before {
-          right: 6px;
+          right: 15px;
         }
         &:after {
-          right: 7px;
+          right: 16px;
         }
       }
     }
@@ -77,7 +87,7 @@
   }
 
   input, textarea, .uneditable-input {
-    width: 255px;
+    width: 275px;
   }
 }
 
@@ -86,15 +96,19 @@
 }
 
 #oroplatform-header .dropdown-menu {
-  left: 10px;
-  max-width: 300px;
-}
-
-#oroplatform-header .user-menu .dropdown-menu {
-  left: auto;
-  right: 10px;
+  left: 0px;
+  max-width: 320px;
 }
 
 #oroplatform-header #search-bar-button {
-  width: 60px !important;
+  width: 80px !important;
+}
+
+#oroplatform-header .user-menu {
+  margin-right: -110px;
+}
+
+#oroplatform-header .top-search.shortcuts {
+  float: right !important;
+  margin-right: 40px;
 }
