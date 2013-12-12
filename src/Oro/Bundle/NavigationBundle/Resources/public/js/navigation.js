@@ -460,6 +460,7 @@ define(function (require) {
                         }
                         $('.sf-toolbar').remove();
                         container.append(dtContainer);
+                        mediator.trigger('layout:adjustHeight');
                     }, this)
                 );
             }
