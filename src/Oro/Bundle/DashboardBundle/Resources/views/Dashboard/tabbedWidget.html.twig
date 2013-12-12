@@ -1,4 +1,4 @@
-{% extends 'OroUIBundle:Dashboard:widget.html.twig' %}
+{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
 
 {% block content %}
     <ul class="nav nav-tabs">
@@ -19,16 +19,19 @@
     <script type="text/javascript">
         require(['jquery', 'underscore', 'oro/error', 'oro/loading-mask'],
         function($, _, error, LoadingMask){
-            var $tabContent = $('.{{ widgetContentCssClass }}').find('.tab-content');
-            var loadingMask = new LoadingMask();
-            $tabContent.find('.loading-mask').append(loadingMask.render().$el);
-
-            $(document).on('click', '.{{ widgetName }}-widget-content .tab-button', function (e) {
+            var loadingMask = null;
+            $(document).on('click', '#{{ widgetContentId }} .tab-button', function (e) {
                 var $el = $(this);
                 var $prevTab = $el.closest('.nav-tabs').find('li.active');
                 var $currentTab = $el.closest('li');
                 $prevTab.removeClass('active');
                 $currentTab.addClass('active');
+
+                var $tabContent = $el.closest('.widget-content').find('.tab-content');
+                if (_.isNull(loadingMask)) {
+                    loadingMask = new LoadingMask();
+                    $tabContent.find('.loading-mask').append(loadingMask.render().$el);
+                }
 
                 loadingMask.show();
                 $.ajax({
