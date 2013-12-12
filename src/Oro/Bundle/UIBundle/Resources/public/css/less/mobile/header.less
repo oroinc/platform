@@ -10,7 +10,7 @@
     }
   }
   .logo, #main-menu-toggle {
-    margin: 0 4px;
+    margin: 0 10px;
     float: left;
     font-weight: bold;
     font-size: 17px;
@@ -71,6 +71,9 @@
         }
       }
     }
+    .dropdown.open > .dropdown-toggle > [class^=icon-] {
+      .header-button-active;
+    }
   }
   li {
     .help {
@@ -100,7 +103,7 @@
 }
 
 #oroplatform-header .user-menu {
-  margin-right: -150px;
+  margin-right: -165px;
 }
 
 #oroplatform-header .top-search.shortcuts {
@@ -122,10 +125,19 @@
 #oroplatform-header .icon-menu-bars,
 #oroplatform-header .logo {
   font-size: 24px !important;
-  line-height: 24px !important;
+  line-height: 32px !important;
   margin: 0px !important;
   border: none !important;
   margin-top: 12px !important;
+}
+
+#oroplatform-header .icon-user,
+#oroplatform-header .icon-search,
+#oroplatform-header .icon-share-sign,
+#oroplatform-header .icon-menu-bars {
+  text-align: center;
+  width: 32px !important;
+  height: 32px !important;
 }
 
 #oroplatform-header .logo {
