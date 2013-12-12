@@ -28,6 +28,7 @@ interface PropertyInterface
     const TYPE_KEY          = 'type';
     const NAME_KEY          = 'name';
     const DATA_NAME_KEY     = 'data_name';
+    const TRANSLATABLE_KEY  = 'translatable';
     const FRONTEND_TYPE_KEY = 'frontend_type';
 
     /**

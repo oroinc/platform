@@ -18,13 +18,22 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
             entityName: null,
             storageElementSelector: null,
             getLoadColumnsUrl: null,
+            columnChainTemplateSelector: null,
+            fieldsLabel: 'Fields',
+            relatedLabel: 'Related',
+            findEntity: function (entityName) {
+                return {name: entityName, label: entityName, plural_label: entityName, icon: null};
+            },
             columnsOptions: {
                 collection: null,
+                groupingFormSelector: null,
                 itemTemplateSelector: null,
                 itemFormSelector: null
             },
             filtersOptions: {
-                collection: null
+                collection: null,
+                itemTemplateSelector: null,
+                itemFormSelector: null
             }
         },
 
@@ -82,8 +91,15 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
                     delete value.id;
                     delete value.index;
                 });
+                var groupingColumns = [];
+                _.each(this.columnsView.getGroupingColumns(), function (name) {
+                    groupingColumns.push({
+                        name: name
+                    });
+                });
                 var data = {
                     columns: columns,
+                    grouping_columns: groupingColumns,
                     filters: filters,
                     filters_logic: this.filtersView.getFiltersLogic()
                 };
@@ -106,18 +122,59 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
                 data = JSON.parse(this.storageEl.val());
             }
 
-            // initialize columns view
-            var columnsOptions = _.extend(this.options.columnsOptions, {entityName: this.options.entityName});
+            // initialize views
+            this.initColumnsView(data);
+            this.initFiltersView(data);
+
+            this.$el.closest('form').on('submit', _.bind(function (e) {
+                this.onPreSubmit();
+                return true;
+            }, this));
+
+            return this;
+        },
+
+        initColumnsView: function (data) {
+            var columnsOptions = _.extend(
+                {
+                    entityName: this.options.entityName,
+                    columnChainTemplateSelector: this.options.columnChainTemplateSelector,
+                    fieldsLabel: this.options.fieldsLabel,
+                    relatedLabel: this.options.relatedLabel,
+                    findEntity: this.options.findEntity
+                },
+                this.options.columnsOptions
+            );
             this.columnsView = new ColumnView(columnsOptions);
             this.columnsView.render();
             delete this.options.columnsOptions;
+
+
+            var groupingColumnNames = [];
+            _.each(data['grouping_columns'], function (column) {
+                groupingColumnNames.push(column['name']);
+            });
+            this.columnsView.setGroupingColumns(groupingColumnNames);
+
             if (!_.isUndefined(data['columns']) && !_.isEmpty(data['columns'])) {
                 this.columnsView.getCollection().reset(data['columns']);
             }
-            this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
 
-            // initialize filters view
-            var filtersOptions = _.extend(this.options.filtersOptions, {entityName: this.options.entityName});
+            this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
+            this.listenTo(this.columnsView, 'grouping:change', _.bind(this.updateStorage, this));
+        },
+
+        initFiltersView: function (data) {
+            var filtersOptions = _.extend(
+                {
+                    entityName: this.options.entityName,
+                    columnChainTemplateSelector: this.options.columnChainTemplateSelector,
+                    fieldsLabel: this.options.fieldsLabel,
+                    relatedLabel: this.options.relatedLabel,
+                    findEntity: this.options.findEntity
+                },
+                this.options.filtersOptions
+            );
             this.filtersView = new FilterView(filtersOptions);
             this.filtersView.render();
             delete this.options.filtersOptions;
@@ -128,13 +185,6 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
                 this.filtersView.setFiltersLogic(data['filters_logic']);
             }
             this.listenTo(this.filtersView, 'collection:change', _.bind(this.updateStorage, this));
-
-            this.$el.closest('form').on('submit', _.bind(function (e) {
-                this.onPreSubmit();
-                return true;
-            }, this));
-
-            return this;
         },
 
         onPreSubmit: function () {

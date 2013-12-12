@@ -3,7 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
 {
@@ -13,17 +13,19 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     protected $doctrine;
 
     /**
-     * @var ClassMetadata[]
+     * @var ClassMetadataInfo[]
      */
     protected $classMetadataLocalCache;
 
     /**
      * Constructor
      *
-     * @param ManagerRegistry       $doctrine
+     * @param FunctionProviderInterface $functionProvider
+     * @param ManagerRegistry           $doctrine
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
     {
+        parent::__construct($functionProvider);
         $this->doctrine = $doctrine;
     }
 
@@ -40,10 +42,30 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     }
 
     /**
+     * Check whether the given join is INNER JOIN or LEFT JOIN
+     *
+     * @param string $joinAlias
+     * @param string $joinFieldName
+     * @return bool true if INNER JOIN; otherwise, false
+     */
+    protected function isInnerJoin($joinAlias, $joinFieldName)
+    {
+        $metadata = $this->getClassMetadata(
+            $this->getEntityClassName($this->getJoinIdentifierByTableAlias($joinAlias))
+        );
+        $nullable = false;
+        foreach ($metadata->getAssociationMapping($joinFieldName)['joinColumns'] as $joinColumns) {
+            $nullable = ($nullable || $joinColumns['nullable']);
+        }
+
+        return !$nullable;
+    }
+
+    /**
      * Returns a metadata for the given entity
      *
      * @param string $className
-     * @return ClassMetadata
+     * @return ClassMetadataInfo
      */
     protected function getClassMetadata($className)
     {
