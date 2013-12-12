@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  * @outputBuffering enabled
  * @db_isolation
  */
-class RestApiRolesTest extends WebTestCase
+class RestRolesTest extends WebTestCase
 {
     /** @var Client  */
     protected $client;
@@ -23,7 +23,7 @@ class RestApiRolesTest extends WebTestCase
     /**
      * @return array $request
      */
-    public function testApiCreateRole()
+    public function testCreateRole()
     {
         $roleName = 'Role_'.mt_rand(100, 500);
         $request = array(
@@ -40,10 +40,10 @@ class RestApiRolesTest extends WebTestCase
     }
 
     /**
-     * @depends testApiCreateRole
+     * @depends testCreateRole
      * @param array $request
      */
-    public function testApiGetRoleByName($request)
+    public function testGetRoleByName($request)
     {
         $this->client->request(
             'GET',
@@ -54,11 +54,11 @@ class RestApiRolesTest extends WebTestCase
     }
 
     /**
-     * @depends testApiCreateRole
+     * @depends testCreateRole
      * @param  array $request
      * @return int   $roleId
      */
-    public function testApiGetRoleById($request)
+    public function testGetRoleById($request)
     {
         $this->client->request('GET', $this->client->generate('oro_api_get_roles'));
         $result = $this->client->getResponse();
@@ -77,12 +77,12 @@ class RestApiRolesTest extends WebTestCase
     }
 
     /**
-     * @depends testApiGetRoleById
-     * @depends testApiCreateRole
+     * @depends testGetRoleById
+     * @depends testCreateRole
      * @param int   $roleId
      * @param array $request
      */
-    public function testApiUpdateRole($roleId, $request)
+    public function testUpdateRole($roleId, $request)
     {
         $request['role']['label'] .= '_Update';
         $this->client->request('PUT', $this->client->generate('oro_api_put_role', array('id' => $roleId)), $request);
@@ -95,10 +95,10 @@ class RestApiRolesTest extends WebTestCase
     }
 
     /**
-     * @depends testApiGetRoleById
+     * @depends testGetRoleById
      * @param $roleId
      */
-    public function testApiDeleteRole($roleId)
+    public function testDeleteRole($roleId)
     {
         $this->client->request('DELETE', $this->client->generate('oro_api_delete_role', array('id' => $roleId)));
         $result = $this->client->getResponse();

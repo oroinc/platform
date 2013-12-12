@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  * @outputBuffering enabled
  * @db_isolation
  */
-class RestApiGroupsTest extends WebTestCase
+class RestGroupsTest extends WebTestCase
 {
     /**
      * @var Client
@@ -25,7 +25,7 @@ class RestApiGroupsTest extends WebTestCase
     /**
      * @return array
      */
-    public function testApiCreateGroup()
+    public function testCreateGroup()
     {
         $request = array(
             "group" => array(
@@ -42,18 +42,17 @@ class RestApiGroupsTest extends WebTestCase
     }
 
     /**
-     * @depends testApiCreateGroup
+     * @depends testCreateGroup
      * @param  array $request
      * @return array $group
      */
-    public function testApiGetGroups($request)
+    public function testGetGroups($request)
     {
         $this->client->request('GET', $this->client->generate('oro_api_get_groups'));
         $result = $this->client->getResponse();
         $result = json_decode($result->getContent(), true);
         foreach ($result as $group) {
             if ($group['name'] == $request['group']['name']) {
-                //TODO Change after BAP-1357 fix
                 $this->assertEquals($request['group']['name'], $group['name']);
                 break;
             }
@@ -64,29 +63,13 @@ class RestApiGroupsTest extends WebTestCase
     }
 
     /**
-     * @depends testApiCreateGroup
-     * @depends testApiGetGroups
+     * @depends testCreateGroup
+     * @depends testGetGroups
      * @param  array $request
      * @param  array $group
      * @return array $group
      */
-    /*public function testApiRolesGroup($request, $group)
-    {
-        $this->client->request('GET', $this->client->generate('oro_api_get_group_roles', array('id' => $group['id'])));
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        return $group;
-    }*/
-
-    /**
-     * @depends testApiCreateGroup
-     * @depends testApiGetGroups
-     * @param  array $request
-     * @param  array $group
-     * @return array $group
-     */
-    public function testApiUpdateGroup($request, $group)
+    public function testUpdateGroup($request, $group)
     {
         $request['group']['name'] .= '_updated';
         $this->client->request(
@@ -106,10 +89,10 @@ class RestApiGroupsTest extends WebTestCase
     }
 
     /**
-     * @depends testApiUpdateGroup
+     * @depends testUpdateGroup
      * @param $group
      */
-    public function apiDeleteGroup($group)
+    public function testDeleteGroup($group)
     {
         $this->client->request('DELETE', $this->client->generate('oro_api_delete_group', array('id' => $group['id'])));
         $result = $this->client->getResponse();
