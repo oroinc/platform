@@ -105,7 +105,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                                 ],
                                 'columnAlias' => 'user_name'
                             ],
-                            'OR',
+                            'AND',
                             [
                                 [
                                     'column'     => 'user_status',
@@ -171,7 +171,8 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $this->assertEquals(
             'SELECT user.id, user.name as user_name, user.status as user_status '
             . 'FROM Doctrine\Tests\Models\CMS\CmsUser user INNER JOIN user.address address '
-            . 'WHERE user_name NOT LIKE :string1 OR ('
+            //. 'WHERE (user_name IS NULL OR NOT(user_name LIKE :string1)) AND ('
+            . 'WHERE user_name NOT LIKE :string1 AND ('
             . '(user_status < :datetime2 OR user_status > :datetime3) AND '
             . '(address.country LIKE :string4 OR address.city LIKE :string5 OR address.zip LIKE :string6)'
             . ')',

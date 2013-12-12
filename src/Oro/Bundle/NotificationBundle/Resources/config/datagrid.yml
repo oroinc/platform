@@ -32,7 +32,7 @@ datagrid:
                 choices: @oro_notification.event_listener.email_notification_service->getEntityNameChoices
 
             eventName:
-                type: translateable
+                type: translatable
                 label: oro.notification.datagrid.event_name
                 choices: @oro_notification.event_listener.email_notification_service->getEventNameChoices
 

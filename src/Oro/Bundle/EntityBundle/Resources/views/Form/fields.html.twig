@@ -1,0 +1,59 @@
+{% block oro_combobox_dataconfig_entity_field %}
+    var EntityFieldUtil = function ($el) {
+        this.$el = $el;
+        this.findEntity = function (entity) {
+            return {name: entity, label: entity, plural_label: entity, icon: null};
+        },
+        this.splitValue = function (value) {
+            var result = [];
+            var chain = value.split(',');
+            if (_.size(chain) > 1) {
+                result.push({
+                    entity: this.findEntity(this.$el.data('entity')),
+                    label: this.getFieldGroupLabel(value)
+                });
+                var lastValue = chain[0];
+                _.each(_.rest(chain), _.bind(function (item) {
+                    lastValue += ',' + item;
+                    result.push({
+                        entity: this.findEntity(item.split('::')[0]),
+                        label: this.getFieldLabel(lastValue)
+                    });
+                }, this));
+            } else if (chain[0] != '') {
+                result.push({
+                    entity: this.findEntity(this.$el.data('entity')),
+                    label: this.getFieldLabel(chain[0])
+                });
+            }
+            return result;
+        },
+        this.getFieldLabel = function (value) {
+            return this.$el
+                .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
+                .data('label');
+        },
+        this.getFieldGroupLabel = function (value) {
+            return this.$el
+                .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
+                .parent()
+                .attr('label');
+        }
+    };
+    $field.data('entity-field-util', new EntityFieldUtil($field));
+
+    {% if configs.entities is defined %}
+    var entities = {{ configs.entities|json_encode|raw }};
+    $field.data('entity-field-util').findEntity = function (entity) {
+        return _.findWhere(entities, {name: entity});
+    };
+    {% endif %}
+    var formatContext = {
+        splitValue: function (value) {
+            return $field.data('entity-field-util').splitValue(value);
+        }
+    };
+    select2Config.formatContext = function () {
+        return formatContext;
+    };
+{% endblock %}
