@@ -21,7 +21,6 @@ parameters:
     oro_user.change_password.subscriber.class:              Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
     oro_user.event_listener.user_email_grid_listener.class: Oro\Bundle\UserBundle\EventListener\UserEmailGridListener
 
-
 services:
     oro_user.manager:
         class:                        %oro_user.manager.class%
