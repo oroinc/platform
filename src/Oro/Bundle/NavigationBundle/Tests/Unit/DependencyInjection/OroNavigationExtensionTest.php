@@ -37,7 +37,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     array($expectedMenu)
                 )
             ),
-            $data
+            $data,
+            'Unexpected menu for builder'
         );
 
         $this->assertTrue($container->hasDefinition('oro_menu.twig.extension'));
@@ -50,7 +51,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     array($expectedMenu)
                 )
             ),
-            $data
+            $data,
+            'Unexpected menu for twig'
         );
 
         $this->assertTrue($container->hasDefinition('oro_navigation.title_config_reader'));
@@ -133,7 +135,10 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     'tree' => array(
                         'application_menu' => array(
                             'children' => array(
-                                'items_sub2' => array('children' => array())
+                                'items_sub2' => array(
+                                    'children' => array(),
+                                    'merge_strategy' => 'append'
+                                )
                             ),
                             'extras' => array(),
                         )
@@ -153,7 +158,16 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         'tree' => array(
                             'application_menu' => array(
                                 'children' => array(
-                                    'items_sub2' => null
+                                    'items_sub2' => array(
+                                        'children' => array(
+                                            'to_replace' => array(
+                                                'merge_strategy' => 'replace'
+                                            ),
+                                            'to_move_top' => array(
+                                                'merge_strategy' => 'move'
+                                            ),
+                                        )
+                                    )
                                 )
                             )
                         )
@@ -167,6 +181,9 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                     'items' => array(
                         'customers_tab' => array_merge(array('label' => 'Customers'), $defaultItemParameters),
                         'call_list' => array_merge(array('label' => 'Calls RENAMED'), $defaultItemParameters),
+                        'to_replace' => array_merge(array('label' => 'Replaced'), $defaultItemParameters),
+                        'to_move_top' => array_merge(array('label' => 'To move'), $defaultItemParameters),
+                        'to_move_child' => array_merge(array('label' => 'To move child'), $defaultItemParameters),
                         'shortcut_call_list' => array_merge(array('label' => 'Show list'), $defaultItemParameters),
                         'items_sub2' => array_merge(array('label' => 'Sub2'), $defaultItemParameters)
                     ),
@@ -176,17 +193,41 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                             'children' => array(
                                 'customers_tab' => array(
                                     'children' => array(
-                                        'call_list' => array('children' => array())
-                                    )
+                                        'call_list' => array(
+                                            'children' => array(),
+                                            'merge_strategy' => 'append'
+                                        )
+                                    ),
+                                    'merge_strategy' => 'append'
                                 ),
-                                'items_sub2' => array('children' => array())
+                                'items_sub2' => array(
+                                    'children' => array(
+                                        'to_replace' => array(
+                                            'children' => array(),
+                                            'merge_strategy' => 'replace'
+                                        ),
+                                        'to_move_top' => array(
+                                            'children' => array(
+                                                'to_move_child' => array(
+                                                    'children' => array(),
+                                                    'merge_strategy' => 'append'
+                                                )
+                                            ),
+                                            'merge_strategy' => 'move'
+                                        ),
+                                    ),
+                                    'merge_strategy' => 'append'
+                                )
                             ),
                             'extras' => array(),
                         ),
                         'shortcuts' => array(
                             'type' => 'shortcuts',
                             'children' => array(
-                                'shortcut_call_list' => array('children' => array())
+                                'shortcut_call_list' => array(
+                                    'children' => array(),
+                                    'merge_strategy' => 'append'
+                                )
                             ),
                             'extras' => array(),
                         )

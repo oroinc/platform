@@ -79,15 +79,74 @@ class OroNavigationExtension extends Extension
      * @param array $config
      * @param array $configPart
      */
-    protected function mergeMenuConfig(array &$config, array $configPart)
+    protected function mergeMenuConfig(array &$config, array &$configPart)
     {
         foreach ($configPart as $entity => $entityConfig) {
-            if (isset($config['oro_menu_config'][$entity])) {
+            if (array_key_exists('tree', $configPart)) {
+                foreach ($configPart['tree'] as $type => &$menuPartConfig) {
+                    if (isset($config[self::MENU_CONFIG_KEY]['tree'][$type])
+                        && is_array($config[self::MENU_CONFIG_KEY]['tree'][$type])
+                        && is_array($menuPartConfig)
+                    ) {
+                        $this->reorganizeTree($config[self::MENU_CONFIG_KEY]['tree'][$type], $menuPartConfig);
+                    }
+                }
+            }
+
+            if (isset($config[self::MENU_CONFIG_KEY][$entity])) {
                 $config[self::MENU_CONFIG_KEY][$entity] =
                     array_replace_recursive($config[self::MENU_CONFIG_KEY][$entity], $entityConfig);
             } else {
                 $config[self::MENU_CONFIG_KEY][$entity] = $entityConfig;
             }
         }
+    }
+
+    protected function reorganizeTree(array &$config, array &$configPart)
+    {
+        if (!empty($configPart['children'])) {
+            foreach ($configPart['children'] as $childName => &$childConfig) {
+                if (isset($childConfig['merge_strategy']) && $childConfig['merge_strategy'] != 'append') {
+                    if (isset($childConfig['merge_strategy']) && $childConfig['merge_strategy'] == 'move') {
+                        $existingItem = $this->getMenuItemByName($config, $childName);
+                        if (!empty($existingItem['children'])) {
+                            $childChildren = isset($childConfig['children']) ? $childConfig['children'] : array();
+                            $childConfig['children']
+                                = array_merge($existingItem['children'], $childChildren);
+                        }
+                    }
+                    $this->removeItem($config, $childName);
+                } elseif (is_array($childConfig)) {
+                    $this->reorganizeTree($config, $childConfig);
+                }
+            }
+        }
+    }
+
+    protected function removeItem(array &$config, $childName)
+    {
+        if (!empty($config['children'])) {
+            foreach ($config['children'] as $key => &$configRow) {
+                if ($key === $childName) {
+                    unset($config['children'][$childName]);
+                } elseif (is_array($configRow)) {
+                    $this->removeItem($configRow, $childName);
+                }
+            }
+        }
+    }
+
+    protected function getMenuItemByName(array $config, $childName)
+    {
+        if (!empty($config['children'])) {
+            foreach ($config['children'] as $key => $configRow) {
+                if ($key === $childName) {
+                    return $config['children'][$childName];
+                } elseif (is_array($configRow)) {
+                    return $this->getMenuItemByName($configRow, $childName);
+                }
+            }
+        }
+        return null;
     }
 }

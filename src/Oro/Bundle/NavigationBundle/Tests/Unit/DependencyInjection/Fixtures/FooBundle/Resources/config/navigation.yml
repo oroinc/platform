@@ -4,6 +4,12 @@ oro_menu_config:
             label: 'Customers'
         call_list:
             label: 'Calls'
+        to_replace:
+            label: 'Replaced'
+        to_move_top:
+            label: 'To move'
+        to_move_child:
+            label: 'To move child'
         shortcut_call_list:
             label: Show list
     tree:
@@ -12,6 +18,11 @@ oro_menu_config:
                 customers_tab:
                     children:
                         call_list: ~
+                        to_replace: ~
+                        to_move_top:
+                            children:
+                                to_move_child: ~
+
         shortcuts:
             children:
                 shortcut_call_list: ~
