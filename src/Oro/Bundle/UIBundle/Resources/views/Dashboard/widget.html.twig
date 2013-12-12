@@ -14,16 +14,17 @@
     <script type="text/javascript">
         require(['jquery', 'underscore', 'oro/widget-manager', 'oro/navigation'],
         function($, _, widgetManager, Navigation){
-            var $widgetContent = $('.{{ widgetContentCssClass }}');
-            var wid = $widgetContent.parent().attr('id').replace(/widget-container-/, '');
-            widgetManager.getWidgetInstance(wid, function(widget) {
-                widget.setTitle('{{ widgetTitle }}');
+            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                widget.setTitle({{ widgetTitle|json_encode|raw }});
                 widget.on('renderStart', function(el) {
                     var navigation = Navigation.getInstance();
                     if (navigation) {
-                        _.each(widget.getActions().adopted, function (action) {
-                            navigation.processClicks(action);
-                        });
+                        var actions = widget.getActions();
+                        if (!_.isUndefined(actions.adopted)) {
+                            _.each(actions.adopted, function (action) {
+                                navigation.processClicks(action);
+                            });
+                        }
                     }
                 });
             });

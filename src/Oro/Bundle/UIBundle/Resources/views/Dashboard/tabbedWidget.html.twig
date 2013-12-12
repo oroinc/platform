@@ -25,16 +25,20 @@
 
             $(document).on('click', '.{{ widgetName }}-widget-content .tab-button', function (e) {
                 var $el = $(this);
-                $el.closest('.nav-tabs').find('li.active').removeClass('active');
-                $el.closest('li').addClass('active');
+                var $prevTab = $el.closest('.nav-tabs').find('li.active');
+                var $currentTab = $el.closest('li');
+                $prevTab.removeClass('active');
+                $currentTab.addClass('active');
 
                 loadingMask.show();
                 $.ajax({
                     url: $el.data('url'),
                     dataType: 'html',
                     error: function(jqXHR, textStatus, errorThrown) {
-                        error.dispatch(null, jqXHR);
                         loadingMask.hide();
+                        $currentTab.removeClass('active');
+                        $prevTab.addClass('active');
+                        error.dispatch(null, jqXHR);
                     },
                     success: function(data, textStatus, jqXHR) {
                         loadingMask.hide();
