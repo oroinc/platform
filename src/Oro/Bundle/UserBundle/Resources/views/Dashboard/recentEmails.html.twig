@@ -6,12 +6,12 @@
 
 {% block content %}
     {% set tabs = [{
-        'url': path('oro_user_dashboard_recentemails', {'activeTab': 'inbox', 'contentType': 'tab'}),
+        'url': path('oro_user_dashboard_recent_emails', {'activeTab': 'inbox', 'contentType': 'tab'}),
         'name': 'inbox',
         'label': 'oro.dashboard.recent_emails.inbox'|trans
     },
     {
-        'url': path('oro_user_dashboard_recentemails', {'activeTab': 'sent', 'contentType': 'tab'}),
+        'url': path('oro_user_dashboard_recent_emails', {'activeTab': 'sent', 'contentType': 'tab'}),
         'name': 'sent',
         'label': 'oro.dashboard.recent_emails.sent'|trans
     }] %}
