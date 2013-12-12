@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  * @outputBuffering enabled
  * @db_isolation
  */
-class SoapUsersApiTest extends WebTestCase
+class SoapUsersTest extends WebTestCase
 {
     /** Default value for role label */
     const DEFAULT_VALUE = 'USER_LABEL';
@@ -90,6 +90,29 @@ class SoapUsersApiTest extends WebTestCase
         $this->assertTrue($result);
     }
 
+    public function testGetUserRoles()
+    {
+        $roles = $this->client->getSoap()->getUserRoles(1);
+        $roles = ToolsAPI::classToArray($roles);
+        $this->assertEquals('Administrator', $roles['item']['label']);
+    }
+
+    public function testGetUserGroups()
+    {
+        $groups = $this->client->getSoap()->getUserGroups(1);
+        $groups = ToolsAPI::classToArray($groups);
+        $this->assertEquals('Administrators', $groups['item']['name']);
+    }
+
+    /**
+     * @expectedException \SoapFault
+     * @expectedExceptionMessage Empty filter data
+     */
+    public function testGetUserByException()
+    {
+        $this->client->getSoap()->getUserBy();
+    }
+
     /**
      * @dataProvider requestsApi
      * @depends testGetUsers
@@ -120,6 +143,15 @@ class SoapUsersApiTest extends WebTestCase
                 throw $e;
             }
         }
+    }
+
+    /**
+     * @expectedException \SoapFault
+     * @expectedExceptionMessage Self delete forbidden
+     */
+    public function testSelfDeleteUser()
+    {
+        $this->client->getSoap()->deleteUser(1);
     }
 
     /**
