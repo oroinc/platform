@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DistributionBundle\Controller;
 
+use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -31,19 +31,29 @@ class PackageController extends Controller
     public function listInstalledAction()
     {
         $this->setUpEnvironment();
+        $manager = $this->getPackageManager();
+        $items = [];
 
-        return ['packages' => $this->container->get('oro_distribution.package_manager')->getInstalled()];
+        foreach ($manager->getInstalled() as $package) {
+            $items[] = [
+                'package' => $package,
+                'update' => $manager->getPackageUpdate($package)
+            ];
+        }
+
+        return ['items' => $items];
     }
 
     /**
      * @Route("/packages/available")
      * @Template("OroDistributionBundle:Package:list_available.html.twig")
      */
-    public function listAvailableAction()
+    public function ListAvailableAction()
     {
         $this->setUpEnvironment();
+        $packageManager = $this->getPackageManager();
 
-        return ['packages' => $this->container->get('oro_distribution.package_manager')->getAvailable()];
+        return ['packages' => $packageManager->getAvailable()];
     }
 
     /**
@@ -76,16 +86,6 @@ class PackageController extends Controller
     public function uninstallAction()
     {
         $this->setUpEnvironment();
-
-//        $responseContent = [
-//            'code' => self::CODE_ERROR,
-//            'message' => 'Not implemented yet'
-//        ];
-//        $response = new Response();
-//        $response->headers->set('Content-Type', 'application/json');
-//        $response->setContent(json_encode($responseContent));
-//
-//        return $response;
 
         $params = $this->getRequest()->get('params');
         $packageName = $params['packageName'];
@@ -135,17 +135,60 @@ class PackageController extends Controller
     {
         $this->setUpEnvironment();
 
+
         $params = $this->getRequest()->get('params');
-        $packageName = $params['packageName'];
-        $packageVersion = $params['packageVersion'];
+        $packageName = isset($params['packageName']) ? $params['packageName'] : null;
+        $packageVersion = isset($params['version']) ? $params['version'] : null;
         $forceDependenciesInstalling = isset($params['force']) ? (bool)$params['force'] : false;
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
-        $responseContent = [
-            'code' => self::CODE_ERROR,
-            'message' => 'Not implemented yet'
-        ];
+        $responseContent = [];
+        $response = new Response();
+        $response->headers->set('Content-Type', 'application/json');
+
+        if ($manager->isPackageInstalled($packageName)) {
+            $responseContent = [
+                'code' => self::CODE_ERROR,
+                'message' => 'Package has already been installed'
+            ];
+            $response->setContent(json_encode($responseContent));
+
+            return $response;
+        }
+
+        try {
+            if (
+                !$forceDependenciesInstalling &&
+                $requirements = $manager->getRequirements($packageName)
+            ) {
+                $params['force'] = true;
+                $responseContent = [
+                    'code' => self::CODE_CONFIRM,
+                    'packages' => $requirements,
+                    'params' => $params
+                ];
+                $response->setContent(json_encode($responseContent));
+
+                return $response;
+            }
+
+            $manager->install($packageName, $packageVersion);
+
+
+        } catch (\Exception $e) {
+            $message = $e instanceof VerboseException ? $e->getMessage() . '_' . $e->getVerboseMessage(
+                ) : $e->getMessage();
+            $responseContent = [
+                'code' => self::CODE_ERROR,
+                'message' => $message
+            ];
+            $response->setContent(json_encode($responseContent));
+
+            return $response;
+        }
+
+        $responseContent = ['code' => self::CODE_INSTALLED];
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
         $response->setContent(json_encode($responseContent));
@@ -165,16 +208,61 @@ class PackageController extends Controller
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
-        $responseContent = [
-            'code' => self::CODE_ERROR,
-            'message' => 'Not implemented yet'
-        ];
         $response = new Response();
         $response->headers->set('Content-Type', 'application/json');
+
+        if (!$manager->isPackageInstalled($packageName)) {
+            $responseContent = [
+                'code' => self::CODE_ERROR,
+                'message' => sprintf('Package %s is not yet installed', $packageName)
+            ];
+            $response->setContent(json_encode($responseContent));
+
+            return $response;
+        }
+
+        if (!$manager->isUpdateAvailable($packageName)) {
+            $responseContent = [
+                'code' => self::CODE_ERROR,
+                'message' => sprintf('No updates available for package %s', $packageName)
+            ];
+            $response->setContent(json_encode($responseContent));
+
+            return $response;
+        }
+
+        try {
+            $manager->update($packageName);
+        } catch (VerboseException $e) {
+            $responseContent = [
+                'code' => self::CODE_ERROR,
+                'message' => $e->getMessage() . '_' . $e->getVerboseMessage()
+            ];
+            $response->setContent(json_encode($responseContent));
+
+            return $response;
+        } catch (\Exception $e) {
+            $responseContent = [
+                'code' => self::CODE_ERROR,
+                'message' => $e->getMessage()
+            ];
+            $response->setContent(json_encode($responseContent));
+
+            return $response;
+        }
+        $responseContent = [
+            'code' => self::CODE_UPDATED,
+        ];
         $response->setContent(json_encode($responseContent));
 
         return $response;
     }
 
-
+    /**
+     * @return PackageManager
+     */
+    protected function getPackageManager()
+    {
+        return $this->container->get('oro_distribution.package_manager');
+    }
 }

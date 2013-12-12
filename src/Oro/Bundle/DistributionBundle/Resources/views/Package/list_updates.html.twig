@@ -23,7 +23,7 @@
                 <td>{{ update.packageName }}</td>
                 <td>{{ update.currentVersionString }}</td>
                 <td>{{ update.upToDateVersionString }}</td>
-                <td><a href="#" class="ajax update">Update</a></td>
+                <td><a href="#" class="ajax update" data-params='{"packageName": "{{ update.packageName }}" }'>Update</a></td>
             </tr>
         {% else %}
             <tr>

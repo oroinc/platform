@@ -1,23 +1,79 @@
 {% extends 'OroDistributionBundle::base.html.twig' %}
 
-{% block title %}List of available packages{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(function () {
+            $('select.install-version').on('change', function (el) {
+                var install = $(this).closest('tr').find('a.install');
+                install.data('params', $.extend(install.data('params'), {"version": $(this).val()}));
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block title %}Available Packages{% endblock %}
+
+{% block menu %}
+    <a id="back-to-installed" href="{{ path('oro_distribution_package_listinstalled') }}">
+        <i class="icon icon-reply"></i>
+        Back to Installed Packages
+    </a>
+{% endblock %}
+
 
 {% block body %}
-
     <table class="table">
-        <col width="75%" valign="top"/>
-        <col width="25%" valign="top"/>
+        <col width="40%" valign="top"/>
+        <col width="10%" valign="top"/>
+        <col width="10%" valign="top"/>
+        <col width="10%" valign="top"/>
+        <col width="15%" valign="top"/>
         <thead>
         <tr>
-            <th>Package name</th>
+            <th>Package</th>
+            <th>Type</th>
+            <th>License</th>
+            <th>Author</th>
+            <th>Version</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
         <tbody>
         {% for package in packages %}
             <tr>
-                <td>{{ package }}</td>
-                <td><a href="#" class="ajax install">Install</a></td>
+                <td>
+                    <strong>{{ package.prettyName }}</strong>
+                    <br/>
+                    {{ package.description }}
+                </td>
+                <td>{{ package.type }}</td>
+                <td>
+                    {% for license in package.license %}
+                        {{ license }}
+                    {% else %}
+                        <em>unknown</em>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for author in package.authors %}
+                        <div>
+                            {{ author.name }}
+                            <br/>
+                            <a href="mailto:{{ author.email }}">{{ author.email }}</a>
+                        </div>
+                    {% else %}
+                        <em>unknown</em>
+                    {% endfor %}
+                </td>
+                <td>
+                    {{ package.prettyVersion }}
+                </td>
+                <td>
+                    <a href="#" class="btn btn-success ajax install"
+                       data-action="install"
+                       data-params='{"packageName": "{{ package.prettyName }}"}'>Install</a>
+                </td>
             </tr>
         {% else %}
             <tr>

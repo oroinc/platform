@@ -1,0 +1,27 @@
+security:
+    providers:
+        chain_provider:
+            chain:
+                providers:                  [in_memory]
+        in_memory:
+            memory:
+                users:
+                  admin: {password: test, roles: 'ROLE_PACKAGE_MANAGER' }
+
+    encoders:
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    firewalls:
+        dev:
+            pattern:                        ^/(_(profiler|wdt)|css|images|js)/
+            security:                       false
+
+        index:
+            pattern:   ^/
+            anonymous: ~
+            http_basic:
+                realm: "Secured Demo Area"
+
+    access_control:
+        - { path: ^/$, role: ROLE_PACKAGE_MANAGER }
+        - { path: ^/packages$, role: ROLE_PACKAGE_MANAGER }

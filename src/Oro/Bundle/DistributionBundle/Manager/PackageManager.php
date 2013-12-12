@@ -78,7 +78,7 @@ class PackageManager
         $notificationUrl = new \ReflectionProperty('Composer\Package\Package', 'notificationUrl');
         $notificationUrl->setAccessible(true);
 
-        foreach($this->getLocalRepository()->getCanonicalPackages() as $package) {
+        foreach ($this->getLocalRepository()->getCanonicalPackages() as $package) {
             if ('https://packagist.org/downloads/' != $notificationUrl->getValue($package)) {
                 $packages[] = $package;
             }
@@ -88,11 +88,12 @@ class PackageManager
     }
 
     /**
-     * @return array
+     * @return PackageInterface[]
      */
     public function getAvailable()
     {
         $packages = [];
+        $packageNames = [];
         $repositories = $this->getRepositories();
 
         $url = new \ReflectionProperty('Composer\Repository\ComposerRepository', 'url');
@@ -104,16 +105,48 @@ class PackageManager
                 if ('http://packagist.org' == $url->getValue($repo)) {
                     continue;
                 }
-                $packages = array_merge($packages, $repo->getProviderNames());
+                $packageNames = array_merge($packages, $repo->getProviderNames());
             } else {
-                /** @var PackageInterface $package */
-                foreach ($repo->getPackages() as $package) {
-                    $packages[] = $package->getPrettyName();
+                /** @var PackageInterface[] $repoPackages */
+                $repoPackages = $repo->getPackages();
+                foreach ($repoPackages as $package) {
+                    $packageNames[] = $package->getPrettyName();
                 }
             }
         }
 
-        return array_values(array_unique(array_diff($packages, $this->getFlatListInstalledPackage())));
+        $packages = array_reduce(
+            array_unique($packageNames),
+            function ($packages, $packageName) {
+                $packages[] = $this->getPreferredPackage($packageName);
+                return $packages;
+            },
+            []
+        );
+
+        return array_filter(
+            $packages,
+            function (PackageInterface $package) {
+                return !$this->isPackageInstalled($package->getPrettyName());
+            }
+        );
+    }
+
+    /**
+     * @param string $packageName
+     * @return array
+     */
+    public function getAvailableVersions($packageName)
+    {
+        $versions = [];
+        /** @var PackageInterface $package */
+        foreach ($this->createPool()->whatProvides($packageName) as $package) {
+            if (!in_array($package->getPrettyVersion(), $versions)) {
+                $versions[] = $package->getPrettyVersion();
+            }
+        }
+
+        return $versions;
     }
 
     /**
@@ -201,7 +234,7 @@ class PackageManager
     {
         $previousInstalled = $this->getFlatListInstalledPackage();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
-        $this->addToComposerJsonFile($package, $packageVersion);
+        $this->updateComposerJsonFile($package, $packageVersion);
         if ($this->doInstall($package->getName())) {
             foreach ($this->getInstalled() as $installedPackage) {
                 if (!in_array($installedPackage->getName(), $previousInstalled)) {
@@ -298,7 +331,8 @@ class PackageManager
     public function update($packageName)
     {
         $previousInstalled = $this->getInstalled();
-
+        $currentPackage = $this->findInstalledPackage($packageName);
+        $this->updateComposerJsonFile($currentPackage, '*');
         if ($this->doInstall($packageName)) {
             list($installedPackages, $updatedPackages, $uninstalledPackages) = $this->getChangeSet($previousInstalled);
             array_map(
@@ -331,8 +365,10 @@ class PackageManager
                 },
                 $uninstalledPackages
             );
-
+            $justInstalledPackage = $this->findInstalledPackage($packageName);
+            $this->updateComposerJsonFile($justInstalledPackage, $justInstalledPackage->getPrettyVersion());
         } else {
+            $this->updateComposerJsonFile($currentPackage, $currentPackage->getPrettyVersion());
             throw new VerboseException(
                 sprintf('%s can\'t be updated!', $packageName), $this->composerIO->getOutput()
             );
@@ -357,7 +393,9 @@ class PackageManager
             ->setUpdateWhitelist([$packageName])
             ->setOptimizeAutoloader(true);
 
-        return $this->installer->run();
+        $result = $this->installer->run();
+
+        return $result === 0;
     }
 
     /**
@@ -424,11 +462,12 @@ class PackageManager
      *
      * @return null|PackageUpdate
      */
-    protected function getPackageUpdate(PackageInterface $package)
+    public function getPackageUpdate(PackageInterface $package)
     {
         $preferredPackage = $this->getPreferredPackage(
             $package->getName(),
-            $this->getPackagePrettyConstraint($package)
+            null
+//            $this->getPackagePrettyConstraint($package)
         );
         if ($package->getSourceReference() !== $preferredPackage->getSourceReference()) {
             $versionString = '%s (%s)';
@@ -528,12 +567,13 @@ class PackageManager
 
     /**
      * @param PackageInterface $package
+     * @param string|null $version
      */
-    protected function addToComposerJsonFile(PackageInterface $package, $version = null)
+    protected function updateComposerJsonFile(PackageInterface $package, $version = null)
     {
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
-        $composerData['require'][$package->getName()] = $version?: $package->getPrettyVersion();
+        $composerData['require'][$package->getName()] = $version ? : $package->getPrettyVersion();
 
         $composerFile->write($composerData);
         $this->updateRootPackage($composerData['require']);
