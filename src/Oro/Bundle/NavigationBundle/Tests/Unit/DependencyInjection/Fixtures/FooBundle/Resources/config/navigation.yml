@@ -1,0 +1,21 @@
+oro_menu_config:
+    items:
+        customers_tab:
+            label: 'Customers'
+        call_list:
+            label: 'Calls'
+        shortcut_call_list:
+            label: Show list
+    tree:
+        application_menu:
+            children:
+                customers_tab:
+                    children:
+                        call_list: ~
+        shortcuts:
+            children:
+                shortcut_call_list: ~
+
+oro_titles:
+    orocrm_call_index: Calls
+
