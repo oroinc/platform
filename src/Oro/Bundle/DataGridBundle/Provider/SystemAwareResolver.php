@@ -117,7 +117,11 @@ class SystemAwareResolver implements ContainerAwareInterface
                         $key,
                         $this->parentNode
                     );
-                $val = str_replace($match[0], $_val, $val);
+                if (!is_callable($_val)) {
+                    $val = str_replace($match[0], $_val, $val);
+                } else {
+                    $val = $_val;
+                }
                 break;
             // service pass @service
             case preg_match('#@([\w\._]+)#', $val, $match):
