@@ -454,7 +454,7 @@ datagrid:
         source:
             query:
                 select:
-                    - @oro_email.datagrid_query_factory->getFromEmailExpression()
+                    - @oro_email.datagrid_query_factory->getFromEmailExpression
                 join:
                     inner:
                         from_email_address:
