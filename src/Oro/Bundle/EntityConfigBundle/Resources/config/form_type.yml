@@ -1,7 +1,6 @@
 parameters:
     oro_entity_config.type.config.class:                    Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType
     oro_entity_config.extension.config.class:               Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension
-    oro_entity_config.type.label.class:                     Oro\Bundle\EntityConfigBundle\Form\Type\ConfigLabelType
 
 services:
     oro_entity_config.type.config:
@@ -17,10 +16,3 @@ services:
         class: %oro_entity_config.extension.config.class%
         tags:
             - { name: form.type_extension, alias: form }
-
-    oro_entity_config.type.label:
-        class: %oro_entity_config.type.label.class%
-        arguments:
-            - @translator
-        tags:
-            - { name: form.type, alias: oro_entity_config_label_type}

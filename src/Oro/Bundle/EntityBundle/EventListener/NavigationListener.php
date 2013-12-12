@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Symfony\Component\Translation\Translator;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -29,22 +29,28 @@ class NavigationListener
     /** @var ConfigProvider $entityExtendProvider */
     protected $entityExtendProvider = null;
 
+    /** @var  Translator */
+    protected $translator;
+
     /**
      * @param SecurityFacade $securityFacade
-     * @param EntityManager  $entityManager
+     * @param EntityManager $entityManager
      * @param ConfigProvider $entityConfigProvider
      * @param ConfigProvider $entityExtendProvider
+     * @param Translator $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
         EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
-        ConfigProvider $entityExtendProvider
+        ConfigProvider $entityExtendProvider,
+        Translator $translator
     ) {
         $this->securityFacade       = $securityFacade;
         $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->entityExtendProvider = $entityExtendProvider;
+        $this->translator           = $translator;
     }
 
     /**
@@ -73,9 +79,8 @@ class NavigationListener
                     }
 
                     $children[$config->get('label')] = array(
-                        'label'   => $config->get('label'),
+                        'label'   => $this->translator->trans($config->get('label')),
                         'options' => array(
-                            'label'           => $config->get('label'),
                             'route'           => 'oro_entity_index',
                             'routeParameters' => array(
                                 'id' => str_replace('\\', '_', $config->getId()->getClassName())

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\Form\FormEvent;
@@ -11,8 +10,13 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
@@ -66,7 +70,9 @@ class ConfigSubscriber implements EventSubscriberInterface
     /**
      * Check for translatable values and preSet it on form
      * if NO translations in DB -> retrieve translation from messages
-     * if NO -> return key (placeholder)
+     * if NO, return:
+     *  field name (in case of FieldConfigModel)
+     *  translation key (in case of EntityConfigModel)
      *
      * @param FormEvent $event
      */
@@ -78,25 +84,33 @@ class ConfigSubscriber implements EventSubscriberInterface
         $configModel = $options['config_model'];
         $dataChanges = false;
 
-        if ($configModel instanceof FieldConfigModel) {
-            foreach ($this->configManager->getProviders() as $provider) {
-                if (isset($data[$provider->getScope()])) {
-                    $translatable = $provider->getPropertyConfig()->getTranslatableValues();
-                    foreach ($data[$provider->getScope()] as $code => $value) {
-                        $messages = $this->translator->getTranslations()['messages'];
-                        if (in_array($code, $translatable) && isset($messages[$value])) {
+        foreach ($this->configManager->getProviders() as $provider) {
+            if (isset($data[$provider->getScope()])) {
+
+                $type = PropertyConfigContainer::TYPE_FIELD;
+                if ($configModel instanceof EntityConfigModel) {
+                    $type = PropertyConfigContainer::TYPE_ENTITY;
+                }
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues($type);
+
+                foreach ($data[$provider->getScope()] as $code => $value) {
+                    $messages = $this->translator->getTranslations()['messages'];
+                    if (in_array($code, $translatable)) {
+                        if (isset($messages[$value])) {
                             $value = $messages[$value];
                             $data[$provider->getScope()][$code] = $value;
-
+                            $dataChanges = true;
+                        } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
+                            $data[$provider->getScope()][$code] = $configModel->getFieldName();
                             $dataChanges = true;
                         }
                     }
                 }
             }
+        }
 
-            if ($dataChanges) {
-                $event->setData($data);
-            }
+        if ($dataChanges) {
+            $event->setData($data);
         }
     }
 
@@ -119,8 +133,17 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         foreach ($this->configManager->getProviders() as $provider) {
             if (isset($data[$provider->getScope()])) {
-                $translatable = $provider->getPropertyConfig()->getTranslatableValues();
+
                 $config = $provider->getConfig($className, $fieldName);
+
+                /**
+                 * config translations
+                 */
+                $type = PropertyConfigContainer::TYPE_FIELD;
+                if ($configModel instanceof EntityConfigModel) {
+                    $type = PropertyConfigContainer::TYPE_ENTITY;
+                }
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues($type);
 
                 foreach ($data[$provider->getScope()] as $code => $value) {
                     if (in_array($code, $translatable)) {
@@ -159,7 +182,12 @@ class ConfigSubscriber implements EventSubscriberInterface
                                 glob($this->translatorCacheDir . 'catalogue.' . $this->translator->getLocale() . '.*')
                             );
                         }
-                        unset($data[$provider->getScope()][$code]);
+
+                        if (!$configModel->getId()) {
+                            $data[$provider->getScope()][$code] = $key;
+                        } else {
+                            unset($data[$provider->getScope()][$code]);
+                        }
                     }
                 }
 

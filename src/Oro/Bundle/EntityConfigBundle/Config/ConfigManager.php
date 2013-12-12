@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -510,6 +511,8 @@ class ConfigManager
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
 
             foreach ($this->getProviders() as $provider) {
+                $translatable = $provider->getPropertyConfig()
+                    ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
 
                 $metadata      = $this->getEntityMetadata($className);
                 $defaultValues = array();
@@ -518,7 +521,14 @@ class ConfigManager
                 }
 
                 $entityId = new EntityConfigId($className, $provider->getScope());
-                $config   = $provider->createConfig($entityId, $defaultValues);
+
+                foreach ($translatable as $code) {
+                    if (!in_array($code, $defaultValues)) {
+                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, null, $code);
+                    }
+                }
+
+                $config = $provider->createConfig($entityId, $defaultValues);
 
                 $this->localCache->set($config->getId()->toString(), $config);
             }
@@ -597,7 +607,7 @@ class ConfigManager
 
                 foreach ($translatable as $code) {
                     if (!in_array($code, $defaultValues)) {
-                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, $fieldName);
+                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, $fieldName, $code);
                     }
                 }
 

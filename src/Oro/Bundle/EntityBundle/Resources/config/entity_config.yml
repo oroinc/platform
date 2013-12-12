@@ -17,6 +17,7 @@ oro_entity_config:
                             block:          entity
                 label:
                     options:
+                        translatable:       true
                         priority:           20
                     constraints:
                         - NotBlank:         ~
@@ -40,6 +41,7 @@ oro_entity_config:
 
                 plural_label:
                     options:
+                        translatable:       true
                         priority:           35
                     constraints:
                         - Length:
