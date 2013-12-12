@@ -404,14 +404,6 @@ disabled look for disabled choices in the results dropdown
   padding: 3px 5px 3px 5px !important;
 }
 
-.select2-container-multi.select2-container-active .select2-choices {
-  border: 1px solid #5897fb;
-  outline: none;
-
-  -webkit-box-shadow: 0 0 5px rgba(0,0,0,.3);
-  -moz-box-shadow: 0 0 5px rgba(0,0,0,.3);
-  box-shadow: 0 0 5px rgba(0,0,0,.3);
-}
 .select2-container-multi .select2-choices li {
   float: left;
   list-style: none;
@@ -440,7 +432,7 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-container-multi .select2-choices .select2-search-choice {
-  padding: 3px 5px 3px 18px;
+  padding: 4px 16px 4px 7px;
   margin: 3px 0 3px 5px;
   position: relative;
 
@@ -498,7 +490,16 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-container-multi .select2-search-choice-close {
-  left: 3px;
+  width: 0;
+  height: 0;
+  top: 5px;
+  right: 15px;
+  &:before {
+    width: 20px;
+    content: "\f00d";
+    font: 11px 'FontAwesome';
+    color: #777;
+  }
 }
 
 .select2-container-multi .select2-choices .select2-search-choice .select2-search-choice-close:hover {
