@@ -28,6 +28,40 @@
       display: none;
     }
   }
+  .nav.top-search {
+    .header-dropdown-shortcut {
+      .dropdown-menu {
+        &:before {
+          left: 122px;
+        }
+        &:after {
+          left: 123px;
+        }
+      }
+    }
+    .header-dropdown-search {
+      .dropdown-menu {
+        &:before {
+          left: 158px;
+        }
+        &:after {
+          left: 159px;
+        }
+      }
+    }
+  }
+  .nav.user-menu {
+    .dropdown {
+      .dropdown-menu {
+        &:before {
+          right: 6px;
+        }
+        &:after {
+          right: 7px;
+        }
+      }
+    }
+  }
   li {
     .help {
       display: none;
@@ -38,4 +72,29 @@
       font-size: 18px !important;
     }
   }
+  .dropup, .dropdown {
+    position: static;
+  }
+
+  input, textarea, .uneditable-input {
+    width: 255px;
+  }
+}
+
+.navbar .nav {
+  position: static;
+}
+
+#oroplatform-header .dropdown-menu {
+  left: 10px;
+  max-width: 300px;
+}
+
+#oroplatform-header .user-menu .dropdown-menu {
+  left: auto;
+  right: 10px;
+}
+
+#oroplatform-header #search-bar-button {
+  width: 60px !important;
 }
