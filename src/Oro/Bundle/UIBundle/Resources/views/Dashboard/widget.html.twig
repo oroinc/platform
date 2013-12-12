@@ -1,0 +1,32 @@
+{% set widgetContentCssClass = widgetName ~ '-widget-content' %}
+<div class="widget-content dashboard-widget-content {{ widgetContentCssClass }}">
+    {% block content %}
+    {% endblock %}
+    <div class="widget-actions">
+        {% block actions %}
+            {% if actions is defined %}
+                {% for action in actions -%}
+                    <a class="btn btn-mini {{ action.class|default('btn-primary') }}" href="{{ action.url }}">{% if action.icon is defined %}<i class="icon-{{ action.icon }}"></i> {% endif %}{{ action.label }}</a>
+                {%- endfor %}
+            {% endif %}
+        {% endblock %}
+    </div>
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'oro/widget-manager', 'oro/navigation'],
+        function($, _, widgetManager, Navigation){
+            var $widgetContent = $('.{{ widgetContentCssClass }}');
+            var wid = $widgetContent.parent().attr('id').replace(/widget-container-/, '');
+            widgetManager.getWidgetInstance(wid, function(widget) {
+                widget.setTitle('{{ widgetTitle }}');
+                widget.on('renderStart', function(el) {
+                    var navigation = Navigation.getInstance();
+                    if (navigation) {
+                        _.each(widget.getActions().adopted, function (action) {
+                            navigation.processClicks(action);
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</div>

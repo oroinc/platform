@@ -1,0 +1,44 @@
+{% extends 'OroUIBundle:Dashboard:widget.html.twig' %}
+
+{% block content %}
+    <ul class="nav nav-tabs">
+        {% for tab in tabs %}
+            <li{% if activeTab == tab.name %} class="active"{% endif %}><a
+                href="javascript:void(0);" class="no-hash tab-button"
+                data-name="{{ tab.name }}" data-url="{{ tab.url }}">{{ tab.label|trans }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="tab-content">
+        {% block tab_content %}
+            {{ activeTabContent|raw }}
+        {% endblock %}
+    </div>
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'oro/error', 'oro/loading-mask'],
+        function($, _, error, LoadingMask){
+            $(document).on('click', '.{{ widgetName }}-widget-content .tab-button', function (e) {
+                var $el = $(this);
+                var $tabContent = $el.closest('.dashboard-widget-content').find('.tab-content');
+
+                $el.closest('.nav-tabs').find('li.active').removeClass('active');
+                $el.closest('li').addClass('active');
+
+                var loadingMask = new LoadingMask();
+                $tabContent.append(loadingMask.render().$el);
+                loadingMask.show();
+
+                $.ajax({
+                    url: $el.data('url'),
+                    dataType: 'html',
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        error.dispatch(null, jqXHR);
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        $tabContent.html(data);
+                    }
+                });
+            });
+        });
+    </script>
+    {{ parent() }}
+{% endblock %}

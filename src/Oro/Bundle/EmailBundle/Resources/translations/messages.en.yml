@@ -30,6 +30,7 @@ oro:
                     system_templates: "System only"
             email:
                 from_name: "From"
+                receivedAt: "Received"
                 sentAt: "Sent"
                 subject: "Subject"
                 recipients: "Recipients"

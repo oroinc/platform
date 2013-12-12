@@ -1,5 +1,6 @@
 parameters:
     oro_email.email.entity.class:                 Oro\Bundle\EmailBundle\Entity\Email
+    oro_email.email_folder.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailFolder
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
