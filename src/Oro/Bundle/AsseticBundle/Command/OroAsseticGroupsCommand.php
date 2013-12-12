@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\AsseticBundle\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\AsseticBundle\AssetsConfiguration;
@@ -24,8 +22,7 @@ class OroAsseticGroupsCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:assetic:groups')
-            ->setDescription('Information about oro assetics')
-            ->addArgument('write_to', InputArgument::OPTIONAL, 'Override the configured asset root');
+            ->setDescription('Information about oro assetics');
     }
 
     /**
@@ -33,7 +30,6 @@ class OroAsseticGroupsCommand extends ContainerAwareCommand
      */
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        $this->basePath = $input->getArgument('write_to') ? : $this->getContainer()->getParameter('assetic.write_to');
         $this->assetsConfiguration = $this->getContainer()->get('oro_assetic.configuration');
     }
 

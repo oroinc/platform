@@ -59,6 +59,20 @@ class ThemeRegistry
     }
 
     /**
+     * Gets list of all themes
+     *
+     * @return Theme[]
+     */
+    public function getAllThemes()
+    {
+        $result = array();
+        foreach (array_keys($this->themeSettings) as $name) {
+            $result[$name] = $this->getTheme($name);
+        }
+        return $result;
+    }
+
+    /**
      * Create instance of theme based on name and settings
      *
      * @param string $name

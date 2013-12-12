@@ -49,6 +49,11 @@ class ThemeRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($barTheme->getLogo());
         $this->assertNull($barTheme->getScreenshot());
         $this->assertSame($barTheme, $this->themeRegistry->getTheme('bar'));
+
+        $this->assertEquals(
+            array('foo' => $fooTheme, 'bar' => $barTheme),
+            $this->themeRegistry->getAllThemes()
+        );
     }
 
     /**

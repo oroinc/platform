@@ -25,17 +25,12 @@ class Configuration implements ConfigurationInterface
                                 ->cannotBeEmpty()
                             ->end()
                             ->scalarNode('logo')
-                                ->cannotBeEmpty()
                             ->end()
                             ->scalarNode('icon')
-                                ->cannotBeEmpty()
                             ->end()
                             ->scalarNode('screenshot')
-                                ->cannotBeEmpty()
                             ->end()
                             ->arrayNode('styles')
-                                ->isRequired()
-                                ->requiresAtLeastOneElement()
                                 ->beforeNormalization()
                                     ->always(
                                         function ($value) {

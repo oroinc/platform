@@ -7,7 +7,9 @@
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             {% block head_style %}
-                <link rel="shortcut icon" href="{{ asset('favicon.ico') }}" />
+                {% if oro_theme_icon() %}
+                    <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
+                {% endif %}
                {% placeholder head_style %}
             {% endblock %}
 

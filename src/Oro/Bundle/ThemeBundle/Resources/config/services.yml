@@ -1,6 +1,7 @@
 parameters:
     oro_theme.registry.class: Oro\Bundle\ThemeBundle\Model\ThemeRegistry
     oro_theme.event_listener.load_css.class: Oro\Bundle\ThemeBundle\EventListener\LoadCssEventListener
+    oro_theme.twig.extension.class: Oro\Bundle\ThemeBundle\Twig\ThemeExtension
 
 services:
     oro_theme.registry:
@@ -14,3 +15,10 @@ services:
             - @oro_theme.registry
         tags:
             - { name: kernel.event_listener, event: oro_assetic.load_css, method: onLoadCss  }
+
+    oro_theme.twig.extension:
+        class: %oro_theme.twig.extension.class%
+        arguments:
+            - @oro_theme.registry
+        tags:
+            - { name: twig.extension }

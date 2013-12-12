@@ -124,7 +124,6 @@ class AsseticTokenParser extends \Twig_TokenParser
         $lineno
     ) {
         $inputs = $this->assetsConfiguration->getCssFiles(false);
-        var_dump($inputs);
 
         $name = $this->assetFactory->generateAssetName($inputs, $filters, $attributes);
         $asset = $this->assetFactory->createAsset($inputs, $filters, $attributes + array('name' => $name));
@@ -146,7 +145,6 @@ class AsseticTokenParser extends \Twig_TokenParser
         $lineno
     ) {
         $inputs = $this->assetsConfiguration->getCssFiles(true);
-        var_dump($inputs);
 
         $name = $this->assetFactory->generateAssetName($inputs, $filters, $attributes);
         $asset = $this->assetFactory->createAsset($inputs, $filters, $attributes + array('name' => $name));
