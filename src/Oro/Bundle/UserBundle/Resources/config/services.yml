@@ -20,7 +20,7 @@ parameters:
     oro_user.gender_provider.class:                         Oro\Bundle\UserBundle\Provider\GenderProvider
     oro_user.change_password.subscriber.class:              Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
     oro_user.event_listener.user_email_grid_listener.class: Oro\Bundle\UserBundle\EventListener\UserEmailGridListener
-
+    oro_user.grid.helper.class:         Oro\Bundle\UserBundle\GridHelper
 
 services:
     oro_user.manager:
@@ -163,3 +163,8 @@ services:
           - @oro_datagrid.datagrid.request_params
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.group-users-grid, method: onBuildAfter }
+
+    oro_user.grid.helper:
+        class: %oro_user.grid.helper.class%
+        arguments:
+            - @security.context

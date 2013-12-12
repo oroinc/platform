@@ -110,13 +110,14 @@ class SystemAwareResolver implements ContainerAwareInterface
             case preg_match('#@([\w\._]+)->([\w\._]+)#', $val, $match):
                 $service = $match[1];
                 $method  = $match[2];
-                $val     = $this->container
+                $_val    = $this->container
                     ->get($service)
                     ->$method(
                         $datagridName,
                         $key,
                         $this->parentNode
                     );
+                $val = str_replace($match[0], $_val, $val);
                 break;
             // service pass @service
             case preg_match('#@([\w\._]+)#', $val, $match):
