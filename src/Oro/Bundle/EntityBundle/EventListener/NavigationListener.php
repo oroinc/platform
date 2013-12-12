@@ -34,10 +34,10 @@ class NavigationListener
 
     /**
      * @param SecurityFacade $securityFacade
-     * @param EntityManager $entityManager
+     * @param EntityManager  $entityManager
      * @param ConfigProvider $entityConfigProvider
      * @param ConfigProvider $entityExtendProvider
-     * @param Translator $translator
+     * @param Translator     $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
