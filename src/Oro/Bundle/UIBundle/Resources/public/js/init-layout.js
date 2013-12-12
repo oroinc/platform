@@ -156,6 +156,19 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         $('#main-menu').mouseover(function () {
             $('.open').removeClass('open');
         });
+
+        // fix + extend bootstrap.collapse functionality
+        $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function (e) {
+            var $elem = $(e.target),
+                action = $elem.data('action').slice(10),
+                method = {'expand-all': 'show', 'collapse-all': 'hide'}[action],
+                $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
+            $target.find('.collapse').collapse({toggle: false}).collapse(method);
+        });
+        $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.collapse', function (e) {
+            var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
+            $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
+        });
     });
 
     /**
@@ -179,11 +192,6 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
                 content.css('overflow', 'auto');
-
-                $('.scrollable-substructure').css({
-                    'padding-bottom': '0px',
-                    'margin-bottom': '0px'
-                });
             }
         };
 

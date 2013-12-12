@@ -1,3 +1,28 @@
+.left-sidebar-container {
+    background-color: white;
+}
+.left-sidebar-container > .placeholder {
+    margin-left: 334px;
+    background-color: #f1f1f1;
+    border-left: 1px solid #e2e2e2;
+}
+.left-sidebar-container > .placeholder > * {
+    margin-left: -335px;
+}
+.left-sidebar-container > .placeholder > * > .sidebar{
+    float: left;
+    width: 334px;
+    border-top: 1px solid #f2f2f2;
+}
+.left-sidebar-container > .placeholder > * > .content{
+    margin-left: 335px;
+    padding: 15px 15px 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+
 .system-configuration-container {
 }
 
@@ -15,15 +40,12 @@
     color: #D6D8DA;
 }
 
-.system-configuration-container .system-configuration-sidebar dl {
-    margin: 0;
-}
-
 .system-configuration-container .row-fluid-divider {
     background-position: 16% 0;
 }
 
 .system-configuration-container .controls.control-subgroup {
+    width: 295px;
     margin: 0 15px 0 0;
     float: left;
 }
@@ -47,33 +69,14 @@
 .scrollable-container .container-fluid.configuration-header .pull-right{
     margin: 10px 0;
 }
-.system-configuration-sidebar{
-    background-color: #fff;
-    float: left;
-    width: 335px;
-    margin: 0 0 0 -335px;
-    border-top: 1px solid #f2f2f2;
-    border-right: 1px solid #e2e2e2;
-}
-.system-configuration-content{
-    padding: 15px 15px 0;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-}
-.row-fluid-configuration{
-    width: 100%;
-    padding: 0 0 0 335px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-}
 .system-configuration-content .accordion .accordion-inner{
     padding: 27px 30px 9px;
 }
 .system-configuration-content .accordion{
-    background-color: #fff;
     margin-bottom: 15px;
+}
+.system-configuration-content .accordion-group {
+    background-color: #fff;
 }
 .system-configuration-content .accordion .accordion-heading .accordion-toggle{
     color: #727272;
@@ -200,7 +203,7 @@
     font-weight: normal;
     content: "\f078";
     font-size: 11px;
-    margin: 0 15px 0 0;
+    margin: 0 10px 0 0;
 }
 .system-configuration-accordion ul > .accordion-group > .accordion-heading a.collapsed:before,
 .system-configuration-accordion > li> a:before,
@@ -209,7 +212,7 @@
     font-size: 11px;
     font-weight: normal;
     content: "\f054";
-    margin: 0 10px 0 0;
+    margin: 0 13px 0 0;
 }
 .system-configuration-accordion > .accordion-group:first-child{
     border-top: 0;
