@@ -2,18 +2,18 @@
 {% import 'OroEmailBundle::macros.html.twig' as Email %}
 
 {% set widgetName = 'recent-emails' %}
-{% set widgetTitle = 'Recent Emails'|trans %}
+{% set widgetTitle = 'oro.dashboard.recent_emails.title'|trans %}
 
 {% block content %}
     {% set tabs = [{
         'url': path('oro_user_dashboard_recentemails', {'activeTab': 'inbox', 'contentType': 'tab'}),
         'name': 'inbox',
-        'label': 'Inbox'|trans
+        'label': 'oro.dashboard.recent_emails.inbox'|trans
     },
     {
         'url': path('oro_user_dashboard_recentemails', {'activeTab': 'sent', 'contentType': 'tab'}),
         'name': 'sent',
-        'label': 'Sent'|trans
+        'label': 'oro.dashboard.recent_emails.sent'|trans
     }] %}
 
     {{ parent() }}
@@ -24,7 +24,7 @@
     {% set actions = [{
         'url': path('oro_user_view', {'id': currentUserId}),
         'icon': 'envelope',
-        'label': 'View All'|trans
+        'label': 'oro.dashboard.recent_emails.view_all'|trans
     }] %}
 
     {{ parent() }}

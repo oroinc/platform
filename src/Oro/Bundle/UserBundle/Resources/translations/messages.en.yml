@@ -116,3 +116,9 @@ oro:
             groups:
                 columns:
                     name:       "Name"
+    dashboard:
+        recent_emails:
+            title:      Recent Emails
+            inbox:      Inbox
+            sent:       Sent
+            view_all:   View All
