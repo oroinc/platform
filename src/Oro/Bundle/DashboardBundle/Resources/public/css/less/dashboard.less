@@ -1,0 +1,110 @@
+@backgroundColor:  #f7f8f9;
+
+// Drop shadows
+.box-shadow(@shadow) {
+  -webkit-box-shadow: @shadow;
+  -moz-box-shadow: @shadow;
+  box-shadow: @shadow;
+}
+
+// Border Radius
+.border-radius(@radius) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
+}
+
+.fullHeight() {
+  height: 100%;
+}
+
+.launchpad-container {
+  background: @backgroundColor;
+  .responsive-block > div {
+    padding-right: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+.launchpad-widget-content > div {
+  height: 190px;
+  border: 1px solid #b6b6b6;
+  overflow: hidden;
+  .border-radius(5px);
+  .box-shadow(1px 1px 5px rgba(50, 50, 50, 0.2));
+}
+
+.launchpad-widget-content {
+  max-width: 600px;
+  margin: 0 auto;
+
+  .image-wrap {
+    background: #fff;
+    display: block;
+    width: 40%;
+    .fullHeight();
+    .widget-image {
+      display: block !important;
+      font-size: 64px;
+      width: 64px;
+      color: #cecece;
+      cursor: default;
+      margin: 0 auto;
+      &:hover {
+        color: #8baed9;
+      }
+    }
+    p {
+      padding: 35px 0 10px;
+      font-size: 17px;
+      color: #555555;
+    }
+  }
+  .list-wrap {
+    background: @backgroundColor;
+    border-left: 1px solid #e5e5e5;
+    width: 60%;
+    margin-left: -1px;
+    .fullHeight();
+    ul {
+      margin: 5px 0;
+      li > a {
+        border-bottom: 1px solid #e5e5e5;
+        font-size:14px;
+      }
+      li.last > a {
+        border: none;
+      }
+    }
+  }
+}
+
+.dashboard-widget-content {
+  .nav-tabs {
+    margin-bottom: 0;
+    .active > a,
+    .active > a:hover,
+    .active > a:focus {
+      background-color: #fff;
+    }
+  }
+  .tab-content {
+    position: relative;
+    overflow: hidden;
+  }
+  .container-fluid {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .grid-container {
+    margin-top: 0;
+    .grid {
+      border: 0;
+      margin-bottom: 0;
+    }
+    .no-data {
+      border: 0;
+      margin: 0;
+    }
+  }
+}

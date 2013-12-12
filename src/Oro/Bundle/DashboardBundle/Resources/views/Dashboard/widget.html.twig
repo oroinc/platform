@@ -1,5 +1,7 @@
-{% set widgetContentCssClass = widgetName ~ '-widget-content' %}
-<div class="widget-content dashboard-widget-content {{ widgetContentCssClass }}">
+{% set widgetId = app.request.get('_wid') %}
+{% set widgetContentId = 'widget-content-' ~ widgetId %}
+{% set widgetType = widgetType|default('dashboard') %}
+<div id="{{ widgetContentId }}" class="widget-content {{ widgetType }}-widget-content {{ widgetName }}'-widget-content">
     {% block content %}
     {% endblock %}
     <div class="widget-actions">
@@ -14,8 +16,10 @@
     <script type="text/javascript">
         require(['jquery', 'underscore', 'oro/widget-manager', 'oro/navigation'],
         function($, _, widgetManager, Navigation){
-            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+            widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
+                {% if widgetTitle is defined %}
                 widget.setTitle({{ widgetTitle|json_encode|raw }});
+                {% endif %}
                 widget.on('renderStart', function(el) {
                     var navigation = Navigation.getInstance();
                     if (navigation) {
