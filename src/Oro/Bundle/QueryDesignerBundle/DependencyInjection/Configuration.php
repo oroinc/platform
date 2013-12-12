@@ -13,7 +13,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_querydesigner');
+        $treeBuilder->root('oro_query_designer');
 
         return $treeBuilder;
     }

@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
@@ -14,9 +15,14 @@ class EntityFieldChoiceType extends AbstractType
     const NAME = 'oro_entity_field_choice';
 
     /**
+     * @var EntityProvider
+     */
+    protected $entityProvider;
+
+    /**
      * @var EntityFieldProvider
      */
-    protected $provider;
+    protected $entityFieldProvider;
 
     /**
      * @var TranslatorInterface
@@ -26,13 +32,18 @@ class EntityFieldChoiceType extends AbstractType
     /**
      * Constructor
      *
-     * @param EntityFieldProvider $provider
+     * @param EntityProvider      $entityProvider
+     * @param EntityFieldProvider $entityFieldProvider
      * @param TranslatorInterface $translator
      */
-    public function __construct(EntityFieldProvider $provider, TranslatorInterface $translator)
-    {
-        $this->provider   = $provider;
-        $this->translator = $translator;
+    public function __construct(
+        EntityProvider $entityProvider,
+        EntityFieldProvider $entityFieldProvider,
+        TranslatorInterface $translator
+    ) {
+        $this->entityProvider      = $entityProvider;
+        $this->entityFieldProvider = $entityFieldProvider;
+        $this->translator          = $translator;
     }
 
     /**
@@ -52,6 +63,21 @@ class EntityFieldChoiceType extends AbstractType
                 );
         };
 
+        $defaultConfigs = array(
+            'is_translate_option'     => false,
+            'placeholder'             => 'oro.entity.form.choose_entity_field',
+            'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
+            'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection%s.html.twig',
+            'extra_config'            => 'entity_field'
+        );
+
+        $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
+            return $that->configsNormalizer($options, $configs, $defaultConfigs);
+        };
+        $attrNormalizer    = function (Options $options, $attr) use ($that) {
+            return $that->attrNormalizer($options, $attr);
+        };
+
         $resolver->setDefaults(
             array(
                 'entity'                    => null,
@@ -60,14 +86,57 @@ class EntityFieldChoiceType extends AbstractType
                 'last_deep_level_relations' => false,
                 'choices'                   => $choices,
                 'empty_value'               => '',
-                'configs'                   => array(
-                    'is_translate_option'     => false,
-                    'placeholder'             => 'oro.entity.form.choose_entity_field',
-                    'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
-                    'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection.html.twig',
-                )
+                'skip_load_entities'        => false,
+                'configs'                   => $defaultConfigs
             )
         );
+        $resolver->setNormalizers(
+            array(
+                'configs' => $configsNormalizer,
+                'attr'    => $attrNormalizer
+            )
+        );
+    }
+
+    /**
+     * Applies dynamic attributes for 'configs' options
+     *
+     * @param Options $options
+     * @param array   $configs
+     * @param array   $defaultConfigs
+     * @return array
+     */
+    protected function configsNormalizer(Options $options, &$configs, &$defaultConfigs)
+    {
+        if ($options['multiple'] && $configs['placeholder'] === $defaultConfigs['placeholder']) {
+            $configs['placeholder'] .= 's';
+        }
+        if ($configs['selection_template_twig'] === $defaultConfigs['selection_template_twig']) {
+            $suffix = $options['multiple'] ? '_multiple' : '';
+            if ($options['with_relations']) {
+                $suffix .= '_with_relations';
+            }
+            $configs['selection_template_twig'] = sprintf($configs['selection_template_twig'], $suffix);
+        }
+        if ($options['with_relations'] && !$options['skip_load_entities']) {
+            $configs['entities'] = $this->entityProvider->getEntities();
+        }
+
+        return $configs;
+    }
+
+    /**
+     * Applies dynamic attributes for 'attr' options
+     *
+     * @param Options $options
+     * @param array   $attr
+     * @return array
+     */
+    protected function attrNormalizer(Options $options, &$attr)
+    {
+        $attr['data-entity'] = $options['entity'];
+
+        return $attr;
     }
 
     /**
@@ -85,7 +154,7 @@ class EntityFieldChoiceType extends AbstractType
         $choiceFields          = array();
         $choiceRelations       = array();
         $isRelationsWithFields = false;
-        $fields                = $this->provider->getFields(
+        $fields                = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
             true,
@@ -106,7 +175,7 @@ class EntityFieldChoiceType extends AbstractType
                     $isRelationsWithFields = true;
                     $relatedFields         = array();
                     foreach ($field['related_entity_fields'] as $relatedField) {
-                        $attributes   = [];
+                        $attributes = [];
                         foreach ($relatedField as $key => $val) {
                             if (!in_array($key, ['related_entity_fields'])) {
                                 $attributes['data-' . str_replace('_', '-', $key)] = $val;
