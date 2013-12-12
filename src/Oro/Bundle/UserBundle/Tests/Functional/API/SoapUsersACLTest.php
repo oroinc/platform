@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  * @outputBuffering enabled
  * @db_isolation
  */
-class SoapApiUsersACLTest extends WebTestCase
+class SoapUsersACLTest extends WebTestCase
 {
 
     const USER_NAME = 'user_wo_permissions';
