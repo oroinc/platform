@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
+use Symfony\Component\HttpKernel\Log\NullLogger;
+
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractConnector;
 
 class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
@@ -20,9 +24,13 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->connector = $this->getMockForAbstractClass('Oro\Bundle\IntegrationBundle\Provider\AbstractConnector');
+        $loggerStrategy  = new LoggerStrategy(new NullLogger());
+        $this->connector = $this->getMockForAbstractClass(
+            'Oro\Bundle\IntegrationBundle\Provider\AbstractConnector',
+            [new ContextRegistry(), $loggerStrategy]
+        );
 
-        $this->transport = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
+        $this->transport     = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Transport');
         $this->realTransport = $this->getMock('Oro\Bundle\IntegrationBundle\Provider\TransportInterface');
     }
 
@@ -34,50 +42,8 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
         unset($this->connector, $this->transport, $this->realTransport);
     }
 
-    /**
-     * Test connect method
-     */
-    public function testConnect()
+    public function testGetLabel()
     {
-        $this->connector->configure($this->realTransport, $this->transport);
-        $params = $this->getMock('Symfony\Component\HttpFoundation\ParameterBag');
-
-        $this->transport->expects($this->once())
-            ->method('getSettingsBag')
-            ->will($this->returnValue($params));
-
-        $this->realTransport->expects($this->once())
-            ->method('init')
-            ->with($params)
-            ->will($this->returnValue(true));
-
-        $this->realTransport->expects($this->once())
-            ->method('call');
-
-        $obj = new \ReflectionObject($this->connector);
-        $method = $obj->getMethod('call');
-        $method->setAccessible(true);
-        $method->invoke($this->connector, 'test');
-    }
-
-    /**
-     * Test init method errors
-     *
-     * @expectedException \LogicException
-     */
-    public function testConnectErrors()
-    {
-        $this->connector->connect();
-    }
-
-    /**
-     * Test protected method call
-     */
-    public function estCall()
-    {
-        $obj = new \ReflectionObject($this->connector);
-        $method = $obj->getMethod('call');
-        $method->setAccessible(true);
-        $method->invoke($this->connector, 'test');
+        $this->assertNull($this->connector->getLabel());
     }
 }

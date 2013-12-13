@@ -27,6 +27,9 @@ function(_, Backbone, AbstractWidget) {
         initialize: function(options) {
             options = options || {};
 
+            if (!_.isFunction(this.options.template)) {
+                this.options.template = _.template(this.options.template);
+            }
             this.widget = Backbone.$(this.options.template({
                 'title': this.options.title,
                 'contentClasses': this.options.contentClasses
