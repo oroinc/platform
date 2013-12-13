@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  * @outputBuffering enabled
  * @db_isolation
  */
-class RestApiUsersACLTest extends WebTestCase
+class RestUsersACLTest extends WebTestCase
 {
     const USER_NAME = 'user_wo_permissions';
     const USER_PASSWORD = 'user_api_key';
@@ -36,7 +36,7 @@ class RestApiUsersACLTest extends WebTestCase
         self::$hasLoaded = true;
     }
 
-    public function testApiCreateUser()
+    public function testCreateUser()
     {
         $request = array(
             "user" => array (
@@ -55,7 +55,7 @@ class RestApiUsersACLTest extends WebTestCase
         ToolsAPI::assertJsonResponse($result, 403);
     }
 
-    public function testApiGetUsers()
+    public function testGetUsers()
     {
         //get user id
         $this->client->request('GET', $this->client->generate('oro_api_get_users'), array('limit' => 100));
@@ -63,7 +63,7 @@ class RestApiUsersACLTest extends WebTestCase
         ToolsAPI::assertJsonResponse($result, 403);
     }
 
-    public function testApiGetUser()
+    public function testGetUser()
     {
         //open user by id
         $this->client->request(
@@ -74,7 +74,7 @@ class RestApiUsersACLTest extends WebTestCase
         ToolsAPI::assertJsonResponse($result, 403);
     }
 
-    public function testApiUpdateUser()
+    public function testUpdateUser()
     {
         $request = array(
             "user" => array (
@@ -96,7 +96,7 @@ class RestApiUsersACLTest extends WebTestCase
         ToolsAPI::assertJsonResponse($result, 403);
     }
 
-    public function testApiDeleteUser()
+    public function testDeleteUser()
     {
         $this->client->request(
             'DELETE',

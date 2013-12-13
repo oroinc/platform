@@ -5,12 +5,13 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\UserBundle\Entity\Role;
 
 /**
  * @outputBuffering enabled
  * @db_isolation
  */
-class SoapRolesApiTest extends WebTestCase
+class SoapRolesTest extends WebTestCase
 {
     /** Default value for role label */
     const DEFAULT_VALUE = 'ROLE_LABEL';
@@ -44,6 +45,29 @@ class SoapRolesApiTest extends WebTestCase
         $id = $this->client->getSoap()->createRole($request);
         $this->assertInternalType('int', $id);
         $this->assertGreaterThan(0, $id);
+
+        return $id;
+    }
+
+    public function testGetRoleByName()
+    {
+        $this->client->getKernel()->boot();
+        $roles = $this->client->getContainer()->get('doctrine.orm.entity_manager')->getRepository('OroUserBundle:Role');
+        /** @var Role $managerRole */
+        $managerRole = $roles->findOneBy(array('label' => 'Manager'));
+        $roleByName =  $this->client->getSoap()->getRoleByName('Manager');
+        $roleByName = ToolsAPI::classToArray($roleByName);
+        $this->assertEquals($managerRole->getLabel(), $roleByName['label']);
+        $this->assertEquals($managerRole->getId(), $roleByName['id']);
+    }
+
+    /**
+     * @expectedException \SoapFault
+     * @expectedExceptionMessage Role "NonExistRole" can not be found
+     */
+    public function testGetRoleByNameException()
+    {
+        $this->client->getSoap()->getRoleByName('NonExistRole');
     }
 
     /**
@@ -74,7 +98,7 @@ class SoapRolesApiTest extends WebTestCase
      * @depends testUpdateRole
      * @return array
      */
-    public function testGetRole()
+    public function testGetRoles()
     {
         //get roles
         $roles =  $this->client->getSoap()->getRoles();
@@ -92,7 +116,7 @@ class SoapRolesApiTest extends WebTestCase
     }
 
     /**
-     * @depends testGetRole
+     * @depends testGetRoles
      * @param array $roles
      */
     public function testDeleteRoles($roles)

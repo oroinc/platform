@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  * @outputBuffering enabled
  * @db_isolation
  */
-class SoapGroupsApiTest extends WebTestCase
+class SoapGroupsTest extends WebTestCase
 {
     /** @var Client */
     protected $client;

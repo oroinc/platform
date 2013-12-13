@@ -184,8 +184,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
      * ============================================================ */
     (function () {
         /* dynamic height for central column */
-        var debugBar = $('.sf-toolbar'),
-            anchor = $('#bottom-anchor'),
+        var anchor = $('#bottom-anchor'),
             content = false;
 
         var initializeContent = function () {
@@ -198,19 +197,32 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         var adjustHeight = function () {
             initializeContent();
 
-            var debugBarHeight = debugBar.length && debugBar.is(':visible') ? debugBar.height() : 0,
-                anchorTop = anchor.position().top;
+            var debugBar = $('.sf-toolbar');
+            var debugBarHeight = debugBar.length && debugBar.is(':visible') ? debugBar.height() : 0;
+            var anchorTop = anchor.position().top;
+            var footerHeight = $('#footer').height();
+            var fixContent = 1;
 
             $(content.get().reverse()).each(function (pos, el) {
                 el = $(el);
-                el.height(anchorTop - el.position().top - debugBarHeight);
+                el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
             });
 
             layout.adjustScrollspy();
+
+            var fixDialog = 2;
+            var dialogContainerBottom = $('.sf-toolbar').height() + $('#footer').height();
+
+            $('#dialog-extend-fixed-container').css({
+                position: 'fixed',
+                bottom: dialogContainerBottom + fixDialog,
+                zIndex: 9999
+            });
         };
 
         var tries = 0;
         var waitForDebugBar = function () {
+            var debugBar = $('.sf-toolbar');
             if (debugBar.children().length) {
                 window.setTimeout(adjustHeight, 500);
             } else if (tries < 100) {
@@ -237,6 +249,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         }
 
         mediator.once("page-rendered", function () {
+            var debugBar = $('.sf-toolbar');
             if (debugBar.length) {
                 waitForDebugBar();
             } else {
@@ -247,6 +260,8 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         $(window).on('resize', adjustHeight);
 
         mediator.bind("hash_navigation_request:complete", adjustReloaded);
+
+        mediator.bind('layout:adjustHeight', adjustHeight);
     }());
 
     /* ============================================================
