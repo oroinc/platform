@@ -102,6 +102,10 @@ class OroNavigationExtension extends Extension
         }
     }
 
+    /**
+     * @param array $config
+     * @param array $configPart
+     */
     protected function reorganizeTree(array &$config, array &$configPart)
     {
         if (!empty($configPart['children'])) {
@@ -123,6 +127,10 @@ class OroNavigationExtension extends Extension
         }
     }
 
+    /**
+     * @param array $config
+     * @param string $childName
+     */
     protected function removeItem(array &$config, $childName)
     {
         if (!empty($config['children'])) {
@@ -136,6 +144,11 @@ class OroNavigationExtension extends Extension
         }
     }
 
+    /**
+     * @param array $config
+     * @param $childName
+     * @return array|null
+     */
     protected function getMenuItemByName(array $config, $childName)
     {
         if (!empty($config['children'])) {
