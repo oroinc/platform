@@ -335,7 +335,9 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             var keys = ['date', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
-                'firstDay', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort'];
+                'firstDay', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
+                'contentHeight'
+            ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
                 if (_.isString(options.date)) {

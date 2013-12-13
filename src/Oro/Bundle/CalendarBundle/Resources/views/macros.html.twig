@@ -37,7 +37,7 @@
 </script>
 {% endmacro %}
 
-{% macro renderCalendar(containerSelector, entity, startDate, endDate, calendar, eventsOptions, connectionsOptions) %}
+{% macro renderCalendar(containerSelector, entity, startDate, endDate, calendar, eventsOptions, connectionsOptions, callbackMacro) %}
 <script type="text/javascript">
     require(['jquery', 'underscore', 'oro/calendar', 'oro/calendar/event/collection',
         'oro/calendar/connection/collection', 'oro/locale-settings'],
@@ -65,6 +65,9 @@
                 subordinate: true,
                 containerSelector: {{ eventsOptions.containerSelector|json_encode|raw }},
                 itemFormTemplateSelector: {{ eventsOptions.itemFormTemplateSelector|json_encode|raw }},
+                {% if eventsOptions.contentHeight is defined %}
+                contentHeight: {{ eventsOptions.contentHeight|json_encode|raw }},
+                {% endif %}
                 date: "{{ 'now'|date('Y-m-d') }}",
                 firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1,
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
@@ -115,6 +118,10 @@
         $(function() {
             var calendar = new Calendar(options);
             calendar.render();
+            {% if eventsOptions.renderCompleteCallback is defined %}
+            var renderCompleteCallback = {{ eventsOptions.renderCompleteCallback|raw }};
+            renderCompleteCallback(calendar);
+            {% endif %}
             calendar.$el.data('calendar', calendar);
         });
     });
