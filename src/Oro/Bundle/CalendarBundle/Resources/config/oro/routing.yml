@@ -3,7 +3,7 @@ oro_calendar:
     type:         annotation
     prefix:       /calendar
 
-oro_calendar:
+oro_calendar_dashboard:
     resource:     "@OroCalendarBundle/Controller/Dashboard"
     type:         annotation
     prefix:       /dashboard
