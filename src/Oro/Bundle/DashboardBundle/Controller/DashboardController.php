@@ -10,10 +10,9 @@ class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/{bundle}/{name}/{_format}",
+     *      "/{bundle}/{name}",
      *      name="oro_dashboard_widget",
-     *      requirements={"bundle"="\w+", "name"="\w+", "_format"="html|json"},
-     *      defaults={"_format" = "html"}
+     *      requirements={"bundle"="\w+", "name"="\w+"}
      * )
      */
     public function widgetAction($bundle, $name)

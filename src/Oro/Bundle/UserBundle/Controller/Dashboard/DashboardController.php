@@ -11,10 +11,10 @@ class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/recent_emails/{activeTab}/{contentType}/{_format}",
+     *      "/recent_emails/{activeTab}/{contentType}",
      *      name="oro_user_dashboard_recent_emails",
-     *      requirements={"activeTab"="inbox|sent", "contentType"="full|tab", "_format"="html|json"},
-     *      defaults={"activeTab" = "inbox", "contentType" = "full", "_format" = "html"}
+     *      requirements={"activeTab"="inbox|sent", "contentType"="full|tab"},
+     *      defaults={"activeTab" = "inbox", "contentType" = "full"}
      * )
      */
     public function recentEmailsAction($activeTab, $contentType)

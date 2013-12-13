@@ -11,10 +11,8 @@ class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/calendar/{_format}",
-     *      name="oro_calendar_dashboard_calendar",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
+     *      "/calendar",
+     *      name="oro_calendar_dashboard_calendar"
      * )
      * @Template("OroCalendarBundle:Dashboard:calendar.html.twig")
      */
