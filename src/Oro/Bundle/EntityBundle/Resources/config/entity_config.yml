@@ -55,6 +55,7 @@ oro_entity_config:
 
                 description:
                     options:
+                        translatable:       true
                         priority:           50
                     constraints:
                         - Length:
@@ -81,13 +82,14 @@ oro_entity_config:
                             min:            2
                             max:            50
                     grid:
-                        type:               string
+                        type:               html
                         label:              'Label'
                         filter_type:        string
                         required:           true
                         sortable:           true
                         filterable:         false
                         show_filter:        false
+                        template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
                         type:               text
                         options:
@@ -96,6 +98,7 @@ oro_entity_config:
 
                 description:
                     options:
+                        translatable:       true
                         priority:           30
                     constraints:
                         - Length:
