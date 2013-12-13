@@ -1,7 +1,0 @@
-label: Purple Theme
-icon: bundles/oroui/themes/purple/images/favicon.ico
-logo: bundles/oroui/themes/purple/images/logo.png
-styles:
-    variables: bundles/oroui/themes/purple/css/variables.less
-    main: bundles/oroui/themes/purple/css/main.less
-
