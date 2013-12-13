@@ -6,12 +6,17 @@ use Doctrine\Common\Annotations\Reader as CommonAnnotationsReader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class AnnotationsReader extends Reader
+class AnnotationsReader implements ReaderInterface
 {
     /**
      * @var \Doctrine\Common\Annotations\Reader
      */
     private $reader;
+
+    /**
+     * @var array
+     */
+    protected $bundles;
 
     /**
      * @var array
@@ -22,8 +27,7 @@ class AnnotationsReader extends Reader
 
     public function __construct(KernelInterface $kernel, CommonAnnotationsReader $reader)
     {
-        parent::__construct($kernel);
-
+        $this->bundles = $kernel->getBundles();
         $this->reader = $reader;
     }
 
@@ -166,5 +170,23 @@ class AnnotationsReader extends Reader
         }
 
         return $result;
+    }
+
+    /**
+     * Get dir array of bundles
+     *
+     * @return array
+     */
+    protected function getScanDirectories()
+    {
+        $directories = false;
+        $bundles = $this->bundles;
+
+        foreach ($bundles as $bundle) {
+            /** @var $bundle \Symfony\Component\HttpKernel\Bundle\BundleInterface  */
+            $directories[] = $bundle->getPath();
+        }
+
+        return $directories;
     }
 }
