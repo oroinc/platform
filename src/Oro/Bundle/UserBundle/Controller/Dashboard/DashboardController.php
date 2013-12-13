@@ -19,7 +19,7 @@ class DashboardController extends Controller
      */
     public function recentEmailsAction($activeTab, $contentType)
     {
-        $currentUserId    = $this->get('security.context')->getToken()->getUser()->getId();
+        $currentUserId    = $this->getUser()->getId();
         $renderMethod     = ($contentType === 'tab') ? 'render' : 'renderView';
         $activeTabContent = $this->$renderMethod(
             'OroUserBundle:Dashboard:recentEmailsGrid.html.twig',
