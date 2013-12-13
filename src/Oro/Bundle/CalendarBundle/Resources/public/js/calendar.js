@@ -2,11 +2,11 @@
 /* global define */
 define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oro/loading-mask',
     'oro/calendar/event/collection', 'oro/calendar/event/model', 'oro/calendar/event/view',
-    'oro/calendar/connection/collection', 'oro/calendar/connection/view', 'oro/formatter/datetime',
-    'jquery.fullcalendar'],
+    'oro/calendar/connection/collection', 'oro/calendar/connection/view', 'oro/calendar/color-manager',
+    'oro/formatter/datetime', 'jquery.fullcalendar'],
 function(_, Backbone, __, app, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
-         ConnectionCollection, ConnectionView, dateTimeFormatter) {
+         ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -57,6 +57,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         fullCalendar: null,
         eventView: null,
         loadingMask: null,
+        colorManager: null,
 
         initialize: function() {
             // init event collection
@@ -72,6 +73,8 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             this.listenTo(this.getCollection(), 'add', this.onEventAdded);
             this.listenTo(this.getCollection(), 'change', this.onEventChanged);
             this.listenTo(this.getCollection(), 'destroy', this.onEventDeleted);
+
+            this.colorManager = new ColorManager();
         },
 
         getEventsView: function (model) {
@@ -239,7 +242,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             fcEvent.start = dateTimeFormatter.unformatBackendDateTime(fcEvent.start);
             fcEvent.end = dateTimeFormatter.unformatBackendDateTime(fcEvent.end);
             // set an event text and background colors the same as the owning calendar
-            var colors = this.connectionsView.getCalendarColors(fcEvent.calendar);
+            var colors = this.colorManager.getCalendarColors(fcEvent.calendar);
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
         },
@@ -315,13 +318,6 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         initializeFullCalendar: function () {
             // prepare options for jQuery FullCalendar control
             var options = {
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay',
-                    ignoreTimezone: false,
-                    allDayDefault: false
-                },
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
@@ -334,16 +330,10 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                     } else {
                         this._hideMask();
                     }
-                }, this),
-                allDayText: __('all-day'),
-                buttonText: {
-                    today: __('today'),
-                    month: __('month'),
-                    week: __('week'),
-                    day: __('day')
-                }
+                }, this)
             };
             var keys = ['date', 'defaultView', 'editable', 'selectable',
+                'header', 'allDayText', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'firstDay', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort'];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
@@ -384,7 +374,8 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 el: connectionsContainer,
                 collection: this.options.connectionsOptions.collection,
                 calendar: this.options.calendar,
-                itemTemplateSelector: this.options.connectionsOptions.itemTemplateSelector
+                itemTemplateSelector: this.options.connectionsOptions.itemTemplateSelector,
+                colorManager: this.colorManager
             });
 
             this.listenTo(this.connectionsView, 'connectionAdd', this.onConnectionAddedOrDeleted);
@@ -392,10 +383,28 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             this.listenTo(this.connectionsView, 'connectionRemove', this.onConnectionAddedOrDeleted);
         },
 
+        loadConnectionColors: function () {
+            var lastBackgroundColor = null;
+            this.options.connectionsOptions.collection.each(_.bind(function (connection) {
+                var obj = connection.toJSON();
+                this.colorManager.applyColors(obj, function () {
+                    return lastBackgroundColor;
+                });
+                this.colorManager.setCalendarColors(obj.calendar, obj.color, obj.backgroundColor);
+                lastBackgroundColor = obj.backgroundColor;
+            }, this));
+        },
+
         render: function() {
             // init views
             this.initCalendarContainer();
-            this.initializeConnectionsView();
+            if (_.isUndefined(this.options.connectionsOptions.containerTemplateSelector)) {
+                // connections management is not required - just load connections' colors and forged about connections
+                this.loadConnectionColors();
+                delete this.options.connectionsOptions;
+            } else {
+                this.initializeConnectionsView();
+            }
             // initialize jQuery FullCalendar control
             this.initializeFullCalendar();
 
