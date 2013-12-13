@@ -1,9 +1,32 @@
+.left-sidebar-container {
+    background-color: white;
+}
+.left-sidebar-container > .placeholder {
+    margin-left: 334px;
+    background-color: #f1f1f1;
+    border-left: 1px solid #e2e2e2;
+}
+.left-sidebar-container > .placeholder > * {
+    margin-left: -335px;
+}
+.left-sidebar-container > .placeholder > * > .sidebar{
+    float: left;
+    width: 334px;
+    border-top: 1px solid #f2f2f2;
+}
+.left-sidebar-container > .placeholder > * > .content{
+    margin-left: 335px;
+    padding: 15px 15px 0;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+
 .system-configuration-container {
-    padding-top: 10px;
 }
 
 .system-configuration-container .scrollspy-title {
-    margin-left: -18px;
 }
 
 .system-configuration-container .nav.nav-tabs > .active > a,
@@ -17,16 +40,14 @@
     color: #D6D8DA;
 }
 
-.system-configuration-container .system-configuration-sidebar dl {
-    margin: 0;
-}
-
 .system-configuration-container .row-fluid-divider {
     background-position: 16% 0;
 }
 
 .system-configuration-container .controls.control-subgroup {
-    margin: 0;
+    width: 295px;
+    margin: 0 15px 0 0;
+    float: left;
 }
 
 .system-configuration-container .parent-scope-checkbox label {
@@ -36,4 +57,224 @@
 .search-header .configuration-search-form {
     margin-top: 0;
     margin-bottom: 16px;
+}
+.scrollable-container .container-fluid.configuration-header{
+    background-color: #fff;
+}
+.scrollable-container .container-fluid.configuration-header h1{
+    font-size: 20px;
+    line-height: 28px;
+    float: left;
+}
+.scrollable-container .container-fluid.configuration-header .pull-right{
+    margin: 10px 0;
+}
+.system-configuration-content .accordion .accordion-inner{
+    padding: 27px 30px 9px;
+}
+.system-configuration-content .accordion{
+    margin-bottom: 15px;
+}
+.system-configuration-content .accordion-group {
+    background-color: #fff;
+}
+.system-configuration-content .accordion .accordion-heading .accordion-toggle{
+    color: #727272;
+    font-size: 13px;
+    font-family: 'HelveticaNeue bold', helvetica, Arial, sans-serif;
+    font-weight: bold;
+}
+.system-configuration-content .accordion .accordion-heading .accordion-toggle:before{
+    content: '−';
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    font-weight: normal;
+    border: 1px solid #c3c3c3;
+    margin-right: 12px;
+    background-color: #fcfcfc;
+    font-size: 12px;
+    line-height: 13px;
+    text-align: center;
+    color: #727272;
+    background-image: -moz-linear-gradient(left, #fcfcfc, #e9e9e9);
+    background-image: -webkit-gradient(linear, 0 0, 100% 0, from(#fcfcfc), to(#e9e9e9));
+    background-image: -webkit-linear-gradient(left, #fcfcfc, #e9e9e9);
+    background-image: -o-linear-gradient(left, #fcfcfc, #e9e9e9);
+    background-image: linear-gradient(to right, #fcfcfc, #e9e9e9);
+}
+.system-configuration-content .accordion .accordion-heading .accordion-toggle.collapsed:before{
+    content: '+';
+}
+.controls .parent-scope-checkbox{
+    float: left;
+}
+.controls .parent-scope-checkbox label{
+    margin: 0 15px 0 0;
+}
+.inline.small-text > li.separator{
+    padding: 0;
+    line-height: 12px;
+}
+.inline.small-text > li{
+    line-height: 12px;
+}
+
+.system-configuration-content .accordion-heading ul.inline{
+    margin: 8px 7px 0 0;
+}
+.system-configuration-content select{
+    width: 280px;
+}
+.system-configuration-search{
+    padding: 15px;
+}
+.system-configuration-search .icon-search{
+    color : #ccc;
+}
+.system-configuration-search .input-append input[type="search"],
+.system-configuration-search .input-append input[type="text"]{
+    border-color: #ddd;
+    border-width: 1px 0 1px 1px;
+    width: 260px;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.system-configuration-search .input-append button{
+    background-color: #fff;
+    background-image: -moz-linear-gradient(left, #ffffff, #ffffff);
+    background-image: -webkit-gradient(linear, 0 0, 100% 0, from(#ffffff), to(#ffffff));
+    background-image: -webkit-linear-gradient(left, #ffffff, #ffffff);
+    background-image: -o-linear-gradient(left, #ffffff, #ffffff);
+    background-image: linear-gradient(to right, #ffffff, #ffffff);
+    border-color: #ddd;
+    border-width: 1px 1px 1px 0;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 30px;
+
+}
+.system-configuration-search .input-append input:focus,
+.system-configuration-search .input-prepend input:focus,
+.system-configuration-search .input-append select:focus,
+.system-configuration-search .input-prepend select:focus,
+.system-configuration-search .input-append .uneditable-input:focus,
+.system-configuration-search .input-prepend .uneditable-input:focus{
+   -webkit-box-shadow: none;
+   box-shadow: none;
+}
+
+.system-configuration-accordion{
+    padding: 0 0 0 15px;
+    list-style: none;
+    margin: 0;
+}
+.system-configuration-accordion a{
+    color: #727272;
+}
+.system-configuration-accordion > li> a,
+.system-configuration-accordion > .accordion-group{
+    background-color: #f4f4f4;
+    border-right: 0;
+    border-left: 0;
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #e6e6e6;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    display: block;
+    margin: 0;
+}
+.system-configuration-accordion .accordion-inner{
+    background-color: #fff;
+    padding-left: 0;
+    padding-right: 0;
+}
+.system-configuration-accordion .accordion-body .accordion-inner{
+    padding: 0;
+}
+.system-configuration-accordion ul > .accordion-group > .accordion-heading a,
+.system-configuration-accordion > li> a,
+.system-configuration-accordion > .accordion-group > .accordion-heading a{
+    font-family: "helveticaneue bold", helvetica, Arial, sans-serif;
+    font-weight: bold;
+    padding: 8px 15px;
+    display: block;
+}
+.system-configuration-accordion > .accordion-group > .accordion-heading a{
+    text-transform: uppercase;
+    font-size: 12px;
+
+}
+.system-configuration-accordion ul > .accordion-group > .accordion-heading a:before,
+.system-configuration-accordion > .accordion-group > .accordion-heading a:before{
+    font-family: 'FontAwesome';
+    font-weight: normal;
+    content: "\f078";
+    font-size: 11px;
+    margin: 0 10px 0 0;
+}
+.system-configuration-accordion ul > .accordion-group > .accordion-heading a.collapsed:before,
+.system-configuration-accordion > li> a:before,
+.system-configuration-accordion > .accordion-group > .accordion-heading a.collapsed:before{
+    font-family: 'FontAwesome';
+    font-size: 11px;
+    font-weight: normal;
+    content: "\f054";
+    margin: 0 13px 0 0;
+}
+.system-configuration-accordion > .accordion-group:first-child{
+    border-top: 0;
+}
+.system-configuration-accordion > .accordion-group:last-child{
+    border-bottom: 0;
+}
+.system-configuration-accordion ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.system-configuration-accordion ul > .accordion-group{
+    -webkit-border-radius: 0;
+    border-radius:0;
+    margin-bottom: 0;
+    border: 0;
+}
+.system-configuration-accordion ul > .accordion-group > .accordion-heading a{
+    padding-left: 30px;
+    font-weight: normal;
+}
+.system-configuration-accordion ul > .accordion-group > .accordion-heading a:hover{
+    background-color: #f4f4f4;
+}
+.system-configuration-accordion ul > li > a:hover{
+    background-color: #f4f4f4;
+}
+.system-configuration-accordion ul > li > a:before{
+    content: ".";
+    font-size: 32px;
+    height: 21px;
+    margin: 0 11px 0 0;
+    overflow: hidden;
+    position: relative;
+    top: -2px;
+    display: inline-block;
+}
+.system-configuration-accordion ul > li.accordion-group > a{
+    list-style: none;
+}
+.system-configuration-accordion ul > li > a{
+    padding: 8px 15px 8px 30px;
+    display: block;
+}
+.system-configuration-accordion .accordion-inner .accordion-inner{
+    border: 0;
+}
+.system-configuration-accordion ul > .accordion-group > .accordion-heading{
+
+}
+.system-configuration-accordion .accordion-inner .accordion-inner ul li a:before{
+    display: none;
+}
+.system-configuration-accordion .accordion-inner .accordion-inner ul li a{
+    padding-left: 45px;
 }
