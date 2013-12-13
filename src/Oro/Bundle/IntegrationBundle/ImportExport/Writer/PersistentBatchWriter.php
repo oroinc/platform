@@ -6,6 +6,9 @@ use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
 class PersistentBatchWriter extends EntityWriter
 {
+    /**
+     * {@inheritdoc}
+     */
     public function write(array $items)
     {
         try {
