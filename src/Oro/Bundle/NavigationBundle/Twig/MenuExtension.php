@@ -8,8 +8,6 @@ use Knp\Menu\Provider\MenuProviderInterface;
 
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 class MenuExtension extends \Twig_Extension
 {
     const MENU_NAME = 'oro_menu';
@@ -27,9 +25,9 @@ class MenuExtension extends \Twig_Extension
     private $provider;
 
     /**
-     * @var ContainerInterface $container
+     * @var array $menuConfiguration
      */
-    protected $container;
+    protected $menuConfiguration;
 
     /**
      * @var BreadcrumbManager
@@ -40,18 +38,23 @@ class MenuExtension extends \Twig_Extension
      * @param Helper $helper
      * @param MenuProviderInterface $provider
      * @param BreadcrumbManager $breadcrumbManager
-     * @param ContainerInterface $container
      */
     public function __construct(
         Helper $helper,
         MenuProviderInterface $provider,
-        BreadcrumbManager $breadcrumbManager,
-        ContainerInterface $container
+        BreadcrumbManager $breadcrumbManager
     ) {
         $this->helper = $helper;
         $this->provider = $provider;
         $this->breadcrumbManager = $breadcrumbManager;
-        $this->container = $container;
+    }
+
+    /**
+     * @param array $configuration
+     */
+    public function setMenuConfiguration(array $configuration)
+    {
+        $this->menuConfiguration = $configuration;
     }
 
     /**
@@ -101,12 +104,9 @@ class MenuExtension extends \Twig_Extension
         }
 
         $menuType = $menu->getExtra('type');
-        if (!empty($menuType)) {
-            $menuConfig = $this->container->getParameter('oro_menu_config');
-            if (!empty($menuConfig['templates'][$menuType])) {
-                // rewrite config options with args
-                $options = array_replace_recursive($menuConfig['templates'][$menuType], $options);
-            }
+        // rewrite config options with args
+        if (!empty($menuType) && !empty($this->menuConfiguration['templates'][$menuType])) {
+            $options = array_replace_recursive($this->menuConfiguration['templates'][$menuType], $options);
         }
 
         return $this->helper->render($menu, $options, $renderer);
@@ -155,7 +155,6 @@ class MenuExtension extends \Twig_Extension
      *
      * @return ItemInterface
      *
-     * @throws \LogicException
      * @throws \InvalidArgumentException when the path is invalid
      */
     public function getMenu($menu, array $path = array(), array $options = array())
