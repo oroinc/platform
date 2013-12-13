@@ -15,7 +15,7 @@
     }) %}
     {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
     <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post"
-          data-collect="true" style="margin:0">
+          data-collect="true">
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
         {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
     </form>
