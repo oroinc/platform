@@ -1,0 +1,5 @@
+label: Demo Theme
+icon: bundles/oroui/themes/demo/images/favicon.ico
+styles:
+    - bundles/oroui/themes/purple/css/main.less
+
