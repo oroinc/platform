@@ -30,12 +30,8 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'empty' => array(
-                'configs' => array(
-                    array()
-                ),
-                'expected' => array(
-                    'themes' => array()
-                )
+                'configs' => array(array()),
+                'expected' => array('themes' => array())
             ),
             'full' => array(
                 'configs' => array(
@@ -57,9 +53,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'themes' => array(
                         'foo' => array(
                             'label' => 'Foo Theme',
-                            'styles' => array(
-                                'style.css'
-                            ),
+                            'styles' => array('style.css'),
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
@@ -110,19 +104,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'themes' => array(
                         'foo' => array(
                             'label' => 'Foo Theme',
-                            'styles' => array(
-                                'style.css'
-                            ),
+                            'styles' => array('style.css'),
                             'logo' => 'logo.png',
                             'icon' => 'favicon.ico',
                             'screenshot' => 'screenshot.png'
                         ),
                         'bar' => array(
                             'label' => 'Bar Extended Theme',
-                            'styles' => array(
-                                'style.css',
-                                'style-extended.css'
-                            ),
+                            'styles' => array('style.css', 'style-extended.css'),
                             'logo' => 'logo-extended.png',
                             'icon' => 'favicon-extended.ico',
                             'screenshot' => 'screenshot-extended.png'

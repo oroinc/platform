@@ -48,7 +48,12 @@ class OroAsseticGroupsCommand extends ContainerAwareCommand
         $this->writeGroups($cssGroups, $debugGroups, $output);
     }
 
-    protected function writeGroups($groups, $debugGroups, $output)
+    /**
+     * @param array $groups
+     * @param array $debugGroups
+     * @param OutputInterface $output
+     */
+    protected function writeGroups(array $groups, array $debugGroups, OutputInterface $output)
     {
         foreach ($groups as $group) {
             if (in_array($group, $debugGroups)) {

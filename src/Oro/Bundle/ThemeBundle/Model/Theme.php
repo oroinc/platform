@@ -30,7 +30,7 @@ class Theme
     protected $logo;
 
     /**
-     * @var string $name
+     * @var string
      */
     protected $screenshot;
 

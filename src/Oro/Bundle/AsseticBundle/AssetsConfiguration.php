@@ -127,7 +127,7 @@ class AssetsConfiguration
     /**
      * Get value of configuration option
      *
-     * @param $optionName
+     * @param string $optionName
      * @param mixed $defaultValue
      * @return mixed
      */
@@ -143,7 +143,7 @@ class AssetsConfiguration
     /**
      * Set value of configuration option
      *
-     * @param $optionName
+     * @param string $optionName
      * @param mixed $value
      */
     protected function setOption($optionName, $value)
