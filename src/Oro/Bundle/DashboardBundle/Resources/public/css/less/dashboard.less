@@ -1,3 +1,4 @@
+@import "../../../oroui/css/less/mixins";
 @backgroundColor:  #f7f8f9;
 
 // Drop shadows
@@ -105,6 +106,45 @@
     .no-data {
       border: 0;
       margin: 0;
+    }
+  }
+}
+
+.quick-launchpad-toolbar{
+  width: 100%;
+  margin: 0;
+  list-style: none;
+  & > li{
+    float: left;
+    border-left: 1px solid #eaeaea;
+    padding: 15px 0 25px;
+    text-align: center;
+    /* width: 20%; calculated on backend and depends on a number of items */
+    #gradient > .vertical(#ffffff, #f7f7f7);
+    &:first-child{
+      border: 0;
+    }
+    &:hover{
+      #gradient > .vertical(#f7f7f7, #ffffff);
+    }
+    .title-box{
+      margin-bottom: 19px;
+      display: block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 100%;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .list-content{
+      display: block;
+       i{
+        font-size: 35px;
+        color: #444;
+      }
+    }
+    a{
+      color: #444;
     }
   }
 }
