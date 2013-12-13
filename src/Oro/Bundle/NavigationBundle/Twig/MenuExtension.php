@@ -104,11 +104,9 @@ class MenuExtension extends \Twig_Extension
         }
 
         $menuType = $menu->getExtra('type');
-        if (!empty($menuType)) {
-            if (!empty($this->menuConfiguration['templates'][$menuType])) {
-                // rewrite config options with args
-                $options = array_replace_recursive($this->menuConfiguration['templates'][$menuType], $options);
-            }
+        // rewrite config options with args
+        if (!empty($menuType) && !empty($this->menuConfiguration['templates'][$menuType])) {
+            $options = array_replace_recursive($this->menuConfiguration['templates'][$menuType], $options);
         }
 
         return $this->helper->render($menu, $options, $renderer);
@@ -157,7 +155,6 @@ class MenuExtension extends \Twig_Extension
      *
      * @return ItemInterface
      *
-     * @throws \LogicException
      * @throws \InvalidArgumentException when the path is invalid
      */
     public function getMenu($menu, array $path = array(), array $options = array())

@@ -81,18 +81,18 @@ class OroNavigationExtension extends Extension
      */
     protected function mergeMenuConfig(array &$config, array &$configPart)
     {
-        foreach ($configPart as $entity => $entityConfig) {
-            if (array_key_exists('tree', $configPart)) {
-                foreach ($configPart['tree'] as $type => &$menuPartConfig) {
-                    if (isset($config[self::MENU_CONFIG_KEY]['tree'][$type])
-                        && is_array($config[self::MENU_CONFIG_KEY]['tree'][$type])
-                        && is_array($menuPartConfig)
-                    ) {
-                        $this->reorganizeTree($config[self::MENU_CONFIG_KEY]['tree'][$type], $menuPartConfig);
-                    }
+        if (array_key_exists('tree', $configPart)) {
+            foreach ($configPart['tree'] as $type => &$menuPartConfig) {
+                if (isset($config[self::MENU_CONFIG_KEY]['tree'][$type])
+                    && is_array($config[self::MENU_CONFIG_KEY]['tree'][$type])
+                    && is_array($menuPartConfig)
+                ) {
+                    $this->reorganizeTree($config[self::MENU_CONFIG_KEY]['tree'][$type], $menuPartConfig);
                 }
             }
+        }
 
+        foreach ($configPart as $entity => $entityConfig) {
             if (isset($config[self::MENU_CONFIG_KEY][$entity])) {
                 $config[self::MENU_CONFIG_KEY][$entity] =
                     array_replace_recursive($config[self::MENU_CONFIG_KEY][$entity], $entityConfig);
