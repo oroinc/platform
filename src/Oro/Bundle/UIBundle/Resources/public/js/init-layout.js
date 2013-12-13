@@ -201,10 +201,9 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         var adjustHeight = function () {
             initializeContent();
 
-            var debugBar = $('.sf-toolbar');
-            var debugBarHeight = debugBar.length && debugBar.is(':visible') ? debugBar.height() : 0;
+            var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
             var anchorTop = anchor.position().top;
-            var footerHeight = $('#footer').height();
+            var footerHeight = $('#footer:visible').height() || 0;
             var fixContent = 1;
 
             $(content.get().reverse()).each(function (pos, el) {
