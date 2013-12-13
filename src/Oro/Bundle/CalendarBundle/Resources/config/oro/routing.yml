@@ -3,6 +3,11 @@ oro_calendar:
     type:         annotation
     prefix:       /calendar
 
+oro_calendar:
+    resource:     "@OroCalendarBundle/Controller/Dashboard"
+    type:         annotation
+    prefix:       /dashboard
+
 oro_calendar_api:
     resource: "@OroCalendarBundle/Resources/config/oro/routing_api.yml"
     type: rest
