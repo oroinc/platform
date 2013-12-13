@@ -1,6 +1,13 @@
 oro:
     calendar:
-        form.choose_user_to_add_calendar: "Choose a user to add a calendar ..."
+        form:
+            choose_user_to_add_calendar: Choose a user to add a calendar ...
+        control:
+            all_day: ""
+            today:   today
+            month:   month
+            week:    week
+            day:     day
     dashboard:
         calendar:
             new_event: New Event
@@ -12,8 +19,3 @@ oro:
 "Delete": "Delete"
 "Delete event": "Delete event"
 "Are you sure you want to delete this event?": "Are you sure you want to delete this event?"
-"all-day": "all-day"
-"today": "today"
-"month": "month"
-"week": "week"
-"day": "day"

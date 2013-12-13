@@ -82,12 +82,12 @@
                     allDayDefault: false
                 },
                 defaultView: {{ eventsOptions.defaultView|default('month')|json_encode|raw }},
-                allDayText: {{ 'all-day'|trans|json_encode|raw }},
+                allDayText: {{ 'oro.calendar.control.all_day'|trans|json_encode|raw }},
                 buttonText: {
-                    today: {{ 'today'|trans|json_encode|raw }},
-                    month: {{ 'month'|trans|json_encode|raw }},
-                    week: {{ 'week'|trans|json_encode|raw }},
-                    day: {{ 'day'|trans|json_encode|raw }}
+                    today: {{ 'oro.calendar.control.today'|trans|json_encode|raw }},
+                    month: {{ 'oro.calendar.control.month'|trans|json_encode|raw }},
+                    week: {{ 'oro.calendar.control.week'|trans|json_encode|raw }},
+                    day: {{ 'oro.calendar.control.day'|trans|json_encode|raw }}
                 },
                 titleFormat: {
                     month: 'MMMM yyyy',
