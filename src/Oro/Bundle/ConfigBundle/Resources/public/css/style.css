@@ -189,6 +189,9 @@
     padding-left: 0;
     padding-right: 0;
 }
+.system-configuration-accordion .accordion-body .accordion-inner{
+    padding: 0;
+}
 .system-configuration-accordion ul > .accordion-group > .accordion-heading a,
 .system-configuration-accordion > li> a,
 .system-configuration-accordion > .accordion-group > .accordion-heading a{
@@ -196,6 +199,11 @@
     font-weight: bold;
     padding: 8px 15px;
     display: block;
+}
+.system-configuration-accordion > .accordion-group > .accordion-heading a{
+    text-transform: uppercase;
+    font-size: 12px;
+
 }
 .system-configuration-accordion ul > .accordion-group > .accordion-heading a:before,
 .system-configuration-accordion > .accordion-group > .accordion-heading a:before{
@@ -216,6 +224,9 @@
 }
 .system-configuration-accordion > .accordion-group:first-child{
     border-top: 0;
+}
+.system-configuration-accordion > .accordion-group:last-child{
+    border-bottom: 0;
 }
 .system-configuration-accordion ul{
     list-style: none;
