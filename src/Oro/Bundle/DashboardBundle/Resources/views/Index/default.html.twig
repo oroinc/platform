@@ -1,0 +1,78 @@
+{% extends bap.layout %}
+
+{% macro renderColumn(widgets, isEven) %}
+    {% if (not isEven and widgets|length) or (isEven and widgets|length > 1) %}
+        <div class="responsive-block">
+            {% set index = 1 %}
+            {% for widget in widgets %}
+                {% if (isEven and index is even) or (not isEven and index is odd) %}
+                    {{
+                        oro_widget_render({
+                            'widgetType': 'block',
+                            'url': path(widget.route, widget.route_parameters)
+                        })
+                    }}
+                {% endif %}
+                {% set index = index + 1 %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+{% import _self as __ %}
+
+{% block page_container %}
+    <div class="container-fluid page-title">
+        <div class="navigation clearfix navbar-extra">
+            <div class="row">
+                <div class="span9">
+                    <div class="pull-left">
+                        <div class="container-fluid">
+                            <h1 class="oro-subtitle">{{ pageTitle|trans }}</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-right title-buttons-container">
+                    {% placeholder dashboard_navButtons_before %}
+                    <div class="dashboard-selector-container">
+                        <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
+                        <select id="dashboard_selector">
+                            {% for name,label in dashboards %}
+                                <option value="{{ name }}"{% if name == dashboardName %} selected="selected"{% endif %}>{{ label|trans }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <script type="text/javascript">
+                        require(['jquery', 'routing', 'oro/navigation'],
+                        function($, routing, Navigation){
+                            $(function () {
+                                $('#dashboard_selector').on('change', function (e) {
+                                    var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}),
+                                        navigation = Navigation.getInstance();
+                                    if (navigation) {
+                                        navigation.processRedirect({
+                                            fullRedirect: false,
+                                            location: url
+                                        });
+                                    } else {
+                                        location.href = url;
+                                    }
+                                });
+                            });
+                        });
+                    </script>
+                    {% placeholder dashboard_navButtons_after %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block content %}
+        {% set contentClass = contentClass|default('dashboard-container') %}
+        <div class="scrollable-container responsive-section {{ contentClass }}">
+        {% block widgets %}
+            {{ __.renderColumn(widgets, false) }}
+            {{ __.renderColumn(widgets, true) }}
+        {% endblock %}
+        </div>
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,11 @@
+oro_dashboard_config:
+    widgets:
+        recent_emails:
+            route:      oro_user_dashboard_recent_emails
+            acl:        oro_email_view
+
+    dashboards:
+        main:
+            widgets:
+                recent_emails:
+                    position:   30

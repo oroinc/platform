@@ -19,9 +19,25 @@
   height: 100%;
 }
 
+.dashboard-selector-container {
+  label {
+    padding-top: 4px;
+    padding-right: 10px;
+  }
+  select {
+    width: auto;
+  }
+  label,
+  select,
+  .selector {
+    float: left;
+  }
+}
+
 .dashboard-container,
 .launchpad-container {
   background: @backgroundColor;
+  padding-left: 20px;
   .responsive-block > div {
     padding-right: 20px;
     padding-bottom: 20px;

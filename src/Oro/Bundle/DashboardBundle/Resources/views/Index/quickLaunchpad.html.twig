@@ -1,0 +1,15 @@
+{% extends 'OroDashboardBundle:Index:default.html.twig' %}
+
+{% block content %}
+    {% set contentClass = 'launchpad-container' %}
+    {{ parent() }}
+{% endblock %}
+
+{% block widgets %}
+    <div class="container">
+        {{ parent() }}
+    </div>
+    <div class="version-container">
+        Version: {{ constant('Oro\\Bundle\\PlatformBundle\\OroPlatformBundle::VERSION') }}
+    </div>
+{% endblock %}

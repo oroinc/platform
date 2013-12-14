@@ -16,7 +16,7 @@
         'renderCompleteCallback': 'function (calendar) {'
             ~ ' var allDayEventCount = 0;'
             ~ ' calendar.getCollection().each(function (model) { if (model.get("allDay")) { allDayEventCount++; } });'
-            ~ ' var suggestedContentHeight = Math.round(calendar.getCalendarElement().width() * 0.75);'
+            ~ ' var suggestedContentHeight = Math.round(calendar.getCalendarElement().width() * 0.5);'
             ~ ' var contentHeight = allDayEventCount < 5 ? suggestedContentHeight : (allDayEventCount * 20) + suggestedContentHeight;'
             ~ ' calendar.getCalendarElement().fullCalendar("option", "contentHeight", contentHeight);'
             ~ ' }'

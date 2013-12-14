@@ -11,12 +11,12 @@ class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/calendar",
-     *      name="oro_calendar_dashboard_calendar"
+     *      "/my_calendar",
+     *      name="oro_calendar_dashboard_my_calendar"
      * )
-     * @Template("OroCalendarBundle:Dashboard:calendar.html.twig")
+     * @Template("OroCalendarBundle:Dashboard:myCalendar.html.twig")
      */
-    public function calendarAction()
+    public function myCalendarAction()
     {
         /** @var SecurityFacade $securityFacade */
         $securityFacade = $this->get('oro_security.security_facade');
