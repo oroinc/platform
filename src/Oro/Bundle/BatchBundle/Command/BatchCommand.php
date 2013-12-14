@@ -76,54 +76,6 @@ class BatchCommand extends ContainerAwareCommand
             );
         }
 
-        $this->validate($input, $jobInstance);
-
-        $executionId = $input->getArgument('execution');
-        if ($executionId) {
-            $jobExecution = $this->getEntityManager()->getRepository('OroBatchBundle:JobExecution')->find($executionId);
-            if (!$jobExecution) {
-                throw new \InvalidArgumentException(sprintf('Could not find job execution "%s".', $executionId));
-            }
-            if (!$jobExecution->getStatus()->isStarting()) {
-                throw new \RuntimeException(
-                    sprintf('Job execution "%s" has invalid status: %s', $executionId, $jobExecution->getStatus())
-                );
-            }
-        } else {
-            $jobExecution = new JobExecution();
-        }
-        $jobExecution->setJobInstance($jobInstance);
-
-        $job->execute($jobExecution);
-
-        $this->getEntityManager()->persist($jobInstance);
-        $this->getEntityManager()->flush($jobInstance);
-
-        $this->getEntityManager()->persist($jobExecution);
-        $this->getEntityManager()->flush($jobExecution);
-
-        if (ExitStatus::COMPLETED === $jobExecution->getExitStatus()->getExitCode()) {
-            $output->writeln(
-                sprintf(
-                    '<info>%s has been successfully executed.</info>',
-                    ucfirst($jobInstance->getType())
-                )
-            );
-        } else {
-            $output->writeln(
-                sprintf(
-                    '<error>An error occured during the %s execution.</error>',
-                    $jobInstance->getType()
-                )
-            );
-        }
-    }
-
-    /**
-     * Validate job instance
-     */
-    protected function validate(InputInterface $input, JobInstance $jobInstance)
-    {
         $validator = $this->getValidator();
 
         // Override mail notifier recipient email
@@ -145,6 +97,50 @@ class BatchCommand extends ContainerAwareCommand
                 sprintf('Job "%s" is invalid: %s', $code, $this->getErrorMessages($errors))
             );
         }
+
+        $executionId = $input->getArgument('execution');
+        if ($executionId) {
+            $jobExecution = $this->getEntityManager()->getRepository('OroBatchBundle:JobExecution')->find($executionId);
+            if (!$jobExecution) {
+                throw new \InvalidArgumentException(sprintf('Could not find job execution "%s".', $id));
+            }
+            if (!$jobExecution->getStatus()->isStarting()) {
+                throw new \RuntimeException(
+                    sprintf('Job execution "%s" has invalid status: %s', $executionId, $jobExecution->getStatus())
+                );
+            }
+        } else {
+            $jobExecution = new JobExecution();
+        }
+        $jobExecution->setJobInstance($jobInstance);
+
+        $job->execute($jobExecution);
+
+        $this->getEntityManager()->persist($jobExecution);
+        $this->getEntityManager()->flush($jobExecution);
+
+        $this->getEntityManager()->persist($jobInstance);
+        $this->getEntityManager()->flush($jobInstance);
+
+        if (ExitStatus::COMPLETED === $jobExecution->getExitStatus()->getExitCode()) {
+            $output->writeln(
+                sprintf(
+                    '<info>%s has been successfully executed.</info>',
+                    ucfirst($jobInstance->getType())
+                )
+            );
+        } else {
+            $output->writeln(
+                sprintf(
+                    '<error>An error occured during the %s execution.</error>',
+                    $jobInstance->getType()
+                )
+            );
+        }
+
+        // FIXME: Workaround, waiting for https://github.com/symfony/SwiftmailerBundle/pull/64
+        // to be merged
+        $this->flushMailQueue();
     }
 
     /**
@@ -215,5 +211,36 @@ class BatchCommand extends ContainerAwareCommand
         }
 
         throw new \InvalidArgumentException($error);
+    }
+
+    /**
+     * @see Symfony\Bundle\SwiftmailerBundle\EventListener\EmailSenderListener::onKernelTerminate
+     * and https://github.com/symfony/SwiftmailerBundle/pull/64
+     */
+    public function flushMailQueue()
+    {
+       if (!$this->getContainer()->has('mailer')) {
+            return;
+        }
+
+        $mailers = array_keys($this->getContainer()->getParameter('swiftmailer.mailers'));
+        foreach ($mailers as $name) {
+            if ($this->getContainer() instanceof IntrospectableContainerInterface ?
+                $this->getContainer()->initialized(sprintf('swiftmailer.mailer.%s', $name)) : true) {
+                if ($this->getContainer()->getParameter(sprintf('swiftmailer.mailer.%s.spool.enabled', $name))) {
+                    $mailer = $this->getContainer()->get(sprintf('swiftmailer.mailer.%s', $name));
+                    $transport = $mailer->getTransport();
+                    if ($transport instanceof \Swift_Transport_SpoolTransport) {
+                        $spool = $transport->getSpool();
+                        if ($spool instanceof \Swift_MemorySpool) {
+                            $spool->flushQueue(
+                                $this->getContainer()->get(sprintf('swiftmailer.mailer.%s.transport.real', $name))
+                            );
+                        }
+                    }
+                }
+            }
+        }
+ 
     }
 }

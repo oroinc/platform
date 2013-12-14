@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Item;
 
+use Oro\Bundle\BatchBundle\Entity\StepExecution;
+
 /**
  * Interface to provide data.
  *
