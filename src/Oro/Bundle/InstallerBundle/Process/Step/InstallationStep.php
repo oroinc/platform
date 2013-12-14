@@ -26,8 +26,6 @@ class InstallationStep extends AbstractStep
                 return $this->handleAjaxAction('assets:install', array('target' => './'));
             case 'assetic':
                 return $this->handleAjaxAction('assetic:dump');
-            case 'assetic-oro':
-                return $this->handleAjaxAction('oro:assetic:dump');
             case 'translation':
                 return $this->handleAjaxAction('oro:translation:dump');
             case 'requirejs':

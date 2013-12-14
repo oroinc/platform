@@ -198,7 +198,6 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:localization:dump', $input, $output)
             ->runCommand('assets:install', $input, $output)
             ->runCommand('assetic:dump', $input, $output)
-            ->runCommand('oro:assetic:dump', $input, $output)
             ->runCommand('oro:translation:dump', $input, $output)
             ->runCommand('oro:requirejs:build', $input, $output);
 
@@ -210,7 +209,7 @@ class InstallCommand extends ContainerAwareCommand
 
         // clear the cache set installed flag in DI container
         $this->runCommand('cache:clear', $input, $output);
- 
+
         $output->writeln('');
         return $this;
     }

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
+use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 
 /**
  * Class BasePerson
@@ -15,7 +16,7 @@ use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
  *
  * @ORM\MappedSuperclass
  */
-class BasePerson
+class BasePerson implements FullNameInterface
 {
     /**
      * @var int
