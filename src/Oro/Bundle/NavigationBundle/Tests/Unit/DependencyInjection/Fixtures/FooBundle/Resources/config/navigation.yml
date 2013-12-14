@@ -1,0 +1,32 @@
+oro_menu_config:
+    items:
+        customers_tab:
+            label: 'Customers'
+        call_list:
+            label: 'Calls'
+        to_replace:
+            label: 'Replaced'
+        to_move_top:
+            label: 'To move'
+        to_move_child:
+            label: 'To move child'
+        shortcut_call_list:
+            label: Show list
+    tree:
+        application_menu:
+            children:
+                customers_tab:
+                    children:
+                        call_list: ~
+                        to_replace: ~
+                        to_move_top:
+                            children:
+                                to_move_child: ~
+
+        shortcuts:
+            children:
+                shortcut_call_list: ~
+
+oro_titles:
+    orocrm_call_index: Calls
+

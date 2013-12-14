@@ -1,49 +1,64 @@
 <?php
 namespace Oro\Bundle\AsseticBundle\Tests\Unit\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
 use Oro\Bundle\AsseticBundle\DependencyInjection\OroAsseticExtension;
+use Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures;
 
 class OroAsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Data provider for testGetAssets
-     *
-     * @return array
+     * @dataProvider loadDataProvider
      */
-    public function getAssetsDataProvider()
-    {
-        return array(
-            array(
-                array('css_debug' => array(), 'css_debug_all' => true),
-                array('compress' => array(array()), 'uncompress' => array(array('first.css', 'second.css'))),
-            ),
-            array(
-                array('css_debug' => array(), 'css_debug_all' => false),
-                array('compress' => array(array('first.css', 'second.css')), 'uncompress' => array(array())),
-            ),
-        );
-    }
-
-    /**
-     * @dataProvider getAssetsDataProvider
-     */
-    public function testGetAssets($config, $expectedCss)
+    public function testLoad(array $configs, array $expectedBundles, array $expectedConfiguration)
     {
         $extension = new OroAsseticExtension();
 
-        $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.bundles', $expectedBundles);
 
-        $container->expects($this->once())
-            ->method('getParameter')
-            ->will(
-                $this->returnValue(
+        $extension->load($configs, $container);
+
+        $this->assertEquals($expectedConfiguration, $container->getParameter('oro_assetic.raw_configuration'));
+
+        $this->assertNotNull($container->getDefinition('oro_assetic.configuration'));
+        $this->assertNotNull($container->getDefinition('oro_assetic.twig.extension'));
+    }
+
+    public function loadDataProvider()
+    {
+        return array(
+            'minimal' => array(
+                'configs' => array(
+                    array()
+                ),
+                'expectedBundles' => array(),
+                'expectedConfiguration' => array(
+                    'css_debug_groups' => array(),
+                    'css_debug_all' => false,
+                    'css' => array()
+                )
+            ),
+            'full' => array(
+                'configs' => array(
                     array(
-                        'Oro\Bundle\AsseticBundle\Tests\Unit\Fixtures\TestBundle'
+                        'css_debug' => array('css_group'),
+                        'css_debug_all' => true,
+                    )
+                ),
+                'expectedBundles' => array(new Fixtures\TestBundle()),
+                'expectedConfiguration' => array(
+                    'css_debug_groups' => array('css_group'),
+                    'css_debug_all' => true,
+                    'css' => array(
+                        'css_group' => array(
+                            'first.css',
+                            'second.css'
+                        )
                     )
                 )
-            );
-
-        $assets = $extension->getAssets($container, $config);
-        $this->assertEquals($expectedCss, $assets['css']);
+            ),
+        );
     }
 }
