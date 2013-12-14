@@ -1,8 +1,8 @@
 {% extends bap.layout %}
 
-{% macro renderColumn(widgets, isEven) %}
+{% macro renderCell(widgets, isEven) %}
     {% if (not isEven and widgets|length) or (isEven and widgets|length > 1) %}
-        <div class="responsive-block">
+        <div class="responsive-cell">
             {% set index = 1 %}
             {% for widget in widgets %}
                 {% if (isEven and index is even) or (not isEven and index is odd) %}
@@ -20,7 +20,8 @@
 {% endmacro %}
 {% import _self as __ %}
 
-{% block page_container %}
+{% block content %}
+<div class="layout-content">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra">
             <div class="row">
@@ -71,14 +72,16 @@
             </div>
         </div>
     </div>
-
-    {% block content %}
+    {% block widgets_content %}
         {% set contentClass = contentClass|default('dashboard-container') %}
         <div class="responsive-section {{ contentClass }}">
-        {% block widgets %}
-            {{ __.renderColumn(widgets, false) }}
-            {{ __.renderColumn(widgets, true) }}
-        {% endblock widgets %}
+            <div class="clearfix">
+            {% block widgets %}
+                {{ __.renderCell(widgets, false) }}
+                {{ __.renderCell(widgets, true) }}
+            {% endblock widgets %}
+            </div>
         </div>
-    {% endblock content %}
-{% endblock page_container %}
+    {% endblock widgets_content %}
+</div>
+{% endblock content %}
