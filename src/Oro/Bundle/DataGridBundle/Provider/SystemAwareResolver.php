@@ -96,14 +96,14 @@ class SystemAwareResolver implements ContainerAwareInterface
                 $method = $match[2];
                 if (is_callable([$class, $method])) {
                     $_val = $class::$method($datagridName, $key);
-                    if (is_scalar($_val)) {
+                    if (is_scalar($_val) && $match[0] !== $val) {
                         $val = str_replace($match[0], (string)$_val, $val);
                     } else {
                         $val = $_val;
                     }
                 } elseif (defined("$class::$method")) {
                     $_val = constant("$class::$method");
-                    if (is_scalar($_val)) {
+                    if (is_scalar($_val) && $match[0] !== $val) {
                         $val = str_replace($match[0], (string)$_val, $val);
                     } else {
                         $val = $_val;
@@ -121,7 +121,7 @@ class SystemAwareResolver implements ContainerAwareInterface
                         $key,
                         $this->parentNode
                     );
-                if (is_scalar($_val)) {
+                if (is_scalar($_val) && $match[0] !== $val) {
                     $val = str_replace($match[0], (string)$_val, $val);
                 } else {
                     $val = $_val;
