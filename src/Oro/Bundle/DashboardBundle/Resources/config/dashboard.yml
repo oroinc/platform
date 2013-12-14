@@ -16,4 +16,4 @@ oro_dashboard_config:
             twig:       OroDashboardBundle:Index:quickLaunchpad.html.twig
             position:   10
 
-    default_dashboard: main
+    default_dashboard: quick_launchpad

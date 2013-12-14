@@ -13,11 +13,11 @@ class DashboardController extends Controller
      * @Route(
      *      "/index/{name}",
      *      name="oro_dashboard_index",
-     *      requirements={"name"="[\w_-]+"},
+     *      requirements={"name"="[\w_-]*"},
      *      defaults={"name" = ""}
      * )
      */
-    public function indexAction($name)
+    public function indexAction($name = null)
     {
         /** @var Manager $manager */
         $manager = $this->get('oro_dashboard.manager');

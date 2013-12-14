@@ -24,6 +24,7 @@
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra">
             <div class="row">
+                {% block title %}
                 <div class="span9">
                     <div class="pull-left">
                         <div class="container-fluid">
@@ -31,8 +32,11 @@
                         </div>
                     </div>
                 </div>
+                {% endblock title %}
+                {% block titleNavButtons %}
                 <div class="pull-right title-buttons-container">
                     {% placeholder dashboard_navButtons_before %}
+                    {% block navButtons %}
                     <div class="dashboard-selector-container">
                         <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
                         <select id="dashboard_selector">
@@ -60,19 +64,21 @@
                             });
                         });
                     </script>
+                    {% endblock navButtons %}
                     {% placeholder dashboard_navButtons_after %}
                 </div>
+                {% endblock titleNavButtons %}
             </div>
         </div>
     </div>
 
     {% block content %}
         {% set contentClass = contentClass|default('dashboard-container') %}
-        <div class="scrollable-container responsive-section {{ contentClass }}">
+        <div class="responsive-section {{ contentClass }}">
         {% block widgets %}
             {{ __.renderColumn(widgets, false) }}
             {{ __.renderColumn(widgets, true) }}
-        {% endblock %}
+        {% endblock widgets %}
         </div>
-    {% endblock %}
-{% endblock %}
+    {% endblock content %}
+{% endblock page_container %}
