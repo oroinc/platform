@@ -29,6 +29,25 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
+     * Find all channels with given type
+     *
+     * @param string $type
+     *
+     * @return array
+     */
+    protected function getChannelsBytType($type)
+    {
+        $channels = $this->createQueryBuilder('c')
+            ->select('c')
+            ->where('c.type = :type')
+            ->setParameter('type', $type)
+            ->getQuery()
+            ->getResult();
+
+        return $channels;
+    }
+
+    /**
      * Load instance once and precache it in property
      *
      * @param int $id
