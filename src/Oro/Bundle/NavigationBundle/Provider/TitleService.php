@@ -345,7 +345,7 @@ class TitleService implements TitleServiceInterface
         $data = $routes;
 
         foreach ($this->readers as $reader) {
-            /** @var $reader  \Oro\Bundle\NavigationBundle\Title\TitleReader\Reader */
+            /** @var $reader  \Oro\Bundle\NavigationBundle\Title\TitleReader\ReaderInterface */
             $data = array_merge($data, $reader->getData($routes));
         }
 

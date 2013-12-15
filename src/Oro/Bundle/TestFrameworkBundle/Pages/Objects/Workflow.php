@@ -126,11 +126,9 @@ class Workflow extends AbstractEntity implements Entity
 
     public function setCompanyName($company)
     {
-        $this->closedate = $this->byId($this->byId('oro_workflow_transition_company_name'));
+        $this->closedate = $this->byId('oro_workflow_transition_company_name');
         $this->closedate->clear();
         $this->closedate->value($company);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
         return $this;
     }
 
@@ -142,9 +140,11 @@ class Workflow extends AbstractEntity implements Entity
     public function qualify()
     {
         $this->byXPath("//div[@class='btn-group']/a[@id='transition-sales_lead-qualify']")->click();
-        $this->waitPageToLoad();
         $this->waitForAjax();
-        return new Workflow($this->test);
+        $this->assertElementPresent(
+            "//div[@class='ui-dialog-content ui-widget-content']/preceding-sibling::div/span[text()='Qualify']"
+        );
+        return $this;
     }
 
     public function disqualify()
@@ -159,6 +159,9 @@ class Workflow extends AbstractEntity implements Entity
     {
         $this->byXpath("//div[@class='btn-group']/a[@id='transition-sales_flow_b2b-develop']")->click();
         $this->waitForAjax();
+        $this->assertElementPresent(
+            "//div[@class='ui-dialog-content ui-widget-content']/preceding-sibling::div/span[text()='Develop']"
+        );
         return $this;
     }
 

@@ -68,7 +68,6 @@ process:
             localization:  Dump localization
             assets:        Install assets
             assetic:       Dump assetic
-            assetic-oro:   Dump Oro assetic
             translation:   Prepare translations
             requirejs:     Optimize JS resources (optional)
             finish:        Clear cache to finalize installation
