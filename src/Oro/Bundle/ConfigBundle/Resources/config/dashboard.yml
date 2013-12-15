@@ -7,11 +7,4 @@ oro_dashboard_config:
                     icon:       cogs
                     route:      oro_config_configuration_system
                     acl:        oro_config_system
-
-    dashboards:
-        main:
-            widgets:
-                quick_launchpad:
-                    items:
-                        settings:
-                            position:   50
+                    position:   50

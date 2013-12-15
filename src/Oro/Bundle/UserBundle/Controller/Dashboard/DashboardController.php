@@ -11,34 +11,39 @@ class DashboardController extends Controller
 {
     /**
      * @Route(
-     *      "/recent_emails/{activeTab}/{contentType}",
+     *      "/recent_emails/{widget}/{activeTab}/{contentType}",
      *      name="oro_user_dashboard_recent_emails",
-     *      requirements={"activeTab"="inbox|sent", "contentType"="full|tab"},
+     *      requirements={"widget"="[\w_-]+", "activeTab"="inbox|sent", "contentType"="full|tab"},
      *      defaults={"activeTab" = "inbox", "contentType" = "full"}
      * )
      */
-    public function recentEmailsAction($activeTab, $contentType)
+    public function recentEmailsAction($widget, $activeTab, $contentType)
     {
-        $currentUserId    = $this->getUser()->getId();
+        $loggedUserId     = $this->getUser()->getId();
         $renderMethod     = ($contentType === 'tab') ? 'render' : 'renderView';
         $activeTabContent = $this->$renderMethod(
             'OroUserBundle:Dashboard:recentEmailsGrid.html.twig',
             [
-                'currentUserId' => $currentUserId,
-                'gridName'      => sprintf('dashboard-recent-emails-%s-grid', $activeTab)
+                'loggedUserId' => $loggedUserId,
+                'gridName'     => sprintf('dashboard-recent-emails-%s-grid', $activeTab)
             ]
         );
 
         if ($contentType === 'tab') {
             return $activeTabContent;
         } else {
-            return $this->render(
-                'OroUserBundle:Dashboard:recentEmails.html.twig',
+            $params = array_merge(
                 [
-                    'currentUserId'    => $currentUserId,
+                    'loggedUserId'     => $loggedUserId,
                     'activeTab'        => $activeTab,
                     'activeTabContent' => $activeTabContent
-                ]
+                ],
+                $this->get('oro_dashboard.manager')->getWidgetAttributesForTwig($widget)
+            );
+
+            return $this->render(
+                'OroUserBundle:Dashboard:recentEmails.html.twig',
+                $params
             );
         }
     }

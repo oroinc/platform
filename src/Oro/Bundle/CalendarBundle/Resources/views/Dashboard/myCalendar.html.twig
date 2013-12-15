@@ -1,9 +1,6 @@
 {% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
 {% import 'OroCalendarBundle::macros.html.twig' as c %}
 
-{% set widgetName = 'calendar' %}
-{% set widgetTitle = 'My Calendar'|trans %}
-
 {% block content %}
     {% set calendarId = 'calendar-' ~ widgetId %}
     <div id="{{ calendarId }}">

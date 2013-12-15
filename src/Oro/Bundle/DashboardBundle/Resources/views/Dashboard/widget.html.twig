@@ -1,7 +1,16 @@
 {% set widgetId = app.request.get('_wid') %}
 {% set widgetContentId = 'widget-content-' ~ widgetId %}
 {% set widgetType = widgetType|default('dashboard') %}
-<div id="{{ widgetContentId }}" class="widget-content {{ widgetType }}-widget-content {{ widgetName }}'-widget-content">
+{% set widgetClass = (widgetName|replace({'_': '-'}))|lower %}
+{% if not widgetTitle is defined %}
+    {% if not widgetLabel is defined %}
+        {% set widgetTitle = false %}
+    {% else %}
+        {% set widgetTitle = widgetLabel|trans %}
+    {% endif %}
+{% endif %}
+
+<div id="{{ widgetContentId }}" class="widget-content {{ widgetType }}-widget-content {{ widgetClass }}-widget-content">
     {% block content %}
     {% endblock %}
     <div class="widget-actions">
@@ -24,7 +33,7 @@
         require(['jquery', 'underscore', 'oro/widget-manager', 'oro/navigation'],
         function($, _, widgetManager, Navigation){
             widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
-                {% if widgetTitle is defined %}
+                {% if widgetTitle %}
                 widget.setTitle({{ widgetTitle|json_encode|raw }});
                 {% endif %}
                 widget.on('renderStart', function(el) {

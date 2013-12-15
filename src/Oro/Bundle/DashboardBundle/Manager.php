@@ -24,7 +24,7 @@ class Manager
      */
     public function __construct(array $config, SecurityFacade $securityFacade)
     {
-        $this->config = $config;
+        $this->config         = $config;
         $this->securityFacade = $securityFacade;
     }
 
@@ -82,10 +82,50 @@ class Manager
             $widget = array_merge_recursive($result[$widgetName], $this->config['widgets'][$widgetName]);
             if (!isset($widget['acl']) || $this->securityFacade->isGranted($widget['acl'])) {
                 unset($widget['acl']);
+                unset($widget['items']);
                 $result[$widgetName] = $widget;
             } else {
                 unset($result[$widgetName]);
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns widget attributes
+     *
+     * @param string $widgetName The name of widget
+     * @return array
+     */
+    public function getWidgetAttributes($widgetName)
+    {
+        $widget = $this->config['widgets'][$widgetName];
+        unset($widget['route']);
+        unset($widget['route_parameters']);
+        unset($widget['acl']);
+        unset($widget['items']);
+
+        return $widget;
+    }
+
+    /**
+     * Returns widget attributes with attribute name converted to use in widget's TWIG template
+     *
+     * @param string $widgetName The name of widget
+     * @return array
+     */
+    public function getWidgetAttributesForTwig($widgetName)
+    {
+        $result = [
+            'widgetName' => $widgetName
+        ];
+        foreach ($this->getWidgetAttributes($widgetName) as $key => $val) {
+            $attrName = 'widget';
+            foreach (explode('_', str_replace('-', '_', $key)) as $keyPart) {
+                $attrName .= ucfirst($keyPart);
+            }
+            $result[$attrName] = $val;
         }
 
         return $result;
@@ -99,7 +139,9 @@ class Manager
      */
     public function getWidgetItems($widgetName)
     {
-        $items = $this->config['widgets'][$widgetName]['items'];
+        $items = isset($this->config['widgets'][$widgetName]['items'])
+            ? $this->config['widgets'][$widgetName]['items']
+            : [];
         foreach ($items as $itemName => &$item) {
             if (!isset($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
                 unset($item['acl']);

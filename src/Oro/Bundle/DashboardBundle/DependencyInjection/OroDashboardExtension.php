@@ -29,20 +29,31 @@ class OroDashboardExtension extends Extension
         }
 
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $dashboardConfigs);
+        $config        = $this->processConfiguration($configuration, $dashboardConfigs);
+        // sort dashboards and widgets
+        // remove 'position' attribute after sorting
+        // remove non visible dashboards and widgets
+        // remove 'visible' attribute for rest dashboards and widgets
+        $this->prepareItems($config['dashboards'], 'widgets');
+        // set 'widget' parameter for all widget routes
+        // sort widget items (if any)
+        // remove 'position' attribute after sorting
+        // remove non visible items
+        // remove 'visible' attribute for rest items
+        // remove empty 'items' attribute
+        $this->prepareWidgets($config['widgets']);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
         $container
             ->getDefinition('oro_dashboard.manager')
             ->replaceArgument(0, $config);
-        var_dump($config);
     }
 
     /**
      * Sorts items by a value of 'position' attribute and then remove 'position' attribute.
-     * Also items which has 'visible' attribute equals false will be removed
+     * Removes items which has 'visible' attribute equals false and then remove 'visible' attribute for rest items.
      *
      * @param array       $items    The array to be processed
      * @param string|null $children The name of child array to be processed as well
@@ -51,54 +62,58 @@ class OroDashboardExtension extends Extension
      */
     protected function prepareItems(&$items, $children = null)
     {
+        // update 'position' attribute if it was not specified to keep order of such items as it was declared in config
+        $lastUnspecifiedPosition = Configuration::UNSPECIFIED_POSITION;
+        foreach ($items as &$item) {
+            if ($item['position'] === Configuration::UNSPECIFIED_POSITION) {
+                $lastUnspecifiedPosition++;
+                $item['position'] = $lastUnspecifiedPosition;
+            }
+        }
+        // sort items
         uasort(
             $items,
             function (&$a, &$b) {
-                $aPos = (isset($a['position']) ? $a['position'] : 9999);
-                $bPos = (isset($b['position']) ? $b['position'] : 9999);
-                if ($aPos == $bPos) {
+                if ($a['position'] == $b['position']) {
                     return 0;
+                } else {
+                    return ($a['position'] < $b['position']) ? -1 : 1;
                 }
-
-                return ($aPos < $bPos) ? -1 : 1;
             }
         );
+        // remove non visible items and remove 'position' and 'visible' attributes
         foreach ($items as $key => &$item) {
             unset($item['position']);
-            if (isset($item['visible']) && !$item['visible']) {
-                unset($items[$key]);
-                continue;
-            }
-            if ($children !== null) {
-                if (isset($item[$children])) {
-                    $this->prepareItems($item[$children], $children === 'widgets' ? 'items' : null);
-                } elseif ($children === 'widgets') {
-                    $item[$children] = [];
+            if (isset($item['visible'])) {
+                if (!$item['visible']) {
+                    unset($items[$key]);
+                    continue;
+                } else {
+                    unset($item['visible']);
                 }
+            }
+            if ($children !== null && isset($item[$children])) {
+                $this->prepareItems($item[$children]);
             }
         }
     }
 
     /**
-     * Sets empty 'route_parameters' attribute if it is not specified
-     * Sets 'widget' parameter for 'oro_dashboard_itemized_widget' routes
+     * Sets 'widget' parameter for all widget routes
+     * Sorts items by a value of 'position' attribute and then remove 'position' attribute.
+     * Removes items which has 'visible' attribute equals false and then remove 'visible' attribute for rest items.
+     * Removes empty 'items' attribute.
      *
      * @param array $widgets
      */
     protected function prepareWidgets(&$widgets)
     {
         foreach ($widgets as $widgetName => &$widget) {
-            if (!isset($widget['route_parameters'])) {
-                $widget['route_parameters'] = [];
-            }
-            if ($widget['route'] === 'oro_dashboard_itemized_widget') {
-                $widget['route_parameters']['widget'] = $widgetName;
-            }
+            $widget['route_parameters']['widget'] = $widgetName;
             if (isset($widget['items'])) {
-                foreach ($widget['items'] as &$item) {
-                    if (!isset($item['route_parameters'])) {
-                        $item['route_parameters'] = [];
-                    }
+                $this->prepareItems($widget['items']);
+                if (empty($widget['items'])) {
+                    unset($widget['items']);
                 }
             }
         }

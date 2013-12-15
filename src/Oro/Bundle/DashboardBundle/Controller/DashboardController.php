@@ -40,35 +40,41 @@ class DashboardController extends Controller
 
     /**
      * @Route(
-     *      "/widget/{bundle}/{name}",
+     *      "/widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_widget",
-     *      requirements={"bundle"="\w+", "name"="[\w_-]+"}
+     *      requirements={"widget"="[\w_-]+", "bundle"="\w+", "name"="[\w_-]+"}
      * )
      */
-    public function widgetAction($bundle, $name)
+    public function widgetAction($widget, $bundle, $name)
     {
         return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name)
+            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            $this->get('oro_dashboard.manager')->getWidgetAttributesForTwig($widget)
         );
     }
 
     /**
      * @Route(
-     *      "/widget/{bundle}/{name}/{widget}",
+     *      "/itemized_widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_itemized_widget",
-     *      requirements={"bundle"="\w+", "name"="[\w_-]+", "widget"="[\w_-]+"}
+     *      requirements={"widget"="[\w_-]+", "bundle"="\w+", "name"="[\w_-]+"}
      * )
      */
-    public function itemizedWidgetAction($bundle, $name, $widget)
+    public function itemizedWidgetAction($widget, $bundle, $name)
     {
         /** @var Manager $manager */
         $manager = $this->get('oro_dashboard.manager');
 
-        return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+        $params = array_merge(
             [
                 'items' => $manager->getWidgetItems($widget)
-            ]
+            ],
+            $manager->getWidgetAttributesForTwig($widget)
+        );
+
+        return $this->render(
+            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            $params
         );
     }
 }

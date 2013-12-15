@@ -1,7 +1,6 @@
 {% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
 
 {% set widgetType = 'quick-launchpad' %}
-{% set widgetName = 'quick-launchpad' %}
 
 {% block content %}
     <ul class="quick-launchpad-toolbar">
@@ -10,9 +9,9 @@
             <li style="width: {{ loop.last ? 100 - ((items|length - 1) * itemWidth) : itemWidth }}%">
                 <a href="{{ path(item.route, item.route_parameters)|raw }}">
                     <span class="title-box">{{ item.label|trans }}</span>
-                <span class="list-content">
-                    <i class="icon-{{ item.icon }}"></i>
-                </span>
+                    <span class="list-content">
+                        <i class="icon-{{ item.icon }}"></i>
+                    </span>
                 </a>
             </li>
         {% endfor %}
