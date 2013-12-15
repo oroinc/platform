@@ -84,6 +84,15 @@
             {% endblock widgets %}
             </div>
         </div>
+        <script type="text/javascript">
+            require(['jquery'],
+            function($){
+                $(function () {
+                    var $contentEl = $('.{{ contentClass }}');
+                    $contentEl.closest('.scrollable-container').css('background-color', $contentEl.css('background-color'));
+                });
+            });
+        </script>
     {% endblock widgets_content %}
 </div>
 {% endblock content %}
