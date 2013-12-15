@@ -81,4 +81,15 @@ abstract class SOAPTransport implements TransportInterface
     {
         $this->client = null;
     }
+
+    /**
+     * Does not allow to serialize
+     * It may cause serialization error on SoapClient
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [];
+    }
 }

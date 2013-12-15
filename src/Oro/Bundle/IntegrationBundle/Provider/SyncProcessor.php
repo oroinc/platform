@@ -88,11 +88,12 @@ class SyncProcessor implements SyncProcessorInterface
             );
             $configuration    = [
                 $mode => [
-                    'processorAlias' => reset($processorAliases),
-                    'entityName'     => $realConnector->getImportEntityFQCN(),
-                    'channel'        => $channel,
-                    'transport'      => $realTransport,
-                    'batchSize'      => self::DEFAULT_BATCH_SIZE
+                    'processorAlias'    => reset($processorAliases),
+                    'entityName'        => $realConnector->getImportEntityFQCN(),
+                    'channel'           => $channel->getId(),
+                    'transport'         => $realTransport,
+                    'transportSettings' => $channel->getTransport()->getSettingsBag(),
+                    'batchSize'         => self::DEFAULT_BATCH_SIZE
                 ],
             ];
             $this->processImport($connector, $mode, $jobName, $configuration, $channel);

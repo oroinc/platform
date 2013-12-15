@@ -24,7 +24,7 @@ class BaseOrder
     protected $id;
 
     /**
-     * @var ArrayCollection
+     * @var BasePerson
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson", cascade={"persist"})
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
