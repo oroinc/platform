@@ -38,33 +38,35 @@
                 <div class="pull-right title-buttons-container">
                     {% placeholder dashboard_navButtons_before %}
                     {% block navButtons %}
-                    <div class="dashboard-selector-container">
-                        <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
-                        <select id="dashboard_selector">
-                            {% for name,label in dashboards %}
-                                <option value="{{ name }}"{% if name == dashboardName %} selected="selected"{% endif %}>{{ label|trans }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <script type="text/javascript">
-                        require(['jquery', 'routing', 'oro/navigation'],
-                        function($, routing, Navigation){
-                            $(function () {
-                                $('#dashboard_selector').on('change', function (e) {
-                                    var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}),
-                                        navigation = Navigation.getInstance();
-                                    if (navigation) {
-                                        navigation.processRedirect({
-                                            fullRedirect: false,
-                                            location: url
-                                        });
-                                    } else {
-                                        location.href = url;
-                                    }
+                        {% if dashboards|length > 1 %}
+                        <div class="dashboard-selector-container">
+                            <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
+                            <select id="dashboard_selector">
+                                {% for name,label in dashboards %}
+                                    <option value="{{ name }}"{% if name == dashboardName %} selected="selected"{% endif %}>{{ label|trans }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <script type="text/javascript">
+                            require(['jquery', 'routing', 'oro/navigation'],
+                            function($, routing, Navigation){
+                                $(function () {
+                                    $('#dashboard_selector').on('change', function (e) {
+                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}),
+                                            navigation = Navigation.getInstance();
+                                        if (navigation) {
+                                            navigation.processRedirect({
+                                                fullRedirect: false,
+                                                location: url
+                                            });
+                                        } else {
+                                            location.href = url;
+                                        }
+                                    });
                                 });
                             });
-                        });
-                    </script>
+                        </script>
+                        {% endif %}
                     {% endblock navButtons %}
                     {% placeholder dashboard_navButtons_after %}
                 </div>

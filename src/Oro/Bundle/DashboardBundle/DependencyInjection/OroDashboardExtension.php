@@ -42,6 +42,12 @@ class OroDashboardExtension extends Extension
         // remove 'visible' attribute for rest items
         // remove empty 'items' attribute
         $this->prepareWidgets($config['widgets']);
+        // remove dashboards which have no widgets
+        foreach ($config['dashboards'] as $dashboardName => &$dashboard) {
+            if (empty($dashboard['widgets'])) {
+                unset($config['dashboards'][$dashboardName]);
+            }
+        }
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
