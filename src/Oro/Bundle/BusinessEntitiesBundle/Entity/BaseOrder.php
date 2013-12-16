@@ -77,7 +77,7 @@ class BaseOrder
     /**
      * @var float
      *
-     * @ORM\Column(name="shipping_method", type="float", nullable=true)
+     * @ORM\Column(name="shipping_method", type="string", nullable=true)
      */
     protected $shippingMethod;
 
