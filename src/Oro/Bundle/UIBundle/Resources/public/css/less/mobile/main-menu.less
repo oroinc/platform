@@ -8,6 +8,7 @@
   position: absolute;
   width: @mainMenuWidth;
   margin-left: -@mainMenuWidth;
+  overflow: auto;
   ul {
     margin-left: 0;
   }
@@ -78,4 +79,16 @@
   margin-left: @mainMenuWidth;
   margin-right: -@mainMenuWidth;
   border-left: 1px solid darken(@mainMenuBorderColor, 5%);
+  position: relative;
+  &:before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    background-color: #000;
+    position: fixed;
+    z-index: 750;
+    top: 54px;
+  }
 }
