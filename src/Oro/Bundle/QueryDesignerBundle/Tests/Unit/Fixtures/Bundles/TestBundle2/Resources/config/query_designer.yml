@@ -1,0 +1,21 @@
+query_designer:
+    filters:
+        filter1:
+            applicable: [{type: text}]
+        filter3:
+            type:       number
+        filter4:
+            query_type: [type2]
+
+    grouping:
+        exclude: [{type: array}]
+
+    converters:
+        converter1:
+            applicable: [{type: text}]
+            functions:  [{name: Func2, expr: FUNC2($column)}]
+
+    aggregates:
+        aggregate1:
+            applicable: [{type: float}]
+            functions:  [{name: Count, expr: COUNT($column), return_type: integer}]

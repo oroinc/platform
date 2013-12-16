@@ -345,14 +345,14 @@ class TitleService implements TitleServiceInterface
         $data = $routes;
 
         foreach ($this->readers as $reader) {
-            /** @var $reader  \Oro\Bundle\NavigationBundle\Title\TitleReader\Reader */
+            /** @var $reader  \Oro\Bundle\NavigationBundle\Title\TitleReader\ReaderInterface */
             $data = array_merge($data, $reader->getData($routes));
         }
 
-        $bdData = $this->getStoredTitlesRepository()->findAll();
+        $dbData = $this->getStoredTitlesRepository()->findAll();
 
-        foreach ($bdData as $entity) {
-            /** @var $entity Title */
+        /** @var $entity Title */
+        foreach ($dbData as $entity) {
 
             if (!array_key_exists($entity->getRoute(), $data)) {
                 // remove not existing entries

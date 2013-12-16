@@ -1,0 +1,3 @@
+css:
+    'query_designer':
+        - 'bundles/oroquerydesigner/css/query-designer.css'

@@ -72,12 +72,12 @@ class GroupController extends SoapController
      * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\Role[]")
      * @AclAncestor("oro_user_role_view")
      */
-    public function getRolesAction($id)
+    /*public function getRolesAction($id)
     {
         $entity = $this->getEntity($id);
 
         return $entity->getRoles()->toArray();
-    }
+    }*/
 
     /**
      * {@inheritdoc}

@@ -4,21 +4,17 @@ namespace Oro\Bundle\DataAuditBundle\Loggable;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
 use Doctrine\Common\Collections\Collection;
-
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\DataAuditBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\UserBundle\Entity\User;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
-
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexibleValue;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -75,13 +71,6 @@ class LoggableManager
      * @var array
      */
     protected $collectionLogData = array();
-
-    /**
-     * Stack of logged flexible entities
-     *
-     * @var array
-     */
-    protected $loggedObjects = array();
 
     /**
      * @var ConfigProvider
@@ -183,17 +172,17 @@ class LoggableManager
 
         if ($this->pendingLogEntityInserts && array_key_exists($oid, $this->pendingLogEntityInserts)) {
             $logEntry     = $this->pendingLogEntityInserts[$oid];
-            $logEntryMeta = $em->getClassMetadata(get_class($logEntry));
+            $logEntryMeta = $em->getClassMetadata(ClassUtils::getClass($logEntry));
 
             $id = $this->getIdentifier($entity);
             $logEntryMeta->getReflectionProperty('objectId')->setValue($logEntry, $id);
+
             $uow->scheduleExtraUpdate(
                 $logEntry,
                 array(
                     'objectId' => array(null, $id)
                 )
             );
-
             $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $id);
 
             unset($this->pendingLogEntityInserts[$oid]);
@@ -216,6 +205,7 @@ class LoggableManager
                 );
                 $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $data);
             }
+
             unset($this->pendingRelatedEntities[$oid]);
         }
     }
@@ -265,6 +255,8 @@ class LoggableManager
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @throws \ReflectionException
      */
     protected function createLogEntity($action, $entity)
     {
@@ -290,24 +282,6 @@ class LoggableManager
             $logEntryMeta = $this->em->getClassMetadata($this->getLogEntityClass());
             /** @var Audit $logEntry */
             $logEntry = $logEntryMeta->newInstance();
-
-            // do not store log entries for flexible attributes - add them to a parent entity instead
-            if ($entity instanceof AbstractEntityFlexibleValue) {
-                if ($action !== self::ACTION_REMOVE && !$this->logFlexible($entity)) {
-                    $flexibleEntityMeta = $this->em->getClassMetadata($this->getEntityClassName($entity));
-
-                    // if no "parent" object has been saved previously - get it from attribute and save it's log
-                    $value = $flexibleEntityMeta->reflFields['entity']->getValue($entity);
-                    if ($value instanceof AbstractEntityFlexible) {
-                        $this->createLogEntity($action, $flexibleEntityMeta->reflFields['entity']->getValue($entity));
-                    }
-
-                    $this->logFlexible($entity);
-                }
-
-                return;
-            }
-
             $logEntry->setAction($action);
             $logEntry->setObjectClass($meta->name);
             $logEntry->setLoggedAt();
@@ -381,10 +355,7 @@ class LoggableManager
                 $logEntry->setData($newValues);
             }
 
-            if ($action === self::ACTION_UPDATE
-                && 0 === count($newValues)
-                && !($entity instanceof AbstractEntityFlexible)
-            ) {
+            if ($action === self::ACTION_UPDATE && 0 === count($newValues)) {
                 return;
             }
 
@@ -403,15 +374,6 @@ class LoggableManager
 
             $this->em->persist($logEntry);
             $uow->computeChangeSet($logEntryMeta, $logEntry);
-
-            // save logged data for possible future handling of flexible attributes
-            if ($entity instanceof AbstractEntityFlexible) {
-                $this->loggedObjects[] = array(
-                    'object' => $entity,
-                    'log'    => $logEntry,
-                    'meta'   => $logEntryMeta,
-                );
-            }
         }
     }
 
@@ -423,87 +385,6 @@ class LoggableManager
     protected function getLogEntityClass()
     {
         return $this->logEntityClass;
-    }
-
-    /**
-     * Add flexible attribute log to a parent entity's log entry
-     *
-     * @param  AbstractEntityFlexibleValue $entity
-     * @return boolean                     True if value has been saved, false otherwise
-     */
-    protected function logFlexible(AbstractEntityFlexibleValue $entity)
-    {
-        $uow = $this->em->getUnitOfWork();
-
-        foreach ($this->loggedObjects as &$lo) {
-            if ($lo['object']->getValues()->contains($entity)) {
-                $logEntry = $lo['log'];
-                $changes  = current($uow->getEntityChangeSet($entity));
-                $oldData  = $changes[0];
-                $newData  = $entity->getData();
-
-                if ($newData instanceof Collection) {
-
-                    $newDataArray = $newData->toArray();
-                    $oldDataArray = $newData->getSnapshot();
-
-                    $newData = implode(
-                        ', ',
-                        array_map(
-                            function ($item) {
-                                return (string) $item;
-                            },
-                            $newDataArray
-                        )
-                    );
-
-                    $oldData = implode(
-                        ', ',
-                        array_map(
-                            function ($item) {
-                                return (string) $item;
-                            },
-                            $oldDataArray
-                        )
-                    );
-
-                } elseif ($newData instanceof \DateTime) {
-                    if ($oldData instanceof \DateTime) {
-                        $oldData = $oldData->format(\DateTime::ISO8601);
-                    }
-                    $newData = $newData->format(\DateTime::ISO8601);
-
-                } elseif (is_object($newData)) {
-                    $oldData = (string) $oldData;
-                    $newData = (string) $newData;
-                }
-
-                // special case for, as an example, decimal values
-                // do not store changeset d:123 and s:3:"123"
-                if ($oldData == $newData) {
-                    return true;
-                }
-
-                $data = array_merge(
-                    (array) $logEntry->getData(),
-                    array(
-                        $entity->getAttribute()->getCode() => array(
-                            'old' => $oldData,
-                            'new' => $newData,
-                        )
-                    )
-                );
-
-                $logEntry->setData($data);
-
-                $this->em->persist($logEntry);
-                $uow->recomputeSingleEntityChangeSet($lo['meta'], $logEntry);
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -546,7 +427,7 @@ class LoggableManager
 
     protected function checkAuditable($entityClassName)
     {
-        if ($this->hasConfig($entityClassName)) {
+        if (!$this->hasConfig($entityClassName)) {
             return;
         }
 

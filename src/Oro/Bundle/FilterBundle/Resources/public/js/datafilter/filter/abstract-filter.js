@@ -26,6 +26,13 @@ function($, _, Backbone, app) {
         className: 'btn-group filter-item oro-drop',
 
         /**
+         * Is filter can be disabled
+         *
+         * @property {Boolean}
+         */
+        canDisable: true,
+
+        /**
          * Is filter enabled
          *
          * @property {Boolean}
@@ -47,6 +54,13 @@ function($, _, Backbone, app) {
         name: 'input_name',
 
         /**
+         * Placeholder for default value
+         *
+         * @property
+         */
+        placeholder: 'All',
+
+        /**
          * Label of filter
          *
          * @property {String}
@@ -54,18 +68,11 @@ function($, _, Backbone, app) {
         label: 'Input Label',
 
         /**
-         * Raw value of filter
+         * Is filter label visible
          *
-         * @property {Object}
+         * @property {Boolean}
          */
-        value: {},
-
-        /**
-         * Empty value object
-         *
-         * @property {Object}
-         */
-        emptyValue: {},
+        showLabel: true,
 
         /**
          * Parent element active class
@@ -92,7 +99,24 @@ function($, _, Backbone, app) {
             if (_.has(options, 'enabled')) {
                 this.enabled = options.enabled;
             }
+            if (_.has(options, 'canDisable')) {
+                this.canDisable = options.canDisable;
+            }
+            if (_.has(options, 'placeholder')) {
+                this.placeholder = options.placeholder;
+            }
+            if (_.has(options, 'showLabel')) {
+                this.showLabel = options.showLabel;
+            }
             this.defaultEnabled = this.enabled;
+
+            // init empty value object if it was not initialized so far
+            if (_.isUndefined(this.emptyValue)) {
+                this.emptyValue = {};
+            }
+            // init raw value of filter
+            this.value = _.clone(this.emptyValue);
+
             Backbone.View.prototype.initialize.apply(this, arguments);
         },
 
@@ -171,7 +195,7 @@ function($, _, Backbone, app) {
          * @return {*}
          */
         setValue: function(value) {
-            if (this._isNewValueUpdated(value)) {
+            if (!app.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
                 this.value = app.deepClone(value);
                 this._updateDOMValue();
@@ -204,17 +228,6 @@ function($, _, Backbone, app) {
         },
 
         /**
-         * Checks if new value differs from current value
-         *
-         * @param {*} newValue
-         * @return {Boolean}
-         * @protected
-         */
-        _isNewValueUpdated: function(newValue) {
-            return !app.isEqualsLoosely(this.value, newValue)
-        },
-
-        /**
          * Triggers when filter value is updated
          *
          * @param {*} newValue
@@ -243,6 +256,21 @@ function($, _, Backbone, app) {
          */
         isEmpty: function() {
             return app.isEqualsLoosely(this.getValue(), this.emptyValue);
+        },
+
+        /**
+         * Determines whether a filter value is empty or not
+         * Unlike isEmpty method this method should take in account only data values.
+         * For example if a filter has a string value and comparison type, the comparison type
+         * should be ignored in this method.
+         *
+         * @return {Boolean}
+         */
+        isEmptyValue: function() {
+            if (_.has(this.emptyValue, 'value') && _.has(this.value, 'value')) {
+                return app.isEqualsLoosely(this.value.value, this.emptyValue.value);
+            }
+            return true;
         },
 
         /**
@@ -310,13 +338,23 @@ function($, _, Backbone, app) {
         },
 
         /**
+         * Get criteria hint value
+         *
+         * @return {String}
+         */
+        _getCriteriaHint: function() {
+            return '';
+        },
+
+        /**
          * Get current value formatted to display format
          *
          * @return {*}
          * @protected
          */
         _getDisplayValue: function() {
-            return this._formatDisplayValue(this.getValue());
+            var value = (arguments.length > 0) ? arguments[0] : this.getValue();
+            return this._formatDisplayValue(value);
         },
 
         /**

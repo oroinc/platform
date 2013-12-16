@@ -2,4 +2,10 @@ oro:
     entity:
         controller:
             message:
-                saved: "Entity saved"
+                saved:              Entity saved
+        form:
+            choose_entity:          Choose an entity...
+            choose_entity_field:    Choose a column...
+            choose_entity_fields:   Choose columns...
+            entity_fields:          Fields
+            entity_related:         Related
