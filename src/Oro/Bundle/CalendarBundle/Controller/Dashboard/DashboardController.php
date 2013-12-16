@@ -13,7 +13,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/my_calendar/{widget}",
      *      name="oro_calendar_dashboard_my_calendar",
-     *      requirements={"widget"="[\w_-]+"},
+     *      requirements={"widget"="[\w_-]+"}
      * )
      * @Template("OroCalendarBundle:Dashboard:myCalendar.html.twig")
      */
