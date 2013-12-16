@@ -3,7 +3,7 @@ Sidebars
 Sidebars layout and Widget containers
 
 ## Sidebar initializing
-`left_panel.html.twig` and `right_panel.html.twig` templates define initial html makup and data
+`left_panel.html.twig` and `right_panel.html.twig` templates define initial html markup and data
 for left and right sidebars accordingly. The `data-models` attribute with JSON-data is expected
 to contain data for sidebar model. Example:
 

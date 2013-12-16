@@ -11,10 +11,11 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
     helloWorld.defaults = {
         title: 'Hello world',
-        icon: 'bundles/orosidebar/img/hello-world.ico',
+        icon: '/bundles/orosidebar/img/hello-world.ico',
         settings: function () {
             return {
-                content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse pulvinar.'
+                content: 'Welcome to OroCRM!<br/>'
+                + 'OroCRM is an easy-to-use, open source CRM with built-in marketing tools for your ecommerce business. learn more at <a href="http://orocrm.com">orocrm.com</a>'
             };
         }
     };
