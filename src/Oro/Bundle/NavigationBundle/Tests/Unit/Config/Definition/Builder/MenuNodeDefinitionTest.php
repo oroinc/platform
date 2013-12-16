@@ -19,7 +19,9 @@ class MenuNodeDefinitionTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->builder = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder')
-            ->setMethods(array('node', 'children', 'scalarNode', 'end', 'menuNode', 'menuNodeHierarchy'))
+            ->setMethods(
+                array('node', 'children', 'scalarNode', 'end', 'menuNode', 'menuNodeHierarchy', 'defaultValue')
+            )
             ->getMock();
         $this->definition = new MenuNodeDefinition('test');
         $this->definition->setBuilder($this->builder);
@@ -63,7 +65,10 @@ class MenuNodeDefinitionTest extends \PHPUnit_Framework_TestCase
             ->method('menuNodeHierarchy')
             ->with(9)
             ->will($this->returnSelf());
+        $this->builder->expects($this->any())
+            ->method('defaultValue')
+            ->will($this->returnSelf());
 
-        $node = $this->definition->menuNodeHierarchy(10);
+        $this->definition->menuNodeHierarchy(10);
     }
 }
