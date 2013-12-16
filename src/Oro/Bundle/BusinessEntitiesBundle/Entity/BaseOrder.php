@@ -131,7 +131,7 @@ class BaseOrder
     protected $updatedAt;
 
     /**
-     * @var BaseOrderItem
+     * @var BaseOrderItem[]|ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="BaseOrderItem", mappedBy="order",cascade={"all"})
      */
@@ -514,12 +514,36 @@ class BaseOrder
     }
 
     /**
+     * @param BaseOrderItem[] $items
+     *
+     * @return $this
+     */
+    public function setItems($items)
+    {
+        $this->items = $items;
+
+        return $this;
+    }
+
+    /**
+     * @return BaseOrderItem[]
+     */
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    /**
      * Clone relations
      */
     public function __clone()
     {
         if ($this->addresses) {
             $this->addresses = clone $this->addresses;
+        }
+
+        if ($this->items) {
+            $this->items = clone $this->items;
         }
     }
 }
