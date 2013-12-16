@@ -1,6 +1,7 @@
+/*jshint devel: true, multistr: true*/
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/multiselect-decorator'],
-function($, _, Backbone, mediator, MultiselectDecorator) {
+define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/multiselect-decorator', 'oro/app'],
+function($, _, Backbone, mediator, MultiselectDecorator, app) {
     'use strict';
 
     /**
@@ -50,6 +51,22 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
                 '<% }); %>' +
             '</select>'
         ),
+
+        /**
+         * Mobile template
+         */
+        mobileTemplate: _.template('\
+            <div class="dropdown">\
+                <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-toggle="dropdown">Filter Results</a>\
+                <ul class="dropdown-menu">\
+                    <li>\
+                        <div class="filter-dropdown">\
+                            <a id="reset-filter-button" href="javascript:void(0);">Reset</a>\
+                        </div>\
+                    </li>\
+                </ul>\
+            </div>\
+        '),
 
         /**
          * Filter list input selector
@@ -273,12 +290,46 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
             if (_.isEmpty(this.filters)) {
                 this.$el.hide();
             } else {
-                this.$el.append(this.addButtonTemplate({filters: this.filters}));
-                this.$el.append(fragment);
+                var addButton = this.addButtonTemplate({filters: this.filters});
+                if (app.isMobile()) {
+                    this.renderMobile(addButton, fragment);
+                } else {
+                    this.$el.append(addButton);
+                    this.$el.append(fragment);
+                }
                 this._initializeSelectWidget();
             }
 
             return this;
+        },
+
+        /**
+         * Mobile render
+         */
+        renderMobile: function (addButton, fragment) {
+            var view = this;
+
+            var $mobile = $(view.mobileTemplate());
+            $mobile.find('.filter-dropdown').append(addButton);
+            $mobile.find('.filter-dropdown').append(fragment);
+            view.$el.append($mobile);
+
+            view.$el.find('#reset-filter-button').click(function () {
+                mediator.trigger('datagrid:doReset:' + view.collection.inputName);
+            });
+
+            view.$el.find('a.dropdown-toggle').off().click(function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var $toggle = view.$el.find('.dropdown');
+                $toggle.toggleClass('oro-open');
+            });
+
+            view.collection.on('beforeFetch', function () {
+                var $toggle = view.$el.find('.dropdown');
+                $toggle.removeClass('oro-open');
+            });
         },
 
         /**
