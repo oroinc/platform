@@ -2,8 +2,8 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroEntityConfigBundle:Include:fields.html.twig'] %}
 
 {% oro_title_set({params : {
-    "%entityName%": entity_config.get('label')|default('N/A'),
-    "%fieldName%": field_config.get('label')|default('N/A')|trans,
+    "%entityName%": (entity_config.get('label')|trans)|default('N/A'),
+    "%fieldName%": (field_config.get('label')|trans)|default('N/A')|trans,
 }}) %}
 
 {% set audit_entity_class = field.entity.className|replace('\\', '_') %}
@@ -25,7 +25,7 @@
         'entity'      : 'entity',
         'indexPath'   : path('oro_entityconfig_index'),
         'indexLabel'  : 'Entities',
-        'entityTitle' : field.id ? field_config.get('label')|default(field.fieldName|capitalize)|trans : 'New Field'|trans,
+        'entityTitle' : field.id ? (field_config.get('label')|trans)|default(field.fieldName|capitalize) : 'New Field'|trans,
         'additional'  : [
             {
                 'indexPath'  : path('oro_entityconfig_view', {id: field.entity.id}),
