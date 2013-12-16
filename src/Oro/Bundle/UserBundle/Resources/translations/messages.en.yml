@@ -85,34 +85,79 @@ Login: Login
 oro:
     user:
         controller:
-            group:
-                message:
-                    saved: "Group saved"
-            role:
-                message:
-                    saved: "Role saved"
-            user:
-                message:
-                    saved: "User saved"
-            status:
-                message:
-                    saved: "Status saved"
-
+            group.message.saved: "Group saved"
+            role.message.saved: "Role saved"
+            user.message.saved: "User saved"
+            status.message.saved: "Status saved"
         grid:
             users:
                 columns:
-                    username:    "Username"
-                    email:       "Email"
-                    firstName:   "First name"
-                    lastName:    "Last name"
-                    createdAt:   "Created at"
-                    updatedAt:   "Updated at"
-                    enabled:     "Status"
+                    username:    Username
+                    email:       Email
+                    firstName:   First name
+                    lastName:    Last name
+                    createdAt:   Created at
+                    updatedAt:   Updated at
+                    enabled:     Status
 
-            roles:
-                columns:
-                    label:       "Label"
+            roles.columns.label: Label
+            groups.columns.name: Name
 
-            groups:
-                columns:
-                    name:       "Name"
+        #
+        # Oro/Bundle/UserBundle/Entity/User
+        #
+        entity_label:        User
+        entity_plural_label: Users
+        entity_description:  Represent user profile
+        id.label:          Id
+        username.label:    Username
+        email.label:       E-mail
+        name_prefix.label: Name prefix
+        first_name.label:  First name
+        middle_name.label: Middle name
+        last_name.label:   Last name
+        name_suffix.label: Name suffix
+        birthday.label:    Birthday
+        image.label:       Avatar
+        enabled.label:     Status
+        salt.label:        ~
+        password.label:    Password
+        last_login.label:  Last logged in
+        login_count.label: Cogin count
+        created_at.label:  Created
+        updated_at.label:  Updated
+        owner.label:       Owner
+#        roles.label:
+#        groups.label:
+#        api.label:
+#        statuses.label:
+#        current_status.label:
+#        emails.label:
+#        business_units.label:
+#        confirmation_token.label:
+#        password_requested_at.label:
+#        imap_configuration.label:
+
+        #
+        # Oro/Bundle/UserBundle/Entity/Group
+        #
+#        group:
+#            entity_label:
+#            entity_plural_label:
+#            entity_description:
+#            id.label:
+#            name.label:
+#            roles.label:
+#            owner.label:
+
+        #
+        # Oro/Bundle/UserBundle/Entity/Role
+        #
+#        role:
+#            entity_label:
+#            entity_plural_label:
+#            entity_description:
+#            id.label:
+#            role.label:
+#            label.label:
+#            owner.label:
