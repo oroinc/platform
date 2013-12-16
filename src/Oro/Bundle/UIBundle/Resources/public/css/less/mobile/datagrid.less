@@ -1,0 +1,52 @@
+.grid-toolbar {
+  padding: 10px;
+  label {
+    font-size: @baseFontSize;
+    line-height: 32px;
+    display: inline-block;
+    padding: 0 5px;
+    vertical-align: top;
+  }
+  .pagination {
+    float: left;
+    .icons-holder{
+      text-align: center;
+    }
+    & > ul > li a {
+      width: 28px;
+      height: 32px;
+    }
+    input[type="text"] {
+      width: 28px;
+      height: 22px;
+    }
+  }
+  .btn-group {
+    .btn {
+      height: 32px;
+      padding-left: 12px;
+      padding-right: 14px;
+      font-size: @baseFontSize;
+      &.dropdown-toggle{
+        padding-right: 9px;
+      }
+      .caret {
+        margin-left: 12px;
+      }
+    }
+    & > .dropdown-menu li a {
+      padding-left: 12px;
+      padding-right: 21px;
+    }
+  }
+  .mass-actions-panel .btn-group:not(:empty) {
+    margin-right: 12px;
+  }
+  .separator{
+    line-height: 27px;
+    font-size: 32px;
+    color: #eee;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+}
