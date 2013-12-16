@@ -9,22 +9,16 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ConfigurationBuilder implements BuilderInterface
 {
     /**
-     * @var ContainerInterface $container
+     * @var array $container
      */
-    protected $container;
+    protected $configuration;
 
     /**
-     * Inject service container
-     *
-     * @param ContainerInterface $container
-     *
-     * @return ConfigurationBuilder
+     * @param array $configuration
      */
-    public function setContainer(ContainerInterface $container)
+    public function setConfiguration(array $configuration)
     {
-        $this->container = $container;
-
-        return $this;
+        $this->configuration = $configuration;
     }
 
     /**
@@ -36,7 +30,7 @@ class ConfigurationBuilder implements BuilderInterface
      */
     public function build(ItemInterface $menu, array $options = array(), $alias = null)
     {
-        $menuConfig = $this->container->getParameter('oro_menu_config');
+        $menuConfig = $this->configuration;
 
         if (!empty($menuConfig['items']) && !empty($menuConfig['tree'])) {
             foreach ($menuConfig['tree'] as $menuTreeName => $menuTreeElement) {

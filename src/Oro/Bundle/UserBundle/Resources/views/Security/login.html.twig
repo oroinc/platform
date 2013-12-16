@@ -7,7 +7,13 @@
 
     <form action="{{ path('oro_user_security_check') }}" method="post" class="form-signin">
         <div class="title-box">
-            <h1 class="oro-title" title="{{ oro_config_value('oro_ui.application_title') }}">{{ oro_config_value('oro_ui.application_name') }}</h1>
+            <h1 class="oro-title logo-{{ oro_theme_logo() ? 'image' : 'text' }}" title="{{ oro_config_value('oro_ui.application_title')|escape }}">
+                {% if oro_theme_logo() %}
+                    <img src="{{ asset(oro_theme_logo()) }}" alt="{{ oro_config_value('oro_ui.application_name')|escape }}">
+                {% else %}
+                    {{ oro_config_value('oro_ui.application_name') }}
+                {% endif %}
+            </h1>
             <span class="divider-vertical"></span>
             <h2 class="title">{{ 'Login'|trans }}</h2>
         </div>

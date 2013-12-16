@@ -65,8 +65,6 @@ services:
 
     oro_menu.configuration_builder:
         class: %oro_menu.configuration_builder.class%
-        calls:
-            - [ setContainer, [ @service_container ] ]
         tags:
             - { name: oro_menu.builder }
 
@@ -76,7 +74,6 @@ services:
             - @knp_menu.helper
             - @oro_menu.builder_chain
             - @oro_navigation.breadcrumb_manager
-            - @service_container
         tags:
             - { name: twig.extension }
 
@@ -188,8 +185,6 @@ services:
           - @serializer
           - @oro_config.user
           - @oro_navigation.breadcrumb_manager
-        calls:
-          - [ setTitles, [ %oro_titles% ] ]
 
     oro_navigation.title_annotations_reader:
         class:                        %oro_navigation.title_service.annotations_reader.class%
@@ -197,7 +192,6 @@ services:
 
     oro_navigation.title_config_reader:
         class:                        %oro_navigation.title_service.config_reader.class%
-        arguments:                    ["%oro_titles%"]
 
     oro_navigation.title_service.twig.extension:
         class: %oro_navigation.title_service.twig.extension.class%
