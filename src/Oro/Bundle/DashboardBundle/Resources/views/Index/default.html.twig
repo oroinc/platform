@@ -1,4 +1,5 @@
 {% extends bap.layout %}
+{% oro_title_set({params : {"%name%": pageTitle|trans }}) %}
 
 {% macro renderCell(widgets, isEven) %}
     {% if (not isEven and widgets|length) or (isEven and widgets|length > 1) %}
