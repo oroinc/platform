@@ -1,0 +1,22 @@
+{% extends 'OroDashboardBundle:Index:default.html.twig' %}
+
+{% block content %}
+<div class="layout-content">
+    {{ block('widgets_content') }}
+</div>
+{% endblock %}
+
+{% block widgets_content %}
+    {% set contentClass = 'launchpad-container' %}
+    {{ parent() }}
+{% endblock %}
+
+{% block widgets %}
+<div class="container">
+    <div class="clearfix page-title">
+        <h1 class="oro-subtitle pull-left">{{ pageTitle|trans }}</h1>
+        {{ block('titleNavButtons') }}
+    </div>
+    {{ parent() }}
+</div>
+{% endblock %}
