@@ -31,7 +31,7 @@
         {% set breadcrumbs = {
                 'entity':      form.vars.value,
                 'indexPath':   path('oro_tag_index'),
-                'indexLabel': 'Tags',
+                'indexLabel': 'oro.tag.entity_plural_label',
                 'entityTitle': form.vars.value.name|default('N/A')
             }
         %}
@@ -40,6 +40,11 @@
         {% include 'OroUIBundle::page_title_block.html.twig' %}
     {% endif %}
 {% endblock pageHeader %}
+
+{% block stats %}
+    <li>{{ 'oro.tag.created.label'|trans }}: {{ form.vars.value.createdAt ? form.vars.value.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.tag.updated.label'|trans }}: {{ form.vars.value.updatedAt ? form.vars.value.updatedAt|oro_format_datetime : 'N/A' }}</li>
+{% endblock stats %}
 
 {% block content_data %}
     {% set id = 'tag-edit' %}
@@ -50,7 +55,7 @@
             'subblocks': [{
                 'title': '',
                 'data': [
-                    form_row(form.name)
+                    form_row(form.name, {label: 'oro.tag.name.label'})
                 ]
             }]
         }]

@@ -48,7 +48,7 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_user_index'),
-        'indexLabel': 'Users'|trans,
+        'indexLabel':  'oro.user.entity_plural_label'|trans,
         'entityTitle': fullname,
         'hasAvatar':   true,
         'imagePath':   entity.imagePath,
@@ -69,18 +69,24 @@
 {% endblock breadcrumbs %}
 
 {% block stats %}
-    {{ parent() }}
-    <li>{{ 'Last logged in'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'Login count'|trans }}: {{ entity.loginCount|default(0) }}</li>
+    <li>{{ 'oro.user.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.login_count.label'|trans }}: {{ entity.loginCount|default(0) }}</li>
 {% endblock stats %}
 
 {% block content_data %}
   <div class="user-profile-cols">
     {% set id = 'user-profile' %}
 
-    {% set dataSubBlocks = [UI.attibuteRow('Email', {value: entity.email, hint: 'Primary'|trans}, entity.emails|length ? {data: entity.emails, field:'email'} : {})] %}
+    {% set dataSubBlocks = [UI.attibuteRow('oro.user.email.label', {
+        value: entity.email,
+        hint: 'Primary'|trans},
+        entity.emails|length ? {data: entity.emails, field:'email'} : {}
+    )] %}
+
     {% if resource_granted('oro_tag_view_tag_cloud') %}
-        {% set dataSubBlocks = dataSubBlocks|merge([UI.renderAttribute('Tags'|trans, _tag.renderView(entity))]) %}
+        {% set dataSubBlocks = dataSubBlocks|merge([UI.renderAttribute('oro.tag.entity_plural_label', _tag.renderView(entity))]) %}
     {% endif %}
 
     {#{{ render(controller('OroEmailBundle:Email:activities', {'emails': entity.emails})) }}#}
@@ -93,14 +99,14 @@
                 {
                     'title': 'Basic Information'|trans,
                     'data': [
-                        UI.attibuteRow('User name'|trans, entity.username),
-                        entity.namePrefix ? UI.attibuteRow('Name prefix'|trans, entity.namePrefix),
-                        UI.attibuteRow('First name'|trans, entity.firstName|default('N/A')),
-                        entity.middleName ? UI.attibuteRow('Middle name'|trans, entity.middleName),
-                        UI.attibuteRow('Last name'|trans, entity.lastName|default('N/A')),
-                        entity.nameSuffix ? UI.attibuteRow('Name suffix'|trans, entity.nameSuffix),
-                        UI.attibuteRow('Birthday'|trans, entity.birthday ? entity.birthday|oro_format_date : 'N/A'),
-                        UI.renderAttribute('API key'|trans, _self.api_data_block(entity))
+                        UI.attibuteRow('oro.user.username.label', entity.username),
+                        entity.namePrefix ? UI.attibuteRow('oro.user.name_prefix.label', entity.namePrefix),
+                        UI.attibuteRow('oro.user.first_name.label', entity.firstName|default('N/A')),
+                        entity.middleName ? UI.attibuteRow('oro.user.middle_name.label', entity.middleName),
+                        UI.attibuteRow('oro.user.last_name.label', entity.lastName|default('N/A')),
+                        entity.nameSuffix ? UI.attibuteRow('oro.user.name_suffix.label', entity.nameSuffix),
+                        UI.attibuteRow('oro.user.birthday.label', entity.birthday ? entity.birthday|oro_format_date : 'N/A'),
+                        UI.renderAttribute('oro.user.api.label', _self.api_data_block(entity))
                     ]
                 },
                 {
@@ -175,7 +181,7 @@
         {% set dataBlocks = dataBlocks|merge
             (
                 [{
-                    'title': 'User emails'|trans,
+                    'title': 'oro.user.emails.label'|trans,
                     'subblocks': [
                         {
                             'title': '',

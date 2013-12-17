@@ -1,14 +1,14 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set gridName = 'groups-grid' %}
-{% set pageTitle = 'Groups' %}
+{% set pageTitle = 'oro.user.group.entity_plural_label'|trans %}
 
 {% block navButtons %}
     {% if resource_granted('oro_user_group_create') %}
         {{ UI.addButton({
             'path' : path('oro_user_group_create'),
-            'title' : 'Create group',
-            'label' : 'Create group'
+            'title' : 'Create'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans|lower,
+            'label' : 'Create'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans|lower
         }) }}
     {% endif %}
 {% endblock %}
