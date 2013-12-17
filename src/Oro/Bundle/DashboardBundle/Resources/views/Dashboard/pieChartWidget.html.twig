@@ -1,0 +1,106 @@
+{% extends 'OroDashboardBundle:Dashboard:chartWidget.html.twig' %}
+
+{% block content %}
+    <div class="chart-container">
+        <div class="clearfix">
+            <div id="{{ widgetId }}-chart" class="pie-chart chart pull-left"></div>
+            <div id="{{ widgetId }}-legend" class="pie-chart-legend chart-legend pull-left"></div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery', 'flotr2'],
+        function($, Flotr){
+            $(function () {
+                var $widgetContent = $('#{{ widgetContentId }}');
+                var $chart = $('#{{ widgetId }}-chart');
+                var $chartLegend = $('#{{ widgetId }}-legend');
+                var setChartSize = function () {
+                    var chartWidth = Math.min(Math.round($widgetContent.width() * 0.35, 0), 350);
+                    if (chartWidth != $chart.width()) {
+                        $chart.width(chartWidth);
+                        $chart.height(chartWidth);
+                        $chartLegend.height(chartWidth);
+                        return true;
+                    }
+                    return false;
+                };
+                var setChartContainerSize = function () {
+                    $chartLegendTable = $chartLegend.find('table');
+                    $chart.closest('.clearfix').width(
+                            $chart.width() +
+                            $chartLegendTable.outerWidth() +
+                            parseInt($chartLegendTable.css('margin-left'))
+                    );
+                };
+                var drawChart = function () {
+                    var data = [
+                        {% block chartData %}
+                        {%- for item in items -%}
+                        {
+                            data : [[0, {{ item.fraction|json_encode|raw }}]],
+                            label : {{ item.label|json_encode|raw }}
+                        }{{ loop.last ? '' : ',' }}
+                        {%- endfor -%}
+                        {% endblock %}
+                    ];
+                    var graph = Flotr.draw(
+                        $chart.get(0),
+                        data,
+                        {
+                            colors: {{ chartColors|json_encode|raw }},
+                            fontColor: {{ chartFontColor|json_encode|raw }},
+                            fontSize: {{ chartFontSize|json_encode|raw }},
+                            shadowSize: 3,
+                            HtmlText: true,
+                            xaxis : {
+                                showLabels : false
+                            },
+                            yaxis : {
+                                showLabels : false
+                            },
+                            grid : {
+                                color: {{ chartFontColor|json_encode|raw }},
+                                verticalLines : false,
+                                horizontalLines : false,
+                                outlineWidth: 0
+                            },
+                            pie : {
+                                show : true,
+                                explode : 0,
+                                sizeRatio: 0.8,
+                                startAngle: Math.PI/3.5
+                            },
+                            mouse : {
+                                track : true,
+                                relative: true,
+                                lineColor: {{ chartHighlightColor|json_encode|raw }},
+                                trackFormatter: function (obj) {
+                                    return (obj.series.label + '&nbsp;&nbsp;&nbsp;' + obj.fraction * 100) + ' %';
+                                }
+                            },
+                            legend : {
+                                position : 'ne',
+                                container: $chartLegend.get(0),
+                                labelBoxWidth: 20,
+                                labelBoxHeight: 13,
+                                labelBoxMargin: 0
+                            }
+                        }
+                    );
+                };
+
+                setChartSize();
+                drawChart();
+                setChartContainerSize();
+
+                $(window).resize(function () {
+                    if (setChartSize()) {
+                        drawChart();
+                        setChartContainerSize();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
