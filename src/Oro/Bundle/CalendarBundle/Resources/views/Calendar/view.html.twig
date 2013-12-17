@@ -13,15 +13,15 @@
 {% block breadcrumb %}
     {% set breadcrumbs = [{'label': name }] %}
     {% if not entity.name is empty %}
-        {% set breadcrumbs = breadcrumbs|merge([{'label': 'Calendars'|trans }, {'label': entity.name}]) %}
+        {% set breadcrumbs = breadcrumbs|merge([{'label': 'oro.calendar.entity_label'|trans }, {'label': entity.name}]) %}
     {% else %}
-        {% set breadcrumbs = breadcrumbs|merge([{'label': 'My Calendar'|trans}]) %}
+        {% set breadcrumbs = breadcrumbs|merge([{'label': 'My'|trans ~ ' ' ~ 'oro.calendar.entity_label'|trans }]) %}
     {% endif %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}
 
 {% block pageHeader %}
-    {% set breadcrumbs = {'entityTitle': 'Calendar' } %}
+    {% set breadcrumbs = {'entityTitle': 'oro.calendar.entity_label'|trans } %}
     {{ parent() }}
 {% endblock pageHeader %}
 
@@ -66,13 +66,13 @@
 
     <script type="text/html" id="template-calendar-event">
         {% set data = [
-                form_row(event_form.title, {'label': 'Title'}),
-                form_row(event_form.start, {'label': 'Start'}),
-                form_row(event_form.end, {'label': 'End'}),
-                form_row(event_form.allDay, {'label': 'All day event'}),
-                form_row(event_form.reminder, {'label': 'Reminder'}),
-            ]
-        %}
+            form_row(event_form.title, {label: 'oro.calendar.calendarevent.title.label'}),
+            form_row(event_form.start, {label: 'oro.calendar.calendarevent.start.label'}),
+            form_row(event_form.end, {label: 'oro.calendar.calendarevent.end.label'}),
+            form_row(event_form.allDay, {label: 'oro.calendar.calendarevent.all_day.label'}),
+            form_row(event_form.reminder, {label: 'oro.calendar.calendarevent.reminder.label'}),
+        ] %}
+
         <div class="alert alert-error" style="display: none;"></div>
         <form id="{{ event_form.vars.name }}" action="#">
             <fieldset class="form-horizontal">
