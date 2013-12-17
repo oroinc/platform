@@ -76,8 +76,6 @@ class CalendarController extends Controller
                         'required' => true,
                         'configs'  => array(
                             'placeholder' => 'oro.calendar.form.choose_user_to_add_calendar',
-                            /* @todo: Must be removed. I have to do this because oro_user_select sets 400px */
-                            'width' => 'off'
                         )
                     )
                 )
