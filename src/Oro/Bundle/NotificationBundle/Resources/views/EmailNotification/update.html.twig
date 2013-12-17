@@ -5,7 +5,10 @@
     'OroNotificationBundle:Form:fields.html.twig',
     'OroEmailBundle:Form:fields.html.twig'
 ]%}
-{% set title = form.vars.value.id ? 'Edit notification rule #%id%'|trans({'%id%': form.vars.value.id}) : 'New Notification Rule'|trans %}
+{% set title = form.vars.value.id
+    ? 'Edit %label% #%id%'|trans({'%id%': form.vars.value.id, '%label%': 'oro.notification.emailnotification.entity_label'|trans|lower})
+    : 'New %label%'|trans({'%label%': 'oro.notification.emailnotification.entity_label'|trans|lower})
+%}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
 {% endif %}
@@ -60,14 +63,14 @@
             'subblocks': [{
                 'title': '',
                 'data': [
-                    form_row(form.entityName),
-                    form_row(form.event),
-                    form_row(form.template),
+                    form_row(form.entityName, {label: 'oro.notification.emailnotification.entity_name.label'}),
+                    form_row(form.event, {label: 'oro.notification.emailnotification.event.label'}),
+                    form_row(form.template, {label: 'oro.notification.emailnotification.template.label'}),
                 ]
             }]
         },
         {
-            'title': 'Recipient List',
+            'title': 'oro.notification.emailnotification.recipient_list.label'|trans,
             'class': '',
             'subblocks': [{
                 'title': '',

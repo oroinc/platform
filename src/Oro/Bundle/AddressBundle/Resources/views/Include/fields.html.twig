@@ -97,12 +97,12 @@
     {{ form_row(form.lastName) }}
     {{ form_row(form.nameSuffix) }}
     {{ form_row(form.organization) }}
-    {{ form_row(form.country) }}
+    {{ form_row(form.country, {label: 'oro.address.country.entity_label'}) }}
     {{ form_row(form.street) }}
     {{ form_row(form.street2) }}
     {{ form_row(form.city) }}
-    {{ form_row(form.state_text) }}
-    {{ form_row(form.state) }}
+    {{ form_row(form.state_text, {label: 'oro.address.region.entity_label'|trans}) }}
+    {{ form_row(form.state, {label: 'oro.address.region.entity_label'|trans}) }}
     {{ form_row(form.postalCode) }}
     {{ form_rest(form) }}
 {%  endblock %}

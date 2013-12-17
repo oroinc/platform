@@ -69,7 +69,6 @@ class EmailNotificationType extends AbstractType
             array(
                 'choices'            => $this->entityNameChoices,
                 'multiple'           => false,
-                'translation_domain' => 'config',
                 'empty_value'        => '',
                 'empty_data'         => null,
                 'required'           => true,

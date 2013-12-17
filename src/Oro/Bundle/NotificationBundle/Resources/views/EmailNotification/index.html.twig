@@ -1,14 +1,14 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set gridName = 'email-notification-grid' %}
-{% set pageTitle = 'Transactional Emails' %}
+{% set pageTitle = 'oro.notification.emailnotification.entity_plural_label'|trans %}
 
 {% block navButtons %}
     {% if resource_granted('oro_notification_emailnotification_create') %}
         {{ UI.addButton({
             'path' : path('oro_notification_emailnotification_create'),
-            'title' : 'Create notification rule',
-            'label' : 'Create notification rule'
+            'title' : 'Create'|trans ~ ' ' ~ 'oro.notification.emailnotification.entity_label'|trans|lower,
+            'label' : 'Create'|trans ~ ' ' ~ 'oro.notification.emailnotification.entity_label'|trans|lower
         }) }}
     {% endif %}
 {% endblock %}
