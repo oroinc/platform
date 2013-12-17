@@ -109,13 +109,14 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
         $('[data-spy="scroll"]').each(function () {
             var $spy = $(this);
             var spyHeight = $spy.innerHeight();
+            var debugBarHeight = $('.sf-toolbar').height() || 0;
 
             var isMultipleRows = $spy.find('.responsive-section').length > 1;
 
             $spy.find('.responsive-section:last').each(function () {
                 var $row = $(this);
                 var titleHeight = $row.find('.scrollspy-title').outerHeight();
-                var rowAdjHeight = isMultipleRows ? titleHeight + spyHeight : spyHeight;
+                var rowAdjHeight = (isMultipleRows ? titleHeight + spyHeight : spyHeight) - debugBarHeight;
 
                 var rowOrigHeight = $row.data('originalHeight');
                 if (!rowOrigHeight) {

@@ -6,8 +6,10 @@
 #top-page{
     width: 100%;
 }
+.footer,footer,
 #footer{
-    display: table-footer-group;
+    font-size: 13px;
+    display: block;
     width: 100%;
 }
 #footer-frame{

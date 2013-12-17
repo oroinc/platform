@@ -48,8 +48,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             $admin = $userManager->createUser();
             $admin
                 ->setUsername('admin')
-                ->addRole($role)
-                ->addGroup($group);
+                ->addRole($role);
         }
 
         $admin->setPlainPassword('admin')
@@ -57,6 +56,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, O
             ->setLastname('Doe')
             ->setEmail('admin@example.com')
             ->setOwner($unit)
+            ->addGroup($group)
             ->setBusinessUnits(
                 new ArrayCollection(array($unit))
             );
