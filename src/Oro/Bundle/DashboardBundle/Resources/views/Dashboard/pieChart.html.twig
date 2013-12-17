@@ -82,7 +82,7 @@
                                 relative: true,
                                 lineColor: {{ chartHighlightColor|json_encode|raw }},
                                 trackFormatter: function (obj) {
-                                    return (obj.series.label + '&nbsp;&nbsp;&nbsp;' + obj.fraction * 100) + ' %';
+                                    return obj.series.label + '&nbsp;&nbsp;&nbsp;' + (Math.round(obj.fraction * 10000) * 0.01) + ' %';
                                 }
                             },
                             legend : {
