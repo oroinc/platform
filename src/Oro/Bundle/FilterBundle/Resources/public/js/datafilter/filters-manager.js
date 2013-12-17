@@ -24,9 +24,14 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
         filters: {},
 
         /**
-         * Desktop/Mobile template
+         * Template selector
          */
-        template: _.template($('#filter-container').html()),
+        templateSelector: '#filter-container',
+
+        /**
+         * Template
+         */
+        template: null,
 
         /**
          * Filter list input selector
@@ -71,6 +76,8 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function (options) {
+            this.template = _.template($(this.templateSelector).html());
+
             if (options.filters) {
                 this.filters = options.filters;
             }
@@ -95,7 +102,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
             }, this);
 
             if (app.isMobile()) {
-                this.collection.on('beforeFetch', this.toggleDropdown, this);
+                this.collection.on('beforeFetch', this.closeDropdown, this);
             }
         },
 
@@ -358,14 +365,14 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
         _onDropdownToggle: function (e) {
             e.preventDefault();
             e.stopPropagation();
-            this.toggleDropdown();
+            this.$el.find('.dropdown').toggleClass('oro-open');
         },
 
         /**
-         * Toggle dropdown
+         * Close dropdown
          */
-        toggleDropdown: function () {
-            this.$el.find('.dropdown').toggleClass('oro-open');
+        closeDropdown: function () {
+            this.$el.find('.dropdown').removeClass('oro-open');
         }
     });
 });
