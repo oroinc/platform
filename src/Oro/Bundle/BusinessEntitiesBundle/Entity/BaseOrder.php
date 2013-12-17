@@ -27,9 +27,9 @@ class BaseOrder
      * @var BasePerson
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson", cascade={"persist"})
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $owner;
+    protected $customer;
 
     /**
      * @var ArrayCollection
@@ -166,19 +166,23 @@ class BaseOrder
     }
 
     /**
-     * @param BasePerson $owner
+     * @param BasePerson $customer
+     *
+     * @return $this
      */
-    public function setOwner(BasePerson $owner = null)
+    public function setCustomer($customer)
     {
-        $this->owner = $owner;
+        $this->customer = $customer;
+
+        return $this;
     }
 
     /**
-     * @return BasePerson
+     * @return \Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson
      */
-    public function getOwner()
+    public function getCustomer()
     {
-        return $this->owner;
+        return $this->customer;
     }
 
     /**

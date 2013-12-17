@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelRepository extends EntityRepository
@@ -56,6 +57,8 @@ class ChannelRepository extends EntityRepository
      */
     public function getOrLoadById($id)
     {
+        $uow = $this->getEntityManager()->getUnitOfWork();
+
         if (!isset($this->loadedInstances[$id])) {
             $this->loadedInstances[$id] = $this->createQueryBuilder('c')
                 ->select('c')
@@ -63,6 +66,9 @@ class ChannelRepository extends EntityRepository
                 ->setParameter('id', $id)
                 ->getQuery()
                 ->getSingleResult();
+        } elseif ($this->loadedInstances[$id]
+            && $uow->getEntityState($this->loadedInstances[$id]) != UnitOfWork::STATE_MANAGED) {
+            $this->loadedInstances[$id] = $uow->merge($this->loadedInstances[$id]);
         }
 
         return $this->loadedInstances[$id];

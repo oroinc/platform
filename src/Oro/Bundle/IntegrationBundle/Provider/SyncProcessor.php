@@ -60,7 +60,7 @@ class SyncProcessor implements SyncProcessorInterface
         /** @var Channel $channel */
         $connectors = $channel->getConnectors();
 
-        foreach ($connectors as $connector) {
+        foreach ((array)$connectors as $connector) {
             try {
                 $this->logger->info(sprintf('Start processing "%s" connector', $connector));
                 /**
