@@ -24,49 +24,9 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
         filters: {},
 
         /**
-         * Container tag name
-         *
-         * @property
+         * Desktop/Mobile template
          */
-        tagName: 'div',
-
-        /**
-         * Container classes
-         *
-         * @property
-         */
-        className: 'filter-box oro-clearfix-width',
-
-        /**
-         * Filter list template
-         *
-         * @property
-         */
-        addButtonTemplate: _.template(
-            '<select id="add-filter-select" multiple>' +
-                '<% _.each(filters, function (filter, name) { %>' +
-                    '<option value="<%= name %>" <% if (filter.enabled) { %>selected<% } %>>' +
-                        '<%= filter.label %>' +
-                    '</option>' +
-                '<% }); %>' +
-            '</select>'
-        ),
-
-        /**
-         * Mobile template
-         */
-        mobileTemplate: _.template('\
-            <div class="dropdown">\
-                <a href="javascript:void(0);" class="btn btn-large dropdown-toggle" data-toggle="dropdown">Filter Results</a>\
-                <ul class="dropdown-menu">\
-                    <li>\
-                        <div class="filter-dropdown">\
-                            <a id="reset-filter-button" href="javascript:void(0);">Reset</a>\
-                        </div>\
-                    </li>\
-                </ul>\
-            </div>\
-        '),
+        template: _.template($('#filter-container').html()),
 
         /**
          * Filter list input selector
@@ -98,7 +58,9 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
 
         /** @property */
         events: {
-            'change #add-filter-select': '_onChangeFilterSelect'
+            'change #add-filter-select': '_onChangeFilterSelect',
+            'click #reset-filter-button': '_onReset',
+            'click a.dropdown-toggle': '_onDropdownToggle'
         },
 
         /**
@@ -108,8 +70,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
          * @param {Object} [options.filters]
          * @param {String} [options.addButtonHint]
          */
-        initialize: function(options)
-        {
+        initialize: function (options) {
             if (options.filters) {
                 this.filters = options.filters;
             }
@@ -132,6 +93,10 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
                     this.stopListening(filter, "disable", this._onFilterDisabled);
                 }, this);
             }, this);
+
+            if (app.isMobile()) {
+                this.collection.on('beforeFetch', this.toggleDropdown, this);
+            }
         },
 
         /**
@@ -274,7 +239,9 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
+            var $container = $(this.template({ filters: this.filters }));
+            this.setElement($container);
+
             var fragment = document.createDocumentFragment();
 
             _.each(this.filters, function(filter) {
@@ -288,48 +255,13 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
             this.trigger("rendered");
 
             if (_.isEmpty(this.filters)) {
-                this.$el.hide();
+                $container.hide();
             } else {
-                var addButton = this.addButtonTemplate({filters: this.filters});
-                if (app.isMobile()) {
-                    this.renderMobile(addButton, fragment);
-                } else {
-                    this.$el.append(addButton);
-                    this.$el.append(fragment);
-                }
+                $container.find('.filter-container').append(fragment);
                 this._initializeSelectWidget();
             }
 
             return this;
-        },
-
-        /**
-         * Mobile render
-         */
-        renderMobile: function (addButton, fragment) {
-            var view = this;
-
-            var $mobile = $(view.mobileTemplate());
-            $mobile.find('.filter-dropdown').append(addButton);
-            $mobile.find('.filter-dropdown').append(fragment);
-            view.$el.append($mobile);
-
-            view.$el.find('#reset-filter-button').click(function () {
-                mediator.trigger('datagrid:doReset:' + view.collection.inputName);
-            });
-
-            view.$el.find('a.dropdown-toggle').off().click(function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-
-                var $toggle = view.$el.find('.dropdown');
-                $toggle.toggleClass('oro-open');
-            });
-
-            view.collection.on('beforeFetch', function () {
-                var $toggle = view.$el.find('.dropdown');
-                $toggle.removeClass('oro-open');
-            });
         },
 
         /**
@@ -409,6 +341,31 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
                 top: buttonPosition.top + button.outerHeight(),
                 left: widgetLeftOffset
             });
+        },
+
+        /**
+         * Reset button click handler
+         */
+        _onReset: function () {
+            mediator.trigger('datagrid:doReset:' + this.collection.inputName);
+        },
+
+        /**
+         * Dropdown button toggle handler
+         * @param e
+         * @private
+         */
+        _onDropdownToggle: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleDropdown();
+        },
+
+        /**
+         * Toggle dropdown
+         */
+        toggleDropdown: function () {
+            this.$el.find('.dropdown').toggleClass('oro-open');
         }
     });
 });
