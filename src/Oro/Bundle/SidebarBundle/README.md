@@ -48,4 +48,4 @@ defaults: {
 }
 ```
     
-The bundle includes example widget, called `helloWorld`, located at `bundles/orosidebar/js/widget/hello-world.js`
+The bundle includes example widget, called `helloWorld`, located at `bundles/orosidebar/js/widget/widget.js`

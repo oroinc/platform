@@ -1,7 +1,7 @@
 /*global define*/
 
-define(['backbone', 'oro/sidebar/constants', 'oro/sidebar/widget-container/collection'
-    ], function (Backbone, constants, WidgetContainerCollection) {
+define(['backbone', 'routing', 'oro/sidebar/constants', 'oro/sidebar/widget-container/collection'],
+function (Backbone, routing, constants, WidgetContainerCollection) {
     'use strict';
 
     /**
@@ -9,9 +9,7 @@ define(['backbone', 'oro/sidebar/constants', 'oro/sidebar/widget-container/colle
      * @class oro.sidebar.sidebar.Model
      * @extends Backbone.Model
      */
-    var SidebarModel = Backbone.Model.extend({
-        urlRoot: 'bundles/orosidebar/api/sidebar',
-
+    return Backbone.Model.extend({
         initialize: function () {
             this.widgets = new WidgetContainerCollection();
 
@@ -36,6 +34,4 @@ define(['backbone', 'oro/sidebar/constants', 'oro/sidebar/widget-container/colle
             this.trigger('change');
         }
     });
-
-    return SidebarModel;
 });

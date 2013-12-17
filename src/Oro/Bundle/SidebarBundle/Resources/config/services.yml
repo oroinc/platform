@@ -1,7 +1,18 @@
 parameters:
-#    oro_sidebar.example.class: Oro\Bundle\SidebarBundle\Example
+    oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
+    oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
 
 services:
-#    oro_sidebar.example:
-#        class: %oro_sidebar.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    oro_sidebar.widget_definition.registry:
+        class: %oro_sidebar.widget_definition.registry.class%
+        scope: request
+        arguments:
+            - %oro_sidebar.sidebar_widgets_definitions%
+            - @templating.helper.assets
+
+    oro_sidebar.twig.extension:
+        class: %oro_sidebar.twig.extension.class%
+        arguments:
+            - @service_container
+        tags:
+            - { name: twig.extension }

@@ -10,7 +10,7 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
      */
     var WidgetContainerModel = Backbone.Model.extend({
         defaults: {
-            order: 0,
+            position: 0,
             title: '',
             icon: '#',
             module: '',

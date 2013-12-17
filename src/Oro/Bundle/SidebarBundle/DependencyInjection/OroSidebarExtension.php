@@ -12,7 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class OroSidebarExtension extends Extension
 {
-    const WIDGETS_SETTINGS_PARAMETER = 'oro_theme.settings';
+    const WIDGETS_SETTINGS_PARAMETER = 'oro_sidebar.sidebar_widgets_definitions';
 
     /**
      * {@inheritDoc}
@@ -50,14 +50,14 @@ class OroSidebarExtension extends Extension
             $finder = new Finder();
             $finder
                 ->files()
-                ->path('#^Resources/public/sidebar_widgets/\w+/settings.yml#')
+                ->path('#^Resources/public/sidebar_widgets/\w+/widget.yml#')
                 ->in($bundlePath);
 
             /** @var SplFileInfo $file */
             foreach ($finder as $file) {
-                $themeName = $file->getPathInfo()->getFilename();
+                $widgetName = $file->getPathInfo()->getFilename();
                 $settings = Yaml::parse($file->getRealPath());
-                $result[$themeName] = $settings;
+                $result[$widgetName] = $settings;
             }
         }
 

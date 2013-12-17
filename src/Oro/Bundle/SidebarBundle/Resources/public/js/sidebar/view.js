@@ -173,7 +173,7 @@ define(function (require) {
 
             view.model.widgets.each(function (widget) {
                 var order = widgetOrder[widget.cid];
-                widget.set({ order: order }, { silent: true });
+                widget.set({ position: order }, { silent: true });
                 widget.save();
             });
 

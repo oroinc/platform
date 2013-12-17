@@ -12,6 +12,7 @@ define(function (require) {
 
     var Modal = require('oro/modal');
     var DialogWidget = require('oro/dialog-widget');
+    var constants = require('oro/sidebar/constants');
 
     /**
      * @export  oro/sidebar/widget-controller/widget-add-view
@@ -54,12 +55,19 @@ define(function (require) {
                 var moduleId = $(selected).closest('li').data('moduleid');
 
                 requirejs([moduleId], function (Widget) {
+                    var placement = null;
+                    if (model.position === constants.SIDEBAR_LEFT) {
+                        placement = 'left';
+                    } else if (model.position === constants.SIDEBAR_RIGHT) {
+                        placement = 'right';
+                    }
                     var widget = new WidgetContainerModel({
                         title: Widget.defaults.title,
                         icon: Widget.defaults.icon,
                         module: moduleId,
                         settings: Widget.defaults.settings(),
-                        order: model.widgets.length
+                        position: model.widgets.length,
+                        placement: placement
                     });
 
                     model.widgets.push(widget);

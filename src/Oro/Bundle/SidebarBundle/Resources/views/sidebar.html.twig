@@ -1,0 +1,23 @@
+<div id="sidebar-{{ placement }}" class="sidebar sidebar-{{ placement }}"></div>
+
+<script type="text/javascript">
+    require(['jquery', 'oro/sidebar/sidebar/model', 'oro/sidebar/sidebar/view', 'oro/sidebar/constants'],
+    function($, SidebarModel, SidebarView, constants) {
+        'use strict';
+
+        $(function () {
+            var sidebarModel = new SidebarModel({
+                'widgets': {{ oro_sidebar_get_available_widgets(placement)|json_encode|raw }}
+            });
+            sidebarModel.position = constants.SIDEBAR_{{ placement|upper }};
+
+            new SidebarView({
+                model: sidebarModel,
+                el: '#sidebar-{{ placement }}',
+                $main: $('#main')
+            });
+
+            sidebarModel.widgets.reset({{ render(path('oro_api_get_sidebarwidgets', {'placement': placement})) }});
+        });
+    });
+</script>

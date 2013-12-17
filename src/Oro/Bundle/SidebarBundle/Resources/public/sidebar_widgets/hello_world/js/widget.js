@@ -11,7 +11,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
     helloWorld.defaults = {
         title: 'Hello world',
-        icon: '/bundles/orosidebar/img/hello-world.ico',
+        icon: '/bundles/orosidebar/sidebar_widgets/hello_world/img/icon.ico',
         settings: function () {
             return {
                 content: 'Welcome to OroCRM!<br/>'

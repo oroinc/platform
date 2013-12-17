@@ -14,11 +14,11 @@ define(function (require) {
      * @extends Backbone.Collection
      */
     var WidgetContainerCollection = Backbone.Collection.extend({
-        url: 'bundles/orosidebar/api/widget-container',
+        url: '/api/rest/latest/sidebarwidgets',
 
         model: WidgetContainerModel,
 
-        comparator: 'order'
+        comparator: 'position'
     });
 
     return WidgetContainerCollection;
