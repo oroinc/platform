@@ -217,7 +217,9 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     public function preSubmit(FormEvent $event)
     {
-        if ($event->getForm()->has($this->fieldName)) {
+        if ($event->getForm()->has($this->fieldName)
+            && is_object($event->getForm()->get($this->fieldName)->getData())
+        ) {
             $this->oldOwner = $event->getForm()->get($this->fieldName)->getData()->getId();
         } else {
             $this->oldOwner = null;
@@ -236,8 +238,15 @@ class OwnerFormExtension extends AbstractTypeExtension
             return;
         }
 
-        $newOwnerId = $event->getData()->getOwner()->getId();
+        $entity = $event->getData();
+        // Check if we have owner in data.
+        // In case Business unit entity, owner(parent) is not required.
+        // For other entities, form without owner will not be valid because owner is required.
+        if (!is_object($event->getData()->getOwner())) {
+            return;
+        }
 
+        $newOwnerId = $entity->getOwner()->getId();
         //validate only if owner was changed or then we are on create page
         if (is_null($event->getData()->getId())
             || ($this->oldOwner && $newOwnerId && $this->oldOwner !== $newOwnerId)
@@ -578,26 +587,9 @@ class OwnerFormExtension extends AbstractTypeExtension
         } elseif (AccessLevel::LOCAL_LEVEL == $this->accessLevel) {
             return $this->treeProvider->getTree()->getUserBusinessUnitIds($this->currentUser->getId());
         } elseif (AccessLevel::DEEP_LEVEL === $this->accessLevel) {
-            $buIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($this->currentUser->getId());
-            $result = array_merge($buIds, []);
-            foreach ($buIds as $buId) {
-                $diff = array_diff($this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId), $result);
-                if (!empty($diff)) {
-                    $result = array_merge($result, $diff);
-                }
-            }
-
-            return $result;
+            return $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds($this->currentUser->getId());
         } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
-            $result = [];
-            foreach ($this->treeProvider->getTree()->getUserOrganizationIds($this->currentUser->getId()) as $orgId) {
-                $buIds = $this->treeProvider->getTree()->getOrganizationBusinessUnitIds($orgId);
-                if (!empty($buIds)) {
-                    $result = array_merge($result, $buIds);
-                }
-            }
-
-            return $result;
+            return $this->treeProvider->getTree()->getBusinessUnitsIdByUserOrganizations($this->currentUser->getId());
         }
     }
 }

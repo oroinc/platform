@@ -89,7 +89,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         }
         if (isset($parameterts['userSubBU'])) {
             $tree->expects($this->any())
-                ->method('getSubordinateBusinessUnitIds')
+                ->method('getUserSubordinateBusinessUnitIds')
                 ->will($this->returnValue($parameterts['userSubBU']));
         }
         if (isset($parameterts['orgBU'])) {
@@ -99,7 +99,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         }
         if (isset($parameterts['userOrg'])) {
             $tree->expects($this->any())
-                ->method('getUserOrganizationIds')
+                ->method('getBusinessUnitsIdByUserOrganizations')
                 ->will($this->returnValue($parameterts['userOrg']));
         }
         $treeProvider->expects($this->any())
@@ -144,7 +144,7 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
             [AccessLevel::SYSTEM_LEVEL, true],
             [AccessLevel::LOCAL_LEVEL, true, ['userBU' => [1, 2, 3], 'ownerId' => 1]],
             [AccessLevel::LOCAL_LEVEL, false, ['userBU' => [2, 3], 'ownerId' => 1]],
-            [AccessLevel::DEEP_LEVEL, true, ['userBU' => [1], 'userSubBU' => [2], 'ownerId' => 1]],
+            [AccessLevel::DEEP_LEVEL, true, ['userBU' => [1], 'userSubBU' => [1, 2], 'ownerId' => 2]],
             [AccessLevel::DEEP_LEVEL, false, ['userBU' => [1], 'userSubBU' => [2], 'ownerId' => 3]],
             [AccessLevel::GLOBAL_LEVEL, true, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 1]],
             [AccessLevel::GLOBAL_LEVEL, false, ['userOrg' => [1], 'orgBU' => [1, 2, 3], 'ownerId' => 4]],

@@ -237,25 +237,9 @@ class UserAclHandler implements SearchHandlerInterface
             if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
                 $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($user->getId());
             } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
-                $buIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($user->getId());
-                $resultBuIds = array_merge($buIds, []);
-                foreach ($buIds as $buId) {
-                    $diff = array_diff(
-                        $this->treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),
-                        $resultBuIds
-                    );
-                    if (!empty($diff)) {
-                        $resultBuIds = array_merge($resultBuIds, $diff);
-                    }
-                }
+                $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds($user->getId());
             } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
-                $resultBuIds = [];
-                foreach ($this->treeProvider->getTree()->getUserOrganizationIds($user->getId()) as $orgId) {
-                    $buIds = $this->treeProvider->getTree()->getOrganizationBusinessUnitIds($orgId);
-                    if (!empty($buIds)) {
-                        $resultBuIds = array_merge($resultBuIds, $buIds);
-                    }
-                }
+                $resultBuIds = $this->treeProvider->getTree()->getBusinessUnitsIdByUserOrganizations($user->getId());
             }
             $queryBuilder->join('users.owner', 'bu')
                 ->andWhere($queryBuilder->expr()->in('bu.id', $resultBuIds));

@@ -95,24 +95,9 @@ class BusinessUnitManager
             if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
                 $resultBuIds = $treeProvider->getTree()->getUserBusinessUnitIds($currentUser->getId());
             } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
-                $buIds = $treeProvider->getTree()->getUserBusinessUnitIds($currentUser->getId());
-                $resultBuIds = array_merge($buIds, []);
-                foreach ($buIds as $buId) {
-                    $diff = array_diff(
-                        $treeProvider->getTree()->getSubordinateBusinessUnitIds($buId),
-                        $resultBuIds
-                    );
-                    if (!empty($diff)) {
-                        $resultBuIds = array_merge($resultBuIds, $diff);
-                    }
-                }
+                $resultBuIds = $treeProvider->getTree()->getUserSubordinateBusinessUnitIds($currentUser->getId());
             } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
-                foreach ($treeProvider->getTree()->getUserOrganizationIds($currentUser->getId()) as $orgId) {
-                    $buIds = $treeProvider->getTree()->getOrganizationBusinessUnitIds($orgId);
-                    if (!empty($buIds)) {
-                        $resultBuIds = array_merge($resultBuIds, $buIds);
-                    }
-                }
+                $resultBuIds = $treeProvider->getTree()->getBusinessUnitsIdByUserOrganizations($currentUser->getId());
             }
 
             if (!empty($resultBuIds)) {
