@@ -110,7 +110,7 @@ oro:
         salt.label:        Salt
         password.label:    Password
         last_login.label:  Last logged in
-        login_count.label: Cogin count
+        login_count.label: Login count
         created_at.label:  Created
         updated_at.label:  Updated
         owner.label:       Owner
