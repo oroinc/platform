@@ -1,71 +1,39 @@
 {#
     Displays title and search form
 #}
-{% macro renderTitleAndSearch(pageTitle, buttons) %}
-    <div class="container-fluid search-header clearfix">
+{% macro renderTitleAndButtons(pageTitle, buttons) %}
+    <div class="container-fluid search-header configuration-header clearfix">
         <h1>
             {{ pageTitle|trans }}
-            <div class="pull-right">
-                {% if buttons is defined %}
-                    {% for button in buttons %}
-                        {{ button }}
-                    {% endfor %}
-                {% endif %}
-                {#
-                    <form class="form-inline search-form configuration-search-form">
-                        <input type="text" id="search" class="span2 search" name="search" value="Find an Option">
-                    </form>
-                #}
-            </div>
         </h1>
+        <div class="pull-right">
+            {% if buttons is defined %}
+                {% for button in buttons %}
+                    {{ button }}
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 {% endmacro %}
 
 {#
     Render page scrollable data
     params:
-        data        - tree of current configuration
-        form        - form view of active group
-        activeTab   - active tab name
-        activeVTab  - active vertical tab name
+        data             - tree of current configuration
+        form             - form view of active group
+        activeTabName    - active tab name
+        activeSubTabName - active subtab name
 #}
-{% macro renderScrollData(data, form, activeTab = false, activeVTab = false) %}
+{% macro renderScrollData(data, form, activeTabName = false, activeSubTabName = false) %}
     {% import _self as __ %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-
-    <div class="system-configuration-container">
-        {% if activeVTab and form != false %}
-            {# @TODO move back to renderTab macro, when styles will be ready #}
-            <div class="pull-absolute-right">
-                {{ UI.saveAndStayButton() }}
-            </div>
-        {% endif %}
-        <div class="container-fluid">
-            <ul class="nav nav-tabs">
-                {% if data is iterable %}
-                    {% for tab in data %}
-                        {% set tabData = {
-                            isActive: activeTab and activeTab == tab.name,
-                            url: path('oro_config_configuration_system', {activeGroup: tab.name})
-                            }|merge(tab.toViewData)
-                        %}
-
-                        {% if tabData.isActive %}
-                            {% set activeTab = tab %}
-                        {% endif %}
-                        {{ __.renderTabNavItem(tabData) }}
-                    {% endfor %}
+    <div class="system-configuration-container left-sidebar-container">
+        <div class="placeholder">
+            <div class="scrollable-container">
+                {% if activeSubTabName and form != false %}
+                    {{ __.renderTabs(data, activeTabName, activeSubTabName) }}
+                    {{ __.renderTabContent(form) }}
                 {% endif %}
-            </ul>
-        </div>
-        <div class="scrollable-container">
-            <div class="container-fluid">
-                <div class="row-fluid row-fluid-divider">
-                    {% if activeVTab and form != false %}
-                        {{ __.renderVerticalSubmenu(activeTab, activeVTab) }}
-                        {{ __.renderTab(form, path('oro_config_configuration_system', {activeGroup: activeTab.name, activeSubGroup: activeVTab})) }}
-                    {% endif %}
-                </div>
             </div>
         </div>
     </div>
@@ -92,36 +60,84 @@
 {#
     Renders submenu
     params:
-        data.children             - Submenu groups
-        data.children[].title     - Group title
-        data.children[].children  - Vertical menu items
-        activeVTab                - Active vertical tab name
+        data              - tree of current configuration
+        activeTabName     - Active tab name
+        activeSubTabName  - Active subtab name
 #}
-{% macro renderVerticalSubmenu(data, activeVTab = false) %}
+{% macro renderTabs(data, activeTabName = false, activeSubTabName = false) %}
     {% import _self as __ %}
-    <div class="span2 system-configuration-sidebar">
-        {% for group in data %}
-            {% set groupData = group.toViewData %}
-            <dl>
-                <dt>
-                    <h4>{{ groupData.title|trans }}</h4>
-                </dt>
-                <dd>
-                    {% if group.count %}
-                        <ul class="nav nav-pills nav-stacked">
-                            {% for tab in group %}
-                                {% set tabData = {
-                                    isActive: activeVTab and activeVTab == tab.name,
-                                    url: path('oro_config_configuration_system', {activeGroup: data.name, activeSubGroup: tab.name })
-                                    }|merge(tab.toViewData)
-                                %}
-                                {{ __.renderTabNavItem(tabData) }}
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                </dd>
-            </dl>
-        {% endfor %}
+    <div class="sidebar">
+        <div class="system-configuration-search">
+            {#div class="clearfix">
+                <div class="input-append">
+                    <input type="text" autocomplete="off" value="" name="search" placeholder="Search" class="search">
+                    <button class="btn btn-search" type="submit"><i class="icon-search"></i></button>
+                </div>
+            </div>#}
+            <div class="clearfix">
+                {{ __.renderCollapseExpandActions('#sidebar-menu-tree') }}
+            </div>
+        </div>
+        {% if data is iterable %}
+        <ul class="system-configuration-accordion accordion" id="sidebar-menu-tree">
+            {% for tab in data %}
+            {% set tabData = {
+                isActive: activeTabName and activeTabName == tab.name,
+                name: tab.name,
+                url: path('oro_config_configuration_system', {activeGroup: tab.name})
+                }|merge(tab.toViewData)
+            %}
+            <li class="accordion-group">
+                <div class="accordion-heading">
+                    <a href="#config_tab_{{ tabData.name }}" data-toggle="collapse"
+                       class="accordion-toggle{% if not tabData.isActive %} collapsed{% endif %}">
+                        {%- if tabData.icon is defined and tabData.icon != '' %}<i class="icon {{ tabData.icon }}"></i>{% endif -%}
+                        {{- tabData.title|trans -}}
+                    </a>
+                </div>
+                <div id="config_tab_{{ tabData.name }}" class="accordion-body collapse{% if tabData.isActive %} in{% endif %}">
+                    <div class="accordion-inner"><ul>
+                    {% for group in tab %}
+                        {% set activeSubTab = null %}
+                        {% for subTab in group %}
+                            {% if tabData.isActive and activeSubTabName and activeSubTabName == subTab.name %}
+                                {% set activeSubTab = subTab %}
+                            {% endif %}
+                        {% endfor %}
+                        {% set groupData = {
+                            isActive: activeSubTab is not null,
+                            name: group.name
+                            }|merge(group.toViewData)
+                        %}
+                        <li class="accordion-group">
+                            <div class="accordion-heading">
+                                <a href="#config_tab_group_{{ groupData.name }}" data-toggle="collapse"
+                                   class="accordion-toggle{% if not groupData.isActive %} collapsed{% endif %}">
+                                    {{- groupData.title|trans -}}
+                                </a>
+                            </div>
+                            <div id="config_tab_group_{{ groupData.name }}"
+                                 class="accordion-body collapse collapse-inner{% if groupData.isActive %} in{% endif %}">
+                                <div class="accordion-inner"><ul>
+                                {% for subTab in group %}
+                                    {% set subTabData = {
+                                        isActive: activeSubTab == subTab,
+                                        name: subTab.name,
+                                        url: path('oro_config_configuration_system', {activeGroup: tab.name, activeSubGroup: subTab.name})
+                                        }|merge(subTab.toViewData)
+                                    %}
+                                    {{ __.renderTabNavItem(subTabData) }}
+                                {% endfor %}
+                                </ul></div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                    </ul></div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </div>
 {% endmacro %}
 
@@ -129,9 +145,8 @@
     Renders tab form
     params:
         form        - form view for active tab tree configuration
-        formAction  - current url for submitting form
 #}
-{% macro renderTab(form, formAction) %}
+{% macro renderTabContent(form) %}
     {% import _self as __ %}
 
     {% set data = {
@@ -142,39 +157,50 @@
 
     {% set data = oro_form_process(data, form) %}
 
-    <div class="span10 form-container">
-        <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post"
-              data-collect="true" class="scrollable-substructure">
-            <div class="pull-right">
-                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
+    <div class="system-configuration-content content form-container" id="configuration-options-block">
+        <div class="pull-right">
+            <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
+        </div>
+        {% if data.formErrors is defined and data.formErrors | length %}
+            <div class="customer-info-actions container-fluid well-small alert-wrap">
+                <div class="alert alert-error">
+                    <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
+                    {{ data.formErrors|raw }}
+                </div>
             </div>
-            {% if data.formErrors is defined and data.formErrors | length %}
-                <div class="customer-info-actions container-fluid well-small alert-wrap">
-                    <div class="alert alert-error">
-                        <button class="close" type="button" data-dismiss="alert" data-target=".alert-wrap">×</button>
-                        {{ data.formErrors|raw }}
+        {% endif %}
+
+        {% for scrollBlock in data.dataBlocks %}
+        {% set accordionId = 'system-configuration-collapse' ~ loop.index %}
+        <div class="accordion">
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    {% if loop.first %}
+                    <div class="pull-right">
+                        {{ __.renderCollapseExpandActions('#configuration-options-block') }}
+                    </div>
+                    {% endif %}
+                    <a href="#{{ accordionId }}" data-toggle="collapse" class="accordion-toggle">
+                        {{ scrollBlock.title|trans }}
+                    </a>
+                </div>
+                <div class="accordion-body in collapse" id="{{ accordionId }}" >
+                    <div class="accordion-inner">
+                        {% if scrollBlock.description is defined and scrollBlock.description != '' %}
+                            <p>{{ scrollBlock.description }}</p>
+                        {% endif %}
+
+                        {% for subblock in scrollBlock.subblocks %}
+                            {{ __.renderFiedset(subblock) }}
+                        {% endfor %}
                     </div>
                 </div>
-            {% endif %}
-
-            {% for scrollBlock in data.dataBlocks %}
-                <div class="clearfix">
-                    <h4 class="scrollspy-title">{{ scrollBlock.title|trans }}</h4>
-
-                    {% if scrollBlock.description is defined and scrollBlock.description != '' %}
-                        <p>{{ scrollBlock.description }}</p>
-                    {% endif %}
-
-                    {% for subblock in scrollBlock.subblocks %}
-                        {{ __.renderFiedset(subblock) }}
-                    {% endfor %}
-                </div>
-            {% endfor %}
-            <div class="hide">
-                {{ data.hiddenData|raw }}
             </div>
-        </form>
-        {{ oro_form_js_validation(form) }}
+        </div>
+        {% endfor %}
+        <div class="hide">
+            {{ data.hiddenData|raw }}
+        </div>
     </div>
 {% endmacro %}
 
@@ -187,7 +213,7 @@
 #}
 {% macro renderFiedset(block) %}
     {% import _self as __ %}
-    <fieldset class="form-horizontal">
+    <fieldset class="form-horizontal form-horizontal-large">
         <h5 class="user-fiedset">
             <span>{{ block.title|trans }}</span>
         </h5>
@@ -202,4 +228,17 @@
             {{ dataBlock|raw }}
         {% endfor %}
     </fieldset>
+{% endmacro %}
+
+{#
+    Renders 'Expand All' and 'Collapse All' links
+    params:
+        target       - CSS selector for accordions container
+#}
+{% macro renderCollapseExpandActions(target) %}
+    <ul class="inline small-text">
+        <li><a href="{{ target }}" data-action="accordion:expand-all">{{ 'Expand All'|trans }}</a></li>
+        <li class="separator">|</li>
+        <li><a href="{{ target }}" data-action="accordion:collapse-all">{{ 'Collapse All'|trans }}</a></li>
+    </ul>
 {% endmacro %}

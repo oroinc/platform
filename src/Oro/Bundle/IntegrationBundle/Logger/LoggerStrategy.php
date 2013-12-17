@@ -34,7 +34,7 @@ class LoggerStrategy
     }
 
     /**
-     * Sets concreate logger
+     * Sets concrete logger
      *
      * @param LoggerInterface $logger
      *
