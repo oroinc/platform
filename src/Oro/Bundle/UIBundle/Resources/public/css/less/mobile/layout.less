@@ -7,3 +7,33 @@
   padding-top: 54px;
   height: 100%;
 }
+
+.row {
+  margin-left: @contentPadding;
+  margin-right: @contentPadding;
+}
+
+.container-fluid {
+  padding-right: @contentPadding;
+  padding-left: @contentPadding;
+  &> .responsive-section {
+    margin: 0 -@contentPadding;
+    padding-right: @contentPadding;
+  }
+}
+.layout-content .responsive-section{
+  padding: 0;
+  .form-horizontal {
+    padding: @contentPadding * 1.5 0;
+  }
+}
+.container-fluid > .responsive-section .responsive-cell {
+  padding: 0 @contentPadding;
+}
+
+.contact-info-col-set {
+  padding: @contentPadding @contentPadding 0 0;
+  .contact-info-col {
+    padding: 0 0 @contentPadding @contentPadding;
+  }
+}

@@ -157,7 +157,7 @@
             {% if (parameters.title is defined) %}
                 title="{{ parameters.title|trans }}"
             {% endif %}
-           ><i class="icon-trash"></i>{{ parameters.label|trans -}}
+           ><i class="icon-trash hide-text">{{ parameters.label }}</i>{{ parameters.label|trans -}}
         </a>
     </div>
 {% endmacro %}

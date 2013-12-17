@@ -23,10 +23,6 @@ define(['jquery', 'backbone', 'oro/mediator', 'jquery-ui'], function ($, Backbon
             this.$toggle = $(this.options.toggleSelector);
             this._on(this.$toggle, {click: this.onToggle});
 
-            this._on(this.element, {
-                shown: this.onCollapse,
-                hidden: this.onCollapse
-            });
             // handler for hiding menu on outside click
             this._onOutsideClick = $.proxy(function (e) {
                 if (!$.contains(this.element.get(0), e.target)) {
@@ -111,17 +107,6 @@ define(['jquery', 'backbone', 'oro/mediator', 'jquery-ui'], function ($, Backbon
                 this._hide();
             }
             e.stopPropagation();
-        },
-
-        /**
-         * Handles open/close sub-menu actions
-         *
-         * @param {jQuery.Event} e
-         */
-        onCollapse: function (e) {
-            var $target = $(e.target),
-                $header = $target.parent().find('[data-target=#' + $target.attr('id') + ']');
-            $header[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         },
 
         /**

@@ -3,7 +3,8 @@
 /*global define*/
 define(function (require) {
     'use strict';
-    var $ = require('jquery');
+    var $ = require('jquery'),
+        pageHeader = require('oro/mobile/page-header');
     require('oro/mobile/side-menu');
 
     /**
@@ -22,6 +23,7 @@ define(function (require) {
      */
     function initLayout() {
         initMainMenu();
+        pageHeader.init();
     }
 
     /**

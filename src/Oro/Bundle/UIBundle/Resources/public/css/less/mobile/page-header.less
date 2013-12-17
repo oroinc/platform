@@ -1,0 +1,66 @@
+.navbar-extra-right {
+  padding-right: 0px;
+}
+.container-fluid.page-title {
+  background-color: #f3f3f3;
+  padding-right: 0;
+  padding-left: 0;
+}
+.navbar-extra {
+  .container-fluid.page-title;
+  & > .row > [class^=span] {
+    margin: 0;
+    width: auto;
+  }
+  .customer-info, .customer-simple {
+    padding: 0;
+  }
+  .user-info-state {
+    float: left;
+    padding: 0;
+    li:not(.owner){
+      display: none;
+    }
+    .owner {
+      font-size: @fontSizeSmall;
+      color: #777;
+      display: block;
+    }
+  }
+  .btn-group {
+    margin: 0;
+    .remove-button, .edit-button, .import-btn, .export-btn {
+      font-size: 0;
+    }
+  }
+  .icons-holder-text.btn {
+    .icon-edit, .icon-trash, .icon-signin, .icon-signout {
+      &:before {
+        margin-right: 0;
+      }
+    }
+  }
+  .user-info-state + .title-buttons-container:not(:empty) {
+    margin-top: 10px;
+  }
+}
+
+.customer-info {
+  h1 {
+    font-size: @baseFontSize * 1.75;
+    margin: 5px 0 10px;
+  }
+  .sub-title {
+    float: none;
+    font-size: @fontSizeSmall;
+    & + .separator{
+      display: none;
+    }
+  }
+  ul.inline li {
+    font-size: @fontSizeSmall;
+    padding: 0;
+    border: 0;
+  }
+}
+

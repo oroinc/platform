@@ -1,5 +1,12 @@
 .grid-toolbar {
-  padding: 10px;
+  padding: @contentPadding @contentPadding 0;
+  margin-bottom: -@contentPadding;
+  &:after {
+    content: '';
+    clear: both;
+    display: table;
+    line-height: 0;
+  }
   label {
     font-size: @baseFontSize;
     line-height: 32px;
@@ -39,14 +46,19 @@
       padding-right: 21px;
     }
   }
-  .mass-actions-panel .btn-group:not(:empty) {
-    margin-right: 12px;
+  .mass-actions-panel .btn-group{
+    &:empty {
+      display: none;
+    }
+    &:not(:empty) {
+      margin: 5px 0 @contentPadding;
+    }
   }
   .separator{
     line-height: 27px;
     font-size: 32px;
     color: #eee;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     text-align: center;
   }
 }

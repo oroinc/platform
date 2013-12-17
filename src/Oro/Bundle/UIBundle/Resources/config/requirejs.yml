@@ -98,4 +98,5 @@ config:
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
         'oro/buttons-widget': 'bundles/oroui/js/widget/buttons-widget.js'
         'oro/mobile/layout': 'bundles/oroui/js/mobile/layout.js'
+        'oro/mobile/page-header': 'bundles/oroui/js/mobile/page-header.js'
         'oro/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'
