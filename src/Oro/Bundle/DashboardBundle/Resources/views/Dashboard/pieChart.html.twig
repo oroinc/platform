@@ -1,5 +1,10 @@
 {% extends 'OroDashboardBundle:Dashboard:chartWidget.html.twig' %}
 
+{#
+    Variables:
+        data - should be an array contains 'fraction' and 'label' values in each row
+               also you can build chart data in nested template by overriding 'data' block
+#}
 {% block content %}
     <div class="chart-container">
         <div class="clearfix">
@@ -35,8 +40,9 @@
                 };
                 var drawChart = function () {
                     var data = [
-                        {% block chartData %}
-                        {%- for item in items -%}
+                        {# build chart data #}
+                        {% block data %}
+                        {%- for item in data -%}
                         {
                             data : [[0, {{ item.fraction|json_encode|raw }}]],
                             label : {{ item.label|json_encode|raw }}
