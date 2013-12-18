@@ -94,8 +94,8 @@
     height: 22px;
     position: absolute;
     bottom: 0;
-    z-index: 12;
 }
+
 .sidebar-toggle-holder{
    border-top: 1px solid #d6d6d6;
 }
