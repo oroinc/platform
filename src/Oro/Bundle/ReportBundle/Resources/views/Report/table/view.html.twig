@@ -6,27 +6,24 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_report_update') %}
-        {{ UI.button({
+        {{ UI.editButton({
             'path': path('oro_report_update', {'id': entity.id}),
-            'aClass': 'edit-button',
-            'iClass': 'icon-edit',
-            'title': 'Edit report'|trans,
-            'label': 'Edit'|trans
+            'title': 'Edit report',
+            'label': 'Edit'
         }) }}
     {% endif %}
     {% if resource_granted('oro_report_delete') %}
         {{ UI.deleteButton({
-                'dataUrl': path('oro_api_delete_report', {'id': entity.id}),
-                'dataRedirect': path('oro_report_index'),
-                'aCss': 'no-hash remove-button',
-                'dataId': entity.id,
-                'id': 'btn-remove-report',
-                'dataMessage': 'Are you sure you want to delete this report?'|trans,
-                'successMessage': 'Report deleted'|trans,
-                'title': 'Delete report'|trans,
-                'label': 'Delete'|trans
-            })
-        }}
+            'dataUrl': path('oro_api_delete_report', {'id': entity.id}),
+            'dataRedirect': path('oro_report_index'),
+            'aCss': 'no-hash remove-button',
+            'dataId': entity.id,
+            'id': 'btn-remove-report',
+            'dataMessage': 'Are you sure you want to delete this report?',
+            'successMessage': 'Report deleted',
+            'title': 'Delete report',
+            'label': 'Delete'
+        }) }}
     {% endif %}
 {% endblock navButtons %}
 

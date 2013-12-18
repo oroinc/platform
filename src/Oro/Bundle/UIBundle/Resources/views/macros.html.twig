@@ -100,6 +100,33 @@
 {% endmacro %}
 
 {#
+    Create edit button
+    Parameters - array:
+        [
+            'path' - button url
+            'aClass' - additional button class
+            'title' - button title
+            'iClass' - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro editButton(parameters) %}
+    {% set iClass = ['icon-edit'] %}
+    {% set aClass = ['edit-button'] %}
+    {% if parameters.iClass is defined %}
+        {% set iClass = parameters.iClass|split(' ')|merge(iClass) %}
+    {% endif %}
+    {% if parameters.aClass is defined %}
+        {% set aClass = parameters.aClass|split(' ')|merge(aClass) %}
+    {% endif %}
+    {% set parameters = parameters|merge({
+        'iClass': iClass|join(' '),
+        'aClass': aClass|join(' '),
+    }) %}
+    {{ _self.button(parameters) }}
+{% endmacro %}
+
+{#
     Create 'add' button
     Parameters - array:
         [
@@ -157,7 +184,7 @@
             {% if (parameters.title is defined) %}
                 title="{{ parameters.title|trans }}"
             {% endif %}
-           ><i class="icon-trash hide-text">{{ parameters.label }}</i>{{ parameters.label|trans -}}
+           ><i class="icon-trash hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
         </a>
     </div>
 {% endmacro %}
@@ -190,18 +217,18 @@
             data-url="{{ parameters.dataUrl }}"
             {% endif %}
             {% if (parameters.successMessage is defined) %}
-            data-success-message="{{ parameters.successMessage }}"
+            data-success-message="{{ parameters.successMessage|trans }}"
             {% endif %}
             {% if parameters.dataRedirect is defined %}
             data-redirect="{{ parameters.dataRedirect  }}"
             {% endif %}
             {% if (parameters.title is defined) %}
-            title="{{ parameters.title }}"
+            title="{{ parameters.title|trans }}"
             {% endif -%}
             {% if (parameters.visible is defined and not parameters.visible) %}
             style="display: none"
             {% endif -%}
-        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label }}</i>{{ parameters.label -}}
+        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
         </a>
     </div>
 {% endmacro %}
