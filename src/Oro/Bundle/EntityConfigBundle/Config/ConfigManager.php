@@ -378,8 +378,6 @@ class ConfigManager
         }
 
         $this->getEntityManager()->flush();
-        // detach all objects from Doctrine
-        $this->getEntityManager()->clear();
 
         $this->persistConfigs   = new \SplObjectStorage();
         $this->configChangeSets = new ArrayCollection;
