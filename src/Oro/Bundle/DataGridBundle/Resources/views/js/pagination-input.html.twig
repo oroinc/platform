@@ -4,7 +4,7 @@
     <% _.each(handles, function (handle) { %>
         <li <% if (handle.className || disabled) { %>class="<%= handle.className %> <% if (disabled) { %>disabled<% } %>"<% } %>>
         <% if (handle.type == "input") { %>
-            <input type="text" value="<%= state.firstPage == 0 ? state.currentPage + 1 : state.currentPage  %>"
+            <input type="number" value="<%= state.firstPage == 0 ? state.currentPage + 1 : state.currentPage  %>"
                 <% if (disabled) { %>disabled="disabled"<% } %>/>
         <% } else { %>
             <a href="#" <% if (handle.title) { %> title="<%= handle.title %>"<% } %>>
