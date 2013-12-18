@@ -21,8 +21,11 @@ class ToolsAPI
     /**
      * Generate WSSE authorization header
      */
-    public static function generateWsseHeader($userName = self::USER_NAME, $userPassword = self::USER_PASSWORD, $nonce = self::NONCE)
-    {
+    public static function generateWsseHeader(
+        $userName = self::USER_NAME,
+        $userPassword = self::USER_PASSWORD,
+        $nonce = self::NONCE
+    ) {
         $created  = date('c');
         $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
         $wsseHeader = array(
@@ -191,16 +194,28 @@ class ToolsAPI
 
     /**
      * @param Client $test
-     * @param $gridName
+     * @param $gridParameters
      * @param array $filter
-     * @return null|\Symfony\Component\HttpFoundation\Response
-    */
-    public static function getEntityGrid($test, $gridName, $filter = array())
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public static function getEntityGrid($test, $gridParameters, $filter = array())
     {
+        if (is_string($gridParameters)) {
+            $gridParameters = array('gridName' => $gridParameters);
+        }
+
+        //transform parameters to nested array
+        $parameters = array();
+        foreach ($filter as $param => $value) {
+            $param .= '=' . $value;
+            parse_str($param, $output);
+            $parameters = array_merge_recursive($parameters, $output);
+        }
+
+        $gridParameters = array_merge_recursive($gridParameters, $parameters);
         $test->request(
             'GET',
-            $test->generate('oro_datagrid_index', array('gridName' => $gridName)),
-            $filter
+            $test->generate('oro_datagrid_index', $gridParameters)
         );
 
         return $test->getResponse();

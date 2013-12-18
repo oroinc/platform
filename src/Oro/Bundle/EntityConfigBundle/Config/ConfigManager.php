@@ -441,7 +441,10 @@ class ConfigManager
      */
     public function getUpdateConfig(\Closure $filter = null)
     {
-        $result = iterator_to_array($this->persistConfigs, false);
+        $result = array();
+        foreach ($this->persistConfigs as $element) {
+            $result[] = $element;
+        }
 
         return $filter ? array_filter($result, $filter) : $result;
     }
@@ -478,6 +481,13 @@ class ConfigManager
     public function hasConfigFieldModel($className, $fieldName)
     {
         return null !== $this->modelManager->findModel($className, $fieldName);
+    }
+
+    public function getConfigFieldModel($className, $fieldName)
+    {
+        if ($this->hasConfigFieldModel($className, $fieldName)) {
+            return $this->modelManager->findModel($className, $fieldName);
+        }
     }
 
     /**

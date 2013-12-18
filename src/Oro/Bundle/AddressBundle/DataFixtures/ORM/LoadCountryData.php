@@ -165,8 +165,8 @@ class LoadCountryData extends AbstractTranslatableEntityFixture
                 }
             }
 
-            $manager->flush();
-            $manager->clear();
         }
+        $manager->flush();
+        $manager->clear();
     }
 }

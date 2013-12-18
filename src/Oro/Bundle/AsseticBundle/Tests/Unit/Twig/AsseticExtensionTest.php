@@ -1,67 +1,55 @@
 <?php
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
+namespace Oro\Bundle\AsseticBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\AsseticBundle\Twig\AsseticExtension;
 
 class AsseticExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    private $assetsFactory;
-    private $assets;
-    private $templateNameParser;
-    private $enabledBundles;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $assetsConfiguration;
 
     /**
-     * @var \Oro\Bundle\NavigationBundle\Twig\AsseticExtension
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $assetFactory;
+
+    /**
+     * @var AsseticExtension
      */
     private $extension;
 
     public function setUp()
     {
-        $this->assetsFactory = $this->getMockBuilder('Symfony\Bundle\AsseticBundle\Factory\AssetFactory')
+        $this->assetsConfiguration = $this->getMockBuilder('Oro\Bundle\AsseticBundle\AssetsConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->templateNameParser = $this->getMockBuilder('Symfony\Component\Templating\TemplateNameParserInterface')
+        $this->assetFactory = $this->getMockBuilder('Symfony\Bundle\AsseticBundle\Factory\AssetFactory')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->assets = array(
-            'css' => array(
-                'first.css',
-                'second.css'
-            ),
-            'js' => array(
-                'first.js',
-                'second.js'
-            )
-        );
-
-        $this->enabledBundles = array('testBundle');
 
         $this->extension = new AsseticExtension(
-            $this->assetsFactory,
-            $this->assets,
-            $this->templateNameParser,
-            $this->enabledBundles
+            $this->assetsConfiguration,
+            $this->assetFactory
         );
     }
 
     public function testGetTokenParsers()
     {
-        $tokens = $this->extension->getTokenParsers();
-        $this->assertTrue(is_array($tokens));
-        $jsToken = $tokens[0];
-        $this->assertEquals('oro_js', $jsToken->getTag());
+        $parsers = $this->extension->getTokenParsers();
+        $this->assertInternalType('array', $parsers);
+        $this->assertCount(1, $parsers);
+        $this->assertInstanceOf('Oro\Bundle\AsseticBundle\Twig\AsseticTokenParser', $parsers[0]);
+        $this->assertEquals('oro_css', $parsers[0]->getTag());
+        $this->assertAttributeSame($this->assetsConfiguration, 'assetsConfiguration', $parsers[0]);
+        $this->assertAttributeSame($this->assetFactory, 'assetFactory', $parsers[0]);
+        $this->assertAttributeSame('css/*.css', 'output', $parsers[0]);
     }
 
     public function testGetName()
     {
         $this->assertEquals('oro_assetic', $this->extension->getName());
-    }
-
-    public function testGetNodeVisitors()
-    {
-        $asseticNodeVisitors = $this->extension->getNodeVisitors();
-        $this->assertTrue(is_array($asseticNodeVisitors));
     }
 }

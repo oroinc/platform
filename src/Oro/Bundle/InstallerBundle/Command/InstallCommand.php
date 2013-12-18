@@ -23,6 +23,7 @@ class InstallCommand extends ContainerAwareCommand
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
             ->addOption(
                 'sample-data',
                 null,
@@ -33,8 +34,16 @@ class InstallCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')) {
+        $forceInstall = $input->getOption('force');
+
+        // if there is application is not installed or no --force option
+        if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')
+            && !$forceInstall
+        ) {
             throw new \RuntimeException('Oro Application already installed.');
+        } elseif ($forceInstall) {
+            // if --force option we have to clear cache
+            $this->runCommand('cache:clear', $input, $output);
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');
@@ -79,6 +88,7 @@ class InstallCommand extends ContainerAwareCommand
 
     /**
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function setupStep(InputInterface $input, OutputInterface $output)
     {
@@ -96,7 +106,12 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('doctrine:schema:create', $input, $output)
             ->runCommand('oro:entity-config:init', $input, $output)
             ->runCommand('oro:entity-extend:init', $input, $output)
-            ->runCommand('oro:entity-extend:update-config', $input, $output)
+            ->runCommand(
+                'oro:entity-extend:update-config',
+                $input,
+                $output,
+                array('--process-isolation' => true)
+            )
             ->runCommand(
                 'doctrine:schema:update',
                 $input,
@@ -118,6 +133,11 @@ class InstallCommand extends ContainerAwareCommand
             ->get('doctrine.orm.entity_manager')
             ->getRepository('OroUserBundle:Role')
             ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
+
+        $businessUnit = $container
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->findOneBy(array('name' => 'Main'));
 
         $passValidator = function ($value) {
             if (strlen(trim($value)) < 2) {
@@ -149,7 +169,9 @@ class InstallCommand extends ContainerAwareCommand
             ->setLastName($userLastName)
             ->setPlainPassword($userPassword)
             ->setEnabled(true)
-            ->addRole($role);
+            ->addRole($role)
+            ->setOwner($businessUnit)
+            ->addBusinessUnit($businessUnit);
 
         $container->get('oro_user.manager')->updateUser($user);
 
@@ -163,7 +185,8 @@ class InstallCommand extends ContainerAwareCommand
                 'oro:demo:fixtures:load',
                 $input,
                 $output,
-                array('--process-isolation' => true, '--process-timeout' => 300));
+                array('--process-isolation' => true, '--process-timeout' => 300)
+            );
         }
 
         $output->writeln('');
@@ -180,21 +203,22 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->runCommand('oro:search:create-index', $input, $output)
             ->runCommand('oro:navigation:init', $input, $output)
+            ->runCommand('fos:js-routing:dump', $input, $output, array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump', $input, $output)
             ->runCommand('assets:install', $input, $output)
             ->runCommand('assetic:dump', $input, $output)
-            ->runCommand('oro:assetic:dump', $input, $output)
             ->runCommand('oro:translation:dump', $input, $output)
             ->runCommand('oro:requirejs:build', $input, $output);
 
-        $params = $this->getContainer()->get('oro_installer.yaml_persister')->parse();
-
+        // update installed flag in parameters.yml
+        $dumper = $this->getContainer()->get('oro_installer.yaml_persister');
+        $params = $dumper->parse();
         $params['system']['installed'] = date('c');
+        $dumper->dump($params);
 
-        $this->getContainer()->get('oro_installer.yaml_persister')->dump($params);
-
+        // clear the cache set installed flag in DI container
         $this->runCommand('cache:clear', $input, $output);
- 
+
         $output->writeln('');
         return $this;
     }
@@ -242,7 +266,7 @@ class InstallCommand extends ContainerAwareCommand
      * @param array           $params
      * @return InstallCommand
      */
-    private function runCommand($command, InputInterface $input, OutputInterface $output, $params = array())
+    protected function runCommand($command, InputInterface $input, OutputInterface $output, $params = array())
     {
         $params = array_merge(
             array(

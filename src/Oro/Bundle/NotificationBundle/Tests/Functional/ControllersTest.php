@@ -75,7 +75,9 @@ class ControllersTest extends WebTestCase
             '<select required="required" name="emailnotification[template]" id="emailnotification_template" ' .
             'tabindex="-1" class="select2-offscreen"> ' .
             '<option value="" selected="selected"></option> ' .
-            '<option value="' . $this->templateUpdate->getId() . '">EmailBundle:' . $this->templateUpdate->getName() . '</option> </select>'
+            '<option value="' . $this->templateUpdate->getId() . '">' .
+            'EmailBundle:' . $this->templateUpdate->getName() .
+            '</option> </select>'
         );
 
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
@@ -97,15 +99,16 @@ class ControllersTest extends WebTestCase
      */
     public function testUpdate()
     {
-        $this->markTestSkipped("BAP-1820");
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_notification_emailnotification_index', array('_format' =>'json')),
-            array('emailnotification[_pager][_page]' => 1, 'emailnotification[_pager][_per_page]' => 1)
+        $result = ToolsAPI::getEntityGrid(
+            $this->client,
+            'email-notification-grid',
+            array(
+                'email-notification-grid[_pager][_page]' => 1,
+                'email-notification-grid[_pager][_per_page]' => 1
+            )
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
 
+        ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
         $result = reset($result['data']);
 
@@ -126,7 +129,9 @@ class ControllersTest extends WebTestCase
             '<select required="required" name="emailnotification[template]" id="emailnotification_template" ' .
             'tabindex="-1" class="select2-offscreen"> ' .
             '<option value="" selected="selected"></option> ' .
-            '<option value="' . $this->templateUpdate->getId() . '">EmailBundle:' . $this->templateUpdate->getName() . '</option> </select>'
+            '<option value="' . $this->templateUpdate->getId() . '">' .
+            'EmailBundle:' . $this->templateUpdate->getName() .
+            '</option> </select>'
         );
 
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
@@ -148,15 +153,17 @@ class ControllersTest extends WebTestCase
      */
     public function testDelete()
     {
-        $this->markTestSkipped("BAP-1820");
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_notification_emailnotification_index', array('_format' =>'json')),
-            array('emailnotification[_pager][_page]' => 1, 'emailnotification[_pager][_per_page]' => 1)
-        );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
 
+        $result = ToolsAPI::getEntityGrid(
+            $this->client,
+            'email-notification-grid',
+            array(
+                'email-notification-grid[_pager][_page]' => 1,
+                'email-notification-grid[_pager][_per_page]' => 1
+            )
+        );
+
+        ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
         $result = reset($result['data']);
 

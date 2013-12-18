@@ -1,0 +1,59 @@
+oro:
+    query_designer:
+        aggregates:
+            identifier:
+                Count:
+                    name: Count
+                    hint: Number of items
+            string:
+                Count:
+                    name: Count
+                    hint: Number of items
+            number:
+                Count:
+                    name: Count
+                    hint: Number of items
+                Sum:
+                    name: Sum
+                    hint: Sum of all values
+                Avg:
+                    name: Average
+                    hint: Average of values
+                Min:
+                    name: Min
+                    hint: Minimum value
+                Max:
+                    name: Max
+                    hint: Maximum value
+
+    report:
+        type:
+            table: Table
+        datagrid:
+            column:
+                name:               Name
+                entity:             Entity
+                report_type:        Report type
+        form:
+            designer:               Designer
+            columns:                Columns
+            filters:                Filters
+            name:                   Name
+            description:            Description
+            entity:                 Entity
+            type:                   Type
+            choose_report_type:     Choose a report type...
+
+"Reports": Reports
+"New Report": New Report
+"Manage Reports - Reports": Manage Reports - Reports
+"Create Report - Reports": Create Report - Reports
+"%report.name% - Edit - Reports": %report.name% - Edit - Reports
+"%report.name% - Reports": %report.name% - Reports
+
+"Edit report": Edit report
+"Delete report": Delete report
+"Are you sure you want to delete this report?": Are you sure you want to delete this report?
+"Report deleted": Report deleted
+"Report saved": Report saved
+"Invalid report configuration": No data to show. Please go to the edit report page and make sure the report was configured properly.

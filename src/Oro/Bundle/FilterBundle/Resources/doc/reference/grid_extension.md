@@ -72,10 +72,6 @@ Provides filtering for boolean values.
 Validated by [BooleanFilterType](./filter_form_types.md#oro_type_boolean_filter-form-type) on backend
 and rendered by [Oro.Filter.ChoiceFilter](./javascript_widgets.md#orofilterchoicefilter) with predefined set of option (yes/no)
 
-**Additional params:**
-
-`nullable: true|false` - is boolean column nullable or no
-
 ### Choice filter
 
 Provides filtering data using list of predefined choices
@@ -118,5 +114,5 @@ Customization
 -------------
 To implement your filter you have to do following:
 
- - Develop class that implements Oro\Bundle\FilterBundle\Extension\Orm\FilterInterface (also there is basic implementation in AbstractFilter class)
+ - Develop class that implements Oro\Bundle\FilterBundle\Filter\FilterInterface (also there is basic implementation in AbstractFilter class)
  - Register you filter as service with tag { name: oro\_filter.extension.orm\_filter.filter, type: YOUR\_FILTER\_TYPE }
