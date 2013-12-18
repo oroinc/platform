@@ -4,15 +4,6 @@
 define(['jquery', 'oro/mediator'], function ($, mediator) {
     'use strict';
 
-    /**
-     *
-     * @param {jQuery} $header
-     */
-    function moveOwnerBlock($header) {
-        var $el = $header.find('.user-info-state');
-        $el.parent().prepend($el);
-    }
-
     function joinButtonsGroup($header) {
         var group,
             groups = $header.find('.separator-btn').parent().nextAll('.btn-group');
@@ -28,7 +19,6 @@ define(['jquery', 'oro/mediator'], function ($, mediator) {
 
     function updatePageHeader() {
         var $el = $('.navigation.navbar-extra');
-        moveOwnerBlock($el);
         joinButtonsGroup($el);
     }
 

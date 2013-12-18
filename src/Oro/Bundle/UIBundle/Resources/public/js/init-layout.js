@@ -182,6 +182,9 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
      * from height_fix.js
      * ============================================================ */
     (function () {
+        if (app.isMobile()) {
+            return;
+        }
         /* dynamic height for central column */
         var anchor = $('#bottom-anchor'),
             content = false;

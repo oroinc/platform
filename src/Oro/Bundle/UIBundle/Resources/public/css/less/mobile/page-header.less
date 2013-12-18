@@ -16,16 +16,7 @@
     padding: 0;
   }
   .user-info-state {
-    float: left;
-    padding: 0;
-    li:not(.owner){
-      display: none;
-    }
-    .owner {
-      font-size: @fontSizeSmall;
-      color: #777;
-      display: block;
-    }
+    display: none;
   }
   .btn-group {
     margin: 0;
@@ -49,6 +40,7 @@
   h1 {
     font-size: @baseFontSize * 1.75;
     margin: 5px 0 10px;
+    line-height: @baseFontSize * 2;
   }
   .sub-title {
     float: none;
@@ -58,6 +50,8 @@
     }
   }
   ul.inline li {
+    line-height: 18px;
+    display: block;
     font-size: @fontSizeSmall;
     padding: 0;
     border: 0;

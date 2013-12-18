@@ -8,7 +8,14 @@
   position: absolute;
   width: @mainMenuWidth;
   margin-left: -@mainMenuWidth;
-  overflow: auto;
+  overflow: hidden;
+  height: 100%;
+  padding-bottom: @headerHeight;
+  & > ul {
+    overflow: auto;
+    height: 100%;
+    margin-bottom: 0;
+  }
   ul {
     margin-left: 0;
   }
@@ -80,6 +87,7 @@
   margin-right: -@mainMenuWidth;
   border-left: 1px solid darken(@mainMenuBorderColor, 5%);
   position: relative;
+  overflow: hidden;
   &:before {
     content: '';
     display: block;
