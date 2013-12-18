@@ -154,7 +154,7 @@ class WorkflowConfiguration implements ConfigurationInterface
                                         if (!isset($value['attribute']) && !isset($value['label'])) {
                                             throw new \Exception('"label" is required when "attribute" is empty.');
                                         }
-                                        foreach (array('path', 'attribute', 'label') as $option) {
+                                        foreach (array('path', 'attribute', 'label', 'default') as $option) {
                                             if (isset($value[$option]) && !is_string($value[$option])) {
                                                 throw new \Exception(sprintf('Option "%s" must be a string.', $option));
                                             }

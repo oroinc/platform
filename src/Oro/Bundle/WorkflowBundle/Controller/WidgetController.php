@@ -78,7 +78,7 @@ class WidgetController extends Controller
         return array(
             'saved' => $saved,
             'workflow' => $workflow,
-            'steps' => $workflow->getStepManager()->getOrderedSteps(),
+            'steps' => $workflow->getPassedStepsByWorkflowItem($workflowItem),
             'displayStep' => $displayStep,
             'currentStep' => $currentStep,
             'form' => $stepForm->createView(),
