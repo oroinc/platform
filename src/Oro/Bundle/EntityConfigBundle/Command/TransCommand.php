@@ -46,7 +46,7 @@ class TransCommand extends BaseCommand
 
         /** @var EntityConfigId[] */
         $entityConfigIds = $cm->getProvider('entity')->getIds();
-        $i = 1;
+        $i = $n = 1;
         foreach ($entityConfigIds as $entityConfigId) {
             /** @var Config $entityConfig */
             $entityConfig = $cm->getProvider('entity')->getConfigById($entityConfigId);
@@ -65,7 +65,7 @@ class TransCommand extends BaseCommand
                 $fLabel  = $field->get('label');
                 $this->addTranslation($em, $field->getId()->getFieldName(), $fLabel);
 
-                $output->writeln($field->getId()->getFieldName() . ' -> ' . $fLabel);
+                $output->writeln($n++ . ': ' . $field->getId()->getFieldName() . ' -> ' . $fLabel);
             }
 
             $output->writeln('-----------------------------------------');
