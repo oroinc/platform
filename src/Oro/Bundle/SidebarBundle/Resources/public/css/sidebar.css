@@ -237,6 +237,7 @@
     color: #777;
     text-transform: uppercase;
     font-size: 11px;
+    margin-top: 1px;
 }
 .sidebar-widget-header-toggle > i {
     height: 16px;
