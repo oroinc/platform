@@ -34,9 +34,9 @@ class WidgetDefinitionRegistry
      */
     protected function setWidgetDefinitions(array $definitions)
     {
-        foreach ($definitions as $definition) {
+        foreach ($definitions as $name => $definition) {
             $definition['icon'] = $this->assetsHelper->getUrl($definition['icon']);
-            $this->widgetDefinitions->add($definition);
+            $this->widgetDefinitions->set($name, $definition);
         }
     }
 
