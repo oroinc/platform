@@ -15,6 +15,19 @@
     user-select: none;
 }
 
+.sidebar-wrap {
+    height: 100%;
+    position: relative;
+}
+
+.sidebar-wrap-1 {
+    overflow: hidden;
+}
+
+.sidebar-wrap-2 {
+    overflow-y: auto;
+}
+
 .sidebar-left {
     left: 0;
     margin-right: 7px;
@@ -81,6 +94,7 @@
     height: 22px;
     position: absolute;
     bottom: 0;
+    z-index: 12;
 }
 .sidebar-toggle-holder{
    border-top: 1px solid #d6d6d6;
