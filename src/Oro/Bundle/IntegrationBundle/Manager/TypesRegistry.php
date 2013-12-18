@@ -273,10 +273,10 @@ class TypesRegistry
         }
 
         if (is_callable($filterClosure)) {
-            $this->connectorTypes[$channelType] = $this->connectorTypes[$channelType]->filter($filterClosure);
+            return $this->connectorTypes[$channelType]->filter($filterClosure);
+        } else {
+            return $this->connectorTypes[$channelType];
         }
-
-        return $this->connectorTypes[$channelType];
     }
 
     /**
