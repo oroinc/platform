@@ -211,12 +211,16 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             layout.adjustScrollspy();
 
             var fixDialog = 2;
-            var dialogContainerBottom = $('.sf-toolbar').height() + $('#footer').height();
+            var footersHeight = $('.sf-toolbar').height() + $('#footer').height();
 
             $('#dialog-extend-fixed-container').css({
                 position: 'fixed',
-                bottom: dialogContainerBottom + fixDialog,
+                bottom: footersHeight + fixDialog,
                 zIndex: 9999
+            });
+
+            $('.sidebar').css({
+                'margin-bottom': footersHeight
             });
         };
 
