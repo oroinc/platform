@@ -53,6 +53,7 @@ abstract class OroKernel extends Kernel
             ->in(
                 array(
                     $this->getRootDir() . '/../src',
+                    $this->getRootDir() . '/../packages',
                     $this->getRootDir() . '/../vendor',
                 )
             )

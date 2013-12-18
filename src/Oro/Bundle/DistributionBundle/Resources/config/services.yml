@@ -6,7 +6,12 @@ parameters:
     oro_distribution.composer.io.class:                    Composer\IO\BufferIO
     oro_distribution.composer.installer.class:             Composer\Installer
     oro_distribution.composer.installation_manager.class:  Composer\Installer\InstallationManager
-    oro_distribution.composer_json:                        %kernel.root_dir%/../composer.json
+    oro_distribution.composer_json:                        %kernel.root_dir%/../packages.json
+
+    oro_user.manager.class:             Oro\Bundle\UserBundle\Entity\UserManager
+    oro_user.entity.class:              Oro\Bundle\UserBundle\Entity\User
+    oro_user.security.provider.class:   Oro\Bundle\UserBundle\Security\UserProvider
+    kernel.listener.oro.access_denied.class: Oro\Bundle\DistributionBundle\Security\AccessDeniedHandler
 
 services:
     oro_distribution.routing_loader:
@@ -54,3 +59,18 @@ services:
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
 
+
+    oro_user.manager:
+        class:                        %oro_user.manager.class%
+        arguments:                    [%oro_user.entity.class%, "@doctrine.orm.entity_manager", "@security.encoder_factory"]
+
+    oro_user.security.provider:
+        class:                        %oro_user.security.provider.class%
+        public:                       false
+        arguments:                    ["@oro_user.manager"]
+
+    kernel.listener.access_denied:
+        class: %kernel.listener.oro.access_denied.class%
+        arguments: ["@session", "@router", "@security.context"]
+        tags:
+           - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }

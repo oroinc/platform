@@ -12,9 +12,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>{% block title %}  {% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block stylesheet %}
     <link rel="stylesheet" type="text/css" href="/css/oro.css"/>
     <link rel="stylesheet" type="text/css" href="/bundles/oroinstaller/css/style.css"/>
     <link rel="stylesheet" type="text/css" href="/bundles/orodistribution/css/style.css"/>
+    {% endblock %}
 
     {% block javascripts %}
     <script type="text/javascript" src="/bundles/oroinstaller/lib/jquery-2.0.3.min.js"></script>
@@ -75,6 +77,11 @@
             <a href="#" target="_blank">
                 <i class="icon-question-sign" title="Get help"></i>
             </a>
+            {% if app.user %}
+                <a href="{{ path('oro_distribution_security_logout') }}">
+                    <i class="icon-signout" title="Sign Out"></i>
+                </a>
+            {% endif %}
         </div>
 
     </div>
