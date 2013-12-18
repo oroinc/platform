@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Form\Extension;
 
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -123,13 +125,23 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->extension = new OwnerFormExtension(
             $this->securityContext,
             $this->managerRegistry,
             $this->ownershipMetadataProvider,
             $this->businessUnitManager,
             $this->securityFacade,
-            $this->tranlsator
+            $this->tranlsator,
+            $aclVoter,
+            $treeProvider
         );
     }
 
@@ -166,11 +178,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->mockConfigs(array('is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER));
         $this->builder->expects($this->once())->method('add')->with(
             $this->fieldName,
-            'oro_user_select',
-            array(
-                'required' => true,
-                'constraints' => array(new NotBlank())
-            )
+            'oro_user_acl_select'
         );
         $this->extension->buildForm($this->builder, array());
     }
@@ -199,12 +207,13 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             $this->fieldName,
             'oro_business_unit_tree_select',
             array(
-                'empty_value' => '',
+                'empty_value' => null,
                 'choices' => $businessUnits,
                 'mapped' => true,
                 'required' => true,
                 'constraints' => array(new NotBlank()),
                 'label' => 'Owner',
+                'business_unit_ids' => null,
                 'configs'     => array(
                     'is_translate_option' => false,
                     'is_safe'             => true
@@ -336,9 +345,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $this->securityContext->expects($this->any())
             ->method('getToken')
             ->will($this->returnValue($token));
-
         $this->securityFacade->expects($this->any())->method('isGranted')
-            ->with('ASSIGN', 'entity:' . $this->entityClassName)
             ->will($this->returnValue($values['is_granted']));
         $metadata = OwnershipType::OWNER_TYPE_NONE === $values['owner_type']
             ? new OwnershipMetadata($values['owner_type'])
@@ -347,13 +354,106 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadata')
             ->with($this->entityClassName)
             ->will($this->returnValue($metadata));
+
+        $aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->extension = new OwnerFormExtension(
             $this->securityContext,
             $this->managerRegistry,
             $this->ownershipMetadataProvider,
             $this->businessUnitManager,
             $this->securityFacade,
-            $this->tranlsator
+            $this->tranlsator,
+            $aclVoter,
+            $treeProvider
         );
+    }
+
+    public function testPreSubmit()
+    {
+        $this->mockConfigs(
+            array(
+                'is_granted' => true,
+                'owner_type' => OwnershipType::OWNER_TYPE_USER
+            )
+        );
+        $businessUnit = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $businessUnit->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(2));
+        $this->user->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(1));
+        $this->user->expects($this->any())
+            ->method('getOwner')
+            ->will($this->returnValue($businessUnit));
+        $ownerForm = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $form->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue($ownerForm));
+        $ownerForm->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue($this->user));
+        $form->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+        $form->expects($this->any())
+            ->method('getParent')
+            ->will($this->returnValue(false));
+        $form->expects($this->once())
+            ->method('getNormData')
+            ->will($this->returnValue($this->entityClassName));
+        $this->businessUnitManager->expects($this->once())
+            ->method('canUserBeSetAsOwner')
+            ->will($this->returnValue(false));
+        $event = new FormEvent($form, $this->user);
+
+        $this->extension->preSubmit($event);
+
+        $ownerForm->expects($this->once())
+            ->method('addError')
+            ->with(new FormError('You have no permission to set this owner'));
+
+        $this->extension->postSubmit($event);
+    }
+
+    public function testPreSetData()
+    {
+        $this->mockConfigs(array('is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER));
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $form->expects($this->any())
+            ->method('getParent')
+            ->will($this->returnValue(false));
+        $form->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+        $this->user->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(1));
+        $businessUnit = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->user->expects($this->any())
+            ->method('getOwner')
+            ->will($this->returnValue($businessUnit));
+        $form->expects($this->once())
+            ->method('remove');
+        $event = new FormEvent($form, $this->user);
+        $this->extension->preSetData($event);
     }
 }
