@@ -17,7 +17,7 @@ parameters:
     oro_user.form.handler.group.class:          Oro\Bundle\UserBundle\Form\Handler\GroupHandler
     oro_user.form.handler.status.class:         Oro\Bundle\UserBundle\Form\Handler\StatusHandler
     oro_user.form.handler.acl_role.class:       Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler
-    oro_user.form.type.user_acl_select.class    Oro\Bundle\UserBundle\Form\Type\UserAclSelectType
+    oro_user.form.type.user_acl_select.class:   Oro\Bundle\UserBundle\Form\Type\UserAclSelectType
 
 services:
     oro_user.form.user:

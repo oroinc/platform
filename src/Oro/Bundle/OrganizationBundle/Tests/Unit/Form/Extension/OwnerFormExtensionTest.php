@@ -425,7 +425,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
 
         $ownerForm->expects($this->once())
             ->method('addError')
-            ->with(new FormError('You have not permission to set this owner'));
+            ->with(new FormError('You have no permission to set this owner'));
 
         $this->extension->postSubmit($event);
     }
