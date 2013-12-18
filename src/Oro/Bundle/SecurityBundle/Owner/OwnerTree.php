@@ -211,6 +211,48 @@ class OwnerTree
     }
 
     /**
+     * Gets all user business unit ids with subordinate business unit ids
+     *
+     * @param int $userId
+     * @return array  of int|string
+     */
+    public function getUserSubordinateBusinessUnitIds($userId)
+    {
+        $buIds = $this->getUserBusinessUnitIds($userId);
+        $resultBuIds = array_merge($buIds, []);
+        foreach ($buIds as $buId) {
+            $diff = array_diff(
+                $this->getSubordinateBusinessUnitIds($buId),
+                $resultBuIds
+            );
+            if (!empty($diff)) {
+                $resultBuIds = array_merge($resultBuIds, $diff);
+            }
+        }
+
+        return $resultBuIds;
+    }
+
+    /**
+     * Gets all user business unit ids by user organization ids
+     *
+     * @param int $userId
+     * @return array  of int|string
+     */
+    public function getBusinessUnitsIdByUserOrganizations($userId)
+    {
+        $resultBuIds = [];
+        foreach ($this->getUserOrganizationIds($userId) as $orgId) {
+            $buIds = $this->getOrganizationBusinessUnitIds($orgId);
+            if (!empty($buIds)) {
+                $resultBuIds = array_merge($resultBuIds, $buIds);
+            }
+        }
+
+        return $resultBuIds;
+    }
+
+    /**
      * Add the given business unit to the tree
      *
      * @param int|string      $businessUnitId
