@@ -20,7 +20,7 @@ define(['underscore', 'backbone', 'oro/mediator', 'oro/translator'],
             initialize: function () {
                 mediator.once('hash_navigation_request:start', this._onDestroyHandler, this);
 
-                this.form = $('.system-configuration-container').parents('from');
+                this.form = $('.system-configuration-container').parents('form');
                 $(window).on(this.LOAD_EVENT, _.bind(this._collectHandler, this));
                 this._collectHandler();
 

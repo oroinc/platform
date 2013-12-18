@@ -23,6 +23,8 @@
 
 {% block oro_acl_label_widget %}
     <strong>{{ value|trans }}</strong>
+    {% set type = type|default('hidden') %}
+    {{ block('form_widget_simple') }}
 {% endblock %}
 
 {% block oro_acl_object_name_widget %}

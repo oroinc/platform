@@ -261,29 +261,35 @@ class TypesRegistry
     /**
      * Returns registered connectors for channel by type
      *
-     * @param string $channelType
+     * @param string        $channelType
+     * @param null|\Closure $filterClosure
      *
      * @return ArrayCollection
      */
-    public function getRegisteredConnectorsTypes($channelType)
+    public function getRegisteredConnectorsTypes($channelType, $filterClosure = null)
     {
         if (!isset($this->connectorTypes[$channelType])) {
             $this->connectorTypes[$channelType] = new ArrayCollection();
         }
 
-        return $this->connectorTypes[$channelType];
+        if (is_callable($filterClosure)) {
+            return $this->connectorTypes[$channelType]->filter($filterClosure);
+        } else {
+            return $this->connectorTypes[$channelType];
+        }
     }
 
     /**
      * Collect available types for choice field
      *
-     * @param string $channelType
+     * @param string        $channelType
+     * @param null|\Closure $filterClosure
      *
      * @return array
      */
-    public function getAvailableConnectorsTypesChoiceList($channelType)
+    public function getAvailableConnectorsTypesChoiceList($channelType, $filterClosure = null)
     {
-        $types  = $this->getRegisteredConnectorsTypes($channelType);
+        $types  = $this->getRegisteredConnectorsTypes($channelType, $filterClosure);
         $keys   = $types->getKeys();
         $values = $types->map(
             function (ConnectorTypeInterface $type) {
