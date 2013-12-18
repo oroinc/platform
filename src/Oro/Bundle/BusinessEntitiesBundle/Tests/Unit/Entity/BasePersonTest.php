@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\BusinessEntitiesBundle\Entity\BasePerson;
 
 class BasePersonTest extends \PHPUnit_Framework_TestCase
@@ -60,5 +62,64 @@ class BasePersonTest extends \PHPUnit_Framework_TestCase
             'createdAt'  => ['createdAt', $created, $created],
             'updatedAt'  => ['updatedAt', $updated, $updated],
         ];
+    }
+
+    public function testSetGetAddress()
+    {
+        /** @var AbstractAddress $address */
+        $address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
+        $this->entity->addAddress($address);
+        $this->assertAttributeEquals($this->entity->getAddresses(), 'addresses', $this->entity);
+    }
+
+    public function testHasAddress()
+    {
+        /** @var AbstractAddress $address */
+        $address = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
+        $this->entity->addAddress($address);
+        $this->assertTrue($this->entity->hasAddress($address));
+    }
+
+    public function testResetGetAddresses()
+    {
+        /** @var ArrayCollection $address */
+        $addresses = new ArrayCollection(
+            array(
+                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress'),
+                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress')
+            )
+        );
+        $this->entity->resetAddresses($addresses);
+        $this->assertEquals($addresses, $this->entity->getAddresses());
+    }
+
+    public function testRemoveAddresses()
+    {
+        /** @var ArrayCollection $address */
+        $addresses = new ArrayCollection(
+            array(
+                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress'),
+                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress')
+            )
+        );
+        $this->entity->resetAddresses($addresses);
+        $this->entity->removeAddress($addresses->first());
+        $this->assertFalse($this->entity->hasAddress($addresses->first()));
+        $this->assertEquals(1, $this->entity->getAddresses()->count());
+    }
+
+    public function testCloneAddresses()
+    {
+        /** @var ArrayCollection $address */
+        $addresses = new ArrayCollection(
+            array(
+                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress'),
+                $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress')
+            )
+        );
+        $this->entity->resetAddresses($addresses);
+
+        $newEntity = clone $this->entity;
+        $this->assertEquals($this->entity, $newEntity);
     }
 }

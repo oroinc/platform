@@ -212,14 +212,4 @@ class Channel
             }
         );
     }
-
-    /**
-     * Do not serialize
-     *
-     * @return array
-     */
-    public function __sleep()
-    {
-        return [];
-    }
 }
