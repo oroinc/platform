@@ -21,7 +21,7 @@
                 var $chart = $('#{{ widgetId }}-chart');
                 var $chartLegend = $('#{{ widgetId }}-legend');
                 var setChartSize = function () {
-                    var chartWidth = Math.min(Math.round($widgetContent.width() * 0.35, 0), 350);
+                    var chartWidth = Math.min(Math.round($widgetContent.width() * 0.35), 350);
                     if (chartWidth != $chart.width()) {
                         $chart.width(chartWidth);
                         $chart.height(chartWidth);
@@ -32,6 +32,25 @@
                 };
                 var setChartContainerSize = function () {
                     $chartLegendTable = $chartLegend.find('table');
+                    $td = $chartLegendTable.find('td');
+                    padding = parseInt($td.css('padding-bottom'));
+                    if (padding > 0 && ($chartLegendTable.height() + 20) > $chartLegend.height()) {
+                        while (($chartLegendTable.height() + 20) > $chartLegend.height()) {
+                            padding = padding - 1;
+                            $td.css('padding-bottom', padding + 'px');
+                            if (padding <= 0) {
+                                break;
+                            }
+                        }
+                    } else if (padding < 7 && ($chartLegendTable.height() + 20) < $chartLegend.height()) {
+                        while (($chartLegendTable.height() + 20) < $chartLegend.height()) {
+                            padding = padding + 1;
+                            $td.css('padding-bottom', padding + 'px');
+                            if (padding >= 7) {
+                                break;
+                            }
+                        }
+                    }
                     $chart.closest('.clearfix').width(
                             $chart.width() +
                             $chartLegendTable.outerWidth() +
@@ -57,7 +76,7 @@
                             colors: {{ chartColors|json_encode|raw }},
                             fontColor: {{ chartFontColor|json_encode|raw }},
                             fontSize: {{ chartFontSize|json_encode|raw }},
-                            shadowSize: 3,
+                            shadowSize: 0,
                             HtmlText: true,
                             xaxis : {
                                 showLabels : false
