@@ -203,7 +203,7 @@ class ConfigManager
 
         $result = $this->cache->getConfigurable($className, $fieldName);
         if ($result === false) {
-            $result = (bool) $this->modelManager->findModel($className, $fieldName) ? : null;
+            $result = (bool)$this->modelManager->findModel($className, $fieldName) ? : null;
 
             $this->cache->setConfigurable($result, $className, $fieldName);
         }
@@ -378,6 +378,8 @@ class ConfigManager
         }
 
         $this->getEntityManager()->flush();
+        // detach all objects from Doctrine
+        $this->getEntityManager()->clear();
 
         $this->persistConfigs   = new \SplObjectStorage();
         $this->configChangeSets = new ArrayCollection;
@@ -552,7 +554,7 @@ class ConfigManager
 
             // set missing values with default ones
             $hasChanges = false;
-            $config = $provider->getConfig($className);
+            $config     = $provider->getConfig($className);
             foreach ($defaultValues as $code => $value) {
                 if (!$config->has($code)) {
                     $config->set($code, $value);
@@ -627,7 +629,7 @@ class ConfigManager
 
             // set missing values with default ones
             $hasChanges = false;
-            $config = $provider->getConfig($className, $fieldName);
+            $config     = $provider->getConfig($className, $fieldName);
             foreach ($defaultValues as $code => $value) {
                 if (!$config->has($code)) {
                     $config->set($code, $value);

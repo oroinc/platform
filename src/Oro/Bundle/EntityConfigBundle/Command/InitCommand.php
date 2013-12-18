@@ -47,12 +47,13 @@ class InitCommand extends BaseCommand
                     $type = $doctrineMetadata->isSingleValuedAssociation($fieldName) ? 'ref-one' : 'ref-many';
                     $this->getConfigManager()->createConfigFieldModel($doctrineMetadata->getName(), $fieldName, $type);
                 }
+
+                // flush data for each entity to speed up this command
+                $this->getConfigManager()->flush();
             }
         }
 
         $this->getConfigManager()->clearConfigurableCache();
-
-        $this->getConfigManager()->flush();
 
         $output->writeln('Completed');
     }
