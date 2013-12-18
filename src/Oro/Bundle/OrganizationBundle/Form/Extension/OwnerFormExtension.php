@@ -268,7 +268,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                 if (!$isCorrect) {
                     $form->get($this->fieldName)->addError(
                         new FormError(
-                            'You have not permission to set this owner'
+                            'You have no permission to set this owner'
                         )
                     );
                 }

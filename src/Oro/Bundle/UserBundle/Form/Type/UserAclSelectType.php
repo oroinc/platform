@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class UserACLSelectType extends AbstractType
+class UserAclSelectType extends AbstractType
 {
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {

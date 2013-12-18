@@ -21,7 +21,7 @@ require(['jquery', 'routing'],
                 var selectDiv = parentDiv.find(selectDivSelector);
                 var linkDiv = parentDiv.find(linkDivSelector);
                 link.hide();
-                var oid =parentDiv.attr(objectIdentityAttribute);
+                var oid = parentDiv.attr(objectIdentityAttribute);
                 oid = oid.replace(/\\/g, '_');
                 $.ajax({
                     url: routing.generate(accessLevelRoute, {oid: oid}),
