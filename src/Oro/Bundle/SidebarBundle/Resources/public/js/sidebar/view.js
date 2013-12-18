@@ -366,7 +366,7 @@ define(function (require) {
                 model: widget
             });
 
-            widgetSetupView.on('cancel', function () {
+            widgetSetupView.on('ok', function () {
                 widget.save();
             });
 
