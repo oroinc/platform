@@ -221,12 +221,15 @@
 .sidebar i[class*=" icon-"]:before{
     color: #a9a8a8;
 }
+.sidebar-add i[class^="icon-"]:before,
+.sidebar-add i[class*=" icon-"]:before{
+    text-shadow: 1px 1px 1px #fff;
+}
 .sidebar-toggle i[class^="icon-"]:before,
 .sidebar-toggle i[class*=" icon-"]:before{
     font-size: 8px;
     line-height: 12px;
-    -webkit-box-shadow:  0px 2px 6px 1px rgba(241, 241, 241, 0.8);
-    box-shadow:  0px 2px 6px 1px rgba(241, 241, 241, 0.8);
+
 }
 .sidebar-widget-header-wrap i[class^="icon-"]:before,
 .sidebar-widget-header-wrap i[class*=" icon-"]:before{
