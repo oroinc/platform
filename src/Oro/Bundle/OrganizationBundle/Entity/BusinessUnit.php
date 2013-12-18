@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -33,7 +35,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  }
  * )
  */
-class BusinessUnit
+class BusinessUnit implements NotificationEmailInterface
 {
     /**
      * @var integer
@@ -394,5 +396,21 @@ class BusinessUnit
         $this->owner = $owningBusinessUnit;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotificationEmails()
+    {
+        $emails = $this->getUsers()->map(
+            function (EmailHolderInterface $user) {
+                return $user->getEmail();
+            }
+        );
+
+        $emails[] = $this->getEmail();
+
+        return $emails;
     }
 }

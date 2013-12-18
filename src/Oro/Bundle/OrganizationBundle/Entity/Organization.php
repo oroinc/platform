@@ -3,7 +3,9 @@
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 /**
  * Organization
@@ -20,7 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  }
  * )
  */
-class Organization
+class Organization implements NotificationEmailInterface
 {
     /**
      * @var integer
@@ -137,5 +139,14 @@ class Organization
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotificationEmails()
+    {
+        // TODO: Implement getNotificationEmails() method.
+        return [];
     }
 }

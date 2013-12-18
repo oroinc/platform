@@ -16,7 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  * )
  * @ORM\Entity
  */
-class Tagging implements ContainAuthorInterface
+class Tagging
 {
     /**
      * @var integer $id

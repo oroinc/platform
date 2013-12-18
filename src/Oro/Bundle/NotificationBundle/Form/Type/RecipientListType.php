@@ -25,19 +25,13 @@ class RecipientListType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'users',
-            'oro_user_multiselect',
-            array(
-                'required' => false
-            )
-        );
+        $builder->add('users', 'oro_user_multiselect', ['required' => false]);
 
         // groups
         $builder->add(
             'groups',
             'entity',
-            array(
+            [
                 'class'         => 'OroUserBundle:Group',
                 'property'      => 'name',
                 'multiple'      => true,
@@ -45,26 +39,14 @@ class RecipientListType extends AbstractType
                 'empty_value'   => '',
                 'empty_data'    => null,
                 'required'      => false,
-            )
+            ]
         );
 
         // custom email
-        $builder->add(
-            'email',
-            'email',
-            array(
-                'required'      => false
-            )
-        );
+        $builder->add('email', 'email', ['required' => false]);
 
         // owner
-        $builder->add(
-            'owner',
-            'checkbox',
-            array(
-                'required'      => false
-            )
-        );
+        $builder->add('owner', 'checkbox', ['required' => false]);
     }
 
     /**

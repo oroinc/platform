@@ -30,7 +30,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  }
  * )
  */
-class Tag implements ContainAuthorInterface, ContainUpdaterInterface
+class Tag implements ContainUpdaterInterface
 {
     /**
      * @var integer

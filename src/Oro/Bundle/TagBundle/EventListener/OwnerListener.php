@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\TagBundle\Entity\ContainAuthorInterface;
 use Oro\Bundle\TagBundle\Entity\ContainUpdaterInterface;
 
 class OwnerListener implements ContainerAwareInterface

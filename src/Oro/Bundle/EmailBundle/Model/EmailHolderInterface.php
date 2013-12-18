@@ -13,4 +13,9 @@ interface EmailHolderInterface
      * @return string
      */
     public function getEmail();
+
+    /**
+     * @return array
+     */
+    public function getEmails();
 }
