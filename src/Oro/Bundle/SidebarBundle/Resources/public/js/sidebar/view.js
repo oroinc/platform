@@ -122,8 +122,6 @@ define(function (require) {
             var model = view.model;
             var $content = view.$el.find('.sidebar-content');
 
-            view.hideAllWidgetHovers();
-
             model.widgets.each(function (widget) {
                 var widgetView = view.widgetViews[widget.cid];
                 if (!widgetView) {
@@ -200,8 +198,6 @@ define(function (require) {
             e.stopPropagation();
             e.preventDefault();
 
-            this.hideAllWidgetHovers();
-
             this.model.toggleState();
         },
 
@@ -271,7 +267,8 @@ define(function (require) {
                 return;
             }
 
-            widget.state = constants.WIDGET_MAXIMIZED;
+            view.hideAllWidgetHovers();
+
             widget.snapshotState();
             widget.state = constants.WIDGET_MAXIMIZED_HOVER;
 
@@ -334,7 +331,6 @@ define(function (require) {
 
             case constants.WIDGET_MAXIMIZED_HOVER:
                 view.hideWidgetHover(cid);
-                widget.state = constants.WIDGET_MINIMIZED;
                 break;
 
             case constants.WIDGET_MAXIMIZED:
