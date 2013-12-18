@@ -12,17 +12,9 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
      * @param string $placement
      * @param array $expected
      */
-    public function testGetWidgetDefinitionsByPlacement(
-        array $definitions,
-        $placement,
-        array $expected
-    ) {
-        $assetHelper = $this->getAssetHelper();
-        $assetHelper->expects($this->exactly(count($definitions)))
-            ->method('getUrl')
-            ->will($this->returnValue('ASSET'));
-
-        $registry = new WidgetDefinitionRegistry($definitions, $assetHelper);
+    public function testGetWidgetDefinitionsByPlacement(array $definitions, $placement, array $expected)
+    {
+        $registry = new WidgetDefinitionRegistry($definitions);
         $actual = $registry->getWidgetDefinitionsByPlacement($placement);
         $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $actual);
         $this->assertEquals($expected, $actual->toArray());
@@ -64,13 +56,13 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
                 array(
                     'foo' => array(
                         'title' => 'Foo',
-                        'icon' => 'ASSET',
+                        'icon' => 'foo.ico',
                         'module' => 'widget/foo',
                         'placement' => 'left'
                     ),
                     'bar' => array(
                         'title' => 'Bar',
-                        'icon' => 'ASSET',
+                        'icon' => 'bar.ico',
                         'module' => 'widget/bar',
                         'placement' => 'both'
                     )
@@ -101,24 +93,18 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
                 array(
                     'bar' => array(
                         'title' => 'Bar',
-                        'icon' => 'ASSET',
+                        'icon' => 'bar.ico',
                         'module' => 'widget/bar',
                         'placement' => 'both'
                     ),
                     'bar2' => array(
                         'title' => 'Bar2',
-                        'icon' => 'ASSET',
+                        'icon' => 'bar2.ico',
                         'module' => 'widget/bar2',
                         'placement' => 'right'
                     ),
                 )
             )
         );
-    }
-
-    protected function getAssetHelper()
-    {
-        return $this->getMockBuilder('Symfony\Component\Templating\Asset\PackageInterface')
-            ->getMock();
     }
 }

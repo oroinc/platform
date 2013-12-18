@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SidebarBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WidgetDefinitionRegistry
 {
