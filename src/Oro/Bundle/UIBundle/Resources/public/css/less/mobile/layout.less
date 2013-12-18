@@ -24,7 +24,7 @@
 .layout-content .responsive-section{
   padding: 0;
   .form-horizontal {
-    padding: @contentPadding * 1.5 0;
+    padding: @contentPadding 0;
   }
 }
 .container-fluid > .responsive-section .responsive-cell {
@@ -35,5 +35,11 @@
   padding: @contentPadding @contentPadding 0 0;
   .contact-info-col {
     padding: 0 0 @contentPadding @contentPadding;
+  }
+}
+
+.responsive-section {
+  .inner-grid {
+    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }

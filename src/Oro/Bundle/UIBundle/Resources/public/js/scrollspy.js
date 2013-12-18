@@ -47,9 +47,9 @@ define(function (require) {
                 $header.wrap('<div class="accordion-heading"></div>');
                 // first is opened, rest are closed
                 if (i > 0) {
-                    $header.addClass('collapsed')
+                    $header.addClass('collapsed');
                 } else {
-                    $target.addClass('in');
+                    $target.addClass('in').data('toggle', false);
                 }
                 $target.on('focusin', function () {
                     $target.collapse('show');
