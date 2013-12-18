@@ -1,9 +1,10 @@
 parameters:
-    oro_datagrid.extension.formatter.property.field_property.class:           Oro\Bundle\DataGridBundle\Extension\Formatter\Property\FieldProperty
-    oro_datagrid.extension.formatter.property.url_property.class:             Oro\Bundle\DataGridBundle\Extension\Formatter\Property\UrlProperty
-    oro_datagrid.extension.formatter.property.twig_property.class:            Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty
-    oro_datagrid.extension.formatter.property.translatable_property.class:    Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TranslatableProperty
-    oro_datagrid.extension.formatter.property.callback_property.class:        Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty
+    oro_datagrid.extension.formatter.property.field_property.class:            Oro\Bundle\DataGridBundle\Extension\Formatter\Property\FieldProperty
+    oro_datagrid.extension.formatter.property.url_property.class:              Oro\Bundle\DataGridBundle\Extension\Formatter\Property\UrlProperty
+    oro_datagrid.extension.formatter.property.twig_property.class:             Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty
+    oro_datagrid.extension.formatter.property.translatable_property.class:     Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TranslatableProperty
+    oro_datagrid.extension.formatter.property.callback_property.class:         Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty
+    oro_datagrid.extension.formatter.property.localized_number_property.class: Oro\Bundle\DataGridBundle\Extension\Formatter\Property\LocalizedNumberProperty
 
 services:
     oro_datagrid.extension.formatter.field_property:
@@ -39,3 +40,11 @@ services:
         arguments: []
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: callback }
+
+    oro_datagrid.extension.formatter.property.localized_number_property:
+        class : %oro_datagrid.extension.formatter.property.localized_number_property.class%
+        arguments:
+            - @translator
+            - @oro_locale.formatter.number
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: localized_number }
