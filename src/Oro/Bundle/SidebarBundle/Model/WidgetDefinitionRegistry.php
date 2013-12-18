@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SidebarBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Templating\Asset\PackageInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class WidgetDefinitionRegistry
 {
@@ -13,17 +13,10 @@ class WidgetDefinitionRegistry
     protected $widgetDefinitions;
 
     /**
-     * @var PackageInterface
-     */
-    protected $assetsHelper;
-
-    /**
      * @param array $definitions
-     * @param PackageInterface $assetHelper
      */
-    public function __construct(array $definitions, PackageInterface $assetHelper)
+    public function __construct(array $definitions)
     {
-        $this->assetsHelper = $assetHelper;
         $this->widgetDefinitions = new ArrayCollection();
 
         $this->setWidgetDefinitions($definitions);
@@ -35,7 +28,6 @@ class WidgetDefinitionRegistry
     protected function setWidgetDefinitions(array $definitions)
     {
         foreach ($definitions as $name => $definition) {
-            $definition['icon'] = $this->assetsHelper->getUrl($definition['icon']);
             $this->widgetDefinitions->set($name, $definition);
         }
     }

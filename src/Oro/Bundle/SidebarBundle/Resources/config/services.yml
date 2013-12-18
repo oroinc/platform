@@ -5,14 +5,13 @@ parameters:
 services:
     oro_sidebar.widget_definition.registry:
         class: %oro_sidebar.widget_definition.registry.class%
-        scope: request
         arguments:
             - %oro_sidebar.sidebar_widgets_definitions%
-            - @templating.helper.assets
 
     oro_sidebar.twig.extension:
         class: %oro_sidebar.twig.extension.class%
         arguments:
+            - @oro_sidebar.widget_definition.registry
             - @service_container
         tags:
             - { name: twig.extension }
