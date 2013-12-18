@@ -127,6 +127,9 @@ define(function (require) {
                 if (!widgetView) {
                     return;
                 }
+                if (widget.state === constants.WIDGET_MAXIMIZED_HOVER) {
+                    widget.state = constants.WIDGET_MAXIMIZED;
+                }
                 widgetView.render().delegateEvents();
                 $content.append(widgetView.$el);
             });
