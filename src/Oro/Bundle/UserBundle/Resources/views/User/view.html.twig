@@ -23,10 +23,18 @@
 
 {% block navButtons %}
     {% if editRoute is defined %}
-        {{ UI.button({'path' : path(editRoute), 'aClass': 'edit-button', 'iClass' : 'icon-edit ', 'title' : 'Edit profile', 'label' : 'Edit'}) }}
+        {{ UI.editButton({
+            'path': path(editRoute),
+            'title': 'Edit profile',
+            'label': 'Edit'
+        }) }}
     {% else %}
         {% if resource_granted('oro_user_user_update') %}
-            {{ UI.button({'path' : path('oro_user_update', { id: entity.id }), 'aClass': 'edit-button', 'iClass' : 'icon-edit ', 'title' : 'Edit user', 'label' : 'Edit'}) }}
+            {{ UI.editButton({
+                'path': path('oro_user_update', { id: entity.id }),
+                'title': 'Edit user',
+                'label': 'Edit'
+            }) }}
         {% endif %}
     {% endif %}
     {% if resource_granted('oro_user_user_delete') and entity.id!=app.user.id %}
@@ -36,8 +44,8 @@
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-user',
             'dataId': entity.id,
-            'dataMessage': 'Are you sure you want to delete this user?'|trans,
-            'successMessage': 'User deleted'|trans,
+            'dataMessage': 'Are you sure you want to delete this user?',
+            'successMessage': 'User deleted',
             'title': 'Delete user',
             'label': 'Delete'
         }) }}
