@@ -12,6 +12,7 @@
 .sidebar-widgetadd-widgets li {
     border-bottom: 1px solid #ddd;
     padding: 10px;
+    cursor: pointer !important;
 }
 
 .sidebar-widgetadd-widgets .ui-selecting {
