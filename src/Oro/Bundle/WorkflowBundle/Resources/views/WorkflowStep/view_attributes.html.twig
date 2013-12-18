@@ -1,6 +1,6 @@
 {% block workflow_view_attribute_row %}
     <div class="control-group">
-        <label class="control-label">{{ label }}</label>
+        <label class="control-label">{{ label|trans }}</label>
         <div class="controls">
             <p class="control-label">{{ oro_workflow_render_view_attribute_value(workflow_item, _context) }}</p>
         </div>

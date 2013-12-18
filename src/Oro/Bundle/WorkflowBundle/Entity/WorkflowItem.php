@@ -28,11 +28,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
- * @Config(
- *  defaultValues={
- *      "entity"={"label"="Workflow Item", "plural_label"="Workflow Items"}
- *  }
- * )
+ * @Config()
  */
 class WorkflowItem
 {

@@ -1,14 +1,14 @@
 {% extends 'OroUIBundle:actions:index.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% set gridName = 'business-unit-grid' %}
-{% set pageTitle = 'Business Units' %}
+{% set pageTitle = 'oro.organization.businessunit.entity_plural_label'|trans %}
 
 {% block navButtons %}
     {% if resource_granted('oro_business_unit_create') %}
         {{ UI.addButton({
             'path' : path('oro_business_unit_create'),
-            'title' : 'Create business unit',
-            'label' : 'Create business unit'
+            'title' : 'Create'|trans ~ ' ' ~ 'oro.organization.businessunit.entity_label'|trans|lower,
+            'label' : 'Create'|trans ~ ' ' ~ 'oro.organization.businessunit.entity_label'|trans|lower
         }) }}
     {% endif %}
 {% endblock %}

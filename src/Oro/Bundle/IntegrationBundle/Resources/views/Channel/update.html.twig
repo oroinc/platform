@@ -33,12 +33,12 @@
 {% endblock navButtons %}
 
 {% block pageHeader %}
-    {% set title = 'Create Channel'|trans %}
+    {% set title = 'Create'|trans ~ ' ' ~ 'oro.integration.channel.entity_label'|trans %}
     {% if entity.id %}
         {% set breadcrumbs = {
             'entity':      entity,
             'indexPath':   path('oro_integration_channel_index'),
-            'indexLabel': 'Channel',
+            'indexLabel':  'oro.integration.channel.entity_label'|trans,
             'entityTitle': entity.name|default('N/A')
             }
         %}

@@ -2,7 +2,7 @@
 
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% set pageTitle = 'Channels' %}
+{% set pageTitle = 'oro.integration.channel.entity_plural_label'|trans %}
 {% set gridName = 'channels-grid' %}
 
 {% block navButtons %}
@@ -10,8 +10,8 @@
         {{
             UI.addButton({
                 'path' : path('oro_integration_channel_create'),
-                'title' : 'Create channel',
-                'label' : 'Create channel'
+                'title' : 'Create'|trans ~ ' ' ~ 'oro.integration.channel.entity_label'|trans,
+                'label' : 'Create'|trans ~ ' ' ~ 'oro.integration.channel.entity_label'|trans
             })
         }}
     {% endif %}
