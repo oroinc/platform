@@ -37,11 +37,18 @@ class OwnerFormSubscriber implements EventSubscriberInterface
      */
     protected $defaultOwner;
 
+    /**
+     * @param ManagerRegistry $managerRegistry
+     * @param string $fieldName
+     * @param string $fieldLabel
+     * @param bool $isAssignGranted this parameter is transmitted as link because value can be changed in form class
+     * @param null $defaultOwner
+     */
     public function __construct(
         ManagerRegistry $managerRegistry,
         $fieldName,
         $fieldLabel,
-        $isAssignGranted = false,
+        &$isAssignGranted,
         $defaultOwner = null
     ) {
         $this->managerRegistry = $managerRegistry;
