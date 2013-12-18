@@ -19,7 +19,7 @@ workflows:
                             options:
                                 required: true
                 view_attributes:
-                    - { attribute: 'first_attribute', view_type: 'custom_view_type' }
+                    - { attribute: 'first_attribute', view_type: 'custom_view_type', default: 'Default value' }
                     - { path: '$first_attribute.name', label: 'Custom label' }
                     - first_attribute
 

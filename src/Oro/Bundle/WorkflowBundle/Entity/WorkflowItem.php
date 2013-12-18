@@ -105,6 +105,7 @@ class WorkflowItem
      *  cascade={"persist", "remove"},
      *  orphanRemoval=true
      * )
+     * @ORM\OrderBy({"transitionDate" = "ASC"})
      */
     protected $transitionRecords;
 

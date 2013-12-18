@@ -1,10 +1,6 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroTagBundle::macros.html.twig' as _tag %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroEmailBundle::macros.html.twig' as Email %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-
-{% set gridName = 'users-email-grid' %}
 
 {% set fullname = entity|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
@@ -168,33 +164,34 @@
           {% set additional_fields = additional_fields|merge([{'title' : null, 'data' : attributes}]) %}
       {% endif %}
 
-      {% set dataBlocks = dataBlocks|merge([ {
+      {% set dataBlocks = dataBlocks|merge([{
           'title': 'Additional Information',
           'subblocks': additional_fields
-      }] ) %}
+      }]) %}
     {% endif %}
     {#
       EntityExtend fields END
     #}
 
     {% if resource_granted('oro_email_view') %}
-        {% set dataBlocks = dataBlocks|merge
-            (
-                [{
-                    'title': 'oro.user.emails.label'|trans,
-                    'subblocks': [
-                        {
-                            'title': '',
-                            'useSpan': false,
-                            'data': [
-                                dataGrid.renderGrid(gridName, {userId: entity.id}, { cssClass: 'inner-grid' }),
-                                Email.renderJs()
-                            ]
-                        }
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'oro.user.emails.label'|trans,
+            'subblocks': [
+                {
+                    'title': '',
+                    'useSpan': false,
+                    'data': [
+                        oro_widget_render({
+                            'widgetType': 'buttons',
+                            'url': path('oro_user_widget_email', {userId: entity.id}),
+                            'alias': 'user_emails',
+                            'cssClass': 'inner-grid',
+                        })
+
                     ]
-                }]
-            )
-        %}
+                }
+            ]
+        }]) %}
     {% endif %}
 
     {%- set additional_data -%}
@@ -202,18 +199,16 @@
     {%- endset -%}
 
     {% if additional_data is not empty %}
-        {% set dataBlocks = dataBlocks|merge(
-            [{
-                'title': 'Additional data'|trans,
-                'subblocks': [
-                    {
-                        'title': '',
-                        'useSpan': false,
-                        'data': [additional_data]
-                    }
-                ]
-            }]
-        ) %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': 'Additional data'|trans,
+            'subblocks': [
+                {
+                    'title': '',
+                    'useSpan': false,
+                    'data': [additional_data]
+                }
+            ]
+        }]) %}
     {% endif %}
 
     {% set data = { 'dataBlocks': dataBlocks } %}

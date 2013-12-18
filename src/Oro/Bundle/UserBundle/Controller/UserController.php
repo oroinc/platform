@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -328,5 +329,16 @@ class UserController extends Controller
         }
 
         return $dynamicRow;
+    }
+
+    /**
+     * @Route("/widget/email/{userId}", name="oro_user_widget_email", requirements={"userId"="\d+"})
+     * @ParamConverter("user", options={"id"="userId"})
+     * @Template("OroUserBundle:User:email.html.twig")
+     * @AclAncestor("oro_email_view")
+     */
+    public function widgetEmailAction(User $user)
+    {
+        return array('entity' => $user);
     }
 }
