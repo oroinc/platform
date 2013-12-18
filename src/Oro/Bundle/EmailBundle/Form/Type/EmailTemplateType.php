@@ -38,9 +38,9 @@ class EmailTemplateType extends AbstractType
             'entityName',
             'choice',
             array(
+                'label'              => 'oro.email.emailtemplate.entity_name.label',
                 'choices'            => $this->entityNameChoices,
                 'multiple'           => false,
-                'translation_domain' => 'config',
                 'empty_value'        => '',
                 'empty_data'         => null,
                 'required'           => true
@@ -51,6 +51,7 @@ class EmailTemplateType extends AbstractType
             'name',
             'text',
             array(
+                'label'    => 'oro.email.emailtemplate.name.label',
                 'required' => true
             )
         );
@@ -59,13 +60,14 @@ class EmailTemplateType extends AbstractType
             'type',
             'choice',
             array(
-                'multiple'           => false,
-                'expanded'           => true,
-                'choices'            => array(
+                'label'    => 'oro.email.emailtemplate.type.label',
+                'multiple' => false,
+                'expanded' => true,
+                'choices'  => array(
                     'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
                     'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
                 ),
-                'required'           => true
+                'required' => true
             )
         );
 
@@ -73,6 +75,7 @@ class EmailTemplateType extends AbstractType
             'translations',
             'oro_email_emailtemplate_translatation',
             array(
+                'label'    => 'oro.email.emailtemplate.translations.label',
                 'required' => false
             )
         );
@@ -81,6 +84,7 @@ class EmailTemplateType extends AbstractType
             'parentTemplate',
             'hidden',
             array(
+                'label'         => 'oro.email.emailtemplate.parent.label',
                 'property_path' => 'parent'
             )
         );

@@ -15,11 +15,11 @@ class CalendarEventType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('title', 'textarea', array('required' => true))
-            ->add('start', 'oro_datetime', array('required' => true))
-            ->add('end', 'oro_datetime', array('required' => true))
-            ->add('allDay', 'checkbox', array('required' => false))
-            ->add('reminder', 'checkbox', array('required' => false));
+            ->add('title', 'textarea', ['required' => true, 'label' => 'oro.calendar.calendarevent.title.label'])
+            ->add('start', 'oro_datetime', ['required' => true, 'label' => 'oro.calendar.calendarevent.start.label'])
+            ->add('end', 'oro_datetime', ['required' => true, 'label' => 'oro.calendar.calendarevent.end.label'])
+            ->add('allDay', 'checkbox', ['required' => false, 'label' => 'oro.calendar.calendarevent.all_day.label'])
+            ->add('reminder', 'checkbox', ['required' => false, 'label' => 'oro.calendar.calendarevent.reminder.label']);
     }
 
     /**
@@ -28,10 +28,10 @@ class CalendarEventType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class' => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
                 'intention'  => 'calendar_event',
-            )
+            ]
         );
     }
 

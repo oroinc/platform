@@ -44,7 +44,7 @@
         {% set breadcrumbs = {
                 'entity':      form.vars.value,
                 'indexPath':   path('oro_notification_emailnotification_index'),
-                'indexLabel': 'Transactional Emails',
+                'indexLabel':  'oro.notification.emailnotification.entity_plural_label'|trans,
                 'entityTitle': title
             }
         %}
@@ -63,9 +63,9 @@
             'subblocks': [{
                 'title': '',
                 'data': [
-                    form_row(form.entityName, {label: 'oro.notification.emailnotification.entity_name.label'}),
-                    form_row(form.event, {label: 'oro.notification.emailnotification.event.label'}),
-                    form_row(form.template, {label: 'oro.notification.emailnotification.template.label'}),
+                    form_row(form.entityName),
+                    form_row(form.event),
+                    form_row(form.template),
                 ]
             }]
         },

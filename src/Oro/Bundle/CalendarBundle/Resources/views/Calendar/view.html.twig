@@ -66,11 +66,11 @@
 
     <script type="text/html" id="template-calendar-event">
         {% set data = [
-            form_row(event_form.title, {label: 'oro.calendar.calendarevent.title.label'}),
-            form_row(event_form.start, {label: 'oro.calendar.calendarevent.start.label'}),
-            form_row(event_form.end, {label: 'oro.calendar.calendarevent.end.label'}),
-            form_row(event_form.allDay, {label: 'oro.calendar.calendarevent.all_day.label'}),
-            form_row(event_form.reminder, {label: 'oro.calendar.calendarevent.reminder.label'}),
+            form_row(event_form.title),
+            form_row(event_form.start),
+            form_row(event_form.end),
+            form_row(event_form.allDay),
+            form_row(event_form.reminder),
         ] %}
 
         <div class="alert alert-error" style="display: none;"></div>

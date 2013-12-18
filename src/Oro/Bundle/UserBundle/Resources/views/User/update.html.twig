@@ -3,7 +3,10 @@
 
 {% set fullname = form.vars.value|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
-{% set title = form.vars.value.id ? fullname ~ ' - ' ~ 'Update User'|trans : 'New User'|trans %}
+{% set title = form.vars.value.id
+    ? fullname ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.user.entity_label'|trans
+    : 'New'|trans ~ ' ' ~ 'oro.user.entity_label'|trans
+%}
 {% set audit_entity_class = 'Oro_Bundle_UserBundle_Entity_User' %}
 {% if editRoute %}
     {% set formAction = path(editRoute) %}
@@ -87,24 +90,24 @@
             {
                 'title': '',
                 'data': [
-                    form_row(form.enabled, {label: 'oro.user.enabled.label'}),
-                    form_row(form.username, {label: 'oro.user.username.label'}),
-                    form.plainPassword is defined ? form_row(form.plainPassword, {label: 'oro.user.password.label'}) : '',
-                    form_row(form.namePrefix, {label: 'oro.user.name_prefix.label'}),
-                    form_row(form.firstName, {label: 'oro.user.first_name.label'}),
-                    form_row(form.middleName, {label: 'oro.user.middle_name.label'}),
-                    form_row(form.lastName, {label: 'oro.user.last_name.label'}),
-                    form_row(form.nameSuffix, {label: 'oro.user.name_suffix.label'}),
-                    form_row(form.birthday, {label: 'oro.user.birthday.label'}),
-                    form_row(form.imageFile, {label: 'oro.user.image.label'}),
+                    form_row(form.enabled),
+                    form_row(form.username),
+                    form.plainPassword is defined ? form_row(form.plainPassword) : '',
+                    form_row(form.namePrefix),
+                    form_row(form.firstName),
+                    form_row(form.middleName),
+                    form_row(form.lastName),
+                    form_row(form.nameSuffix),
+                    form_row(form.birthday),
+                    form_row(form.imageFile),
                 ]
             },
             {
                 'title': '',
                 'data': [
-                    form_row(form.email, {label: 'oro.user.email.label'}),
+                    form_row(form.email),
                     UI.collectionField(form.emails, 'oro.user.emails.label', 'Add another email'|trans),
-                    form_row(form.tags, {label: 'oro.tag.entity_plural_label'})
+                    form_row(form.tags)
                 ]
             }
         ]
@@ -131,7 +134,7 @@
         {% macro userRoles(form) %}
             {% if form.rolesCollection is defined %}
                 <div class="form-horizontal" id="roles-list">
-                    {{ form_row(form.rolesCollection, {label: 'oro.user.roles.label', attr: { class: 'horizontal' } }) }}
+                    {{ form_row(form.rolesCollection, {attr: { class: 'horizontal' } }) }}
                 </div>
             {% endif %}
         {% endmacro %}
@@ -141,7 +144,7 @@
                 {
                     'title': '',
                     'data': [
-                        form.groups is defined ? form_row(form.groups, {label: 'oro.user.groups.label', attr: { class: 'horizontal' } }) : null,
+                        form.groups is defined ? form_row(form.groups, {attr: { class: 'horizontal' } }) : null,
                         _self.userRoles(form)
                     ]
                 }

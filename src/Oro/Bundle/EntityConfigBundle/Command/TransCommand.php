@@ -46,6 +46,7 @@ class TransCommand extends BaseCommand
 
         /** @var EntityConfigId[] */
         $entityConfigIds = $cm->getProvider('entity')->getIds();
+        $i = 1;
         foreach ($entityConfigIds as $entityConfigId) {
             /** @var Config $entityConfig */
             $entityConfig = $cm->getProvider('entity')->getConfigById($entityConfigId);
@@ -56,7 +57,7 @@ class TransCommand extends BaseCommand
             $enPlural = $entityConfig->get('plural_label');
             $this->addTranslation($em, $entityConfig->getId()->toString(), $enPlural);
 
-            $output->writeln('ENTITY -> ' . $enLabel . ' - ' . $enPlural);
+            $output->writeln($i++ . ': ENTITY -> ' . $enLabel . ' - ' . $enPlural);
 
             /** @var Config[] $entityFields */
             $entityFields = $cm->getProvider('entity')->getConfigs($entityConfig->getId()->getClassName());

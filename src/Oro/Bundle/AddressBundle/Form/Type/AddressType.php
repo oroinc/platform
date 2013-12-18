@@ -29,7 +29,6 @@ class AddressType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->countryAndRegionSubscriber);
-
         $builder
             ->add('id', 'hidden')
             ->add('label', 'text', array('required' => false))

@@ -2,7 +2,9 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId ? 'Update' ~ ' ' ~ 'oro.user.group.entity_label'|trans : 'New'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans %}
+{% set title = entityId
+    ? 'Update'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans
+    : 'New'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans %}
 {% oro_title_set({params : { "%group%": form.vars.value.name } }) %}
 {% set gridName = 'group-users-grid' %}
 {% set formAction = entityId ? path('oro_user_group_update', { 'id': entityId}) : path('oro_user_group_create') %}
@@ -52,7 +54,7 @@
                 'data': [
                     form_widget(form.appendUsers, {'id': 'groupAppendUsers'}),
                     form_widget(form.removeUsers, {'id': 'groupRemoveUsers'}),
-                    form_row(form.name, {label: 'oro.user.group.name.label'})
+                    form_row(form.name)
                 ]
             }
         ]

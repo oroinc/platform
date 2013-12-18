@@ -17,8 +17,8 @@ class EmailType extends AbstractType
             ->add('gridName', 'hidden', array('required' => false))
             ->add('from', 'oro_email_email_address', array('required' => true))
             ->add('to', 'oro_email_email_address', array('required' => true, 'multiple' => true))
-            ->add('subject', 'text', array('required' => true))
-            ->add('body', 'textarea', array('required' => false));
+            ->add('subject', 'text', array('required' => true, 'label' => 'oro.email.subject.label'))
+            ->add('body', 'textarea', array('required' => false, 'label' => 'oro.email.email_body.label'));
     }
 
     /**

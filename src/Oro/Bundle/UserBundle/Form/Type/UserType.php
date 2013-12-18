@@ -35,7 +35,8 @@ class UserType extends AbstractType
     public function __construct(
         SecurityContextInterface $security,
         Request $request
-    ) {
+    )
+    {
 
         $this->security = $security;
         if ($request->attributes->get('_route') == 'oro_user_profile_update') {
@@ -66,41 +67,43 @@ class UserType extends AbstractType
                 'rolesCollection',
                 'entity',
                 array(
-                    'label'          => 'Roles',
-                    'class'          => 'OroUserBundle:Role',
-                    'property'       => 'label',
+                    'label' => 'oro.user.roles.label',
+                    'class' => 'OroUserBundle:Role',
+                    'property' => 'label',
                     'query_builder' => function (EntityRepository $er) {
                         return $er->createQueryBuilder('r')
                             ->where('r.role <> :anon')
                             ->setParameter('anon', User::ROLE_ANONYMOUS);
                     },
-                    'multiple'       => true,
-                    'expanded'       => true,
-                    'required'       => !$this->isMyProfilePage,
-                    'read_only'      => $this->isMyProfilePage,
-                    'disabled'      => $this->isMyProfilePage,
+                    'multiple' => true,
+                    'expanded' => true,
+                    'required' => !$this->isMyProfilePage,
+                    'read_only' => $this->isMyProfilePage,
+                    'disabled' => $this->isMyProfilePage,
                 )
             )
             ->add(
                 'groups',
                 'entity',
                 array(
-                    'class'          => 'OroUserBundle:Group',
-                    'property'       => 'name',
-                    'multiple'       => true,
-                    'expanded'       => true,
-                    'required'       => false,
-                    'read_only'      => $this->isMyProfilePage,
-                    'disabled'       => $this->isMyProfilePage
+                    'label' => 'oro.user.groups.label',
+                    'class' => 'OroUserBundle:Group',
+                    'property' => 'name',
+                    'multiple' => true,
+                    'expanded' => true,
+                    'required' => false,
+                    'read_only' => $this->isMyProfilePage,
+                    'disabled' => $this->isMyProfilePage
                 )
             )
             ->add(
                 'plainPassword',
                 'repeated',
                 array(
-                    'type'           => 'password',
-                    'required'       => true,
-                    'first_options'  => array('label' => 'Password'),
+                    'label' => 'oro.user.password.label',
+                    'type' => 'password',
+                    'required' => true,
+                    'first_options' => array('label' => 'Password'),
                     'second_options' => array('label' => 'Re-enter password'),
                 )
             )
@@ -108,24 +111,18 @@ class UserType extends AbstractType
                 'emails',
                 'collection',
                 array(
-                    'type'           => 'oro_user_email',
-                    'allow_add'      => true,
-                    'allow_delete'   => true,
-                    'by_reference'   => false,
-                    'prototype'      => true,
+                    'type' => 'oro_user_email',
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                    'by_reference' => false,
+                    'prototype' => true,
                     'prototype_name' => 'tag__name__',
-                    'label'          => ' '
+                    'label' => ' '
                 )
             )
-            ->add(
-                'tags',
-                'oro_tag_select'
-            )
-            ->add('imapConfiguration', 'oro_imap_configuration')
-            ->add(
-                'change_password',
-                'oro_change_password'
-            );
+            ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
+            ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
+            ->add('change_password', 'oro_change_password');
     }
 
     /**
@@ -135,9 +132,9 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class'           => 'Oro\Bundle\UserBundle\Entity\User',
-                'intention'            => 'user',
-                'validation_groups'    => function ($form) {
+                'data_class' => 'Oro\Bundle\UserBundle\Entity\User',
+                'intention' => 'user',
+                'validation_groups' => function ($form) {
                     if ($form instanceof FormInterface) {
                         $user = $form->getData();
                     } elseif ($form instanceof FormView) {
@@ -151,10 +148,10 @@ class UserType extends AbstractType
                         : array('Registration', 'User', 'Default');
                 },
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'error_mapping'        => array(
+                'error_mapping' => array(
                     'roles' => 'rolesCollection'
                 ),
-                'cascade_validation'   => true
+                'cascade_validation' => true
             )
         );
     }
@@ -175,76 +172,14 @@ class UserType extends AbstractType
     protected function setDefaultUserFields(FormBuilderInterface $builder)
     {
         $builder
-            ->add(
-                'username',
-                'text',
-                array(
-                    'required'       => true,
-                )
-            )
-            ->add(
-                'email',
-                'email',
-                array(
-                    'label'          => 'E-mail',
-                    'required'       => true,
-                )
-            )
-            ->add(
-                'namePrefix',
-                'text',
-                array(
-                    'label'          => 'Name prefix',
-                    'required'       => false,
-                )
-            )
-            ->add(
-                'firstName',
-                'text',
-                array(
-                    'label'          => 'First name',
-                    'required'       => true,
-                )
-            )
-            ->add(
-                'middleName',
-                'text',
-                array(
-                    'label'          => 'Middle name',
-                    'required'       => false,
-                )
-            )
-            ->add(
-                'lastName',
-                'text',
-                array(
-                     'label'          => 'Last name',
-                     'required'       => true,
-                )
-            )
-            ->add(
-                'nameSuffix',
-                'text',
-                array(
-                    'label'          => 'Name suffix',
-                    'required'       => false,
-                )
-            )
-            ->add(
-                'birthday',
-                'oro_date',
-                array(
-                    'label'          => 'Date of birth',
-                    'required'       => false,
-                )
-            )
-            ->add(
-                'imageFile',
-                'file',
-                array(
-                    'label'          => 'Avatar',
-                    'required'       => false,
-                )
-            );
+            ->add('username', 'text', ['label' => 'oro.user.username.label', 'required' => true])
+            ->add('email', 'email', ['label' => 'oro.user.email.label', 'required' => true])
+            ->add('namePrefix', 'text', ['label' => 'oro.user.name_prefix.label', 'required' => false])
+            ->add('firstName', 'text', ['label' => 'oro.user.first_name.label', 'required' => true])
+            ->add('middleName', 'text', ['label' => 'oro.user.middle_name.label', 'required' => false])
+            ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
+            ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
+            ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
+            ->add('imageFile', 'file', ['label' => 'oro.user.image.label', 'required' => false ]);
     }
 }
