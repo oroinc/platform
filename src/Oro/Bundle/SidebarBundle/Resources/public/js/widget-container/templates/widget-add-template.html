@@ -2,7 +2,7 @@
     <h3>Select widget to add</h3>
     <div class="sidebar-widgetadd-widgets">
         <ol>
-            <% _.each(obj.widgets, function (widget) { %>
+            <% _.each(obj.availableWidgets, function (widget) { %>
             <li class="ui-state-default" data-moduleid="<%= widget.module %>">
                 <img src="<%= widget.icon %>"/>
                 <span><%= widget.title %></span>
