@@ -50,6 +50,8 @@ class BatchCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -107,7 +109,7 @@ class BatchCommand extends ContainerAwareCommand
         if ($executionId) {
             $jobExecution = $this->getJobManager()->getRepository('OroBatchBundle:JobExecution')->find($executionId);
             if (!$jobExecution) {
-                throw new \InvalidArgumentException(sprintf('Could not find job execution "%s".', $id));
+                throw new \InvalidArgumentException(sprintf('Could not find job execution "%s".', $executionId));
             }
             if (!$jobExecution->getStatus()->isStarting()) {
                 throw new \RuntimeException(
