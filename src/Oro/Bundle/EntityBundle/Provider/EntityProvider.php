@@ -65,7 +65,7 @@ class EntityProvider
      * Returns entity
      *
      * @param string $entityName Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool $translate    Flag means that label, plural lable should be translated
+     * @param bool $translate    Flag means that label, plural label should be translated
      * @return array contains entity details:
      *                           .    'name'          - entity full class name
      *                           .    'label'         - entity label
