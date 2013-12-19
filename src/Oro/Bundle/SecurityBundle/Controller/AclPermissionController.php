@@ -10,7 +10,7 @@ class AclPermissionController extends Controller
 {
     /**
      * @Route(
-     *  "/acl-access-levels/{oid}", name="oro_security_access_levels" , requirements={"oid"="((\w+):)+(\w+)"
+     *  "/acl-access-levels/{oid}", name="oro_security_access_levels" , requirements={"oid"="((\w+):)+(.*)"
      * })
      */
     public function aclAccessLevelsAction($oid)
