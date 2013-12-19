@@ -11,6 +11,7 @@ oro:
     dashboard:
         calendar:
             new_event: New Event
+            view_calendar: View calendar
 "Calendars": "Calendars"
 "My Calendar": "My Calendar"
 "Exclude this calendar": "Exclude this calendar"

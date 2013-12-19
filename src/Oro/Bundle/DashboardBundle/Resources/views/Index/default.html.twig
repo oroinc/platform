@@ -77,7 +77,7 @@
     </div>
     {% block widgets_content %}
         {% set contentClass = contentClass|default('dashboard-container') %}
-        <div class="responsive-section {{ contentClass }}">
+        <div class="responsive-section scrollable-container {{ contentClass }}">
             <div class="clearfix">
             {% block widgets %}
                 {{ __.renderCell(widgets, false) }}

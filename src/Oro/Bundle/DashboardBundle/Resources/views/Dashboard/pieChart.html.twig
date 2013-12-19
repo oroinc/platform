@@ -115,9 +115,11 @@
                     );
                 };
 
-                setChartSize();
-                drawChart();
-                setChartContainerSize();
+                $(function () {
+                    setChartSize();
+                    drawChart();
+                    setChartContainerSize();
+                });
 
                 $(window).resize(function () {
                     if (setChartSize()) {

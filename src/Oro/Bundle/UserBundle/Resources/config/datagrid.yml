@@ -454,6 +454,8 @@ datagrid:
 
     dashboard-recent-emails-inbox-grid:
         extend: dashboard-recent-emails-grid
+        options:
+            entityHint: emails
         source:
             query:
                 select:
@@ -484,6 +486,8 @@ datagrid:
             default: { receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
 
     dashboard-recent-emails-sent-grid:
+        options:
+            entityHint: emails
         extend: dashboard-recent-emails-grid
         source:
             query:

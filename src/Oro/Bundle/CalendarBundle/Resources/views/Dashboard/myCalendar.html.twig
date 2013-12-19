@@ -39,11 +39,18 @@
 {% endblock %}
 
 {% block actions %}
-    {% set actions = [{
-        'icon': 'plus-sign',
-        'label': 'oro.dashboard.calendar.new_event'|trans,
-        'data': {'action-name': 'new-event'}
-    }] %}
+    {% set actions = [
+        {
+            'icon': 'plus-sign',
+            'label': 'oro.dashboard.calendar.new_event'|trans,
+            'data': {'action-name': 'new-event'}
+        },
+        {
+            'icon': 'calendar',
+            'label': 'oro.dashboard.calendar.view_calendar'|trans,
+            'url': path('oro_calendar_view_default')
+        }
+    ] %}
 
     {{ parent() }}
 {% endblock %}
