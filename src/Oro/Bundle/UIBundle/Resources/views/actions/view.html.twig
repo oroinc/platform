@@ -5,46 +5,6 @@
 <div class="layout-content">
     <div class="navigation clearfix navbar-extra navbar-extra-right">
         <div class="row">
-            <div class="pull-right">
-                <div class="pull-right">
-                    {% placeholder view_navButtons_before with {entity: entity} %}
-                    {% block navButtons %}{% endblock navButtons %}
-                    {% placeholder view_navButtons_after with {entity: entity} %}
-                </div>
-                <div class="pull-right user-info-state">
-                    <ul class="inline-decorate">
-                        {% block pageActions %}
-                            {% if entity.owner is defined and entity.owner %}
-                                {% set ownerType = oro_get_owner_type(entity) %}
-                                <li>
-                                    {{ 'Owner'|trans }}:
-                                    {% if (ownerType == 'USER') %}
-                                        {% if resource_granted('oro_user_user_view') %}
-                                            {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
-                                            {% set ownerName = entity.owner|oro_format_name %}
-                                        {% endif %}
-                                    {% elseif (ownerType == 'BUSINESS_UNIT') %}
-                                        {% if resource_granted('oro_business_unit_view') %}
-                                            {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
-                                            {% set ownerName = entity.owner.name %}
-                                        {% endif %}
-                                    {% endif %}
-                                    {% if ownerName is defined %}
-                                        {% if ownerPath is defined %}
-                                            <a href="{{ ownerPath }}">{{ ownerName }}</a>
-                                        {% else %}
-                                            {{ ownerName }}
-                                        {% endif %}
-                                    {% endif %}
-                                </li>
-                            {% endif %}
-                        {% endblock pageActions %}
-                        {% if (entity is defined and audit_entity_class is defined and resource_granted('oro_dataaudit_history')) %}
-                            {% placeholder change_history_block with {'entity': audit_entity_class, 'id': entity.id, 'title': audit_title|default(entity), 'audit_path': audit_path|default('oro_dataaudit_history') } %}
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
             <div class="span9">
             {% block pageHeader %}
                 <div class="customer-info {% if (breadcrumbs.hasAvatar is not defined) %}customer-simple{% endif %} well-small">
@@ -83,11 +43,44 @@
                                     <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
                                     <li>{{ 'Updated'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
                                 {% endblock stats %}
+                                {% if isMobileVersion() %}
+                                    {% set ownerLink = UI.entityOwnerLink(entity) %}
+                                    {% if ownerLink %}
+                                        <li>{{ ownerLink }}</li>
+                                    {% endif %}
+                                {% endif %}
                             </ul>
                         </div>
                     </div>
                 </div>
             {% endblock pageHeader %}
+            </div>
+            <div class="pull-right">
+                <div class="pull-right title-buttons-container">
+                    {% placeholder view_navButtons_before with {entity: entity} %}
+                    {% block navButtons %}{% endblock navButtons %}
+                    {% placeholder view_navButtons_after with {entity: entity} %}
+                </div>
+                <div class="pull-right user-info-state">
+                    <ul class="inline-decorate">
+                        {% block pageActions %}
+                            {% if isDesktopVersion() %}
+                                {% set ownerLink = UI.entityOwnerLink(entity) %}
+                                {% if ownerLink %}
+                                    <li>{{ ownerLink }}</li>
+                                {% endif %}
+                            {% endif %}
+                        {% endblock pageActions %}
+                        {% if (entity is defined and audit_entity_class is defined and resource_granted('oro_dataaudit_history')) %}
+                            {% placeholder change_history_block with {
+                                'entity': audit_entity_class,
+                                'id': entity.id,
+                                'title': audit_title|default(entity),
+                                'audit_path': audit_path|default('oro_dataaudit_history')
+                            } %}
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
