@@ -21,16 +21,21 @@
   padding: 0 0 35px;
 }
 .container-fluid > .responsive-section {
-  margin: 0 -20px;
-  padding-right: 20px;
+  margin: 0 -@horizontalPadding;
+  padding-right: @horizontalPadding;
   .scrollspy-title {
     margin-left:0;
   }
   .responsive-cell {
-    padding-left: 20px;
+    padding-left: @horizontalPadding;
   }
   .responsive-cell:first-child {
-    padding-right: 20px;
+    padding-right: @horizontalPadding;
     .forScreen(@mediumScreen, padding-right, 0px);
+  }
+}
+.responsive-section {
+  .inner-grid {
+    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }

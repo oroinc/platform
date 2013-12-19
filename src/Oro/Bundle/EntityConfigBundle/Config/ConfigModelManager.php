@@ -53,7 +53,7 @@ class ConfigModelManager
 
     public function __construct(ServiceLink $proxyEm)
     {
-        $this->localCache = new ArrayCollection;
+        $this->localCache = new ArrayCollection();
         $this->proxyEm    = $proxyEm;
     }
 
@@ -78,10 +78,11 @@ class ConfigModelManager
                     $this->getEntityManager()->getConnection()->connect();
                 }
 
-                $this->dbCheckCache = $conn->isConnected() && (bool) array_intersect(
-                    $this->requiredTables,
-                    $this->getEntityManager()->getConnection()->getSchemaManager()->listTableNames()
-                );
+                $this->dbCheckCache = $conn->isConnected()
+                    && (bool)array_intersect(
+                        $this->requiredTables,
+                        $this->getEntityManager()->getConnection()->getSchemaManager()->listTableNames()
+                    );
             } catch (\PDOException $e) {
                 $this->dbCheckCache = false;
             }
@@ -106,30 +107,45 @@ class ConfigModelManager
             return false;
         }
 
-        $cacheKey = $className . $fieldName;
+        $cacheKey = $fieldName ? $className . '::' . $fieldName : $className;
 
+        $result = false;
+        // check that a model exist in the local cache
         if ($this->localCache->containsKey($cacheKey)) {
-            return $this->localCache->get($cacheKey);
-        }
-
-        $entityConfigModelRepo = $this->getEntityManager()->getRepository(EntityConfigModel::ENTITY_NAME);
-
-        $entity = $entityConfigModelRepo->findOneBy(array('className' => $className));
-
-        if ($fieldName) {
-            $fieldConfigModelRepo = $this->getEntityManager()->getRepository(FieldConfigModel::ENTITY_NAME);
-
-            $result = $fieldConfigModelRepo->findOneBy(
-                array(
-                    'entity'    => $entity,
-                    'fieldName' => $fieldName
-                )
-            );
+            $result = $this->localCache->get($cacheKey);
         } else {
-            $result = $entity;
-        }
+            if ($fieldName) {
+                // field model was requested
+                if (!$this->localCache->containsKey($className)) {
+                    // at the first load entity model
+                    // on this stage models for all fields will be loaded in the local cache as well
+                    $this->findModel($className);
+                    // next check again that field model exist in the local cache
+                    if ($this->localCache->containsKey($cacheKey)) {
+                        $result = $this->localCache->get($cacheKey);
+                    }
+                }
+            } else {
+                // entity model was requested
+                // load entity model and put it in the local cache
+                $result = $this->getEntityManager()->getRepository(EntityConfigModel::ENTITY_NAME)
+                    ->findOneBy(['className' => $className]);
+                $this->localCache->set($cacheKey, $result);
 
-        $this->localCache->set($cacheKey, $result);
+                // if entity model found, load models for all fields of this entity and put them in the local cache
+                if ($result) {
+                    /** @var FieldConfigModel[] $fieldModels */
+                    $fieldModels = $this->getEntityManager()->getRepository(FieldConfigModel::ENTITY_NAME)
+                        ->findBy(['entity' => $result]);
+                    foreach ($fieldModels as $fieldModel) {
+                        $this->localCache->set(
+                            $className . '::' . $fieldModel->getFieldName(),
+                            $fieldModel
+                        );
+                    }
+                }
+            }
+        }
 
         return $result;
     }
@@ -143,7 +159,8 @@ class ConfigModelManager
      */
     public function getModel($className, $fieldName = null)
     {
-        if (!$model = $this->findModel($className, $fieldName)) {
+        $model = $this->findModel($className, $fieldName);
+        if (!$model) {
             $message = $fieldName
                 ? sprintf('FieldConfigModel "%s::%s" is not found ', $className, $fieldName)
                 : sprintf('EntityConfigModel "%s" is not found ', $className);
@@ -176,7 +193,7 @@ class ConfigModelManager
         } else {
             $entityConfigModelRepo = $this->getEntityManager()->getRepository(EntityConfigModel::ENTITY_NAME);
 
-            return (array) $entityConfigModelRepo->findAll();
+            return (array)$entityConfigModelRepo->findAll();
         }
     }
 
@@ -225,7 +242,7 @@ class ConfigModelManager
         $fieldModel->setMode($mode);
         $entityModel->addField($fieldModel);
 
-        $this->localCache->set($className . $fieldName, $fieldModel);
+        $this->localCache->set($className . '::' . $fieldName, $fieldModel);
 
         return $fieldModel;
     }

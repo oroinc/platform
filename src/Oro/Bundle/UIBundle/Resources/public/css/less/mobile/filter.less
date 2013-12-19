@@ -1,0 +1,84 @@
+.filter-box {
+  background-color: inherit;
+  border-bottom-width: 0;
+  padding: 10px;
+  & > .dropdown {
+    margin-left: auto;
+    margin-right: auto;
+    width: 300px;
+  }
+  .dropdown > .dropdown-toggle {
+    text-align: center;
+    width: 100%;
+  }
+  .dropdown > .dropdown-toggle:before {
+    content: "\f0b0";
+    font-family: FontAwesome;
+    margin: 0 7px 0 -7px;
+    width: 10px;
+    display: inline-block;
+  }
+  .dropdown > .dropdown-menu {
+    margin: 10px -10px 0 -10px;
+  }
+  .dropdown > .dropdown-menu:before {
+    border-bottom: 8px solid rgba(0, 0, 0, 0.2);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 149px;
+    position: absolute;
+    top: -8px;
+  }
+  .dropdown > .dropdown-menu:after {
+    border-bottom: 7px solid #fff;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    content: "";
+    display: inline-block;
+    left: 150px;
+    position: absolute;
+    top: -7px;
+  }
+  .filter-container {
+    padding: 10px;
+    #reset-filter-button {
+      padding: 6px 0 4px 6px;
+      position: absolute;
+      right: 10px;
+    }
+    .filter-item {
+      padding: 0 0 10px 0;
+      margin: 0;
+      width: 100%;
+      .filter-criteria {
+        font-size: smaller;
+        margin-top: -10px;
+        left: 0px;
+        width: 100%;
+        input {
+          width: 110px;
+        }
+        .btn {
+          padding-left: 10px;
+          padding-right: 10px;
+        }
+      }
+    }
+  }
+  .oro-open {
+    .open;
+  }
+  .filter-criteria-selector {
+    text-align: left;
+    width: 275px;
+  }
+  .filter-list {
+    margin: 0 0 5px -5px;
+  }
+}
+
+.form-horizontal .filter-box {
+  border-top: none;
+}

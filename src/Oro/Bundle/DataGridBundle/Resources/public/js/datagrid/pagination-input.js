@@ -12,31 +12,7 @@ function($, _, Pagination) {
      */
     return Pagination.extend({
         /** @property */
-        template: _.template(
-            '<label class="dib">Page:</label>' +
-            '<ul class="icons-holder">' +
-                '<% _.each(handles, function (handle) { %>' +
-                    '<li <% if (handle.className || disabled) { %>class="<%= handle.className %> <% if (disabled) { %>disabled<% } %>"<% } %>>' +
-                        '<% if (handle.type == "input") { %>' +
-                            '<input type="text" value="<%= state.firstPage == 0 ? state.currentPage + 1 : state.currentPage  %>"' +
-                                ' <% if (disabled) { %>disabled="disabled"<% } %>' +
-                            '/>' +
-                        '<% } else { %>' +
-                            '<a href="#" <% if (handle.title) {%> title="<%= handle.title %>"<% } %>>' +
-                                '<% if (handle.wrapClass) {%>' +
-                                    '<i <% if (handle.wrapClass) { %>class="<%= handle.wrapClass %>"<% } %>>' +
-                                        '<%= handle.label %>' +
-                                    '</i>' +
-                                '<% } else { %>' +
-                                    '<%= handle.label %>' +
-                                '<% } %>' +
-                            '</a>' +
-                        '<% } %>' +
-                    '</li>' +
-                '<% }); %>' +
-            '</ul>' +
-            '<label class="dib">of <%= state.totalPages ? state.totalPages : 1 %> | <%= state.totalRecords %> records</label>'
-        ),
+        template: '#template-datagrid-toolbar-pagination-input',
 
         /** @property */
         events: {
@@ -53,13 +29,6 @@ function($, _, Pagination) {
 
         /** @property */
         windowSize: 0,
-
-        /**
-         * @inheritDoc
-         */
-        initialize: function (options) {
-            Pagination.prototype.initialize.call(this, options);
-        },
 
         /**
          * Apply change of pagination page input
