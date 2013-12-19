@@ -357,9 +357,6 @@ define(function (require) {
             }
 
             view.hideWidgetHover(cid);
-            //switch (widget.state) {
-            //case constants.WIDGET_MAXIMIZED_HOVER:
-            //    break;
         },
 
         onSetupWidget: function (cid) {

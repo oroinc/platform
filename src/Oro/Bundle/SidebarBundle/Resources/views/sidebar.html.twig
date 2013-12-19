@@ -18,6 +18,12 @@
             });
 
             sidebarModel.widgets.reset({{ render(path('oro_api_get_sidebarwidgets', {'placement': placement})) }});
+
+            sidebarModel.widgets.each(function (widget) {
+                var name = widget.get('widgetName');
+                var originalWidget = sidebarModel.get('availableWidgets')[name];
+                widget.update(originalWidget);
+            });
         });
     });
 </script>

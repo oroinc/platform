@@ -10,7 +10,7 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
      */
     var WidgetContainerModel = Backbone.Model.extend({
         defaults: {
-            widget_name: '',
+            widgetName: '',
             position: 0,
             title: '',
             icon: '#',
@@ -55,6 +55,13 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
          */
         restoreState: function () {
             this.state = this.stateSnapshot;
+        },
+
+        /**
+         * Update from original data
+         */
+        update: function (widgetData) {
+            this.set(_.omit(widgetData, 'settings', 'placement'));
         }
     });
 

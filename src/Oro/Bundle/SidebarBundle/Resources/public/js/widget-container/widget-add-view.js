@@ -52,8 +52,8 @@ define(function (require) {
                     return;
                 }
 
-                var widgetData = $(selected).closest('li').data('widgetdata');
                 var widgetName = $(selected).closest('li').data('widgetname');
+                var widgetData = model.get('availableWidgets')[widgetName];
 
                 var placement = null;
                 if (model.position === constants.SIDEBAR_LEFT) {
@@ -63,14 +63,12 @@ define(function (require) {
                 }
 
                 var widget = new WidgetContainerModel({
-                    widget_name: widgetName,
-                    title: widgetData.title,
-                    icon: widgetData.icon,
-                    module: widgetData.module,
-                    settings: widgetData.settings,
+                    widgetName: widgetName,
                     position: model.widgets.length,
                     placement: placement
                 });
+                widget.update(widgetData);
+                widget.set('settings', widgetData.settings);
 
                 model.widgets.push(widget);
 

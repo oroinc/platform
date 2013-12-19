@@ -3,7 +3,7 @@
     <div class="sidebar-widgetadd-widgets">
         <ol>
             <% _.each(obj.availableWidgets, function (widget, name) { %>
-            <li class="ui-state-default" data-widgetname="<%= name %>" data-widgetdata="<%- JSON.stringify(widget) %>">
+            <li class="ui-state-default" data-widgetname="<%= name %>">
                 <img src="<%= widget.icon %>"/>
                 <span><%= widget.title %></span>
             </li>
