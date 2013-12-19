@@ -45,7 +45,7 @@ class EntityProvider
      * Returns entities
      *
      * @param bool $sortByPluralLabel If true entities will be sorted by 'plural_label'; otherwise, by 'label'
-     * @param bool $translate         Flag means that label, plural lable should be translated
+     * @param bool $translate         Flag means that label, plural label should be translated
      * @return array of entities sorted by entity label
      *                                .    'name'          - entity full class name
      *                                .    'label'         - entity label

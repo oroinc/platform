@@ -36,15 +36,3 @@ oro:
             email.label:        Email
             created_at.label:   Created at
             updated_at.label:   Updated at
-
-#oro.organization.businessunit.id.label
-#oro.organization.businessunit.website.label
-#oro.organization.businessunit.users.label
-#oro.organization.businessunit.updated_at.label
-#oro.organization.businessunit.phone.label
-#oro.organization.businessunit.owner.label
-#oro.organization.businessunit.organization.label
-#oro.organization.businessunit.name.label
-#oro.organization.businessunit.fax.label
-#oro.organization.businessunit.email.label
-#oro.organization.businessunit.created_at.label

@@ -24,10 +24,10 @@
     {% set id = 'email-profile' %}
     {% set attributes = [
         UI.attibuteRow('oro.email.sent_at.label'|trans, entity.sentAt|oro_format_datetime),
-        UI.attibuteRow('From', EA.email_address(entity.fromEmailAddress, entity.fromName)),
-        UI.attibuteRow('To', EA.recipient_email_addresses(entity.recipients('to'))),
-        UI.attibuteRow('Cc', EA.recipient_email_addresses(entity.recipients('cc'))),
-        UI.attibuteRow('Bcc', EA.recipient_email_addresses(entity.recipients('bcc'))),
+        UI.attibuteRow('oro.email.from_name.label'|trans, EA.email_address(entity.fromEmailAddress, entity.fromName)),
+        UI.attibuteRow('To'|trans, EA.recipient_email_addresses(entity.recipients('to'))),
+        UI.attibuteRow('Cc'|trans, EA.recipient_email_addresses(entity.recipients('cc'))),
+        UI.attibuteRow('Bcc'|trans, EA.recipient_email_addresses(entity.recipients('bcc'))),
         UI.attibuteRow('oro.email.subject.label'|trans, entity.subject)
     ] %}
 

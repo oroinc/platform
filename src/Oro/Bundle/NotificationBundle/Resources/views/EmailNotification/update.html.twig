@@ -6,8 +6,8 @@
     'OroEmailBundle:Form:fields.html.twig'
 ]%}
 {% set title = form.vars.value.id
-    ? 'Edit %label% #%id%'|trans({'%id%': form.vars.value.id, '%label%': 'oro.notification.emailnotification.entity_label'|trans|lower})
-    : 'New %label%'|trans({'%label%': 'oro.notification.emailnotification.entity_label'|trans|lower})
+    ? 'Edit'|trans ~ ' ' ~ 'notification rule'|trans ~ ' ' ~ form.vars.value.id
+    : 'New'|trans ~ ' ' ~ 'notification rule'|trans
 %}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
@@ -20,18 +20,14 @@
 
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('oro_notification_emailnotification_remove') %}
-        {{
-            UI.deleteButton({
-                'dataUrl': path('oro_api_delete_emailnotication', {'id': form.vars.value.id}),
-                'dataRedirect': path('oro_notification_emailnotification_index'),
-                'aCss': 'no-hash remove-button',
-                'id': 'btn-remove-emailnotification',
-                'dataId': form.vars.value.id,
-                'dataMessage': 'Are you sure you want to delete this notification rule?',
-                'title': 'Delete notification rule',
-                'label': 'Delete'
-            })
-        }}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_api_delete_emailnotication', {'id': form.vars.value.id}),
+            'dataRedirect': path('oro_notification_emailnotification_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-emailnotification',
+            'dataId': form.vars.value.id,
+            'entity_label': 'notification rule'|trans
+        }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.button({'path' : path('oro_notification_emailnotification_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}

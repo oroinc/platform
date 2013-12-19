@@ -6,9 +6,8 @@
 {% block navButtons %}
     {% if resource_granted('oro_user_role_create') %}
         {{ UI.addButton({
-            'path' : path('oro_user_role_create'),
-            'title' : 'Create'|trans ~ ' ' ~ 'oro.user.role.entity_label'|trans|lower,
-            'label' : 'Create'|trans ~ ' ' ~ 'oro.user.role.entity_label'|trans|lower
+            'path': path('oro_user_role_create'),
+            'entity_label': 'oro.user.role.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock %}

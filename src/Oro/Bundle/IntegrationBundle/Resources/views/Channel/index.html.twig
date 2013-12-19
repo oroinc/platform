@@ -7,12 +7,9 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_integration_channel_create') %}
-        {{
-            UI.addButton({
-                'path' : path('oro_integration_channel_create'),
-                'title' : 'Create'|trans ~ ' ' ~ 'oro.integration.channel.entity_label'|trans,
-                'label' : 'Create'|trans ~ ' ' ~ 'oro.integration.channel.entity_label'|trans
-            })
-        }}
+        {{ UI.addButton({
+            'path': path('oro_integration_channel_create'),
+            'entity_label': 'oro.integration.channel.entity_label'|trans
+        }) }}
     {% endif %}
 {% endblock %}

@@ -44,9 +44,9 @@ oro:
         from_email_address.label: From
 
         emailtemplate:
-            entity_label:        Email Template
-            entity_plural_label: Email Templates
-            entity_description:  Email template
+            entity_label:        Template
+            entity_plural_label: Templates
+            entity_description:  Represent email template
             id.label:            Id
             is_system.label:     Is system
             is_editable.label:   Is editable

@@ -17,5 +17,5 @@
 {% set entityInfo = [
     {'title': 'oro.email.sent_at.label'|trans, 'value': entity.sentAt|oro_format_datetime},
     {'title': 'oro.email.from_name.label'|trans, 'value': EA.email_address(entity.fromEmailAddress, entity.fromName)},
-    {'title': 'To', 'value': EA.recipient_email_addresses(entity.recipients('to'))},
+    {'title': 'To'|trans, 'value': EA.recipient_email_addresses(entity.recipients('to'))},
 ] %}

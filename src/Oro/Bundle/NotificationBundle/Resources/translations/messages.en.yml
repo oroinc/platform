@@ -5,9 +5,9 @@ oro:
                 saved.message: "Email notification rule saved"
 
         event:
-            entity_post_update: "Entity update"
+            entity_post_update:  "Entity update"
             entity_post_persist: "Entity create"
-            entity_post_remove: "Entity remove"
+            entity_post_remove:  "Entity remove"
 
         datagrid:
             action:
@@ -20,8 +20,8 @@ oro:
                 owner: "Recipient entity owner"
 
         emailnotification:
-            entity_label:        Email Notification
-            entity_plural_label: Email Notifications
+            entity_label:        Notification
+            entity_plural_label: Notifications
             entity_description:  Represent email notification
             id.label:             Id
             entity_name.label:    Entity name

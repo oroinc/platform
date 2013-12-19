@@ -6,9 +6,8 @@
 {% block navButtons %}
     {% if resource_granted('oro_user_user_create') %}
         {{ UI.addButton({
-            'path' : path('oro_user_create'),
-            'title' : 'Create'|trans ~ ' ' ~ 'oro.user.entity_label'|trans,
-            'label' : 'Create'|trans ~ ' ' ~ 'oro.user.entity_label'|trans
+            'path': path('oro_user_create'),
+            'entity_label': 'oro.user.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock %}

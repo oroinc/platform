@@ -8,18 +8,14 @@
 
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('oro_tag_delete') %}
-        {{
-            UI.deleteButton({
-                'dataUrl': path('oro_api_delete_tag', {'id': form.vars.value.id}),
-                'dataRedirect': path('oro_tag_index'),
-                'aCss': 'no-hash remove-button',
-                'id': 'btn-remove-tag',
-                'dataId': form.vars.value.id,
-                'dataMessage': 'Are you sure you want to delete this tag?',
-                'title': 'Delete Tag',
-                'label': 'Delete'
-            })
-        }}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_api_delete_tag', {'id': form.vars.value.id}),
+            'dataRedirect': path('oro_tag_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-tag',
+            'dataId': form.vars.value.id,
+            'entity_label': 'oro.tag.entity_label'|trans
+        }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.button({'path' : path('oro_tag_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
@@ -29,12 +25,11 @@
 {% block pageHeader %}
     {% if form.vars.value.id %}
         {% set breadcrumbs = {
-                'entity':      form.vars.value,
-                'indexPath':   path('oro_tag_index'),
-                'indexLabel': 'oro.tag.entity_plural_label',
-                'entityTitle': form.vars.value.name|default('N/A')
-            }
-        %}
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_tag_index'),
+            'indexLabel': 'oro.tag.entity_plural_label'|trans,
+            'entityTitle': form.vars.value.name|default('N/A')
+        } %}
         {{ parent() }}
     {% else %}
         {% include 'OroUIBundle::page_title_block.html.twig' %}
