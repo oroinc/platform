@@ -48,10 +48,9 @@
         $('.export-btn').on('click', function(e) {
             e.preventDefault();
 
-            var exportStartedMessage = messenger.notificationFlashMessage(
+            var exportStartedMessage = messenger.notificationMessage(
                 'info',
-                {{ 'Export started, please wait...'|trans|json_encode|raw }},
-                {delay: 0}
+                {{ 'Export started, please wait...'|trans|json_encode|raw }}
             );
 
             $.getJSON(this.href, function(data) {
@@ -66,12 +65,11 @@
                             = '<a href="' + data.url + '" target="_blank">{{ 'Download result file'|trans }}</a>';
                         $successMessage += ' ' + resultFileLink;
 
-                        messenger.notificationFlashMessage('success', $successMessage, {delay: 0});
+                        messenger.notificationMessage('success', $successMessage);
                     } else {
-                        messenger.notificationFlashMessage(
+                        messenger.notificationMessage(
                             'info',
-                            {{ 'No entities found for export.'|trans|json_encode|raw }},
-                            {delay: 0}
+                            {{ 'No entities found for export.'|trans|json_encode|raw }}
                         );
                     }
                 } else {
@@ -83,7 +81,7 @@
                         = '<a href="' + data.url + '" target="_blank">{{ 'Download error log'|trans }}</a>';
                     $errorMessage += ' ' + errorLogLink;
 
-                    messenger.notificationFlashMessage('error', $errorMessage, {delay: 0});
+                    messenger.notificationMessage('error', $errorMessage);
                 }
             });
         });
