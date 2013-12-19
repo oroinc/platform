@@ -10,6 +10,7 @@
                 availableWidgets: {{ oro_sidebar_get_available_widgets(placement)|json_encode|raw }}
             });
             sidebarModel.position = constants.SIDEBAR_{{ placement|upper }};
+            sidebarModel.widgets.url = '{{ path('oro_api_post_sidebarwidgets') }}';
 
             new SidebarView({
                 model: sidebarModel,

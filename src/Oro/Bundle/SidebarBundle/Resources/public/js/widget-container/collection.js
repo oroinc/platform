@@ -14,8 +14,6 @@ define(function (require) {
      * @extends Backbone.Collection
      */
     var WidgetContainerCollection = Backbone.Collection.extend({
-        url: '/api/rest/latest/sidebarwidgets',
-
         model: WidgetContainerModel,
 
         comparator: 'position'
