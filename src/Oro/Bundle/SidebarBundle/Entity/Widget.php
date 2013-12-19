@@ -52,6 +52,13 @@ class Widget
     /**
      * @var string
      *
+     * @ORM\Column(name="widget_name", type="string", nullable=false, length=50)
+     */
+    protected $widgetName;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="title", type="string", nullable=false, length=255)
      */
     protected $title;
@@ -236,6 +243,25 @@ class Widget
     public function setPlacement($placement)
     {
         $this->placement = $placement;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getWidgetName()
+    {
+        return $this->widgetName;
+    }
+
+    /**
+     * @param string $widgetName
+     * @return Widget
+     */
+    public function setWidgetName($widgetName)
+    {
+        $this->widgetName = $widgetName;
 
         return $this;
     }

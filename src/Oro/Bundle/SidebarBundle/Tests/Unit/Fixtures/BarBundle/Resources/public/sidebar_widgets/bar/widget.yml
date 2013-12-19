@@ -2,3 +2,4 @@ title: Bar
 icon: bar.ico
 module: widget/bar
 placement: both
+settings: ~

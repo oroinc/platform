@@ -39,7 +39,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'foo' => array(
                                 'title' => 'Foo',
                                 'icon' => 'icon.ico',
-                                'module' => 'module',
+                                'module' => 'module'
                             )
                         )
                     )
@@ -50,6 +50,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'title' => 'Foo',
                             'icon' => 'icon.ico',
                             'module' => 'module',
+                            'settings' => null
                         )
                     )
                 )
@@ -61,7 +62,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'foo' => array(
                                 'title' => 'Foo',
                                 'icon' => 'icon.ico',
-                                'module' => 'module',
+                                'module' => 'module'
                             )
                         )
                     ),
@@ -71,6 +72,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'title' => 'Bar',
                                 'icon' => 'icon2.ico',
                                 'module' => 'module2',
+                                'settings' => array('test1' => 1, 'test4' => 4)
                             )
                         )
                     ),
@@ -80,6 +82,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'title' => 'Bar Extended',
                                 'icon' => 'icon2_r.ico',
                                 'module' => 'module2_r',
+                                'settings' => array('test1' => 2, 'test2' => 3)
                             )
                         )
                     )
@@ -90,11 +93,13 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                             'title' => 'Foo',
                             'icon' => 'icon.ico',
                             'module' => 'module',
+                            'settings' => null
                         ),
                         'bar' => array(
                             'title' => 'Bar Extended',
                             'icon' => 'icon2_r.ico',
                             'module' => 'module2_r',
+                            'settings' => array('test1' => 2, 'test2' => 3)
                         ),
                     )
                 )

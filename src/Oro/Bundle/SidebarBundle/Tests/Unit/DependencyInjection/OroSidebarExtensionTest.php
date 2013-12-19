@@ -48,13 +48,15 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'title' => 'Foo',
                         'icon' => 'foo.ico',
                         'module' => 'widget/foo',
-                        'placement' => 'left'
+                        'placement' => 'left',
+                        'settings' => array('test' => 'Hello')
                     ),
                     'bar' => array(
                         'title' => 'Bar',
                         'icon' => 'bar.ico',
                         'module' => 'widget/bar',
-                        'placement' => 'both'
+                        'placement' => 'both',
+                        'settings' => null
                     )
                 ),
             ),
@@ -63,7 +65,8 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                     array(
                         'sidebar_widgets' => array(
                             'foo' => array(
-                                'title' => 'Foo Extended'
+                                'title' => 'Foo Extended',
+                                'settings' => array('test2' => 'Rewritten')
                             )
                         )
                     )
@@ -73,14 +76,16 @@ class OroSidebarExtensionTest extends \PHPUnit_Framework_TestCase
                         'title' => 'Foo Extended',
                         'icon' => 'foo.ico',
                         'module' => 'widget/foo',
-                        'placement' => 'left'
+                        'placement' => 'left',
+                        'settings' => array('test2' => 'Rewritten')
 
                     ),
                     'bar' => array(
                         'title' => 'Bar',
                         'icon' => 'bar.ico',
                         'module' => 'widget/bar',
-                        'placement' => 'both'
+                        'placement' => 'both',
+                        'settings' => null
                     )
                 ),
             )

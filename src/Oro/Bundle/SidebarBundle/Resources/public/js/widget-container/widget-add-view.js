@@ -52,7 +52,8 @@ define(function (require) {
                     return;
                 }
 
-                var widgetData = $(selected).closest('li').data('widget');
+                var widgetData = $(selected).closest('li').data('widgetdata');
+                var widgetName = $(selected).closest('li').data('widgetname');
 
                 var placement = null;
                 if (model.position === constants.SIDEBAR_LEFT) {
@@ -62,6 +63,7 @@ define(function (require) {
                 }
 
                 var widget = new WidgetContainerModel({
+                    widget_name: widgetName,
                     title: widgetData.title,
                     icon: widgetData.icon,
                     module: widgetData.module,

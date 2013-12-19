@@ -2,8 +2,8 @@
     <h3>Select widget to add</h3>
     <div class="sidebar-widgetadd-widgets">
         <ol>
-            <% _.each(obj.availableWidgets, function (widget) { %>
-            <li class="ui-state-default" data-widget="<%- JSON.stringify(widget) %>">
+            <% _.each(obj.availableWidgets, function (widget, name) { %>
+            <li class="ui-state-default" data-widgetname="<%= name %>" data-widgetdata="<%- JSON.stringify(widget) %>">
                 <img src="<%= widget.icon %>"/>
                 <span><%= widget.title %></span>
             </li>
