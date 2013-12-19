@@ -1,0 +1,68 @@
+datagrid:
+    jobs-grid:
+        source:
+            type: orm
+            acl_resource: oro_jobs
+            query:
+                select:
+                    - j
+                from:
+                    - { table: JMSJobQueueBundle:Job , alias: j }
+                where:
+                    and:
+                        - j.originalJob IS NULL
+        columns:
+            command:
+                label: oro.cron.header.command
+                type: twig
+                template: OroCronBundle:Job:Datagrid/command.html.twig
+                frontend_type: html
+            state:
+                label: oro.cron.header.state
+                type: twig
+                template: OroCronBundle:Job:Datagrid/state.html.twig
+                frontend_type: html
+            runtime:
+                label: oro.cron.header.runtime
+            memoryUsageReal:
+                label: oro.cron.header.memory
+                type: twig
+                template: OroCronBundle:Job:Datagrid/memory.html.twig
+                frontend_type: html
+            createdAt:
+                label: oro.cron.header.created
+                frontend_type: datetime
+        sorters:
+            columns:
+                command:             { data_name: j.command }
+                state:               { data_name: j.state }
+                runtime:             { data_name: j.runtime }
+                memoryUsageReal:     { data_name: j.memoryUsageReal }
+                createdAt:           { data_name: j.createdAt }
+            default:
+                createdAt: DESC
+        filters:
+            columns:
+                command:
+                    type: string
+                    data_name: j.command
+                runtime:
+                    type: number
+                    data_name: j.runtime
+                createdAt:
+                    type:      datetime
+                    data_name: j.createdAt
+        properties:
+            id: ~
+            view_link:
+                type: url
+                route: oro_cron_job_view
+                params: [ id ]
+        actions:
+            view:
+                type:         navigate
+                label:        oro.cron.header.view
+                link:         view_link
+                icon:         user
+                acl_recource: oro_jobs
+                rowAction:    true
