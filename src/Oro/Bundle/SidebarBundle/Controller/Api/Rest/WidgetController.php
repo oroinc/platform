@@ -59,6 +59,7 @@ class WidgetController extends FOSRestController
         $entity->setPosition($this->getRequest()->get('position'));
         $entity->setSettings($this->getRequest()->get('settings'));
         $entity->setPlacement($this->getRequest()->get('placement'));
+        $entity->setState($this->getRequest()->get('state'));
         $entity->setUser($this->getUser());
 
         $manager = $this->getManager();
@@ -92,6 +93,7 @@ class WidgetController extends FOSRestController
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         }
 
+        $entity->setState($this->getRequest()->get('state', $entity->getState()));
         $entity->setPosition($this->getRequest()->get('position', $entity->getPosition()));
         $entity->setSettings($this->getRequest()->get('settings', $entity->getSettings()));
         $entity->setPlacement($this->getRequest()->get('placement', $entity->getPlacement()));
