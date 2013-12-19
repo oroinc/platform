@@ -15,12 +15,12 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
             title: '',
             icon: '#',
             module: '',
-            settings: {}
+            settings: {},
+            state: constants.WIDGET_MINIMIZED
         },
 
         initialize: function () {
-            this.state = constants.WIDGET_MINIMIZED;
-            this.stateSnapshot = this.state;
+            this.stateSnapshot = this.get('state');
             this.isDragged = false;
         },
 
@@ -29,15 +29,16 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
          */
         toggleState: function () {
             var model = this;
+            var state = model.get('state');
 
-            if (model.state === constants.WIDGET_MAXIMIZED_HOVER) {
+            if (state === constants.WIDGET_MAXIMIZED_HOVER) {
                 return;
             }
 
-            if (model.state === constants.WIDGET_MINIMIZED) {
-                model.state = constants.WIDGET_MAXIMIZED;
+            if (state === constants.WIDGET_MINIMIZED) {
+                model.set('state', constants.WIDGET_MAXIMIZED);
             } else {
-                model.state = constants.WIDGET_MINIMIZED;
+                model.set('state', constants.WIDGET_MINIMIZED);
             }
 
             model.trigger('change');
@@ -47,14 +48,14 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
          * Saves state of widget container
          */
         snapshotState: function () {
-            this.stateSnapshot = this.state;
+            this.stateSnapshot = this.get('state');
         },
 
         /**
          * Restores state of widget container
          */
         restoreState: function () {
-            this.state = this.stateSnapshot;
+            this.set('state', this.stateSnapshot);
         },
 
         /**

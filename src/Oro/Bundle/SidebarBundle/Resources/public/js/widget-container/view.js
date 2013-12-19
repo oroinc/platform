@@ -33,7 +33,7 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
             var model = view.model;
             var template = null;
 
-            if (model.state === constants.WIDGET_MINIMIZED) {
+            if (model.get('state') === constants.WIDGET_MINIMIZED) {
                 template = view.templateMin;
             } else {
                 template = view.templateMax;
@@ -42,7 +42,7 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
             view.$el.html(template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
 
-            if (model.state !== constants.WIDGET_MINIMIZED) {
+            if (model.get('state') !== constants.WIDGET_MINIMIZED) {
                 requirejs([model.get('module')], function (Widget) {
                     var $widgetContent = view.$el.find('.sidebar-widget-content');
                     if (!view.contentView) {
@@ -63,6 +63,7 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
             e.preventDefault();
 
             this.model.toggleState();
+            this.model.save();
         },
 
         onClickSettings: function (e) {

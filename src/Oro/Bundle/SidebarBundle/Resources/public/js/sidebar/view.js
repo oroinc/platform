@@ -128,8 +128,8 @@ define(function (require) {
                 if (!widgetView) {
                     return;
                 }
-                if (widget.state === constants.WIDGET_MAXIMIZED_HOVER) {
-                    widget.state = constants.WIDGET_MAXIMIZED;
+                if (widget.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                    widget.set('state', constants.WIDGET_MAXIMIZED);
                 }
                 widgetView.render().delegateEvents();
                 $content.append(widgetView.$el);
@@ -274,7 +274,7 @@ define(function (require) {
             view.hideAllWidgetHovers();
 
             widget.snapshotState();
-            widget.state = constants.WIDGET_MAXIMIZED_HOVER;
+            widget.set('state', constants.WIDGET_MAXIMIZED_HOVER);
 
             var hoverView = new WidgetContainerView({
                 model: widget
