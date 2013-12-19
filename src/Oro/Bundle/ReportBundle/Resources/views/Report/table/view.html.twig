@@ -9,8 +9,8 @@
         {{ UI.button({
             'path': path('oro_report_update', {'id': entity.id}),
             'iClass': 'icon-edit',
-            'title': 'Edit report'|trans,
-            'label': 'Edit'|trans
+            'title': 'Edit'|trans ~ ' ' ~ 'oro.report.entity_label'|trans|lower,
+            'label': 'Edit'|trans ~ ' ' ~ 'oro.report.entity_label'|trans|lower
         }) }}
     {% endif %}
     {% if resource_granted('oro_report_delete') %}
@@ -22,8 +22,8 @@
                 'id': 'btn-remove-report',
                 'dataMessage': 'Are you sure you want to delete this report?'|trans,
                 'successMessage': 'Report deleted'|trans,
-                'title': 'Delete report'|trans,
-                'label': 'Delete'|trans
+                'title': 'Delete'|trans ~ ' ' ~ 'oro.report.entity_label'|trans|lower,
+                'label': 'Delete'|trans ~ ' ' ~ 'oro.report.entity_label'|trans|lower
             })
         }}
     {% endif %}
@@ -33,7 +33,7 @@
     {% set breadcrumbs = {
         'entity': entity,
         'indexPath': path('oro_report_index'),
-        'indexLabel': 'Reports'|trans,
+        'indexLabel': 'oro.report.entity_plural_label'|trans,
         'entityTitle': entity.name
     } %}
     {{ parent() }}
