@@ -58,6 +58,7 @@ define(function (require) {
 
             view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
             view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
+            view.listenTo(Backbone, 'closeWidget', view.onCloseWidget);
             view.listenTo(Backbone, 'setupWidget', view.onSetupWidget);
         },
 
@@ -330,31 +331,35 @@ define(function (require) {
                 return;
             }
 
-            switch (widget.state) {
+            var modal = new DeleteConfirmation({
+                content: __('The widget will be removed')
+            });
 
-            case constants.WIDGET_MAXIMIZED_HOVER:
-                view.hideWidgetHover(cid);
-                break;
+            modal.on('ok', function () {
+                widget.destroy();
+                modal.off();
+            });
 
-            case constants.WIDGET_MAXIMIZED:
-                var modal = new DeleteConfirmation({
-                    content: __('The widget will be removed')
-                });
+            modal.on('cancel', function () {
+                modal.off();
+            });
 
-                modal.on('ok', function () {
-                    //model.widgets.remove(widget);
-                    widget.destroy();
-                    modal.off();
-                });
+            modal.open();
+        },
 
-                modal.on('cancel', function () {
-                    modal.off();
-                });
+        onCloseWidget: function (cid) {
+            var view = this;
+            var model = view.model;
 
-                modal.open();
-
-                break;
+            var widget = model.widgets.get(cid);
+            if (!widget) {
+                return;
             }
+
+            view.hideWidgetHover(cid);
+            //switch (widget.state) {
+            //case constants.WIDGET_MAXIMIZED_HOVER:
+            //    break;
         },
 
         onSetupWidget: function (cid) {

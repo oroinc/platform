@@ -19,7 +19,8 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
         events: {
             'click .sidebar-widget-header-toggle': 'onClickToggle',
             'click .sidebar-widget-settings': 'onClickSettings',
-            'click .sidebar-widget-remove': 'onClickRemove'
+            'click .sidebar-widget-remove': 'onClickRemove',
+            'click .sidebar-widget-close': 'onClickClose'
         },
 
         initialize: function () {
@@ -74,8 +75,13 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
         onClickRemove: function (e) {
             e.stopPropagation();
             e.preventDefault();
-
             Backbone.trigger('removeWidget', this.model.cid);
+        },
+
+        onClickClose: function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            Backbone.trigger('closeWidget', this.model.cid);
         }
     });
 
