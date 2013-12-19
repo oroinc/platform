@@ -10,24 +10,27 @@ function (Backbone, routing, constants, WidgetContainerCollection) {
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
+        defaults: {
+            state: constants.SIDEBAR_MINIMIZED
+        },
+
         initialize: function () {
             this.widgets = new WidgetContainerCollection();
 
             this.position = constants.SIDEBAR_LEFT;
-            this.state = constants.SIDEBAR_MINIMIZED;
         },
 
         /**
          * Toggles state of sidebar between minimized and maximized
          */
         toggleState: function () {
-            switch (this.state) {
+            switch (this.get('state')) {
             case constants.SIDEBAR_MINIMIZED:
-                this.state = constants.SIDEBAR_MAXIMIZED;
+                this.set('state', constants.SIDEBAR_MAXIMIZED);
                 break;
 
             case constants.SIDEBAR_MAXIMIZED:
-                this.state = constants.SIDEBAR_MINIMIZED;
+                this.set('state', constants.SIDEBAR_MINIMIZED);
                 break;
             }
 

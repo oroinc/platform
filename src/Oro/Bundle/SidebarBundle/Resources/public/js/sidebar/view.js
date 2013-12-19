@@ -68,7 +68,7 @@ define(function (require) {
 
             view.$el.html(view.template(model.toJSON()));
 
-            if (model.state === constants.SIDEBAR_MAXIMIZED) {
+            if (model.get('state') === constants.SIDEBAR_MAXIMIZED) {
                 view.$el.addClass('sidebar-maximized');
             } else {
                 view.$el.removeClass('sidebar-maximized');
@@ -76,7 +76,7 @@ define(function (require) {
 
             view.options.$main.css(view.padding, view.$el.width() + 'px');
 
-            if (model.state === constants.SIDEBAR_MINIMIZED) {
+            if (model.get('state') === constants.SIDEBAR_MINIMIZED) {
                 view.renderIcons();
             } else {
                 view.renderWidgets();
@@ -203,6 +203,7 @@ define(function (require) {
             e.preventDefault();
 
             this.model.toggleState();
+            this.model.save();
         },
 
         onWidgetsReset: function () {
