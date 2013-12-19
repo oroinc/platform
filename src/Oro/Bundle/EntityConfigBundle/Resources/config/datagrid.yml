@@ -17,6 +17,9 @@ datagrid:
                     - ce.mode
                 from:
                     - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
+                where:
+                    and:
+                        - ce.mode <> 'hidden'
         columns:
             name:
                 label: Name

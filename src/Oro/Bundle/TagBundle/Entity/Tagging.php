@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * )
  * @ORM\Entity
  * @Config(
+ *  mode="hidden",
  *  defaultValues={
  *      "ownership"={
  *          "owner_type"="USER",
