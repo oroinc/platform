@@ -324,7 +324,7 @@ class Lead extends AbstractEntity implements Entity
 
     public function reactivate()
     {
-        $this->byXPath("//div[@class='btn-group']/a[@id='transition-sales_lead-reactivate']")->click();
+        $this->byXPath("//div[@class='btn-group']/a[@id='transition-b2b_flow_lead-reactivate']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;

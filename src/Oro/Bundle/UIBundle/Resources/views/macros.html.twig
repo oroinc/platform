@@ -41,23 +41,23 @@
         additionalData - array with additional data
 #}
 {% macro attibuteRow(title, value, additionalData) %}
-        {% macro attribute_data(value, additionalData) %}
-            <div class="clearfix-oro">
-                {% if value.value is not defined  %}
-                    <p class="control-label">{{ value }}</p>
-                {% else %}
-                    <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
-                {% endif %}
-            </div>
-            {% if additionalData|length %}
-                {% for data in additionalData.data %}
-                    <div class="clearfix-oro">
-                        <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
-                    </div>
-                {% endfor %}
+    {% macro attribute_data(value, additionalData) %}
+        <div class="clearfix-oro">
+            {% if value.value is not defined  %}
+                <p class="control-label">{{ value }}</p>
+            {% else %}
+                <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
             {% endif %}
-        {% endmacro %}
-        {{ _self.renderAttribute(title, _self.attribute_data(value, additionalData)) }}
+        </div>
+        {% if additionalData|length %}
+            {% for data in additionalData.data %}
+                <div class="clearfix-oro">
+                    <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endmacro %}
+    {{ _self.renderAttribute(title, _self.attribute_data(value, additionalData)) }}
 {% endmacro %}
 
 {#
@@ -73,6 +73,16 @@
             {{ data|raw }}
         </div>
     </div>
+{% endmacro %}
+
+{#
+    Render property block
+    Parameters:
+        title - property title
+        data  - property data
+#}
+{% macro renderProperty(title, data) %}
+    {{ _self.renderAttribute(title, '<p class="control-label">' ~ data|default('N/A'|trans) ~ '</p>') }}
 {% endmacro %}
 
 {#

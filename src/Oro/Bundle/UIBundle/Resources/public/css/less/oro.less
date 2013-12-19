@@ -41,6 +41,9 @@ a:active,
 a:focus {
   text-decoration: none;
 }
+form {
+  margin: 0;
+}
 #main {
   background-color: #fff;
 }
@@ -48,6 +51,21 @@ a:focus {
   margin-top:-1px;
   .border-radius(3px);
   z-index: 900;
+  li.dropdown {
+    position: relative;
+    & > a{
+      padding-right: 10px;
+    }
+  }
+  li.dropdown:after{
+    content: "\f054";
+    font-family: 'FontAwesome';
+    display: block;
+    font-size: 11px;
+    position: absolute;
+    right: 5px;
+    top: 9px;
+  }
 }
 .dark {
   background-color: #f6f5f5;

@@ -28,15 +28,24 @@
         {% for error in transitionData['transition-condition-messages'] %}
             {% set conditionMessages = conditionMessages|merge(['<li>' ~ error.message|trans(error.parameters) ~ '</li>']) %}
         {% endfor %}
-        {% set transitionData = transitionData|merge({
-            'transition-condition-messages': '<ol>' ~ conditionMessages|join ~ '</ol>'
-        }) %}
+        {% if conditionMessages|length %}
+            {% set transitionData = transitionData|merge({
+                'transition-condition-messages': '<ol>' ~ conditionMessages|join ~ '</ol>'
+            }) %}
+        {% else %}
+            {% set transitionData = transitionData|merge({
+                'transition-condition-messages': ''
+            }) %}
+        {% endif %}
     {% endif %}
 
     <a href="{{ transitionData['transition-url'] }}"
         {% for key, value in transitionData %}
             data-{{ key }}="{{ value }}"
         {% endfor %}
+        {% if transition.frontendOptions is defined and transition.frontendOptions.dialog is defined %}
+            data-dialog-options={{ transition.frontendOptions.dialog|json_encode|raw }}
+        {% endif %}
         title="{{ transition.label|trans }}"
         class="btn icons-holder-text no-hash
             {% if not transitionData.enabled %}disabled{% endif %}
@@ -69,13 +78,18 @@
                         });
                         transitionBtn.trigger('transitionHandlerInitialized');
                     } else {
-                        transitionBtn.popover({
-                            'html': true,
-                            'placement': 'bottomRight',
-                            'trigger': 'hover',
-                            'title': '<i class="icon-exclamation-sign"></i>' + {{ 'Unmet conditions'|trans|json_encode|raw }},
-                            'content': transitionBtn.data('transition-condition-messages')
+                        transitionBtn.on('click', function(e) {
+                            e.preventDefault();
                         });
+                        if (transitionBtn.data('transition-condition-messages')) {
+                            transitionBtn.popover({
+                                'html': true,
+                                'placement': 'bottomRight',
+                                'trigger': 'hover',
+                                'title': '<i class="icon-exclamation-sign"></i>' + {{ 'Unmet conditions'|trans|json_encode|raw }},
+                                'content': transitionBtn.data('transition-condition-messages')
+                            });
+                        }
                     }
                 })(container.find('#transition-{{ data.workflow.name }}-{{ data.transition.name }}'));
                 {% endfor %}

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
  * Cache for ConfigInterface
@@ -37,7 +38,7 @@ class ConfigCache
      */
     public function loadConfigFromCache(ConfigIdInterface $configId)
     {
-        return unserialize($this->cache->fetch($configId->toString()));
+        return unserialize($this->cache->fetch($this->buildConfigCacheKey($configId)));
     }
 
     /**
@@ -46,7 +47,7 @@ class ConfigCache
      */
     public function putConfigInCache(ConfigInterface $config)
     {
-        return $this->cache->save($config->getId()->toString(), serialize($config));
+        return $this->cache->save($this->buildConfigCacheKey($config->getId()), serialize($config));
     }
 
     /**
@@ -55,7 +56,7 @@ class ConfigCache
      */
     public function removeConfigFromCache(ConfigIdInterface $configId)
     {
-        return $this->cache->delete($configId->toString());
+        return $this->cache->delete($this->buildConfigCacheKey($configId));
     }
 
     /**
@@ -73,7 +74,7 @@ class ConfigCache
      */
     public function getConfigurable($className, $fieldName = null)
     {
-        return $this->modelCache->fetch($className . '_' . $fieldName);
+        return $this->modelCache->fetch($this->buildModelCacheKey($className, $fieldName));
     }
 
     /**
@@ -84,7 +85,7 @@ class ConfigCache
      */
     public function setConfigurable($value, $className, $fieldName = null)
     {
-        return $this->modelCache->save($className . '_' . $fieldName, $value);
+        return $this->modelCache->save($this->buildModelCacheKey($className, $fieldName), $value);
     }
 
     /**
@@ -93,5 +94,32 @@ class ConfigCache
     public function removeAllConfigurable()
     {
         return $this->modelCache->deleteAll();
+    }
+
+    /**
+     * Returns a string unique identifies each config model
+     *
+     * @param string      $className
+     * @param string|null $fieldName
+     * @return string
+     */
+    protected function buildModelCacheKey($className, $fieldName = null)
+    {
+        return $fieldName
+            ? sprintf('%s_%s', $className, $fieldName)
+            : $className;
+    }
+
+    /**
+     * Returns a string unique identifies each config item
+     *
+     * @param ConfigIdInterface $configId
+     * @return string
+     */
+    protected function buildConfigCacheKey(ConfigIdInterface $configId)
+    {
+        return $configId instanceof FieldConfigId
+            ? sprintf('%s_%s_%s', $configId->getScope(), $configId->getClassName(), $configId->getFieldName())
+            : sprintf('%s_%s', $configId->getScope(), $configId->getClassName());
     }
 }

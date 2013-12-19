@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
-use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactory;
+use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
 use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Routing\RouterInterface;
-use Oro\Bundle\UserBundle\Acl\Manager;
 use Knp\Menu\MenuItem;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
@@ -22,7 +20,7 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
     protected $configurationBuilder;
 
     /**
-     * @var AclAwareMenuFactory
+     * @var AclAwareMenuFactoryExtension
      */
     protected $factory;
 
@@ -44,20 +42,13 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
     }
 
-    public function testSetContainer()
-    {
-        $this->configurationBuilder->setContainer($this->container);
-        $this->assertAttributeEquals($this->container, 'container', $this->configurationBuilder);
-    }
-
     /**
      * @dataProvider menuStructureProvider
      * @param array $options
      */
     public function testBuild($options)
     {
-        $this->container->setParameter('oro_menu_config', $options);
-        $this->configurationBuilder->setContainer($this->container);
+        $this->configurationBuilder->setConfiguration($options);
 
         $menu = new MenuItem('navbar', $this->factory);
         $this->configurationBuilder->build($menu, array(), 'navbar');

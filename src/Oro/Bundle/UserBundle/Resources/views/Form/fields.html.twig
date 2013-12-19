@@ -3,3 +3,26 @@
 
     select2Config.multiple = true;
 {% endblock %}
+
+{% block oro_combobox_dataconfig_acl_user_autocomplete %}
+    {% set url = '' %}
+    {% if configs.ajax.url is defined and configs.ajax.url%}
+    {% set url = configs.ajax.url %}
+    {% elseif configs.route_name is defined and configs.route_name %}
+        {% set url = path(configs.route_name) %}
+    {% endif %}
+    select2Config.ajax = {
+        'url': {{ url|json_encode|raw }},
+        'data': function (query, page) {
+            return {
+                'page': page,
+                'per_page': {{ configs.per_page|default(10) }},
+                'name': "{{ configs.autocomplete_alias }}",
+                'query': query + ';' + '{{ configs.entity_name }}'+ ';' + '{{ configs.permission }}' + ';' + '{{ configs.entity_id }}'
+            };
+        },
+        'results': function (data, page) {
+            return data;
+        }
+    };
+{% endblock %}

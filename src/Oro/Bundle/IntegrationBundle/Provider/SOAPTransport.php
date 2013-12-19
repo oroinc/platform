@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
@@ -34,6 +34,9 @@ abstract class SOAPTransport implements TransportInterface
      */
     public function call($action, array $params = [])
     {
+        if (!$this->client) {
+            throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
+        }
         $result = $this->client->__soapCall($action, $params);
 
         return $result;
@@ -69,5 +72,24 @@ abstract class SOAPTransport implements TransportInterface
     public function getLastRequest()
     {
         return $this->client->__getLastRequest();
+    }
+
+    /**
+     * Clone
+     */
+    public function __clone()
+    {
+        $this->client = null;
+    }
+
+    /**
+     * Does not allow to serialize
+     * It may cause serialization error on SoapClient
+     *
+     * @return array
+     */
+    public function __sleep()
+    {
+        return [];
     }
 }

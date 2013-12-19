@@ -138,6 +138,7 @@ oro_menu_config:
     tree:
         <menu_alias>                            # menu alias
             type: <menu_type>                   # menu type code. Link to menu template section.
+            merge_strategy: <strategy>          # node merge strategy. possible strategies are append|replace|move
             extras:                             # extra parameters for container renderer
                 brand: <string>
                 brandLink: <string>
@@ -145,6 +146,11 @@ oro_menu_config:
                 <links to items hierarchy>
                 position: <integer>             # menu item posiotion
 ```
+
+To change merge strategy of tree node there are 3 possible options:
+ - append - default. Node will be appended. If same node already present in tree it will be not changed.
+ - replace - all nodes with same name will be removed and replaced in tree with current node definition
+ - move - all nodes with same name will be removed and replaced in tree. Node children will be merged with found node children.
 
 Configuration builder reads all menu.yaml and merges its to one menu configuration. Therefore, developer can add or
 replace any menu item from his bundles. Developers can prioritize loading and rewriting of menu's configuration

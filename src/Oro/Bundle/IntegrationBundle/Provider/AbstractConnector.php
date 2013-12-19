@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
-abstract class AbstractConnector implements ConnectorInterface
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
+
+abstract class AbstractConnector extends AbstractReader implements ConnectorInterface
 {
     const ENTITY_NAME     = null;
     const CONNECTOR_LABEL = null;
@@ -15,34 +20,70 @@ abstract class AbstractConnector implements ConnectorInterface
     /** @var TransportInterface */
     protected $transport;
 
-    /** @var Transport */
+    /** @var ParameterBag */
     protected $transportSettings;
 
-    /** @var bool */
-    protected $isConnected = false;
+    /** @var LoggerStrategy */
+    protected $logger;
 
     /**
-     * {@inheritdoc}
+     * @param ContextRegistry $contextRegistry
+     * @param LoggerStrategy  $logger
      */
-    public function configure(TransportInterface $realTransport, Transport $transportSettings)
+    public function __construct(ContextRegistry $contextRegistry, LoggerStrategy $logger)
     {
-        $this->transport         = $realTransport;
-        $this->transportSettings = $transportSettings;
+        parent::__construct($contextRegistry);
+        $this->logger = $logger;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function connect()
+    public function read()
     {
-        if (!($this->transport && $this->transportSettings)) {
-            throw new \LogicException('Connector does not configured correctly');
+        // read peace of data, skipping empty
+        do {
+            $data = $this->doRead();
+        } while ($data === false);
+
+        if (is_null($data)) {
+            return null; // no data anymore
         }
 
-        $transportSettings = $this->transportSettings->getSettingsBag();
-        $this->isConnected = $this->transport->init($transportSettings);
+        $context = $this->getContext();
+        $context->incrementReadCount();
+        $context->incrementReadOffset();
 
-        return $this->isConnected;
+        // connectors should know how to advance
+        // batch counter/boundaries to the next ones
+        return $data;
+    }
+
+    /**
+     * Should be overridden in descendant classes
+     *
+     * Should return
+     *     null in case when no more data to read
+     *     false if just current batch is empty
+     *     data if read
+     *
+     * @return mixed
+     */
+    abstract protected function doRead();
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeFromContext(ContextInterface $context)
+    {
+        $this->transport         = $context->getOption('transport');
+        $this->transportSettings = $context->getOption('transportSettings');
+
+        if (!$this->transportSettings || !$this->transport) {
+            throw new \LogicException('Connector instance does not configured properly.');
+        }
+
+        $this->transport->init($this->transportSettings);
     }
 
     /**
@@ -55,10 +96,6 @@ abstract class AbstractConnector implements ConnectorInterface
      */
     protected function call($action, $params = [])
     {
-        if ($this->isConnected === false) {
-            $this->connect();
-        }
-
         $params = is_array($params) ? $params : [$params];
 
         return $this->transport->call($action, $params);
@@ -92,32 +129,5 @@ abstract class AbstractConnector implements ConnectorInterface
         }
 
         return static::JOB_IMPORT;
-    }
-
-    /**
-     * Does not allow to serialize (serialize to empty array)
-     *
-     * @return array
-     */
-    public function __sleep()
-    {
-        return [];
-    }
-
-    /**
-     * @param $object
-     * @return array
-     */
-    protected function objectToArray($object)
-    {
-        if (!is_object($object) && !is_array($object)) {
-            return $object;
-        }
-
-        if (is_object($object)) {
-            $object = get_object_vars($object);
-        }
-
-        return array_map([$this, 'objectToArray'], $object);
     }
 }

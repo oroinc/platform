@@ -41,7 +41,13 @@ class CommandsTest extends WebTestCase
         $command = new GenerateWSSEHeaderCommand();
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
-        $commandTester->execute(array('command' => $command->getName(), 'username' => 'admin'));
+        $commandTester->execute(
+            array(
+                'command' => $command->getName(),
+                '--env' => $kernel->getEnvironment(),
+                'username' => 'admin'
+            )
+        );
 
         preg_match_all('/(^Authorization:\s*(.*$))|(^X-WSSE:\s*(.*$))/im', $commandTester->getDisplay(), $header);
 
