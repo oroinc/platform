@@ -188,6 +188,18 @@ class Tagging
     }
 
     /**
+     * @param User $owner
+     *
+     * @return $this
+     */
+    public function setOwner(User $owner)
+    {
+        $this->owner = $owner;
+
+        return $this;
+    }
+
+    /**
      * Set created date
      *
      * @param \DateTime $date
