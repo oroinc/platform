@@ -78,11 +78,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         // Get remote repos
-        $composer->expects($this->exactly(2))
+        $composer->expects($this->any())
             ->method('getRepositoryManager')
             ->will($this->returnValue($repositoryManagerMock));
 
-        $repositoryManagerMock->expects($this->once())
+        $repositoryManagerMock->expects($this->any())
             ->method('getRepositories')
             ->will(
                 $this->returnValue(
@@ -95,13 +95,15 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             );
 
         // Get local repo
-        $repositoryManagerMock->expects($this->once())
+        $repositoryManagerMock->expects($this->any())
             ->method('getLocalRepository')
             ->will($this->returnValue($localRepository));
 
         // Fetch available packages configuration
         // from composer repo
-        $composerRepositoryMock->expects($this->once())
+        $availablePackage1 = $this->getPackage('name1', 1);
+        $availablePackage2 = $this->getPackage($duplicatedPackageName, 1);
+        $composerRepositoryMock->expects($this->any())
             ->method('hasProviders')
             ->will($this->returnValue(true));
 
@@ -109,23 +111,33 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getProviderNames')
             ->will($this->returnValue(['name1', 'name2']));
 
+        $composerRepositoryMock->expects($this->any())
+            ->method('whatProvides')
+            ->will($this->returnValue([$availablePackage1,  $this->getPackage('name2', 1)]));
+
         // from composer repo without providers
-        $composerRepositoryWithoutProvidersMock->expects($this->once())
+        $composerRepositoryWithoutProvidersMock->expects($this->any())
             ->method('hasProviders')
             ->will($this->returnValue(false));
 
-        $availablePackage1 = $this->getPackage('name3', 1);
-        $availablePackage2 = $this->getPackage($duplicatedPackageName, 1);
         $composerRepositoryWithoutProvidersMock->expects($this->once())
             ->method('getPackages')
             ->will($this->returnValue([$availablePackage1, $availablePackage2]));
+        $composerRepositoryWithoutProvidersMock->expects($this->any())
+            ->method('getMinimalPackages')
+            ->will($this->returnValue([]));
 
         // Ready Steady Go!
         $manager = $this->createPackageManager($composer);
 
+        $packages = array_reduce($manager->getAvailable(), function($result, PackageInterface $package){
+                $result[] = $package->getPrettyName();
+                return $result;
+            }, []
+        );
         $this->assertEquals(
-            ['name2', 'name3', $duplicatedPackageName, 'name4'],
-            $manager->getAvailable()
+            ['name2', $duplicatedPackageName, 'name4'],
+            $packages
         );
     }
 
@@ -275,7 +287,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getPackage')
             ->will($this->returnValue($rootPackageMock));
 
-        $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), true);
+        $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
         $manager = $this->createPackageManager($composer, $composerInstaller, null, null, $tempComposerJson);
         $manager->install($newPackage->getName());
 
@@ -426,6 +438,15 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composer->expects($this->any())
             ->method('getInstallationManager')
             ->will($this->returnValue($installationManager));
+
+        // Cache clear
+        $eventDispatcher = $this->createConstructorLessMock('Composer\EventDispatcher\EventDispatcher');
+        $composer->expects($this->once())
+            ->method('getEventDispatcher')
+            ->will($this->returnValue($eventDispatcher));
+        $eventDispatcher->expects($this->once())
+            ->method('dispatchCommandEvent')
+            ->with('cache-clear', false);
 
         // Uninstalling
         $installationManager->expects($this->exactly(count($packageNamesToBeRemoved)))
@@ -620,6 +641,13 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $localRepository->expects($this->at(1))
             ->method('getCanonicalPackages')
             ->will($this->returnValue([$updatedPackage1, $updatedPackage2, $package3, $newInstalledPackage]));
+        $localRepository->expects($this->at(2))
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue([$updatedPackage1, $updatedPackage2, $package3, $newInstalledPackage]));
+        $localRepository->expects($this->exactly(2))
+            ->method('findPackages')
+            ->will($this->returnValue([$newInstalledPackage]));
+
         $runner = $this->createScriptRunnerMock();
         $runner->expects($this->once())
             ->method('install')
@@ -631,8 +659,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('uninstall')
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
 
-        $composerInstaller = $this->prepareInstallerMock($packageName, true);
-        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner);
+        $composerInstaller = $this->prepareInstallerMock($packageName, 0);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner, tempnam(sys_get_temp_dir(),uniqid()));
         $manager->update($packageName);
     }
 
@@ -649,7 +677,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $composer = $this->createComposerMock();
         $repositoryManager = $this->createRepositoryManagerMock();
-        $localRepository = new WritableArrayRepository();
+        $localRepository = new WritableArrayRepository([$this->getPackage($packageName, 1)]);
 
         $composer->expects($this->any())->method('getRepositoryManager')
             ->will($this->returnValue($repositoryManager));
@@ -659,7 +687,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $composerInstaller = $this->prepareInstallerMock($packageName, false);
 
-        $manager = $this->createPackageManager($composer, $composerInstaller, new BufferIO());
+        $manager = $this->createPackageManager($composer, $composerInstaller, new BufferIO(), $this->createScriptRunnerMock(), tempnam(sys_get_temp_dir(),uniqid()));
         $manager->update($packageName);
     }
 
@@ -811,7 +839,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createComposerIO()
     {
-        return new NullIO();
+        return new BufferIO();
     }
 
     /**

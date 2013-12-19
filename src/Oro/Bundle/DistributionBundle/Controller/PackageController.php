@@ -37,7 +37,8 @@ class PackageController extends Controller
         foreach ($manager->getInstalled() as $package) {
             $items[] = [
                 'package' => $package,
-                'update' => $manager->getPackageUpdate($package)
+                'update' => $manager->getPackageUpdate($package),
+                'canBeDeleted' => $manager->canBeDeleted($package->getPrettyName())
             ];
         }
 

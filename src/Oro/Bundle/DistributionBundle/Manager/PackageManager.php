@@ -15,6 +15,7 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+use Composer\Script\ScriptEvents;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Script\Runner;
@@ -48,6 +49,11 @@ class PackageManager
     protected $pathToComposerJson;
 
     /**
+     * @var array
+     */
+    protected $constantPackages;
+
+    /**
      * @param Composer $composer
      * @param Installer $installer
      * @param IOInterface $composerIO
@@ -66,6 +72,8 @@ class PackageManager
         $this->composerIO = $composerIO;
         $this->scriptRunner = $scriptRunner;
         $this->pathToComposerJson = $pathToComposerJson;
+
+        $this->constantPackages = ['oro/platform', 'oro/platform-dist'];
     }
 
     /**
@@ -280,12 +288,22 @@ class PackageManager
 
     /**
      * @param array $packageNames
+     *
+     * @throws \RuntimeException
      */
     public function uninstall(array $packageNames)
     {
+        foreach ($packageNames as $name) {
+            if(!$this->canBeDeleted($name))
+                throw new \RuntimeException(sprintf('Package %s is not deletable'));
+        }
+
         $this->removeFromComposerJson($packageNames);
         $installationManager = $this->composer->getInstallationManager();
         $localRepository = $this->getLocalRepository();
+
+        $this->composer->getEventDispatcher()->dispatchCommandEvent('cache-clear', false);
+
         foreach ($packageNames as $name) {
             $package = $this->findInstalledPackage($name);
             $this->scriptRunner->uninstall($package);
@@ -294,6 +312,7 @@ class PackageManager
                 new UninstallOperation($package)
             );
         }
+
     }
 
     /**
@@ -323,6 +342,38 @@ class PackageManager
         return (bool)$this->getPackageUpdate($package);
     }
 
+    /**
+     * @param PackageInterface $package
+     *
+     * @return null|PackageUpdate
+     */
+    public function getPackageUpdate(PackageInterface $package)
+    {
+        $preferredPackage = $this->getPreferredPackage(
+            $package->getName(),
+            null
+//            $this->getPackagePrettyConstraint($package)
+        );
+        if ($package->getSourceReference() !== $preferredPackage->getSourceReference()) {
+            $versionString = '%s (%s)';
+
+            return new PackageUpdate(
+                $package->getName(),
+                sprintf(
+                    $versionString,
+                    $package->getPrettyVersion(),
+                    substr($package->getSourceReference(), 0, 7)
+                ),
+                sprintf(
+                    $versionString,
+                    $preferredPackage->getPrettyVersion(),
+                    substr($preferredPackage->getSourceReference(), 0, 7)
+                )
+            );
+        }
+
+        return null;
+    }
 
     /**
      * @param string $packageName
@@ -373,6 +424,16 @@ class PackageManager
                 sprintf('%s can\'t be updated!', $packageName), $this->composerIO->getOutput()
             );
         }
+    }
+
+    /**
+     * @param string $packageName
+     *
+     * @return bool
+     */
+    public function canBeDeleted($packageName)
+    {
+        return !in_array($packageName, $this->constantPackages);
     }
 
     /**
@@ -455,39 +516,6 @@ class PackageManager
         }
 
         return [$justInstalled, $justUpdated, $justUninstalled];
-    }
-
-    /**
-     * @param PackageInterface $package
-     *
-     * @return null|PackageUpdate
-     */
-    public function getPackageUpdate(PackageInterface $package)
-    {
-        $preferredPackage = $this->getPreferredPackage(
-            $package->getName(),
-            null
-//            $this->getPackagePrettyConstraint($package)
-        );
-        if ($package->getSourceReference() !== $preferredPackage->getSourceReference()) {
-            $versionString = '%s (%s)';
-
-            return new PackageUpdate(
-                $package->getName(),
-                sprintf(
-                    $versionString,
-                    $package->getPrettyVersion(),
-                    substr($package->getSourceReference(), 0, 7)
-                ),
-                sprintf(
-                    $versionString,
-                    $preferredPackage->getPrettyVersion(),
-                    substr($preferredPackage->getSourceReference(), 0, 7)
-                )
-            );
-        }
-
-        return null;
     }
 
     /**
@@ -593,14 +621,20 @@ class PackageManager
         $composerFile->write($composerData);
     }
 
+    protected $pool;
+
     /**
      * @return Pool
      */
     protected function createPool()
     {
+        if ($this->pool) {
+            return $this->pool;
+        }
+
         $pool = new Pool('dev');
         $pool->addRepository(new CompositeRepository($this->getRepositories()));
 
-        return $pool;
+        return $this->pool = $pool;
     }
 }

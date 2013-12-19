@@ -58,7 +58,7 @@
                 </td>
                 <td>
                     {{ item.update.currentVersionString|default(item.package.prettyVersion) }}
-                    {% if item.package.prettyName != 'oro/platform' %}
+                    {% if item.canBeDeleted %}
                         <br />
                         <a href="#" class="ajax uninstall"
                            data-action="uninstall"
