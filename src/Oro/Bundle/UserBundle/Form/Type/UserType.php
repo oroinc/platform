@@ -35,8 +35,7 @@ class UserType extends AbstractType
     public function __construct(
         SecurityContextInterface $security,
         Request $request
-    )
-    {
+    ) {
 
         $this->security = $security;
         if ($request->attributes->get('_route') == 'oro_user_profile_update') {

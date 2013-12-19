@@ -19,7 +19,11 @@ class CalendarEventType extends AbstractType
             ->add('start', 'oro_datetime', ['required' => true, 'label' => 'oro.calendar.calendarevent.start.label'])
             ->add('end', 'oro_datetime', ['required' => true, 'label' => 'oro.calendar.calendarevent.end.label'])
             ->add('allDay', 'checkbox', ['required' => false, 'label' => 'oro.calendar.calendarevent.all_day.label'])
-            ->add('reminder', 'checkbox', ['required' => false, 'label' => 'oro.calendar.calendarevent.reminder.label']);
+            ->add(
+                'reminder',
+                'checkbox',
+                ['required' => false, 'label' => 'oro.calendar.calendarevent.reminder.label']
+            );
     }
 
     /**
