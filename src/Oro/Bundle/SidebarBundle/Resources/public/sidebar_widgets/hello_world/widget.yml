@@ -1,4 +1,4 @@
-title: "Hello world"
+title: "Welcome Oro"
 icon: "bundles/orosidebar/sidebar_widgets/hello_world/img/icon.ico"
 module: "oro/sidebar/widget/hello-world"
 placement: "both"
