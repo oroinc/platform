@@ -13,7 +13,6 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Report", "plural_label"="Reports"},
  *      "ownership"={
  *          "owner_type"="BUSINESS_UNIT",
  *          "owner_field_name"="owner",
