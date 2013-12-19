@@ -9,7 +9,7 @@ define(['jquery', 'oro/mediator', 'oro/translator'], function ($, mediator, __) 
             $container = $header.find('.title-buttons-container');
         $container.find('.separator-btn').replaceWith('<li class="divider"></li>');
         $buttons = $container.find('.btn, .divider');
-        if ($buttons.length <= 2) {
+        if ($buttons.length <= 1) {
             return;
         }
         $mainButtons = $buttons.filter('.main-group:not(.more-group)');
@@ -17,17 +17,17 @@ define(['jquery', 'oro/mediator', 'oro/translator'], function ($, mediator, __) 
             $mainButtons = $buttons.first();
         }
         $moreButtons = $buttons.not($mainButtons);
+        if ($moreButtons.length > 1) {
+            $moreButtons = $('<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">' +
+                __('More') + '<span class="caret"></span></a>')
+                    .add($('<ul class="dropdown-menu"></ul>').append($moreButtons));
+            $moreButtons.find('.btn').wrap('<li></li>').removeClass(function (index, css) {
+                return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
+            });
+        }
         $group = $('<div class="btn-group pull-right"></div>')
-            .append(
-                $mainButtons,
-                $('<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">' +
-                    __('More') + '<span class="caret"></span></a>'),
-                $('<ul class="dropdown-menu"></ul>').append($moreButtons)
-            );
+            .append($mainButtons, $moreButtons);
         $buttons.removeClass('pull-right');
-        $moreButtons.not('li').wrap('<li></li>').removeClass(function (index, css) {
-            return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
-        });
         $container.find('.btn-group').remove().end().prepend($group);
     }
 
@@ -45,7 +45,7 @@ define(['jquery', 'oro/mediator', 'oro/translator'], function ($, mediator, __) 
     return {
         init: function () {
             updatePageHeader();
-            mediator.on('hash_navigation_request:refresh', updatePageHeader);
+            mediator.on('hash_navigation_request:complete', updatePageHeader);
         }
     };
 });
