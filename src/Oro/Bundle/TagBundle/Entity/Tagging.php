@@ -6,15 +6,29 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table(
  *     name="oro_tag_tagging",
  *     uniqueConstraints={
- *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id", "created_by"})
+ *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id"})
  *    }
  * )
  * @ORM\Entity
+ * @Config(
+ *  defaultValues={
+ *      "ownership"={
+ *          "owner_type"="USER",
+ *          "owner_field_name"="owner",
+ *          "owner_column_name"="user_owner_id"
+ *      },
+ *      "security"={
+ *          "type"="ACL",
+ *          "group_name"=""
+ *      }
+ *  }
+ * )
  */
 class Tagging
 {
@@ -36,9 +50,9 @@ class Tagging
     /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="created_by", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    protected $createdBy;
+    protected $owner;
 
     /**
      * @var \Datetime $created
@@ -166,21 +180,11 @@ class Tagging
     }
 
     /**
-     * {@inheritDoc}
+     * @return User
      */
-    public function getCreatedBy()
+    public function getOwner()
     {
-        return $this->createdBy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setCreatedBy(User $user)
-    {
-        $this->createdBy = $user;
-
-        return $this;
+        return $this->owner;
     }
 
     /**

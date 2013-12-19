@@ -3,3 +3,7 @@ oro:
         controller.tag.saved.message: "Tag saved"
         form.choose_tag: "Choose a tag"
         form.choose_or_create_tag: "Choose or create a tag"
+        tagging:
+            entity_label: Tagging
+            entity_plural_label: Taggings
+            entity_description: Represents tagging relation

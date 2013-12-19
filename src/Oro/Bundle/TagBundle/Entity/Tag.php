@@ -30,7 +30,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  }
  * )
  */
-class Tag implements ContainUpdaterInterface
+class Tag
 {
     /**
      * @var integer
@@ -65,20 +65,6 @@ class Tag implements ContainUpdaterInterface
      * @ORM\OneToMany(targetEntity="Tagging", mappedBy="tag", fetch="LAZY")
      */
     protected $tagging;
-
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="created_by", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $createdBy;
-
-    /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="updated_by", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $updatedBy;
 
     /**
      * @var User
@@ -185,42 +171,6 @@ class Tag implements ContainUpdaterInterface
     public function getTagging()
     {
         return $this->tagging;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getUpdatedBy()
-    {
-        return $this->updatedBy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setUpdatedBy(User $user)
-    {
-        $this->updatedBy = $user;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getCreatedBy()
-    {
-        return $this->createdBy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setCreatedBy(User $user)
-    {
-        $this->createdBy = $user;
-
-        return $this;
     }
 
     /**
