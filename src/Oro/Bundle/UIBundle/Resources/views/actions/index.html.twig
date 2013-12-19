@@ -7,13 +7,11 @@
 {% endblock %}
 {% block content %}
     <div class="container-fluid page-title">
-        <div class="navigation clearfix navbar-extra">
+        <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="span9">
                     <div class="pull-left">
-                        <div class="container-fluid">
-                            <h1 class="oro-subtitle">{{ (pageTitle is defined ? pageTitle : '')|trans }}</h1>
-                        </div>
+                        <h1 class="oro-subtitle">{{ (pageTitle is defined ? pageTitle : '')|trans }}</h1>
                     </div>
                 </div>
                 <div class="pull-right title-buttons-container">

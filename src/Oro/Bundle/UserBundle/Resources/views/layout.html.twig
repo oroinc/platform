@@ -3,7 +3,7 @@
 <head>
     {% block head %}
     <title>{{ oro_title_render() }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
 
     {% if oro_theme_icon() %}
         <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
@@ -36,7 +36,7 @@
     {% endblock %}
     {% placeholder scripts_after %}
 </head>
-<body class="{% block bodyClass %}{% endblock %}">
+<body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
     <div id="page">
         <div id="top-page">
             {% set messagesContent %}

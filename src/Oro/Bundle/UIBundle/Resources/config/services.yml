@@ -2,6 +2,7 @@ parameters:
     oro_ui.twig.ceil.class:              Oro\Bundle\UIBundle\Twig\CeilExtension
     oro_ui.twig.extension.class:         Oro\Bundle\UIBundle\Twig\UiExtension
     oro_ui.twig.md5.class:               Oro\Bundle\UIBundle\Twig\Md5Extension
+    oro_ui.twig.mobile.class:            Oro\Bundle\UIBundle\Twig\MobileExtension
     oro_ui.router.class:                 Oro\Bundle\UIBundle\Route\Router
     oro_ui.twig.widget.class:            Oro\Bundle\UIBundle\Twig\WidgetExtension
     oro_ui.twig.date.class:              Oro\Bundle\UIBundle\Twig\DateExtension
@@ -32,6 +33,13 @@ services:
         class: %oro_ui.twig.md5.class%
         arguments:
             - @serializer
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.mobile_extension:
+        class: %oro_ui.twig.mobile.class%
+        arguments:
+            - @service_container
         tags:
             - { name: twig.extension }
 
