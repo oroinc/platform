@@ -18,19 +18,6 @@
   .user-info-state {
     display: none;
   }
-  .btn-group {
-    margin: 0;
-    .remove-button, .edit-button, .import-btn, .export-btn {
-      font-size: 0;
-    }
-  }
-  .icons-holder-text.btn {
-    .icon-edit, .icon-trash, .icon-signin, .icon-signout {
-      &:before {
-        margin-right: 0;
-      }
-    }
-  }
   .user-info-state + .title-buttons-container:not(:empty) {
     margin-top: 10px;
   }
@@ -58,3 +45,77 @@
   }
 }
 
+.title-buttons-container {
+  margin-top: 5px;
+  .btn [class*=icon-].hide-text,
+  .btn-group > .dropdown-menu li [class^=icon-] {
+    width: 20px;
+    text-align: center;
+    &:before {
+      font-size: @fontSizeLarge;
+    }
+  }
+  .btn {
+    font-size: @fontSizeLarge;
+    line-height: @fontSizeLarge * 1.8;
+    height: 34px;
+    padding-left: 14px;
+    padding-right: 14px;
+    .caret {
+      border-top-color: #666;
+      margin-top: 15px;
+    }
+    &:active .cater{
+      border-top-color: #444;
+    }
+    [class^=icon-].hide-text:before {
+      margin: 7px 0 0 -9px;
+    }
+    &:active [class^=icon-]:before {
+      color: #444;
+    }
+  }
+  .btn-group > .dropdown-menu {
+    left: initial;
+    right: 0;
+    min-width: 100%;
+    li a, li button {
+      font-size: @fontSizeLarge;
+      line-height: @fontSizeLarge * 1.8;
+      padding-left: 30px;
+      padding-right: 26px;
+      color: #666;
+      [class^=icon-] {
+        margin-left: -25px;
+        margin-right: 5px;
+      }
+      &:hover, &:hover [class^=icon-]:before {
+        background: #3875d7;
+        color: #fff;
+      }
+      &:focus, &:focus [class^=icon-]:before {
+        background: #f3f3f3;
+        color: #006acc;
+      }
+      &:active, &:active [class^=icon-]:before {
+        color: #444;
+      }
+    }
+    li button {
+      display: block;
+      clear: both;
+      font-weight: normal;
+      text-align: left;
+      white-space: nowrap;
+      padding-top: 1px;
+      padding-bottom: 1px;
+      background-color: inherit;
+      border: none;
+      margin: 0;
+      width: 100%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: normal;
+    }
+  }
+}

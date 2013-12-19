@@ -112,7 +112,7 @@
 #}
 {% macro editButton(parameters) %}
     {% set iClass = ['icon-edit'] %}
-    {% set aClass = ['edit-button'] %}
+    {% set aClass = ['edit-button', 'main-group'] %}
     {% if parameters.iClass is defined %}
         {% set iClass = parameters.iClass|split(' ')|merge(iClass) %}
     {% endif %}
@@ -138,7 +138,7 @@
 #}
 {% macro addButton(parameters) %}
     <a href="{{ parameters.path }}"
-       class="btn btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
+       class="btn main-group btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
        {% if parameters.title is defined %}
             title="{{ parameters.title|trans }}">
        {% endif %}
@@ -257,7 +257,7 @@
 
 {% macro saveAndStayButton(acl = '', label = 'Save') %}
     {% if acl is empty or resource_granted(acl) %}
-    {{ _self.buttonType({'type': 'button', 'class': 'btn-success', 'label': label, 'action': 'save_and_stay'}) }}
+    {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
     {% endif %}
 {% endmacro %}
 

@@ -44,7 +44,7 @@
         id="transition-{{ workflow.name }}-{{ transition.name }}">
         {% if transition.frontendOptions is defined and transition.frontendOptions.icon is defined %}
             <i class="{{ transition.frontendOptions.icon }}"></i>
-        {% endif %}
+        {%- endif -%}
         {{ transition.label|trans }}
     </a>
 {% endmacro %}
