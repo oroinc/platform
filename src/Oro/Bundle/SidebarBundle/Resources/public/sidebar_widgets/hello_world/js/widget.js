@@ -9,18 +9,6 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
      */
     var helloWorld = {};
 
-    helloWorld.defaults = {
-        widget_name: 'hello_world',
-        title: 'Hello world',
-        icon: '/bundles/orosidebar/sidebar_widgets/hello_world/img/icon.ico',
-        settings: function () {
-            return {
-                content: 'Welcome to OroCRM!<br/>'
-                + 'OroCRM is an easy-to-use, open source CRM with built-in marketing tools for your ecommerce business. learn more at <a href="http://orocrm.com">orocrm.com</a>'
-            };
-        }
-    };
-
     helloWorld.ContentView = Backbone.View.extend({
         template: _.template('<span><%= settings.content %></span>'),
 

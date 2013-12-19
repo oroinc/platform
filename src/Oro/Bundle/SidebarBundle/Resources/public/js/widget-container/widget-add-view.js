@@ -52,31 +52,31 @@ define(function (require) {
                     return;
                 }
 
-                var moduleId = $(selected).closest('li').data('moduleid');
+                var widgetData = $(selected).closest('li').data('widgetdata');
+                var widgetName = $(selected).closest('li').data('widgetname');
 
-                requirejs([moduleId], function (Widget) {
-                    var placement = null;
-                    if (model.position === constants.SIDEBAR_LEFT) {
-                        placement = 'left';
-                    } else if (model.position === constants.SIDEBAR_RIGHT) {
-                        placement = 'right';
-                    }
-                    var widget = new WidgetContainerModel({
-                        widget_name: Widget.defaults.widget_name,
-                        title: Widget.defaults.title,
-                        icon: Widget.defaults.icon,
-                        module: moduleId,
-                        settings: Widget.defaults.settings(),
-                        position: model.widgets.length,
-                        placement: placement
-                    });
+                var placement = null;
+                if (model.position === constants.SIDEBAR_LEFT) {
+                    placement = 'left';
+                } else if (model.position === constants.SIDEBAR_RIGHT) {
+                    placement = 'right';
+                }
 
-                    model.widgets.push(widget);
-
-                    widget.save();
-
-                    view.close();
+                var widget = new WidgetContainerModel({
+                    widget_name: widgetName,
+                    title: widgetData.title,
+                    icon: widgetData.icon,
+                    module: widgetData.module,
+                    settings: widgetData.settings,
+                    position: model.widgets.length,
+                    placement: placement
                 });
+
+                model.widgets.push(widget);
+
+                widget.save();
+
+                view.close();
             });
         }
     });
