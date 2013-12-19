@@ -55,7 +55,7 @@ class WidgetController extends FOSRestController
     public function postAction()
     {
         $entity = new Widget();
-        $entity->setWidgetName($this->getRequest()->get('widget_name'));
+        $entity->setWidgetName($this->getRequest()->get('widgetName'));
 
         // TODO: Remove this after changes to use widget_name
         $entity->setTitle($this->getRequest()->get('title'));
