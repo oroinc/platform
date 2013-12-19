@@ -1,9 +1,15 @@
-/*jshint browser: true*/
-/*jslint browser: true, nomen: true, todo: true, vars: true*/
 /*global define*/
-
-define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui-timepicker'], function ($, __) {
+/*jshint browser: true*/
+define(function (require) {
     'use strict';
+
+    var $ = require('jquery');
+
+    var __ = require('oro/translator');
+    var scrollspy = require('oro/scrollspy');
+    var _bootstrapTooltip = require('bootstrap-tooltip');
+    var _jqueryUI = require('jquery-ui');
+    var _jqueryUITimepicker = require('jquery-ui-timepicker');
 
     // todo: remove this or move somewhere else
     /**
@@ -38,13 +44,7 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
         container = $(container || document.body);
         this.styleForm(container);
 
-        container.find('[data-spy="scroll"]').each(function () {
-            var $spy = $(this);
-            $spy.scrollspy($spy.data());
-            $spy = $(this).scrollspy('refresh');
-            $('.scrollspy-nav ul.nav li').removeClass('active');
-            $('.scrollspy-nav ul.nav li:first').addClass('active');
-        });
+        scrollspy.init(container);
 
         container.find('[data-toggle="tooltip"]').tooltip();
 
@@ -85,7 +85,7 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
             });
 
         setTimeout(function () {
-            layout.scrollspyTop();
+            scrollspy.top();
         }, 500);
     };
 
@@ -103,57 +103,6 @@ define(['jquery', 'oro/translator', 'bootstrap-tooltip', 'jquery-ui', 'jquery-ui
             elements.uniform();
             elements.trigger('uniformInit');
         }
-    };
-
-    layout.adjustScrollspy = function () {
-        $('[data-spy="scroll"]').each(function () {
-            var $spy = $(this);
-            var spyHeight = $spy.innerHeight();
-            var debugBarHeight = $('.sf-toolbar').height() || 0;
-
-            var isMultipleRows = $spy.find('.responsive-section').length > 1;
-
-            $spy.find('.responsive-section:last').each(function () {
-                var $row = $(this);
-                var titleHeight = $row.find('.scrollspy-title').outerHeight();
-                var rowAdjHeight = (isMultipleRows ? titleHeight + spyHeight : spyHeight) - debugBarHeight;
-
-                var rowOrigHeight = $row.data('originalHeight');
-                if (!rowOrigHeight) {
-                    rowOrigHeight = $row.height();
-                    $row.data('originalHeight', rowOrigHeight);
-                }
-
-                if ($row.height() === rowAdjHeight) {
-                    return;
-                }
-
-                if (rowAdjHeight < rowOrigHeight) {
-                    rowAdjHeight = rowOrigHeight;
-                }
-
-                $row.outerHeight(rowAdjHeight);
-            });
-
-            $spy.scrollspy('refresh');
-        });
-    };
-
-    layout.scrollspyTop = function () {
-        $('[data-spy="scroll"]').each(function () {
-            var $spy = $(this);
-            var targetSelector = $spy.data('target');
-            var target = $(targetSelector);
-
-            target.each(function () {
-                var $target = $(this);
-                var firstItemHref = $target.find('li.active:first a').attr('href');
-                var $firstItem = $(firstItemHref);
-                var top = $firstItem.position().top;
-
-                $spy.scrollTop(top);
-            });
-        });
     };
 
     return layout;
