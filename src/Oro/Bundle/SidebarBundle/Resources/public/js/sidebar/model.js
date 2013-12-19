@@ -11,13 +11,12 @@ function (Backbone, routing, constants, WidgetContainerCollection) {
      */
     return Backbone.Model.extend({
         defaults: {
+            position: constants.SIDEBAR_LEFT,
             state: constants.SIDEBAR_MINIMIZED
         },
 
         initialize: function () {
             this.widgets = new WidgetContainerCollection();
-
-            this.position = constants.SIDEBAR_LEFT;
         },
 
         /**

@@ -43,7 +43,7 @@ define(function (require) {
             view.hoverViews = {};
             view.widgetViews = {};
 
-            view.padding = model.position === constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
+            view.padding = model.get('position') === constants.SIDEBAR_LEFT ? 'margin-left' : 'margin-right';
 
             view.listenTo(model, 'change', view.render);
 
@@ -293,7 +293,7 @@ define(function (require) {
             }
 
             var sidebarWidth = view.$el.width();
-            if (view.model.position === constants.SIDEBAR_LEFT) {
+            if (view.model.get('position') === constants.SIDEBAR_LEFT) {
                 cord.left += sidebarWidth;
             } else {
                 cord.left -= sidebarWidth;

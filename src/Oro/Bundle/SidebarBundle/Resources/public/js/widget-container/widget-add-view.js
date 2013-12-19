@@ -56,9 +56,9 @@ define(function (require) {
                 var widgetData = model.get('availableWidgets')[widgetName];
 
                 var placement = null;
-                if (model.position === constants.SIDEBAR_LEFT) {
+                if (model.get('position') === constants.SIDEBAR_LEFT) {
                     placement = 'left';
-                } else if (model.position === constants.SIDEBAR_RIGHT) {
+                } else if (model.get('position') === constants.SIDEBAR_RIGHT) {
                     placement = 'right';
                 }
 
