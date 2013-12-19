@@ -64,6 +64,13 @@ class Widget
     protected $settings;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="state", type="string", nullable=false, length=22)
+     */
+    protected $state;
+
+    /**
      * Get id
      *
      * @return integer 
@@ -172,6 +179,25 @@ class Widget
     public function setWidgetName($widgetName)
     {
         $this->widgetName = $widgetName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param string $state
+     * @return Widget
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
 
         return $this;
     }

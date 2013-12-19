@@ -29,6 +29,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
             array('widgetName', 'test'),
             array('placement', 'left'),
             array('position', 1),
+            array('state', 'WIDGET_MAXIMIZED_HOVER'),
             array('settings', array('a' => 'b')),
         );
     }
