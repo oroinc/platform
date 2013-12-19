@@ -168,7 +168,15 @@ class ItemStep extends AbstractStep
 
         $this->initializeStepComponents($stepExecution);
 
-        while ($readItem = $this->read()) {
+        while (true) {
+            try {
+                $readItem = $this->read();
+                if (null === $readItem) {
+                    break;
+                }
+            } catch (InvalidItemException $e) {
+                continue;
+            }
 
             $processedItem = $this->process($readItem);
             if (null !== $processedItem) {
@@ -208,7 +216,8 @@ class ItemStep extends AbstractStep
     }
 
     /**
-     * @return mixed
+     * @return mixed|null
+     * @throws InvalidItemException
      */
     protected function read()
     {
@@ -218,7 +227,7 @@ class ItemStep extends AbstractStep
         } catch (InvalidItemException $e) {
             $this->handleStepExecutionWarning($this->stepExecution, $this->reader, $e);
 
-            return null;
+            throw $e;
         }
     }
 
@@ -257,16 +266,22 @@ class ItemStep extends AbstractStep
     /**
      * Handle step execution warning
      *
-     * @param StepExecution                   $stepExecution
-     * @param AbstractConfigurableStepElement $element
-     * @param InvalidItemException            $e
+     * @param StepExecution $stepExecution
+     * @param object $element
+     * @param InvalidItemException $e
      */
     protected function handleStepExecutionWarning(
         StepExecution $stepExecution,
-        AbstractConfigurableStepElement $element,
+        $element,
         InvalidItemException $e
     ) {
-        $stepExecution->addWarning($element->getName(), $e->getMessage(), $e->getItem());
+        if ($element instanceof AbstractConfigurableStepElement) {
+            $warningName = $element->getName();
+        } else {
+            $warningName = get_class($element);
+        }
+
+        $stepExecution->addWarning($warningName, $e->getMessage(), $e->getItem());
         $this->dispatchInvalidItemEvent(get_class($element), $e->getMessage(), $e->getItem());
     }
 }
