@@ -75,16 +75,19 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                     $iteration++;
                     if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
                         $this->entityManager->flush();
-                        $this->entityManager->clear();
+                        if ($this->entityManager->getConnection()->getTransactionNestingLevel() == 1) {
+                            $this->entityManager->clear();
+                        }
                     }
                 }
             }
 
             if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
                 $this->entityManager->flush();
-                $this->entityManager->clear();
+                if ($this->entityManager->getConnection()->getTransactionNestingLevel() == 1) {
+                    $this->entityManager->clear();
+                }
             }
-
             $this->entityManager->commit();
         } catch (\Exception $e) {
             $this->entityManager->rollback();
