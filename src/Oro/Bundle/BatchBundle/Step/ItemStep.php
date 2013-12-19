@@ -171,12 +171,12 @@ class ItemStep extends AbstractStep
         $stopExecution = false;
         while (!$stopExecution) {
 
-            try {
-                 $readItem = $this->reader->read();
-                 if (null === $readItem) {
-                    $stopExecution = true;
-                    continue;
-                 }
+        try {
+            $readItem = $this->reader->read();
+            if (null === $readItem) {
+                $stopExecution = true;
+                continue;
+            }
 
             } catch (InvalidItemException $e) {
                 $this->handleStepExecutionWarning($this->stepExecution, $this->reader, $e);
@@ -218,22 +218,6 @@ class ItemStep extends AbstractStep
 
         if ($this->writer instanceof StepExecutionAwareInterface) {
             $this->writer->setStepExecution($stepExecution);
-        }
-    }
-
-    /**
-     * @return mixed|null
-     * @throws InvalidItemException
-     */
-    protected function read()
-    {
-        try {
-            return $this->reader->read();
-
-        } catch (InvalidItemException $e) {
-            $this->handleStepExecutionWarning($this->stepExecution, $this->reader, $e);
-
-            throw $e;
         }
     }
 
