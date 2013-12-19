@@ -299,10 +299,16 @@ class JobInstance
 
         if ($job) {
             // TODO: Provide an interface for injecting of configuration and refactor all related entities
+            // Waiting for the ImportExport fixes on the right uses of the configuration
             // TODO: https://magecore.atlassian.net/browse/BAP-2601
             // $this->rawConfiguration = $job->getConfiguration();
             $jobConfiguration = $job->getConfiguration();
-            $this->rawConfiguration = array_merge_recursive($this->rawConfiguration, $jobConfiguration);
+
+            if (is_array($this->rawConfiguration) && count($this->rawConfiguration) > 0) {
+                $this->rawConfiguration = array_merge($this->rawConfiguration, $jobConfiguration);
+            } else {
+                $this->rawConfiguration = $jobConfiguration;
+            }
         }
 
         return $this;
