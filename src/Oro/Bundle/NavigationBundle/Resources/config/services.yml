@@ -39,6 +39,7 @@ parameters:
     oro_navigation.twig.content_tags.class:                    Oro\Bundle\NavigationBundle\Twig\ContentTagsExtension
     oro_navigation.content.tag_generator_context.class:        Oro\Bundle\NavigationBundle\Content\TagGeneratorContext
     oro_navigation.content.doctrine_tag_generator.class:       Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator
+    oro_navigation.content.simple_tag_generator.class:         Oro\Bundle\NavigationBundle\Content\SimpleTagGenerator
 
 services:
     oro_menu.cache:
@@ -273,3 +274,9 @@ services:
             - @oro_entity.orm.entity_class_resolver
         tags:
             - { name: oro_navigation.tag_generator }
+
+    oro_navigation.content.simple_tag_generator:
+        class: %oro_navigation.content.simple_tag_generator.class%
+        tags:
+            - { name: oro_navigation.tag_generator }
+

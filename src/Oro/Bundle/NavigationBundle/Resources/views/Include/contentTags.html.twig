@@ -31,6 +31,9 @@
 
                 tagsDebugPanel.html(html);
             });
+            mediator.on('hash_navigation_request:start', function () {
+                $('#footer .alert #tag-debug span').remove();
+            });
         });
 
         require([ 'oro/content-manager'],

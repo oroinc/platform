@@ -12,6 +12,9 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class DoctrineTagGenerator implements TagGeneratorInterface
 {
+    /** @var array */
+    protected $generatedTags = [];
+
     /** @var  EntityClassResolver */
     protected $resolver;
 
@@ -48,31 +51,35 @@ class DoctrineTagGenerator implements TagGeneratorInterface
      */
     public function generate($data, $includeCollectionTag = false)
     {
-        $tags = [];
+        if (!isset($this->generatedTags[$this->getCacheIdentifier($data)])) {
+            $tags = [];
 
-        if ($data instanceof FormInterface) {
-            $data = $data->getData();
-        }
-
-        $class = false;
-        if (is_object($data)) {
-            $tag = $this->convertToTag(ClassUtils::getClass($data));
-
-            // tag only in case if it's not a new object
-            if ($this->uow->getEntityState($data) !== UnitOfWork::STATE_NEW) {
-                $tags[] = implode('_', array_merge([$tag], $this->uow->getEntityIdentifier($data)));
+            if ($data instanceof FormInterface) {
+                $data = $data->getData();
             }
 
-            $class = ClassUtils::getClass($data);
-        } elseif (is_string($data)) {
-            $class = ClassUtils::getRealClass($data);
+            $class = false;
+            if (is_object($data)) {
+                $tag = $this->convertToTag(ClassUtils::getClass($data));
+
+                // tag only in case if it's not a new object
+                if ($this->uow->getEntityState($data) !== UnitOfWork::STATE_NEW) {
+                    $tags[] = implode('_', array_merge([$tag], $this->uow->getEntityIdentifier($data)));
+                }
+
+                $class = ClassUtils::getClass($data);
+            } elseif (is_string($data)) {
+                $class = ClassUtils::getRealClass($data);
+            }
+
+            if ($includeCollectionTag && false !== $class) {
+                $tags[] = $this->convertToTag($class) . self::COLLECTION_SUFFIX;
+            }
+
+            $this->generatedTags[$this->getCacheIdentifier($data)] = $tags;
         }
 
-        if ($includeCollectionTag && false !== $class) {
-            $tags[] = $this->convertToTag($class) . self::COLLECTION_SUFFIX;
-        }
-
-        return $tags;
+        return $this->generatedTags[$this->getCacheIdentifier($data)];
     }
 
     /**
@@ -85,5 +92,17 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     protected function convertToTag($data)
     {
         return preg_replace('#[^a-z]+#i', '_', $data);
+    }
+
+    /**
+     * Generates cache identifier
+     *
+     * @param mixed $data
+     *
+     * @return string
+     */
+    protected function getCacheIdentifier($data)
+    {
+        return is_string($data) ? $this->convertToTag($data) : spl_object_hash($data);
     }
 }
