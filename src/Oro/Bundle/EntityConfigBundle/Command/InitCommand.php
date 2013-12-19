@@ -50,9 +50,9 @@ class InitCommand extends BaseCommand
             }
         }
 
-        $this->getConfigManager()->flush();
-
         $this->getConfigManager()->clearConfigurableCache();
+
+        $this->getConfigManager()->flush();
 
         $output->writeln('Completed');
     }
