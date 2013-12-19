@@ -46,11 +46,12 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->defaultOwner = new User();
 
+        $isAssignGranted = true;
         $this->subscriber = new OwnerFormSubscriber(
             $this->managerRegistry,
             $this->fieldName,
             $this->fieldLabel,
-            true,
+            $isAssignGranted,
             $this->defaultOwner
         );
     }
@@ -158,11 +159,12 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
             )
         );
 
+        $isAssignGranted = false;
         $this->subscriber = new OwnerFormSubscriber(
             $this->managerRegistry,
             $this->fieldName,
             $this->fieldLabel,
-            false, // assign is not granted
+            $isAssignGranted, // assign is not granted
             $this->defaultOwner
         );
 

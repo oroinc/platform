@@ -182,3 +182,46 @@
     }
   }
 }
+
+.chart-container {
+  position: relative;
+  &>.clearfix {
+    margin: 0 auto;
+    .pie-chart {
+      z-index: 1;
+    }
+    .pie-chart-legend {
+      position: relative;
+      table {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto 0 auto 30px;
+        width: 50%;
+        height: auto;
+        td {
+          padding-bottom: 7px;
+        }
+      }
+    }
+  }
+}
+.chart-legend table {
+  font-size: 13px !important;
+  .flotr-legend-color-box {
+    &>div {
+      border: 0 !important;
+      &>div {
+        border: 0 !important;
+      }
+    }
+  }
+  .flotr-legend-label {
+    padding-left: 10px;
+  }
+}
+.flotr-mouse-value {
+  cursor: default;
+}

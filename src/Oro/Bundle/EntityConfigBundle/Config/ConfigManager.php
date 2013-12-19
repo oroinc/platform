@@ -483,11 +483,31 @@ class ConfigManager
         return null !== $this->modelManager->findModel($className, $fieldName);
     }
 
+    /**
+     * Gets a config model for the given entity
+     *
+     * @param string $className
+     * @return EntityConfigModel|null
+     */
+    public function getConfigEntityModel($className)
+    {
+        return $this->hasConfigEntityModel($className)
+            ? $this->modelManager->findModel($className)
+            : null;
+    }
+
+    /**
+     * Gets a config model for the given entity field
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @return FieldConfigModel|null
+     */
     public function getConfigFieldModel($className, $fieldName)
     {
-        if ($this->hasConfigFieldModel($className, $fieldName)) {
-            return $this->modelManager->findModel($className, $fieldName);
-        }
+        return $this->hasConfigFieldModel($className, $fieldName)
+            ? $this->modelManager->findModel($className, $fieldName)
+            : null;
     }
 
     /**

@@ -18,7 +18,6 @@
     {% if "oro_business_unit_form" == form.parent.vars.name%}
         {% set entityId = form.parent.vars.value.id %}
     {% endif %}
-
     {% if expanded %}
         {{ block('choice_widget_expanded') }}
     {% else %}
@@ -55,7 +54,7 @@
                 </optgroup>
             {% else %}
                 {% set disable = '' %}
-                {% if entityId and entityId == choice.value %}
+                {% if not (choice.value in business_unit_ids) or (entityId and entityId == choice.value) %}
                     {% set disable = 'disabled="disabled"' %}
                 {% endif %}
                 <option {{ disable }} value="{{ choice.value }}"
