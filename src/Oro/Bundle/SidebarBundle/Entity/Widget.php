@@ -59,27 +59,6 @@ class Widget
     /**
      * @var string
      *
-     * @ORM\Column(name="title", type="string", nullable=false, length=255)
-     */
-    protected $title;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="icon", type="string", nullable=false, length=255)
-     */
-    protected $icon;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="module", type="string", nullable=false, length=255)
-     */
-    protected $module;
-
-    /**
-     * @var string
-     *
      * @ORM\Column(name="settings", nullable=true, type="array")
      */
     protected $settings;
@@ -92,75 +71,6 @@ class Widget
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set title
-     *
-     * @param string $title
-     * @return Widget
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-    
-        return $this;
-    }
-
-    /**
-     * Get title
-     *
-     * @return string 
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /**
-     * Set icon
-     *
-     * @param string $icon
-     * @return Widget
-     */
-    public function setIcon($icon)
-    {
-        $this->icon = $icon;
-    
-        return $this;
-    }
-
-    /**
-     * Get icon
-     *
-     * @return string 
-     */
-    public function getIcon()
-    {
-        return $this->icon;
-    }
-
-    /**
-     * Set module
-     *
-     * @param string $module
-     * @return Widget
-     */
-    public function setModule($module)
-    {
-        $this->module = $module;
-    
-        return $this;
-    }
-
-    /**
-     * Get module
-     *
-     * @return string 
-     */
-    public function getModule()
-    {
-        return $this->module;
     }
 
     /**

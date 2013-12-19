@@ -29,9 +29,6 @@ class EntityTest extends \PHPUnit_Framework_TestCase
             array('widgetName', 'test'),
             array('placement', 'left'),
             array('position', 1),
-            array('title', 'test'),
-            array('icon', 'test'),
-            array('module', 'test'),
             array('settings', array('a' => 'b')),
         );
     }

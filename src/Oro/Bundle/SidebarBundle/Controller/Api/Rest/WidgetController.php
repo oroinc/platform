@@ -56,13 +56,6 @@ class WidgetController extends FOSRestController
     {
         $entity = new Widget();
         $entity->setWidgetName($this->getRequest()->get('widgetName'));
-
-        // TODO: Remove this after changes to use widget_name
-        $entity->setTitle($this->getRequest()->get('title'));
-        $entity->setModule($this->getRequest()->get('module'));
-        $entity->setIcon($this->getRequest()->get('icon'));
-        // --- END ---
-
         $entity->setPosition($this->getRequest()->get('position'));
         $entity->setSettings($this->getRequest()->get('settings'));
         $entity->setPlacement($this->getRequest()->get('placement'));
@@ -98,12 +91,6 @@ class WidgetController extends FOSRestController
         if (!$this->validatePermissions($entity->getUser())) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         }
-
-        // TODO: Remove this after changes to use widget_name
-        $entity->setTitle($this->getRequest()->get('title', $entity->getTitle()));
-        $entity->setModule($this->getRequest()->get('module', $entity->getModule()));
-        $entity->setIcon($this->getRequest()->get('icon', $entity->getIcon()));
-        // --- END ---
 
         $entity->setPosition($this->getRequest()->get('position', $entity->getPosition()));
         $entity->setSettings($this->getRequest()->get('settings', $entity->getSettings()));
