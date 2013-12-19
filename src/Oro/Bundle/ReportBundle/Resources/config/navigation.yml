@@ -7,7 +7,7 @@ oro_menu_config:
                 position: 30
 
         manage_reports:
-            label: 'Manage Reports'
+            label: oro.report.entity_plural_label
             route: 'oro_report_index'
             extras:
                 position: 10

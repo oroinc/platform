@@ -387,7 +387,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     {
         if (isset($gridConfig['type'])
             && $gridConfig['type'] == self::TYPE_HTML
-            && isset($item['grid']['template'])
+            && isset($gridConfig['template'])
         ) {
             $gridConfig['type']          = self::TYPE_TWIG;
             $gridConfig['frontend_type'] = self::TYPE_HTML;
