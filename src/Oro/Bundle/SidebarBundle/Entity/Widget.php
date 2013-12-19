@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SidebarBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Exclude;
 
 /**
  * Widget
@@ -32,6 +33,7 @@ class Widget
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @Exclude
      */
     protected $user;
 

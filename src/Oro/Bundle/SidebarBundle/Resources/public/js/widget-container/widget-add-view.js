@@ -23,18 +23,21 @@ define(function (require) {
         /** @property {String} */
         className: 'modal oro-modal-normal',
 
-        initialize: function (options) {
-            var view = this;
-            var model = view.model;
+        options: {
+            sidebar: null
+        },
 
-            options.content = _.template(widgetAddTemplate, model.toJSON());
+        initialize: function (options) {
+            options.content = _.template(widgetAddTemplate, {
+                'availableWidgets': options.sidebar.getAvailableWidgets()
+            });
 
             Modal.prototype.initialize.apply(this, arguments);
         },
 
         open: function () {
             var view = this;
-            var model = view.model;
+            var position = this.options.sidebar.getPosition();
 
             Modal.prototype.open.apply(this, arguments);
 
@@ -51,26 +54,28 @@ define(function (require) {
                     view.close();
                     return;
                 }
+                var availableWidgets = this.options.sidebar.getAvailableWidgets();
+                var widgets = this.options.sidebar.getWidgets();
 
-                var widgetName = $(selected).closest('li').data('widgetname');
-                var widgetData = model.get('availableWidgets')[widgetName];
+                var widgetName = $(selected).closest('li').data('widget-name');
+                var widgetData = availableWidgets[widgetName];
 
                 var placement = null;
-                if (model.get('position') === constants.SIDEBAR_LEFT) {
+                if (position === constants.SIDEBAR_LEFT) {
                     placement = 'left';
-                } else if (model.get('position') === constants.SIDEBAR_RIGHT) {
+                } else if (position === constants.SIDEBAR_RIGHT) {
                     placement = 'right';
                 }
 
                 var widget = new WidgetContainerModel({
                     widgetName: widgetName,
-                    position: model.widgets.length,
+                    position: widgets.length,
                     placement: placement
                 });
                 widget.update(widgetData);
                 widget.set('settings', widgetData.settings);
 
-                model.widgets.push(widget);
+                widgets.push(widget);
 
                 widget.save();
 

@@ -35,9 +35,15 @@ define(function (require) {
             'click .sidebar-toggle a': 'onClickToggle'
         },
 
+        options: {
+            availableWidgets: null,
+            widgets: null
+        },
+
         initialize: function () {
             var view = this;
             var model = view.model;
+            var widgets = this.getWidgets();
 
             view.iconViews = {};
             view.hoverViews = {};
@@ -47,19 +53,27 @@ define(function (require) {
 
             view.listenTo(model, 'change', view.render);
 
-            view.listenTo(model.widgets, 'reset', view.onWidgetsReset);
-            view.listenTo(model.widgets, 'reset', view.render);
-
-            view.listenTo(model.widgets, 'add', view.onWidgetAdded);
-            view.listenTo(model.widgets, 'add', view.render);
-
-            view.listenTo(model.widgets, 'remove', view.onWidgetRemoved);
-            view.listenTo(model.widgets, 'remove', view.render);
+            view.listenTo(widgets, 'reset', view.onWidgetsReset);
+            view.listenTo(widgets, 'add', view.onWidgetAdded);
+            view.listenTo(widgets, 'remove', view.onWidgetRemoved);
+            view.listenTo(widgets, 'all', view.render);
 
             view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
             view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
             view.listenTo(Backbone, 'closeWidget', view.onCloseWidget);
             view.listenTo(Backbone, 'setupWidget', view.onSetupWidget);
+        },
+
+        getAvailableWidgets: function() {
+            return this.options.availableWidgets;
+        },
+
+        getWidgets: function() {
+            return this.options.widgets;
+        },
+
+        getPosition: function() {
+            return this.model.get('position');
         },
 
         render: function () {
@@ -87,10 +101,9 @@ define(function (require) {
 
         renderIcons: function () {
             var view = this;
-            var model = view.model;
             var $content = view.$el.find('.sidebar-content');
 
-            model.widgets.each(function (widget) {
+            this.getWidgets().each(function (widget) {
                 var iconView = view.iconViews[widget.cid];
                 if (!iconView) {
                     return;
@@ -120,10 +133,9 @@ define(function (require) {
 
         renderWidgets: function () {
             var view = this;
-            var model = view.model;
             var $content = view.$el.find('.sidebar-content');
 
-            model.widgets.each(function (widget) {
+            this.getWidgets().each(function (widget) {
                 var widgetView = view.widgetViews[widget.cid];
                 if (!widgetView) {
                     return;
@@ -155,14 +167,14 @@ define(function (require) {
         },
 
         onIconDragStart: function (cid) {
-            var widget = this.model.widgets.get(cid);
+            var widget = this.getWidgets().get(cid);
             if (widget) {
                 widget.isDragged = true;
             }
         },
 
         onIconDragStop: function (cid) {
-            var widget = this.model.widgets.get(cid);
+            var widget = this.getWidgets().get(cid);
             if (widget) {
                 widget.isDragged = false;
             }
@@ -175,24 +187,23 @@ define(function (require) {
             var ids = $content.sortable('toArray', { attribute: 'data-cid' });
             var widgetOrder = _.object(ids, _.range(ids.length));
 
-            view.model.widgets.each(function (widget) {
+            this.getWidgets().each(function (widget) {
                 var order = widgetOrder[widget.cid];
                 widget.set({ position: order }, { silent: true });
                 widget.save();
             });
 
-            view.model.widgets.sort();
+            this.getWidgets().sort();
         },
 
         onClickAdd: function (e) {
             var view = this;
-            var model = view.model;
 
             e.stopPropagation();
             e.preventDefault();
 
             var widgetAddView = new WidgetAddView({
-                model: model
+                sidebar: this
             });
 
             widgetAddView.open();
@@ -209,7 +220,7 @@ define(function (require) {
         onWidgetsReset: function () {
             var view = this;
 
-            this.model.widgets.each(function (widget) {
+            this.getWidgets().each(function (widget) {
                 var widgetView = new WidgetContainerView({
                     model: widget
                 });
@@ -267,7 +278,7 @@ define(function (require) {
         onShowWidgetHover: function (cid, cord) {
             var view = this;
 
-            var widget = view.model.widgets.get(cid);
+            var widget = this.getWidgets().get(cid);
             if (!widget) {
                 return;
             }
@@ -316,18 +327,14 @@ define(function (require) {
 
         hideAllWidgetHovers: function () {
             var view = this;
-            var model = view.model;
 
-            model.widgets.each(function (widget) {
+            this.getWidgets().each(function (widget) {
                 view.hideWidgetHover(widget.cid);
             });
         },
 
         onRemoveWidget: function (cid) {
-            var view = this;
-            var model = view.model;
-
-            var widget = model.widgets.get(cid);
+            var widget = this.getWidgets().get(cid);
             if (!widget) {
                 return;
             }
@@ -350,9 +357,8 @@ define(function (require) {
 
         onCloseWidget: function (cid) {
             var view = this;
-            var model = view.model;
 
-            var widget = model.widgets.get(cid);
+            var widget = this.getWidgets().get(cid);
             if (!widget) {
                 return;
             }
@@ -361,7 +367,7 @@ define(function (require) {
         },
 
         onSetupWidget: function (cid) {
-            var widget = this.model.widgets.get(cid);
+            var widget = this.getWidgets().get(cid);
             if (!widget) {
                 return;
             }

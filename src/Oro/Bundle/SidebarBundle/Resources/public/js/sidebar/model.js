@@ -1,7 +1,7 @@
 /*global define*/
 
-define(['backbone', 'routing', 'oro/sidebar/constants', 'oro/sidebar/widget-container/collection'],
-function (Backbone, routing, constants, WidgetContainerCollection) {
+define(['backbone', 'routing', 'oro/sidebar/constants'],
+function (Backbone, routing, constants) {
     'use strict';
 
     /**
@@ -13,10 +13,6 @@ function (Backbone, routing, constants, WidgetContainerCollection) {
         defaults: {
             position: constants.SIDEBAR_LEFT,
             state: constants.SIDEBAR_MINIMIZED
-        },
-
-        initialize: function () {
-            this.widgets = new WidgetContainerCollection();
         },
 
         /**
@@ -32,8 +28,6 @@ function (Backbone, routing, constants, WidgetContainerCollection) {
                 this.set('state', constants.SIDEBAR_MINIMIZED);
                 break;
             }
-
-            this.trigger('change');
         }
     });
 });

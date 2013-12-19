@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\SidebarBundle\Entity\Widget;
+use Oro\Bundle\SidebarBundle\Entity\SidebarState;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class WidgetTest extends \PHPUnit_Framework_TestCase
+class SidebarStateTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider propertiesDataProvider
@@ -14,7 +14,7 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
      */
     public function testSettersAndGetters($property, $value)
     {
-        $obj = new Widget();
+        $obj = new SidebarState();
 
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($obj, $property, $value);
@@ -26,11 +26,8 @@ class WidgetTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMockForAbstractClass('Symfony\Component\Security\Core\User\UserInterface');
         return array(
             array('user', $user),
-            array('widgetName', 'test'),
-            array('placement', 'left'),
-            array('position', 1),
-            array('state', 'WIDGET_MAXIMIZED_HOVER'),
-            array('settings', array('a' => 'b')),
+            array('position', 'SIDEBAR_RIGHT'),
+            array('state', 'SIDEBAR_MINIMIZED'),
         );
     }
 }
