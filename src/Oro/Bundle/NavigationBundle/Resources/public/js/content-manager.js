@@ -184,7 +184,9 @@ function (_, sync, mediator, messenger, __) {
             if (callback) {
                 obj.callback = callback;
             }
+
             current.tags.push(obj);
+            mediator.trigger('content-manager:content-tagged', { current: current.tags, added: obj });
         },
 
         /**

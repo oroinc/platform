@@ -4,7 +4,7 @@
     <span class="label label-{{ pid ? 'success' : 'important' }}">{{ pid ? 'oro.cron.sidebar.running'|trans : 'oro.cron.sidebar.not_running'|trans }}</span>
     <img src="{{ asset('bundles/orocron/images/loading.gif') }}" alt="" style="display: none;" />
 </p>
-<p>{{ 'oro.cron.sidebar.pid'|trans }}: <span>{{ pid|default('oro.cron.na'|trans) }}</span></p>
+<p>{{ 'oro.cron.sidebar.pid'|trans }}: <span>{{ pid|default('N/A'|trans) }}</span></p>
 
 <p>
     <a class="btn btn-primary btn-large no-hash" id="run-daemon" href="{{ path('oro_cron_job_run_daemon') }}"{% if pid %} style="display: none;"{% endif %}>{{ 'oro.cron.sidebar.run'|trans }}</a>

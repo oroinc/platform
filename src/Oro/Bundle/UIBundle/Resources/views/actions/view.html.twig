@@ -1,4 +1,5 @@
 {% extends bap.layout %}
+{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% block content %}
@@ -96,5 +97,10 @@
             {{ UI.scrollData(id, data) }}
         {% endblock content_data %}
     </div>
+
+    {% block navigation_content_tags %}
+        {# block added just for possibility to disable it in child templates if needed #}
+        {{ navigationMacro.navigationContentTags(entity) }}
+    {% endblock %}
 </div>
 {% endblock content %}
