@@ -10,6 +10,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     var helloWorld = {};
 
     helloWorld.defaults = {
+        widget_name: 'hello_world',
         title: 'Hello world',
         icon: '/bundles/orosidebar/sidebar_widgets/hello_world/img/icon.ico',
         settings: function () {

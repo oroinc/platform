@@ -26,6 +26,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMockForAbstractClass('Symfony\Component\Security\Core\User\UserInterface');
         return array(
             array('user', $user),
+            array('widget_name', 'test'),
             array('placement', 'left'),
             array('position', 1),
             array('title', 'test'),

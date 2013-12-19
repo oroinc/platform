@@ -62,6 +62,7 @@ define(function (require) {
                         placement = 'right';
                     }
                     var widget = new WidgetContainerModel({
+                        widget_name: Widget.defaults.widget_name,
                         title: Widget.defaults.title,
                         icon: Widget.defaults.icon,
                         module: moduleId,
