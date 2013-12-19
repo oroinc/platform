@@ -17,7 +17,7 @@
         {% block actions %}
             {% if actions is defined %}
                 {% for action in actions -%}
-                    <a class="btn btn-mini {{ action.class|default('btn-primary') }}{% if not action.url is defined or not action.url %} no-hash{% endif %}"
+                    <a class="dashboard-btn btn btn-mini {{ action.class|default('btn-primary') }}{% if not action.url is defined or not action.url %} no-hash{% endif %}"
                         href="{{ action.url|default('javascript:void(0);') }}"
                         {% if action.data is defined %}
                             {% for dataItemName,dataItemValue in action.data %}

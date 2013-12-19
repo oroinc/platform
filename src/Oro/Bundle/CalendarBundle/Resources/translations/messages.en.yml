@@ -11,8 +11,10 @@ oro:
     dashboard:
         calendar:
             new_event: New Event
+            view_calendar: My Calendar
 "Calendars": "Calendars"
 "My Calendar": "My Calendar"
+"Today calendar": "Today's Calendar"
 "Exclude this calendar": "Exclude this calendar"
 "Cancel": "Cancel"
 "Save": "Save"

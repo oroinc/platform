@@ -1,7 +1,7 @@
 oro_dashboard_config:
     widgets:
         my_calendar:
-            label:      My Calendar
+            label:      Today calendar
             route:      oro_calendar_dashboard_my_calendar
             acl:        oro_calendar_view
 
