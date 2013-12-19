@@ -19,3 +19,6 @@ oro:
                 group: "Recipient groups"
                 custom_email: "Recipient email"
                 owner: "Recipient entity owner"
+        form:
+            tooltip:
+                languages: "Languages available for email templates translation."

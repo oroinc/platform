@@ -1,0 +1,35 @@
+oro_system_configuration:
+    groups:
+        notification:
+            title: 'Notification'
+            icon:  'icon-envelope-alt'
+
+        email_templates:
+            title: 'Email Templates'
+
+    fields:
+        oro_notification.languages:
+            type: oro_locale
+            priority: 70
+            options:
+                label: 'Languages'
+                tooltip: oro.notification.form.tooltip.languages
+                required: true
+                multiple: true
+                constraints:
+                    - NotBlank: ~
+
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            notification:
+                                priority: 253
+                                children:
+                                    email_templates:
+                                        priority: 100
+                                        children:
+                                            - oro_notification.languages
