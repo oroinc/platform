@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -53,6 +54,18 @@ class Organization implements NotificationEmailInterface
      * @ORM\Column(name="currency_precision", type="string", length=10)
      */
     protected $precision;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *     targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
+     *     mappedBy="organization",
+     *     cascade={"ALL"},
+     *     fetch="EXTRA_LAZY"
+     * )
+     */
+    protected $businessUnits;
 
     /**
      * Get id
@@ -146,7 +159,13 @@ class Organization implements NotificationEmailInterface
      */
     public function getNotificationEmails()
     {
-        // TODO: Implement getNotificationEmails() method.
-        return [];
+        $emails = [];
+        $this->businessUnits->map(
+            function (BusinessUnit $bu) use ($emails) {
+                $emails = array_merge($emails, $bu->getNotificationEmails());
+            }
+        );
+
+        return $emails;
     }
 }

@@ -95,7 +95,7 @@ class RecipientListRepository extends EntityRepository
             return;
         }
 
-        $owner->getEmails()->map(
+        $owner->getNotificationEmails()->map(
             function ($email) use ($emails) {
                 $emails->add($email);
             }
