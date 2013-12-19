@@ -185,17 +185,9 @@
 	background: #ffffff;
 	color: #222222;
 }
-.ui-widget-content a {
-	color: #222222;
-}
 .ui-widget-header {
 	border: 1px solid #aaaaaa;
 	background: #cccccc;
 	color: #222222;
 	font-weight: bold;
 }
-.ui-widget-header a {
-	color: #222222;
-}
-
-

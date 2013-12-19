@@ -41,23 +41,23 @@
         additionalData - array with additional data
 #}
 {% macro attibuteRow(title, value, additionalData) %}
-        {% macro attribute_data(value, additionalData) %}
-            <div class="clearfix-oro">
-                {% if value.value is not defined  %}
-                    <p class="control-label">{{ value }}</p>
-                {% else %}
-                    <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
-                {% endif %}
-            </div>
-            {% if additionalData|length %}
-                {% for data in additionalData.data %}
-                    <div class="clearfix-oro">
-                        <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
-                    </div>
-                {% endfor %}
+    {% macro attribute_data(value, additionalData) %}
+        <div class="clearfix-oro">
+            {% if value.value is not defined  %}
+                <p class="control-label">{{ value }}</p>
+            {% else %}
+                <p class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></p>
             {% endif %}
-        {% endmacro %}
-        {{ _self.renderAttribute(title, _self.attribute_data(value, additionalData)) }}
+        </div>
+        {% if additionalData|length %}
+            {% for data in additionalData.data %}
+                <div class="clearfix-oro">
+                    <p class="control-label">{{ attribute(data, additionalData.field) }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endmacro %}
+    {{ _self.renderAttribute(title, _self.attribute_data(value, additionalData)) }}
 {% endmacro %}
 
 {#
@@ -73,6 +73,16 @@
             {{ data|raw }}
         </div>
     </div>
+{% endmacro %}
+
+{#
+    Render property block
+    Parameters:
+        title - property title
+        data  - property data
+#}
+{% macro renderProperty(title, data) %}
+    {{ _self.renderAttribute(title, '<p class="control-label">' ~ data|default('N/A'|trans) ~ '</p>') }}
 {% endmacro %}
 
 {#
@@ -100,6 +110,33 @@
 {% endmacro %}
 
 {#
+    Create edit button
+    Parameters - array:
+        [
+            'path' - button url
+            'aClass' - additional button class
+            'title' - button title
+            'iClass' - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro editButton(parameters) %}
+    {% set iClass = ['icon-edit'] %}
+    {% set aClass = ['edit-button', 'main-group'] %}
+    {% if parameters.iClass is defined %}
+        {% set iClass = parameters.iClass|split(' ')|merge(iClass) %}
+    {% endif %}
+    {% if parameters.aClass is defined %}
+        {% set aClass = parameters.aClass|split(' ')|merge(aClass) %}
+    {% endif %}
+    {% set parameters = parameters|merge({
+        'iClass': iClass|join(' '),
+        'aClass': aClass|join(' '),
+    }) %}
+    {{ _self.button(parameters) }}
+{% endmacro %}
+
+{#
     Create 'add' button
     Parameters - array:
         [
@@ -111,7 +148,7 @@
 #}
 {% macro addButton(parameters) %}
     <a href="{{ parameters.path }}"
-       class="btn btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
+       class="btn main-group btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
        {% if parameters.title is defined %}
             title="{{ parameters.title|trans }}">
        {% endif %}
@@ -157,7 +194,7 @@
             {% if (parameters.title is defined) %}
                 title="{{ parameters.title|trans }}"
             {% endif %}
-           ><i class="icon-trash"></i>{{ parameters.label|trans -}}
+           ><i class="icon-trash hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
         </a>
     </div>
 {% endmacro %}
@@ -190,18 +227,18 @@
             data-url="{{ parameters.dataUrl }}"
             {% endif %}
             {% if (parameters.successMessage is defined) %}
-            data-success-message="{{ parameters.successMessage }}"
+            data-success-message="{{ parameters.successMessage|trans }}"
             {% endif %}
             {% if parameters.dataRedirect is defined %}
             data-redirect="{{ parameters.dataRedirect  }}"
             {% endif %}
             {% if (parameters.title is defined) %}
-            title="{{ parameters.title }}"
+            title="{{ parameters.title|trans }}"
             {% endif -%}
             {% if (parameters.visible is defined and not parameters.visible) %}
             style="display: none"
             {% endif -%}
-        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label }}</i>{{ parameters.label -}}
+        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
         </a>
     </div>
 {% endmacro %}
@@ -230,7 +267,7 @@
 
 {% macro saveAndStayButton(acl = '', label = 'Save') %}
     {% if acl is empty or resource_granted(acl) %}
-    {{ _self.buttonType({'type': 'button', 'class': 'btn-success', 'label': label, 'action': 'save_and_stay'}) }}
+    {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
     {% endif %}
 {% endmacro %}
 
@@ -423,4 +460,34 @@
         {% set attr = attr|default({}) %}
         {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue }}" {% endif %}{% endif %}{% endfor %}
     {% endspaceless %}
+{% endmacro %}
+
+{#
+    Render link to entity owner
+    Parameters:
+        entity - entity record
+#}
+{% macro entityOwnerLink(entity) %}
+    {%- if entity.owner is defined and entity.owner %}
+        {% set ownerType = oro_get_owner_type(entity) %}
+        {% if (ownerType == 'USER') %}
+            {% if resource_granted('oro_user_user_view') %}
+                {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
+                {% set ownerName = entity.owner|oro_format_name %}
+            {% endif %}
+        {% elseif (ownerType == 'BUSINESS_UNIT') %}
+            {% if resource_granted('oro_business_unit_view') %}
+                {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
+                {% set ownerName = entity.owner.name %}
+            {% endif %}
+        {% endif %}
+        {% if ownerName is defined %}
+            {{ 'Owner'|trans }}:
+            {% if ownerPath is defined %}
+                <a href="{{ ownerPath }}">{{ ownerName }}</a>
+            {% else %}
+                {{ ownerName }}
+            {% endif %}
+        {% endif %}
+    {% endif -%}
 {% endmacro %}

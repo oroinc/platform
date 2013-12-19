@@ -25,14 +25,14 @@ class BaseCart
     /**
      * @var float
      *
-     * @ORM\Column(name="sub_total", type="float")
+     * @ORM\Column(name="sub_total", type="float", nullable=true)
      */
     protected $subTotal;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="grand_total", type="float")
+     * @ORM\Column(name="grand_total", type="float", nullable=true)
      */
     protected $grandTotal;
 

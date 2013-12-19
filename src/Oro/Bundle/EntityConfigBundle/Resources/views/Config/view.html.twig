@@ -11,8 +11,11 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
-        {{ UI.button({'path' : path('oro_entityconfig_update', { id: entity.id }), 'iClass' : 'icon-edit ', 'title' : 'Edit user', 'label' : 'Edit'}) }}
-
+        {{ UI.editButton({
+            'path': path('oro_entityconfig_update', { id: entity.id }),
+            'title': 'Edit user',
+            'label': 'Edit'
+        }) }}
 
         {% for button in button_config %}
             {{ UI.button({

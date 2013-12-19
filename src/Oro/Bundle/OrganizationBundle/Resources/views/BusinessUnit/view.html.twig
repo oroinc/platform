@@ -7,7 +7,11 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_business_unit_update') %}
-        {{ UI.button({'path' : path('oro_business_unit_update', { id: entity.id }), 'iClass' : 'icon-edit ', 'title' : 'Edit business unit', 'label' : 'Edit'}) }}
+        {{ UI.editButton({
+            'path': path('oro_business_unit_update', { id: entity.id }),
+            'title': 'Edit business unit',
+            'label': 'Edit'
+        }) }}
     {% endif %}
     {% if oro_get_business_units_count() > 1 and resource_granted('oro_business_unit_delete') %}
         {{ UI.deleteButton({

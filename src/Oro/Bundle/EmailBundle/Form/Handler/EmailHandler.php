@@ -2,23 +2,20 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
+use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-
-use Doctrine\ORM\EntityManager;
+use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
@@ -45,9 +42,19 @@ class EmailHandler
     protected $translator;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var SecurityContextInterface
      */
     protected $securityContext;
+
+    /**
+     * @var Processor
+     */
+    protected $emailProcessor;
 
     /**
      * @var EmailAddressManager
@@ -55,40 +62,20 @@ class EmailHandler
     protected $emailAddressManager;
 
     /**
-     * @var EmailEntityBuilder
-     */
-    protected $emailEntityBuilder;
-
-    /**
-     * @var \Swift_Mailer
-     */
-    protected $mailer;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * @var NameFormatter
      */
     protected $nameFormatter;
 
     /**
-     * Constructor
-     *
-     * @param FormInterface            $form
-     * @param Request                  $request
-     * @param EntityManager            $em
-     * @param Translator               $translator
+     * @param FormInterface $form
+     * @param Request $request
+     * @param EntityManager $em
+     * @param Translator $translator
      * @param SecurityContextInterface $securityContext
-     * @param EmailAddressManager      $emailAddressManager
-     * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param \Swift_Mailer            $mailer
-     * @param LoggerInterface          $logger
-     * @param NameFormatter            $nameFormatter
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @param EmailAddressManager $emailAddressManager
+     * @param LoggerInterface $logger
+     * @param Processor $emailProcessor
+     * @param NameFormatter $nameFormatter
      */
     public function __construct(
         FormInterface $form,
@@ -97,21 +84,19 @@ class EmailHandler
         Translator $translator,
         SecurityContextInterface $securityContext,
         EmailAddressManager $emailAddressManager,
-        EmailEntityBuilder $emailEntityBuilder,
-        \Swift_Mailer $mailer,
+        Processor $emailProcessor,
         LoggerInterface $logger,
         NameFormatter $nameFormatter
     ) {
-        $this->form                = $form;
-        $this->request             = $request;
-        $this->em                  = $em;
-        $this->translator          = $translator;
-        $this->securityContext     = $securityContext;
+        $this->form = $form;
+        $this->request = $request;
+        $this->em = $em;
+        $this->translator = $translator;
+        $this->securityContext = $securityContext;
         $this->emailAddressManager = $emailAddressManager;
-        $this->emailEntityBuilder  = $emailEntityBuilder;
-        $this->mailer              = $mailer;
-        $this->logger              = $logger;
-        $this->nameFormatter       = $nameFormatter;
+        $this->emailProcessor = $emailProcessor;
+        $this->logger = $logger;
+        $this->nameFormatter = $nameFormatter;
     }
 
     /**
@@ -122,7 +107,6 @@ class EmailHandler
      */
     public function process(Email $model)
     {
-        $result = false;
         if ($this->request->getMethod() === 'GET') {
             $this->initModel($model);
         }
@@ -133,36 +117,8 @@ class EmailHandler
 
             if ($this->form->isValid()) {
                 try {
-                    $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
-                    $message     = $this->mailer->createMessage();
-                    $message->setDate($messageDate->getTimestamp());
-                    $message->setFrom($this->getAddresses($model->getFrom()));
-                    $message->setTo($this->getAddresses($model->getTo()));
-                    $message->setSubject($model->getSubject());
-                    $message->setBody($model->getBody(), 'text/plain');
-                    $sent = $this->mailer->send($message);
-                    if (!$sent) {
-                        throw new \Swift_SwiftException('An email was not delivered.');
-                    }
-
-                    $origin = $this->em->getRepository('OroEmailBundle:InternalEmailOrigin')
-                        ->findOneBy(array('name' => InternalEmailOrigin::BAP));
-                    $this->emailEntityBuilder->setOrigin($origin);
-                    $email = $this->emailEntityBuilder->email(
-                        $model->getSubject(),
-                        $model->getFrom(),
-                        $model->getTo(),
-                        $messageDate,
-                        $messageDate,
-                        $messageDate
-                    );
-                    $email->setFolder($origin->getFolder(EmailFolder::SENT));
-                    $emailBody = $this->emailEntityBuilder->body($model->getBody(), false, true);
-                    $email->setEmailBody($emailBody);
-                    $this->emailEntityBuilder->getBatch()->persist($this->em);
-                    $this->em->flush();
-
-                    $result = true;
+                    $this->emailProcessor->process($model);
+                    return true;
                 } catch (\Exception $ex) {
                     $this->logger->error('Email sending failed.', array('exception' => $ex));
                     $this->form->addError(
@@ -172,7 +128,7 @@ class EmailHandler
             }
         }
 
-        return $result;
+        return false;
     }
 
     /**
@@ -217,46 +173,13 @@ class EmailHandler
     }
 
     /**
-     * Converts emails addresses to a form acceptable to \Swift_Mime_Message class
-     *
-     * @param string|string[] $addresses Examples of correct email addresses: john@example.com, <john@example.com>,
-     *                                   John Smith <john@example.com> or "John Smith" <john@example.com>
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    protected function getAddresses($addresses)
-    {
-        $result = array();
-
-        if (is_string($addresses)) {
-            $addresses = array($addresses);
-        }
-        if (!is_array($addresses) && !$addresses instanceof \Iterator) {
-            throw new \InvalidArgumentException(
-                'The $addresses argument must be a string or a list of strings (array or Iterator)'
-            );
-        }
-
-        foreach ($addresses as $address) {
-            $name = EmailUtil::extractEmailAddressName($address);
-            if (empty($name)) {
-                $result[] = EmailUtil::extractPureEmailAddress($address);
-            } else {
-                $result[EmailUtil::extractPureEmailAddress($address)] = $name;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string $emailAddress
      * @return string
      */
     protected function preciseFullEmailAddress(&$emailAddress)
     {
         if (!EmailUtil::isFullEmailAddress($emailAddress)) {
-            $repo            = $this->emailAddressManager->getEmailAddressRepository($this->em);
+            $repo = $this->emailAddressManager->getEmailAddressRepository($this->em);
             $emailAddressObj = $repo->findOneBy(array('email' => $emailAddress));
             if ($emailAddressObj) {
                 $owner = $emailAddressObj->getOwner();

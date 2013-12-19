@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 
@@ -20,7 +20,7 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
     /** @var TransportInterface */
     protected $transport;
 
-    /** @var Transport */
+    /** @var ParameterBag */
     protected $transportSettings;
 
     /** @var LoggerStrategy */
@@ -76,16 +76,14 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
      */
     protected function initializeFromContext(ContextInterface $context)
     {
-        /** @var Channel $channel */
-        $channel         = $context->getOption('channel');
-        $this->transport = $context->getOption('transport');
-        $this->transportSettings = $channel->getTransport();
+        $this->transport         = $context->getOption('transport');
+        $this->transportSettings = $context->getOption('transportSettings');
 
         if (!$this->transportSettings || !$this->transport) {
             throw new \LogicException('Connector instance does not configured properly.');
         }
 
-        $this->transport->init($this->transportSettings->getSettingsBag());
+        $this->transport->init($this->transportSettings);
     }
 
     /**
@@ -131,15 +129,5 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
         }
 
         return static::JOB_IMPORT;
-    }
-
-    /**
-     * Does not allow to serialize (serialize to empty array)
-     *
-     * @return array
-     */
-    public function __sleep()
-    {
-        return [];
     }
 }

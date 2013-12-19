@@ -11,7 +11,7 @@ class Workflow extends AbstractEntity implements Entity
     protected $account;
     protected $budget;
     protected $probability;
-    protected $customerneed;
+    protected $customerNeed;
     protected $solution;
 
     public function __construct($testCase, $redirect = true)
@@ -77,9 +77,9 @@ class Workflow extends AbstractEntity implements Entity
 
     public function setCustomerNeed($customerneed)
     {
-        $this->customerneed = $this->byId('oro_workflow_transition_customer_need');
-        $this->customerneed->clear();
-        $this->customerneed->value($customerneed);
+        $this->customerNeed = $this->byId('oro_workflow_transition_customer_need');
+        $this->customerNeed->clear();
+        $this->customerNeed->value($customerneed);
         return $this;
     }
 
@@ -139,7 +139,8 @@ class Workflow extends AbstractEntity implements Entity
 
     public function qualify()
     {
-        $this->byXPath("//div[@class='btn-group']/a[@id='transition-sales_lead-qualify']")->click();
+        $this->byXPath("//div[@class='btn-group']/a[@id='transition-b2b_flow_lead-qualify']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-content ui-widget-content']/preceding-sibling::div/span[text()='Qualify']"
@@ -149,7 +150,7 @@ class Workflow extends AbstractEntity implements Entity
 
     public function disqualify()
     {
-        $this->byXPath("//div[@class='btn-group']/a[@id='transition-sales_lead-cancel']")->click();
+        $this->byXPath("//div[@class='btn-group']/a[@id='transition-b2b_flow_lead-cancel']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
@@ -157,7 +158,8 @@ class Workflow extends AbstractEntity implements Entity
 
     public function develop()
     {
-        $this->byXpath("//div[@class='btn-group']/a[@id='transition-sales_flow_b2b-develop']")->click();
+        $this->byXpath("//div[@class='btn-group']/a[@id='transition-b2b_flow_sales-develop']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-content ui-widget-content']/preceding-sibling::div/span[text()='Develop']"
@@ -167,14 +169,16 @@ class Workflow extends AbstractEntity implements Entity
 
     public function closeAsWon()
     {
-        $this->byXpath("//div[@class='btn-group']/a[@id='transition-sales_flow_b2b-close_as_won']")->click();
+        $this->byXpath("//div[@class='btn-group']/a[@id='transition-b2b_flow_sales-close_as_won']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
     }
 
     public function closeAsLost()
     {
-        $this->byXpath("//div[@class='btn-group']/a[@id='transition-sales_flow_b2b-close_as_lost']")->click();
+        $this->byXpath("//div[@class='btn-group']/a[@id='transition-b2b_flow_sales-close_as_lost']")->click();
+        $this->waitPageToLoad();
         $this->waitForAjax();
         return $this;
     }
@@ -182,8 +186,8 @@ class Workflow extends AbstractEntity implements Entity
     public function submit()
     {
         $this->byXpath("//button[normalize-space(text()) = 'Submit']")->click();
-        $this->waitForAjax();
         $this->waitPageToLoad();
+        $this->waitForAjax();
         return $this;
     }
 }

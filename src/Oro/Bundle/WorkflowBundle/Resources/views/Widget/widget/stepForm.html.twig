@@ -113,8 +113,8 @@
                 <div class="step-form-container row-fluid">
                     {% set attrsPerCol = 4 %}
                     {% set numberOfColumns = 2 %}
-                    {% set formAttrsPerCol = displayStep.viewAttributes|length/numberOfColumns %}
-                    {% if formAttrsPerCol > attrsPerCol  %}
+                    {% set formAttrsPerCol = (displayStep.viewAttributes|length/numberOfColumns)|ceil %}
+                    {% if formAttrsPerCol > attrsPerCol %}
                         {% set attrsPerCol = formAttrsPerCol %}
                     {% endif %}
                     {% for colNum in 1..numberOfColumns %}
@@ -135,7 +135,7 @@
                 <div class="step-form-container row-fluid">
                     {% set fieldsPerCol = 4 %}
                     {% set numberOfColumns = 2 %}
-                    {% set formFieldsPerCol = form|length/numberOfColumns %}
+                    {% set formFieldsPerCol = (form|length/numberOfColumns)|ceil %}
                     {% if formFieldsPerCol > fieldsPerCol  %}
                         {% set fieldsPerCol = formFieldsPerCol %}
                     {% endif %}
