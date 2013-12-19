@@ -84,7 +84,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
 
         $this->markTestSkipped("TODO Fix");
 
-        $configuration->addEntityNamespace('Stub', 'Oro\Bundle\GridBundle\Tests\Unit\Datagrid\ORM\Stub');
+        $configuration->addEntityNamespace('Stub', 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub');
 
         $classMetadata = new ClassMetadata('Entity');
         $classMetadata->mapField(array('fieldName' => 'a', 'columnName' => 'a'));
