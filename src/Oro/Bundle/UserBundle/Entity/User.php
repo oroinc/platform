@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -32,6 +31,8 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\Tag;
+
+use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Entity\Status;
@@ -1424,6 +1425,6 @@ class User extends ExtendUser implements
      */
     public function getNotificationEmails()
     {
-        return [$this->getEmail()];
+        return new ArrayCollection([$this->getEmail()]);
     }
 }

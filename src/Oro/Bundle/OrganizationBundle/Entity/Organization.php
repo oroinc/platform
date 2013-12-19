@@ -155,17 +155,37 @@ class Organization implements NotificationEmailInterface
     }
 
     /**
+     * @param ArrayCollection $businessUnits
+     *
+     * @return $this
+     */
+    public function setBusinessUnits($businessUnits)
+    {
+        $this->businessUnits = $businessUnits;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getBusinessUnits()
+    {
+        return $this->businessUnits;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getNotificationEmails()
     {
         $emails = [];
-        $this->businessUnits->map(
+        $this->businessUnits->forAll(
             function (BusinessUnit $bu) use ($emails) {
                 $emails = array_merge($emails, $bu->getNotificationEmails());
             }
         );
 
-        return $emails;
+        return new ArrayCollection($emails);
     }
 }
