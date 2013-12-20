@@ -205,7 +205,7 @@ class ConfigModelManager
      */
     public function createEntityModel($className, $mode = self::MODE_DEFAULT)
     {
-        if (!in_array($mode, array(self::MODE_DEFAULT, self::MODE_READONLY))) {
+        if (!in_array($mode, array(self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY))) {
             throw new \InvalidArgumentException(
                 sprintf('EntityConfigModel give invalid parameter "mode" : "%s"', $mode)
             );

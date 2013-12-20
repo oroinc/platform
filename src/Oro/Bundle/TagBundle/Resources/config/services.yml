@@ -41,14 +41,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: preRemove }
 
-    oro_tag.docrine.event.owner_listener:
-        class: %oro_tag.owner_listener.class%
-        calls:
-            - [ setContainer, [ @service_container ] ]
-        tags:
-            - { name: doctrine.event_listener, event: prePersist, method: process }
-            - { name: doctrine.event_listener, event: preUpdate, method: process }
-
     oro_tag.form.tag:
         class: Symfony\Component\Form\Form
         factory_method: createNamed
