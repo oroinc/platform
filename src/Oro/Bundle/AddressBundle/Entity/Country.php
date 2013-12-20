@@ -18,11 +18,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * })
  * @ORM\Entity
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
- * @Config(
- *  defaultValues={
- *      "entity"={"label"="Country", "plural_label"="Countries"}
- *  }
- * )
+ * @Config()
  */
 class Country implements Translatable
 {

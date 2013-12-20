@@ -1,0 +1,19 @@
+<script type="text/html" id="template-datagrid-toolbar-page-size">
+{% if isDesktopVersion() %}
+    <label class="control-label"><%- _.__("View per page") %>: &nbsp;</label>
+{% endif %}
+    <div class="btn-group">
+        <button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">
+            <%= currentSizeLabel %><span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-right">
+            <% _.each(items, function (item) { %>
+            <li><a href="#" data-size="<% if (_.isUndefined(item.size)) { %><%= item %><% } else { %><%= item.size %><% } %>">
+                <% if (_.isUndefined(item.label)) { %><%= item %><% } else { %><%= item.label %><% } %></a></li>
+            <% }); %>
+        </ul>
+    </div>
+{% if isMobileVersion() %}
+    <label><%- _.__("Per page") %></label>
+{% endif %}
+</script>

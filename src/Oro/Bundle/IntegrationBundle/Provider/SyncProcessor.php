@@ -93,7 +93,8 @@ class SyncProcessor implements SyncProcessorInterface
                     'channel'           => $channel->getId(),
                     'transport'         => $realTransport,
                     'transportSettings' => $channel->getTransport()->getSettingsBag(),
-                    'batchSize'         => self::DEFAULT_BATCH_SIZE
+                    // batch size should be configured in batch_jobs.yml configuration
+                    // 'batchSize'         => self::DEFAULT_BATCH_SIZE
                 ],
             ];
             $this->processImport($connector, $mode, $jobName, $configuration, $channel);

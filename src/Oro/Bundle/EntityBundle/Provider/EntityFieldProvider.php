@@ -3,10 +3,14 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Translation\Translator;
+
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class EntityFieldProvider
 {
@@ -31,33 +35,42 @@ class EntityFieldProvider
     protected $entityProvider;
 
     /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
      * Constructor
      *
-     * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider $entityConfigProvider
      * @param EntityClassResolver $entityClassResolver
-     * @param ManagerRegistry     $doctrine
-     * @param EntityProvider      $entityProvider
+     * @param ManagerRegistry $doctrine
+     * @param EntityProvider $entityProvider
+     * @param Translator $translator
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
-        EntityProvider $entityProvider
+        EntityProvider $entityProvider,
+        Translator $translator
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
         $this->doctrine             = $doctrine;
         $this->entityProvider       = $entityProvider;
+        $this->translator           = $translator;
     }
 
     /**
      * Returns fields for the given entity
      *
-     * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations          Indicates whether fields of related entities should be returned as well.
-     * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
-     * @param int    $deepLevel              The maximum deep level of related entities.
-     * @param bool   $lastDeepLevelRelations The maximum deep level of related entities.
+     * @param string $entityName           Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool $withRelations          Indicates whether fields of related entities should be returned as well.
+     * @param bool $withEntityDetails      Indicates whether details of related entity should be returned as well.
+     * @param int $deepLevel               The maximum deep level of related entities.
+     * @param bool $lastDeepLevelRelations The maximum deep level of related entities.
+     * @param bool $translate              Flag means that label, plurel lable should be translated
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
@@ -76,19 +89,19 @@ class EntityFieldProvider
      *                                       If a field represents a relation and $deepLevel > 0
      *                                       the related entity fields are added:
      *                                       .       'related_entity_fields'       - array of fields
-     * @throws InvalidEntityException
      */
     public function getFields(
         $entityName,
         $withRelations = false,
         $withEntityDetails = false,
         $deepLevel = 0,
-        $lastDeepLevelRelations = false
+        $lastDeepLevelRelations = false,
+        $translate = true
     ) {
         $result    = array();
         $className = $this->entityClassResolver->getEntityClass($entityName);
         $em        = $this->getManagerForClass($className);
-        $this->addFields($result, $className, $em);
+        $this->addFields($result, $className, $em, $translate);
         if ($withRelations) {
             $this->addRelations($result, $className, $em, $withEntityDetails, $deepLevel - 1, $lastDeepLevelRelations);
         }
@@ -100,11 +113,12 @@ class EntityFieldProvider
     /**
      * Adds entity fields to $result
      *
-     * @param array         $result
-     * @param string        $className
+     * @param array $result
+     * @param string $className
      * @param EntityManager $em
+     * @param bool $translate
      */
-    protected function addFields(array &$result, $className, EntityManager $em)
+    protected function addFields(array &$result, $className, EntityManager $em, $translate)
     {
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
@@ -115,7 +129,8 @@ class EntityFieldProvider
                     $fieldName,
                     $metadata->getTypeOfField($fieldName),
                     $this->getFieldLabel($className, $fieldName),
-                    $metadata->isIdentifier($fieldName)
+                    $metadata->isIdentifier($fieldName),
+                    $translate
                 );
             }
         }
@@ -124,18 +139,19 @@ class EntityFieldProvider
     /**
      * Adds a field to $result
      *
-     * @param array  $result
+     * @param array $result
      * @param string $name
      * @param string $type
      * @param string $label
-     * @param bool   $isIdentifier
+     * @param bool $isIdentifier
+     * @param bool $translate
      */
-    protected function addField(array &$result, $name, $type, $label, $isIdentifier)
+    protected function addField(array &$result, $name, $type, $label, $isIdentifier, $translate)
     {
          $field = array(
             'name'  => $name,
             'type'  => $type,
-            'label' => $label
+            'label' => $translate ? $this->translator->trans($label) : $label
         );
         if ($isIdentifier) {
             $field['identifier'] = true;

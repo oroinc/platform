@@ -12,7 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      indexes={@ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"})})
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Calendar Event", "plural_label"="Calendar Events"},
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE;EDIT;DELETE",

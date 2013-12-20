@@ -1,8 +1,8 @@
 oro_menu_config:
     items:
         oro_business_unit_list:
-            label: 'Business Units'
-            route: 'oro_business_unit_index'
+            label: oro.organization.businessunit.entity_plural_label
+            route: oro_business_unit_index
             extras:
                 routes: ['oro_business_unit_*']
                 description: 'List of business units'
