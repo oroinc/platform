@@ -352,7 +352,6 @@ class PackageManager
         $preferredPackage = $this->getPreferredPackage(
             $package->getName(),
             null
-//            $this->getPackagePrettyConstraint($package)
         );
         if ($package->getSourceReference() !== $preferredPackage->getSourceReference()) {
             $versionString = '%s (%s)';

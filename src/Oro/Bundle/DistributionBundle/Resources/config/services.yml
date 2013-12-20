@@ -6,7 +6,7 @@ parameters:
     oro_distribution.composer.io.class:                    Composer\IO\BufferIO
     oro_distribution.composer.installer.class:             Composer\Installer
     oro_distribution.composer.installation_manager.class:  Composer\Installer\InstallationManager
-    oro_distribution.composer_json:                        %kernel.root_dir%/../packages.json
+    oro_distribution.composer_json:                        %kernel.root_dir%/../composer.json
 
     oro_user.manager.class:             Oro\Bundle\UserBundle\Entity\UserManager
     oro_user.entity.class:              Oro\Bundle\UserBundle\Entity\User
