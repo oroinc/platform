@@ -1,0 +1,17 @@
+oro_sidebar_widget_api:
+    resource: Oro\Bundle\SidebarBundle\Controller\Api\Rest\WidgetController
+    type: rest
+    prefix: api/rest/{version}/
+    requirements:
+        version: latest|v1
+    defaults:
+        version: latest
+
+oro_sidebar_state_api:
+    resource: Oro\Bundle\SidebarBundle\Controller\Api\Rest\SidebarController
+    type: rest
+    prefix: api/rest/{version}/
+    requirements:
+        version: latest|v1
+    defaults:
+        version: latest

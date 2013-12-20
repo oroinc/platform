@@ -1,0 +1,26 @@
+.sidebar-widgetadd-widgets {
+    background-color: #eee;
+    height: 100%;
+    overflow: auto;
+}
+
+.sidebar-widgetadd-widgets ol {
+    list-style-type: none;
+    margin: 0;
+}
+
+.sidebar-widgetadd-widgets li {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    cursor: pointer !important;
+}
+
+.sidebar-widgetadd-widgets .ui-selecting {
+    background: #353E49;
+    color: white;
+}
+
+.sidebar-widgetadd-widgets .ui-selected {
+    background: #2D333B;
+    color: white;
+}
