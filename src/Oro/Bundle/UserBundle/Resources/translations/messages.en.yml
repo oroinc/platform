@@ -82,37 +82,67 @@ Login: Login
 "View role": "View role"
 "Remove role": "Remove role"
 "Template controller": "Template controller"
+
 oro:
     user:
         controller:
-            group:
-                message:
-                    saved: "Group saved"
-            role:
-                message:
-                    saved: "Role saved"
-            user:
-                message:
-                    saved: "User saved"
-            status:
-                message:
-                    saved: "Status saved"
-
-        grid:
-            users:
-                columns:
-                    username:    "Username"
-                    email:       "Email"
-                    firstName:   "First name"
-                    lastName:    "Last name"
-                    createdAt:   "Created at"
-                    updatedAt:   "Updated at"
-                    enabled:     "Status"
-
-            roles:
-                columns:
-                    label:       "Label"
-
-            groups:
-                columns:
-                    name:       "Name"
+            group.message.saved: "Group saved"
+            role.message.saved: "Role saved"
+            user.message.saved: "User saved"
+            status.message.saved: "Status saved"
+        #
+        # Oro/Bundle/UserBundle/Entity/User
+        #
+        entity_label:        User
+        entity_plural_label: Users
+        entity_description:  Represent user profile
+        id.label:          Id
+        username.label:    Username
+        email.label:       Email
+        name_prefix.label: Name prefix
+        first_name.label:  First name
+        middle_name.label: Middle name
+        last_name.label:   Last name
+        name_suffix.label: Name suffix
+        birthday.label:    Birthday
+        image.label:       Avatar
+        enabled.label:     Status
+        salt.label:        Salt
+        password.label:    Password
+        last_login.label:  Last logged in
+        login_count.label: Login count
+        created_at.label:  Created
+        updated_at.label:  Updated
+        owner.label:       Owner
+        roles.label:       Roles
+        groups.label:      Groups
+        api.label:         API key
+        statuses.label:    Statuses
+        emails.label:      Additional emails
+        current_status.label: Current status
+        business_units.label: Business Units
+        confirmation_token.label: Confirmation token
+        password_requested_at.label: Password requested at
+        imap_configuration.label: Email synchronization settings
+        #
+        # Oro/Bundle/UserBundle/Entity/Group
+        #
+        group:
+            entity_label:        Group
+            entity_plural_label: Groups
+            entity_description:  Group of roles
+            id.label:    Id
+            name.label:  Name
+            roles.label: Roles
+            owner.label: Owner
+        #
+        # Oro/Bundle/UserBundle/Entity/Role
+        #
+        role:
+            entity_label:        Role
+            entity_plural_label: Roles
+            entity_description:  User's role
+            id.label:     Id
+            role.label:   Role
+            label.label:  Label
+            owner.label:  Owner

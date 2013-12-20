@@ -21,7 +21,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table(name="oro_access_role")
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Role", "plural_label"="Roles"},
  *      "ownership"={
  *          "owner_type"="BUSINESS_UNIT",
  *          "owner_field_name"="owner",

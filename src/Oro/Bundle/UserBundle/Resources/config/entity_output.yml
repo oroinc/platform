@@ -1,14 +1,14 @@
 Oro\Bundle\UserBundle\Entity\User:
     icon_class:                         icon-user
-    name:                               entity.user.name
-    description:                        entity.user.description
+    name:                               oro.user.entity_label
+    description:                        oro.user.entity_description
 
 Oro\Bundle\UserBundle\Entity\Role:
     icon_class:                         icon-signal
-    name:                               entity.role.name
-    description:                        entity.role.description
+    name:                               oro.user.role.entity_label
+    description:                        oro.user.role.entity_description
 
 Oro\Bundle\UserBundle\Entity\Group:
     icon_class:                         icon-home
-    name:                               entity.group.name
-    description:                        entity.group.description
+    name:                               oro.user.group.entity_label
+    description:                        oro.user.group.entity_description

@@ -20,7 +20,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  *  @Config(
  *  defaultValues={
- *      "entity"={"label"="Email", "plural_label"="Emails"},
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE",

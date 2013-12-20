@@ -72,6 +72,11 @@ oro_entity_config:
                 demo_attr:                                       # adds an attribute named 'demo_attr'
                     options:
                         default_value:      'Demo'               # sets the default value for 'demo_attr' attribute
+
+                        translatable:       true                 # means that value of this attribute is translation key
+                                                                 # and actual value should be taken from translation table
+                                                                 # or in twig via "|trans" filter
+
                     grid:                                        # configure a data grid to display 'demo_attr' attribute
                         type:               string               # sets the attribute type
                         label:              'Demo Attr'          # sets the data grid column name

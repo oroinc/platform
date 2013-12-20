@@ -29,7 +29,8 @@ class RecipientListType extends AbstractType
             'users',
             'oro_user_multiselect',
             array(
-                'required' => false
+                'required' => false,
+                'label'    => 'oro.user.entity_plural_label'
             )
         );
 
@@ -38,13 +39,14 @@ class RecipientListType extends AbstractType
             'groups',
             'entity',
             array(
-                'class'         => 'OroUserBundle:Group',
-                'property'      => 'name',
-                'multiple'      => true,
-                'expanded'      => true,
-                'empty_value'   => '',
-                'empty_data'    => null,
-                'required'      => false,
+                'label'       => 'oro.user.group.entity_plural_label',
+                'class'       => 'OroUserBundle:Group',
+                'property'    => 'name',
+                'multiple'    => true,
+                'expanded'    => true,
+                'empty_value' => '',
+                'empty_data'  => null,
+                'required'    => false,
             )
         );
 
@@ -53,7 +55,7 @@ class RecipientListType extends AbstractType
             'email',
             'email',
             array(
-                'required'      => false
+                'required' => false
             )
         );
 
@@ -62,7 +64,7 @@ class RecipientListType extends AbstractType
             'owner',
             'checkbox',
             array(
-                'required'      => false
+                'required' => false
             )
         );
     }
@@ -77,7 +79,7 @@ class RecipientListType extends AbstractType
                 'data_class'           => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
                 'intention'            => 'recipientlist',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'    => true,
+                'cascade_validation'   => true,
             )
         );
     }
