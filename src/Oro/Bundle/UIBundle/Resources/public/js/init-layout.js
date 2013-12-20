@@ -14,8 +14,8 @@ require(['oro/mediator'], function (mediator) {
 });
 
 require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
-    'oro/delete-confirmation', 'oro/messenger', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger) {
+    'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 
     /* ============================================================
@@ -140,6 +140,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             $(e.target).parent().find('input[type=text]').first().focus();
         }, 10));
 
+        var openDropdownsSelector = '.dropdown.open, .dropdown .open, .oro-drop.open, .oro-drop .open';
         $('html').click(function (e) {
             var $target = $(e.target),
                 clickingTarget = null;
@@ -148,13 +149,11 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             } else {
                 clickingTarget = $target.closest('.dropdown, .oro-drop');
             }
-            clickingTarget.addClass('_currently_clicked');
-            $('.open:not(._currently_clicked)').removeClass('open');
-            clickingTarget.removeClass('_currently_clicked');
+            $(openDropdownsSelector).not(clickingTarget).removeClass('open');
         });
 
         $('#main-menu').mouseover(function () {
-            $('.open').removeClass('open');
+            $(openDropdownsSelector).removeClass('open');
         });
 
         // fix + extend bootstrap.collapse functionality
@@ -183,6 +182,9 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
      * from height_fix.js
      * ============================================================ */
     (function () {
+        if (app.isMobile()) {
+            return;
+        }
         /* dynamic height for central column */
         var anchor = $('#bottom-anchor'),
             content = false;
@@ -190,17 +192,21 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         var initializeContent = function () {
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
-                content.css('overflow', 'auto');
+                if (!app.isMobile()) {
+                    content.css('overflow', 'auto');
+                } else {
+                    content.css('overflow', 'hidden');
+                    content.last().css('overflow-y', 'auto');
+                }
             }
         };
 
         var adjustHeight = function () {
             initializeContent();
 
-            var debugBar = $('.sf-toolbar');
-            var debugBarHeight = debugBar.length && debugBar.is(':visible') ? debugBar.height() : 0;
+            var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
             var anchorTop = anchor.position().top;
-            var footerHeight = $('#footer').height();
+            var footerHeight = $('#footer:visible').height() || 0;
             var fixContent = 1;
 
             $(content.get().reverse()).each(function (pos, el) {
@@ -208,7 +214,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
             });
 
-            layout.adjustScrollspy();
+            scrollspy.adjust();
 
             var fixDialog = 2;
             var dialogContainerBottom = $('.sf-toolbar').height() + $('#footer').height();

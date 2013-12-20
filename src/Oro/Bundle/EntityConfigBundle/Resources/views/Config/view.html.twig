@@ -1,19 +1,21 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 {% set gridName = 'entityfields-grid' %}
-{% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A') }}) %}
+{% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
 {% if resource_granted('oro_entityconfig_manage') %}
     {% set audit_entity_class = entity.classname|replace('\\', '_') %}
-    {% set audit_title = entity_config.get('label')|default(entity_name) %}
+    {% set audit_title = entity_config.get('label')|default(entity_name)|trans %}
     {% set audit_path = 'oro_entityconfig_audit' %}
 {% endif %}
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
-        {{ UI.button({'path' : path('oro_entityconfig_update', { id: entity.id }), 'iClass' : 'icon-edit ', 'title' : 'Edit user', 'label' : 'Edit'}) }}
-
-
+        {{ UI.editButton({
+            'path': path('oro_entityconfig_update', { id: entity.id }),
+            'title': 'Edit entity',
+            'label': 'Edit'
+        }) }}
         {% for button in button_config %}
             {{ UI.button({
                 'path'   : button.void is defined ? [ 'javascript:void(0);//', path(button.route, button.args|default({})) ]|join : path(button.route, button.args|default({})),
@@ -31,7 +33,7 @@
         'entity':      entity,
         'indexPath':   path('oro_entityconfig_index'),
         'indexLabel': 'Entities',
-        'entityTitle': entity_config.get('label')|default(entity_name),
+        'entityTitle': entity_config.get('label')|default(entity_name)|trans,
     }%}
 
     {{ parent() }}
@@ -63,10 +65,10 @@
     {% set general_fields = [
         UI.attibuteRow('Name', entity_name),
         UI.renderAttribute('Icon', ['<div class="clearfix-oro"><p class="control-label"><i class="',entity_config.get('icon'),' hide-text"></i> (',entity_config.get('icon'),')</p></div>']|join),
-        UI.attibuteRow('Label', entity_config.get('label')),
-        UI.attibuteRow('Plural Label', entity_config.get('plural_label')),
+        UI.attibuteRow('Label', entity_config.get('label')|trans),
+        UI.attibuteRow('Plural Label', entity_config.get('plural_label')|trans),
         UI.attibuteRow('Type', entity_extend.get('owner')),
-        UI.attibuteRow('Description', entity_config.get('description')),
+        UI.attibuteRow('Description', entity_config.get('description')|trans),
         UI.attibuteRow('Ownership Type', entity_ownership.get('owner_type')),
         UI.attibuteRow('Module', module_name),
     ]%}

@@ -110,22 +110,59 @@
 {% endmacro %}
 
 {#
+    Create 'Edit' button
+    Parameters - array:
+        [
+            'path' - button url
+            'aClass' - additional button class
+            'title' - button title | 'Edit' by default
+            'label' - button label | 'Edit' by default
+            'entity_label' - if specified will be added for title and label
+        ]
+#}
+{% macro editButton(parameters) %}
+    {% set iClass = ['icon-edit'] %}
+    {% set aClass = ['edit-button', 'main-group'] %}
+    {% if parameters.iClass is defined %}
+        {% set iClass = parameters.iClass|split(' ')|merge(iClass) %}
+    {% endif %}
+    {% if parameters.aClass is defined %}
+        {% set aClass = parameters.aClass|split(' ')|merge(aClass) %}
+    {% endif %}
+    {% set title = parameters.title is defined
+        ? parameters.title
+        : 'Edit'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '')
+    %}
+    {% set label = parameters.label is defined
+        ? parameters.label
+        : 'Edit'|trans
+    %}
+    {% set parameters = parameters|merge({
+        'iClass': iClass|join(' '),
+        'aClass': aClass|join(' '),
+        'title': title,
+        'label': label
+    }) %}
+    {{ _self.button(parameters) }}
+{% endmacro %}
+
+{#
     Create 'add' button
     Parameters - array:
         [
             'path' - button url
             'aClass' - additional button class
-            'title' - button title
-            'label' - button label
+            'title' - button title | 'Create' by default
+            'label' - button label | 'Create' by default
+            'entity_label' - if specified will be added for title and label
         ]
 #}
 {% macro addButton(parameters) %}
     <a href="{{ parameters.path }}"
-       class="btn btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
-       {% if parameters.title is defined %}
-            title="{{ parameters.title|trans }}">
-       {% endif %}
-       {{ parameters.label|trans }}
+        class="btn main-group btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
+        title="{{ parameters.title is defined ? parameters.title : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
+    >
+        {{ parameters.label is defined ? parameters.label : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}
     </a>
 {% endmacro %}
 
@@ -135,11 +172,12 @@
         [
             'aCss' - additional css class for 'a' tag
             'dataId' - data-id parameter
-            'dataMessage' - message before delete record
-            'dataRedirect' - url to redirect after delete
+            'dataMessage' - message before delete record | 'Are you sure you want to delete this %entity_label%?' by default
+            'dataRedirect' - url to redirect after delete | '%entity_label% deleted' by default
             'dataUrl' - data-url parameter
-            'title' - button title
-            'label' - button label
+            'title' - button title | 'Delete' by default
+            'label' - button label | 'Delete' by default
+            'entity_label' - if specified will be added for title, label and messages| 'item' by default
         ]
 #}
 {% macro deleteButton(parameters) %}
@@ -151,8 +189,8 @@
             {% if (parameters.dataId is defined) %}
                 data-id="{{ parameters.dataId }}"
             {% endif %}
-            data-message="{{ parameters.dataMessage|trans }}"
-            data-success-message="{{ parameters.successMessage|default('Item deleted')|trans }}"
+            data-message="{{ parameters.dataMessage is defined ? parameters.dataMessage|trans : 'Are you sure you want to delete this %entity_label%?'|trans({ '%entity_label%' : parameters.entity_label ? parameters.entity_label|lower : 'item'|trans }) }}"
+            data-success-message="{{ parameters.successMessage is defined ? parameters.successMessage|trans : '%entity_label% deleted'|trans({ '%entity_label%' : parameters.entity_label ? parameters.entity_label : 'Item'|trans }) }}"
             {% if (parameters.dataUrl is defined) %}
                 data-url="{{ parameters.dataUrl }}"
             {% endif %}
@@ -164,10 +202,10 @@
                 data-{{ dataItemName }}="{{ dataItemValue|raw }}"
                 {% endfor %}
             {% endif %}
-            {% if (parameters.title is defined) %}
-                title="{{ parameters.title|trans }}"
-            {% endif %}
-           ><i class="icon-trash"></i>{{ parameters.label|trans -}}
+            title="{{ parameters.title is defined ? parameters.title : 'Delete'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
+        >
+            <i class="icon-trash hide-text"></i>
+            {{ parameters.label is defined ? parameters.label : 'Delete'|trans }}
         </a>
     </div>
 {% endmacro %}
@@ -200,18 +238,18 @@
             data-url="{{ parameters.dataUrl }}"
             {% endif %}
             {% if (parameters.successMessage is defined) %}
-            data-success-message="{{ parameters.successMessage }}"
+            data-success-message="{{ parameters.successMessage|trans }}"
             {% endif %}
             {% if parameters.dataRedirect is defined %}
             data-redirect="{{ parameters.dataRedirect  }}"
             {% endif %}
             {% if (parameters.title is defined) %}
-            title="{{ parameters.title }}"
+            title="{{ parameters.title|trans }}"
             {% endif -%}
             {% if (parameters.visible is defined and not parameters.visible) %}
             style="display: none"
             {% endif -%}
-        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label }}</i>{{ parameters.label -}}
+        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
         </a>
     </div>
 {% endmacro %}
@@ -240,7 +278,7 @@
 
 {% macro saveAndStayButton(acl = '', label = 'Save') %}
     {% if acl is empty or resource_granted(acl) %}
-    {{ _self.buttonType({'type': 'button', 'class': 'btn-success', 'label': label, 'action': 'save_and_stay'}) }}
+    {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
     {% endif %}
 {% endmacro %}
 
@@ -433,4 +471,34 @@
         {% set attr = attr|default({}) %}
         {% for attrname, attrvalue in attr %}{% if not excludes is defined or not excludes[attrname] is defined %}{% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% else %}{{ attrname }}="{{ attrvalue }}" {% endif %}{% endif %}{% endfor %}
     {% endspaceless %}
+{% endmacro %}
+
+{#
+    Render link to entity owner
+    Parameters:
+        entity - entity record
+#}
+{% macro entityOwnerLink(entity) %}
+    {%- if entity.owner is defined and entity.owner %}
+        {% set ownerType = oro_get_owner_type(entity) %}
+        {% if (ownerType == 'USER') %}
+            {% if resource_granted('oro_user_user_view') %}
+                {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
+                {% set ownerName = entity.owner|oro_format_name %}
+            {% endif %}
+        {% elseif (ownerType == 'BUSINESS_UNIT') %}
+            {% if resource_granted('oro_business_unit_view') %}
+                {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
+                {% set ownerName = entity.owner.name %}
+            {% endif %}
+        {% endif %}
+        {% if ownerName is defined %}
+            {{ 'Owner'|trans }}:
+            {% if ownerPath is defined %}
+                <a href="{{ ownerPath }}">{{ ownerName }}</a>
+            {% else %}
+                {{ ownerName }}
+            {% endif %}
+        {% endif %}
+    {% endif -%}
 {% endmacro %}

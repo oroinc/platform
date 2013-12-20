@@ -21,6 +21,7 @@ class BusinessUnitType extends AbstractType
                 'name',
                 'text',
                 array(
+                    'label'    => 'oro.organization.businessunit.name.label',
                     'required' => true,
                 )
             )
@@ -28,6 +29,7 @@ class BusinessUnitType extends AbstractType
                 'phone',
                 'text',
                 array(
+                    'label'    => 'oro.organization.businessunit.phone.label',
                     'required' => false,
                 )
             )
@@ -35,6 +37,7 @@ class BusinessUnitType extends AbstractType
                 'website',
                 'text',
                 array(
+                    'label'    => 'oro.organization.businessunit.website',
                     'required' => false,
                 )
             )
@@ -42,6 +45,7 @@ class BusinessUnitType extends AbstractType
                 'email',
                 'text',
                 array(
+                    'label'    => 'oro.organization.businessunit.email.label',
                     'required' => false,
                 )
             )
@@ -49,6 +53,7 @@ class BusinessUnitType extends AbstractType
                 'fax',
                 'text',
                 array(
+                    'label'    => 'oro.organization.businessunit.fax.label',
                     'required' => false,
                 )
             )
@@ -56,7 +61,7 @@ class BusinessUnitType extends AbstractType
                 'organization',
                 'entity',
                 array(
-                    'label'    => 'Organization',
+                    'label'    => 'oro.organization.businessunit.organization.label',
                     'class'    => 'OroOrganizationBundle:Organization',
                     'property' => 'name',
                     'required' => true,

@@ -1,7 +1,7 @@
 oro_menu_config:
     items:
         oro_notification_emailnotification_list:
-            label: 'Notifications'
+            label: oro.notification.emailnotification.entity_plural_label
             route: 'oro_notification_emailnotification_index'
             extras:
                 routes: ['oro_notification_emailnotification_*']

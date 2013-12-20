@@ -12,9 +12,9 @@ datagrid:
                     - { table: %oro_integration.channel.entity.class%, alias: c }
         columns:
             name:
-                label: oro.integration.datagrid.column.name
+                label: oro.integration.channel.name.label
             type:
-                label: oro.integration.datagrid.column.type
+                label: oro.integration.channel.type.label
                 frontend_type:  select
                 choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()
         properties:

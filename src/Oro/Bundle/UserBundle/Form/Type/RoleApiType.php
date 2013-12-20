@@ -23,7 +23,7 @@ class RoleApiType extends AclRoleType
             'text',
             array(
                 'required' => true,
-                'label' => 'Role'
+                'label' => 'oro.user.role.label.label'
             )
         );
 

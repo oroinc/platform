@@ -3,14 +3,14 @@
 
 {% oro_title_set({
     params : {
-        '%section%': 'Workflows'|trans,
+        '%section%': 'oro.workflow.workflowitem.entity_plural_label'|trans,
         '%entity%': workflow.label,
         '%workflow_data%': currentStep.label
     }
 }) %}
 
 {% set breadcrumbs = [{
-    label: 'Workflows'|trans
+    label: 'oro.workflow.workflowitem.entity_plural_label'|trans
 }] %}
 
 {% block breadcrumb %}
