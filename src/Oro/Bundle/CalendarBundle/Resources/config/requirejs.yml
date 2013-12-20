@@ -14,3 +14,4 @@ config:
         'oro/calendar/event/model': 'bundles/orocalendar/js/calendar/event/model.js'
         'oro/calendar/event/view': 'bundles/orocalendar/js/calendar/event/view.js'
         'oro/form-validation': 'bundles/orocalendar/js/form-validation.js'
+        'oro/calendar/color-manager': 'bundles/orocalendar/js/calendar/color-manager.js'
