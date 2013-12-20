@@ -15,7 +15,6 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
  * @ORM\Entity
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Organization", "plural_label"="Organizations"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""

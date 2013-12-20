@@ -38,11 +38,27 @@ oro:
             designer:               Designer
             columns:                Columns
             filters:                Filters
-            name:                   Name
-            description:            Description
-            entity:                 Entity
-            type:                   Type
             choose_report_type:     Choose a report type...
+
+        entity_label:        Report
+        entity_plural_label: Manage Reports
+        entity_description:  Represent Report
+        id.label:           Id
+        type.label:         Report type
+        owner.label:        Owner
+        name.label:         Name
+        entity.label:       Entity
+        description.label:  Description
+        definition.label:   Definition
+        created_at.label:   Created at
+        updated_at.label:   Updated at
+
+        reporttype:
+            entity_label:        Report Type
+            entity_plural_label: Report Types
+            entity_description:  Represent Report Type
+            name.label:
+            label.label:
 
 "Reports": Reports
 "New Report": New Report

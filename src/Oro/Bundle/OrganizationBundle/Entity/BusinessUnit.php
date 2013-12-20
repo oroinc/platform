@@ -22,7 +22,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Oro\Loggable
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Business Unit", "plural_label"="Business Units"},
  *      "ownership"={
  *          "owner_type"="BUSINESS_UNIT",
  *          "owner_field_name"="owner",

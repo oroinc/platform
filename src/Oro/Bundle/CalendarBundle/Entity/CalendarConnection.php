@@ -13,7 +13,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\HasLifecycleCallbacks
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Calendar of other users", "plural_label"="Calendars of other users"},
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW",

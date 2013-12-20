@@ -4,5 +4,31 @@
 "Edit address": "Edit address"
 "Create address": "Create address"
 "Remove address": "Remove address"
-oro.address.form.choose_country: "Choose a country..."
-oro.address.form.choose_state: "Choose a state..."
+
+oro:
+    address:
+        form:
+            choose_country: "Choose a country..."
+            choose_state: "Choose a state..."
+        region:
+            entity_label:         State
+            entity_plural_label:  States
+            entity_description:   Represent address region
+            name.label:           Name
+            country.label:        Country
+            combined_code.label:  Combined code
+            code.label:           Code
+        country:
+            entity_label:         Country
+            entity_plural_label:  Countries
+            entity_description:   Represent address country
+            regions.label:        Regions
+            name.label:           Name
+            iso3_code.label:      ISO3 code
+            iso2_code.label:      ISO2 code
+        addresstype:
+            entity_label:         Address Type
+            entity_plural_label:  Address Types
+            entity_description:   Represent address type
+            name.label:           Name
+            label.label:          Label

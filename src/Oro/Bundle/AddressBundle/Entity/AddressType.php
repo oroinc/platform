@@ -14,11 +14,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * @ORM\Entity
  * @ORM\Table(name="oro_address_type")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation")
- * @Config(
- *  defaultValues={
- *      "entity"={"label"="Address Type", "plural_label"="Address Types"}
- *  }
- * )
+ * @Config()
  */
 class AddressType implements Translatable
 {

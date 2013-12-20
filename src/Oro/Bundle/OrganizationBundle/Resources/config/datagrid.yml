@@ -27,17 +27,17 @@ datagrid:
 
         columns:
             name:
-                label: oro.business_unit.datagrid.name
+                label: oro.organization.businessunit.name.label
             email:
-                label: oro.business_unit.datagrid.email
+                label: oro.organization.businessunit.email.label
             phone:
-                label: oro.business_unit.datagrid.phone
+                label: oro.organization.businessunit.phone.label
             ownerName:
-                label: oro.business_unit.datagrid.owner
+                label: oro.organization.businessunit.owner.label
             organizationName:
-                label: oro.business_unit.datagrid.organization
+                label: oro.organization.entity_label
             createdAt:
-                label: oro.business_unit.datagrid.created_at
+                label: oro.organization.businessunit.created_at.label
                 frontend_type: datetime
 
         properties:
@@ -146,13 +146,13 @@ datagrid:
                 editable: true
                 frontend_type: boolean
             firstName:
-                label: oro.user.grid.users.columns.firstName
+                label: oro.user.first_name.label
             lastName:
-                label: oro.user.grid.users.columns.lastName
+                label: oro.user.last_name.label
             username:
-                label: oro.user.grid.users.columns.username
+                label: oro.user.username.label
             email:
-                label: oro.user.grid.users.columns.email
+                label: oro.user.email.label
         filters:
             columns:
                 hasCurrentBusinessUnit:
@@ -202,13 +202,13 @@ datagrid:
                         - :business_unit_id MEMBER OF u.businessUnits
         columns:
             firstName:
-                label: oro.user.grid.users.columns.firstName
+                label: oro.user.first_name.label
             lastName:
-                label: oro.user.grid.users.columns.lastName
+                label: oro.user.last_name.label
             username:
-                label: oro.user.grid.users.columns.username
+                label: oro.user.username.label
             email:
-                label: oro.user.grid.users.columns.email
+                label: oro.user.email.label
         sorters:
             default:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
