@@ -555,13 +555,8 @@ body .select2-container {
     border:none;
     margin:0;
     padding:0;
-    background: -moz-linear-gradient(top, #3b4651 0%, #323b45 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#3b4651), color-stop(100%,#323b45)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #3b4651 0%,#323b45 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top, #3b4651 0%,#323b45 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #3b4651 0%,#323b45 100%); /* IE10+ */
-    background: linear-gradient(to bottom, #3b4651 0%,#323b45 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#3b4651', endColorstr='#323b45',GradientType=0 ); /* IE6-9 */  }
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+  }
 }
 header {
   &:after {
@@ -1500,7 +1495,7 @@ footer {
 .pin-bar {
   border-bottom:1px solid #2a2f36;
   padding: 0 30px 0 0;
-  #gradient > .vertical(#303944, #323b46);
+  #gradient > .vertical(@PinBarColorStart, @PinBarColorEnd);
   position: relative;
   z-index: 998;
   .pin-menus {
@@ -5294,3 +5289,4 @@ footer.footer{
     margin-bottom: 0px;
   }
 }
+
