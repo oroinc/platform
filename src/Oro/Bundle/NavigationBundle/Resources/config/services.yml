@@ -17,6 +17,7 @@ parameters:
 
     oro_navigation.event.response_history.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
     oro_navigation.event.response_hashnav.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
+    oro_navigation.event.doctrine_tag_subscriber.class:        Oro\Bundle\NavigationBundle\Event\DoctrineTagEventSubscriber
 
     oro_navigation.menu.matcher.voter.request:                 Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter
     oro_navigation.menu.matcher.voter.routepattern:            Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
@@ -179,6 +180,13 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_navigation.title_service
 
+    oro_navigation.event.doctrine_tag_subscriber:
+        class: %oro_navigation.event.doctrine_tag_subscriber.class%
+        arguments:
+            - @oro_wamp.publisher
+            - %installed%
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
 
     oro_navigation.title_service:
         class: %oro_navigation.title_service.class%
