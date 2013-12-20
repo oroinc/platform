@@ -8,10 +8,9 @@
 {% block navButtons %}
     {% if resource_granted('oro_business_unit_update') %}
         {{ UI.editButton({
-            'path': path('oro_business_unit_update', { id: entity.id }),
-            'title': 'Edit business unit',
-            'label': 'Edit'
-        }) }}
+            'path' : path('oro_business_unit_update', { id: entity.id }),
+            'entity_label': 'oro.organization.businessunit.entity_label'|trans
+        })  }}
     {% endif %}
     {% if oro_get_business_units_count() > 1 and resource_granted('oro_business_unit_delete') %}
         {{ UI.deleteButton({
@@ -20,9 +19,7 @@
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-business_unit',
             'dataId': entity.id,
-            'dataMessage': 'Are you sure you want to delete this business unit?',
-            'title': 'Delete business unit',
-            'label': 'Delete'
+            'entity_label': 'oro.organization.businessunit.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock navButtons %}
@@ -31,57 +28,48 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_business_unit_index'),
-        'indexLabel': 'Business Units',
+        'indexLabel':  'oro.organization.businessunit.entity_plural_label',
         'entityTitle': entity.name|default('N/A'),
-    }
-    %}
+    } %}
     {{ parent() }}
 {% endblock pageHeader %}
 
 {% block content_data %}
     {% set id = 'business-unit-profile' %}
-
     {% set dataSubBlocks = [] %}
-
     {% set dataBlocks = [{
-            'title': 'General',
-            'class': 'active',
-            'subblocks': [
-                {
-                    'title': 'Basic Information',
-                    'data': [
-                        UI.attibuteRow('Name', entity.name),
-                        UI.attibuteRow('Phone', entity.phone),
-                        UI.attibuteRow('Organization', entity.organization),
-                        UI.attibuteRow('Website', entity.website),
-                        UI.attibuteRow('Email', entity.email),
-                        UI.attibuteRow('Fax', entity.fax),
-                    ]
-                },
-            ]
-        }]
-    %}
+        'title': 'General',
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': 'Basic Information',
+                'data': [
+                    UI.attibuteRow('oro.organization.businessunit.name.label', entity.name),
+                    UI.attibuteRow('oro.organization.businessunit.phone.label', entity.phone),
+                    UI.attibuteRow('oro.organization.businessunit.organization.label', entity.organization),
+                    UI.attibuteRow('oro.organization.businessunit.website.label', entity.website),
+                    UI.attibuteRow('oro.organization.businessunit.email.label', entity.email),
+                    UI.attibuteRow('oro.organization.businessunit.fax.label', entity.fax),
+                ]
+            }
+        ]
+    }] %}
 
-    {% set dataBlocks = dataBlocks|merge(
-        [{
-            'title' : 'Users',
-            'subblocks':
-            [
-                {
-                    'title' : null,
-                    'useSpan': false,
-                    'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entity.id}, { cssClass: 'inner-grid' })]
-                }
-            ]
-        }]
-    )
-    %}
+    {% set dataBlocks = dataBlocks|merge([{
+        'title': 'oro.organization.businessunit.users.label',
+        'subblocks':
+        [
+            {
+                'title' : null,
+                'useSpan': false,
+                'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entity.id}, { cssClass: 'inner-grid' })]
+            }
+        ]
+    }]) %}
 
-    {% set data =
-        {
-            'dataBlocks': dataBlocks,
-        }
-    %}
+    {% set data = {
+        'dataBlocks': dataBlocks,
+    } %}
 
     {{ parent() }}
 {% endblock content_data %}

@@ -129,7 +129,7 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\Form\Exception\UnexpectedTypeException
+     * @expectedException \Symfony\Component\Form\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "Doctrine\ORM\QueryBuilder", "NULL" given
      */
     public function testReverseTransformQueryBuilderException()
@@ -176,7 +176,7 @@ class EntityToIdTransformerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\FormBundle\Form\Exception\FormException
+     * @expectedException \Oro\Bundle\FormBundle\Form\Exception\FormException
      * @expectedExceptionMessage Cannot get id property path of entity. "TestClass" has composite primary key.
      */
     public function testPropertyConstructionException()

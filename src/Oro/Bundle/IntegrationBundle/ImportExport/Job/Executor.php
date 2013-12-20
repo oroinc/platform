@@ -12,28 +12,19 @@ use Oro\Bundle\ImportExportBundle\Job\JobResult;
 class Executor extends JobExecutor
 {
     /**
-     * @param string $jobType
-     * @param string $jobName
-     * @param array $configuration
+     * @param JobExecution $jobExecution
+     * @param JobInstance $jobInstance
      * @return JobResult
      */
-    public function executeJob($jobType, $jobName, array $configuration = array())
+    protected function doJob(JobInstance $jobInstance, JobExecution $jobExecution)
     {
-        // create and persist job instance and job execution
-        $jobInstance = new JobInstance(self::CONNECTOR_NAME, $jobType, $jobName);
-        $jobInstance->setCode($this->generateJobCode($jobName));
-        $jobInstance->setLabel(sprintf('%s.%s', $jobType, $jobName));
-        $jobInstance->setRawConfiguration($configuration);
-        $jobExecution = new JobExecution();
-        $jobExecution->setJobInstance($jobInstance);
-
         $jobResult = new JobResult();
         $jobResult->setSuccessful(false);
 
         try {
-            $job = $this->jobRegistry->getJob($jobInstance);
+            $job = $this->batchJobRegistry->getJob($jobInstance);
             if (!$job) {
-                throw new RuntimeException(sprintf('Can\'t find job "%s"', $jobName));
+                throw new RuntimeException(sprintf('Can\'t find job "%s"', $jobInstance->getAlias()));
             }
 
             $job->execute($jobExecution);
@@ -50,31 +41,6 @@ class Executor extends JobExecutor
         } catch (\Exception $exception) {
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
-        }
-
-        // EntityManager can be closed when there was an exception in flush method called inside some jobs execution
-        // Can't be implemented right now due to OroEntityManager external dependencies
-        // on ExtendManager and FilterCollection
-        if (!$this->entityManager->isOpen()) {
-            $this->managerRegistry->resetManager();
-            $this->entityManager = $this->managerRegistry->getManager();
-        }
-
-        // save job instance
-        $this->entityManager->persist($jobInstance);
-        $this->entityManager->flush($jobInstance);
-
-        // set data to JobResult
-        $jobResult->setJobId($jobInstance->getId());
-        $jobResult->setJobCode($jobInstance->getCode());
-        /** @var JobExecution $jobExecution */
-        $jobExecution = $jobInstance->getJobExecutions()->first();
-        if ($jobExecution) {
-            $stepExecution = $jobExecution->getStepExecutions()->first();
-            if ($stepExecution) {
-                $context = $this->contextRegistry->getByStepExecution($stepExecution);
-                $jobResult->setContext($context);
-            }
         }
 
         return $jobResult;

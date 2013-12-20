@@ -23,6 +23,7 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @doctrine
             - @oro_report.entity_provider
+            - @translator
 
     oro_report.listener.navigation_listener:
         class: %oro_report.listener.navigation_listener.class%

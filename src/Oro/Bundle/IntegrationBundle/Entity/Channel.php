@@ -14,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *  routeName="oro_integration_channel_index",
  *  defaultValues={
- *      "entity"={"label"="Integration Channel", "plural_label"="Integration Channels"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""

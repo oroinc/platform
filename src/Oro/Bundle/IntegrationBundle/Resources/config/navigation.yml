@@ -1,8 +1,8 @@
 oro_menu_config:
     items:
         channels_list:
-            label: 'Channels'
-            route: 'oro_integration_channel_index'
+            label: oro.integration.channel.entity_plural_label
+            route: oro_integration_channel_index
             extras:
                 routes: 'oro_integration_channel_*'
 
