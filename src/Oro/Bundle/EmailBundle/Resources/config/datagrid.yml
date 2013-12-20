@@ -6,7 +6,7 @@ datagrid:
             query:
                 select:
                     - e
-                    - @oro_email.datagrid_query_factory->getFromEmailExpression()
+                    - @oro_email.datagrid_query_factory->getFromEmailExpression
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
                 join:
