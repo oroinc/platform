@@ -3,13 +3,6 @@
   -moz-box-sizing: @sizing;
   box-sizing: @sizing;
 }
-.opacity(@float, @decimal) {
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=@float)";
-  filter: "alpha(opacity=@float)";
-  -moz-opacity: @decimal;
-  -khtml-opacity: @decimal;
-  opacity: @decimal;
-}
 
 .forScreen (@size; background; @value: none) {
   @media only screen and (max-width: @size) {
