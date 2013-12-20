@@ -1,5 +1,5 @@
 @import "../../../oroui/css/less/mixins";
-@backgroundColor:  #f1f1f1;
+@dashboardBackgroundColor:  #f1f1f1;
 
 // Drop shadows
 .box-shadow(@shadow) {
@@ -34,9 +34,9 @@
   }
 }
 
-.layout-content {
+.dashboard-contailer {
   .responsive-section {
-    background: @backgroundColor;
+    background: @dashboardBackgroundColor;
     padding-top: 13px;
     padding-left: 13px;
     .responsive-cell > div {
@@ -47,7 +47,7 @@
   .launchpad-container {
     .box-type1 {
       border: 0;
-      background-color: @backgroundColor;
+      background-color: @dashboardBackgroundColor;
     }
     .oro-subtitle {
       margin: 10px 10px 10px 0;
@@ -94,7 +94,7 @@
     }
   }
   .list-wrap {
-    background: @backgroundColor;
+    background: @dashboardBackgroundColor;
     border-left: 1px solid #e5e5e5;
     width: 60%;
     margin-left: -1px;
