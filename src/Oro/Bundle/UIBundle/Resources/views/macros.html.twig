@@ -347,7 +347,7 @@
                 <div class="form-horizontal">
             {% endif %}
                 {% for subblock in subblocks %}
-                    {{ _self.scrollSubblock(subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
+                    {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
                 {% endfor %}
             {% if isForm is defined and isForm == true %}
                 </fieldset>
