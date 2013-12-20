@@ -1,0 +1,9 @@
+parameters:
+    oro_dashboard.manager.class:      Oro\Bundle\DashboardBundle\Manager
+
+services:
+    oro_dashboard.manager:
+        class: %oro_dashboard.manager.class%
+        arguments:
+            - []
+            - @oro_security.security_facade
