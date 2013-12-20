@@ -27,6 +27,9 @@ config:
         'jstree/jquery.hotkeys':
             deps:
                 - 'jquery.jstree'
+        'flotr2':
+            deps:
+                - 'jquery'
         'bootstrap':
             deps:
                 - 'jquery'
@@ -74,6 +77,8 @@ config:
         'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
+        'flotr2': 'bundles/oroui/lib/flotr2/flotr2.amd.js'
+        'bean': 'bundles/oroui/lib/flotr2/bean.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
         'bootstrap-tooltip': 'bundles/oroui/lib/bootstrap/js/bootstrap-tooltip.js'
         'popover-extra-placements': 'bundles/oroui/lib/bootstrap/js/popover-extra-placements.js'
