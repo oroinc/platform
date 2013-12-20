@@ -180,7 +180,7 @@ class Organization implements NotificationEmailInterface
     {
         $emails = [];
         $this->businessUnits->forAll(
-            function (BusinessUnit $bu) use ($emails) {
+            function (BusinessUnit $bu) use (&$emails) {
                 $emails = array_merge($emails, $bu->getNotificationEmails());
             }
         );
