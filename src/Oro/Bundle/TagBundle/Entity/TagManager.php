@@ -178,7 +178,7 @@ class TagManager
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
-                if ($this->getUser()->getId() == $tagging->getCreatedBy()->getId()) {
+                if ($this->getUser()->getId() == $tagging->getOwner()->getId()) {
                     $entry['owner'] = true;
                 }
             }

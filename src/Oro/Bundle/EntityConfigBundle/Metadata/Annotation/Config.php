@@ -50,6 +50,7 @@ class Config
 
         $availableMode = array(
             ConfigModelManager::MODE_DEFAULT,
+            ConfigModelManager::MODE_HIDDEN,
             ConfigModelManager::MODE_READONLY
         );
 
