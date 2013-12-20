@@ -71,6 +71,8 @@ class SystemAwareResolver implements ContainerAwareInterface
      * @param string $val value to be resolved/replaced
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function resolveSystemCall($datagridName, $key, $val)
     {
