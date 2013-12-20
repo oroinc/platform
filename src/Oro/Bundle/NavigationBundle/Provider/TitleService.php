@@ -176,6 +176,19 @@ class TitleService implements TitleServiceInterface
                 $trans->trans($title, $params) . $trans->trans($suffix, $params);
         }
 
+        $delimiter = ' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ';
+        if ($translatedTemplate) {
+            $transItems = explode($delimiter, $translatedTemplate);
+            $messages   = $this->translator->getTranslations()['messages'];
+            foreach ($transItems as $key => $transItem) {
+                if (isset($messages[$transItem])) {
+                    $transItems[$key] = $messages[$transItem];
+                }
+            }
+
+            $translatedTemplate = implode($delimiter, $transItems);
+        }
+
         return $translatedTemplate;
     }
 
