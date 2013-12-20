@@ -7,8 +7,16 @@ class TagGeneratorContext
     /** @var array|TagGeneratorInterface[] */
     protected $generators = [];
 
-    public function __construct($generators)
+    public function __construct(array $generators = [])
     {
+        array_walk(
+            $generators,
+            function ($generator) {
+                if (!$generator instanceof TagGeneratorInterface) {
+                    throw new \LogicException('Generator should implement "TagGeneratorInterface"');
+                }
+            }
+        );
         $this->generators = $generators;
     }
 
@@ -27,7 +35,7 @@ class TagGeneratorContext
 
         foreach ($this->generators as $generator) {
             if ($generator->supports($data)) {
-                $tags = array_merge($generator->generate($data, $includeCollectionTag));
+                $tags = array_merge($tags, $generator->generate($data, $includeCollectionTag));
             }
         }
         $tags = array_unique($tags);

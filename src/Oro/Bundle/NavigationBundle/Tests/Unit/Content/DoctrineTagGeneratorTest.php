@@ -87,10 +87,10 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
      * @param mixed $data
      * @param bool  $includeCollectionTag
      * @param int   $expectedCount
+     * @param bool  $isManaged
      */
-    public function testGenerate($data, $includeCollectionTag, $expectedCount)
+    public function testGenerate($data, $includeCollectionTag, $expectedCount, $isManaged = false)
     {
-        $isManaged = !is_string($data) && get_class($data) == self::TEST_ENTITY_NAME;
         // only once if it's object
         $this->uow->expects($this->exactly(is_object($data) ? 1 : 0))->method('getEntityState')
             ->will(
@@ -121,10 +121,26 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
         return [
             'Should not generate any tags for new entity'                       => [new NewEntityStub(), false, 0],
             'Should not generate any tags for new entity even collection asked' => [new NewEntityStub(), true, 0],
-            'Should generate one tag for managed entity'                        => [new EntityStub(), false, 1],
-            'Should generate two tag for managed entity when collection asked'  => [new EntityStub(), true, 2],
+            'Should generate one tag for managed entity'                        => [new EntityStub(), false, 1, true],
+            'Should generate two tag for managed entity when collection asked'  => [new EntityStub(), true, 2, true],
             'Should not generate tag when data taken from string'               => [self::TEST_ENTITY_NAME, false, 0],
-            'Should generate collection tag when data taken from string'        => [self::TEST_ENTITY_NAME, true, 1]
+            'Should generate collection tag when data taken from string'        => [self::TEST_ENTITY_NAME, true, 1],
+            'Should take data from form and return tags for managed entity'     => [
+                $this->getFormMock(
+                    new EntityStub()
+                ),
+                true,
+                2,
+                true
+            ],
+            'Should take data from form and do not return tag for new entity'   => [
+                $this->getFormMock(
+                    new NewEntityStub()
+                ),
+                true,
+                0,
+                false
+            ],
         ];
     }
 
@@ -137,7 +153,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()->getMock();
-        $form->expects($this->once())->method('getData')
+        $form->expects($this->any())->method('getData')
             ->will($this->returnValue($data));
 
         return $form;

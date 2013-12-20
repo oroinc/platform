@@ -34,6 +34,8 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     {
         if ($data instanceof FormInterface) {
             $data = $data->getData();
+
+            return $this->supports($data);
         }
 
         $class = false;
@@ -56,6 +58,8 @@ class DoctrineTagGenerator implements TagGeneratorInterface
 
             if ($data instanceof FormInterface) {
                 $data = $data->getData();
+
+                return $this->generate($data, $includeCollectionTag);
             }
 
             $class = false;
