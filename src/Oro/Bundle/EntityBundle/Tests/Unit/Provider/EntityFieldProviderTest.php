@@ -39,7 +39,15 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $entityProvider = new EntityProvider($this->entityConfigProvider, $this->entityClassResolver);
+
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnArgument(0));
+
+        $entityProvider = new EntityProvider($this->entityConfigProvider, $this->entityClassResolver, $translator);
 
         $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -49,7 +57,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->entityConfigProvider,
             $this->entityClassResolver,
             $this->doctrine,
-            $entityProvider
+            $entityProvider,
+            $translator
         );
     }
 

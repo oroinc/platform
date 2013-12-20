@@ -65,7 +65,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -84,6 +84,10 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->breadcrumbManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->translator->expects($this->any())
+            ->method('getTranslations')
+            ->will($this->returnValue(['messages' => []]));
 
         $this->titleService = new TitleService(
             $this->annotationsReader,

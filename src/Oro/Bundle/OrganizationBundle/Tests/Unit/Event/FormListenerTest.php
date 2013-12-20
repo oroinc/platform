@@ -35,7 +35,20 @@ class FormListenerTest extends \PHPUnit_Framework_TestCase
         $formData['dataBlocks'][0]['subblocks'][0]['data'][] = $newField;
         $event->expects($this->once())->method('setFormData')->with($formData);
 
-        $listener = new FormListener();
+        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $provider->expects($this->any())
+            ->method('hasConfig')
+            ->will($this->returnValue(false));
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManager->expects($this->any())
+            ->method('getProvider')
+            ->will($this->returnValue($provider));
+
+        $listener = new FormListener($configManager);
 
         $listener->addOwnerField($event);
     }
