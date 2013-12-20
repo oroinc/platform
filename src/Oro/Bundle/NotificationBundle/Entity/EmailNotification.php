@@ -17,7 +17,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository")
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Email Notification", "plural_label"="Email Notifications"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""

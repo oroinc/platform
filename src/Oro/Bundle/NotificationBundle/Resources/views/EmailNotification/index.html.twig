@@ -7,8 +7,7 @@
     {% if resource_granted('oro_notification_emailnotification_create') %}
         {{ UI.addButton({
             'path' : path('oro_notification_emailnotification_create'),
-            'title' : 'Create notification rule',
-            'label' : 'Create notification rule'
+            'entity_label' : 'notification rule'|trans
         }) }}
     {% endif %}
 {% endblock %}

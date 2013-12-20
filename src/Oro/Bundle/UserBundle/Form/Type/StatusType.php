@@ -17,7 +17,8 @@ class StatusType extends AbstractType
             'status',
             'text',
             array(
-                 'required' => true,
+                'label'    => 'oro.user.enabled.label',
+                'required' => true,
             )
         );
 

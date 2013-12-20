@@ -36,17 +36,17 @@ class ChannelType extends AbstractType
             [
                 'required' => true,
                 'choices'  => $this->registry->getAvailableChannelTypesChoiceList(),
-                'label'    => 'Type'
+                'label'    => 'oro.integration.channel.type.label'
             ]
         );
-        $builder->add('name', 'text', ['required' => true, 'label' => 'Name']);
+        $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.channel.name.label']);
 
         // add transport type selector
         $builder->add(
             'transportType',
             'choice',
             [
-                'label'       => 'Transport type',
+                'label'       => 'oro.integration.channel.transport.label',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
                 'constraints' => new NotBlank()
@@ -58,7 +58,7 @@ class ChannelType extends AbstractType
             'connectors',
             'choice',
             [
-                'label'    => 'Connectors',
+                'label'    => 'oro.integration.channel.connectors.label',
                 'expanded' => true,
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener

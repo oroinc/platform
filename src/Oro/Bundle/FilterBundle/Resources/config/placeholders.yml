@@ -1,0 +1,9 @@
+placeholders:
+    scripts_before:
+        items:
+            filter_container:
+                order: 20
+
+items:
+   filter_container:
+        template: OroFilterBundle:Filter:container.js.twig

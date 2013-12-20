@@ -37,7 +37,6 @@ class TypedAddressType extends AbstractType
                 'primary',
                 'checkbox',
                 array(
-                    'label' => 'Primary',
                     'required' => false
                 )
             );
