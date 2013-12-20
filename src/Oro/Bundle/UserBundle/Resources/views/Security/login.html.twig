@@ -24,11 +24,11 @@
                 </div>
             {% endif %}
             <div class="input-prepend">
-                <span class="add-on">{{ 'Username'|trans }}</span>
+                <span class="add-on"><span data-width-collapse-group="login" data-width-sibling-sel="#prependedInput">{{ 'Username'|trans }}</span></span>
                 <input type="text" id="prependedInput" class="span2" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
             </div>
             <div class="input-prepend">
-                <span class="add-on">{{ 'Password'|trans }}</span>
+                <span class="add-on"><span data-width-collapse-group="login" data-width-sibling-sel="#prependedInput2">{{ 'Password'|trans }}</span></span>
                 <input type="password" id="prependedInput2" class="span2" name="_password" required="required" placeholder="{{ 'Password'|trans }}" autocomplete="off" />
             </div>
             <label class="checkbox oro-remember-me">
