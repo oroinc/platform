@@ -24,23 +24,43 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('title', 'textarea', array('required' => true))
+            ->with(
+                'title',
+                'textarea',
+                array('required' => true, 'label' => 'oro.calendar.calendarevent.title.label')
+            )
             ->will($this->returnSelf());
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('start', 'oro_datetime', array('required' => true))
+            ->with(
+                'start',
+                'oro_datetime',
+                array('required' => true, 'label' => 'oro.calendar.calendarevent.start.label')
+            )
             ->will($this->returnSelf());
         $builder->expects($this->at(2))
             ->method('add')
-            ->with('end', 'oro_datetime', array('required' => true))
+            ->with(
+                'end',
+                'oro_datetime',
+                array('required' => true, 'label' => 'oro.calendar.calendarevent.end.label')
+            )
             ->will($this->returnSelf());
         $builder->expects($this->at(3))
             ->method('add')
-            ->with('allDay', 'checkbox', array('required' => false))
+            ->with(
+                'allDay',
+                'checkbox',
+                array('required' => false, 'label' => 'oro.calendar.calendarevent.all_day.label')
+            )
             ->will($this->returnSelf());
         $builder->expects($this->at(4))
             ->method('add')
-            ->with('reminder', 'checkbox', array('required' => false))
+            ->with(
+                'reminder',
+                'checkbox',
+                array('required' => false, 'label' => 'oro.calendar.calendarevent.reminder.label')
+            )
             ->will($this->returnSelf());
 
         $this->type->buildForm($builder, array());

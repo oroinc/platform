@@ -49,7 +49,7 @@ class FieldConfigGridListener extends AbstractConfigGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        // false flag used to place dynaic columns to the end of grid
+        // false flag used to place dynamic columns to the end of grid
         $this->doBuildBefore($event, 'cfv_', PropertyConfigContainer::TYPE_FIELD, false);
     }
 

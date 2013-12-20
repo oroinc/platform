@@ -2,11 +2,11 @@
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set data = [
-            form_row(form.title, {'label': 'Title'}),
-            form_row(form.start, {'label': 'Start'}),
-            form_row(form.end, {'label': 'End'}),
-            form_row(form.allDay, {'label': 'All day event'}),
-            form_row(form.reminder, {'label': 'Reminder'}),
+            form_row(form.title),
+            form_row(form.start),
+            form_row(form.end),
+            form_row(form.allDay),
+            form_row(form.reminder),
         ]
     %}
     <div class="alert alert-error" style="display: none;"></div>

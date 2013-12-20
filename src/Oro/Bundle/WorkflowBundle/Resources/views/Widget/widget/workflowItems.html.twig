@@ -31,9 +31,9 @@
         <table class="grid table-hover table table-bordered table-condensed">
             <thead>
                 <tr>
-                    <th>{% trans %}Workflow Name{% endtrans %}</th>
-                    <th>{% trans %}Current Step{% endtrans %}</th>
-                    <th>{% trans %}Start Date{% endtrans %}</th>
+                    <th>{{ 'oro.workflow.workflowitem.workflow_name.label'|trans }}</th>
+                    <th>{{ 'oro.workflow.workflowitem.current_step_name.label'|trans }}</th>
+                    <th>{{ 'oro.workflow.workflowitem.created.label'|trans }}</th>
                     <th></th>
                 </tr>
             </thead>
@@ -132,6 +132,12 @@
                     transitionsWidget.render();
                 })();
                 {% endfor %}
+
+                widget.on('workflowItemRemoved', function() {
+                    widgetManager.getWidgetInstanceByAlias('workflow_entity_buttons', function(buttonsWidget) {
+                        buttonsWidget.loadContent();
+                    });
+                });
             });
         });
     </script>

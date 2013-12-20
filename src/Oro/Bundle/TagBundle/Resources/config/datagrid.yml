@@ -21,11 +21,11 @@ datagrid:
 
         columns:
             name:
-                label: Tag
+                label: oro.tag.name.label
                 type: field
                 frontend_type: string
             usage:
-                label: Usage Count
+                label: oro.tag.datagrid.usage_count
                 type: field
                 frontend_type: integer
 

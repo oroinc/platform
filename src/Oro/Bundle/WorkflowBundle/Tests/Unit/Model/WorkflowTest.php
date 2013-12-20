@@ -816,6 +816,110 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider passedStepsDataProvider
+     * @param array $records
+     * @param array $expected
+     */
+    public function testGetPassedStepsByWorkflowItem($records, $expected)
+    {
+        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflowItem->expects($this->once())
+            ->method('getTransitionRecords')
+            ->will($this->returnValue($records));
+
+        $stepsOne = $this->getStepMock('step1');
+        $stepsOne->expects($this->any())
+            ->method('getOrder')
+            ->will($this->returnValue(1));
+        $stepsTwo = $this->getStepMock('step2');
+        $stepsTwo->expects($this->any())
+            ->method('getOrder')
+            ->will($this->returnValue(2));
+        $stepsThree = $this->getStepMock('step3');
+        $stepsThree->expects($this->any())
+            ->method('getOrder')
+            ->will($this->returnValue(2));
+
+        $workflow = new Workflow();
+        $workflow->getStepManager()->setSteps(array($stepsOne, $stepsTwo, $stepsThree));
+
+        $passedSteps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
+        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $passedSteps);
+        $actual = array();
+        /** @var Step $step */
+        foreach ($passedSteps as $step) {
+            $actual[] = $step->getName();
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function passedStepsDataProvider()
+    {
+        return array(
+            array(
+                array(
+                    $this->getTransitionRecordMock('step1')
+                ),
+                array('step1')
+            ),
+            array(
+                array(
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                ),
+                array('step1', 'step2')
+            ),
+            array(
+                array(
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                ),
+                array('step1', 'step2')
+            ),
+            array(
+                array(
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step3'),
+                ),
+                array('step1', 'step3')
+            ),
+            array(
+                array(
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step3'),
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step2'),
+                    $this->getTransitionRecordMock('step1'),
+                    $this->getTransitionRecordMock('step3'),
+                ),
+                array('step1', 'step3')
+            ),
+        );
+    }
+
+    protected function getTransitionRecordMock($stepToName)
+    {
+        $record = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $record->expects($this->any())
+            ->method('getStepToName')
+            ->will($this->returnValue($stepToName));
+        return $record;
+    }
+
+    /**
      * @param null|string $workflowName
      * @return Workflow
      */

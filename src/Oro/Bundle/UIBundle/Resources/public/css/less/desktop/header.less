@@ -1,0 +1,56 @@
+#oroplatform-header {
+  .logo {
+    position: relative;
+    height: 40px;
+    font-weight: bold;
+    font-size: 17px;
+    padding: 0 14px 0 0;
+    margin: 0 5px 0 0;
+    line-height:36px;
+    float: left;
+    &:before {
+      width: 0px;
+      height: 0px;
+      border-style: solid;
+      border-width: 20px 0 21px 12px;
+      border-color: transparent transparent transparent #1b1e24;
+      content: "";
+      display: inline-block;
+      position: absolute;
+      right: 1px;
+      top: 0;
+      bottom:0;
+    }
+    &:after {
+      width: 0px;
+      height: 0px;
+      border-style: solid;
+      border-width: 21px 0 21px 12px;
+      border-color: transparent transparent transparent #2d333b;
+      content: "";
+      display: inline-block;
+      position: absolute;
+      right:2px;
+      top: -1px;
+      bottom:0;
+    }
+    a {
+      color: #fff;
+      background: #2d333b;
+      display: block;
+      position: relative;
+      text-transform: uppercase;
+      padding: 2px 6px 3px 10px;
+      [class^='icon-'] {
+        font-size:1.2em;
+      }
+      &:hover,
+      &:focus,
+      &:active {
+        text-decoration: none;
+        color: #fff;
+        outline: 0;
+      }
+    }
+  }
+}

@@ -60,7 +60,7 @@ class SyncProcessor implements SyncProcessorInterface
         /** @var Channel $channel */
         $connectors = $channel->getConnectors();
 
-        foreach ($connectors as $connector) {
+        foreach ((array)$connectors as $connector) {
             try {
                 $this->logger->info(sprintf('Start processing "%s" connector', $connector));
                 /**
@@ -88,11 +88,13 @@ class SyncProcessor implements SyncProcessorInterface
             );
             $configuration    = [
                 $mode => [
-                    'processorAlias' => reset($processorAliases),
-                    'entityName'     => $realConnector->getImportEntityFQCN(),
-                    'channel'        => $channel,
-                    'transport'      => $realTransport,
-                    'batchSize'      => self::DEFAULT_BATCH_SIZE
+                    'processorAlias'    => reset($processorAliases),
+                    'entityName'        => $realConnector->getImportEntityFQCN(),
+                    'channel'           => $channel->getId(),
+                    'transport'         => $realTransport,
+                    'transportSettings' => $channel->getTransport()->getSettingsBag(),
+                    // batch size should be configured in batch_jobs.yml configuration
+                    // 'batchSize'         => self::DEFAULT_BATCH_SIZE
                 ],
             ];
             $this->processImport($connector, $mode, $jobName, $configuration, $channel);

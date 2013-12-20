@@ -18,7 +18,7 @@ use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
 class ChannelController extends Controller
 {
     /**
-     * @Route("/index")
+     * @Route("/")
      * @Acl(
      *      id="oro_integration_channel_index",
      *      type="entity",

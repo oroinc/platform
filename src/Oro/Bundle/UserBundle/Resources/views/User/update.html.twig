@@ -3,7 +3,10 @@
 
 {% set fullname = form.vars.value|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
-{% set title = form.vars.value.id ? fullname ~ ' - ' ~ 'Update User'|trans : 'New User'|trans %}
+{% set title = form.vars.value.id
+    ? fullname ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.user.entity_label'|trans
+    : 'New'|trans ~ ' ' ~ 'oro.user.entity_label'|trans
+%}
 {% set audit_entity_class = 'Oro_Bundle_UserBundle_Entity_User' %}
 {% if editRoute %}
     {% set formAction = path(editRoute) %}
@@ -40,10 +43,7 @@
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-user',
             'dataId':  form.vars.value.id,
-            'dataMessage': 'Are you sure you want to delete this user?'|trans,
-            'successMessage': 'User deleted'|trans,
-            'title': 'Delete user',
-            'label': 'Delete'
+            'entity_label': 'oro.user.entity_label'|trans
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -57,7 +57,7 @@
         {% set breadcrumbs = {
             'entity':      form.vars.value,
             'indexPath':   path('oro_user_index'),
-            'indexLabel': 'Users'|trans,
+            'indexLabel': 'oro.user.entity_plural_label'|trans,
             'entityTitle': fullname,
             'hasAvatar':   true,
             'imagePath':   form.vars.value.imagePath,
@@ -70,9 +70,10 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    {{ parent() }}
-    <li>{{ 'Last logged in'|trans }}: {{ form.vars.value.lastLogin ? form.vars.value.lastLogin|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'Login count'|trans }}: {{ form.vars.value.loginCount|default(0) }}</li>
+    <li>{{ 'oro.user.created_at.label'|trans }}: {{ form.vars.value.createdAt ? form.vars.value.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.updated_at.label'|trans }}: {{ form.vars.value.updatedAt ? form.vars.value.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.last_login.label'|trans }}: {{ form.vars.value.lastLogin ? form.vars.value.lastLogin|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.user.login_count.label'|trans }}: {{ form.vars.value.loginCount|default(0) }}</li>
 {% endblock stats %}
 
 {% block content_data %}
@@ -102,13 +103,12 @@
                 'title': '',
                 'data': [
                     form_row(form.email),
-                    UI.collectionField(form.emails, 'Additional emails'|trans, 'Add another email'|trans),
+                    UI.collectionField(form.emails, 'oro.user.emails.label', 'Add another email'|trans),
                     form_row(form.tags)
                 ]
             }
         ]
     }] %}
-
 
     {% if form.additional is defined and form.additional.children|length > 0 %}
         {% set additionalData = [] %}
@@ -130,17 +130,17 @@
         {% macro userRoles(form) %}
             {% if form.rolesCollection is defined %}
                 <div class="form-horizontal" id="roles-list">
-                    {{ form_row(form.rolesCollection, { attr: { class: 'horizontal' } }) }}
+                    {{ form_row(form.rolesCollection, {attr: { class: 'horizontal' } }) }}
                 </div>
             {% endif %}
         {% endmacro %}
         {% set dataBlocks = dataBlocks|merge( [{
-            'title': 'Groups and Roles'|trans,
+            'title': 'oro.user.groups.label'|trans ~ ' ' ~ 'and' ~ ' ' ~ 'oro.user.roles.label'|trans,
             'subblocks': [
                 {
                     'title': '',
                     'data': [
-                        form.groups is defined ? form_row(form.groups, { attr: { class: 'horizontal' } }) : null,
+                        form.groups is defined ? form_row(form.groups, {attr: { class: 'horizontal' } }) : null,
                         _self.userRoles(form)
                     ]
                 }
@@ -150,7 +150,7 @@
 
     {% if form.change_password is defined %}
         {% set dataBlocks = dataBlocks|merge( [{
-            'title': 'Passwords'|trans,
+            'title': 'oro.user.password.label'|trans,
             'subblocks': [
                 {
                     'title': '',
@@ -169,7 +169,7 @@
     {% endmacro %}
 
     {% set dataBlocks = dataBlocks|merge( [{
-        'title': 'Business Units'|trans,
+        'title': 'oro.user.business_units.label'|trans,
         'subblocks': [
             {
                 'title': '',
@@ -182,7 +182,7 @@
     }] ) %}
 
     {% set dataBlocks = dataBlocks|merge([{
-        'title': 'Email synchronization settings',
+        'title': 'oro.user.imap_configuration.label'|trans,
         'subblocks': [{
             'title': '',
             'data': [form_widget(form.imapConfiguration)]

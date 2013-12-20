@@ -14,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *  routeName="oro_integration_channel_index",
  *  defaultValues={
- *      "entity"={"label"="Integration Channel", "plural_label"="Integration Channels"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""
@@ -212,15 +211,5 @@ class Channel
                 return $connectorFilter && $codeFilter;
             }
         );
-    }
-
-    /**
-     * Do not serialize
-     *
-     * @return array
-     */
-    public function __sleep()
-    {
-        return [];
     }
 }

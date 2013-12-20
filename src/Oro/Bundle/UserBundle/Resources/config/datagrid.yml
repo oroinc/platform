@@ -20,21 +20,21 @@ datagrid:
                     - { table: %oro_user.entity.class%, alias: u }
         columns:
             username:
-                label: oro.user.grid.users.columns.username
+                label: oro.user.username.label
             email:
-                label: oro.user.grid.users.columns.email
+                label: oro.user.email.label
             firstName:
-                label: oro.user.grid.users.columns.firstName
+                label: oro.user.first_name.label
             lastName:
-                label: oro.user.grid.users.columns.lastName
+                label: oro.user.last_name.label
             createdAt:
-                label: oro.user.grid.users.columns.createdAt
+                label: oro.user.created_at.label
                 frontend_type: datetime
             updatedAt:
-                label: oro.user.grid.users.columns.updatedAt
+                label: oro.user.updated_at.label
                 frontend_type: datetime
             enabled:
-                label: oro.user.grid.users.columns.enabled
+                label: oro.user.enabled.label
                 frontend_type: select
                 choices:
                    - Inactive
@@ -140,7 +140,7 @@ datagrid:
                     - { table: OroUserBundle:Group, alias: g }
         columns:
             name:
-                label: oro.user.grid.groups.columns.name
+                label: oro.user.group.name.label
 
         properties:
             id: ~
@@ -202,7 +202,7 @@ datagrid:
                         - r.role <> '%oro_user.entity.class%::ROLE_ANONYMOUS'
         columns:
             label:
-                label: oro.user.grid.roles.columns.label
+                label: oro.user.role.label.label
 
         properties:
             id: ~
@@ -315,13 +315,13 @@ datagrid:
                 editable: true
                 frontend_type: boolean
             firstName:
-                label: oro.user.grid.users.columns.firstName
+                label: oro.user.first_name.label
             lastName:
-                label: oro.user.grid.users.columns.lastName
+                label: oro.user.last_name.label
             username:
-                label: oro.user.grid.users.columns.username
+                label: oro.user.username.label
             email:
-                label: oro.user.grid.users.columns.email
+                label: oro.user.email.label
         filters:
             columns:
                 has_role:
@@ -380,13 +380,13 @@ datagrid:
                 editable: true
                 frontend_type: boolean
             firstName:
-                label: oro.user.grid.users.columns.firstName
+                label: oro.user.first_name.label
             lastName:
-                label: oro.user.grid.users.columns.lastName
+                label: oro.user.last_name.label
             username:
-                label: oro.user.grid.users.columns.username
+                label: oro.user.username.label
             email:
-                label: oro.user.grid.users.columns.email
+                label: oro.user.email.label
         filters:
             columns:
                 has_group:

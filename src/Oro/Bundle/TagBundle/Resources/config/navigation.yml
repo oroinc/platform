@@ -1,8 +1,8 @@
 oro_menu_config:
     items:
         oro_tag_list:
-            label: 'Tags'
-            route: 'oro_tag_index'
+            label: oro.tag.entity_plural_label
+            route: oro_tag_index
             extras:
                 routes: ['oro_tag_*']
                 description: Tags list

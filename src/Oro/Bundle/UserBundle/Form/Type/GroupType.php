@@ -23,6 +23,7 @@ class GroupType extends AbstractType
                 'name',
                 'text',
                 array(
+                    'label' => 'oro.user.group.name.label',
                     'required' => true,
                 )
             )
