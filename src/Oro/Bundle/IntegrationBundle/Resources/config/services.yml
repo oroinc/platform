@@ -5,7 +5,6 @@ parameters:
     oro_integration.form.handler.channel.class:                           Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
 
     oro_integration.manager.types_registry.class:                         Oro\Bundle\IntegrationBundle\Manager\TypesRegistry
-    oro_integration.import.api_reader.class:                              Oro\Bundle\IntegrationBundle\ImportExport\Reader\ApiReader
 
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
     oro_integration.provider.channel_type.simple.class:                   Oro\Bundle\IntegrationBundle\Provider\SimpleChannelType
@@ -51,6 +50,7 @@ services:
         class: %oro_integration.job_executor.class%
         arguments:
             - @oro_batch.connectors
+            - @oro_batch.job_repository
             - @oro_importexport.context_registry
             - @doctrine
 

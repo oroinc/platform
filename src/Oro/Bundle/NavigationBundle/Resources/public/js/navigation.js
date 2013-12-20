@@ -460,6 +460,7 @@ define(function (require) {
                         }
                         $('.sf-toolbar').remove();
                         container.append(dtContainer);
+                        mediator.trigger('layout:adjustHeight');
                     }, this)
                 );
             }
@@ -943,7 +944,6 @@ define(function (require) {
         disableEmptyLinks: function(selector) {
             $(selector).on('click', function(e) {
                 e.preventDefault();
-                e.stopPropagation();
             });
         },
 

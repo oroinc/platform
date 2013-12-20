@@ -25,26 +25,26 @@ class SelectRowFilter extends ChoiceFilter
             return false;
         }
 
-        $expression = false;
-        switch (true) {
-            case $data['in'] === null && $data['out'] !== null && empty($data['out']):
-                $expression = $ds->expr()->eq(1, 1);
-                break;
-            case $data['out'] === null && $data['in'] !== null && empty($data['in']):
-                $expression = $ds->expr()->eq(0, 1);
-                break;
-            case !empty($data['in']):
-                $expression = $ds->expr()->in($this->get(FilterUtility::DATA_NAME_KEY), $data['in']);
-                break;
-            case !empty($data['out']):
-                $expression = $ds->expr()->notIn($this->get(FilterUtility::DATA_NAME_KEY), $data['out']);
-                break;
+        if ($data['in'] !== null) {
+            if (!empty($data['in'])) {
+                $parameterName = $ds->generateParameterName($this->getName());
+                $this->applyFilterToClause(
+                    $ds,
+                    $ds->expr()->in($this->get(FilterUtility::DATA_NAME_KEY), $parameterName, true)
+                );
+                $ds->setParameter($parameterName, $data['in']);
+            } else {
+                // requested to return all selected rows, but no one row are selected
+                $this->applyFilterToClause($ds, $ds->expr()->eq(0, 1));
+            }
+        } elseif ($data['out'] !== null && !empty($data['out'])) {
+            $parameterName = $ds->generateParameterName($this->getName());
+            $this->applyFilterToClause(
+                $ds,
+                $ds->expr()->notIn($this->get(FilterUtility::DATA_NAME_KEY), $parameterName, true)
+            );
+            $ds->setParameter($parameterName, $data['out']);
         }
-        if (!$expression) {
-            return false;
-        }
-
-        $this->applyFilterToClause($ds, $expression);
 
         return true;
     }
@@ -59,7 +59,7 @@ class SelectRowFilter extends ChoiceFilter
     protected function parseData($data)
     {
         $expectedChoices = [SelectRowFilterType::NOT_SELECTED_VALUE, SelectRowFilterType::SELECTED_VALUE];
-        if (empty($data['value'])
+        if (!isset($data['value'])
             || !in_array($data['value'], $expectedChoices)) {
             return false;
         }

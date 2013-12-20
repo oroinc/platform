@@ -9,10 +9,16 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class AclPermissionController extends Controller
 {
     /**
-     * @Route("/acl-access-levels/{oid}", name="oro_security_access_levels")
+     * @Route(
+     *  "/acl-access-levels/{oid}", name="oro_security_access_levels" , requirements={"oid"="\w+:[\w\(\)]+"
+     * })
      */
     public function aclAccessLevelsAction($oid)
     {
+        if (strpos($oid, 'entity') !== false) {
+            $oid = str_replace('_', '\\', $oid);
+        }
+
         $levels = $this
             ->get('oro_security.acl.manager')
             ->getAccessLevels($oid);

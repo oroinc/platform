@@ -11,6 +11,7 @@ class CountryType extends AbstractType
     {
         $resolver->setDefaults(
             array(
+                'label' => 'oro.address.country.entity_label',
                 'class' => 'OroAddressBundle:Country',
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('c')

@@ -13,9 +13,9 @@
 {% endif %}
 
 {% set title = entity.name|default('N/A') %}
-{% set entityType = entity_output.name|trans({}, 'config') %}
+{% set entityType = entity_output.name|trans %}
 
 {% set entityInfo = [
-    {'title': 'Created', 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
-    {'title': 'Updated', 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.tag.created.label'|trans, 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.tag.updated.label'|trans, 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
 ] %}

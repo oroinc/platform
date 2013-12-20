@@ -4,12 +4,15 @@ parameters:
 
 services:
     oro_entity_config.type.config:
-        class:                                                  %oro_entity_config.type.config.class%
-        arguments:                                              [@oro_entity_config.config_manager]
+        class: %oro_entity_config.type.config.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @translator
+            - @service_container
         tags:
             - { name: form.type, alias: oro_entity_config_type }
 
     oro_entity_config.extension.config:
-        class:                                              %oro_entity_config.extension.config.class%
+        class: %oro_entity_config.extension.config.class%
         tags:
             - { name: form.type_extension, alias: form }

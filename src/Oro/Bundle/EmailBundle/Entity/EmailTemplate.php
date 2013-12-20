@@ -25,7 +25,6 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Email Template", "plural_label"="Email Templates"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""

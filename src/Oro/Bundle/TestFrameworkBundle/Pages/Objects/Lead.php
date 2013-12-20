@@ -183,12 +183,6 @@ class Lead extends AbstractEntity implements Entity
         $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
-
-    }
-
-    public function getOwner()
-    {
-        return;
     }
 
     public function setAddressLabel($value)
@@ -319,6 +313,20 @@ class Lead extends AbstractEntity implements Entity
         $values['country'] = $this->getAddressCountry();
         $values['state'] = $this->getAddressState();
 
+        return $this;
+    }
+
+    public function checkStatus($status)
+    {
+        $this->assertElementPresent("//div[@class='status-enabled pull-left'][contains(., '{$status}')]");
+        return $this;
+    }
+
+    public function reactivate()
+    {
+        $this->byXPath("//div[@class='btn-group']/a[@id='transition-b2b_flow_lead-reactivate']")->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
         return $this;
     }
 

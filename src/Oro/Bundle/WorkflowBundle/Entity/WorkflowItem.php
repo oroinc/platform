@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use JMS\Serializer\Annotation as Serializer;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Workflow item
@@ -27,6 +28,7 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
+ * @Config()
  */
 class WorkflowItem
 {
@@ -103,6 +105,7 @@ class WorkflowItem
      *  cascade={"persist", "remove"},
      *  orphanRemoval=true
      * )
+     * @ORM\OrderBy({"transitionDate" = "ASC"})
      */
     protected $transitionRecords;
 

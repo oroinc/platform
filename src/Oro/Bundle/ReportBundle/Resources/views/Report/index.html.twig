@@ -1,0 +1,13 @@
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set gridName = 'reports-grid' %}
+{% set pageTitle = 'oro.report.entity_plural_label'|trans %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_report_create') %}
+    {{ UI.addButton({
+        'path': path('oro_report_create'),
+        'entity_label': 'oro.report.entity_label'|trans
+    }) }}
+    {% endif %}
+{% endblock %}

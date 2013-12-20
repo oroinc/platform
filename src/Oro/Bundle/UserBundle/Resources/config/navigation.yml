@@ -7,7 +7,7 @@ oro_menu_config:
             label: 'Users Management'
             uri: '#'
         user_list:
-            label: 'Users'
+            label: oro.user.entity_plural_label
             route: 'oro_user_index'
             extras:
                 routes: ['/^oro_user_(?!role\w+|group\w+|security\w+|reset\w+)\w+$/']
@@ -16,13 +16,13 @@ oro_menu_config:
             label: 'Create User'
             route: 'oro_user_create'
         user_roles:
-            label: 'Roles'
+            label: oro.user.role.entity_plural_label
             route: 'oro_user_role_index'
             extras:
                 routes: ['oro_user_role_*']
                 description: List of system roles
         user_groups:
-            label: 'Groups'
+            label: oro.user.group.entity_plural_label
             route: 'oro_user_group_index'
             extras:
                 routes: ['oro_user_group_*']
@@ -77,17 +77,17 @@ oro_menu_config:
                 shortcut_new_group: ~
 
 oro_titles:
+    oro_user_index: ~
     oro_user_view: %%username%%
     oro_user_update: %%username%% - Edit
     oro_user_create: Create User
-    oro_user_index: ~
 
     oro_user_profile_view: %%username%%
     oro_user_profile_update: %%username%% - Edit
 
+    oro_user_role_index: ~
     oro_user_role_update: %%role%% - Edit
     oro_user_role_create: Create Role
-    oro_user_role_index: ~
 
     oro_user_security_login: Login
     oro_user_status_list: "User Status"
@@ -97,6 +97,6 @@ oro_titles:
     oro_user_reset_request: Forgot Password
     oro_user_reset_check_email: Password Reset - Check Email
 
+    oro_user_group_index: ~
     oro_user_group_create: Create Group
     oro_user_group_update: %%group%% - Edit
-    oro_user_group_index: ~

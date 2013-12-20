@@ -3,9 +3,12 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -21,11 +24,20 @@ class ConfigType extends AbstractType
     protected $configManager;
 
     /**
-     * @param ConfigManager $configManager
+     * @var Translator
      */
-    public function __construct(ConfigManager $configManager)
+    protected $translator;
+    protected $contaner;
+    /**
+     * @param ConfigManager $configManager
+     * @param Translator $translator
+     * @param Container $container
+     */
+    public function __construct(ConfigManager $configManager, Translator $translator, Container $container)
     {
         $this->configManager = $configManager;
+        $this->translator    = $translator;
+        $this->container     = $container;
     }
 
     /**
@@ -75,7 +87,13 @@ class ConfigType extends AbstractType
 
         $builder->setData($data);
 
-        $builder->addEventSubscriber(new ConfigSubscriber($this->configManager));
+        $builder->addEventSubscriber(
+            new ConfigSubscriber(
+                $this->configManager,
+                $this->translator,
+                $this->container->getParameter('kernel.cache_dir') . '/translations/'
+            )
+        );
     }
 
     /**

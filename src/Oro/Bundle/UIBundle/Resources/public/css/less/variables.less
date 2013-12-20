@@ -1,9 +1,10 @@
 //Oro variables
-@horizontalPadding:               20px;
-@verticalPadding:                 20px;
-@topPadding:                      20px;
-@bottomPadding:                   20px;
-@marginBottomBox:                 20px;
+@contentPadding:                  20px;
+@horizontalPadding:               @contentPadding;
+@verticalPadding:                 @contentPadding;
+@topPadding:                      @contentPadding;
+@bottomPadding:                   @contentPadding;
+@marginBottomBox:                 @contentPadding;
 @generalBorderColor:              #ddd;
 @widthPage:                       960px;
 @widthBodyPage:                   980px;
@@ -18,9 +19,13 @@
 @bodyBackground:                  #3e434a;
 @wellBackground:                  #f8f8f8;
 
-//@baseFontFamily:                  'HelveticaNeue','Helvetica Neue', Arial, Helvetica, sans-serif;
-@baseFontSize:                    12px;
+@baseFontFamily:                  'Helvetica Neue',Arial, Helvetica,sans-serif;
+@baseFontSize:                    13px;
 @baseLineHeight:                  20px;
+
+@fontSizeLarge:                   @baseFontSize * 1.25; // ~16px
+@fontSizeSmall:                   @baseFontSize * 0.85; // ~11px
+@fontSizeMini:                    @baseFontSize * 0.75; // ~10px
 
 @inputBorderRadius:               3px;
 @WindowBorderRadius:              3px;
@@ -40,7 +45,6 @@
 @warningBorder:                   #b4a68d;
 @warningText:                     #444;
 @warningClose:                    #e2d59a;
-@baseFontFamily:                  'Helvetica Neue',Arial, Helvetica,sans-serif;
 
 // Links
 @linkColor:                       #006acc;

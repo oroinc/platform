@@ -78,8 +78,7 @@ services:
             - @translator
             - @security.context
             - @oro_email.email.address.manager
-            - @oro_email.email.entity.builder=
-            - @oro_email.direct_mailer
+            - @oro_email.mailer.processor
             - @logger
             - @oro_locale.formatter.name
 

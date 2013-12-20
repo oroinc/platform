@@ -11,12 +11,14 @@ function(_, Backbone, AbstractWidget) {
     return AbstractWidget.extend({
         options: _.extend({}, AbstractWidget.prototype.options, {
             type: 'block',
+            title: null,
+            titleBlock: '.title',
             titleContainer: '.widget-title',
             actionsContainer: '.widget-actions-container',
             contentContainer: '.row-fluid',
             contentClasses: [],
             template: _.template('<div class="box-type1">' +
-                '<div class="title">' +
+                '<div class="title"<% if (_.isNull(title)) { %>style="display: none;"<% } %>>' +
                     '<div class="pull-right widget-actions-container"></div>' +
                     '<span class="widget-title"><%- title %></span>' +
                 '</div>' +
@@ -27,6 +29,9 @@ function(_, Backbone, AbstractWidget) {
         initialize: function(options) {
             options = options || {};
 
+            if (!_.isFunction(this.options.template)) {
+                this.options.template = _.template(this.options.template);
+            }
             this.widget = Backbone.$(this.options.template({
                 'title': this.options.title,
                 'contentClasses': this.options.contentClasses
@@ -36,6 +41,9 @@ function(_, Backbone, AbstractWidget) {
         },
 
         setTitle: function(title) {
+            if (_.isNull(this.options.title)) {
+                this._getTitleContainer().closest(this.options.titleBlock).show();
+            }
             this.options.title = title;
             this._getTitleContainer().html(this.options.title);
         },

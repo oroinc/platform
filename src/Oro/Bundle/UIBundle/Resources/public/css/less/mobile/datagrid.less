@@ -1,0 +1,68 @@
+.grid-toolbar {
+  padding: @contentPadding;
+  margin-bottom: -@contentPadding;
+  &:after {
+    content: '';
+    clear: both;
+    display: table;
+    line-height: 0;
+  }
+  label {
+    font-size: @baseFontSize;
+    line-height: 32px;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    vertical-align: top;
+  }
+  .pagination-container {
+    float: right;
+    width: 50%;
+    min-width: 210px;
+    padding-left: 90px;
+    box-sizing: content-box;
+    margin-bottom: @contentPadding / 2;
+  }
+  .pagination {
+    float: left;
+    margin-left: -90px;
+    .icons-holder{
+      text-align: center;
+    }
+    & > ul > li a {
+      width: 28px;
+      height: 32px;
+    }
+    input[type="number"] {
+      width: 28px;
+      height: 22px;
+    }
+  }
+  .btn-group {
+    .btn {
+      height: 32px;
+      padding-left: 12px;
+      padding-right: 14px;
+      font-size: @baseFontSize;
+      &.dropdown-toggle{
+        padding-right: 9px;
+      }
+      .caret {
+        margin-left: 12px;
+      }
+    }
+    & > .dropdown-menu li a {
+      padding-left: 12px;
+      padding-right: 21px;
+    }
+  }
+  .separator{
+    line-height: 27px;
+    font-size: 32px;
+    color: #eee;
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+    .forScreen(320px, height, 32px);
+  }
+}

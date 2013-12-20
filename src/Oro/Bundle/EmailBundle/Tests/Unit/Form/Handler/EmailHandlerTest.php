@@ -2,10 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
-use Oro\Bundle\EmailBundle\Entity\EmailBody;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,10 +31,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
     protected $emailAddressManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $emailEntityBuilder;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mailer;
+    protected $emailProcessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
@@ -68,10 +61,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->emailEntityBuilder  = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mailer              = $this->getMockBuilder('\Swift_Mailer')
+        $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->logger              = $this->getMock('Psr\Log\LoggerInterface');
@@ -108,8 +98,7 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             $this->translator,
             $this->securityContext,
             $this->emailAddressManager,
-            $this->emailEntityBuilder,
-            $this->mailer,
+            $this->emailProcessor,
             $this->logger,
             $this->nameFormatter
         );
@@ -199,63 +188,56 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('isValid')
             ->will($this->returnValue(true));
 
-        $message = new \Swift_Message();
-        $this->mailer->expects($this->once())
-            ->method('createMessage')
-            ->will($this->returnValue($message));
-        $this->mailer->expects($this->once())
-            ->method('send')
-            ->will($this->returnValue(1));
-
-        $origin = new InternalEmailOrigin();
-        $folder = new EmailFolder();
-        $folder->setType(EmailFolder::SENT);
-        $origin->addFolder($folder);
-        $emailOriginRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailOriginRepo->expects($this->once())
-            ->method('findOneBy')
-            ->with(array('name' => InternalEmailOrigin::BAP))
-            ->will($this->returnValue($origin));
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with('OroEmailBundle:InternalEmailOrigin')
-            ->will($this->returnValue($emailOriginRepo));
-
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('setOrigin')
-            ->with($this->identicalTo($origin));
-        $email = new EmailEntity();
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('email')
-            ->with('testSubject', 'from@example.com', array('to@example.com'))
-            ->will($this->returnValue($email));
-        $body = new EmailBody();
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('body')
-            ->with('testBody', false, true)
-            ->will($this->returnValue($body));
-        $batch = $this->getMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('getBatch')
-            ->will($this->returnValue($batch));
-        $batch->expects($this->once())
-            ->method('persist')
-            ->with($this->identicalTo($this->em));
-        $this->em->expects($this->once())
-            ->method('flush');
+        $this->emailProcessor->expects($this->once())
+            ->method('process')
+            ->with($this->model);
 
         $this->assertTrue($this->handler->process($this->model));
+    }
 
-        $this->assertNotNull($message);
-        $this->assertEquals(array('from@example.com' => null), $message->getFrom());
-        $this->assertEquals(array('to@example.com' => null), $message->getTo());
-        $this->assertEquals('testSubject', $message->getSubject());
-        $this->assertEquals('testBody', $message->getBody());
+    /**
+     * @dataProvider supportedMethods
+     */
+    public function testProcessException($method)
+    {
+        $this->request->setMethod($method);
+        $this->model
+            ->setFrom('from@example.com')
+            ->setTo(array('to@example.com'))
+            ->setSubject('testSubject')
+            ->setBody('testBody');
 
-        $this->assertTrue($folder === $email->getFolder());
-        $this->assertTrue($body === $email->getEmailBody());
+        $this->form->expects($this->once())
+            ->method('setData')
+            ->with($this->model);
+
+        $this->form->expects($this->once())
+            ->method('submit')
+            ->with($this->request);
+
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->will($this->returnValue(true));
+
+        $exception = new \Exception('TEST');
+        $this->emailProcessor->expects($this->once())
+            ->method('process')
+            ->with($this->model)
+            ->will(
+                $this->returnCallback(
+                    function () use ($exception) {
+                        throw $exception;
+                    }
+                )
+            );
+
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('Email sending failed.', array('exception' => $exception));
+        $this->form->expects($this->once())
+            ->method('addError')
+            ->with($this->isInstanceOf('Symfony\Component\Form\FormError'));
+        $this->assertFalse($this->handler->process($this->model));
     }
 
     public function supportedMethods()

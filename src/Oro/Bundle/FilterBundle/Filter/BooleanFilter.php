@@ -7,8 +7,6 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class BooleanFilter extends ChoiceFilter
 {
-    const NULLABLE_KEY = 'nullable';
-
     /**
      * {@inheritdoc}
      */
@@ -37,29 +35,15 @@ class BooleanFilter extends ChoiceFilter
             return false;
         }
 
-        $field             = $this->get(FilterUtility::DATA_NAME_KEY);
-        $compareExpression = $ds->expr()->neq($field, 'false');
-
-        if ($this->getOr(self::NULLABLE_KEY, false)) {
-            $summaryExpression = $ds->expr()->andX(
-                $ds->expr()->isNotNull($field),
-                $compareExpression
-            );
-        } else {
-            $summaryExpression = $compareExpression;
-        }
-
-        switch ($data['value']) {
-            case BooleanFilterType::TYPE_YES:
-                $expression = $summaryExpression;
-                break;
-            case BooleanFilterType::TYPE_NO:
-            default:
-                $expression = $ds->expr()->not($summaryExpression);
-                break;
-        }
-
-        $this->applyFilterToClause($ds, $expression);
+        $this->applyFilterToClause(
+            $ds,
+            $this->buildComparisonExpr(
+                $ds,
+                $data['value'],
+                $this->get(FilterUtility::DATA_NAME_KEY),
+                null
+            )
+        );
 
         return true;
     }
@@ -81,5 +65,28 @@ class BooleanFilter extends ChoiceFilter
         }
 
         return $data;
+    }
+
+    /**
+     * Build an expression used to filter data
+     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param int                              $comparisonType 0 to compare with false, 1 to compare with true
+     * @param string                           $fieldName
+     * @param string                           $parameterName  Not used in this type of a filter
+     * @return string
+     */
+    protected function buildComparisonExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName,
+        $parameterName
+    ) {
+        switch ($comparisonType) {
+            case BooleanFilterType::TYPE_YES:
+                return $ds->expr()->eq($fieldName, 'true');
+            default:
+                return $ds->expr()->neq($fieldName, 'true');
+        }
     }
 }

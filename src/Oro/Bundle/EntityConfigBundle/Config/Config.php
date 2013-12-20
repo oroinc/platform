@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * The aim of this class is to store configuration data for each configurable object (entity or field).

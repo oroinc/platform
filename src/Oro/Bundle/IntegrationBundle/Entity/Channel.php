@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -13,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *  routeName="oro_integration_channel_index",
  *  defaultValues={
- *      "entity"={"label"="Integration Channel", "plural_label"="Integration Channels"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""
@@ -64,6 +64,15 @@ class Channel
      * @Oro\Versioned()
      */
     protected $connectors;
+
+    /**
+     * @var Status[]|ArrayCollection
+     * @ORM\OneToMany(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Status",
+     *     cascade={"all"}, orphanRemoval=true, mappedBy="channel"
+     * )
+     * @ORM\OrderBy({"date" = "DESC"})
+     */
+    protected $statuses;
 
     /**
      * @return integer
@@ -161,5 +170,46 @@ class Channel
     public function getConnectors()
     {
         return $this->connectors;
+    }
+
+    /**
+     * @param Status $status
+     *
+     * @return $this
+     */
+    public function addStatus(Status $status)
+    {
+        if (!$this->statuses->contains($status)) {
+            $status->setChannel($this);
+            $this->statuses->add($status);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection|Status[]
+     */
+    public function getStatuses()
+    {
+        return $this->statuses;
+    }
+
+    /**
+     * @param string  $connector
+     * @param int|int $codeFilter
+     *
+     * @return ArrayCollection
+     */
+    public function getStatusesForConnector($connector, $codeFilter = null)
+    {
+        return $this->statuses->filter(
+            function (Status $status) use ($connector, $codeFilter) {
+                $connectorFilter = $status->getConnector() === $connector;
+                $codeFilter      = $codeFilter === null ? true : $status->getCode() == $codeFilter;
+
+                return $connectorFilter && $codeFilter;
+            }
+        );
     }
 }

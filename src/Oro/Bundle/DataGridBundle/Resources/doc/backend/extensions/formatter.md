@@ -53,7 +53,45 @@ column_name:
 ```
 Used when field should be formatted using some callback, format [see](./../../link.md).
 
-**Note:** _option `frontened_type` could be applied to formatter of any type, it will be used for formatting cell data on frontend_
+### Localized Number
+```
+column_name:
+    type: localized_number
+    method: formatCurrency      # required
+    context: []                 # optional
+    context_resolver: @callable # optional
+```
+Using for format numbers using Oro\Bundle\LocaleBundle\Formatter\NumberFormatter on backend.
+
+`method` - method from NumberFormatter that should be used for formatting
+`context` - static arguments for method that will be called, starts from 2nd arg
+`context_resolver` - callback that will resolve dynamic arguments for method that will be called, starts from 2nd arg
+should be compatible with following declaration:
+function (ResultRecordInterface $record, $value, NumberFormatter $formatter) {}
+
+Example:
+We would like to format currency, but currency code should be retrieved from current row
+```
+column_name:
+    type: localized_number
+    method: formatCurrency
+    context_resolver: staticClass::staticFunc
+```
+```php
+class staticClass {
+    public static function staticFunc()
+        {
+            return function (ResultRecordInterface $record, $value, NumberFormatter $formatter) {
+                return [$record->getValue('currencyFieldInResultRow')];
+            };
+        }
+}
+
+// will call
+// NumberFormatter->formatCurrency('value of column_name field', 'value of currencyFieldInResultRow field');
+```
+
+**Note:** _option `frontend_type` could be applied to formatter of any type, it will be used for formatting cell data on frontend_
 
 Customization
 -----------
