@@ -8,11 +8,8 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManager;
 
-use Swift_Transport_SpoolTransport;
-
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
 
