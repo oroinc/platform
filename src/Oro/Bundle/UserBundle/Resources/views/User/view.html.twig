@@ -1,21 +1,9 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroTagBundle::macros.html.twig' as _tag %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set fullname = entity|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
 {% set audit_entity_class = 'Oro_Bundle_UserBundle_Entity_User' %}
-{% macro api_data_block(user) %}
-<div class="horizontal">
-    <strong class="label label-info">{{ user.api ? user.api.apiKey : 'N/A' }}</strong>
-    {% if resource_granted('oro_user_user_update') %}
-        <a class="btn btn-small no-hash" id="btn-apigen" href="{{ path('oro_user_apigen', { id: user.id }) }}"
-           data-title="{{ 'Generate key'|trans }}" data-message="{{ 'Generate key was successful. New key:'|trans }}">
-            {{ 'Generate key'|trans }}
-        </a>
-    {% endif %}
-</div>
-{% endmacro %}
 
 {% block navButtons %}
     {% if editRoute is defined %}
@@ -74,146 +62,61 @@
 {% endblock stats %}
 
 {% block content_data %}
-  <div class="user-profile-cols">
-    {% set id = 'user-profile' %}
-
-    {% set dataSubBlocks = [UI.attibuteRow('oro.user.email.label', {
-        value: entity.email,
-        hint: 'Primary'|trans},
-        entity.emails|length ? {data: entity.emails, field:'email'} : {}
-    )] %}
-
-    {% if resource_granted('oro_tag_view_tag_cloud') %}
-        {% set dataSubBlocks = dataSubBlocks|merge([UI.renderAttribute('oro.tag.entity_plural_label', _tag.renderView(entity))]) %}
-    {% endif %}
-
-    {#{{ render(controller('OroEmailBundle:Email:activities', {'emails': entity.emails})) }}#}
-
+    {% set userInformationWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_user_widget_info', {id: entity.id}),
+            'title': 'User Information'|trans
+        }) }}
+    {% endset %}
     {% set dataBlocks = [
         {
-            'title': 'General'|trans,
+            'title': 'General Information'|trans,
             'class': 'active',
             'subblocks': [
-                {
-                    'title': 'Basic Information'|trans,
-                    'data': [
-                        UI.attibuteRow('oro.user.username.label', entity.username),
-                        entity.namePrefix ? UI.attibuteRow('oro.user.name_prefix.label', entity.namePrefix),
-                        UI.attibuteRow('oro.user.first_name.label', entity.firstName|default('N/A')),
-                        entity.middleName ? UI.attibuteRow('oro.user.middle_name.label', entity.middleName),
-                        UI.attibuteRow('oro.user.last_name.label', entity.lastName|default('N/A')),
-                        entity.nameSuffix ? UI.attibuteRow('oro.user.name_suffix.label', entity.nameSuffix),
-                        UI.attibuteRow('oro.user.birthday.label', entity.birthday ? entity.birthday|oro_format_date : 'N/A'),
-                        UI.renderAttribute('oro.user.api.label', _self.api_data_block(entity))
-                    ]
-                },
-                {
-                'title': 'Contact Information'|trans,
-                'data': dataSubBlocks
-                }
+                {'data' : [userInformationWidget]}
             ]
         }
-    ]
-    %}
-
-    {#
-      EntityExtend fields START
-    #}
-    {% set additional = [ ] %}
-    {% set additional_fields = [ ] %}
-    {% macro attibuteRow(title, value) %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
-        {% macro attribute_data(value) %}
-          <div class="clearfix-oro">
-              <p class="control-label">{{ value|raw }}</p>
-          </div>
-        {% endmacro %}
-        {{ UI.renderAttribute(title, _self.attribute_data(value)) }}
-    {% endmacro %}
-    {% if dynamic|length %}
-        {% for label, item in dynamic %}
-            {% if item is iterable %}
-                {% set data = '' %}
-                {% for value in item.values %}
-                    {% if value.link is defined and value.link != false  %}
-                        {% set data = data ~ '<a href="' ~ value.link ~ '">' ~ value.title ~ '</a>' %}
-                    {% else %}
-                        {% set data = data ~ value.title %}
-                    {% endif %}
-                    {% if not loop.last %}
-                        {% set data = data ~ ', ' %}
-                    {% endif %}
-                {% endfor %}
-                {% set item = data %}
-          {% endif %}
-
-          {% set additional = additional|merge([_self.attibuteRow(label|trans, item)]) %}
-      {% endfor %}
-
-      {% if additional|length %}
-          {% set col = 2 %}
-          {% set attributes = {} %}
-          {% set half = (additional|length / col)|ceil %}
-
-          {% for value in additional %}
-              {% set attributes = attributes | merge([value]) %}
-              {% if loop.index % half == 0  and not loop.last %}
-                  {% set additional_fields = additional_fields|merge([{'title' : null, 'data' : attributes}]) %}
-                  {% set attributes = {} %}
-              {% endif %}
-          {% endfor %}
-
-          {% set additional_fields = additional_fields|merge([{'title' : null, 'data' : attributes}]) %}
-      {% endif %}
-
-      {% set dataBlocks = dataBlocks|merge([{
-          'title': 'Additional Information',
-          'subblocks': additional_fields
-      }]) %}
-    {% endif %}
-    {#
-      EntityExtend fields END
-    #}
+    ] %}
 
     {% if resource_granted('oro_email_view') %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'oro.user.emails.label'|trans,
-            'subblocks': [
-                {
-                    'title': '',
-                    'useSpan': false,
-                    'data': [
-                        oro_widget_render({
-                            'widgetType': 'buttons',
-                            'url': path('oro_user_widget_emails', {id: entity.id}),
-                            'alias': 'user_emails',
-                            'cssClass': 'inner-grid',
-                        })
-
-                    ]
-                }
-            ]
-        }]) %}
+        {% set userEmailsWidget %}
+            {{ oro_widget_render({
+                'widgetType': 'block',
+                'url': path('oro_user_widget_emails', {id: entity.id}),
+                'title': 'oro.user.emails.label'|trans,
+                'alias': 'user_emails',
+                'cssClass': 'inner-grid'
+            }) }}
+        {% endset %}
+        {% set dataBlocks = dataBlocks|merge([
+            {
+                'title': 'Related Information'|trans,
+                'class': 'active',
+                'subblocks': [
+                    {'data' : [userEmailsWidget]}
+                ]
+            }
+        ]) %}
     {% endif %}
 
-    {%- set additional_data -%}
+    {%- set additionalInformation -%}
         {% placeholder oro_user_view_additional_data %}
     {%- endset -%}
 
-    {% if additional_data is not empty %}
+    {% if additionalInformation is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Additional data'|trans,
+            'title': 'Additional Information'|trans,
             'subblocks': [
                 {
-                    'title': '',
-                    'useSpan': false,
-                    'data': [additional_data]
+                    'spanClass': 'empty',
+                    'data': [additionalInformation]
                 }
             ]
         }]) %}
     {% endif %}
 
+    {% set id = 'userView' %}
     {% set data = { 'dataBlocks': dataBlocks } %}
     {{ parent() }}
-  </div>
 {% endblock content_data %}
