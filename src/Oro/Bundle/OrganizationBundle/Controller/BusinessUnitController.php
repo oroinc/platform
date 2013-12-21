@@ -167,4 +167,28 @@ class BusinessUnitController extends Controller
             'form'     => $this->get('oro_organization.form.business_unit')->createView(),
         );
     }
+
+    /**
+     * @Route("/widget/info/{id}", name="oro_business_unit_widget_info", requirements={"id"="\d+"})
+     * @Template
+     * @AclAncestor("oro_business_unit_view")
+     */
+    public function infoAction(BusinessUnit $entity)
+    {
+        return array(
+            'entity' => $entity,
+        );
+    }
+
+    /**
+     * @Route("/widget/users/{id}", name="oro_business_unit_widget_users", requirements={"id"="\d+"})
+     * @Template
+     * @AclAncestor("oro_user_user_view")
+     */
+    public function usersAction(BusinessUnit $entity)
+    {
+        return array(
+            'entity' => $entity,
+        );
+    }
 }

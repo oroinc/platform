@@ -2,9 +2,10 @@
 {% import 'OroTagBundle::macros.html.twig' as tag %}
 {% import 'OroEntityExtendBundle::macros.html.twig' as entityExtend %}
 
-{% macro renderEmail(email, isPrimary) %}
+{% macro renderEmail(emailAddress, isPrimary) %}
+    {% import 'OroEmailBundle::macros.html.twig' as email %}
     {% if isPrimary %}<strong>{% endif %}
-        <a href="mailto:{{ email }}" title="{{ email }}">{{ email }}</a>
+        {{ email.email_address_simple(emailAddress) }}
     {% if isPrimary %}</strong>{% endif %}
 {% endmacro %}
 
