@@ -4094,12 +4094,44 @@ span.validation-faled {
 .input-addon{
   width: 258px;
 }
-.responsive-cell .box-type1 .filter-box {
-  padding: 5px 20px 5px 130px;
-  margin: 5px;
-
-  .btn-group {
-    margin-bottom: 0px;
+.dashboard-contailer .page-title{
+  border-bottom: 1px solid #F2F2F2;
+}
+.responsive-cell .box-type1{
+  .title{
+    overflow: hidden;
+    .widget-title{
+      line-height: 21px;
+    }
+  }
+ .filter-box {
+    padding: 5px 20px 5px 130px;
+    margin: 5px;
+    .btn-group {
+      margin-bottom: 0px;
+    }
+  }
+  .tab-container{
+    .nav-tabs > li > a{
+      color: #577bd5;
+      font-size: 13px;
+      padding-left: 6px;
+      padding-right: 6px;
+      font-weight: normal;
+      &:hover{
+        text-decoration: underline;
+      }
+    }
+    .nav-tabs > .active > a,
+    .nav-tabs > .active > a:hover,
+    .nav-tabs > .active > a:focus{
+      color: #577bd5;
+      font-size: 13px;
+      background: none;
+      border: 0;
+      font-weight: bold;
+      text-decoration: underline;
+    }
   }
 }
 
