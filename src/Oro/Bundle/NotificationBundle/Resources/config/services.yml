@@ -118,6 +118,7 @@ services:
             - @doctrine.orm.entity_manager
             - %oro_notification.send_from%
             - @logger
+            - @oro_locale.settings
         calls:
             - [ setEnv, ['prod'] ]
             - [ setMessageLimit, [100] ]

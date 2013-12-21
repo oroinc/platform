@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\EventListener;
 
+use Gedmo\Translatable\TranslatableListener;
+
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,15 +22,22 @@ class LocaleListener implements EventSubscriberInterface
      * @var bool
      */
     protected $isInstalled;
+    /**
+     * @var TranslatableListener
+     */
+    private $translatableListener;
 
     /**
-     * @param LocaleSettings $localeSettings
-     * @param string|bool|null $installed
+     * @param LocaleSettings       $localeSettings
+     * @param TranslatableListener $translatableListener
+     * @param string|bool|null     $installed
      */
-    public function __construct(LocaleSettings $localeSettings, $installed)
+    public function __construct(LocaleSettings $localeSettings, TranslatableListener $translatableListener, $installed)
     {
         $this->localeSettings = $localeSettings;
         $this->isInstalled = !empty($installed);
+
+        $this->translatableListener = $translatableListener;
     }
 
     /**
@@ -42,7 +51,9 @@ class LocaleListener implements EventSubscriberInterface
 
         if ($this->isInstalled) {
             if (!$request->attributes->get('_locale')) {
-                $request->setLocale($this->localeSettings->getLanguage());
+                $request->setLocale($this->localeSettings->getLocale());
+
+                $this->translatableListener->setDefaultLocale($this->localeSettings->getLocale());
             }
             $this->setPhpDefaultLocale($this->localeSettings->getLocale());
         }
