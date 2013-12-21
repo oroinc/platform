@@ -6,10 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
-
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
@@ -39,15 +36,13 @@ class Group
      * @ORM\Id
      * @ORM\Column(type="smallint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int", nillable=true)
-     * @Type("integer")
+     * @JMS\Type("integer")
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
-     * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $name;
 
@@ -57,7 +52,7 @@ class Group
      *      joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Exclude
+     * @JMS\Exclude
      */
     protected $roles;
 
@@ -65,7 +60,6 @@ class Group
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $owner;
 

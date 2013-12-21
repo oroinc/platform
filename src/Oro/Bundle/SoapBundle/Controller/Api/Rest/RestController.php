@@ -3,14 +3,14 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiCrudInterface;
-use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
-use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
-use Symfony\Component\HttpFoundation\Response;
-
 use Doctrine\Common\Util\ClassUtils;
 
 use FOS\Rest\Util\Codes;
+
+use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
+use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 
 abstract class RestController extends RestGetController implements
     FormAwareInterface,
@@ -92,7 +92,36 @@ abstract class RestController extends RestGetController implements
      */
     protected function processForm($entity)
     {
+        $this->fixRequestAttributes($entity);
         return $this->getFormHandler()->process($entity);
+    }
+
+    /**
+     * Convert REST request to format applicable for form.
+     *
+     * @param object $entity
+     */
+    protected function fixRequestAttributes($entity)
+    {
+        $request = $this->container->get('request');
+        $data = $request->get($this->getForm()->getName());
+
+        $request->request->set(
+            $this->getForm()->getName(),
+            $this->fixFormData($data, $entity)
+        );
+    }
+
+    /**
+     * Fixes form data
+     *
+     * @param array $data
+     * @param mixed $entity
+     * @return array
+     */
+    protected function fixFormData(array $data, $entity)
+    {
+        return $data;
     }
 
     /**

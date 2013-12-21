@@ -14,7 +14,7 @@ class RoleController extends SoapController
      * @Soap\Method("getRoles")
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\Role[]")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\RoleSoap[]")
      * @AclAncestor("oro_user_role_view")
      */
     public function cgetAction($page = 1, $limit = 10)
@@ -25,7 +25,7 @@ class RoleController extends SoapController
     /**
      * @Soap\Method("getRole")
      * @Soap\Param("id", phpType="int")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\Role")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\RoleSoap")
      * @AclAncestor("oro_user_role_view")
      */
     public function getAction($id)
@@ -35,7 +35,7 @@ class RoleController extends SoapController
 
     /**
      * @Soap\Method("createRole")
-     * @Soap\Param("role", phpType="Oro\Bundle\UserBundle\Entity\Role")
+     * @Soap\Param("role", phpType="Oro\Bundle\UserBundle\Entity\RoleSoap")
      * @Soap\Result(phpType="int")
      * @AclAncestor("oro_user_role_create")
      */
@@ -47,7 +47,7 @@ class RoleController extends SoapController
     /**
      * @Soap\Method("updateRole")
      * @Soap\Param("id", phpType="int")
-     * @Soap\Param("role", phpType="Oro\Bundle\UserBundle\Entity\Role")
+     * @Soap\Param("role", phpType="Oro\Bundle\UserBundle\Entity\RoleSoap")
      * @Soap\Result(phpType="boolean")
      * @AclAncestor("oro_user_role_update")
      */
@@ -70,7 +70,7 @@ class RoleController extends SoapController
     /**
      * @Soap\Method("getRoleByName")
      * @Soap\Param("name", phpType="string")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\Role")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\RoleSoap")
      * @AclAncestor("oro_user_role_view")
      */
     public function getBynameAction($name)

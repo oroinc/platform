@@ -18,6 +18,11 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Email;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+
 /**
  * @NamePrefix("oro_api_")
  */
@@ -223,10 +228,111 @@ class UserController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view(
-                $entity,
+                $entity ? $this->getPreparedItem($entity) : null,
                 $entity ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function transformEntityField($field, &$value)
+    {
+        switch ($field) {
+            case 'roles':
+                $result = array();
+                /** @var Role $role */
+                foreach ($value as $index => $role) {
+                    $result[$index] = array(
+                        'id' => $role->getId(),
+                        'role' => $role->getRole(),
+                        'label' => $role->getLabel(),
+                    );
+                }
+                $value = $result;
+                break;
+            case 'groups':
+                $result = array();
+                /** @var Group $group */
+                foreach ($value as $index => $group) {
+                    $result[$index] = array(
+                        'id' => $group->getId(),
+                        'name' => $group->getName()
+                    );
+                }
+                $value = $result;
+                break;
+            case 'emails':
+                $result = array();
+                /** @var Email $email */
+                foreach ($value as $email) {
+                    $result[] = $email->getEmail();
+                }
+                $value = $result;
+                break;
+            case 'businessUnits':
+                $result = array();
+                /** @var BusinessUnit $businessUnit */
+                foreach ($value as $index => $businessUnit) {
+                    $result[$index] = array(
+                        'id' => $businessUnit->getId(),
+                        'name' => $businessUnit->getName()
+                    );
+                }
+                $value = $result;
+                break;
+            case 'owner':
+                if ($value) {
+                    $value = array(
+                        'id' => $value->getId(),
+                        'name' => $value->getName()
+                    );
+                }
+                break;
+            default:
+                parent::transformEntityField($field, $value);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array $data, $entity)
+    {
+        $result = parent::fixFormData($data, $entity);
+
+        if (!empty($result['roles'])) {
+            $result['rolesCollection'] = $result['roles'];
+        }
+        unset($result['roles']);
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPreparedItem($entity)
+    {
+        $result = parent::getPreparedItem($entity);
+
+        unset($result['salt']);
+        unset($result['password']);
+        unset($result['confirmationToken']);
+        unset($result['passwordRequestedAt']);
+        unset($result['imapConfiguration']);
+        unset($result['currentStatus']);
+        unset($result['statuses']);
+        unset($result['api']);
+
+        $result['imagePath'] = null;
+        if (isset($result['image'])) {
+            $result['imagePath'] = $this->getRequest()->getBasePath() . '/' . $entity->getImagePath();
+        }
+        unset($result['image']);
+
+        return $result;
     }
 
     /**

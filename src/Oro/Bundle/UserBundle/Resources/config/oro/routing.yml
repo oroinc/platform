@@ -12,6 +12,9 @@ oro_user_api_user:
     resource:     "@OroUserBundle/Controller/Api/Rest/UserController.php"
     type:         rest
     prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format: json
     defaults:
         version:  latest
 
@@ -19,6 +22,9 @@ oro_user_api_role:
     resource:     "@OroUserBundle/Controller/Api/Rest/RoleController.php"
     type:         rest
     prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format: json
     defaults:
         version:  latest
 
@@ -26,5 +32,9 @@ oro_user_api_group:
     resource:     "@OroUserBundle/Controller/Api/Rest/GroupController.php"
     type:         rest
     prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format: json
     defaults:
         version:  latest
+

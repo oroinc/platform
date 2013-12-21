@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 
-use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class AddressApiType extends AbstractType
 {
