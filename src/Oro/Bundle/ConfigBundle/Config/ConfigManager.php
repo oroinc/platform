@@ -13,6 +13,7 @@ class ConfigManager
 {
     const SECTION_VIEW_SEPARATOR  = '___';
     const SECTION_MODEL_SEPARATOR = '.';
+    const SCOPE_NAME = 'app';
 
     /**
      * @var ObjectManager
@@ -149,9 +150,10 @@ class ConfigManager
     }
 
     /**
-     * @param $entity
-     * @param $entityId
-     * @param null $section
+     * @param string      $entity
+     * @param int         $entityId
+     * @param null|string $section
+     *
      * @return bool
      */
     public function loadStoredSettings($entity, $entityId, $section = null)
@@ -160,9 +162,20 @@ class ConfigManager
             return false;
         }
 
-        $this->storedSettings[$entity][$entityId] = $this->om
+        $config = $this->om
             ->getRepository('OroConfigBundle:Config')
             ->loadSettings($entity, $entityId, $section);
+
+        // TODO: optimize it
+        // merge app settings with scope settings
+        if ($entity != static::SCOPE_NAME) {
+            $appConfig = $this->om
+                ->getRepository('OroConfigBundle:Config')
+                ->loadSettings(static::SCOPE_NAME, 0, $section);
+            $config = array_merge($appConfig, $config);
+        }
+
+        $this->storedSettings[$entity][$entityId] = $config;
 
         return true;
     }
@@ -198,7 +211,7 @@ class ConfigManager
      */
     public function getScopedEntityName()
     {
-        return 'app';
+        return static::SCOPE_NAME;
     }
 
     /**

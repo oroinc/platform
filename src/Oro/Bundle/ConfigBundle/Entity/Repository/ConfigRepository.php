@@ -5,6 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
+use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 
 /**
  * Class ConfigRepository
@@ -37,13 +38,34 @@ class ConfigRepository extends EntityRepository
         $settings = array();
         foreach ($scope->getValues() as $value) {
             $settings[$value->getSection()][$value->getName()] = array(
-                'value' => $value->getValue(),
+                'value' => $this->getValue($value),
                 'scope' => $scope->getEntity() ?: 'app',
                 'use_parent_scope_value' => false
             );
         }
 
         return $settings;
+    }
+
+    /**
+     * @param ConfigValue $value
+     *
+     * @return array|string
+     */
+    protected function getValue(ConfigValue $value)
+    {
+        switch ($value->getType()) {
+            case ConfigValue::FIELD_SERIALIZED_TYPE:
+                $result = unserialize($value->getValue());
+                break;
+            case ConfigValue::FIELD_LIST_TYPE:
+                $result = explode(ConfigValue::DELIMITER, $value->getValue());
+                break;
+            default:
+                $result = $value->getValue();
+        }
+
+        return $result;
     }
 
     /**

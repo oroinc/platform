@@ -17,6 +17,11 @@ use JMS\Serializer\Annotation\Exclude;
  */
 class ConfigValue
 {
+    const FIELD_SCALAR_TYPE     = 'text';
+    const FIELD_LIST_TYPE       = 'list';
+    const FIELD_SERIALIZED_TYPE = 'serialized';
+    const DELIMITER             = ',';
+
     /**
      * @var integer
      *
@@ -52,6 +57,12 @@ class ConfigValue
      * @ORM\Column(type="text", nullable=true)
      */
     protected $value;
+
+    /**
+     * @var string
+     * @ORM\Column(type="string", length=20, nullable=false)
+     */
+    protected $type = self::FIELD_SCALAR_TYPE;
 
     /**
      * Get id
@@ -145,6 +156,26 @@ class ConfigValue
     public function getSection()
     {
         return $this->section;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
