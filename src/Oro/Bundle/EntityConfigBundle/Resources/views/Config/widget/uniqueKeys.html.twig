@@ -1,0 +1,13 @@
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+
+<div class="widget-content form-horizontal row-fluid">
+    <div class="responsive-block">
+        {% if unique_key is not empty %}
+            {% for key in unique_key.keys|default %}
+                {{ ui.renderProperty(key.name, key.key|join(', ')) }}
+            {% endfor %}
+        {% else %}
+            {% trans %}No unique keys found.{% endtrans %}
+        {% endif %}
+    </div>
+</div>
