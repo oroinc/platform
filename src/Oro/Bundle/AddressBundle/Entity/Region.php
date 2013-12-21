@@ -19,11 +19,7 @@ use Oro\Bundle\AddressBundle\Entity\Country;
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
- * @Config(
- *  defaultValues={
- *      "entity"={"label"="Region", "plural_label"="Regions"}
- *  }
- * )
+ * @Config()
  */
 class Region implements Translatable
 {

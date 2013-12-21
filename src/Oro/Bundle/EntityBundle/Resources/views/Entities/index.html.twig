@@ -27,8 +27,8 @@
     {% if resource_granted('CREATE', 'entity:'~entity_class) %}
         {{ UI.addButton({
             'path': path('oro_entity_update', {'entity_id': entity_id}),
-            'title': 'Create '~label,
-            'label': 'Create '~label,
+            'title': 'Create '~label|trans,
+            'label': 'Create '~label|trans,
         }) }}
     {% endif %}
 {% endblock %}

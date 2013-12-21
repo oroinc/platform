@@ -1,0 +1,82 @@
+& {
+  min-width: inherit;
+  font-size: @baseFontSize;
+}
+
+.btn-group > .dropdown-menu li a {
+  font-size: @baseFontSize;
+}
+
+.container,
+.navbar-static-top .container,
+.navbar-fixed-top .container,
+.navbar-fixed-bottom .container,
+.popup-box-errors {
+  width: auto;
+}
+
+.form-horizontal .control-group {
+  max-width: auto;
+}
+
+.form-horizontal .control-group label.control-label {
+  float: none;
+  text-align: left;
+//  something goes wrong after width:auto, font-size starts jumping (+1px)
+//  width: auto;
+}
+
+.form-horizontal .control-group .controls {
+  margin-left: 0px;
+}
+
+.pin-bar, #pin-button-div, .breadcrumb-pin {
+  display: none !important;
+}
+
+.scrollspy-nav, .scrollspy-nav-target {
+  display: none;
+}
+
+&.error-page {
+  #container {
+    position: inherit;
+    .popup-frame {
+      position: inherit;
+    }
+    .popup-holder {
+      position: inherit;
+      margin: 0;
+    }
+  }
+}
+
+#progressbar {
+  margin-top: 100px;
+}
+
+.ui-dialog {
+  max-width: 100%;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+#footer {
+  display: none;
+}
+
+.modal {
+  max-width: 100%;
+  max-height: 100%;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+fieldset {
+  min-width: 100%;
+}

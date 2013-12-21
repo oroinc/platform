@@ -24,6 +24,11 @@ class FoundEntityConfigRepository extends EntityRepository
         }
     }
 
+    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    {
+        return [self::getResultConfigField()];
+    }
+
     public function findAll()
     {
         return array(self::getResultConfigEntity());

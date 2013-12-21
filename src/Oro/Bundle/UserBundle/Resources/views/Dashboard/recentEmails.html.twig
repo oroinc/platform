@@ -1,0 +1,34 @@
+{% extends 'OroDashboardBundle:Dashboard:tabbedWidget.html.twig' %}
+{% import 'OroEmailBundle::macros.html.twig' as Email %}
+
+{% block content %}
+    {% set tabs = [{
+        'url': path(
+            'oro_user_dashboard_recent_emails',
+            {'widget': widgetName, 'activeTab': 'inbox', 'contentType': 'tab'}
+        ),
+        'name': 'inbox',
+        'label': 'oro.dashboard.recent_emails.inbox'|trans
+    },
+    {
+        'url': path(
+            'oro_user_dashboard_recent_emails',
+            {'widget': widgetName, 'activeTab': 'sent', 'contentType': 'tab'}
+        ),
+        'name': 'sent',
+        'label': 'oro.dashboard.recent_emails.sent'|trans
+    }] %}
+
+    {{ parent() }}
+    {{ Email.renderJs() }}
+{% endblock %}
+
+{% block actions %}
+    {% set actions = [{
+        'url': path('oro_user_view', {'id': loggedUserId}),
+        'icon': 'envelope',
+        'label': 'oro.dashboard.recent_emails.view_all'|trans
+    }] %}
+
+    {{ parent() }}
+{% endblock %}

@@ -1,0 +1,53 @@
+{% set widgetId = app.request.get('_wid') %}
+{% set widgetContentId = 'widget-content-' ~ widgetId %}
+{% set widgetType = widgetType|default('dashboard') %}
+{% set widgetClass = (widgetName|replace({'_': '-'}))|lower %}
+{% if not widgetTitle is defined %}
+    {% if not widgetLabel is defined %}
+        {% set widgetTitle = false %}
+    {% else %}
+        {% set widgetTitle = widgetLabel|trans %}
+    {% endif %}
+{% endif %}
+
+<div id="{{ widgetContentId }}" class="widget-content {{ widgetType }}-widget-content {{ widgetClass }}-widget-content">
+    {% block content %}
+    {% endblock %}
+    <div class="widget-actions">
+        {% block actions %}
+            {% if actions is defined %}
+                {% for action in actions -%}
+                    <a class="dashboard-btn btn btn-mini {{ action.class|default('btn-primary') }}{% if not action.url is defined or not action.url %} no-hash{% endif %}"
+                        href="{{ action.url|default('javascript:void(0);') }}"
+                        {% if action.data is defined %}
+                            {% for dataItemName,dataItemValue in action.data %}
+                            data-{{ dataItemName }}="{{ dataItemValue|raw }}"
+                            {% endfor %}
+                        {% endif %}
+                    >{% if action.icon is defined %}<i class="icon-{{ action.icon }}"></i> {% endif %}{{ action.label }}</a>
+                {%- endfor %}
+            {% endif %}
+        {% endblock %}
+    </div>
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'oro/widget-manager', 'oro/navigation'],
+        function($, _, widgetManager, Navigation){
+            widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
+                {% if widgetTitle %}
+                widget.setTitle({{ widgetTitle|json_encode|raw }});
+                {% endif %}
+                widget.on('renderStart', function(el) {
+                    var navigation = Navigation.getInstance();
+                    if (navigation) {
+                        var actions = widget.getActions();
+                        if (!_.isUndefined(actions.adopted)) {
+                            _.each(actions.adopted, function (action) {
+                                navigation.processClicks(action);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</div>

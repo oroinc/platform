@@ -31,8 +31,5 @@
     display: none;
 }
 .calendars form .select2-container {
-    /* @todo: I'm not sure that it is good idea to set max-width here.
-              But I have no choice because default max-width is 290px */
-    max-width: 100%;
-    width: 100%;
+
 }

@@ -10,19 +10,6 @@ function($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionMod
      * @extends Backbone.View
      */
     return Backbone.View.extend({
-        /**
-         * A list of text/background colors are used to determine colors of events of connected calendars
-         *  @property {Array}
-         */
-        colors: [
-            ['FFFFFF', 'AC725E'], ['FFFFFF', 'D06B64'], ['FFFFFF', 'F83A22'], ['000000', 'FA573C'],
-            ['000000', 'FF7537'], ['000000', 'FFAD46'], ['000000', '42D692'], ['FFFFFF', '16A765'],
-            ['000000', '7BD148'], ['000000', 'B3DC6C'], ['000000', 'FBE983'], ['000000', 'FAD165'],
-            ['000000', '92E1C0'], ['000000', '9FE1E7'], ['000000', '9FC6E7'], ['FFFFFF', '4986E7'],
-            ['000000', '9A9CFF'], ['000000', 'B99AFF'], ['000000', 'C2C2C2'], ['000000', 'CABDBF'],
-            ['000000', 'CCA6AC'], ['000000', 'F691B2'], ['FFFFFF', 'CD74E6'], ['FFFFFF', 'A47AE2']
-        ],
-
         /** @property {Object} */
         attrs: {
             calendar:        'data-calendar',
@@ -43,15 +30,10 @@ function($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionMod
             newOwnerSelector: '#new_calendar_owner'
         },
 
-        /** @property {Object} */
-        calendarColorCache: null,
-
         initialize: function() {
             this.options.collection = this.options.collection || new ConnectionCollection();
             this.options.collection.setCalendar(this.options.calendar);
             this.template = _.template($(this.options.itemTemplateSelector).html());
-
-            this.defaultColors = this.findColors('4986E7');
 
             // render connected calendars
             this.getCollection().each(_.bind(function (model) {
@@ -79,15 +61,10 @@ function($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionMod
         onModelAdded: function(model){
             var viewModel = model.toJSON();
             // init text/background colors
-            if (_.isEmpty(viewModel.color) && _.isEmpty(viewModel.backgroundColor)) {
-                var colors = this.findNextColors(this.$el.find(this.selectors.lastItem).attr(this.attrs.backgroundColor));
-                viewModel.color = colors[0];
-                viewModel.backgroundColor = colors[1];
-            } else if (_.isEmpty(viewModel.color)) {
-                viewModel.color = this.defaultColors[0];
-            } else if (_.isEmpty(viewModel.backgroundColor)) {
-                viewModel.backgroundColor = this.defaultColors[1];
-            }
+            this.options.colorManager.applyColors(viewModel, _.bind(function () {
+                return this.$el.find(this.selectors.lastItem).attr(this.attrs.backgroundColor);
+            }, this));
+            this.options.colorManager.setCalendarColors(viewModel.calendar, viewModel.color, viewModel.backgroundColor);
 
             var el = $(this.template(viewModel));
             // set 'data-' attributes
@@ -105,12 +82,12 @@ function($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionMod
         },
 
         onModelChanged: function(model){
-            this.setCalendarColorCache(model.get('calendar'), model.get('color'), model.get('backgroundColor'));
+            this.options.colorManager.setCalendarColors(model.get('calendar'), model.get('color'), model.get('backgroundColor'));
             this.trigger('connectionChange', model);
         },
 
         onModelDeleted: function(model) {
-            this.resetCalendarColorCache(model.get('calendar'));
+            this.options.colorManager.removeCalendarColors(model.get('calendar'));
             this.$el.find(this.selectors.findItemByCalendar(model.get('calendar'))).remove();
             this.trigger('connectionRemove', model);
         },
@@ -161,62 +138,6 @@ function($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionMod
                 deletingMsg.close();
                 this.showError(err);
             }
-        },
-
-        getCalendarColors: function (calendarId) {
-            if (!_.isNull(this.calendarColorCache) && this.calendarColorCache.calendarId == calendarId) {
-                return this.calendarColorCache.colors;
-            }
-            var el = this.$el.find(this.selectors.findItemByCalendar(calendarId));
-            this.setCalendarColorCache(calendarId, el.attr(this.attrs.color), el.attr(this.attrs.backgroundColor));
-            return this.calendarColorCache.colors;
-        },
-
-        setCalendarColorCache: function (calendarId, color, backgroundColor) {
-            this.calendarColorCache = {
-                calendarId: calendarId,
-                colors: {
-                    color: '#' + color,
-                    backgroundColor: '#' + backgroundColor
-                }};
-        },
-
-        resetCalendarColorCache: function (calendarId) {
-            if (!_.isNull(this.calendarColorCache) && this.calendarColorCache.calendarId == calendarId) {
-                this.calendarColorCache = null;
-            }
-        },
-
-        findColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
-            }
-            bgColor = bgColor.toUpperCase();
-            var result = _.find(this.colors, function(item) { return item[1] === bgColor; });
-            if (_.isUndefined(result)) {
-                result = this.findColors(this.defaultColors[1]);
-            }
-            return result;
-        },
-
-        findNextColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
-            }
-            bgColor = bgColor.toUpperCase();
-            var i = -1;
-            _.each(this.colors, function(item, index) {
-                if (item[1] === bgColor) {
-                    i = index;
-                }
-            });
-            if (i === -1) {
-                return this.findColors(this.defaultColors[1]);
-            }
-            if ((i + 1) === _.size(this.colors)) {
-                return _.first(this.colors);
-            }
-            return this.colors[i + 1];
         },
 
         showAddError: function (err) {
