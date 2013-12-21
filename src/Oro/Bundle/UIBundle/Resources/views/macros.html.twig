@@ -502,3 +502,12 @@
         {% endif %}
     {% endif -%}
 {% endmacro %}
+
+{%- macro renderUrl(url, title) -%}
+    {% if title is empty %}
+        {% set title = url %}
+    {% endif %}
+    {% if url is not empty %}
+        <a href="{{ url|raw }}" title="{{ title|escape }}">{{ title }}</a>
+    {% endif %}
+{%- endmacro -%}
