@@ -57,12 +57,12 @@ class PageFilteredGrid extends PageGrid
     public function filterBy($filterName, $value = '', $condition = '')
     {
         $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/div[contains(@class, 'filter-item')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
             . "/button[contains(.,'{$filterName}')]"
         )->click();
 
         $criteria = $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/div[contains(@class, 'filter-item')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
             . "[button[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
         );
         $input = $criteria->element($this->using('xpath')->value("div/div/div/input[@name='value']"));

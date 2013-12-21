@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\NotificationBundle\Event\Handler\EmailNotificationHandler;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool;
 
@@ -44,47 +45,38 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test adding to spool/queueing message
-     *
-     * @param bool $flush
-     * @dataProvider queueMessageDataProvider
      */
-    public function testQueueMessage($flush)
+    public function testQueueMessage()
     {
         $message = $this->getMock('\Swift_Mime_Message');
 
+        $basicPersister = $this->getMockBuilder('\Doctrine\ORM\Persisters\BasicEntityPersister')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $basicPersister->expects($this->once())
+            ->method('addInsert');
+
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $uow->expects($this->once())
+            ->method('computeChangeSet');
+
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->will($this->returnValue(new ClassMetadata('JMS\JobQueueBundle\Entity\Job')));
+
+        $uow->expects($this->once())
+            ->method('getEntityPersister')
+            ->will($this->returnValue($basicPersister));
+
         $this->em
-            ->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf($this->className));
+            ->expects($this->exactly(2))
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
 
-        if ($flush) {
-            $this->em
-                ->expects($this->once())
-                ->method('flush')
-                ->with($this->isInstanceOf($this->className));
-        } else {
-            $this->em
-                ->expects($this->never())
-                ->method('flush');
-        }
-
-        $this->spool->setFlushOnQueue($flush);
         $this->assertTrue($this->spool->queueMessage($message));
-    }
-
-    /**
-     * @return array
-     */
-    public function queueMessageDataProvider()
-    {
-        return array(
-            'with flush' => array(
-                'flush' => true,
-            ),
-            'without flush' => array(
-                'flush' => false,
-            ),
-        );
     }
 
     /**
@@ -97,15 +89,9 @@ class DbSpoolTest extends \PHPUnit_Framework_TestCase
 
         $this->em
             ->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf($this->className));
+            ->method('getUnitOfWork')
+            ->will($this->throwException(new \Swift_IoException('problem')));
 
-        $this->em
-            ->expects($this->once())
-            ->method('flush')
-            ->will($this->throwException(new \Exception('problem')));
-
-        $this->spool->setFlushOnQueue(true);
         $this->spool->queueMessage($message);
     }
 

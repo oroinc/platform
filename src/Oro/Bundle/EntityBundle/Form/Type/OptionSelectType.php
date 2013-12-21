@@ -4,17 +4,18 @@ namespace Oro\Bundle\EntityBundle\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
@@ -29,11 +30,6 @@ class OptionSelectType extends AbstractType
      * @var ConfigManager
      */
     protected $configManager;
-
-    /**
-     * @var Config
-     */
-    protected $config;
 
     /**
      * @var OroEntityManager
@@ -55,8 +51,7 @@ class OptionSelectType extends AbstractType
      */
     public function __construct(ConfigManager $configManager)
     {
-        $this->configManager  = $configManager;
-        $this->extendProvider = $configManager->getProvider('extend');
+        $this->configManager = $configManager;
 
         $this->em        = $this->configManager->getEntityManager();
         $this->options   = $this->em->getRepository(OptionSet::ENTITY_NAME);
@@ -68,64 +63,61 @@ class OptionSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->config = $this->extendProvider->getConfigById($options['config_id']);
-
         $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSetData'));
         $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'preSubmitData'));
     }
 
+    /**
+     * PRE_SET_DATA event handler
+     *
+     * @param FormEvent $event
+     */
     public function preSetData(FormEvent $event)
     {
-        list($entityId, $model, $extendConfig) = $this->prepareEvent($event);
+        $configFieldModel = $this->configManager->getConfigFieldModel(
+            $event->getForm()->getConfig()->getOption('entityClassName'),
+            $event->getForm()->getConfig()->getOption('entityFieldName')
+        );
 
-        if ($entityId && $saved = $this->relations->findByFieldId($model->getId(), $entityId)) {
-            $data = [];
-            foreach ($saved as $option) {
-                $data[] = $option->getOption()->getId();
-            }
-
-            if ($extendConfig->is('set_expanded')) {
-                $event->setData($data);
-            } else {
-                $event->setData(array_shift($data));
-            }
-        } elseif ($entityId) {
-            $event->setData($extendConfig->is('set_expanded') ? [] : '');
+        $entityId = $this->getEntityId($event);
+        if ($entityId) {
+            $this->setData($event, $this->getSavedOptionIds($configFieldModel, $entityId));
+        } else {
+            $this->setData($event, $this->getDefaultOptionIds($configFieldModel));
         }
     }
 
+    /**
+     * PRE_SUBMIT event handler
+     *
+     * @param FormEvent $event
+     */
     public function preSubmitData(FormEvent $event)
     {
-        list($entityId, $model) = $this->prepareEvent($event);
-
-        $saved = [];
+        $entityId = $this->getEntityId($event);
         if ($entityId) {
-            $saved = $this->relations->findByFieldId($model->getId(), $entityId);
-            array_walk(
-                $saved,
-                function (&$item) {
-                    $item = $item->getOption()->getId();
-                }
+            $configFieldModel = $this->configManager->getConfigFieldModel(
+                $event->getForm()->getConfig()->getOption('entityClassName'),
+                $event->getForm()->getConfig()->getOption('entityFieldName')
             );
-        }
+            $savedOptionIds   = $this->getSavedOptionIds($configFieldModel, $entityId);
 
-        $data = $event->getData();
-        if (empty($data)) {
-            $data = [];
-        }
-        if (!is_array($data)) {
-            $data = [$data];
-        }
+            $data = $event->getData();
+            if (empty($data)) {
+                $data = [];
+            }
+            if (!is_array($data)) {
+                $data = [$data];
+            }
 
-        if ($entityId) {
             /**
              * Save selected options
              */
-            $toSave = array_intersect($data, $saved);
+            $toSave = array_intersect($data, $savedOptionIds);
             foreach ($data as $option) {
-                if (!in_array($option, $saved)) {
+                if (!in_array($option, $savedOptionIds)) {
                     $optionRelation = new OptionSetRelation();
-                    $optionRelation->setData(null, $entityId, $model, $this->options->find($option));
+                    $optionRelation->setData(null, $entityId, $configFieldModel, $this->options->find($option));
                     $toSave[] = $option;
 
                     $this->em->persist($optionRelation);
@@ -135,8 +127,8 @@ class OptionSelectType extends AbstractType
             /**
              * Remove unselected
              */
-            if ($entityId && $this->relations->count($model->getId(), $entityId)) {
-                $toRemove = $this->relations->findByNotIn($model->getId(), $entityId, $toSave);
+            if ($entityId && $this->relations->count($configFieldModel->getId(), $entityId)) {
+                $toRemove = $this->relations->findByNotIn($configFieldModel->getId(), $entityId, $toSave);
                 foreach ($toRemove as $option) {
                     $this->em->remove($option);
                 }
@@ -145,25 +137,150 @@ class OptionSelectType extends AbstractType
     }
 
     /**
-     * @param FormEvent $event
-     * @return array
+     * {@inheritdoc}
      */
-    protected function prepareEvent(FormEvent $event)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $that    = $this;
+        $choices = function (Options $options) use ($that) {
+            return $that->getChoices($options['entityClassName'], $options['entityFieldName']);
+        };
+        $resolver->setDefaults(
+            [
+                'choices'     => $choices,
+                'empty_value' => ''
+            ]
+        );
+        $resolver->setRequired(['entityClassName', 'entityFieldName']);
+
+        $multipleNormalizer   = function (Options $options, $value) use ($that) {
+            $extendConfig = $that->getExtendProvider()
+                ->getConfig($options['entityClassName'], $options['entityFieldName']);
+
+            return $extendConfig->is('set_expanded');
+        };
+        $emptyValueNormalizer = function (Options $options, $value) use ($that) {
+            $extendConfig = $that->getExtendProvider()
+                ->getConfig($options['entityClassName'], $options['entityFieldName']);
+            if (!$extendConfig->is('set_expanded')) {
+                $value = 'oro.form.choose_value';
+            }
+
+            return $value;
+        };
+        $resolver->setNormalizers(
+            array(
+                'multiple'    => $multipleNormalizer,
+                'empty_value' => $emptyValueNormalizer
+            )
+        );
+    }
+
+    /**
+     * Returns id of an entity associated with root form
+     *
+     * @param FormEvent $event
+     * @return int|null
+     */
+    protected function getEntityId(FormEvent $event)
+    {
+        $entityId = null;
         $formData = $event->getForm()->getRoot()->getData();
-        if (!$formData) {
-            return;
+        if ($formData) {
+            $entityId = $formData->getId();
         }
 
-        $entityId      = $formData->getId();
-        $fieldConfigId = $event->getForm()->getConfig()->getOption('config_id');
-        $extendConfig  = $this->configManager->getConfig($fieldConfigId);
-        $model         = $this->configManager->getConfigFieldModel(
-            $fieldConfigId->getClassName(),
-            $fieldConfigId->getFieldName()
+        return $entityId;
+    }
+
+    /**
+     * Sets form data
+     *
+     * @param FormEvent $event
+     * @param mixed     $data
+     */
+    protected function setData(FormEvent $event, $data)
+    {
+        if ($event->getForm()->getConfig()->getOption('multiple')) {
+            $event->setData($data ? $data : []);
+        } else {
+            $event->setData($data ? array_shift($data) : '');
+        }
+    }
+
+    /**
+     * Returns a list of all choices for an option set
+     *
+     * @param string $entityClassName
+     * @param string $entityFieldName
+     * @return array
+     */
+    protected function getChoices($entityClassName, $entityFieldName)
+    {
+        $configFieldModel = $this->configManager->getConfigFieldModel($entityClassName, $entityFieldName);
+        $options          = $configFieldModel->getOptions()->toArray();
+        uasort(
+            $options,
+            function ($a, $b) {
+                if ($a->getPriority() === $b->getPriority()) {
+                    return 0;
+                }
+
+                return ($a->getPriority() < $b->getPriority()) ? -1 : 1;
+            }
+        );
+        $result = [];
+        foreach ($options as $option) {
+            $result[$option->getId()] = $option->getLabel();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return ConfigProvider
+     */
+    protected function getExtendProvider()
+    {
+        return $this->configManager->getProvider('extend');
+    }
+
+    /**
+     * Returns already set options for the given option set and entity
+     *
+     * @param FieldConfigModel $configFieldModel
+     * @param int              $entityId
+     * @return int[]
+     */
+    protected function getSavedOptionIds(FieldConfigModel $configFieldModel, $entityId)
+    {
+        $savedOptionIds = $this->relations->findByFieldId($configFieldModel->getId(), $entityId);
+        array_walk(
+            $savedOptionIds,
+            function (&$item) {
+                $item = $item->getOption()->getId();
+            }
         );
 
-        return [$entityId, $model, $extendConfig];
+        return $savedOptionIds;
+    }
+
+    /**
+     * Returns default options for the given option set
+     *
+     * @param FieldConfigModel $configFieldModel
+     * @return int[]
+     */
+    protected function getDefaultOptionIds(FieldConfigModel $configFieldModel)
+    {
+        $defaultOptionIds = [];
+        foreach ($configFieldModel->getOptions()->toArray() as $option) {
+            if ($option->getIsDefault()) {
+                $defaultOptionIds[] = $option->getId();
+            }
+        }
+
+        return $defaultOptionIds;
     }
 
     /**

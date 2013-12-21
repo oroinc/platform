@@ -84,6 +84,13 @@ Login: Login
 "Template controller": "Template controller"
 
 oro:
+    dashboard:
+        recent_emails:
+            title:      Recent Emails
+            inbox:      Inbox
+            sent:       Sent
+            view_all:   View All
+
     user:
         controller:
             group.message.saved: "Group saved"

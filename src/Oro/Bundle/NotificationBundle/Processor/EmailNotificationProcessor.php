@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\NotificationBundle\Processor;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Psr\Log\LoggerInterface;
+
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\HttpFoundation\ParameterBag;
+
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
 
@@ -121,6 +126,13 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $this->notify($params);
             $this->addJob(self::SEND_COMMAND);
         }
+
+        /**
+         * Usage of EntityManager->flush is not safe here, cause this can happen in
+         * event listener postUpdate, onFlush, etc
+         */
+        $this->getEntityPersister(AbstractNotificationProcessor::JOB_ENTITY)
+             ->executeInserts();
     }
 
     /**
@@ -145,6 +157,13 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $this->mailer->send($message);
         }
 
+        /**
+         * Usage of EntityManager->flush is not safe here, cause this can happen in
+         * event listener postUpdate, onFlush, etc
+         */
+        $this->getEntityPersister(AbstractNotificationProcessor::SPOOL_ITEM_ENTITY)
+             ->executeInserts();
+
         return true;
     }
 
@@ -153,17 +172,16 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      *
      * @param string $command
      * @param array  $commandArgs
-     * @param bool $needFlush
-     * @return boolean|integer
+     * @return Job
      */
-    protected function addJob($command, $commandArgs = array(), $needFlush = false)
+    protected function addJob($command, $commandArgs = [])
     {
         $commandArgs = array_merge(
-            array(
+            [
                 '--message-limit=' . $this->messageLimit,
                 '--env=' . $this->env,
                 '--mailer=db_spool_mailer',
-            ),
+            ],
             $commandArgs
         );
 
@@ -171,6 +189,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $commandArgs[] = '--no-debug';
         }
 
-        return parent::addJob($command, $commandArgs, $needFlush);
+        return parent::addJob($command, $commandArgs);
     }
 }

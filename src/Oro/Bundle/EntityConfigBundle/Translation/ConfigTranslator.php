@@ -73,14 +73,42 @@ class ConfigTranslator implements LoaderInterface
         /** @var TranslationRepository $translationRepo */
         $translationRepo = $this->configManager->getEntityManager()->getRepository(Translation::ENTITY_NAME);
 
-        /** @var Translation[] $translations */
-        $translations = $translationRepo->findValues($this->translator->getLocale());
-        foreach ($translations as $translation) {
-            $messages[$translation->getKey()] = $translation->getValue();
+        if ($this->checkDatabase()) {
+            /** @var Translation[] $translations */
+            $translations = $translationRepo->findValues($this->translator->getLocale());
+            foreach ($translations as $translation) {
+                $messages[$translation->getKey()] = $translation->getValue();
+            }
+
+            $catalogue->add($messages);
         }
 
-        $catalogue->add($messages);
-
         return $catalogue;
+    }
+
+    /**
+     * Check if translations table exists in db
+     *
+     * @return bool
+     */
+    protected function checkDatabase()
+    {
+        $tableName  = $this->em->getClassMetadata(Translation::ENTITY_NAME)->getTableName();
+        $result = false;
+        try {
+            $conn = $this->em->getConnection();
+
+            if (!$conn->isConnected()) {
+                $this->em->getConnection()->connect();
+            }
+
+            $result = $conn->isConnected() && (bool)array_intersect(
+                array($tableName),
+                $this->em->getConnection()->getSchemaManager()->listTableNames()
+            );
+        } catch (\PDOException $e) {
+        }
+
+        return $result;
     }
 }

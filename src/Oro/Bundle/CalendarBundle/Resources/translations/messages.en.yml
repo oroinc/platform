@@ -1,4 +1,5 @@
 "My Calendar": "My Calendar"
+"Today calendar": "Today's Calendar"
 "Exclude this calendar": "Exclude this calendar"
 "Cancel": "Cancel"
 "Save": "Save"
@@ -7,8 +8,20 @@
 "Are you sure you want to delete this event?": "Are you sure you want to delete this event?"
 
 oro:
+    dashboard:
+        calendar:
+            new_event: New Event
+            view_calendar: My Calendar
+
     calendar:
         form.choose_user_to_add_calendar: "Choose a user to add a calendar ..."
+
+        control:
+            all_day: ""
+            today:   today
+            month:   month
+            week:    week
+            day:     day
 
         #
         # Oro/Bundle/CalendarBundle/Entity/Calendar
