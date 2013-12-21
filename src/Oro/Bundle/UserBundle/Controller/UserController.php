@@ -332,13 +332,25 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/widget/email/{userId}", name="oro_user_widget_email", requirements={"userId"="\d+"})
-     * @ParamConverter("user", options={"id"="userId"})
-     * @Template("OroUserBundle:User:email.html.twig")
+     * @Route("/widget/emails/{id}", name="oro_user_widget_emails", requirements={"id"="\d+"})
+     * @Template
      * @AclAncestor("oro_email_view")
      */
-    public function widgetEmailAction(User $user)
+    public function emailsAction(User $user)
     {
         return array('entity' => $user);
+    }
+
+    /**
+     * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
+     * @Template
+     * @AclAncestor("oro_user_user_view")
+     */
+    public function infoAction(User $user)
+    {
+        return array(
+            'entity'  => $user,
+            'dynamic' => $this->getDynamicFields($user)
+        );
     }
 }
