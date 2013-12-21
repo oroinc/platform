@@ -1,17 +1,20 @@
 {% import 'OroUIBundle::macros.html.twig' as ui %}
 {% import 'OroEmailBundle::macros.html.twig' as email %}
 
-<div class="widget-content form-horizontal box-content row-fluid">
-    <div class="responsive-block">
-        {{ ui.renderProperty('oro.organization.businessunit.name.label'|trans, entity.name) }}
-        {{ ui.renderProperty('oro.organization.businessunit.organization.label'|trans, entity.organization) }}
+<div class="widget-content">
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            {{ ui.renderProperty('oro.organization.businessunit.name.label'|trans, entity.name) }}
+            {{ ui.renderProperty('oro.organization.businessunit.organization.label'|trans, entity.organization) }}
 
-        {% set wibsite = entity.website ? ui.renderUrl(entity.website) : null %}
-        {{ ui.renderProperty('oro.organization.businessunit.website.label'|trans, wibsite) }}
-    </div>
-    <div class="responsive-block">
-        {{ ui.renderProperty('oro.organization.businessunit.email.label'|trans, email.email_address_simple(entity.email)) }}
-        {{ ui.renderProperty('oro.organization.businessunit.phone.label'|trans, entity.phone) }}
-        {{ ui.renderProperty('oro.organization.businessunit.fax.label'|trans, entity.fax) }}
+            {% set wibsite = entity.website ? ui.renderUrl(entity.website) : null %}
+            {{ ui.renderProperty('oro.organization.businessunit.website.label'|trans, wibsite) }}
+        </div>
+
+        <div class="responsive-block">
+            {{ ui.renderProperty('oro.organization.businessunit.email.label'|trans, email.email_address_simple(entity.email)) }}
+            {{ ui.renderProperty('oro.organization.businessunit.phone.label'|trans, entity.phone) }}
+            {{ ui.renderProperty('oro.organization.businessunit.fax.label'|trans, entity.fax) }}
+        </div>
     </div>
 </div>
