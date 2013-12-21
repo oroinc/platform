@@ -81,7 +81,8 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     protected function prepareMocks()
     {
         $configuration = new Configuration();
-        $configuration->addEntityNamespace('Stub', 'Oro\Bundle\GridBundle\Tests\Unit\Datagrid\ORM\Stub');
+
+        $configuration->addEntityNamespace('Stub', 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub');
 
         $classMetadata = new ClassMetadata('Entity');
         $classMetadata->mapField(array('fieldName' => 'a', 'columnName' => 'a'));
