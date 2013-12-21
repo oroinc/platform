@@ -2,81 +2,73 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Soap;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Doctrine\Common\Persistence\ObjectManager;
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
-use Oro\Bundle\AddressBundle\Entity\Address;
-use Oro\Bundle\AddressBundle\Entity\Country;
-use Oro\Bundle\AddressBundle\Entity\Region;
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
 
-/**
- * TODO: Discuss ACL impl.
- */
-class RegionController extends ContainerAware
+class RegionController extends SoapGetController
 {
     /**
      * @Soap\Method("getRegions")
-     * @Soap\Result(phpType = "Oro\Bundle\AddressBundle\Entity\Region[]")
-     * AclAncestor("oro_address")
+     * @Soap\Result(phpType = "Oro\Bundle\AddressBundle\Entity\RegionSoap[]")
+     * @AclAncestor("oro_address_dictionaries_read")
      */
     public function cgetAction()
     {
-        return $this->getManager()->getRepository('OroAddressBundle:Region')->findAll();
+        return $this->transformToSoapEntities($this->getRepository()->findAll());
     }
 
     /**
      * @Soap\Method("getRegion")
      * @Soap\Param("combinedCode", phpType = "string")
-     * @Soap\Result(phpType = "Oro\Bundle\AddressBundle\Entity\Region")
-     * AclAncestor("oro_address")
+     * @Soap\Result(phpType = "Oro\Bundle\AddressBundle\Entity\RegionSoap")
+     * @AclAncestor("oro_address_dictionaries_read")
      */
     public function getAction($combinedCode)
     {
-        return $this->getEntity('OroAddressBundle:Region', $combinedCode);
+        $entity = $this->getRepository()->find($combinedCode);
+
+        if (!$entity) {
+            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $combinedCode));
+        }
+
+        return $this->transformToSoapEntity($entity);
     }
 
     /**
      * @Soap\Method("getRegionByCountry")
-     * @Soap\Param("country", phpType = "string")
-     * @Soap\Result(phpType = "Oro\Bundle\AddressBundle\Entity\Region[]")
-     * AclAncestor("oro_address")
+     * @Soap\Param("countryIso2Code", phpType = "string")
+     * @Soap\Result(phpType = "Oro\Bundle\AddressBundle\Entity\RegionSoap[]")
+     * @AclAncestor("oro_address_dictionaries_read")
      */
-    public function getByCountryAction(Country $country)
+    public function getByCountryAction($countryIso2Code)
     {
-        /** @var  RegionRepository $regionRepository */
-        $regionRepository = $this->getManager()->getRepository('OroAddressBundle:Region');
-        $regions = $regionRepository->getCountryRegions($country);
+        $country = $this->getManager()->getRepository('OroAddressBundle:Country')->find($countryIso2Code);
 
-        return $regions;
+        if (!$country) {
+            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $countryIso2Code));
+        }
+
+        return $this->transformToSoapEntities($this->getRepository()->getCountryRegions($country));
+    }
+
+    /**
+     * @return RegionRepository
+     */
+    protected function getRepository()
+    {
+        return $this->getManager()->getRepository('OroAddressBundle:Region');
     }
 
     /**
      * @return ObjectManager
      */
-    protected function getManager()
+    public function getManager()
     {
         return $this->container->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * Shortcut to get entity
-     *
-     * @param string $repo
-     * @param int|string $id
-     * @throws \SoapFault
-     * @return Address
-     */
-    protected function getEntity($repo, $id)
-    {
-        $entity = $this->getManager()->find($repo, $id);
-
-        if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $id));
-        }
-
-        return $entity;
     }
 }

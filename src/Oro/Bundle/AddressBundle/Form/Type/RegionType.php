@@ -47,7 +47,7 @@ class RegionType extends AbstractType
                     'country'       => null,
                     'country_field' => null,
                     'configs' => array(
-                        'placeholder' => 'oro.address.form.choose_state',
+                        'placeholder' => 'oro.address.form.choose_region',
                     ),
                     'empty_value' => '',
                     'empty_data'  => null

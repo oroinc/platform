@@ -24,11 +24,6 @@ OroAddressBundle provides PHP/REST/SOAP API for address CRUD operations.
 ### REST API
 
 <pre>
-    oro_api_get_addresses     GET           /api/rest/{version}/addresses.{_format}
-    oro_api_get_address       GET           /api/rest/{version}/addresses/{id}.{_format}
-    oro_api_post_address      POST          /api/rest/{version}/address.{_format}
-    oro_api_put_address       PUT           /api/rest/{version}/address.{_format}
-    oro_api_delete_address    DELETE        /api/rest/{version}/address.{_format}
     oro_api_get_addresstype   GET           /api/rest/{version}/addresstypes/{name}.{_format}
     oro_api_get_addresstypes  GET           /api/rest/{version}/addresstypes.{_format}
 </pre>

@@ -81,7 +81,19 @@ class RoleController extends SoapController
             throw new \SoapFault('NOT_FOUND', sprintf('Role "%s" can not be found', $name));
         }
 
-        return $entity;
+        return $this->transformToSoapEntity($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array $data, $entity)
+    {
+        $result = parent::fixFormData($data, $entity);
+
+        unset($result['role']);
+
+        return $result;
     }
 
     /**

@@ -17,7 +17,7 @@ class RoleSoap extends Role implements SoapEntityInterface
     protected $id;
 
     /**
-     * @Soap\ComplexType("string")
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $role;
 

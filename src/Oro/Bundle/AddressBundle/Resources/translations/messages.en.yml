@@ -9,7 +9,7 @@ oro:
     address:
         form:
             choose_country: "Choose a country..."
-            choose_state: "Choose a state..."
+            choose_region: "Choose a state..."
         region:
             entity_label:         State
             entity_plural_label:  States

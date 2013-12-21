@@ -56,7 +56,8 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
             in_array('Oro\Bundle\SoapBundle\Entity\SoapEntityInterface', class_implements($soapEntityClass))
         ) {
             /** @var SoapEntityInterface $soapEntity */
-            $soapEntity = new $soapEntityClass();
+            $soapEntity = unserialize(sprintf('O:%u:"%s":0:{}', strlen($soapEntityClass), $soapEntityClass));
+
             $soapEntity->soapInit($entity);
             return $soapEntity;
         }
