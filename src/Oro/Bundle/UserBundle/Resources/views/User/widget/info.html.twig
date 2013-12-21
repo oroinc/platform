@@ -21,44 +21,60 @@
     </div>
 {% endmacro %}
 
-<div class="widget-content form-horizontal box-content row-fluid">
-    <div class="responsive-block">
-        {{ ui.renderProperty('oro.user.username.label'|trans, entity.username) }}
-        {{ ui.renderProperty('oro.user.birthday.label'|trans, entity.birthday ? entity.birthday|oro_format_date : null) }}
+<div class="widget-content">
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            {{ ui.renderProperty('oro.user.username.label'|trans, entity.username) }}
 
-        {% set emails = [_self.renderEmail(entity.email, true)] %}
-        {% for emailEntity in entity.emails %}
-            {% set emails = emails|merge([_self.renderEmail(emailEntity.email)]) %}
-        {% endfor %}
-        {{ ui.renderProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
+            {% set birthday_string %}
+                {{ entity.birthday is empty ? 'N/A'|trans : entity.birthday|oro_format_date }}
+                {% if entity.birthday is not empty %}
+                    ({{ entity.birthday|age_string({'default': 'N/A'}) }})
+                {% endif %}
+            {% endset %}
+            {{ ui.renderProperty('oro.user.birthday.label'|trans, birthday_string) }}
 
-        {{ entityExtend.renderDynamicFields(dynamic) }}
+            {% set emails = [_self.renderEmail(entity.email, true)] %}
+            {% for emailEntity in entity.emails %}
+                {% set emails = emails|merge([_self.renderEmail(emailEntity.email)]) %}
+            {% endfor %}
+            {{ ui.renderProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
+
+            {{ entityExtend.renderDynamicFields(dynamic) }}
+        </div>
+
+        <div class="responsive-block">
+            {{ ui.renderProperty('oro.user.api.label'|trans, _self.renderApiBlock(entity)) }}
+        </div>
     </div>
-    <div class="responsive-block">
-        {{ ui.renderProperty('oro.user.api.label'|trans, _self.renderApiBlock(entity)) }}
 
-        {% if resource_granted('oro_tag_view_tag_cloud') %}
-            {{ ui.renderProperty('oro.tag.entity_plural_label'|trans, tag.renderView(entity)) }}
-        {% endif %}
-    </div>
-</div>
+    {% if resource_granted('oro_tag_view_tag_cloud') %}
+        <div class="clearfix">
+            <label class="title">{{ 'oro.tag.entity_plural_label'|trans }}</label>
+            <div class="clearfix-oro container-fluid">
+                {{ tag.renderView(entity) }}
+            </div>
+        </div>
+    {% endif %}
 
-<script type="text/javascript">
-    require(['jquery', 'oro/messenger'],
-    function($, messenger){
-        'use strict';
-        $(function () {
-            $(document).on('click', '#btn-apigen', function () {
-                var el = $(this);
+    <script type="text/javascript">
+        require(['jquery', 'oro/messenger'],
+        function($, messenger){
+            'use strict';
+            $(function () {
+                $(document).on('click', '#btn-apigen', function () {
+                    var el = $(this);
 
-                $.get(el.attr('href'), function (data) {
-                    el.prev().text(data);
-                    var messageText = el.attr('data-message') + ' <strong>' + data + '</strong>';
-                    messenger.notificationFlashMessage('success', messageText);
+                    $.get(el.attr('href'), function (data) {
+                        el.prev().text(data);
+                        var messageText = el.attr('data-message') + ' <strong>' + data + '</strong>';
+                        messenger.notificationFlashMessage('success', messageText);
+                    });
+
+                    return false;
                 });
-
-                return false;
             });
         });
-    });
-</script>
+    </script>
+</div>
+
