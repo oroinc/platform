@@ -40,7 +40,7 @@ oro_system_configuration:
             type: oro_locale
             priority: 40
             options:
-                label: 'Language'
+                label: 'Default Language'
                 tooltip: oro.locale.form.tooltip.language
                 required: true
                 constraints:

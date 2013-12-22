@@ -4,6 +4,9 @@ namespace Oro\Bundle\NotificationBundle\Processor;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManager;
@@ -33,26 +36,34 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     protected $env = 'prod';
 
     /**
+     * @var LocaleSettings
+     */
+    private $localeSettings;
+
+    /**
      * Constructor
      *
-     * @param EmailRenderer   $emailRenderer
-     * @param \Swift_Mailer   $mailer
-     * @param EntityManager   $em
-     * @param string          $sendFrom
-     * @param LoggerInterface $logger
+     * @param EmailRenderer                                 $emailRenderer
+     * @param \Swift_Mailer                                 $mailer
+     * @param EntityManager                                 $em
+     * @param string                                        $sendFrom
+     * @param LoggerInterface                               $logger
+     * @param LocaleSettings $localeSettings
      */
     public function __construct(
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
         EntityManager $em,
         $sendFrom,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        LocaleSettings $localeSettings
     ) {
         parent::__construct($logger, $em);
 
         $this->renderer = $emailRenderer;
         $this->mailer   = $mailer;
         $this->sendFrom = $sendFrom;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -91,7 +102,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
-            $emailTemplate = $notification->getTemplate();
+            $emailTemplate = $notification->getTemplate($this->localeSettings->getLocale());
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;

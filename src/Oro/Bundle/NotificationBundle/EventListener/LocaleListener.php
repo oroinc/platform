@@ -1,34 +1,33 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\EventListener;
+namespace Oro\Bundle\NotificationBundle\EventListener;
+
+use Gedmo\Translatable\TranslatableListener;
 
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-
 class LocaleListener implements EventSubscriberInterface
 {
-    /**
-     * @var LocaleSettings
-     */
-    protected $localeSettings;
-
     /**
      * @var bool
      */
     protected $isInstalled;
+    /**
+     * @var TranslatableListener
+     */
+    private $translatableListener;
 
     /**
-     * @param LocaleSettings $localeSettings
-     * @param string|bool|null $installed
+     * @param TranslatableListener $translatableListener
+     * @param string|bool|null     $installed
      */
-    public function __construct(LocaleSettings $localeSettings, $installed)
+    public function __construct(TranslatableListener $translatableListener, $installed)
     {
-        $this->localeSettings = $localeSettings;
         $this->isInstalled = !empty($installed);
+        $this->translatableListener = $translatableListener;
     }
 
     /**
@@ -36,16 +35,11 @@ class LocaleListener implements EventSubscriberInterface
      */
     public function setRequest(Request $request = null)
     {
-        if (!$request) {
+        if (!$request || !$this->isInstalled) {
             return;
         }
 
-        if ($this->isInstalled) {
-            if (!$request->attributes->get('_locale')) {
-                $request->setLocale($this->localeSettings->getLocale());
-            }
-            $this->setPhpDefaultLocale($this->localeSettings->getLocale());
-        }
+        $this->translatableListener->setDefaultLocale($request->getLocale());
     }
 
     /**
@@ -53,16 +47,9 @@ class LocaleListener implements EventSubscriberInterface
      */
     public function onKernelRequest(GetResponseEvent $event)
     {
+        /** @var Request $request */
         $request = $event->getRequest();
         $this->setRequest($request);
-    }
-
-    /**
-     * @param string $locale
-     */
-    public function setPhpDefaultLocale($locale)
-    {
-        \Locale::setDefault($locale);
     }
 
     /**
@@ -70,9 +57,9 @@ class LocaleListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             // must be registered after Symfony's original LocaleListener
-            KernelEvents::REQUEST => array(array('onKernelRequest', 15)),
-        );
+            KernelEvents::REQUEST => [['onKernelRequest', 15]],
+        ];
     }
 }

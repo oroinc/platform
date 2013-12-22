@@ -13,13 +13,13 @@ class ArrayToStringTransformer implements DataTransformerInterface
     private $delimiter;
 
     /**
-     * @var string
+     * @var boolean
      */
     private $filterUniqueValues;
 
     /**
      * @param string $delimiter
-     * @param string $filterUniqueValues
+     * @param boolean $filterUniqueValues
      */
     public function __construct($delimiter, $filterUniqueValues)
     {

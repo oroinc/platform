@@ -30,11 +30,9 @@ class EmailNotificationAdapter implements EmailNotificationInterface
     }
 
     /**
-     * Gets a template is used to prepare calendar reminder message
-     *
-     * @return EmailTemplateInterface
+     * {@inheritdoc}
      */
-    public function getTemplate()
+    public function getTemplate($locale = null)
     {
         return $this->template;
     }

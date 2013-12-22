@@ -7,7 +7,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+
+use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 
 class EmailTemplateType extends AbstractType
 {
@@ -17,9 +18,15 @@ class EmailTemplateType extends AbstractType
     protected $entityNameChoices = array();
 
     /**
-     * @param array $entitiesConfig
+     * @var UserConfigManager
      */
-    public function __construct($entitiesConfig = array())
+    private $userConfig;
+
+    /**
+     * @param array             $entitiesConfig
+     * @param UserConfigManager $userConfig
+     */
+    public function __construct($entitiesConfig, UserConfigManager $userConfig)
     {
         $this->entityNameChoices = array_map(
             function ($value) {
@@ -27,6 +34,7 @@ class EmailTemplateType extends AbstractType
             },
             $entitiesConfig
         );
+        $this->userConfig = $userConfig;
     }
 
     /**
@@ -76,7 +84,8 @@ class EmailTemplateType extends AbstractType
             'oro_email_emailtemplate_translatation',
             array(
                 'label'    => 'oro.email.emailtemplate.translations.label',
-                'required' => false
+                'required' => false,
+                'locales' => $this->userConfig->get('oro_notification.languages'),
             )
         );
 
