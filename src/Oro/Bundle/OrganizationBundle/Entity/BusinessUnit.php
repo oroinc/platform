@@ -161,7 +161,7 @@ class BusinessUnit implements NotificationEmailInterface
      * @param Organization $organization
      * @return BusinessUnit
      */
-    public function setOrganization(Organization $organization)
+    public function setOrganization($organization)
     {
         $this->organization = $organization;
 

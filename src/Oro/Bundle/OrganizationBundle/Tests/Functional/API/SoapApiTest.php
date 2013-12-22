@@ -16,18 +16,16 @@ class SoapApiTest extends WebTestCase
     /** @var Client */
     protected $client;
 
-    protected $fixtureData = array('business_unit' =>
-            array(
-                'name'          => 'BU Name',
-                'organization'  => '1',
-                'phone' => '123-123-123',
-                'website' => 'http://localhost',
-                'email' => 'email@email.localhost',
-                'fax' => '321-321-321',
-                'parent' => null,
-                'appendUsers' => array(1),
-                'owner' => '1',
-            )
+    protected $fixtureData = array(
+        'business_unit' => array(
+            'name' => 'BU Name',
+            'organization' => '1',
+            'phone' => '123-123-123',
+            'website' => 'http://localhost',
+            'email' => 'email@email.localhost',
+            'fax' => '321-321-321',
+            'owner' => '1',
+        )
     );
 
     public function setUp()
@@ -48,13 +46,9 @@ class SoapApiTest extends WebTestCase
      */
     public function testCreate()
     {
-        $this->markTestSkipped('BAP-1375');
-        $result = $this->client->getSoap()->createBusinessUnit($this->fixtureData['business_unit']);
-        $responseData = ToolsAPI::classToArray($result);
-        $this->assertNotEmpty($responseData);
-        $this->assertInternalType('array', $responseData);
-        $this->assertArrayHasKey('id', $responseData);
+        $id = $this->client->getSoap()->createBusinessUnit($this->fixtureData['business_unit']);
+        $this->assertGreaterThan(0, $id);
 
-        return $responseData['id'];
+        return $id;
     }
 }
