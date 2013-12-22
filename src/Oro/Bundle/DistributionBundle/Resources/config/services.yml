@@ -59,7 +59,6 @@ services:
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
 
-
     oro_user.manager:
         class:                        %oro_user.manager.class%
         arguments:                    [%oro_user.entity.class%, "@doctrine.orm.entity_manager", "@security.encoder_factory"]
@@ -68,9 +67,3 @@ services:
         class:                        %oro_user.security.provider.class%
         public:                       false
         arguments:                    ["@oro_user.manager"]
-
-    kernel.listener.access_denied:
-        class: %kernel.listener.oro.access_denied.class%
-        arguments: ["@session", "@router", "@security.context"]
-        tags:
-           - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }
