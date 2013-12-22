@@ -16,9 +16,14 @@ class FilesystemCache extends BaseFilesystemCache
      */
     protected function getFilename($id)
     {
+        $namespace = $this->getNamespace();
+        if ($namespace && strpos($id, $namespace) === 0) {
+            $id = substr($id, strlen($namespace));
+        }
         $id = preg_replace('@[\\\/:"*?<>|]+@', '', $id);
-        $namespaceDir = preg_replace('@[\\\/:"*?<>|]+@', '', $this->getNamespace());
 
-        return $this->directory . DIRECTORY_SEPARATOR . $namespaceDir . DIRECTORY_SEPARATOR . $id . $this->extension;
+        return $this->directory . DIRECTORY_SEPARATOR
+        . ($namespace ? preg_replace('@[\\\/:"*?<>|]+@', '', $namespace) . DIRECTORY_SEPARATOR : '')
+        . $id . $this->extension;
     }
 }

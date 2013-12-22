@@ -117,4 +117,20 @@ class FieldConfigId implements ConfigIdInterface
             $this->fieldType,
             ) = unserialize($serialized);
     }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return FieldConfigId A new instance of a FieldConfigId object
+     */
+    public static function __set_state($data)
+    {
+        return new FieldConfigId(
+            $data['className'],
+            $data['scope'],
+            $data['fieldName'],
+            $data['fieldType']
+        );
+    }
 }

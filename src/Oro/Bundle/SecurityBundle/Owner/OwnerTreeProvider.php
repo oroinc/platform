@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManager;
  */
 class OwnerTreeProvider
 {
-    const CACHE_KEY = 'OwnerTreeData';
+    const CACHE_KEY = 'data';
 
     /**
      * @var EntityManager
@@ -79,17 +79,14 @@ class OwnerTreeProvider
         if ($this->tree === null) {
             $treeData = null;
             if ($this->cache) {
-                $cachedData = $this->cache->fetch(self::CACHE_KEY);
-                if ($cachedData) {
-                    $treeData = unserialize($cachedData);
-                }
+                $treeData = $this->cache->fetch(self::CACHE_KEY);
             }
             if (!$treeData && $this->checkDatabase()) {
                 $treeData = new OwnerTree();
                 $this->fillTree($treeData);
 
                 if ($this->cache) {
-                    $this->cache->save(self::CACHE_KEY, serialize($treeData));
+                    $this->cache->save(self::CACHE_KEY, $treeData);
                 }
             }
 

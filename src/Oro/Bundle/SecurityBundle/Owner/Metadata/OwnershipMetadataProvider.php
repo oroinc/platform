@@ -12,8 +12,6 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
  */
 class OwnershipMetadataProvider
 {
-    const CACHE_NAMESPACE = 'EntityOwnership';
-
     /**
      * @var string
      */
@@ -79,9 +77,6 @@ class OwnershipMetadataProvider
 
         $this->configProvider = $configProvider;
         $this->cache = $cache;
-        if ($this->cache !== null && $this->cache->getNamespace() === '') {
-            $this->cache->setNamespace(self::CACHE_NAMESPACE);
-        }
 
         $this->noOwnershipMetadata = new OwnershipMetadata();
     }

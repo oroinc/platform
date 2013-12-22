@@ -6,7 +6,6 @@ parameters:
 
     oro_security.owner.entity_owner_accessor.class:                       Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor
     oro_security.owner.ownership_metadata_provider.class:                 Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider
-    oro_security.owner.ownership_metadata_provider.cache.class:           Oro\Bundle\SecurityBundle\Cache\FilesystemCache
     oro_security.owner.ownership_config_subscriber.class:                 Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigSubscriber
     oro_security.owner.ownership_metadata_provider.cache.warmer.class:    Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheWarmer
     oro_security.owner.ownership_metadata_provider.cache.clearer.class:   Oro\Bundle\SecurityBundle\Cache\OwnershipMetadataCacheClearer
@@ -28,9 +27,9 @@ services:
 
     oro_security.owner.ownership_metadata_provider.cache:
         public: false
-        class: %oro_security.owner.ownership_metadata_provider.cache.class%
-        arguments:
-            - %kernel.cache_dir%/oro_ownership_metadata
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_acl_entity_ownership.cache" ] ]
 
     oro_security.owner.ownership_config_subscriber:
         class: %oro_security.owner.ownership_config_subscriber.class%
