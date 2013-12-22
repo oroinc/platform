@@ -49,7 +49,7 @@ class ConfigManager
      * @param  string $name Setting name, for example "oro_user.level"
      * @param bool $default
      * @param bool $full
-     * @return mixed
+     * @return array|string
      */
     public function get($name, $default = false, $full = false)
     {

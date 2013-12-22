@@ -3,10 +3,18 @@
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class EmailTemplateTranslationType extends AbstractType
 {
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['labels'] = $options['labels'];
+    }
+
+
     /**
      * {@inheritdoc}
      */
@@ -18,6 +26,7 @@ class EmailTemplateTranslationType extends AbstractType
                 'intention'            => 'emailtemplate_translation',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'cascade_validation'   => true,
+                'labels'               => [],
             )
         );
     }

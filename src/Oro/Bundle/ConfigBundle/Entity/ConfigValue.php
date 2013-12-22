@@ -14,6 +14,7 @@ use JMS\Serializer\Annotation\Exclude;
  *  uniqueConstraints={@ORM\UniqueConstraint(name="CONFIG_VALUE_UQ_ENTITY", columns={"name", "section", "config_id"})}
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class ConfigValue
 {
@@ -184,5 +185,52 @@ class ConfigValue
     public function __toString()
     {
         return (string) $this->getValue();
+    }
+
+    /**
+     * @ORM\PostLoad
+     */
+    public function doOnPostLoad()
+    {
+        switch ($this->type) {
+            case self::FIELD_SERIALIZED_TYPE:
+                $result = unserialize($this->value);
+                break;
+            case self::FIELD_LIST_TYPE:
+                $result = explode(ConfigValue::DELIMITER, $this->value);
+                break;
+            default:
+                $result = $this->value;
+        }
+
+        $this->value = $result;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function doOnPrePersist()
+    {
+        switch ($this->type) {
+            case is_object($this->value):
+                $this->value = serialize($this->value);
+                $this->type = self::FIELD_SERIALIZED_TYPE;
+                break;
+            case is_array($this->value):
+                $this->value = join(ConfigValue::DELIMITER, $this->value);
+                $this->type = self::FIELD_LIST_TYPE;
+                break;
+            default:
+                $this->type = self::FIELD_SCALAR_TYPE;
+                break;
+        }
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function doOnPreUpdate()
+    {
+        $this->doOnPrePersist();
     }
 }

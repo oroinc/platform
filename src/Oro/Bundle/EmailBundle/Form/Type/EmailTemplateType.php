@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 
 class EmailTemplateType extends AbstractType
@@ -23,10 +24,16 @@ class EmailTemplateType extends AbstractType
     private $userConfig;
 
     /**
+     * @var LocaleSettings
+     */
+    private $localeSettings;
+
+    /**
      * @param array             $entitiesConfig
      * @param UserConfigManager $userConfig
+     * @param LocaleSettings    $localeSettings
      */
-    public function __construct($entitiesConfig, UserConfigManager $userConfig)
+    public function __construct($entitiesConfig, UserConfigManager $userConfig, LocaleSettings $localeSettings)
     {
         $this->entityNameChoices = array_map(
             function ($value) {
@@ -35,6 +42,7 @@ class EmailTemplateType extends AbstractType
             $entitiesConfig
         );
         $this->userConfig = $userConfig;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -79,13 +87,18 @@ class EmailTemplateType extends AbstractType
             )
         );
 
+        $locale = $this->userConfig->get('oro_locale.locale');
+        $notificationLangs = $this->userConfig->get('oro_notification.languages');
+        $notificationLangs = array_merge($notificationLangs, [$locale]);
+        $localeLabels = $this->localeSettings->getLocalesByCodes($notificationLangs, $locale);
         $builder->add(
             'translations',
             'oro_email_emailtemplate_translatation',
             array(
-                'label'    => 'oro.email.emailtemplate.translations.label',
+                'label' => 'oro.email.emailtemplate.translations.label',
                 'required' => false,
-                'locales' => $this->userConfig->get('oro_notification.languages'),
+                'locales' => $notificationLangs,
+                'labels' => $localeLabels,
             )
         );
 

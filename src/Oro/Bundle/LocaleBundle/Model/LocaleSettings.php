@@ -424,4 +424,29 @@ class LocaleSettings
 
         return LocaleConfiguration::DEFAULT_COUNTRY;
     }
+
+    /**
+     * @param string $settingName
+     *
+     * @return mixed
+     */
+    public function get($settingName)
+    {
+        return $this->configManager->get($settingName);
+    }
+
+    /**
+     * @param array  $codes
+     * @param string $locale
+     *
+     * @return array
+     */
+    public function getLocalesByCodes(array $codes, $locale = 'en')
+    {
+        $result = [];
+        $localeLabels = Intl::getLocaleBundle()->getLocaleNames($locale);
+
+
+        return array_flip(array_intersect(array_flip($localeLabels), $codes));
+    }
 }

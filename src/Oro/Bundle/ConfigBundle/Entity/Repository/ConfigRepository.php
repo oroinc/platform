@@ -38,34 +38,13 @@ class ConfigRepository extends EntityRepository
         $settings = array();
         foreach ($scope->getValues() as $value) {
             $settings[$value->getSection()][$value->getName()] = array(
-                'value' => $this->getValue($value),
+                'value' => $value->getValue(),
                 'scope' => $scope->getEntity() ?: 'app',
                 'use_parent_scope_value' => false
             );
         }
 
         return $settings;
-    }
-
-    /**
-     * @param ConfigValue $value
-     *
-     * @return array|string
-     */
-    protected function getValue(ConfigValue $value)
-    {
-        switch ($value->getType()) {
-            case ConfigValue::FIELD_SERIALIZED_TYPE:
-                $result = unserialize($value->getValue());
-                break;
-            case ConfigValue::FIELD_LIST_TYPE:
-                $result = explode(ConfigValue::DELIMITER, $value->getValue());
-                break;
-            default:
-                $result = $value->getValue();
-        }
-
-        return $result;
     }
 
     /**
