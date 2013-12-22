@@ -30,6 +30,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  *  }
  * )
+ * @JMS\ExclusionPolicy("ALL")
  */
 class Role extends BaseRole
 {
@@ -40,6 +41,7 @@ class Role extends BaseRole
      * @ORM\Column(type="smallint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
+     * @JMS\Expose
      */
     protected $id;
 
@@ -48,6 +50,7 @@ class Role extends BaseRole
      *
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
      * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $role;
 
@@ -56,6 +59,7 @@ class Role extends BaseRole
      *
      * @ORM\Column(type="string", length=30)
      * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $label;
 

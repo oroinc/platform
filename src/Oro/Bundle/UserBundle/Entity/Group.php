@@ -29,6 +29,7 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
  *          }
  *      }
  * )
+ * @JMS\ExclusionPolicy("ALL")
  */
 class Group
 {
@@ -37,12 +38,14 @@ class Group
      * @ORM\Column(type="smallint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
+     * @JMS\Expose
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
      * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $name;
 
@@ -52,7 +55,6 @@ class Group
      *      joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @JMS\Exclude
      */
     protected $roles;
 
