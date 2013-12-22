@@ -13,7 +13,7 @@ class PageFilteredGrid extends PageGrid
     public function removeFilter($filterName)
     {
         $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/div[contains(@class, 'filter-item')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
             . "[button[contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
         )->click();
         $this->waitForAjax();
