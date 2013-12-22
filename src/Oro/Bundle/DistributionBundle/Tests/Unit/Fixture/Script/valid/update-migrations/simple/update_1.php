@@ -1,2 +1,3 @@
 <?php
-    echo 'update 1';
+
+echo 'update 1';

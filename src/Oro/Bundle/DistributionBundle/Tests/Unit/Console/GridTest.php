@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Console;
 
-
 use Oro\Bundle\DistributionBundle\Console\Grid;
 
 class GridTest extends \PHPUnit_Framework_TestCase
@@ -37,7 +36,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldSetDelimitersFromDefaultDelimiter()
     {
-        $grid=new Grid(6);
+        $grid = new Grid(6);
 
         $this->assertAttributeEquals([':', ':', ':', ':', ':'], 'delimiters', $grid);
     }
@@ -47,7 +46,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function sizeOfDelimitersShouldBeOneLessThenColumnCount()
     {
-        $grid=new Grid(6);
+        $grid = new Grid(6);
 
         $this->assertAttributeCount(5, 'delimiters', $grid);
     }
@@ -57,7 +56,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldPadDelimitersFromDefaultDelimiter()
     {
-        $grid=new Grid(6, [';', ';', ';']);
+        $grid = new Grid(6, [';', ';', ';']);
 
         $this->assertAttributeEquals([';', ';', ';', ':', ':'], 'delimiters', $grid);
     }
@@ -67,7 +66,7 @@ class GridTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldSliceRedundantDelimiters()
     {
-        $grid=new Grid(4, [';', ';', ';', ';']);
+        $grid = new Grid(4, [';', ';', ';', ';']);
 
         $this->assertAttributeEquals([';', ';', ';'], 'delimiters', $grid);
     }
@@ -197,6 +196,4 @@ GRID;
 
         $this->assertEquals($expectedResult, $grid->render());
     }
-
 }
- 

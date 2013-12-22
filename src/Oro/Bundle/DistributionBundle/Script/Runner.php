@@ -118,24 +118,24 @@ class Runner
             /** @var SplFileInfo $file */
             $files[] = $file->getPathname();
         }
-        $fetchItemVersion=function($item){
+        $fetchItemVersion = function ($item) {
             $regexp = '/_(.+).php/i';
             preg_match($regexp, $item, $itemMatches);
 
             return $itemMatches[1];
 
         };
-        $files = array_filter($files, function($item) use($previousPackageVersion, $fetchItemVersion){
-                $itemVersion = $fetchItemVersion($item);
+        $files = array_filter($files, function ($item) use ($previousPackageVersion, $fetchItemVersion) {
+            $itemVersion = $fetchItemVersion($item);
 
-                return version_compare($itemVersion, $previousPackageVersion, '>');
-            });
-        usort($files, function($a, $b) use($fetchItemVersion){
-                $aVersion = $fetchItemVersion($a);
-                $bVersion = $fetchItemVersion($b);
+            return version_compare($itemVersion, $previousPackageVersion, '>');
+        });
+        usort($files, function ($a, $b) use ($fetchItemVersion) {
+            $aVersion = $fetchItemVersion($a);
+            $bVersion = $fetchItemVersion($b);
 
-                return version_compare($aVersion, $bVersion);
-            });
+            return version_compare($aVersion, $bVersion);
+        });
         return $files;
     }
 }

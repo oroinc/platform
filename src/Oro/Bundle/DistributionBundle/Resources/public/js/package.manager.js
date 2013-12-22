@@ -4,7 +4,8 @@ function PackageManager(Urls, util) {
     var InstallStatus = {INSTALLED: 0, ERROR: 1, CONFIRM: 2};
     var UpdateStatus = {UPDATED: 0, ERROR: 1};
 
-    var reflectUICallback = function(){};
+    var reflectUICallback = function () {
+    };
 
     function sendRequest(url, params, completeCallback) {
         $.ajax({
@@ -44,7 +45,9 @@ function PackageManager(Urls, util) {
 
                 util.confirm(
                     message,
-                    function(){pm.install(response.params)},
+                    function () {
+                        pm.install(response.params)
+                    },
                     'Yes, install',
                     reflectUICallback
                 );
@@ -87,7 +90,9 @@ function PackageManager(Urls, util) {
                     "\n" + "\n" + 'Do you want to uninstall them all?';
                 util.confirm(
                     message,
-                    function(){pm.uninstall(response.params)},
+                    function () {
+                        pm.uninstall(response.params)
+                    },
                     'Yes, delete',
                     reflectUICallback
                 );
@@ -128,17 +133,17 @@ function PackageManager(Urls, util) {
         reflectUICallback();
     }
 
-    var pm= {
+    var pm = {
         install: function (params, _reflectUICallback) {
-            reflectUICallback=_reflectUICallback || reflectUICallback;
+            reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.install, params, installCompleteCallback);
         },
         uninstall: function (params, _reflectUICallback) {
-            reflectUICallback=_reflectUICallback || reflectUICallback;
+            reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.uninstall, params, uninstallCompleteCallback);
         },
         update: function (params, _reflectUICallback) {
-            reflectUICallback=_reflectUICallback || reflectUICallback;
+            reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.update, params, updateCompleteCallback);
         }
     };

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DistributionBundle\Security;
 
-
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;

@@ -20,7 +20,6 @@ use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 
-
 class PackageManager
 {
     /**
@@ -251,7 +250,8 @@ class PackageManager
             }
         } else {
             throw new VerboseException(
-                sprintf('%s can\'t be installed!', $packageName), $this->composerIO->getOutput()
+                sprintf('%s can\'t be installed!', $packageName),
+                $this->composerIO->getOutput()
             );
         }
     }
@@ -294,8 +294,9 @@ class PackageManager
     public function uninstall(array $packageNames)
     {
         foreach ($packageNames as $name) {
-            if(!$this->canBeDeleted($name))
+            if (!$this->canBeDeleted($name)) {
                 throw new \RuntimeException(sprintf('Package %s is not deletable'));
+            }
         }
 
         $this->removeFromComposerJson($packageNames);
@@ -420,7 +421,8 @@ class PackageManager
         } else {
             $this->updateComposerJsonFile($currentPackage, $currentPackage->getPrettyVersion());
             throw new VerboseException(
-                sprintf('%s can\'t be updated!', $packageName), $this->composerIO->getOutput()
+                sprintf('%s can\'t be updated!', $packageName),
+                $this->composerIO->getOutput()
             );
         }
     }

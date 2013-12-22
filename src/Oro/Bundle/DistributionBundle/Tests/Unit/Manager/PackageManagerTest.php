@@ -113,7 +113,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $composerRepositoryMock->expects($this->any())
             ->method('whatProvides')
-            ->will($this->returnValue([$availablePackage1,  $this->getPackage('name2', 1)]));
+            ->will($this->returnValue([$availablePackage1, $this->getPackage('name2', 1)]));
 
         // from composer repo without providers
         $composerRepositoryWithoutProvidersMock->expects($this->any())
@@ -130,10 +130,13 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         // Ready Steady Go!
         $manager = $this->createPackageManager($composer);
 
-        $packages = array_reduce($manager->getAvailable(), function($result, PackageInterface $package){
+        $packages = array_reduce(
+            $manager->getAvailable(),
+            function ($result, PackageInterface $package) {
                 $result[] = $package->getPrettyName();
                 return $result;
-            }, []
+            },
+            []
         );
         $this->assertEquals(
             ['name2', $duplicatedPackageName, 'name4'],
@@ -660,7 +663,13 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Composer\Package\PackageInterface'));
 
         $composerInstaller = $this->prepareInstallerMock($packageName, 0);
-        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner, tempnam(sys_get_temp_dir(),uniqid()));
+        $manager = $this->createPackageManager(
+            $composer,
+            $composerInstaller,
+            null,
+            $runner,
+            tempnam(sys_get_temp_dir(), uniqid())
+        );
         $manager->update($packageName);
     }
 
@@ -687,7 +696,13 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $composerInstaller = $this->prepareInstallerMock($packageName, false);
 
-        $manager = $this->createPackageManager($composer, $composerInstaller, new BufferIO(), $this->createScriptRunnerMock(), tempnam(sys_get_temp_dir(),uniqid()));
+        $manager = $this->createPackageManager(
+            $composer,
+            $composerInstaller,
+            new BufferIO(),
+            $this->createScriptRunnerMock(),
+            tempnam(sys_get_temp_dir(), uniqid())
+        );
         $manager->update($packageName);
     }
 
@@ -723,7 +738,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepositories')
             ->will($this->returnValue([$repository]));
 
-        $manager=$this->createPackageManager($composer);
+        $manager = $this->createPackageManager($composer);
         $this->assertTrue($manager->isUpdateAvailable($packageName));
 
     }
@@ -756,7 +771,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepositories')
             ->will($this->returnValue([$repository]));
 
-        $manager=$this->createPackageManager($composer);
+        $manager = $this->createPackageManager($composer);
         $this->assertFalse($manager->isUpdateAvailable($packageName));
     }
 

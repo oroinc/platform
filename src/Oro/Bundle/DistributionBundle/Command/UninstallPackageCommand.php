@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 class UninstallPackageCommand extends ContainerAwareCommand
 {
     protected function configure()
@@ -39,7 +38,7 @@ class UninstallPackageCommand extends ContainerAwareCommand
         }
 
         $dependents = $manager->getDependents($packageName);
-        if(!$forceDependentsUninstalling && $dependents) {
+        if (!$forceDependentsUninstalling && $dependents) {
             $output->writeln(sprintf("%s is required by: \n%s", $packageName, implode("\n", $dependents)));
             /** @var DialogHelper $dialog */
             $dialog = $this->getHelperSet()->get('dialog');

@@ -13,4 +13,4 @@ trait MockHelperTrait
             ->disableOriginalConstructor()
             ->getMock();
     }
-} 
+}

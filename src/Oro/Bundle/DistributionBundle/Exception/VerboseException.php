@@ -15,7 +15,7 @@ class VerboseException extends \Exception
      * @param int $code
      * @param \Exception $previous
      */
-    public function __construct($message = '', $verboseMessage = '',  $code = 0, \Exception $previous = null)
+    public function __construct($message = '', $verboseMessage = '', $code = 0, \Exception $previous = null)
     {
         $this->verboseMessage = $verboseMessage;
 

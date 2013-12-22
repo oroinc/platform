@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper;
 
-
 trait ReflectionHelperTrait
 {
     /**
@@ -14,4 +13,4 @@ trait ReflectionHelperTrait
         $rc = new \ReflectionClass($subclass);
         $this->assertTrue($rc->isSubclassOf($class));
     }
-} 
+}

@@ -25,7 +25,10 @@ class SecurityController extends Controller
                 SecurityContext::AUTHENTICATION_ERROR
             );
         } else {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR, $session->get(SecurityContext::ACCESS_DENIED_ERROR));
+            $error = $session->get(
+                SecurityContext::AUTHENTICATION_ERROR,
+                $session->get(SecurityContext::ACCESS_DENIED_ERROR)
+            );
             $session->remove(SecurityContext::AUTHENTICATION_ERROR);
         }
 

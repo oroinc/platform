@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\DistributionBundle\Entity;
 
-class PackageUpdate 
+class PackageUpdate
 {
     /**
      * @var string
@@ -51,6 +51,4 @@ class PackageUpdate
     {
         return $this->upToDateVersionString;
     }
-
-
-} 
+}

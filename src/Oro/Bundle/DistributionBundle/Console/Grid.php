@@ -39,15 +39,15 @@ class Grid
         $this->formatString = '';
 
         $this->countColumns = $countColumns;
-        $delimiters = array_slice($delimiters, 0, $this->countColumns-1);
-        $this->delimiters = array_pad($delimiters, $this->countColumns-1, $this->defaultDelimiter);
+        $delimiters = array_slice($delimiters, 0, $this->countColumns - 1);
+        $this->delimiters = array_pad($delimiters, $this->countColumns - 1, $this->defaultDelimiter);
 
         for ($i = 0; $i < $this->countColumns; $i++) {
             $placeholder = '_' . ($i) . '_';
             $this->formatString .= '%' . $placeholder . '.' . $placeholder . 's';
 
             if ($i !== $this->countColumns - 1) {
-                $this->formatString .= ' '.$this->delimiters[$i].' ';
+                $this->formatString .= ' ' . $this->delimiters[$i] . ' ';
             }
         }
 
@@ -58,8 +58,8 @@ class Grid
      */
     public function addRow(array $row)
     {
-        $row=array_slice($row, 0, $this->countColumns);
-        $row=array_pad($row, $this->countColumns, '');
+        $row = array_slice($row, 0, $this->countColumns);
+        $row = array_pad($row, $this->countColumns, '');
         $this->rows[] = $row;
     }
 

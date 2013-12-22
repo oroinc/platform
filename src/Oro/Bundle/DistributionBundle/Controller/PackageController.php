@@ -49,7 +49,7 @@ class PackageController extends Controller
      * @Route("/packages/available")
      * @Template("OroDistributionBundle:Package:list_available.html.twig")
      */
-    public function ListAvailableAction()
+    public function listAvailableAction()
     {
         $this->setUpEnvironment();
         $packageManager = $this->getPackageManager();
@@ -136,7 +136,6 @@ class PackageController extends Controller
     {
         $this->setUpEnvironment();
 
-
         $params = $this->getRequest()->get('params');
         $packageName = isset($params['packageName']) ? $params['packageName'] : null;
         $packageVersion = isset($params['version']) ? $params['version'] : null;
@@ -159,10 +158,7 @@ class PackageController extends Controller
         }
 
         try {
-            if (
-                !$forceDependenciesInstalling &&
-                $requirements = $manager->getRequirements($packageName)
-            ) {
+            if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName)) {
                 $params['force'] = true;
                 $responseContent = [
                     'code' => self::CODE_CONFIRM,
@@ -178,8 +174,9 @@ class PackageController extends Controller
 
 
         } catch (\Exception $e) {
-            $message = $e instanceof VerboseException ? $e->getMessage() . '_' . $e->getVerboseMessage(
-                ) : $e->getMessage();
+            $message = $e instanceof VerboseException ?
+                $e->getMessage() . '_' . $e->getVerboseMessage() :
+                $e->getMessage();
             $responseContent = [
                 'code' => self::CODE_ERROR,
                 'message' => $message

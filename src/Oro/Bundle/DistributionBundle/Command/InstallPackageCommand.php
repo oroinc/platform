@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-
 class InstallPackageCommand extends ContainerAwareCommand
 {
     protected function configure()
@@ -38,11 +37,13 @@ class InstallPackageCommand extends ContainerAwareCommand
         /** @var PackageManager $manager */
         $manager = $this->getContainer()->get('oro_distribution.package_manager');
 
-        if($manager->isPackageInstalled($packageName)) {
-            return $output->writeln(sprintf('<error>%s has been already installed. Try to update it</error>', $packageName));
+        if ($manager->isPackageInstalled($packageName)) {
+            return $output->writeln(
+                sprintf('<error>%s has been already installed. Try to update it</error>', $packageName)
+            );
         }
 
-        if(!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName, $packageVersion)) {
+        if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName, $packageVersion)) {
             $output->writeln(sprintf("Package requires: \n%s", implode("\n", $requirements)));
 
             /** @var DialogHelper $dialog */

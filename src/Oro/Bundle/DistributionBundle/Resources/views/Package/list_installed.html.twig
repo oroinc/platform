@@ -3,7 +3,8 @@
 {% block title %}Installed Packages{% endblock %}
 
 {% block menu %}
-    <a class="btn btn-primary btn-large" id="install-new-package" href="{{ path('oro_distribution_package_listavailable') }}">
+    <a class="btn btn-primary btn-large" id="install-new-package"
+       href="{{ path('oro_distribution_package_listavailable') }}">
         <i class="icon-settings"></i>
         Install New Package
     </a>
@@ -59,7 +60,7 @@
                 <td>
                     {{ item.update.currentVersionString|default(item.package.prettyVersion) }}
                     {% if item.canBeDeleted %}
-                        <br />
+                        <br/>
                         <a href="#" class="ajax uninstall"
                            data-action="uninstall"
                            data-params='{"packageName": "{{ item.package.prettyName }}" }'>
@@ -72,7 +73,7 @@
                 <td>
                     {% if item.update %}
                         {{ item.update.upToDateVersionString }}
-                        <br />
+                        <br/>
                         <a href="#" class="ajax update"
                            data-action="update"
                            data-params='{"packageName": "{{ item.package.prettyName }}" }'>

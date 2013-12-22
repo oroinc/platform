@@ -21,11 +21,10 @@ class PackageUpdateTest extends \PHPUnit_Framework_TestCase
         $packageName = 'vendor/package';
         $currentVersion = 'v1';
         $upToDateVersion = 'v2';
-        $pu=new PackageUpdate($packageName, $currentVersion, $upToDateVersion);
+        $pu = new PackageUpdate($packageName, $currentVersion, $upToDateVersion);
 
         $this->assertEquals($packageName, $pu->getPackageName());
         $this->assertEquals($currentVersion, $pu->getCurrentVersionString());
         $this->assertEquals($upToDateVersion, $pu->getUpToDateVersionString());
     }
 }
- 

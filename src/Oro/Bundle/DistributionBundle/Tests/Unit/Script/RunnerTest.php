@@ -120,12 +120,17 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldRunMigrationScriptsUpToCurrentPackageVersionSimple()
     {
-        $expectedRunnerOutput= <<<OUTPUT
+        $expectedRunnerOutput = <<<OUTPUT
 update 2
 update 3
 OUTPUT;
         $package = $this->createPackageMock();
-        $runner = new Runner($this->createInstallationManagerMock($package, __DIR__ . '/../Fixture/Script/valid/update-migrations/simple'));
+        $runner = new Runner(
+            $this->createInstallationManagerMock(
+                $package,
+                __DIR__ . '/../Fixture/Script/valid/update-migrations/simple'
+            )
+        );
 
         $this->assertEquals($expectedRunnerOutput, $runner->update($package, '1'));
     }
@@ -136,12 +141,17 @@ OUTPUT;
      */
     public function shouldRunMigrationScriptsUpToCurrentPackageVersionComplex()
     {
-        $expectedRunnerOutput= <<<OUTPUT
+        $expectedRunnerOutput = <<<OUTPUT
 update 0.1.9.1
 update 0.1.10
 OUTPUT;
         $package = $this->createPackageMock();
-        $runner = new Runner($this->createInstallationManagerMock($package, __DIR__ . '/../Fixture/Script/valid/update-migrations/complex'));
+        $runner = new Runner(
+            $this->createInstallationManagerMock(
+                $package,
+                __DIR__ . '/../Fixture/Script/valid/update-migrations/complex'
+            )
+        );
 
         $this->assertEquals($expectedRunnerOutput, $runner->update($package, '0.1.9'));
     }
