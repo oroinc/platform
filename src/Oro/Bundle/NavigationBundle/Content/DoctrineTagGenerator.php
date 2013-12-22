@@ -67,11 +67,12 @@ class DoctrineTagGenerator implements TagGeneratorInterface
                 $tag = $this->convertToTag(ClassUtils::getClass($data));
 
                 // tag only in case if it's not a new object
-                if ($this->uow->getEntityState($data) !== UnitOfWork::STATE_NEW) {
+                if ($this->uow->getEntityState($data) !== UnitOfWork::STATE_NEW
+                    && !$this->uow->isScheduledForInsert($data)) {
                     $tags[] = implode('_', array_merge([$tag], $this->uow->getEntityIdentifier($data)));
-
-                    $class = ClassUtils::getClass($data);
                 }
+
+                $class = ClassUtils::getClass($data);
             } elseif (is_string($data)) {
                 $class = ClassUtils::getRealClass($data);
             }

@@ -108,6 +108,8 @@ function (_, sync, mediator, messenger, __) {
      * @param {Array} tags
      */
     function onUpdate(tags) {
+        tags = tags.split(',');
+
         _.each(pagesTags, function(items, url) {
             var handler, callbacks = [];
             // collect callbacks for outdated contents

@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\NavigationBundle\Content\TagGeneratorContext;
+use Oro\Bundle\NavigationBundle\Content\TagGeneratorChain;
 use Oro\Bundle\NavigationBundle\Twig\ContentTagsExtension;
 
 class ContentTagsExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|TagGeneratorContext
+     * @var \PHPUnit_Framework_MockObject_MockObject|TagGeneratorChain
      */
     private $service;
 
@@ -19,7 +19,7 @@ class ContentTagsExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->service   = $this->getMock('Oro\Bundle\NavigationBundle\Content\TagGeneratorContext');
+        $this->service   = $this->getMock('Oro\Bundle\NavigationBundle\Content\TagGeneratorChain');
         $this->extension = new ContentTagsExtension($this->service);
     }
 

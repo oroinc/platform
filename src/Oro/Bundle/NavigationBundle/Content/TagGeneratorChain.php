@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Content;
 
-class TagGeneratorContext
+class TagGeneratorChain
 {
     /** @var array|TagGeneratorInterface[] */
     protected $generators = [];

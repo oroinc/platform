@@ -119,13 +119,13 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     public function generateDataProvider()
     {
         return [
-            'Should not generate any tags for new entity'                       => [new NewEntityStub(), false, 0],
-            'Should not generate any tags for new entity even collection asked' => [new NewEntityStub(), true, 0],
-            'Should generate one tag for managed entity'                        => [new EntityStub(), false, 1, true],
-            'Should generate two tag for managed entity when collection asked'  => [new EntityStub(), true, 2, true],
-            'Should not generate tag when data taken from string'               => [self::TEST_ENTITY_NAME, false, 0],
-            'Should generate collection tag when data taken from string'        => [self::TEST_ENTITY_NAME, true, 1],
-            'Should take data from form and return tags for managed entity'     => [
+            'Should not generate any tags for new entity'                      => [new NewEntityStub(), false, 0],
+            'Should not generate only collection tag for new entity'           => [new NewEntityStub(), true, 1],
+            'Should generate one tag for managed entity'                       => [new EntityStub(), false, 1, true],
+            'Should generate two tag for managed entity when collection asked' => [new EntityStub(), true, 2, true],
+            'Should not generate tag when data taken from string'              => [self::TEST_ENTITY_NAME, false, 0],
+            'Should generate collection tag when data taken from string'       => [self::TEST_ENTITY_NAME, true, 1],
+            'Should take data from form and return tags for managed entity'    => [
                 $this->getFormMock(
                     new EntityStub()
                 ),
@@ -133,12 +133,12 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
                 2,
                 true
             ],
-            'Should take data from form and do not return tag for new entity'   => [
+            'Should take data from form and generate collection tag for new entity'  => [
                 $this->getFormMock(
                     new NewEntityStub()
                 ),
                 true,
-                0,
+                1,
                 false
             ],
         ];

@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
-use Oro\Bundle\NavigationBundle\Content\TagGeneratorContext;
+use Oro\Bundle\NavigationBundle\Content\TagGeneratorChain;
 
 class ContentTagsExtension extends \Twig_Extension
 {
-    /** @var TagGeneratorContext */
-    protected $tagGeneratorContext;
+    /** @var TagGeneratorChain */
+    protected $tagGeneratorChain;
 
-    public function __construct(TagGeneratorContext $tagGeneratorContext)
+    public function __construct(TagGeneratorChain $tagGeneratorChain)
     {
-        $this->tagGeneratorContext = $tagGeneratorContext;
+        $this->tagGeneratorChain = $tagGeneratorChain;
     }
 
     /**
@@ -32,7 +32,7 @@ class ContentTagsExtension extends \Twig_Extension
      */
     public function generate($data, $includeCollectionTag = false)
     {
-        return $this->tagGeneratorContext->generate($data, $includeCollectionTag);
+        return $this->tagGeneratorChain->generate($data, $includeCollectionTag);
     }
 
     /**

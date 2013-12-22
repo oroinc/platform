@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class TagGeneratorPass implements CompilerPassInterface
 {
-    const CONTEXT_SERVICE_ID = 'oro_navigation.content.tag_generator_context';
-    const TAG_NAME           = 'oro_navigation.tag_generator';
+    const CHAIN_SERVICE_ID = 'oro_navigation.content.tag_generator_chain';
+    const TAG_NAME         = 'oro_navigation.tag_generator';
 
     /**
      * {@inheritDoc}
@@ -19,7 +19,7 @@ class TagGeneratorPass implements CompilerPassInterface
         /**
          * Find and add available generator to context
          */
-        $context = $container->getDefinition(self::CONTEXT_SERVICE_ID);
+        $context = $container->getDefinition(self::CHAIN_SERVICE_ID);
         if ($context) {
             $generators = $container->findTaggedServiceIds(self::TAG_NAME);
 

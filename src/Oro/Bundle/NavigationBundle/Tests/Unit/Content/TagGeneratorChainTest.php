@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Content;
 
-use Oro\Bundle\NavigationBundle\Content\TagGeneratorContext;
+use Oro\Bundle\NavigationBundle\Content\TagGeneratorChain;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\SimpleGeneratorStub;
 
-class TagGeneratorContextTest extends \PHPUnit_Framework_TestCase
+class TagGeneratorChainTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider constructorDataProvider
@@ -18,7 +18,7 @@ class TagGeneratorContextTest extends \PHPUnit_Framework_TestCase
         if ($exceptionExpected) {
             $this->setExpectedException($exceptionExpected);
         }
-        new TagGeneratorContext($generators);
+        new TagGeneratorChain($generators);
     }
 
     /**
@@ -35,12 +35,12 @@ class TagGeneratorContextTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider generateDataProvider
      *
-     * @param TagGeneratorContext $generator
-     * @param mixed               $data
-     * @param bool                $includeCollection
-     * @param int                 $expectedCount
+     * @param TagGeneratorChain $generator
+     * @param mixed             $data
+     * @param bool              $includeCollection
+     * @param int               $expectedCount
      */
-    public function testGenerate(TagGeneratorContext $generator, $data, $includeCollection, $expectedCount)
+    public function testGenerate(TagGeneratorChain $generator, $data, $includeCollection, $expectedCount)
     {
         $result = $generator->generate($data, $includeCollection);
         $this->assertCount($expectedCount, $result);
@@ -52,31 +52,31 @@ class TagGeneratorContextTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'Expect one tag from one generator w/o collection'            => [
-                new TagGeneratorContext([new SimpleGeneratorStub('s')]),
+                new TagGeneratorChain([new SimpleGeneratorStub('s')]),
                 'testString',
                 false,
                 1
             ],
             'Expect two tags from one generator with collection'          => [
-                new TagGeneratorContext([new SimpleGeneratorStub('s')]),
+                new TagGeneratorChain([new SimpleGeneratorStub('s')]),
                 'testString',
                 true,
                 2
             ],
             'Expect no tags, not supported type, but should return array' => [
-                new TagGeneratorContext([new SimpleGeneratorStub('s')]),
+                new TagGeneratorChain([new SimpleGeneratorStub('s')]),
                 ['someArray'],
                 true,
                 0
             ],
             'Expected filtration by unique tags'                          => [
-                new TagGeneratorContext([new SimpleGeneratorStub('s'), new SimpleGeneratorStub('s')]),
+                new TagGeneratorChain([new SimpleGeneratorStub('s'), new SimpleGeneratorStub('s')]),
                 'testString',
                 false,
                 1
             ],
             'Expected merge tags from different generators'               => [
-                new TagGeneratorContext([new SimpleGeneratorStub('s'), new SimpleGeneratorStub('e')]),
+                new TagGeneratorChain([new SimpleGeneratorStub('s'), new SimpleGeneratorStub('e')]),
                 'testString',
                 false,
                 2
