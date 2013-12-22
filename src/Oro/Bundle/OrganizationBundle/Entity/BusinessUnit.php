@@ -5,8 +5,6 @@ namespace Oro\Bundle\OrganizationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -42,7 +40,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int", nillable=true)
      */
     protected $id;
 
@@ -50,7 +47,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @Soap\ComplexType("string", nillable=false)
      * @Oro\Versioned
      */
     protected $name;
@@ -60,7 +56,6 @@ class BusinessUnit implements NotificationEmailInterface
      *
      * @ORM\ManyToOne(targetEntity="Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @Soap\ComplexType("string", nillable=false)
      */
     protected $organization;
 
@@ -68,7 +63,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="phone", type="string", length=100, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      * @Oro\Versioned
      */
     protected $phone;
@@ -77,7 +71,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="website", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      * @Oro\Versioned
      */
     protected $website;
@@ -86,7 +79,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      * @Oro\Versioned
      */
     protected $email;
@@ -95,7 +87,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="fax", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      * @Oro\Versioned
      */
     protected $fax;
@@ -104,7 +95,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
-     * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $createdAt;
 
@@ -112,7 +102,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime")
-     * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $updatedAt;
 
@@ -130,7 +119,6 @@ class BusinessUnit implements NotificationEmailInterface
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="BusinessUnit")
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $owner;
 

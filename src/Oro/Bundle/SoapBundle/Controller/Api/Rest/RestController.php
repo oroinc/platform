@@ -106,10 +106,10 @@ abstract class RestController extends RestGetController implements
         $request = $this->container->get('request');
         $data = $request->get($this->getForm()->getName());
 
-        $request->request->set(
-            $this->getForm()->getName(),
-            $this->fixFormData($data, $entity)
-        );
+        if (is_array($data)) {
+            $data = $this->fixFormData($data, $entity);
+        }
+        $request->request->set($this->getForm()->getName(), $data);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Entity\SoapEntityInterface;
@@ -87,6 +88,6 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
      */
     protected function getSoapEntityClass($entity)
     {
-        return get_class($entity) . 'Soap';
+        return ClassUtils::getRealClass($entity) . 'Soap';
     }
 }
