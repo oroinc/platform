@@ -29,12 +29,13 @@ class PageFilteredGrid extends PageGrid
     public function addFilter($filterName)
     {
         $addFilter = $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/button[contains(.,'Manage filters')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//button[contains(.,'Manage filters')]"
         );
         //expand filter list
         $addFilter->click();
         $filter = $this->byXPath(
-            "{$this->filtersPath}//input[@title='{$filterName}'][@name='multiselect_add-filter-select']"
+            "{$this->filtersPath}//input[@title[normalize-space(.)='{$filterName}']]" .
+            "[@name='multiselect_add-filter-select']"
         );
         if (!$filter->selected()) {
             $filter->click();
