@@ -148,8 +148,8 @@ div.navbar-inner .help a:hover {
 .confirm-dialog.modal.fade.in {
     top: 25%;
     -webkit-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
-    -moz-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
-    box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    0px 0px 19px rgba(50, 50, 50, 0.75);
+    box-shadow:         0px 0px 19px rgba(50, 50, 50, 0.75);
 }
 
 .confirm-dialog .modal-dialog .modal-content {
