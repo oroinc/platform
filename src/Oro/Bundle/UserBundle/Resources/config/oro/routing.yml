@@ -14,7 +14,7 @@ oro_user_api_user:
     prefix:       api/rest/{version}/
     requirements:
         version:  latest|v1
-        _format: json
+        _format:  json
     defaults:
         version:  latest
 
