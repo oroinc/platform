@@ -41,6 +41,7 @@ parameters:
     oro_navigation.content.tag_generator_chain.class:          Oro\Bundle\NavigationBundle\Content\TagGeneratorChain
     oro_navigation.content.doctrine_tag_generator.class:       Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator
     oro_navigation.content.simple_tag_generator.class:         Oro\Bundle\NavigationBundle\Content\SimpleTagGenerator
+    oro_navigation.content.datagrid_tag_listener.class:        Oro\Bundle\NavigationBundle\Content\DataGridTagListener
 
 services:
     oro_menu.cache:
@@ -295,3 +296,9 @@ services:
         tags:
             - { name: oro_navigation.tag_generator }
 
+    oro_navigation.content.datagrid_tag_listener:
+        class: %oro_navigation.content.datagrid_tag_listener.class%
+        arguments:
+            - @oro_navigation.content.tag_generator_chain
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after, method: buildAfter }
