@@ -5,7 +5,6 @@ namespace Oro\Bundle\ConfigBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
-use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 
 /**
  * Class ConfigRepository

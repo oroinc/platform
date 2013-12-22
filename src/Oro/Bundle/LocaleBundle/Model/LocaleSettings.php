@@ -443,10 +443,8 @@ class LocaleSettings
      */
     public function getLocalesByCodes(array $codes, $locale = 'en')
     {
-        $result = [];
         $localeLabels = Intl::getLocaleBundle()->getLocaleNames($locale);
 
-
-        return array_flip(array_intersect(array_flip($localeLabels), $codes));
+        return array_intersect_key($localeLabels, array_combine($codes, $codes));
     }
 }

@@ -14,7 +14,6 @@ class EmailTemplateTranslationType extends AbstractType
         $view->vars['labels'] = $options['labels'];
     }
 
-
     /**
      * {@inheritdoc}
      */
