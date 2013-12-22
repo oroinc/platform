@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Provider;
 
 use JMS\Serializer\Exception\RuntimeException;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Routing\Route;
 use JMS\Serializer\Serializer;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -65,7 +65,7 @@ class TitleService implements TitleServiceInterface
     private $prefix = null;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var Translator
      */
     private $translator;
 
@@ -176,7 +176,30 @@ class TitleService implements TitleServiceInterface
                 $trans->trans($title, $params) . $trans->trans($suffix, $params);
         }
 
+        $this->translateTitleParts($translatedTemplate);
+
         return $translatedTemplate;
+    }
+
+    /**
+     * Checks if the given template contains several parts and if so translate each part individually
+     *
+     * @param string $translatedTemplate
+     */
+    protected function translateTitleParts(&$translatedTemplate)
+    {
+        if ($translatedTemplate) {
+            $delimiter = ' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ';
+            $transItems = explode($delimiter, $translatedTemplate);
+            $messages   = $this->translator->getTranslations()['messages'];
+            foreach ($transItems as $key => $transItem) {
+                if (isset($messages[$transItem])) {
+                    $transItems[$key] = $messages[$transItem];
+                }
+            }
+
+            $translatedTemplate = implode($delimiter, $transItems);
+        }
     }
 
     /**

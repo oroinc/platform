@@ -110,35 +110,8 @@ class CustomEntityType extends AbstractType
                         $options['choices']     = ['No', 'Yes'];
                         break;
                     case 'optionSet':
-                        $options['multiple'] = $extendConfig->get('set_expanded');
-                        $configFieldModel    = $extendConfigProvider->getConfigManager()->getConfigFieldModel(
-                            $className,
-                            $fieldConfigId->getFieldName()
-                        );
-
-                        $modelOptions = $configFieldModel->getOptions()->toArray();
-                        uasort(
-                            $modelOptions,
-                            function ($a, $b) {
-                                return ($a->getPriority() < $b->getPriority()) ? -1 : 1;
-                            }
-                        );
-
-                        $options['config_id'] = $extendConfig->getId();
-
-                        foreach ($modelOptions as $option) {
-                            $options['choices'][$option->getId()] = $option->getLabel();
-                            if ($option->getIsDefault()) {
-                                $options['data'][] = $option->getId();
-                            }
-                        }
-
-                        if ($extendConfig->is('set_expanded', false)) {
-                            $options['empty_value'] = 'oro.form.choose_value';
-                            if (isset($options['data']) && count($options['data'])) {
-                                $options['data'] = array_shift($options['data']);
-                            }
-                        }
+                        $options['entityClassName'] = $className;
+                        $options['entityFieldName'] = $fieldConfigId->getFieldName();
                         break;
                     case 'manyToOne':
                         $options['entity_class'] = $extendConfig->get('target_entity');

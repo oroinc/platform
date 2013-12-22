@@ -1,5 +1,21 @@
 oro:
     tag:
-        controller.tag.saved.message: "Tag saved"
-        form.choose_tag: "Choose a tag"
-        form.choose_or_create_tag: "Choose or create a tag"
+        controller:
+            tag.saved.message: "Tag saved"
+        form:
+            choose_tag: "Choose a tag"
+            choose_or_create_tag: "Choose or create a tag"
+        datagrid:
+            usage_count: Usage Count
+
+        entity_label:        Tag
+        entity_plural_label: Tags
+        entity_description:  Show records tagged by this tag
+        id.label:         Id
+        name.label:       Tag
+        tagging.label:    Tagging
+        owner.label:      Owner
+        created.label:    Created
+        created_by.label: Created by
+        updated.label:    Updated
+        updated_by.label: Updated by

@@ -50,6 +50,7 @@ services:
         class: %oro_integration.job_executor.class%
         arguments:
             - @oro_batch.connectors
+            - @oro_batch.job_repository
             - @oro_importexport.context_registry
             - @doctrine
 

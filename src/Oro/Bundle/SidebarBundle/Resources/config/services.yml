@@ -1,0 +1,17 @@
+parameters:
+    oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
+    oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
+
+services:
+    oro_sidebar.widget_definition.registry:
+        class: %oro_sidebar.widget_definition.registry.class%
+        arguments:
+            - %oro_sidebar.sidebar_widgets_definitions%
+
+    oro_sidebar.twig.extension:
+        class: %oro_sidebar.twig.extension.class%
+        arguments:
+            - @oro_sidebar.widget_definition.registry
+            - @service_container
+        tags:
+            - { name: twig.extension }

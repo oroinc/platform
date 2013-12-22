@@ -34,7 +34,11 @@ function($, _, Backbone) {
         selectionChanged: function (e) {
             var entityId = $(e.currentTarget).val();
             this.collection.setEntityId(entityId.split('\\').join('_'));
-            this.collection.fetch();
+            if (entityId) {
+                this.collection.fetch();
+            } else {
+                this.collection.reset();
+            }
         },
 
         render: function() {

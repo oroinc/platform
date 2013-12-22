@@ -8,8 +8,7 @@
     {% if resource_granted('oro_report_update') %}
         {{ UI.editButton({
             'path': path('oro_report_update', {'id': entity.id}),
-            'title': 'Edit report',
-            'label': 'Edit'
+            'entity_label': 'oro.report.entity_label'|trans
         }) }}
     {% endif %}
     {% if resource_granted('oro_report_delete') %}
@@ -19,10 +18,7 @@
             'aCss': 'no-hash remove-button',
             'dataId': entity.id,
             'id': 'btn-remove-report',
-            'dataMessage': 'Are you sure you want to delete this report?',
-            'successMessage': 'Report deleted',
-            'title': 'Delete report',
-            'label': 'Delete'
+            'entity_label': 'oro.report.entity_label'|trans
         }) }}
     {% endif %}
 {% endblock navButtons %}
@@ -31,7 +27,7 @@
     {% set breadcrumbs = {
         'entity': entity,
         'indexPath': path('oro_report_index'),
-        'indexLabel': 'Reports'|trans,
+        'indexLabel': 'oro.report.entity_plural_label'|trans,
         'entityTitle': entity.name
     } %}
     {{ parent() }}

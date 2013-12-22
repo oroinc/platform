@@ -6,7 +6,7 @@ datagrid:
             query:
                 select:
                     - e
-                    - @oro_email.datagrid_query_factory->getFromEmailExpression()
+                    - @oro_email.datagrid_query_factory->getFromEmailExpression
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
                 join:
@@ -18,20 +18,20 @@ datagrid:
         columns:
             fromEmailAddress:
                 type: twig
-                label: oro.email.datagrid.email.from_name
+                label: oro.email.from_name.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
             subject:
                 type: twig
-                label: oro.email.datagrid.email.subject
+                label: oro.email.subject.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
             sentAt:
-                label: oro.email.datagrid.email.sentAt
+                label: oro.email.sent_at.label
                 frontend_type: datetime
             recipients:
                 type: twig
-                label: oro.email.datagrid.email.recipients
+                label: oro.email.recipients.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
         properties:
@@ -67,17 +67,17 @@ datagrid:
             entityName:
                 type:           twig
                 frontend_type:  html
-                label:          oro.email.datagrid.emailtemplate.column.entity_name
+                label:          oro.email.emailtemplate.entity_name.label
                 template:       OroNotificationBundle:EmailNotification:Datagrid/Property/entityName.html.twig
             name:
-                label:          oro.email.datagrid.emailtemplate.column.name
+                label:          oro.email.emailtemplate.name.label
             type:
                 frontend_type:  select
-                label:          oro.email.datagrid.emailtemplate.column.type
+                label:          oro.email.emailtemplate.type.label
                 choices:        @oro_email.emailtemplate.datagrid_helper->getTypeChoices
             isSystem:
                 frontend_type:  select
-                label:          oro.email.datagrid.emailtemplate.column.isSystem
+                label:          oro.email.emailtemplate.is_system.label
                 choices:        @oro_email.emailtemplate.datagrid_helper->getSystemChoices
         properties:
             id: ~
@@ -98,7 +98,6 @@ datagrid:
             columns:
                 entityName:
                     type:      choice
-                    label:     oro.email.datagrid.emailtemplate.column.entity_name
                     data_name: t.entityName
                     options:
                         translation_domain: config
@@ -108,10 +107,8 @@ datagrid:
                 name:
                     type:      string
                     data_name: t.name
-                    label:     oro.email.datagrid.emailtemplate.column.name
                 type:
                     type:            choice
-                    label:           oro.email.datagrid.emailtemplate.column.type
                     data_name:       t.type
                     options:
                         field_options:
@@ -119,7 +116,6 @@ datagrid:
 
                 isSystem:
                     type:           boolean
-                    label:          oro.email.datagrid.emailtemplate.column.isSystem
                     data_name:      t.isSystem
 
         sorters:

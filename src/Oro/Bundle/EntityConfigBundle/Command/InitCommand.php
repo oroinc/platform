@@ -36,7 +36,7 @@ class InitCommand extends BaseCommand
                 && $metadata->name == $doctrineMetadata->getName()
                 && $metadata->configurable
             ) {
-                $this->getConfigManager()->createConfigEntityModel($doctrineMetadata->getName());
+                $this->getConfigManager()->createConfigEntityModel($doctrineMetadata->getName(), $metadata->mode);
 
                 foreach ($doctrineMetadata->getFieldNames() as $fieldName) {
                     $type = $doctrineMetadata->getTypeOfField($fieldName);
@@ -49,7 +49,6 @@ class InitCommand extends BaseCommand
                 }
             }
         }
-
         $this->getConfigManager()->clearConfigurableCache();
 
         $this->getConfigManager()->flush();

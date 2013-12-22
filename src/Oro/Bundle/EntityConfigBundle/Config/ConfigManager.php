@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -34,6 +36,8 @@ use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
+
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 /**
  * @SuppressWarnings(PHPMD)
@@ -105,13 +109,15 @@ class ConfigManager
      * @param ServiceLink        $providerBagLink
      * @param ConfigModelManager $modelManager
      * @param AuditManager       $auditManager
+     * @param Container          $container
      */
     public function __construct(
         MetadataFactory $metadataFactory,
         EventDispatcher $eventDispatcher,
         ServiceLink $providerBagLink,
         ConfigModelManager $modelManager,
-        AuditManager $auditManager
+        AuditManager $auditManager,
+        Container $container
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->eventDispatcher = $eventDispatcher;
@@ -121,6 +127,8 @@ class ConfigManager
         $this->persistConfigs   = [];
         $this->originalConfigs  = [];
         $this->configChangeSets = [];
+
+        $this->container        = $container;
 
         $this->modelManager = $modelManager;
         $this->auditManager = $auditManager;
@@ -498,11 +506,31 @@ class ConfigManager
         return null !== $this->modelManager->findModel($className, $fieldName);
     }
 
+    /**
+     * Gets a config model for the given entity
+     *
+     * @param string $className
+     * @return EntityConfigModel|null
+     */
+    public function getConfigEntityModel($className)
+    {
+        return $this->hasConfigEntityModel($className)
+            ? $this->modelManager->findModel($className)
+            : null;
+    }
+
+    /**
+     * Gets a config model for the given entity field
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @return FieldConfigModel|null
+     */
     public function getConfigFieldModel($className, $fieldName)
     {
-        if ($this->hasConfigFieldModel($className, $fieldName)) {
-            return $this->modelManager->findModel($className, $fieldName);
-        }
+        return $this->hasConfigFieldModel($className, $fieldName)
+            ? $this->modelManager->findModel($className, $fieldName)
+            : null;
     }
 
     /**
@@ -518,6 +546,8 @@ class ConfigManager
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
 
             foreach ($this->getProviders() as $provider) {
+                $translatable = $provider->getPropertyConfig()
+                    ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
 
                 $metadata      = $this->getEntityMetadata($className);
                 $defaultValues = [];
@@ -526,7 +556,14 @@ class ConfigManager
                 }
 
                 $entityId = new EntityConfigId($className, $provider->getScope());
-                $config   = $provider->createConfig($entityId, $defaultValues);
+
+                foreach ($translatable as $code) {
+                    if (!in_array($code, $defaultValues)) {
+                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, null, $code);
+                    }
+                }
+
+                $config = $provider->createConfig($entityId, $defaultValues);
 
                 $this->localCache[$this->buildConfigKey($config->getId())] = $config;
             }
@@ -593,6 +630,7 @@ class ConfigManager
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
 
             foreach ($this->getProviders() as $provider) {
+                $translatable  = $provider->getPropertyConfig()->getTranslatableValues();
                 $defaultValues = [];
                 $metadata      = $this->getFieldMetadata($className, $fieldName);
                 if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
@@ -600,6 +638,13 @@ class ConfigManager
                 }
 
                 $fieldId = new FieldConfigId($className, $provider->getScope(), $fieldName, $fieldType);
+
+                foreach ($translatable as $code) {
+                    if (!in_array($code, $defaultValues)) {
+                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, $fieldName, $code);
+                    }
+                }
+
                 $config  = $provider->createConfig($fieldId, $defaultValues);
 
                 $this->localCache[$this->buildConfigKey($config->getId())] = $config;

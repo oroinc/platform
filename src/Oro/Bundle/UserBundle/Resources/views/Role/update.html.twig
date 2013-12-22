@@ -2,7 +2,10 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId ? 'Update Role'|trans : 'New Role'|trans %}
+{% set title = entityId
+    ? 'Update'|trans ~ ' ' ~ 'oro.user.role.entity_label'|trans
+    : 'New'|trans ~ ' ' ~ 'oro.user.role.entity_label'|trans
+%}
 {% oro_title_set({params : { "%role%": form.vars.value.label } }) %}
 {% set gridName = 'role-users-grid' %}
 {% set formAction = entityId ? path('oro_user_role_update', { 'id': entityId}) : path('oro_user_role_create') %}
@@ -22,10 +25,7 @@
                 'aCss': 'no-hash remove-button',
                 'dataId': entityId,
                 'id': 'btn-remove-role',
-                'dataMessage': 'Are you sure you want to delete this role?'|trans,
-                'successMessage': 'Role removed'|trans,
-                'title': 'Delete Role'|trans,
-                'label': 'Delete'|trans
+                'entity_label': 'oro.user.role.entity_label'|trans
             })
         }}
         {{ UI.buttonSeparator() }}
@@ -40,7 +40,7 @@
         {% set breadcrumbs = {
             'entity':      form.vars.value,
             'indexPath':   path('oro_user_role_index'),
-            'indexLabel': 'Roles'|trans,
+            'indexLabel': 'oro.user.role.entity_plural_label'|trans,
             'entityTitle': form.vars.value.label
         }
         %}
@@ -53,61 +53,51 @@
 {% block content_data %}
     {% set id = 'role-profile' %}
 
-    {% set dataBlocks = [
-        {
-            'title': 'General'|trans,
-            'class': 'active',
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_widget(form.appendUsers, {'id': 'roleAppendUsers'}),
+                    form_widget(form.removeUsers, {'id': 'roleRemoveUsers'}),
+                    form_row(form.label)
+                ]
+            }
+        ]
+    }] %}
+
+    {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
+        {% set dataBlocks = dataBlocks|merge([{
+            'title': privilegeConfig.label,
             'subblocks': [
                 {
                     'title': '',
+                    'useSpan': false,
                     'data': [
-                        form_widget(form.appendUsers, {'id': 'roleAppendUsers'}),
-                        form_widget(form.removeUsers, {'id': 'roleRemoveUsers'}),
-                        form_row(form.label)
+                        form_widget(form.children[privilegeBlock])
                     ]
                 }
             ]
-        }]
-    %}
-
-    {% for privilegeBlock, privilegeConfig in  privilegesConfig %}
-        {% set dataBlocks = dataBlocks|merge(
-            [{
-                'title': privilegeConfig.label,
-                'subblocks': [
-                    {
-                        'title': '',
-                        'useSpan': false,
-                        'data': [
-                            form_widget(form.children[privilegeBlock])
-                        ]
-                    }
-                ]
-            }]
-            )
-        %}
+        }]) %}
     {% endfor %}
 
-    {% set dataBlocks = dataBlocks|merge(
-        [{
-            'title' : 'Users'|trans,
-            'subblocks':
-            [
-                {
-                    'title' : null,
-                    'useSpan': false,
-                    'data' : [dataGrid.renderGrid(gridName, {role_id: entityId}, { cssClass: 'inner-grid' })]
-                }
-            ]
-        }]
-    )
-    %}
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'oro.user.entity_plural_label'|trans,
+        'subblocks':
+        [
+            {
+                'title' : null,
+                'useSpan': false,
+                'data' : [dataGrid.renderGrid(gridName, {role_id: entityId}, { cssClass: 'inner-grid' })]
+            }
+        ]
+    }]) %}
 
-    {% set data =
-        {
-            'formErrors': form_errors(form)? form_errors(form) : null,
-            'dataBlocks': dataBlocks,
-        }
-    %}
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
     {{ parent() }}
 {% endblock content_data %}

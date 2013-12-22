@@ -1,0 +1,13 @@
+placeholders:
+    right_panel:
+        items:
+            sidebar:
+                order: 200
+    left_panel:
+        items:
+            sidebar:
+                order: 200
+
+items:
+    sidebar:
+        template: OroSidebarBundle::sidebar.html.twig

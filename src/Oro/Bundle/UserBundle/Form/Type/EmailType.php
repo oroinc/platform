@@ -17,7 +17,8 @@ class EmailType extends AbstractType
             'email',
             'email',
             array(
-                 'required' => false,
+                'label' => 'oro.user.email.label',
+                'required' => false,
             )
         );
     }

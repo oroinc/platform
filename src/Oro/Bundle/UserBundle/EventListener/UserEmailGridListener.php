@@ -13,27 +13,26 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
 class UserEmailGridListener
 {
-    /** @var  EmailQueryFactory */
-    protected $queryFactory;
-
     /** @var  EntityManager */
     protected $em;
 
     /** @var RequestParameters */
     protected $requestParams;
 
+    /** @var  EmailQueryFactory */
+    protected $queryFactory;
+
     /** @var ImapEmailSynchronizer */
     protected $imapSync;
 
     public function __construct(
         EntityManager $em,
-        EmailQueryFactory $factory,
-        RequestParameters $requestParameters
+        RequestParameters $requestParameters,
+        EmailQueryFactory $factory = null
     ) {
         $this->em      = $em;
-        $this->queryFactory = $factory;
         $this->requestParams = $requestParameters;
-        //$this->imapSync = $imapSync;
+        $this->queryFactory = $factory;
     }
 
     public function setEmailSync(ImapEmailSynchronizer $emailSync)
@@ -48,7 +47,9 @@ class UserEmailGridListener
             /** @var QueryBuilder $query */
             $queryBuilder = $datasource->getQueryBuilder();
 
-            $this->queryFactory->prepareQuery($queryBuilder);
+            if ($this->queryFactory !== null) {
+                $this->queryFactory->prepareQuery($queryBuilder);
+            }
 
             if ($id = $this->requestParams->get('userId')) {
                 $user = $this->em

@@ -34,7 +34,13 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $this->provider = new EntityProvider($this->entityConfigProvider, $this->entityClassResolver);
+        $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $translator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnArgument(0));
+        $this->provider = new EntityProvider($this->entityConfigProvider, $this->entityClassResolver, $translator);
     }
 
     public function testGetEntity()

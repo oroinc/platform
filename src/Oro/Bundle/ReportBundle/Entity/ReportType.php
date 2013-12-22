@@ -8,11 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_report_type")
- * @Config(
- *  defaultValues={
- *      "entity"={"label"="Report Type", "plural_label"="Report Types"}
- *  }
- * )
+ * @Config()
  */
 class ReportType
 {
