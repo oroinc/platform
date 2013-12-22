@@ -68,14 +68,15 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getEmail')
             ->will($this->returnValue('a@a.com'));
 
+        $emailCollection = new ArrayCollection(['a@b.com']);
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $user->expects($this->once())
-            ->method('getEmail')
-            ->will($this->returnValue('b@b.com'));
+            ->method('getNotificationEmails')
+            ->will($this->returnValue($emailCollection));
 
-        $entity = $this->getMock('Oro\Bundle\TagBundle\Entity\ContainAuthorInterface');
+        $entity = $this->getMock('Oro\Bundle\TagBundle\Entity\Tag');
         $entity->expects($this->once())
-            ->method('getCreatedBy')
+            ->method('getOwner')
             ->will($this->returnValue($user));
 
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
@@ -108,8 +109,7 @@ class RecipientListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('createQueryBuilder')
             ->will($this->returnValue($queryBuilder));
 
-
-        $emails = $this->repository->getRecipientEmails($recipientList, $entity);
-        $this->assertCount(2, $emails);
+        $emails = $this->repository->getRecipientEmails($recipientList, $entity, 'owner');
+        $this->assertCount(3, $emails);
     }
 }

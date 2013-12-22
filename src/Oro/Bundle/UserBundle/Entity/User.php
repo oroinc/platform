@@ -32,12 +32,12 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\Tag;
 
+use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
+
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
-
-use DateTime;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -74,7 +74,8 @@ class User extends ExtendUser implements
     EmailOwnerInterface,
     EmailHolderInterface,
     ImapConfigurationOwnerInterface,
-    FullNameInterface
+    FullNameInterface,
+    NotificationEmailInterface
 {
     const ROLE_DEFAULT   = 'ROLE_USER';
     const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
@@ -169,7 +170,7 @@ class User extends ExtendUser implements
     protected $nameSuffix;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="birthday", type="date", nullable=true)
      * @Soap\ComplexType("date", nillable=true)
@@ -248,7 +249,7 @@ class User extends ExtendUser implements
     protected $confirmationToken;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="password_requested", type="datetime", nullable=true)
      * @Exclude
@@ -256,7 +257,7 @@ class User extends ExtendUser implements
     protected $passwordRequestedAt;
 
     /**
-     * @var DateTime
+     * @var \DateTime
      *
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
      * @Soap\ComplexType("dateTime", nillable=true)
@@ -600,7 +601,7 @@ class User extends ExtendUser implements
     /**
      * Gets the timestamp that the user requested a password reset.
      *
-     * @return null|DateTime
+     * @return null|\DateTime
      */
     public function getPasswordRequestedAt()
     {
@@ -675,7 +676,7 @@ class User extends ExtendUser implements
 
     public function isPasswordRequestNonExpired($ttl)
     {
-        return $this->getPasswordRequestedAt() instanceof DateTime &&
+        return $this->getPasswordRequestedAt() instanceof \DateTime &&
                $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
@@ -766,10 +767,10 @@ class User extends ExtendUser implements
 
     /**
      *
-     * @param  DateTime $birthday [optional] New birthday value. Null by default.
+     * @param  \DateTime $birthday [optional] New birthday value. Null by default.
      * @return User
      */
-    public function setBirthday(DateTime $birthday = null)
+    public function setBirthday(\DateTime $birthday = null)
     {
         $this->birthday = $birthday;
 
@@ -795,7 +796,7 @@ class User extends ExtendUser implements
     {
         $this->imageFile = $imageFile;
         // this will trigger PreUpdate callback even if only image has been changed
-        $this->updatedAt = new DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
 
         return $this;
     }
@@ -870,10 +871,10 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  DateTime $time [optional] New password request time. Null by default.
+     * @param  \DateTime $time [optional] New password request time. Null by default.
      * @return User
      */
-    public function setPasswordRequestedAt(DateTime $time = null)
+    public function setPasswordRequestedAt(\DateTime $time = null)
     {
         $this->passwordRequestedAt = $time;
 
@@ -881,10 +882,10 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  DateTime $time New login time
+     * @param  \DateTime $time New login time
      * @return User
      */
-    public function setLastLogin(DateTime $time)
+    public function setLastLogin(\DateTime $time)
     {
         $this->lastLogin = $time;
 
@@ -1181,8 +1182,8 @@ class User extends ExtendUser implements
      */
     public function beforeSave()
     {
-        $this->createdAt = new DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->loginCount = 0;
     }
 
@@ -1193,7 +1194,7 @@ class User extends ExtendUser implements
      */
     public function preUpdate()
     {
-        $this->updatedAt = new DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -1417,5 +1418,13 @@ class User extends ExtendUser implements
         $this->owner = $owningBusinessUnit;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotificationEmails()
+    {
+        return new ArrayCollection([$this->getEmail()]);
     }
 }

@@ -87,6 +87,6 @@ class BusinessUnitsTest extends Selenium2TestCase
             ->open(array($unitname))
             ->delete()
             ->assertTitle('Business Units - Users Management - System')
-            ->assertMessage('Item deleted');
+            ->assertMessage('Business Unit deleted');
     }
 }
