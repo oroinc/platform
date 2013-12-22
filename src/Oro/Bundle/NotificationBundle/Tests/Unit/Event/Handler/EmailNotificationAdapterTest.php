@@ -19,6 +19,9 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $configProvider;
+
     protected function setUp()
     {
         $this->entity = new \stdClass();
@@ -28,8 +31,16 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->adapter = new EmailNotificationAdapter($this->entity, $this->emailNotification, $this->em);
+        $this->adapter = new EmailNotificationAdapter(
+            $this->entity,
+            $this->emailNotification,
+            $this->em,
+            $this->configProvider
+        );
     }
 
     protected function tearDown()

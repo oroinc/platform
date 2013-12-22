@@ -1,0 +1,9 @@
+oro_distribution_bundle:
+    resource: "@OroDistributionBundle/Controller"
+    type: annotation
+
+oro_distribution_security_login_check:
+    path: /login_check
+
+oro_distribution_security_logout:
+    path:   /logout

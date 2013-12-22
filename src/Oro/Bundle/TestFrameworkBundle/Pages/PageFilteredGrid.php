@@ -13,7 +13,7 @@ class PageFilteredGrid extends PageGrid
     public function removeFilter($filterName)
     {
         $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/div[contains(@class, 'filter-item')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
             . "[button[contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
         )->click();
         $this->waitForAjax();
@@ -29,12 +29,13 @@ class PageFilteredGrid extends PageGrid
     public function addFilter($filterName)
     {
         $addFilter = $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/button[contains(.,'Manage filters')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//button[contains(.,'Manage filters')]"
         );
         //expand filter list
         $addFilter->click();
         $filter = $this->byXPath(
-            "{$this->filtersPath}//input[@title='{$filterName}'][@name='multiselect_add-filter-select']"
+            "{$this->filtersPath}//input[@title[normalize-space(.)='{$filterName}']]" .
+            "[@name='multiselect_add-filter-select']"
         );
         if (!$filter->selected()) {
             $filter->click();
@@ -57,12 +58,12 @@ class PageFilteredGrid extends PageGrid
     public function filterBy($filterName, $value = '', $condition = '')
     {
         $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/div[contains(@class, 'filter-item')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
             . "/button[contains(.,'{$filterName}')]"
         )->click();
 
         $criteria = $this->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]/div[contains(@class, 'filter-item')]"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
             . "[button[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
         );
         $input = $criteria->element($this->using('xpath')->value("div/div/div/input[@name='value']"));

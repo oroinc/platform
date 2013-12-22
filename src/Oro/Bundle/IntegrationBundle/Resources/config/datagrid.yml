@@ -16,7 +16,7 @@ datagrid:
             type:
                 label: oro.integration.channel.type.label
                 frontend_type:  select
-                choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()
+                choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
         properties:
             id: ~
             update_link:
@@ -39,7 +39,7 @@ datagrid:
                     type: choice
                     options:
                         field_options:
-                            choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList() }
+                            choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
         actions:
             update:
                 type:         navigate

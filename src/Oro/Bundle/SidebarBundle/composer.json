@@ -1,0 +1,24 @@
+{
+    "name": "oro/sidebar-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Sidebar Bundle",
+    "keywords": ["BAP"],
+    "homepage": "https://github.com/laboro/SidebarBundle",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": "2.3.*",
+        "oro/platform-bundle": "dev-master",
+        "oro/requirejs-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\SidebarBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/SidebarBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

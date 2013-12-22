@@ -201,11 +201,6 @@ class User extends AbstractEntity implements Entity
 
     }
 
-    public function getRoles()
-    {
-
-    }
-
     public function setGroups($groups = array())
     {
         foreach ($groups as $group) {
@@ -215,11 +210,6 @@ class User extends AbstractEntity implements Entity
         }
 
         return $this;
-    }
-
-    public function getGroups()
-    {
-
     }
 
     public function edit()
@@ -247,7 +237,7 @@ class User extends AbstractEntity implements Entity
         $this->byXpath("//ul[@class='dropdown-menu']//a[contains(normalize-space(.), 'My User')]")->click();
         $this->waitPageToLoad();
         $this->assertElementPresent(
-            "//div[label[normalize-space(text()) = 'User name']]//div/p[normalize-space(text()) = '$userName']"
+            "//div[label[normalize-space(text()) = 'Username']]//div/p[normalize-space(text()) = '$userName']"
         );
         return $this;
     }

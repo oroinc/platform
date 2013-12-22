@@ -119,4 +119,17 @@ class OroEntityManager extends EntityManager
     {
         return null !== $this->filterCollection && $this->filterCollection->getEnabledFilters();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRepository($className)
+    {
+        $repo = parent::getRepository($className);
+        if ($repo instanceof EntityConfigAwareRepositoryInterface) {
+            $repo->setEntityConfigManager($this->extendManager->getConfigProvider()->getConfigManager());
+        }
+
+        return $repo;
+    }
 }

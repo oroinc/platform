@@ -37,7 +37,7 @@ class BusinessUnitType extends AbstractType
                 'website',
                 'text',
                 array(
-                    'label'    => 'oro.organization.businessunit.website',
+                    'label'    => 'oro.organization.businessunit.website.label',
                     'required' => false,
                 )
             )
