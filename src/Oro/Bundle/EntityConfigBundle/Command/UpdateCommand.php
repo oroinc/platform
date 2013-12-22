@@ -58,7 +58,7 @@ class UpdateCommand extends BaseCommand
                 && $classMetadata->name === $className
                 && $classMetadata->configurable
             ) {
-                $output->writeln('Check entity"' . $className . '"');
+                $output->writeln('Update entity "' . $className . '"');
 
                 if ($configManager->hasConfigEntityModel($classMetadata->name)) {
                     $configManager->updateConfigEntityModel($className, $input->getOption('force'));
