@@ -6,6 +6,7 @@ class SimpleTagGenerator implements TagGeneratorInterface
 {
     const STATIC_NAME_KEY = 'name';
     const IDENTIFIER_KEY  = 'params';
+    const NESTED_DATA_KEY = 'children';
 
     /**
      * {@inheritdoc}
@@ -18,10 +19,17 @@ class SimpleTagGenerator implements TagGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($data, $includeCollectionTag = false)
+    public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         $params = isset($data[self::IDENTIFIER_KEY]) ? $data[self::IDENTIFIER_KEY] : [];
         $tags   = [implode('_', array_merge([$data[self::STATIC_NAME_KEY]], $params))];
+
+        if (!empty($data[self::NESTED_DATA_KEY]) && is_array($data[self::NESTED_DATA_KEY])) {
+            foreach ($data[self::NESTED_DATA_KEY] as $child) {
+                // allowed one nested level
+                $tags = array_merge($tags, $this->generate($child));
+            }
+        }
 
         if ($includeCollectionTag) {
             $tags[] = $data[self::STATIC_NAME_KEY] . self::COLLECTION_SUFFIX;

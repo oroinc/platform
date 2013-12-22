@@ -27,12 +27,14 @@ class ContentTagsExtension extends \Twig_Extension
     /**
      * @param mixed $data
      * @param bool  $includeCollectionTag
+     * @param bool  $processNestedData
      *
      * @return array
      */
-    public function generate($data, $includeCollectionTag = false)
+    public function generate($data, $includeCollectionTag = false, $processNestedData = true)
     {
-        return $this->tagGeneratorChain->generate($data, $includeCollectionTag);
+        // enforce plain array should returns
+        return array_values($this->tagGeneratorChain->generate($data, $includeCollectionTag, $processNestedData));
     }
 
     /**

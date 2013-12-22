@@ -24,7 +24,7 @@ class SimpleGeneratorStub implements TagGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($data, $includeCollectionTag = false)
+    public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         $tags = [$data . $this->suffix];
         if ($includeCollectionTag) {

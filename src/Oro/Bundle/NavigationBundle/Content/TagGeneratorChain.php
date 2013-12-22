@@ -26,16 +26,17 @@ class TagGeneratorChain
      *
      * @param mixed $data
      * @param bool  $includeCollectionTag
+     * @param bool  $processNestedData
      *
      * @return array
      */
-    public function generate($data, $includeCollectionTag = false)
+    public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         $tags = [];
 
         foreach ($this->generators as $generator) {
             if ($generator->supports($data)) {
-                $tags = array_merge($tags, $generator->generate($data, $includeCollectionTag));
+                $tags = array_merge($tags, $generator->generate($data, $includeCollectionTag, $processNestedData));
             }
         }
         $tags = array_unique($tags);

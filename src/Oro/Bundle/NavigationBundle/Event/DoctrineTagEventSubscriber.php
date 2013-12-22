@@ -71,10 +71,27 @@ class DoctrineTagEventSubscriber implements EventSubscriber
 
         $collections = array_merge($uow->getScheduledCollectionUpdates(), $uow->getScheduledCollectionDeletions());
         foreach ($collections as $collection) {
-            $entities[] = $collection->getOwner();
+            $owner = $collection->getOwner();
+            if (!in_array($owner, $entities, true)) {
+                $entities[] = $owner;
+            }
         }
 
-        $this->collectedTags($entities);
+        $generator = $this->generatorLink->getService();
+        foreach ($entities as $entity) {
+            if (!in_array(ClassUtils::getClass($entity), self::$skipTrackingFor)) {
+                // invalidate collection view pages only when entity has been added or removed
+                $includeCollectionTag = $uow->isScheduledForInsert($entity)
+                    || $uow->isScheduledForDelete($entity);
+
+                $this->collectedTags = array_merge(
+                    $this->collectedTags,
+                    $generator->generate($entity, $includeCollectionTag)
+                );
+            }
+        }
+
+        $this->collectedTags = array_unique($this->collectedTags);
     }
 
     /**
@@ -82,33 +99,8 @@ class DoctrineTagEventSubscriber implements EventSubscriber
      */
     public function postFlush()
     {
-        $this->send($this->collectedTags);
-    }
-
-    /**
-     * Publish tags in topic
-     *
-     * @param array $tags
-     */
-    protected function send(array $tags)
-    {
-        if (!empty($tags)) {
-            $this->publisher->send(self::UPDATE_TOPIC, implode(self::TAG_DELIMITER, $tags));
-        }
-    }
-
-    /**
-     * Collect tags to protected property
-     *
-     * @param array $entities
-     */
-    protected function collectedTags(array $entities)
-    {
-        $generator = $this->generatorLink->getService();
-        foreach ($entities as $entity) {
-            if (!in_array(ClassUtils::getClass($entity), self::$skipTrackingFor)) {
-                $this->collectedTags = array_merge($this->collectedTags, $generator->generate($entity, true));
-            }
+        if (!empty($this->collectedTags)) {
+            $this->publisher->send(self::UPDATE_TOPIC, implode(self::TAG_DELIMITER, $this->collectedTags));
         }
     }
 }

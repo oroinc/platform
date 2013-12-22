@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Content;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Form\FormInterface;
 
@@ -21,9 +22,13 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     /** @var UnitOfWork */
     protected $uow;
 
+    /** @var EntityManager */
+    protected $em;
+
     public function __construct(EntityManager $em, EntityClassResolver $resolver)
     {
         $this->uow      = $em->getUnitOfWork();
+        $this->em       = $em;
         $this->resolver = $resolver;
     }
 
@@ -51,7 +56,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($data, $includeCollectionTag = false)
+    public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         if (!isset($this->generatedTags[$this->getCacheIdentifier($data)])) {
             $tags = [];
@@ -59,17 +64,20 @@ class DoctrineTagGenerator implements TagGeneratorInterface
             if ($data instanceof FormInterface) {
                 $data = $data->getData();
 
-                return $this->generate($data, $includeCollectionTag);
+                return $this->generate($data, $includeCollectionTag, $processNestedData);
             }
 
-            $class = false;
             if (is_object($data)) {
                 $tag = $this->convertToTag(ClassUtils::getClass($data));
-
                 // tag only in case if it's not a new object
                 if ($this->uow->getEntityState($data) !== UnitOfWork::STATE_NEW
-                    && !$this->uow->isScheduledForInsert($data)) {
+                    && !$this->uow->isScheduledForInsert($data)
+                ) {
                     $tags[] = implode('_', array_merge([$tag], $this->uow->getEntityIdentifier($data)));
+
+                    if ($processNestedData) {
+                        $tags = array_merge($tags, $this->collectNestedDataTags($data));
+                    }
                 }
 
                 $class = ClassUtils::getClass($data);
@@ -77,7 +85,7 @@ class DoctrineTagGenerator implements TagGeneratorInterface
                 $class = ClassUtils::getRealClass($data);
             }
 
-            if ($includeCollectionTag && false !== $class) {
+            if ($includeCollectionTag) {
                 $tags[] = $this->convertToTag($class) . self::COLLECTION_SUFFIX;
             }
 
@@ -85,6 +93,31 @@ class DoctrineTagGenerator implements TagGeneratorInterface
         }
 
         return $this->generatedTags[$this->getCacheIdentifier($data)];
+    }
+
+    /**
+     * @param mixed $data
+     *
+     * @return array
+     */
+    protected function collectNestedDataTags($data)
+    {
+        $tags = [];
+
+        $metadata = $this->em->getClassMetadata(ClassUtils::getClass($data));
+        foreach ($metadata->getAssociationMappings() as $field => $assoc) {
+            $value = $metadata->reflFields[$field]->getValue($data);
+            if (null !== $value) {
+                // skip DoctrineTagGenerator#supports() call due to doctrine association mapping always contain entities
+                $unwrappedValue = ($assoc['type'] & ClassMetadata::TO_ONE) ? [$value] : $value->unwrap();
+                foreach ($unwrappedValue as $entity) {
+                    // allowed one nested level
+                    $tags = array_merge($tags, $this->generate($entity));
+                }
+            }
+        }
+
+        return $tags;
     }
 
     /**
