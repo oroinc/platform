@@ -1,3 +1,10 @@
+services:
+    kernel.listener.access_denied:
+        class: %kernel.listener.oro.access_denied.class%
+        arguments: ["@session", "@router", "@security.context"]
+        tags:
+           - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }
+
 security:
     acl:
         connection: default
