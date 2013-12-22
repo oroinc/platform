@@ -84,62 +84,6 @@ class BusinessUnitController extends Controller
     }
 
     /**
-     * Get grid users data
-     *
-     * @Route(
-     *      "/update_grid/{id}",
-     *      name="oro_business_update_unit_user_grid",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0, "_format"="json"}
-     * )
-     * @AclAncestor("oro_user_user_view")
-     */
-    public function updateGridDataAction(BusinessUnit $entity = null)
-    {
-        if (!$entity) {
-            $entity = new BusinessUnit();
-        }
-        $datagridView = $this->getBusinessUnitDatagridManager($entity, 'update')
-            ->getDatagrid()->createView();
-
-        return $this->get('oro_grid.renderer')->renderResultsJsonResponse($datagridView);
-    }
-
-    /**
-     * Get grid users data
-     *
-     * @Route(
-     *      "/view_grid/{id}",
-     *      name="oro_business_view_unit_user_grid",
-     *      requirements={"id"="\d+"},
-     *      defaults={"_format"="json"}
-     * )
-     * @AclAncestor("oro_user_user_view")
-     */
-    public function viewGridDataAction(BusinessUnit $entity)
-    {
-        $datagridView = $this->getBusinessUnitDatagridManager($entity, 'view')
-            ->getDatagrid()->createView();
-
-        return $this->get('oro_grid.renderer')->renderResultsJsonResponse($datagridView);
-    }
-
-    /**
-     * @param  BusinessUnit $businessUnit
-     * @param  string       $action
-     * @return BusinessUnitUpdateUserDatagridManager
-     */
-    protected function getBusinessUnitDatagridManager(BusinessUnit $businessUnit, $action)
-    {
-        /** @var $result BusinessUnitUpdateUserDatagridManager */
-        $result = $this->get('oro_organization.business_unit_' . $action . '_user_datagrid_manager');
-        $result->setBusinessUnit($businessUnit);
-        $result->getRouteGenerator()->setRouteParameters(array('id' => $businessUnit->getId()));
-
-        return $result;
-    }
-
-    /**
      * @param BusinessUnit $entity
      * @return array
      */
