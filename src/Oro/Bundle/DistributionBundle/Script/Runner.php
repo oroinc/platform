@@ -8,6 +8,7 @@ use Composer\Package\PackageInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
 class Runner
@@ -69,24 +70,29 @@ class Runner
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return string
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     * @throws \RuntimeException when PHP cannot be found
      */
     protected function run($path)
     {
         if (file_exists($path)) {
-            $process = (new ProcessBuilder())
-                ->setPrefix('/usr/bin/php')
-                ->setArguments([$path])
-                ->getProcess();
-            $process->run();
+            if ($phpPath = (new PhpExecutableFinder())->find()) {
+                $process = (new ProcessBuilder())
+                    ->setPrefix($phpPath)
+                    ->setArguments([$path])
+                    ->getProcess();
+                $process->run();
 
-            if (!$process->isSuccessful()) {
-                throw new ProcessFailedException($process);
+                if (!$process->isSuccessful()) {
+                    throw new ProcessFailedException($process);
+                }
+
+                return $process->getOutput();
             }
 
-            return $process->getOutput();
+            throw new \RuntimeException('PHP cannot be found');
         }
     }
 
