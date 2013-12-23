@@ -116,7 +116,6 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     *
      */
     public function shouldRunMigrationScriptsUpToCurrentPackageVersionSimple()
     {
@@ -137,7 +136,6 @@ OUTPUT;
 
     /**
      * @test
-     *
      */
     public function shouldRunMigrationScriptsUpToCurrentPackageVersionComplex()
     {
