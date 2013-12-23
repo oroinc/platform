@@ -344,7 +344,6 @@ class UserController extends Controller
     /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
      * @Template
-     * @AclAncestor("oro_user_user_view")
      */
     public function infoAction(User $user)
     {
