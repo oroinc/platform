@@ -55,6 +55,10 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
                 });
             }
 
+            if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                view.$el.addClass('sidebar-widget-popup');
+            }
+
             return view;
         },
 
