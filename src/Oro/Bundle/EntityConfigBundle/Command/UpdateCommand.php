@@ -56,7 +56,7 @@ class UpdateCommand extends BaseCommand
             ) {
                 $output->writeln('Update entity "' . $className . '"');
 
-                if ($configManager->hasConfigEntityModel($classMetadata->name)) {
+                if ($configManager->hasConfig($classMetadata->name)) {
                     $configManager->updateConfigEntityModel($className, $input->getOption('force'));
                 } else {
                     $configManager->createConfigEntityModel($className);
@@ -64,7 +64,8 @@ class UpdateCommand extends BaseCommand
 
                 foreach ($doctrineMetadata->getFieldNames() as $fieldName) {
                     $fieldType = $doctrineMetadata->getTypeOfField($fieldName);
-                    if ($configManager->hasConfigFieldModel($className, $fieldName)) {
+                    //if ($configManager->hasConfigFieldModel($className, $fieldName)) {
+                    if ($configManager->hasConfig($className, $fieldName)) {
                         $configManager->updateConfigFieldModel($className, $fieldName, $input->getOption('force'));
                     } else {
                         $configManager->createConfigFieldModel($className, $fieldName, $fieldType);
@@ -73,7 +74,7 @@ class UpdateCommand extends BaseCommand
 
                 foreach ($doctrineMetadata->getAssociationNames() as $fieldName) {
                     $fieldType = $doctrineMetadata->isSingleValuedAssociation($fieldName) ? 'ref-one' : 'ref-many';
-                    if ($configManager->hasConfigFieldModel($className, $fieldName)) {
+                    if ($configManager->hasConfig($className, $fieldName)) {
                         $configManager->updateConfigFieldModel($className, $fieldName, $input->getOption('force'));
                     } else {
                         $configManager->createConfigFieldModel($className, $fieldName, $fieldType);
