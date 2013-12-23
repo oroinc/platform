@@ -11,7 +11,7 @@
 
 {% macro renderApiBlock(user) %}
     <div style="padding-top: 2px">
-        {{ user.api ? user.api.apiKey : 'N/A' }}
+        <span class="api-key">{{ user.api ? user.api.apiKey : '' }}</span>
         {% if resource_granted('oro_user_user_update') %}
             <a class="btn btn-mini no-hash" id="btn-apigen" href="{{ path('oro_user_apigen', { id: user.id }) }}"
                data-title="{{ 'Generate key'|trans }}" data-message="{{ 'Generate key was successful. New key:'|trans }}">
@@ -61,7 +61,7 @@
                     var el = $(this);
 
                     $.get(el.attr('href'), function (data) {
-                        el.prev().text(data);
+                        el.parent().find('.api-key').text(data);
                         var messageText = el.attr('data-message') + ' <strong>' + data + '</strong>';
                         messenger.notificationFlashMessage('success', messageText);
                     });
