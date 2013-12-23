@@ -12,7 +12,7 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
      * @extends Backbone.View
      */
     var WidgetView = Backbone.View.extend({
-        className: 'sidebar-widget',
+        className: 'sidebar-widget-pin',
         templateMin: _.template(widgetMinTemplate),
         templateMax: _.template(widgetMaxTemplate),
 
@@ -56,6 +56,12 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
             }
 
             return view;
+        },
+
+        setOffset: function (cord) {
+            var view = this;
+            view.$el.offset(cord);
+            view.$el.find('.sidebar-widget-content').css('max-height', view.$el.height());
         },
 
         onClickToggle: function (e) {

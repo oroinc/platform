@@ -186,6 +186,7 @@
 .sidebar-widget-header{
     width: 100%;
     overflow: hidden;
+    position: relative;
 }
 .sidebar-widget-header-title{
     float: left;
@@ -271,6 +272,16 @@
     border-radius: 3px;
     background-color: #f4f4f4;
 }
-.sidebar-widget{
-    overflow: hidden;
+.sidebar>.sidebar-widget-pin{
+    bottom: 75px;
+    position: fixed;
+    width: 0;
+    overflow: visible;
+}
+.sidebar-widget-pin>.sidebar-widget {
+    width: 200px;
+    padding-bottom: 2px;
+}
+.sidebar-widget-pin .sidebar-widget-content {
+    overflow: auto;
 }
