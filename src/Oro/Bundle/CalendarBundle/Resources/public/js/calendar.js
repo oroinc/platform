@@ -333,9 +333,10 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 }, this)
             };
             var keys = ['date', 'defaultView', 'editable', 'selectable',
-                'header', 'allDayText', 'buttonText',
+                'header', 'allDayText', 'allDaySlot', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
-                'firstDay', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
+                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
+                'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
                 'contentHeight'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
