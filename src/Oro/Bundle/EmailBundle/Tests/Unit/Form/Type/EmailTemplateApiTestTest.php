@@ -26,7 +26,7 @@ class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->type = new EmailTemplateApiType(
-            [],
+            [['name' => 'test']],
             $this->configManager,
             $this->localeSettings
         );
@@ -65,6 +65,14 @@ class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_locale.languages')
+            ->will($this->returnValue(['en', 'fr_FR']));
+
+        $this->localeSettings->expects($this->once())
+            ->method('getLanguage')
+            ->will($this->returnValue('ru_UA'));
+
+        $this->localeSettings->expects($this->once())
+            ->method('getLocalesByCodes')
             ->will($this->returnValue(['en', 'fr_FR']));
 
         $this->type->buildForm($builder, array());

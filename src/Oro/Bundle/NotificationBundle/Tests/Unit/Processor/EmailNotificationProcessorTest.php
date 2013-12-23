@@ -5,6 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Tests\Unit\Processor;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -84,8 +85,14 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $template->expects($this->once())
             ->method('getType')
             ->will($this->returnValue('html'));
+
+        $locale = 'uk_UA';
+        $this->localeSettings->expects($this->once())
+            ->method('getLocale')
+            ->will($this->returnValue($locale));
         $notification->expects($this->once())
             ->method('getTemplate')
+            ->with($locale)
             ->will($this->returnValue($template));
 
         $this->twig->expects($this->once())
@@ -105,6 +112,16 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->addJob();
 
         $this->processor->process($object, $notifications);
+    }
+
+    public function testNotify()
+    {
+        $refl = new \ReflectionObject($this->processor);
+        $method = $refl->getMethod('notify');
+        $method->setAccessible(true);
+
+        $params = new ParameterBag();
+        $this->assertFalse($method->invoke($this->processor, $params));
     }
 
     /**

@@ -9,6 +9,13 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class EmailTemplateTranslationType extends AbstractType
 {
+    /**
+     * Set labels for translation widget tabs
+     *
+     * @param FormView      $view
+     * @param FormInterface $form
+     * @param array         $options
+     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['labels'] = $options['labels'];

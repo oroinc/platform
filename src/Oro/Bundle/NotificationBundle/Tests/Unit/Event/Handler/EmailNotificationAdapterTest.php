@@ -59,10 +59,32 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('getTemplate')
             ->will($this->returnValue($template));
 
+
+        $translation = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation');
+        $translation->expects($this->once())
+            ->method('getLocale')
+            ->will($this->returnValue('en'));
+
+        $translation->expects($this->once())
+            ->method('getField')
+            ->will($this->returnValue('subject'));
+
+        $translation->expects($this->once())
+            ->method('getContent')
+            ->will($this->returnValue('testContent'));
+
+        $template->expects($this->once())
+            ->method('setSubject')
+            ->with('testContent');
+
+        $template->expects($this->once())
+            ->method('getTranslations')
+            ->will($this->returnValue([$translation]));
+
         $template->expects($this->once())
             ->method('setLocale');
 
-        $this->assertEquals($template, $this->adapter->getTemplate());
+        $this->assertEquals($template, $this->adapter->getTemplate('en'));
     }
 
     public function testGetRecipientEmails()

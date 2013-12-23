@@ -194,16 +194,12 @@ class ConfigValue
     {
         switch ($this->type) {
             case self::FIELD_SERIALIZED_TYPE:
-                $result = unserialize($this->value);
+                $this->value = unserialize($this->value);
                 break;
             case self::FIELD_LIST_TYPE:
-                $result = explode(ConfigValue::DELIMITER, $this->value);
+                $this->value = explode(ConfigValue::DELIMITER, $this->value);
                 break;
-            default:
-                $result = $this->value;
         }
-
-        $this->value = $result;
     }
 
     /**
