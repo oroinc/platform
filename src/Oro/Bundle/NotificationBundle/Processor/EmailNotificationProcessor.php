@@ -4,9 +4,6 @@ namespace Oro\Bundle\NotificationBundle\Processor;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Psr\Log\LoggerInterface;
 
 use Doctrine\ORM\EntityManager;
@@ -14,7 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {

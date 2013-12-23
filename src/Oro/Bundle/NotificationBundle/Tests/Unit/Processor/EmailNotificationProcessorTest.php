@@ -20,6 +20,9 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
     protected $mailer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $localeSettings;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
     /** @var EmailNotificationProcessor */
@@ -39,12 +42,16 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->logger = $this->getMockBuilder('Monolog\Logger')
             ->disableOriginalConstructor()->getMock();
 
+        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()->getMock();
+
         $this->processor = new EmailNotificationProcessor(
             $this->twig,
             $this->mailer,
             $this->entityManager,
             'a@a.com',
-            $this->logger
+            $this->logger,
+            $this->localeSettings
         );
         $this->processor->setEnv('prod');
         $this->processor->setMessageLimit(10);
