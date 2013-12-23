@@ -47,7 +47,7 @@ class RequestListener
     {
         if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST) {
             $locale = $this->translator->getLocale();
-            // check if a resource has already registered to avoid duplicated
+            // check if a resource has already registered to avoid duplicates
             if (!isset($this->registeredTranslationResources[$locale])) {
                 $this->translator->addResource(
                     'oro_database_translation',
