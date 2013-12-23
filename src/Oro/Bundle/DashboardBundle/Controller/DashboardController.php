@@ -25,7 +25,7 @@ class DashboardController extends Controller
             $name = $manager->getDefaultDashboardName();
         }
         /**
-         * @todo: change work with session after user state was implement
+         * @todo: change work with session after user state will be implement
          */
         if ($this->get('request')->get('change_dashboard', false)) {
             $this->get('session')->set('saved_dashboard', $name);
