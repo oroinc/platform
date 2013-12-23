@@ -24,6 +24,14 @@ class DashboardController extends Controller
         if (empty($name)) {
             $name = $manager->getDefaultDashboardName();
         }
+        /**
+         * @todo: change work with session after user state was implement
+         */
+        if ($this->get('request')->get('change_dashboard', false)) {
+            $this->get('session')->set('saved_dashboard', $name);
+        } else {
+            $name = $this->get('session')->get('saved_dashboard', $manager->getDefaultDashboardName());
+        }
         $dashboard = $manager->getDashboard($name);
         $template  = isset($dashboard['twig']) ? $dashboard['twig'] : 'OroDashboardBundle:Index:default.html.twig';
 
