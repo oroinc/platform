@@ -141,7 +141,7 @@ class Runner
     }
 
     /**
-     * @return false|string
+     * @return string
      * @throws \RuntimeException when PHP cannot be found
      */
     protected function getPhpExecutablePath()
