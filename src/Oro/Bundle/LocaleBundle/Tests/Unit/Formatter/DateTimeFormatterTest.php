@@ -26,12 +26,13 @@ class DateTimeFormatterTest extends IcuAwareTestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      * @dataProvider formatDataProvider
      */
     public function testFormat(
         $expectedDateType,
         $expectedTimeType,
-        $expectedDate,
+        \DateTime $expectedDate,
         $date,
         $dateType,
         $timeType,
@@ -65,6 +66,10 @@ class DateTimeFormatterTest extends IcuAwareTestCase
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function formatDataProvider()
     {
         return array(
