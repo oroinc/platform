@@ -6,15 +6,13 @@
         <div class="responsive-block">
             {{ ui.renderProperty('oro.organization.businessunit.name.label'|trans, entity.name) }}
             {{ ui.renderProperty('oro.organization.businessunit.organization.label'|trans, entity.organization) }}
-
-            {% set wibsite = entity.website ? ui.renderUrl(entity.website) : null %}
-            {{ ui.renderProperty('oro.organization.businessunit.website.label'|trans, wibsite) }}
+            {{ ui.renderProperty('oro.organization.businessunit.website.label'|trans, entity.website ? ui.renderUrl(entity.website) : null) }}
         </div>
 
         <div class="responsive-block">
             {{ ui.renderProperty('oro.organization.businessunit.email.label'|trans, email.email_address_simple(entity.email)) }}
-            {{ ui.renderProperty('oro.organization.businessunit.phone.label'|trans, entity.phone) }}
-            {{ ui.renderProperty('oro.organization.businessunit.fax.label'|trans, entity.fax) }}
+            {{ ui.renderProperty('oro.organization.businessunit.phone.label'|trans, entity.phone ? ui.renderPhone(entity.phone) : null) }}
+            {{ ui.renderProperty('oro.organization.businessunit.fax.label'|trans, entity.fax ? ui.renderPhone(entity.fax) : null) }}
         </div>
     </div>
 </div>

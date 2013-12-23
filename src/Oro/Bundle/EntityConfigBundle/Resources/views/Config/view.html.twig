@@ -75,7 +75,6 @@
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': path('oro_entityconfig_widget_entity_fields', {id: entity.id}),
-            'title': 'Fields'|trans,
             'cssClass': 'inner-grid'
         }) }}
     {% endset %}
@@ -90,7 +89,7 @@
             ]
         },
         {
-            'title': 'Related Information'|trans,
+            'title': 'Fields'|trans,
             'subblocks': [
                 {'data' : [entityFieldsWidget]},
             ]
