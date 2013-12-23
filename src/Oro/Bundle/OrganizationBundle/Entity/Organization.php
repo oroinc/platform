@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 /**
  * Organization
@@ -19,7 +22,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  }
  * )
  */
-class Organization
+class Organization implements NotificationEmailInterface
 {
     /**
      * @var integer
@@ -50,6 +53,18 @@ class Organization
      * @ORM\Column(name="currency_precision", type="string", length=10)
      */
     protected $precision;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *     targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit",
+     *     mappedBy="organization",
+     *     cascade={"ALL"},
+     *     fetch="EXTRA_LAZY"
+     * )
+     */
+    protected $businessUnits;
 
     /**
      * Get id
@@ -136,5 +151,40 @@ class Organization
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * @param ArrayCollection $businessUnits
+     *
+     * @return $this
+     */
+    public function setBusinessUnits($businessUnits)
+    {
+        $this->businessUnits = $businessUnits;
+
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getBusinessUnits()
+    {
+        return $this->businessUnits;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotificationEmails()
+    {
+        $emails = [];
+        $this->businessUnits->forAll(
+            function (BusinessUnit $bu) use (&$emails) {
+                $emails = array_merge($emails, $bu->getNotificationEmails());
+            }
+        );
+
+        return new ArrayCollection($emails);
     }
 }

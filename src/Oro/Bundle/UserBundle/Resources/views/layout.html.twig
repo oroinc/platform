@@ -21,18 +21,6 @@
             });
         });
     </script>
-
-    <!--[if lte IE 9]>
-    <link href="{{ asset('bundles/oroui/css/ie.css') }}" rel="stylesheet" media="all" />
-    <script type="text/javascript">
-        require(['jquery', 'bundles/oroui/lib/html5', 'bundles/oroui/lib/jquery/jquery.placeholder'],
-        function($){
-            $(function() {
-                $('input[placeholder], textarea[placeholder]').placeholder();
-            });
-        });
-    </script>
-    <![endif]-->
     {% endblock %}
     {% placeholder scripts_after %}
 </head>

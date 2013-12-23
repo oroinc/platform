@@ -393,7 +393,7 @@ class Contact extends AbstractEntity implements Entity
 
     public function edit()
     {
-        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Update contact']")->click();
+        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit contact']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->init();

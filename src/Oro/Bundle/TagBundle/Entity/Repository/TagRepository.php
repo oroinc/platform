@@ -26,7 +26,7 @@ class TagRepository extends EntityRepository
             ->setParameter('entityName', get_class($resource));
 
         if (!is_null($createdBy)) {
-            $qb->where('t2.createdBy ' . ($all ? '!=' : '=') . ' :createdBy')
+            $qb->where('t2.owner ' . ($all ? '!=' : '=') . ' :createdBy')
                 ->setParameter('createdBy', $createdBy);
         }
 
@@ -57,7 +57,7 @@ class TagRepository extends EntityRepository
         }
 
         if (!is_null($createdBy)) {
-            $builder->andWhere('t.createdBy = :createdBy')
+            $builder->andWhere('t.owner = :createdBy')
                 ->setParameter('createdBy', $createdBy);
         }
 

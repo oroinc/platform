@@ -3,6 +3,8 @@
 namespace Oro\Bundle\NotificationBundle\Event\Handler;
 
 use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
@@ -19,16 +21,24 @@ class EmailNotificationHandler implements EventHandlerInterface
      */
     protected $em;
 
+    /** @var ConfigProvider */
+    protected $configProvider;
+
     /**
      * Constructor
      *
      * @param EmailNotificationProcessor $processor
      * @param EntityManager              $em
+     * @param ConfigProvider             $configProvider
      */
-    public function __construct(EmailNotificationProcessor $processor, EntityManager $em)
-    {
-        $this->processor = $processor;
-        $this->em        = $em;
+    public function __construct(
+        EmailNotificationProcessor $processor,
+        EntityManager $em,
+        ConfigProvider $configProvider
+    ) {
+        $this->processor      = $processor;
+        $this->em             = $em;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -48,7 +58,8 @@ class EmailNotificationHandler implements EventHandlerInterface
             $notifications[] = new EmailNotificationAdapter(
                 $entity,
                 $notification,
-                $this->em
+                $this->em,
+                $this->configProvider
             );
         }
 

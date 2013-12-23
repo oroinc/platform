@@ -14,7 +14,7 @@
 }
 
 .modal-body .loading-content {
-    background: #fff url('/bundles/orogrid/img/loader.gif') no-repeat center left;
+    background: #fff url('../img/loader.gif') no-repeat center left;
     padding-left: 30px;
 }
 
