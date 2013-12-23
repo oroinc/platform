@@ -29,10 +29,6 @@ class UpdateCommand extends BaseCommand
 
     /**
      * {@inheritdoc}
-     *
-     * @TODO: may be need an option to update one value
-     *       (may be helpful when default value is changed during a development)
-     *       may be need an option to show changes (options like --dump-sql and --force in doctrine:schema:update)
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
