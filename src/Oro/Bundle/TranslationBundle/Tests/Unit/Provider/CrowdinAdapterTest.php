@@ -11,8 +11,9 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->callback = function () {
-
+        $phpunit = $this;
+        $this->callback = function ($item) use ($phpunit) {
+            $phpunit->assertInternalType('string', $item);
         };
 
         $this->adapter = $this->getMock(
@@ -39,7 +40,7 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
             'some/path/to/file.yml' => 'api/path/test.yml',
         );
 
-        $dirs = array('/some', '/some/path', '/some/path/to');
+        $dirs = array('some', 'some/path', 'some/path/to');
         $dirs = array_combine($dirs, $dirs);
 
         $this->adapter->expects($this->once())
