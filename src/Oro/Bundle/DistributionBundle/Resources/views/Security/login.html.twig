@@ -1,0 +1,30 @@
+{% extends 'OroDistributionBundle::base.html.twig' %}
+
+{% block stylesheet %}
+    {{ parent() }}
+    <style type="text/css">
+        .wrapper {
+            width: 400px;
+        }
+
+
+    </style>
+{% endblock %}
+
+{% block title %}Sign In{% endblock %}
+
+{% block body %}
+    {% if error %}
+        <div class="alert alert-error">{{ error.message }}</div>
+    {% endif %}
+
+    <form action="{{ path('oro_distribution_security_login_check') }}" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="_username" value="{{ last_username }}" />
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="_password" />
+
+        <button type="submit" class="btn btn-success">login</button>
+    </form>
+{% endblock %}
