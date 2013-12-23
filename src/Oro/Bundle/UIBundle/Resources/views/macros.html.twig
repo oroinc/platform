@@ -503,11 +503,23 @@
     {% endif -%}
 {% endmacro %}
 
-{%- macro renderUrl(url, title) -%}
+{%- macro renderUrl(url, title, class) -%}
     {% if title is empty %}
         {% set title = url %}
     {% endif %}
+    {% if class is empty %}
+        {% set class = '' %}
+    {% endif %}
     {% if url is not empty %}
-        <a href="{{ url|raw }}" title="{{ title|escape }}">{{ title }}</a>
+        <a href="{{ url|raw }}" title="{{ title|escape }}" class="{{ class }}">{{ title }}</a>
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro renderPhone(phone, title) -%}
+    {% if title is empty %}
+        {% set title = phone %}
+    {% endif %}
+    {% if phone is not empty %}
+        <a href="tel:{{ phone|raw }}" title="{{ title|escape }}">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
