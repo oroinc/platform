@@ -352,28 +352,4 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         e.preventDefault();
         $(this).parents('*[data-content]').remove();
     });
-
-
-    $(function () {
-        var collapseGroups = {};
-        $('[data-width-collapse-group]').each(function () {
-            var $el = $(this);
-            var group = $el.data('width-collapse-group');
-            if ($el.outerWidth() >= $el.parent().innerWidth()) {
-                collapseGroups[group] = true;
-            }
-        });
-        _.each(collapseGroups, function (obj, group) {
-            $('[data-width-collapse-group="' + group + '"]').each(function () {
-                var $el = $(this);
-                var siblingSel = $el.data('width-sibling-sel');
-                var $sibling = $(siblingSel);
-                var $parent = $el.parent();
-                var collapsedWidth = $parent.width();
-                var siblingWidth = $sibling.outerWidth();
-                $parent.hide();
-                $sibling.width(siblingWidth + collapsedWidth);
-            });
-        });
-    });
 });
