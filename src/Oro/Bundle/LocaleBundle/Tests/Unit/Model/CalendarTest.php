@@ -157,9 +157,9 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
             $widthToPatternMap[$width ? : Calendar::WIDTH_WIDE]
         );
         foreach ($actual as $dayNum => $dayName) {
-            $checkDate = new \DateTime('2013/07/0' . $dayNum);
+            $checkDate = new \DateTime('2013/09/0' . $dayNum, new \DateTimeZone('UTC'));
             $expected = $formatter->format((int)$checkDate->format('U'));
-            $this->assertEquals($expected, $actual[$dayNum]);
+            $this->assertEquals($expected, $actual[$dayNum], 'Incorrect day for day #' . $dayNum);
         }
     }
 
