@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Model;
 
-use Oro\Bundle\LocaleBundle\Tests\Unit\IcuAwareTestCase;
 use Oro\Bundle\LocaleBundle\Model\Calendar;
 
-class CalendarTest extends IcuAwareTestCase
+class CalendarTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var Calendar
@@ -136,12 +135,10 @@ class CalendarTest extends IcuAwareTestCase
      */
     public function testGetDayOfWeekNames($width, $locale, $defaultLocale = null)
     {
-        //$this->ignoreIfIcuVersionGreaterThan('4.8.1.1');
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
             \Locale::setDefault($defaultLocale);
         }
-        //$this->assertEquals($expected, $this->calendar->getDayOfWeekNames($width));
         $actual = $this->calendar->getDayOfWeekNames($width);
         $this->assertCount(7, $actual);
 

@@ -3,9 +3,8 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\LocaleBundle\Tests\Unit\IcuAwareTestCase;
 
-class DateTimeFormatterTest extends IcuAwareTestCase
+class DateTimeFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
