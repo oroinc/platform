@@ -210,6 +210,9 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:translation:dump', $input, $output)
             ->runCommand('oro:requirejs:build', $input, $output);
 
+        // run package installer scripts
+        $this->processPackageInstaller($output);
+
         // update installed flag in parameters.yml
         $dumper = $this->getContainer()->get('oro_installer.yaml_persister');
         $params = $dumper->parse();
@@ -221,6 +224,26 @@ class InstallCommand extends ContainerAwareCommand
 
         $output->writeln('');
         return $this;
+    }
+
+    /**
+     * Process package installer scripts
+     *
+     * @param OutputInterface $output
+     */
+    protected function processPackageInstaller(OutputInterface $output)
+    {
+        $installerProvider = $this->getContainer()->get('oro_installer.installer_provider');
+        $packageInstallers = $installerProvider->getInstallerList();
+        if (!empty($packageInstallers)) {
+            foreach ($packageInstallers as $installer) {
+                $installerProvider->runPackageInstaller(
+                    $installer['key'],
+                    $output,
+                    $this->getContainer()
+                );
+            }
+        }
     }
 
     /**

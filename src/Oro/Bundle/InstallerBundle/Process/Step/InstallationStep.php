@@ -4,6 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Process\Step;
 
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class InstallationStep extends AbstractStep
 {
@@ -11,7 +12,8 @@ class InstallationStep extends AbstractStep
     {
         set_time_limit(900);
 
-        switch ($this->getRequest()->query->get('action')) {
+        $action = $this->getRequest()->query->get('action');
+        switch ($action) {
             case 'fixtures':
                 return $this->handleAjaxAction('oro:demo:fixtures:load');
             case 'search':
@@ -44,10 +46,22 @@ class InstallationStep extends AbstractStep
                 return $this->handleAjaxAction('cache:clear');
         }
 
+        // check if we have package installation step
+        if (strpos($action, 'packageInstaller-') !== false) {
+            $this->container->get('oro_installer.installer_provider')->runPackageInstaller(
+                str_replace('packageInstaller-', '', $action),
+                $this->getOutput(),
+                $this->container
+            );
+
+            return new JsonResponse(array('result' => true));
+        }
+
         return $this->render(
             'OroInstallerBundle:Process/Step:installation.html.twig',
             array(
                 'loadFixtures' => $context->getStorage()->get('loadFixtures'),
+                'packageSteps' => $this->container->get('oro_installer.installer_provider')->getInstallersLabels(),
             )
         );
     }
