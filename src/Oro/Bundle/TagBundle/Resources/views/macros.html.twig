@@ -1,10 +1,11 @@
 {% macro renderView(entity) %}
-    <div id="tags">
+    {% set tagCloudElId = 'tags-' ~ random() %}
+    <div id="{{ tagCloudElId }}">
         <div class="tag-view">
             {% import _self as _ %}
             {{ _.tagSortActions() }}
 
-            <div class="well well-small" id="tags-holder"></div>
+            <div class="well well-small tags-holder"></div>
         </div>
     </div>
 
@@ -13,7 +14,9 @@
         function($, TagView){
             $(function() {
                 /** @type oro.tag.View */
-                var tagView = new TagView();
+                var tagView = new TagView({
+                    el: '#{{ tagCloudElId }}'
+                });
                 tagView.getCollection().reset({{ oro_tag_get_list(entity)|json_encode|raw }});
             });
         });
@@ -24,7 +27,7 @@
     Render sort actions list
 #}
 {% macro tagSortActions() %}
-    <ul class="inline" id="tag-sort-actions">
+    <ul class="tag-sort-actions inline">
         <li>
             <a href="javascript:void(0);" class="no-hash active">
                 {% trans %}All tags{% endtrans %}
