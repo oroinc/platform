@@ -40,6 +40,12 @@ function (_, sync, mediator, messenger, __) {
         },
 
         /**
+         * User ID needed to check whenever update person is the same user
+         * @type {String}
+         */
+        currentUser = null,
+
+        /**
          * Notifier object
          * @type {{close: function()}}
          */
@@ -105,10 +111,10 @@ function (_, sync, mediator, messenger, __) {
     /**
      * Handler of content update message from server
      *
-     * @param {Array} tags
+     * @param {String} tags
      */
     function onUpdate(tags) {
-        tags = tags.split(',');
+        tags = prepareTags(tags);
 
         _.each(pagesTags, function(items, url) {
             var handler, callbacks = [];
@@ -145,6 +151,25 @@ function (_, sync, mediator, messenger, __) {
         });
     }
 
+    /**
+     * Tags come from server in following structure
+     * [
+     *  { tagname: TAG, username: AUTHOR},
+     *  ...
+     *  { tagname: TAG2, username: AUTHOR},
+     *  ...
+     * ]
+     *
+     * @param {String} tags
+     * @return []
+     */
+    function prepareTags(tags) {
+        tags = _.reject(JSON.parse(tags), function (tag) {
+            return (tag.username || null) === currentUser;
+        });
+        return _.pluck(tags, 'tagname');
+    }
+
     // handles page changing
     mediator.on('hash_navigation_request:start', function(navigation) {
         changeUrl(navigation.url);
@@ -167,9 +192,11 @@ function (_, sync, mediator, messenger, __) {
          * Setups content management component, sets initial URL
          *
          * @param {string} url
+         * @param {string} userName
          */
-        init: function (url) {
+        init: function (url, userName) {
             currentUrl(url);
+            currentUser = userName;
         },
 
         /**

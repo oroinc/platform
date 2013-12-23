@@ -186,15 +186,18 @@ services:
         arguments:
             - @oro_wamp.publisher
             - @oro_navigation.content.tag_generator_chain.link
+            - @oro_navigation.content.security.context.linksss
             - %installed%
-            - @logger
         tags:
             - { name: doctrine.event_subscriber, connection: default }
-            - { name: monolog.logger, channel: doctrine_tag_logs }
 
     oro_navigation.content.tag_generator_chain.link:
         tags:
             - { name: oro_service_link,  service: oro_navigation.content.tag_generator_chain }
+
+    oro_navigation.content.security.context.linksss:
+        tags:
+            - { name: oro_service_link,  service: security.context }
 
     oro_navigation.title_service:
         class: %oro_navigation.title_service.class%

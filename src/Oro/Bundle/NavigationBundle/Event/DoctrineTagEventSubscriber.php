@@ -7,13 +7,14 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class DoctrineTagEventSubscriber implements EventSubscriber
 {
-    const UPDATE_TOPIC  = 'oro/data/update';
-    const TAG_DELIMITER = ',';
+    const UPDATE_TOPIC = 'oro/data/update';
 
     /** @var TopicPublisher */
     protected $publisher;
@@ -23,6 +24,9 @@ class DoctrineTagEventSubscriber implements EventSubscriber
 
     /** @var ServiceLink */
     protected $generatorLink;
+
+    /** @var ServiceLink */
+    protected $securityContextLink;
 
     /** @var array */
     protected static $skipTrackingFor = [
@@ -34,10 +38,15 @@ class DoctrineTagEventSubscriber implements EventSubscriber
     /** @var array */
     protected $collectedTags = [];
 
-    public function __construct(TopicPublisher $publisher, ServiceLink $generatorLink, $isApplicationInstalled)
-    {
+    public function __construct(
+        TopicPublisher $publisher,
+        ServiceLink $generatorLink,
+        ServiceLink $securityContextLink,
+        $isApplicationInstalled
+    ) {
         $this->publisher              = $publisher;
         $this->generatorLink          = $generatorLink;
+        $this->securityContextLink    = $securityContextLink;
         $this->isApplicationInstalled = $isApplicationInstalled;
     }
 
@@ -99,8 +108,19 @@ class DoctrineTagEventSubscriber implements EventSubscriber
      */
     public function postFlush()
     {
+        /** @var SecurityContextInterface $securityContext */
+        $securityContext = $this->securityContextLink->getService();
+        $userName        = $securityContext->getToken() && is_object($securityContext->getToken()->getUser())
+            ? $securityContext->getToken()->getUser()->getUserName() : null;
+
         if (!empty($this->collectedTags)) {
-            $this->publisher->send(self::UPDATE_TOPIC, implode(self::TAG_DELIMITER, $this->collectedTags));
+            $this->collectedTags = array_map(
+                function ($tag) use ($userName) {
+                    return ['username' => $userName, 'tagname' => $tag];
+                },
+                $this->collectedTags
+            );
+            $this->publisher->send(self::UPDATE_TOPIC, json_encode($this->collectedTags));
         }
     }
 }

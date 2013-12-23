@@ -1,3 +1,4 @@
+/* global define */
 define(['underscore', 'oro/content-manager'], function (_, ContentManager) {
     'use strict';
 
@@ -15,8 +16,30 @@ define(['underscore', 'oro/content-manager'], function (_, ContentManager) {
         };
 
     return {
-        init: function ($el) {
-            methods.initHandler($el);
+        /** @property [] */
+        trackGrids: [],
+
+        /**
+         * Adds grid to track list
+         *
+         * @param name
+         */
+        addGridTrack: function (name) {
+            if (_.indexOf(this.trackGrids, name) === -1) {
+                this.trackGrids.push(name);
+            }
+        },
+
+        /**
+         * Builder interface implementation
+         *
+         * @param $el
+         * @param {String} gridName
+         */
+        init: function ($el, gridName) {
+            if (_.indexOf(this.trackGrids, gridName) !== -1) {
+                methods.initHandler($el);
+            }
         }
     };
 });

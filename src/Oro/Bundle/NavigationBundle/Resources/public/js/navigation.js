@@ -189,7 +189,7 @@ define(function (require) {
             }
 
             this.init();
-            contentManager.init(this.url);
+            contentManager.init(this.url, options.userName || false);
 
             Backbone.Router.prototype.initialize.apply(this, arguments);
         },
