@@ -10,6 +10,7 @@
         'containerSelector': '.calendar-events',
         'itemFormTemplateSelector': '#template-calendar-event-' ~ widgetId,
         'defaultView': 'agendaDay',
+        'firstHour': firstHour,
         'renderCompleteCallback': 'function (calendar) {'
             ~ ' var allDayEventCount = 0;'
             ~ ' calendar.getCollection().each(function (model) { if (model.get("allDay")) { allDayEventCount++; } });'

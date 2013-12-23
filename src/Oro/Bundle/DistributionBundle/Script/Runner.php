@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DistributionBundle\Script;
 
-
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ProcessBuilder;
@@ -75,9 +75,12 @@ class Runner
      */
     protected function run($path)
     {
+        $finder = new PhpExecutableFinder();
+        $phpExec = $finder->find();
+
         if (file_exists($path)) {
             $process = (new ProcessBuilder())
-                ->setPrefix('/usr/bin/php')
+                ->setPrefix($phpExec)
                 ->setArguments([$path])
                 ->getProcess();
             $process->run();
