@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DistributionBundle\Script;
 
-
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\ProcessBuilder;
@@ -69,17 +69,22 @@ class Runner
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return string
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     protected function run($path)
     {
         if (file_exists($path)) {
+            $phpPath = $this->getPhpExecutablePath();
+
             $process = (new ProcessBuilder())
-                ->setPrefix('/usr/bin/php')
-                ->setArguments([$path])
+                ->setPrefix($phpPath)
+                ->add($path)
+                ->add('-p')
+                ->add($phpPath)
                 ->getProcess();
+
             $process->run();
 
             if (!$process->isSuccessful()) {
@@ -119,23 +124,42 @@ class Runner
             $files[] = $file->getPathname();
         }
         $fetchItemVersion = function ($item) {
-            $regexp = '/_(.+).php/i';
+            $regexp = '~_([^_]+?)\.php$~i';
             preg_match($regexp, $item, $itemMatches);
 
             return $itemMatches[1];
 
         };
-        $files = array_filter($files, function ($item) use ($previousPackageVersion, $fetchItemVersion) {
-            $itemVersion = $fetchItemVersion($item);
+        $files = array_filter(
+            $files,
+            function ($item) use ($previousPackageVersion, $fetchItemVersion) {
+                $itemVersion = $fetchItemVersion($item);
 
-            return version_compare($itemVersion, $previousPackageVersion, '>');
-        });
-        usort($files, function ($a, $b) use ($fetchItemVersion) {
-            $aVersion = $fetchItemVersion($a);
-            $bVersion = $fetchItemVersion($b);
+                return version_compare($itemVersion, $previousPackageVersion, '>');
+            }
+        );
+        usort(
+            $files,
+            function ($a, $b) use ($fetchItemVersion) {
+                $aVersion = $fetchItemVersion($a);
+                $bVersion = $fetchItemVersion($b);
 
-            return version_compare($aVersion, $bVersion);
-        });
+                return version_compare($aVersion, $bVersion);
+            }
+        );
         return $files;
+    }
+
+    /**
+     * @return string
+     * @throws \RuntimeException when PHP cannot be found
+     */
+    protected function getPhpExecutablePath()
+    {
+        if ($path = (new PhpExecutableFinder())->find()) {
+            return $path;
+        }
+
+        throw new \RuntimeException('PHP cannot be found');
     }
 }
