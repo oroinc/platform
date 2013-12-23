@@ -64,7 +64,6 @@ class UpdateCommand extends BaseCommand
 
                 foreach ($doctrineMetadata->getFieldNames() as $fieldName) {
                     $fieldType = $doctrineMetadata->getTypeOfField($fieldName);
-                    //if ($configManager->hasConfigFieldModel($className, $fieldName)) {
                     if ($configManager->hasConfig($className, $fieldName)) {
                         $configManager->updateConfigFieldModel($className, $fieldName, $input->getOption('force'));
                     } else {
