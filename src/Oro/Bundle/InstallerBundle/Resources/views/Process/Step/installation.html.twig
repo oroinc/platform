@@ -9,9 +9,9 @@
 
 {% set steps = platformSteps %}
 
-{% if packageSteps is not empty %}
-    {% for stepName in packageSteps|keys %}
-        {% set steps = steps|merge(['packageInstaller-' ~ stepName]) %}
+{% if installerScripts is not empty %}
+    {% for stepName in installerScripts|keys %}
+        {% set steps = steps|merge(['installerScript-' ~ stepName]) %}
     {% endfor %}
 {% endif %}
 
@@ -41,10 +41,10 @@
                  <td>&nbsp;</td>
              </tr>
              {% endfor %}
-             {% if packageSteps is not empty %}
-                 {% for stepKey, stepLabel in packageSteps %}
+             {% if installerScripts is not empty %}
+                 {% for stepKey, stepLabel in installerScripts %}
                      <tr>
-                         <td><span id="step-packageInstaller-{{ stepKey }}"></span>{{ stepLabel|trans }}</td>
+                         <td><span id="step-installerScript-{{ stepKey }}"></span>{{ stepLabel|trans }}</td>
                          <td>&nbsp;</td>
                      </tr>
                  {% endfor %}

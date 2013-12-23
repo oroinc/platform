@@ -19,7 +19,7 @@ class InstallerProvider
     /**
      * @var array
      */
-    protected $installers;
+    protected $installerScripts;
 
     /**
      * @param $bundles
@@ -31,67 +31,67 @@ class InstallerProvider
     }
 
     /**
-     * Run package installer by installer key
+     * Run installer script by installer key
      *
-     * @param string $installerKey
+     * @param string $scriptKey
      * @param StreamOutput $output
      * @param ContainerInterface $containerInstance
      */
-    public function runPackageInstaller($installerKey, StreamOutput $output, ContainerInterface $containerInstance)
+    public function runInstallerScript($scriptKey, StreamOutput $output, ContainerInterface $containerInstance)
     {
-        $installer = $this->getInstallerByKey($installerKey);
-        if ($installer) {
+        $script = $this->getInstallerScriptByKey($scriptKey);
+        if ($script) {
             $output->writeln('');
-            $output->writeln(sprintf('[%s] Launching "%s" package installer', date('Y-m-d H:i:s'), $installer['file']));
+            $output->writeln(sprintf('[%s] Launching "%s" installer script', date('Y-m-d H:i:s'), $script['file']));
 
-            if (is_file($installer['file'])) {
+            if (is_file($script['file'])) {
                 ob_start();
                 $container = $containerInstance;
-                include($installer['file']);
-                $installerOutput = ob_get_contents();
+                include($script['file']);
+                $scriptOutput = ob_get_contents();
                 ob_clean();
-                $output->writeln($installerOutput);
+                $output->writeln($scriptOutput);
             } else {
-                $output->writeln('File "%s" not found', $installer['file']);
+                $output->writeln('File "%s" not found', $script['file']);
             }
         } else {
-            $output->writeln(sprintf('Installer "%s" was not found', $installerKey));
+            $output->writeln(sprintf('Installer "%s" was not found', $scriptKey));
         }
     }
 
     /**
-     * get array with installers keys and labels
+     * get array with installer scripts keys and labels
      *
      * @return array
      *  key -> installer file md5 key
      *  value -> installer label
      */
-    public function getInstallersLabels()
+    public function getInstallerScriptsLabels()
     {
-        $installers = [];
-        $this->checkInstallersLoaded();
+        $scripts = [];
+        $this->checkInstallerScriptsLoaded();
 
-        if (!empty($this->installers)) {
-            foreach ($this->installers as $installer) {
-                $installers[$installer['key']] = $installer['label'];
+        if (!empty($this->installerScripts)) {
+            foreach ($this->installerScripts as $installerScript) {
+                $scripts[$installerScript['key']] = $installerScript['label'];
             }
         }
 
-        return $installers;
+        return $scripts;
     }
 
     /**
-     * Get installer info array by installer md5 key
+     * Get installer script info array by installer script md5 key
      *
-     * @param $installerKey
+     * @param $scriptKey
      * @return array|bool
      */
-    public function getInstallerByKey($installerKey)
+    public function getInstallerScriptByKey($scriptKey)
     {
-        $this->checkInstallersLoaded();
+        $this->checkInstallerScriptsLoaded();
 
-        if (!empty($this->installers) && isset($this->installers[$installerKey])) {
-            return $this->installers[$installerKey];
+        if (!empty($this->installerScripts) && isset($this->installerScripts[$scriptKey])) {
+            return $this->installerScripts[$scriptKey];
         }
 
         return false;
@@ -104,36 +104,36 @@ class InstallerProvider
      *  key -> installer md5 key
      *  value -> installer info array
      */
-    public function getInstallerList()
+    public function getInstallerScriptList()
     {
-        $this->checkInstallersLoaded();
+        $this->checkInstallerScriptsLoaded();
 
-        return $this->installers;
+        return $this->installerScripts;
     }
 
     /**
-     * Checks if installer was loaded and load they
+     * Checks if installer scripts was loaded and load they if needed
      */
-    protected function checkInstallersLoaded()
+    protected function checkInstallerScriptsLoaded()
     {
-        if (!is_array($this->installers)) {
-            $this->processInstallers();
+        if (!is_array($this->installerScripts)) {
+            $this->processInstallerScripts();
         }
     }
 
     /**
-     * Read installers info from installer files
+     * Read installer scripts info from installer files
      */
-    protected function processInstallers()
+    protected function processInstallerScripts()
     {
         $index = 0;
-        $installers = [];
-        $this->installers = [];
+        $scripts = [];
+        $this->installerScripts = [];
         $rootDir = realpath($this->kernel->getRootDir() . DIRECTORY_SEPARATOR.'..' . DIRECTORY_SEPARATOR);
         $bundles = $this->kernel->getBundles();
         foreach ($bundles as $bundle) {
             $bundleDirName = $bundle->getPath();
-            $this->getInstallerInfo($bundleDirName, $index, $installers);
+            $this->getInstallerScriptInfo($bundleDirName, $index, $scripts);
 
             $relativePathArray = explode(DIRECTORY_SEPARATOR, str_replace($rootDir, '', $bundleDirName));
             if ($relativePathArray[0] == '') {
@@ -142,36 +142,36 @@ class InstallerProvider
             for ($i = count($relativePathArray); $i >= 0; $i--) {
                 unset($relativePathArray[$i]);
                 $checkPath = $rootDir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $relativePathArray);
-                if ($this->getInstallerInfo($checkPath, $index, $installers)) {
+                if ($this->getInstallerScriptInfo($checkPath, $index, $scripts)) {
                     break;
                 }
             }
         }
-        if (!empty($installers)) {
-            usort($installers, array($this, "compareInstallers"));
-            foreach ($installers as $installer) {
-                $this->installers[$installer['key']] = $installer;
+        if (!empty($scripts)) {
+            usort($scripts, array($this, "compareInstallerScripts"));
+            foreach ($scripts as $script) {
+                $this->installerScripts[$script['key']] = $script;
             }
         }
     }
 
     /**
-     * Get installer info from dir
+     * Get installer script info from dir
      *
      * @param string $dirName
      * @param int $index
-     * @param array $installers
+     * @param array $scripts
      * @return array|bool
      */
-    protected function getInstallerInfo($dirName, &$index, &$installers)
+    protected function getInstallerScriptInfo($dirName, &$index, &$scripts)
     {
         $file = $dirName . DIRECTORY_SEPARATOR . self::ORO_INSTALLER_FILE_NAME;
-        if (is_file($file) && !isset($installers[md5($file)])) {
-            $data = $this->getInstallerInfoFromFile($file);
+        if (is_file($file) && !isset($scripts[md5($file)])) {
+            $data = $this->getInstallerScriptInfoFromFile($file);
             if ($data) {
                 $data['index'] = $index;
                 $index++;
-                $installers[$data['file']] = $data;
+                $scripts[$data['file']] = $data;
 
                 return $data;
             }
@@ -181,13 +181,13 @@ class InstallerProvider
     }
 
     /**
-     * Compare two installers for sorting
+     * Compare two installer scripts for sorting
      *
      * @param array $a
      * @param array $b
      * @return int
      */
-    protected function compareInstallers($a, $b)
+    protected function compareInstallerScripts($a, $b)
     {
         $pathA = dirname($a['file']) . DIRECTORY_SEPARATOR;
         $pathB = dirname($b['file']) . DIRECTORY_SEPARATOR;
@@ -202,12 +202,12 @@ class InstallerProvider
     }
 
     /**
-     * Get info about installer file
+     * Get info about installer script file
      *
      * @param string $fileName
      * @return array|bool
      */
-    protected function getInstallerInfoFromFile($fileName)
+    protected function getInstallerScriptInfoFromFile($fileName)
     {
         $tokens =[];
         if (preg_match(

@@ -47,9 +47,9 @@ class InstallationStep extends AbstractStep
         }
 
         // check if we have package installation step
-        if (strpos($action, 'packageInstaller-') !== false) {
-            $this->container->get('oro_installer.installer_provider')->runPackageInstaller(
-                str_replace('packageInstaller-', '', $action),
+        if (strpos($action, 'installerScript-') !== false) {
+            $this->container->get('oro_installer.installer_provider')->runInstallerScript(
+                str_replace('installerScript-', '', $action),
                 $this->getOutput(),
                 $this->container
             );
@@ -61,7 +61,10 @@ class InstallationStep extends AbstractStep
             'OroInstallerBundle:Process/Step:installation.html.twig',
             array(
                 'loadFixtures' => $context->getStorage()->get('loadFixtures'),
-                'packageSteps' => $this->container->get('oro_installer.installer_provider')->getInstallersLabels(),
+                'installerScripts' => $this
+                        ->container
+                        ->get('oro_installer.installer_provider')
+                        ->getInstallerScriptsLabels(),
             )
         );
     }

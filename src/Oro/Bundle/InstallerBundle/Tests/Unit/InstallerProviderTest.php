@@ -38,10 +38,10 @@ class InstallerProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->installerProvider = new InstallerProvider($this->kernel);
 
-        $this->installers = $this->installerProvider->getInstallerList();
+        $this->installers = $this->installerProvider->getInstallerScriptList();
     }
 
-    public function testGetInstallerList()
+    public function testGetInstallerScriptList()
     {
         $this->assertEquals(3, count($this->installers));
         $i = 0;
@@ -58,23 +58,23 @@ class InstallerProviderTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testGetInstallersLabels()
+    public function testGetInstallerScriptsLabels()
     {
-        $labels = $this->installerProvider->getInstallersLabels();
+        $labels = $this->installerProvider->getInstallerScriptsLabels();
         foreach ($this->installers as $installer) {
             $this->assertEquals($installer['label'], $labels[$installer['key']]);
         }
     }
 
-    public function testGetInstallerByKey()
+    public function testGetInstallerScriptByKey()
     {
         foreach ($this->installers as $installer) {
-            $this->assertEquals($installer, $this->installerProvider->getInstallerByKey($installer['key']));
+            $this->assertEquals($installer, $this->installerProvider->getInstallerScriptByKey($installer['key']));
         }
-        $this->assertFalse($this->installerProvider->getInstallerByKey('false_installer'));
+        $this->assertFalse($this->installerProvider->getInstallerScriptByKey('false_installer'));
     }
 
-    public function testRunPackageInstaller()
+    public function testRunInstallerScript()
     {
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\StreamOutput')
             ->disableOriginalConstructor()
@@ -90,7 +90,7 @@ class InstallerProviderTest extends \PHPUnit_Framework_TestCase
             ->with('Test1 Bundle Installer data');
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
 
-        $this->installerProvider->runPackageInstaller($testInstaller, $output, $container);
+        $this->installerProvider->runInstallerScript($testInstaller, $output, $container);
     }
 
     public function testRunWromgInstaller()
@@ -102,6 +102,6 @@ class InstallerProviderTest extends \PHPUnit_Framework_TestCase
             ->method('writeln')
             ->with('Installer "wrong_installer" was not found');
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $this->installerProvider->runPackageInstaller('wrong_installer', $output, $container);
+        $this->installerProvider->runInstallerScript('wrong_installer', $output, $container);
     }
 }
