@@ -292,10 +292,8 @@ define(function (require) {
                 model: widget
             });
 
-            var widgetWidth = 200;
             view.$el.append(hoverView.render().$el);
-            hoverView.$el.css('position', 'fixed');
-            hoverView.$el.width(widgetWidth);
+            var widgetWidth = hoverView.$el.width();
 
             var windowWidth = $(window).width();
 
@@ -310,7 +308,7 @@ define(function (require) {
                 cord.left -= sidebarWidth;
             }
 
-            hoverView.$el.offset(cord);
+            hoverView.setOffset(cord);
 
             view.hoverViews[cid] = hoverView;
         },
