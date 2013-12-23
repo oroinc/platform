@@ -53,7 +53,7 @@
                             function($, routing, Navigation){
                                 $(function () {
                                     $('#dashboard_selector').on('change', function (e) {
-                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}),
+                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}) + '?change_dashboard=true',
                                             navigation = Navigation.getInstance();
                                         if (navigation) {
                                             navigation.processRedirect({
