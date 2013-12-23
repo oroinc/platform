@@ -1,6 +1,6 @@
 services:
-    kernel.listener.access_denied:
-        class: %kernel.listener.oro.access_denied.class%
+    oro_distribution.listener.access_denied:
+        class: %oro_distribution.security.access_denied_listener.class%
         arguments: ["@session", "@router", "@security.context"]
         tags:
            - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }
