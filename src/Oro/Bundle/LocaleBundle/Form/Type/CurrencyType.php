@@ -13,9 +13,11 @@ class CurrencyType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array(
-            'choices' => Intl::getCurrencyBundle()->getCurrencyNames('en'),
-        ));
+        $resolver->setDefaults(
+            array(
+                'choices' => Intl::getCurrencyBundle()->getCurrencyNames('en'),
+            )
+        );
     }
 
     /**
