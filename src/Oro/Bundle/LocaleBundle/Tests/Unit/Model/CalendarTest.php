@@ -136,12 +136,34 @@ class CalendarTest extends IcuAwareTestCase
      */
     public function testGetDayOfWeekNames($width, $locale, array $expected, $defaultLocale = null)
     {
-        $this->ignoreIfIcuVersionGreaterThan('4.8.1.1');
+        //$this->ignoreIfIcuVersionGreaterThan('4.8.1.1');
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
             \Locale::setDefault($defaultLocale);
         }
-        $this->assertEquals($expected, $this->calendar->getDayOfWeekNames($width));
+        //$this->assertEquals($expected, $this->calendar->getDayOfWeekNames($width));
+        $actual = $this->calendar->getDayOfWeekNames($width);
+        $this->assertCount(7, $actual);
+
+        $widthToPatternMap = array(
+            Calendar::WIDTH_ABBREVIATED => 'ccc',
+            Calendar::WIDTH_SHORT => 'cccccc',
+            Calendar::WIDTH_NARROW => 'ccccc',
+            Calendar::WIDTH_WIDE => 'cccc'
+        );
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            null,
+            null,
+            'UTC',
+            \IntlDateFormatter::GREGORIAN,
+            $widthToPatternMap[$width ? : Calendar::WIDTH_WIDE]
+        );
+        foreach ($actual as $dayNum => $dayName) {
+            $checkDate = new \DateTime('2013/07/0' . $dayNum);
+            $expected = $formatter->format((int)$checkDate->format('U'));
+            $this->assertEquals($expected, $actual[$dayNum]);
+        }
     }
 
     /**
@@ -194,13 +216,13 @@ class CalendarTest extends IcuAwareTestCase
                 Calendar::WIDTH_SHORT,
                 'en_US',
                 array(
-                    Calendar::DOW_SUNDAY    => 'Sun',
-                    Calendar::DOW_MONDAY    => 'Mon',
-                    Calendar::DOW_TUESDAY   => 'Tue',
-                    Calendar::DOW_WEDNESDAY => 'Wed',
-                    Calendar::DOW_THURSDAY  => 'Thu',
-                    Calendar::DOW_FRIDAY    => 'Fri',
-                    Calendar::DOW_SATURDAY  => 'Sat',
+                    Calendar::DOW_SUNDAY    => 'Su',
+                    Calendar::DOW_MONDAY    => 'Mo',
+                    Calendar::DOW_TUESDAY   => 'Tu',
+                    Calendar::DOW_WEDNESDAY => 'We',
+                    Calendar::DOW_THURSDAY  => 'Th',
+                    Calendar::DOW_FRIDAY    => 'Fr',
+                    Calendar::DOW_SATURDAY  => 'Sa',
                 )
             ),
             'narrow, en_US' => array(
