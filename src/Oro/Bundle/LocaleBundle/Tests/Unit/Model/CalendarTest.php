@@ -134,7 +134,7 @@ class CalendarTest extends IcuAwareTestCase
     /**
      * @dataProvider getDayOfWeekNamesDataProvider
      */
-    public function testGetDayOfWeekNames($width, $locale, array $expected, $defaultLocale = null)
+    public function testGetDayOfWeekNames($width, $locale, $defaultLocale = null)
     {
         //$this->ignoreIfIcuVersionGreaterThan('4.8.1.1');
         $this->calendar->setLocale($locale);
@@ -174,134 +174,44 @@ class CalendarTest extends IcuAwareTestCase
         return array(
             'wide, en_US' => array(
                 Calendar::WIDTH_WIDE,
-                'en_US',
-                array(
-                    Calendar::DOW_SUNDAY    => 'Sunday',
-                    Calendar::DOW_MONDAY    => 'Monday',
-                    Calendar::DOW_TUESDAY   => 'Tuesday',
-                    Calendar::DOW_WEDNESDAY => 'Wednesday',
-                    Calendar::DOW_THURSDAY  => 'Thursday',
-                    Calendar::DOW_FRIDAY    => 'Friday',
-                    Calendar::DOW_SATURDAY  => 'Saturday',
-                )
+                'en_US'
             ),
             'default wide, default locale' => array(
                 null,
                 null,
-                array(
-                    Calendar::DOW_SUNDAY    => 'Sunday',
-                    Calendar::DOW_MONDAY    => 'Monday',
-                    Calendar::DOW_TUESDAY   => 'Tuesday',
-                    Calendar::DOW_WEDNESDAY => 'Wednesday',
-                    Calendar::DOW_THURSDAY  => 'Thursday',
-                    Calendar::DOW_FRIDAY    => 'Friday',
-                    Calendar::DOW_SATURDAY  => 'Saturday',
-                ),
                 'en_US',
             ),
             'abbreviated, en_US' => array(
                 Calendar::WIDTH_ABBREVIATED,
                 'en_US',
-                array(
-                    Calendar::DOW_SUNDAY    => 'Sun',
-                    Calendar::DOW_MONDAY    => 'Mon',
-                    Calendar::DOW_TUESDAY   => 'Tue',
-                    Calendar::DOW_WEDNESDAY => 'Wed',
-                    Calendar::DOW_THURSDAY  => 'Thu',
-                    Calendar::DOW_FRIDAY    => 'Fri',
-                    Calendar::DOW_SATURDAY  => 'Sat',
-                )
             ),
             'short, en_US' => array(
                 Calendar::WIDTH_SHORT,
-                'en_US',
-                array(
-                    Calendar::DOW_SUNDAY    => 'Su',
-                    Calendar::DOW_MONDAY    => 'Mo',
-                    Calendar::DOW_TUESDAY   => 'Tu',
-                    Calendar::DOW_WEDNESDAY => 'We',
-                    Calendar::DOW_THURSDAY  => 'Th',
-                    Calendar::DOW_FRIDAY    => 'Fr',
-                    Calendar::DOW_SATURDAY  => 'Sa',
-                )
+                'en_US'
             ),
             'narrow, en_US' => array(
                 Calendar::WIDTH_NARROW,
-                'en_US',
-                array(
-                    Calendar::DOW_SUNDAY    => 'S',
-                    Calendar::DOW_MONDAY    => 'M',
-                    Calendar::DOW_TUESDAY   => 'T',
-                    Calendar::DOW_WEDNESDAY => 'W',
-                    Calendar::DOW_THURSDAY  => 'T',
-                    Calendar::DOW_FRIDAY    => 'F',
-                    Calendar::DOW_SATURDAY  => 'S',
-                )
+                'en_US'
             ),
             'fr_FR' => array(
                 Calendar::WIDTH_WIDE,
-                'fr_FR',
-                array(
-                    Calendar::DOW_SUNDAY    => 'dimanche',
-                    Calendar::DOW_MONDAY    => 'lundi',
-                    Calendar::DOW_TUESDAY   => 'mardi',
-                    Calendar::DOW_WEDNESDAY => 'mercredi',
-                    Calendar::DOW_THURSDAY  => 'jeudi',
-                    Calendar::DOW_FRIDAY    => 'vendredi',
-                    Calendar::DOW_SATURDAY  => 'samedi',
-                )
+                'fr_FR'
             ),
             'ru_RU' => array(
                 Calendar::WIDTH_WIDE,
-                'ru_RU',
-                array(
-                    Calendar::DOW_SUNDAY    => 'Воскресенье',
-                    Calendar::DOW_MONDAY    => 'Понедельник',
-                    Calendar::DOW_TUESDAY   => 'Вторник',
-                    Calendar::DOW_WEDNESDAY => 'Среда',
-                    Calendar::DOW_THURSDAY  => 'Четверг',
-                    Calendar::DOW_FRIDAY    => 'Пятница',
-                    Calendar::DOW_SATURDAY  => 'Суббота',
-                )
+                'ru_RU'
             ),
             'abbreviated, ru_RU' => array(
                 Calendar::WIDTH_ABBREVIATED,
-                'ru_RU',
-                array(
-                    Calendar::DOW_SUNDAY    => 'Вс',
-                    Calendar::DOW_MONDAY    => 'Пн',
-                    Calendar::DOW_TUESDAY   => 'Вт',
-                    Calendar::DOW_WEDNESDAY => 'Ср',
-                    Calendar::DOW_THURSDAY  => 'Чт',
-                    Calendar::DOW_FRIDAY    => 'Пт',
-                    Calendar::DOW_SATURDAY  => 'Сб',
-                )
+                'ru_RU'
             ),
             'short, ru_RU' => array(
                 Calendar::WIDTH_SHORT,
-                'ru_RU',
-                array(
-                    Calendar::DOW_SUNDAY    => 'Вс',
-                    Calendar::DOW_MONDAY    => 'Пн',
-                    Calendar::DOW_TUESDAY   => 'Вт',
-                    Calendar::DOW_WEDNESDAY => 'Ср',
-                    Calendar::DOW_THURSDAY  => 'Чт',
-                    Calendar::DOW_FRIDAY    => 'Пт',
-                    Calendar::DOW_SATURDAY  => 'Сб',
-                )
+                'ru_RU'
             ),
             'narrow, ru_RU' => array(
                 Calendar::WIDTH_NARROW,
-                'ru_RU',
-                array(
-                    Calendar::DOW_SUNDAY    => 'В',
-                    Calendar::DOW_MONDAY    => 'П',
-                    Calendar::DOW_TUESDAY   => 'В',
-                    Calendar::DOW_WEDNESDAY => 'С',
-                    Calendar::DOW_THURSDAY  => 'Ч',
-                    Calendar::DOW_FRIDAY    => 'П',
-                    Calendar::DOW_SATURDAY  => 'С',
-                )
+                'ru_RU'
             ),
         );
     }
