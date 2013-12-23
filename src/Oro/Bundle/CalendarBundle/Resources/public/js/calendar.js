@@ -357,6 +357,16 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                     this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.35);
                 }
             }, this);
+
+            var that = this;
+            options.viewDisplay = function(view) {
+                that.setTimeline();
+                setInterval(function () { that.setTimeline(); }, 5 * 60 * 1000);
+            };
+            options.windowResize = function(view) {
+                that.setTimeline();
+            };
+
             // create jQuery FullCalendar control
             this.getCalendarElement().fullCalendar(options);
             this.enableEventLoading = true;
@@ -412,6 +422,54 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             this.initializeFullCalendar();
 
             return this;
+        },
+
+        setTimeline: function() {
+            var calendarElement = this.getCalendarElement();
+            var curTime = new Date();
+            curTime = new Date(curTime.getTime()
+                + curTime.getTimezoneOffset() * 60000
+                + this.options.eventsOptions.timezoneOffset * 60000);
+            // this function is called every 5 minutes
+            if (curTime.getHours() == 0 && curTime.getMinutes() <= 5) {
+                // the day has changed
+                var todayElement = calendarElement.find('.fc-today');
+                todayElement.removeClass('fc-today');
+                todayElement.removeClass('fc-state-highlight');
+                todayElement.next().addClass('fc-today');
+                todayElement.next().addClass('fc-state-highlight');
+            }
+
+            var parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
+            var timelineElement = parentDiv.children('.timeline');
+            if (timelineElement.length == 0) {
+                // if timeline isn't there, add it
+                timelineElement = $('<hr>').addClass('timeline');
+                parentDiv.prepend(timelineElement);
+            }
+
+            var curCalView = calendarElement.fullCalendar('getView');
+            if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
+                timelineElement.show();
+            } else {
+                timelineElement.hide();
+            }
+
+            var curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+            var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
+            var topLoc = Math.floor(parentDiv.height() * percentOfDay);
+            timelineElement.css('top', topLoc + 'px');
+
+            if (curCalView.name == 'agendaWeek') {
+                // week view, don't want the timeline to go the whole way across
+                var dayCol = calendarElement.find('.fc-today:visible');
+                if (dayCol.position() != null) {
+                    timelineElement.css({
+                        left: (dayCol.position().left - 1) + 'px',
+                        width: (dayCol.width() + 2) + 'px'
+                    });
+                }
+            }
         }
     });
 });
