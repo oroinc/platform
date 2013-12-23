@@ -27,7 +27,7 @@ abstract class OroKernel extends Kernel
                     : new $class;
             }
         } else {
-            $file  = $this->getCacheDir() . '/bundles.php';
+            $file = $this->getCacheDir() . '/bundles.php';
             $cache = new ConfigCache($file, false);
 
             if (!$cache->isFresh($file)) {
@@ -45,7 +45,7 @@ abstract class OroKernel extends Kernel
 
     protected function collectBundles()
     {
-        $finder  = new Finder();
+        $finder = new Finder();
         $bundles = array();
 
         $finder
@@ -62,21 +62,21 @@ abstract class OroKernel extends Kernel
             $import = Yaml::parse($file->getRealpath());
 
             foreach ($import['bundles'] as $bundle) {
-                $kernel   = false;
+                $kernel = false;
                 $priority = 0;
 
                 if (is_array($bundle)) {
-                    $class    = $bundle['name'];
-                    $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
-                    $priority = isset($bundle['priority']) ? (int) $bundle['priority'] : 0;
+                    $class = $bundle['name'];
+                    $kernel = isset($bundle['kernel']) && true == $bundle['kernel'];
+                    $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
                 } else {
-                    $class    = $bundle;
+                    $class = $bundle;
                 }
 
                 if (!isset($bundles[$class])) {
                     $bundles[$class] = array(
-                        'name'     => $class,
-                        'kernel'   => $kernel,
+                        'name' => $class,
+                        'kernel' => $kernel,
                         'priority' => $priority,
                     );
                 }
@@ -92,12 +92,12 @@ abstract class OroKernel extends Kernel
     {
         // @todo: this is preliminary algorithm. we need to implement more sophisticated one,
         // for example using bundle dependency info from composer.json
-        $p1 = (int) $a['priority'];
-        $p2 = (int) $b['priority'];
+        $p1 = (int)$a['priority'];
+        $p2 = (int)$b['priority'];
 
         if ($p1 == $p2) {
-            $n1 = (string) $a['name'];
-            $n2 = (string) $b['name'];
+            $n1 = (string)$a['name'];
+            $n2 = (string)$b['name'];
 
             // make sure OroCRM bundles follow Oro bundles
             if (strpos($n1, 'Oro') === 0 && strpos($n2, 'Oro') === 0) {
