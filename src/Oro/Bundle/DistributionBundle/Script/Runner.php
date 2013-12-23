@@ -119,7 +119,7 @@ class Runner
             $files[] = $file->getPathname();
         }
         $fetchItemVersion = function ($item) {
-            $regexp = '/_(.+).php/i';
+            $regexp = '~_([^_]+?)\.php$~i';
             preg_match($regexp, $item, $itemMatches);
 
             return $itemMatches[1];
