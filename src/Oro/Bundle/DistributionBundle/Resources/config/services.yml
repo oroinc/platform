@@ -8,10 +8,10 @@ parameters:
     oro_distribution.composer.installation_manager.class:  Composer\Installer\InstallationManager
     oro_distribution.composer_json:                        %kernel.root_dir%/../composer.json
 
-    oro_user.manager.class:             Oro\Bundle\UserBundle\Entity\UserManager
-    oro_user.entity.class:              Oro\Bundle\UserBundle\Entity\User
-    oro_user.security.provider.class:   Oro\Bundle\UserBundle\Security\UserProvider
-    kernel.listener.oro.access_denied.class: Oro\Bundle\DistributionBundle\Security\AccessDeniedHandler
+    oro_distribution.user_manager.class:                   Oro\Bundle\UserBundle\Entity\UserManager
+    oro_distribution.user.entity.class:                    Oro\Bundle\UserBundle\Entity\User
+    oro_distribution.security.provider.class:              Oro\Bundle\UserBundle\Security\UserProvider
+    kernel.listener.oro.access_denied.class:               Oro\Bundle\DistributionBundle\Security\AccessDeniedHandler
 
 services:
     oro_distribution.routing_loader:
@@ -59,11 +59,14 @@ services:
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
 
-    oro_user.manager:
-        class:                        %oro_user.manager.class%
-        arguments:                    [%oro_user.entity.class%, "@doctrine.orm.entity_manager", "@security.encoder_factory"]
 
-    oro_user.security.provider:
-        class:                        %oro_user.security.provider.class%
+    ### Security
+
+    oro_distribution.user_manager:
+        class:                        %oro_distribution.user_manager.class%
+        arguments:                    [%oro_distribution.user.entity.class%, "@doctrine.orm.entity_manager", "@security.encoder_factory"]
+
+    oro_distribution.security.provider:
+        class:                        %oro_distribution.security.provider.class%
         public:                       false
-        arguments:                    ["@oro_user.manager"]
+        arguments:                    ["@oro_distribution.user_manager"]

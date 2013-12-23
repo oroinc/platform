@@ -17,7 +17,7 @@ security:
             chain:
                 providers:                  [in_memory, oro_user]
         oro_user:
-            id:                             oro_user.security.provider
+            id:                             oro_distribution.security.provider
         in_memory:
             memory:
                 users:                      []
