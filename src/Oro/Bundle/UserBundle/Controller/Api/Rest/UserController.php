@@ -298,21 +298,6 @@ class UserController extends RestController implements ClassResourceInterface
     /**
      * {@inheritdoc}
      */
-    protected function fixFormData(array $data, $entity)
-    {
-        $result = parent::fixFormData($data, $entity);
-
-        if (!empty($result['roles'])) {
-            $result['rolesCollection'] = $result['roles'];
-        }
-        unset($result['roles']);
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getPreparedItem($entity)
     {
         $result = parent::getPreparedItem($entity);

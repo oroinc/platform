@@ -128,12 +128,6 @@ class UserController extends SoapController
         unset($result['id']);
         unset($result['lastLogin']);
 
-        if (!empty($result['roles'])) {
-            $result['rolesCollection'] = $result['roles'];
-        }
-        unset($result['roles']);
-
-
         if ($entity instanceof User &&
             $entity->getId() &&
             !$this->container->get('oro_security.security_facade')->isGranted('ASSIGN', $entity)

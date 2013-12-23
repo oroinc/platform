@@ -88,7 +88,7 @@ class CommandsTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
-                "rolesCollection" => array("3"),
+                "roles" => array("3"),
                 "owner" => "1",
             )
         );
