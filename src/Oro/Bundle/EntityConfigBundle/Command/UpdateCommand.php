@@ -29,6 +29,9 @@ class UpdateCommand extends BaseCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @TODO: add --dry-run option to show diff about what will be changed
+     *
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
