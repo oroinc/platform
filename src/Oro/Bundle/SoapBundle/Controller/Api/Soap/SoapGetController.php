@@ -38,7 +38,7 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
         $entity = $this->getManager()->find($id);
 
         if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $id));
+            throw new \SoapFault('NOT_FOUND', sprintf('Record with ID "%s" can not be found', $id));
         }
 
         return $entity;

@@ -46,7 +46,7 @@ class CountryController extends SoapGetController
         $entity = $this->getRepository()->find($id);
 
         if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $id));
+            throw new \SoapFault('NOT_FOUND', sprintf('Country with code "%s" can not be found', $id));
         }
 
         return $entity;

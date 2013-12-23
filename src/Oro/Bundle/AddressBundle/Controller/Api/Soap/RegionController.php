@@ -33,7 +33,7 @@ class RegionController extends SoapGetController
         $entity = $this->getRepository()->find($combinedCode);
 
         if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $combinedCode));
+            throw new \SoapFault('NOT_FOUND', sprintf('Region with code "%s" can not be found', $combinedCode));
         }
 
         return $this->transformToSoapEntity($entity);
@@ -50,7 +50,7 @@ class RegionController extends SoapGetController
         $country = $this->getManager()->getRepository('OroAddressBundle:Country')->find($countryIso2Code);
 
         if (!$country) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $countryIso2Code));
+            throw new \SoapFault('NOT_FOUND', sprintf('Country with code "%s" can not be found', $countryIso2Code));
         }
 
         return $this->transformToSoapEntities($this->getRepository()->getCountryRegions($country));
