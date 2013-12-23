@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use JMS\Serializer\Annotation as Serializer;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Workflow item
@@ -27,6 +28,7 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
+ * @Config()
  */
 class WorkflowItem
 {
@@ -103,6 +105,7 @@ class WorkflowItem
      *  cascade={"persist", "remove"},
      *  orphanRemoval=true
      * )
+     * @ORM\OrderBy({"transitionDate" = "ASC"})
      */
     protected $transitionRecords;
 
@@ -311,6 +314,44 @@ class WorkflowItem
         }
 
         return $this;
+    }
+
+    /**
+     * Synchronize current bind entities with the list of actual bind entities, removes entities that are outdated and
+     * adds new entities.
+     *
+     * @param WorkflowBindEntity[] $actualBindEntities
+     * @return bool
+     */
+    public function syncBindEntities(array $actualBindEntities)
+    {
+        $hasChanges = false;
+
+        // Remove connections with WorkflowBindEntity that are outdated
+        /** @var $bindEntity WorkflowBindEntity */
+        foreach ($this->getBindEntities() as $bindEntity) {
+            $isActual = false;
+            foreach ($actualBindEntities as $actualBindEntity) {
+                if ($actualBindEntity->hasSameEntity($bindEntity)) {
+                    $isActual = true;
+                    break;
+                }
+            }
+            if (!$isActual) {
+                $hasChanges = true;
+                $this->removeBindEntity($bindEntity);
+            }
+        }
+
+        // Add WorkflowBindEntity that are missing entities
+        foreach ($actualBindEntities as $bindEntity) {
+            if (!$this->hasBindEntity($bindEntity)) {
+                $this->addBindEntity($bindEntity);
+                $hasChanges = true;
+            }
+        }
+
+        return $hasChanges;
     }
 
     /**

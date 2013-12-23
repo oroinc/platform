@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
 
-class LoginFormTest extends \PHPUnit_Extensions_Selenium2TestCase
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+
+class LoginFormTest extends Selenium2TestCase
 {
     protected $coverageScriptUrl = PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE;
 
@@ -97,7 +99,8 @@ class LoginFormTest extends \PHPUnit_Extensions_Selenium2TestCase
         $this->assertEquals('Dashboard', $this->title());
 
         $this->byXPath("//*[@id='top-page']//ul[@class='nav pull-right user-menu']/li[@class='dropdown']/a")->click();
-        $this->byXPath("//*[@id='top-page']//ul[@class='nav pull-right user-menu']//li/a[contains(.,'Logout')]")->click();
+        $this->byXPath("//*[@id='top-page']//ul[@class='nav pull-right user-menu']//li/a[contains(.,'Logout')]")
+            ->click();
         $this->assertEquals('Login', $this->title());
     }
 
@@ -172,7 +175,10 @@ class LoginFormTest extends \PHPUnit_Extensions_Selenium2TestCase
         $this->waitForAjax();
         $messageActual = $this->byXPath("//*[@id='top-page']//div[contains(@class,'alert-success')]")->text();
 
-        $this->assertEquals('An email has been sent to ...@example.com. It contains a link you must click to reset your password.', $messageActual);
+        $this->assertEquals(
+            'An email has been sent to ...@example.com. It contains a link you must click to reset your password.',
+            $messageActual
+        );
     }
 
     public function testRememberFunction()

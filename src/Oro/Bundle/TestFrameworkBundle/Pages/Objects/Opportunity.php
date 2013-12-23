@@ -35,7 +35,7 @@ class Opportunity extends AbstractEntity implements Entity
         $this->proposedsolution = $this->byId('orocrm_sales_opportunity_form_proposedSolution');
         $this->closereason = $this->select($this->byId('orocrm_sales_opportunity_form_closeReason'));
         $this->closerevenu = $this->byId('orocrm_sales_opportunity_form_closeRevenue');
-        $this->closedate = $this->byId('orocrm_sales_opportunity_form_closeDate');
+        $this->closedate = $this->byId('date_selector_orocrm_sales_opportunity_form_closeDate');
         $this->owner = $this->byXpath("//div[@id='s2id_orocrm_sales_opportunity_form_owner']/a");
 
         return $this;
@@ -64,6 +64,8 @@ class Opportunity extends AbstractEntity implements Entity
             "Contact autocoplete doesn't return search value"
         );
         $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$contact}')]")->click();
+
+        return $this;
     }
 
     public function getContact()
@@ -75,7 +77,7 @@ class Opportunity extends AbstractEntity implements Entity
 
     public function setAccount($account)
     {
-        $this->contact->click();
+        $this->account->click();
         $this->waitForAjax();
         $this->byXpath("//div[@id='select2-drop']/div/input")->value($account);
         $this->waitForAjax();
@@ -84,6 +86,8 @@ class Opportunity extends AbstractEntity implements Entity
             "Account autocoplete doesn't return search value"
         );
         $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$account}')]")->click();
+
+        return $this;
     }
 
     public function getAccount()
@@ -190,9 +194,15 @@ class Opportunity extends AbstractEntity implements Entity
         return $this->closedate->value();
     }
 
+    public function checkStatus($status)
+    {
+        $this->assertElementPresent("//div[@class='status-enabled pull-left'][contains(., '{$status}')]");
+        return $this;
+    }
+
     public function edit()
     {
-        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Update opportunity']")->click();
+        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit opportunity']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->init();

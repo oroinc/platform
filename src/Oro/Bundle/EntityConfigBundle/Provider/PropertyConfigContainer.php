@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Provider;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -102,8 +103,30 @@ class PropertyConfigContainer
 
         $result = array();
         foreach ($this->getItems($type) as $code => $item) {
-            if (isset($item['options']['auditable']) && $item['options']['auditable'] === false) {
+            if ((isset($item['options']['auditable']) && $item['options']['auditable'] === false)
+                || (isset($item['options']['serializable']) && $item['options']['serializable'] === true)
+            ) {
                 $result[$code] = true;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get translatable property's codes
+     *
+     * @param string $type
+     * @return array
+     */
+    public function getTranslatableValues($type = self::TYPE_FIELD)
+    {
+        $type = $this->getConfigType($type);
+
+        $result = array();
+        foreach ($this->getItems($type) as $code => $item) {
+            if ((isset($item['options']['translatable']) && $item['options']['translatable'] === true)) {
+                $result[] = $code;
             }
         }
 

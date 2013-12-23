@@ -1,0 +1,83 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroCalendarBundle::macros.html.twig' as c %}
+
+{% set name = entity.owner|oro_format_name|default('N/A') %}
+{% oro_title_set({params : {"%username%": name, "%calendarname%": entity.name|default(name) }}) %}
+
+{% block head_script %}
+    {{ parent() }}
+{% endblock %}
+
+{% block navButtons %}
+{% endblock navButtons %}
+
+{% block breadcrumb %}
+    {% set breadcrumbs = [{'label': name }] %}
+    {% if not entity.name is empty %}
+        {% set breadcrumbs = breadcrumbs|merge([{'label': 'oro.calendar.entity_label'|trans }, {'label': entity.name}]) %}
+    {% else %}
+        {% set breadcrumbs = breadcrumbs|merge([{'label': 'My'|trans ~ ' ' ~ 'oro.calendar.entity_label'|trans }]) %}
+    {% endif %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {'entityTitle': 'oro.calendar.entity_label'|trans } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block stats %}{% endblock stats %}
+
+{% block content_data %}
+    <div class="row-fluid" id="calendar">
+        <div class="span3">
+            <div class="calendars">
+                <div class="calendar-connections"></div>
+                {% if resource_granted('oro_calendar_connection_view') %}
+                <form action="#">
+                    {{ form_row(user_select_form) }}
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="span9 calendar-events scrollable-container"></div>
+    </div>
+
+    <script type="text/html" id="template-calendar-connections">
+        <ul class="media-list connection-container">
+        </ul>
+    </script>
+
+    <script type="text/html" id="template-calendar-connection-item">
+        <li class="media connection-item"
+            <% if (!_.isEmpty(backgroundColor)) { %>
+                style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
+            <% } %> >
+            <div class="pull-left media-body"
+                    <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
+                ><%- calendarName %></div>
+            <% if (removable) { %>
+            <div class="pull-right icons-holder"><a
+                href="javascript: void(0);" class="icons-holder-text no-hash remove-connection-button"
+                title="{{ 'Exclude this calendar'|trans }}"><i
+                    class="icon-remove hide-text"></i></a></div>
+            <% } %>
+        </li>
+    </script>
+
+    {% set connectionsOptions = {
+        'containerSelector': '.calendar-connections',
+        'containerTemplateSelector': '#template-calendar-connections',
+        'itemTemplateSelector': '#template-calendar-connection-item',
+    } %}
+    {% set eventsOptions = {
+        'containerSelector': '.calendar-events',
+        'itemFormTemplateSelector': '#template-calendar-event',
+        'leftHeader': 'prev,next today',
+        'centerHeader': 'title',
+        'rightHeader': 'month,agendaWeek,agendaDay',
+    } %}
+    {{ c.calendar_event_form_template('template-calendar-event', event_form) }}
+    {{ c.renderCalendar('#calendar', entity, startDate, endDate, calendar, eventsOptions, connectionsOptions) }}
+
+{% endblock content_data %}

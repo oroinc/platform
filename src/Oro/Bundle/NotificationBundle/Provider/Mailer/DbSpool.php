@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 
 class DbSpool extends \Swift_ConfigurableSpool
@@ -67,8 +68,14 @@ class DbSpool extends \Swift_ConfigurableSpool
         $mailObject->setStatus(self::STATUS_READY);
 
         try {
-            $this->em->persist($mailObject);
-            $this->em->flush($mailObject);
+            $this->em->getUnitOfWork()->computeChangeSet(
+                $this->em->getClassMetadata($this->entityClass),
+                $mailObject
+            );
+            $this->em
+                ->getUnitOfWork()
+                ->getEntityPersister($this->entityClass)
+                ->addInsert($mailObject);
         } catch (\Exception $e) {
             throw new \Swift_IoException("Unable to persist object for enqueuing message");
         }

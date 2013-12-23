@@ -256,7 +256,7 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
         $userMock = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
         $tagging->expects($this->exactly(2))
-            ->method('getCreatedBy')->will($this->returnValue($userMock));
+            ->method('getOwner')->will($this->returnValue($userMock));
         $tagging->expects($this->any())
             ->method('getEntityName')->will($this->returnValue(get_class($resource)));
         $tagging->expects($this->any())
@@ -332,17 +332,17 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getTagging')
             ->will($this->returnValue(new ArrayCollection(array($tagging))));
 
-        $tag2->expects($this->once())->method('getName')
-            ->will($this->returnValue('test name 2'));
         $tag2->expects($this->any())->method('getId')
             ->will($this->returnValue(2));
+        $tag2->expects($this->once())->method('getName')
+            ->will($this->returnValue('test name 2'));
         $tag2->expects($this->exactly(1))->method('getTagging')
             ->will($this->returnValue(new ArrayCollection(array($tagging))));
 
         $userMock = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
         $tagging->expects($this->exactly(2))
-            ->method('getCreatedBy')->will($this->returnValue($userMock));
+            ->method('getOwner')->will($this->returnValue($userMock));
         $tagging->expects($this->any())
             ->method('getEntityName')->will($this->returnValue('Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable'));
         $tagging->expects($this->any())

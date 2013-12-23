@@ -1,6 +1,6 @@
 /* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/datafilter/choice-filter'],
-function($, _, __, ChoiceFilter) {
+define(['jquery', 'underscore', 'oro/translator', 'oro/datafilter/choice-filter', 'oro/locale-settings'],
+function($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
 
     /**
@@ -20,8 +20,8 @@ function($, _, __, ChoiceFilter) {
             '<div>' +
                 '<div class="horizontal clearfix">' +
                     '<select name="<%= name %>" class="filter-select-oro">' +
-                        '<% _.each(choices, function (hint, value) { %>' +
-                            '<option value="<%= value %>"><%= hint %></option>' +
+                        '<% _.each(choices, function (option) { %>' +
+                            '<option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>' +
                         '<% }); %>' +
                     '</select>' +
                 '</div>' +
@@ -52,19 +52,6 @@ function($, _, __, ChoiceFilter) {
         },
 
         /**
-         * Empty data object
-         *
-         * @property
-         */
-        emptyValue: {
-            type: '',
-            value: {
-                start: '',
-                end: ''
-            }
-        },
-
-        /**
          * CSS class for visual date input elements
          *
          * @property
@@ -80,11 +67,10 @@ function($, _, __, ChoiceFilter) {
             changeMonth: true,
             changeYear:  true,
             yearRange:  '-80:+1',
-            dateFormat: 'yy-mm-dd',
+            dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'),
             altFormat:  'yy-mm-dd',
             className:      'date-filter-widget',
-            showButtonPanel: true,
-            currentText: 'Now'
+            showButtonPanel: true
         },
 
         /**
@@ -129,6 +115,17 @@ function($, _, __, ChoiceFilter) {
          */
         initialize: function () {
             _.extend(this.dateWidgetOptions, this.externalWidgetOptions);
+            // init empty value object if it was not initialized so far
+            if (_.isUndefined(this.emptyValue)) {
+                this.emptyValue = {
+                    type: (_.isEmpty(this.choices) ? '' : _.first(this.choices).value),
+                    value: {
+                        start: '',
+                        end: ''
+                    }
+                };
+            }
+
             ChoiceFilter.prototype.initialize.apply(this, arguments);
         },
 
@@ -148,11 +145,14 @@ function($, _, __, ChoiceFilter) {
          * @inheritDoc
          */
         _renderCriteria: function(el) {
-            $(el).append(this.popupCriteriaTemplate({
-                name: this.name,
-                choices: this.choices,
-                inputClass: this.inputClass
-            }));
+            $(el).append(
+                this.popupCriteriaTemplate({
+                    name: this.name,
+                    choices: this.choices,
+                    selectedChoice: this.emptyValue.type,
+                    inputClass: this.inputClass
+                })
+            );
 
             $(el).find('select:first').bind('change', _.bind(this.changeFilterType, this));
 
@@ -184,12 +184,13 @@ function($, _, __, ChoiceFilter) {
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var value = this._getDisplayValue();
+            var hint = '',
+                option, start, end, type,
+                value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             if (value.value) {
-                var hint = '';
-                var start = value.value.start;
-                var end   = value.value.end;
-                var type  = value.type ? value.type.toString() : '';
+                start = value.value.start;
+                end   = value.value.end;
+                type  = value.type ? value.type.toString() : '';
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():
@@ -200,7 +201,8 @@ function($, _, __, ChoiceFilter) {
                         break;
                     case this.typeValues.notBetween.toString():
                         if (start && end) {
-                            hint += [this.choices[this.typeValues.notBetween], start, __('and'), end].join(' ');
+                            option = this._getChoiceOption(this.typeValues.notBetween);
+                            hint += [option.label, start, __('and'), end].join(' ');
                         } else if (start) {
                             hint += [__('before'), start].join(' ');
                         } else if (end) {
@@ -210,7 +212,8 @@ function($, _, __, ChoiceFilter) {
                     case this.typeValues.between.toString():
                     default:
                         if (start && end) {
-                            hint += [this.choices[this.typeValues.between], start, __('and'), end].join(' ');
+                            option = this._getChoiceOption(this.typeValues.between);
+                            hint += [option.label, start, __('and'), end].join(' ');
                         } else if (start) {
                             hint += [__('from'), start].join(' ');
                         } else if (end) {
@@ -223,7 +226,7 @@ function($, _, __, ChoiceFilter) {
                 }
             }
 
-            return this.defaultCriteriaHint;
+            return this.placeholder;
         },
 
         /**

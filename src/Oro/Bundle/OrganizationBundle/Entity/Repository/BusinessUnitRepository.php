@@ -58,6 +58,26 @@ class BusinessUnitRepository extends EntityRepository
     }
 
     /**
+     * Get business units ids
+     *
+     * @return array
+     */
+    public function getBusinessUnitIds()
+    {
+        $result = [];
+        $businessUnits = $this->createQueryBuilder('businessUnit')
+            ->select('businessUnit.id')
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach ($businessUnits as $buId) {
+            $result[] = $buId['id'];
+        }
+
+        return $result;
+    }
+
+    /**
      * @param array $businessUnits
      * @return mixed
      */
@@ -82,5 +102,35 @@ class BusinessUnitRepository extends EntityRepository
         $qb->select('count(businessUnit.id)');
 
         return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string $field
+     * @param string $entity
+     * @param string $alias
+     *
+     * @return array
+     */
+    public function getGridFilterChoices($field, $entity, $alias = 'bu')
+    {
+        $options = [];
+
+        $result = $this->_em->createQueryBuilder()
+            ->select($alias)
+            ->from($entity, $alias)
+            ->add('select', $alias . '.' . $field)
+            ->distinct($alias . '.' . $field)
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach ((array) $result as $value) {
+            $options[$value[$field]] = current(
+                array_reverse(
+                    explode('\\', $value[$field])
+                )
+            );
+        }
+
+        return $options;
     }
 }

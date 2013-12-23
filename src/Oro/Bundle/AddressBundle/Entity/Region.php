@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 use Oro\Bundle\AddressBundle\Entity\Country;
 
@@ -14,10 +15,11 @@ use Oro\Bundle\AddressBundle\Entity\Country;
  * Region
  *
  * @ORM\Table("oro_dictionary_region", indexes={
- *      @ORM\Index(name="name_idx", columns={"name"})
+ *      @ORM\Index(name="region_name_idx", columns={"name"})
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
+ * @Config()
  */
 class Region implements Translatable
 {
@@ -67,6 +69,17 @@ class Region implements Translatable
     public function __construct($combinedCode)
     {
         $this->combinedCode = $combinedCode;
+    }
+
+    /**
+     * @param string $combinedCode
+     * @return $this
+     */
+    public function setCombinedCode($combinedCode)
+    {
+        $this->combinedCode = $combinedCode;
+
+        return $this;
     }
 
     /**

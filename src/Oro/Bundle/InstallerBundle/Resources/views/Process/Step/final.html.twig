@@ -21,10 +21,4 @@
 
 {% block javascript %}
     {{ parent() }}
-
-    <script type="text/javascript">
-        $(function() {
-            $.get('{{ path('sylius_flow_display', { scenarioAlias: 'oro_installer', stepName: 'schema' }) }}?action=cache');
-        });
-    </script>
 {% endblock javascript %}

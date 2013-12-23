@@ -4,36 +4,17 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 
-use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactory;
-use Symfony\Component\DependencyInjection\Container;
-use Symfony\Component\Routing\RouterInterface;
-use Oro\Bundle\UserBundle\Acl\Manager;
-use Knp\Menu\Twig\Helper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
-
 class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var Container $container
-     */
-    protected $container;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Helper $helper
+     * @var \PHPUnit_Framework_MockObject_MockObject $helper
      */
     protected $helper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationBuilder $builder
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $builder;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|AclAwareMenuFactory $factory
-     */
-    protected $factory;
+    protected $provider;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -47,8 +28,6 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = new Container();
-
         $this->breadcrumbManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -58,28 +37,11 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('render'))
             ->getMock();
 
-        $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
-            ->setMethods(array('getRouteInfo', 'processRoute'))
+        $this->provider = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider')
+            ->disableOriginalConstructor()
             ->getMock();
 
-        $this->factory->expects($this->any())
-            ->method('getRouteInfo')
-            ->will($this->returnValue(false));
-
-        $this->factory->expects($this->any())
-            ->method('processRoute')
-            ->will($this->returnSelf());
-
-        /** @var $eventDispatcher EventDispatcherInterface */
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->getMock();
-        $provider = new BuilderChainProvider($this->factory, $eventDispatcher);
-
-        $this->builder = new ConfigurationBuilder();
-        $this->builder->setContainer($this->container);
-        $provider->addBuilder($this->builder);
-
-        $this->menuExtension = new MenuExtension($this->helper, $provider, $this->breadcrumbManager, $this->container);
+        $this->menuExtension = new MenuExtension($this->helper, $this->provider, $this->breadcrumbManager);
     }
 
     public function testGetFunctions()
@@ -97,163 +59,6 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetName()
     {
         $this->assertEquals(MenuExtension::MENU_NAME, $this->menuExtension->getName());
-    }
-
-    /**
-     * @dataProvider menuStructureProvider
-     * @param $menuConfig
-     * @param $menu
-     * @param array $options
-     * @param $renderer
-     * @return void
-     */
-    public function testBuild($menuConfig, $menu, $options, $renderer)
-    {
-        $this->container->setParameter('oro_menu_config', $menuConfig);
-
-        $this->helper->expects($this->once())
-            ->method('render')
-            ->with(
-                $this->containsOnlyInstancesOf('Knp\Menu\MenuItem'),
-                $this->equalTo(array('template' => $menuConfig['templates']['navbar']['template'])),
-                $this->equalTo(null)
-            )
-            ->will($this->returnValue('menu'));
-
-        $this->menuExtension->render($menu, $options, $renderer);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getMenuConfigYamlArray()
-    {
-        return array(
-                'templates' => array(
-                    'navbar' => array(
-                        'template' => 'OroNavigationBundle:Menu:navbar.html.twig'
-                        ),
-                    'dropdown' => array(
-                        'template' => 'OroNavigationBundle:Menu:dropdown.html.twig'
-                    )
-                ),
-                'items' => array(
-                    'homepage' => array(
-                        'name' => 'Home page 2',
-                        'label' => 'Home page title',
-                        'route' => 'oro_menu_index',
-                        'translateDomain' => 'SomeBundle',
-                        'translateParameters' => array(),
-                        'routeParameters' => array(),
-                        'extras' => array()
-                    ),
-                    'user_registration_register' => array(
-                        'route' => 'oro_menu_submenu',
-                        'translateDomain' => 'SomeBundle',
-                        'translateParameters' => array(),
-                        'routeParameters' => array(),
-                        'extras' => array()
-                    ),
-                    'user_user_show' => array(
-                        'translateDomain' => 'SomeBundle',
-                        'translateParameters' => array(),
-                        'routeParameters' => array(),
-                        'extras' => array()
-                    ),
-                ),
-                'tree' => array(
-                    'navbar' => array(
-                        'type' => 'navbar',
-                        'extras' => array(
-                            'brand' => 'Oro',
-                            'brandLink' => '/'
-                        ),
-                        'children' => array(
-                            'user_user_show' => array(
-                                'position' => '10',
-                                'children' => array(
-                                    'user_registration_register' => array(
-                                        'children' => array()
-                                    )
-                                )
-                            ),
-                            'homepage' => array(
-                                'position' => 7,
-                                'children' => array()
-                            )
-                        )
-                    )
-                )
-            );
-    }
-
-    /**
-     * @return array
-     */
-    public function menuStructureProvider()
-    {
-        return array(
-            'full_menu' => array($this->getMenuConfigYamlArray(), 'navbar', array(), null)
-        );
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The menu has no child named "some_element"
-     */
-    public function testBuildChildExistsException()
-    {
-        $menuConfig = $this->getMenuConfigYamlArray();
-        $this->container->setParameter('oro_menu_config', $menuConfig);
-        $this->menuExtension->render(array('navbar', 'some_element'));
-    }
-
-    /**
-     */
-    public function testBuildChildExists()
-    {
-        $menuConfig = $this->getMenuConfigYamlArray();
-        $this->helper->expects($this->once())
-            ->method('render')
-            ->with(
-                $this->containsOnlyInstancesOf('Knp\Menu\MenuItem'),
-                $this->equalTo(array()),
-                $this->equalTo(null)
-            )
-            ->will($this->returnValue('menu'));
-
-        $this->container->setParameter('oro_menu_config', $menuConfig);
-        $this->menuExtension->render(array('navbar', 'user_user_show'));
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage The array cannot be empty
-     */
-    public function testBuildEmptyNameException()
-    {
-        $menuConfig = $this->getMenuConfigYamlArray();
-        $this->container->setParameter('oro_menu_config', $menuConfig);
-        $this->menuExtension->render(array());
-    }
-
-    /**
-     */
-    public function testBuildWithOptionsAndRenderer()
-    {
-        $menuConfig = $this->getMenuConfigYamlArray();
-        $this->helper->expects($this->once())
-            ->method('render')
-            ->with(
-                $this->containsOnlyInstancesOf('Knp\Menu\MenuItem'),
-                $this->equalTo(array('type' => 'some_menu')),
-                $this->equalTo('some_renderer')
-            )
-            ->will($this->returnValue('menu'));
-
-        $this->container->setParameter('oro_menu_config', $menuConfig);
-        $this->menuExtension
-            ->render(array('navbar', 'user_user_show'), array('type' => 'some_menu'), 'some_renderer');
     }
 
     public function testRenderBreadCrumbs()
@@ -300,5 +105,138 @@ class MenuExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->assertNull($this->menuExtension->renderBreadCrumbs($environment, 'test_menu'));
+    }
+
+    public function testGetMenuAsString()
+    {
+        $options = array();
+        $menu = 'test';
+        $menuInstance = $this->assertGetMenuString($menu, 'path', $options);
+        $this->assertSame($menuInstance, $this->menuExtension->getMenu($menu, array('path'), $options));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The menu has no child named "path"
+     */
+    public function testGetMenuException()
+    {
+        $options = array();
+        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+            ->setMethods(array('getChild'))
+            ->getMockForAbstractClass();
+        $menuInstance->expects($this->once())
+            ->method('getChild')
+            ->with('path')
+            ->will($this->returnValue(null));
+        $this->menuExtension->getMenu($menuInstance, array('path'), $options);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The array cannot be empty
+     */
+    public function testRenderException()
+    {
+        $this->menuExtension->render(array());
+    }
+
+    public function testRenderMenuInstance()
+    {
+        $options = array();
+        $renderer = 'test';
+        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+            ->setMethods(array('getExtra'))
+            ->getMockForAbstractClass();
+        $menuInstance->expects($this->once())
+            ->method('getExtra')
+            ->with('type');
+        $this->assertRender($menuInstance, $menuInstance, $options, $renderer);
+    }
+
+    public function testRenderMenuAsArray()
+    {
+        $options = array();
+        $renderer = 'test';
+        $menu = array('path', 'test');
+        $menuInstance = $this->assertGetMenuString('path', 'test', $options);
+        $menuInstance->expects($this->once())
+            ->method('getExtra')
+            ->with('type');
+        $this->assertRender($menu, $menuInstance, $options, $renderer);
+    }
+
+    /**
+     * @dataProvider typeOptionsDataProvider
+     * @param array $options
+     */
+    public function testRenderMenuInstanceWithExtra($options)
+    {
+        $renderer = 'test';
+        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+            ->setMethods(array('getExtra'))
+            ->getMockForAbstractClass();
+        $menuInstance->expects($this->once())
+            ->method('getExtra')
+            ->with('type')
+            ->will($this->returnValue('type'));
+
+        $runtimeOptions = array(
+            'template' => 'test_runtime.tpl'
+        );
+        $this->menuExtension->setMenuConfiguration($options);
+        $this->assertRender($menuInstance, $menuInstance, $runtimeOptions, $renderer);
+    }
+
+    public function typeOptionsDataProvider()
+    {
+        return array(
+            'empty' => array(
+                array()
+            ),
+            'has type config' => array(
+                array(
+                    'templates' => array(
+                        'type' => array(
+                            'template' => 'test2.tpl'
+                        )
+                    )
+                )
+            ),
+            'has other type config' => array(
+                array(
+                    'templates' => array(
+                        'type_no' => array(
+                            'template' => 'test2.tpl'
+                        )
+                    )
+                )
+            )
+        );
+    }
+
+    protected function assertRender($menu, $menuInstance, $options, $renderer)
+    {
+        $this->helper->expects($this->once())
+            ->method('render')
+            ->with($menuInstance, $options, $renderer)
+            ->will($this->returnValue('MENU'));
+        $this->assertEquals('MENU', $this->menuExtension->render($menu, $options, $renderer));
+    }
+
+    protected function assertGetMenuString($menu, $path, $options)
+    {
+        $menuInstance = $this->getMockBuilder('Knp\Menu\ItemInterface')
+            ->setMethods('getChild', 'getExtra')
+            ->getMockForAbstractClass();
+        $menuInstance->expects($this->once())
+            ->method('getChild')
+            ->with($path)
+            ->will($this->returnSelf());
+        $this->provider->expects($this->once())
+            ->method('get')
+            ->with($menu, $options)
+            ->will($this->returnValue($menuInstance));
+        return $menuInstance;
     }
 }

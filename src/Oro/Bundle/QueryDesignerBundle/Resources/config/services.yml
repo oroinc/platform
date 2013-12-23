@@ -1,0 +1,25 @@
+parameters:
+    oro_query_designer.query_designer.manager.class:         Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager
+    oro_query_designer.config.resolver.class:                Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
+    oro_query_designer.grid.extension.orm_datasource.class:  Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension
+
+services:
+    oro_query_designer.query_designer.manager:
+        class: %oro_query_designer.query_designer.manager.class%
+        arguments:
+            - []
+            - @oro_query_designer.config.resolver
+            - @translator
+
+    oro_query_designer.config.resolver:
+        class: %oro_query_designer.config.resolver.class%
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
+            - @service_container
+
+    oro_query_designer.grid.extension.orm_datasource:
+        class: %oro_query_designer.grid.extension.orm_datasource.class%
+        arguments:
+            - @oro_query_designer.query_designer.manager
+        tags:
+            - { name: oro_datagrid.extension }

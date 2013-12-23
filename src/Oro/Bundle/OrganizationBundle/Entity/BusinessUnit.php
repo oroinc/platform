@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
-use Oro\Bundle\UserBundle\Entity\User;
-
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use DateTime;
+
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * BusinessUnit
@@ -20,7 +22,6 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * @Oro\Loggable
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Business Unit", "plural_label"="Business Units"},
  *      "ownership"={
  *          "owner_type"="BUSINESS_UNIT",
  *          "owner_field_name"="owner",
@@ -33,7 +34,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  *  }
  * )
  */
-class BusinessUnit
+class BusinessUnit implements NotificationEmailInterface
 {
     /**
      * @var integer
@@ -284,7 +285,7 @@ class BusinessUnit
     /**
      * Get user created date/time
      *
-     * @return DateTime
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -294,7 +295,7 @@ class BusinessUnit
     /**
      * Get user last update date/time
      *
-     * @return DateTime
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {
@@ -394,5 +395,21 @@ class BusinessUnit
         $this->owner = $owningBusinessUnit;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNotificationEmails()
+    {
+        $emails = $this->getUsers()->map(
+            function (EmailHolderInterface $user) {
+                return $user->getEmail();
+            }
+        );
+
+        $emails[] = $this->getEmail();
+
+        return $emails;
     }
 }

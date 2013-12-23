@@ -16,6 +16,7 @@ class Config
 {
     public $mode = ConfigModelManager::MODE_DEFAULT;
     public $routeName = '';
+    public $routeView = '';
     public $defaultValues = array();
 
     public function __construct(array $data)
@@ -28,6 +29,10 @@ class Config
 
         if (isset($data['routeName'])) {
             $this->routeName = $data['routeName'];
+        }
+
+        if (isset($data['routeView'])) {
+            $this->routeView = $data['routeView'];
         }
 
         if (isset($data['defaultValues'])) {
@@ -45,6 +50,7 @@ class Config
 
         $availableMode = array(
             ConfigModelManager::MODE_DEFAULT,
+            ConfigModelManager::MODE_HIDDEN,
             ConfigModelManager::MODE_READONLY
         );
 

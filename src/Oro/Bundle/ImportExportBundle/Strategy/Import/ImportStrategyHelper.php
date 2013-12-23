@@ -51,7 +51,7 @@ class ImportStrategyHelper
      * @return EntityManager
      * @throws LogicException
      */
-    protected function getEntityManager($entityClass)
+    public function getEntityManager($entityClass)
     {
         $entityManager = $this->managerRegistry->getManagerForClass($entityClass);
         if (!$entityManager) {

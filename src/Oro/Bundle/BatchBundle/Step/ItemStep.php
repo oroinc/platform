@@ -3,14 +3,13 @@
 namespace Oro\Bundle\BatchBundle\Step;
 
 use Symfony\Component\Validator\Constraints as Assert;
-
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Oro\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
 use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\Item\ItemProcessorInterface;
 use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
-use Oro\Bundle\BatchBundle\Event\EventInterface;
-use Oro\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
-use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\BatchBundle\Item\InvalidItemException;
 
 /**
  * Basic step implementation that read items, process them and write them
@@ -21,25 +20,30 @@ class ItemStep extends AbstractStep
     /**
      * @var int
      */
-    private $batchSize = 100;
+    protected $batchSize = 100;
 
     /**
      * @Assert\Valid
      * @var ItemReaderInterface
      */
-    private $reader = null;
+    protected $reader = null;
 
     /**
      * @Assert\Valid
      * @var ItemWriterInterface
      */
-    private $writer = null;
+    protected $writer = null;
 
     /**
      * @Assert\Valid
      * @var ItemProcessorInterface
      */
-    private $processor = null;
+    protected $processor = null;
+
+    /**
+     * @var StepExecution
+     */
+    protected $stepExecution = null;
 
     /**
      * Set the batch size
@@ -116,24 +120,21 @@ class ItemStep extends AbstractStep
      */
     public function getConfiguration()
     {
+        $stepElements = array(
+            $this->reader,
+            $this->writer,
+            $this->processor
+        );
         $configuration = array();
 
-        if ($this->reader instanceof AbstractConfigurableStepElement) {
-            $configuration['reader'] = $this->reader->getConfiguration();
-        } else {
-            $configuration['reader'] = array();
-        }
-
-        if ($this->processor instanceof AbstractConfigurableStepElement) {
-            $configuration['processor'] = $this->processor->getConfiguration();
-        } else {
-            $configuration['processor'] = array();
-        }
-
-        if ($this->writer instanceof AbstractConfigurableStepElement) {
-            $configuration['writer'] = $this->writer->getConfiguration();
-        } else {
-            $configuration['writer'] = array();
+        foreach ($stepElements as $stepElement) {
+            if ($stepElement instanceof AbstractConfigurableStepElement) {
+                foreach ($stepElement->getConfiguration() as $key => $value) {
+                    if (!isset($configuration[$key]) || $value) {
+                        $configuration[$key] = $value;
+                    }
+                }
+            }
         }
 
         return $configuration;
@@ -144,16 +145,16 @@ class ItemStep extends AbstractStep
      */
     public function setConfiguration(array $config)
     {
-        if ($this->reader instanceof AbstractConfigurableStepElement && !empty($config['reader'])) {
-            $this->reader->setConfiguration($config['reader']);
-        }
+        $stepElements = array(
+            $this->reader,
+            $this->writer,
+            $this->processor
+        );
 
-        if ($this->processor instanceof AbstractConfigurableStepElement && !empty($config['processor'])) {
-            $this->processor->setConfiguration($config['processor']);
-        }
-
-        if ($this->writer instanceof AbstractConfigurableStepElement && !empty($config['writer'])) {
-            $this->writer->setConfiguration($config['writer']);
+        foreach ($stepElements as $stepElement) {
+            if ($stepElement instanceof AbstractConfigurableStepElement) {
+                $stepElement->setConfiguration($config);
+            }
         }
     }
 
@@ -162,33 +163,41 @@ class ItemStep extends AbstractStep
      */
     public function doExecute(StepExecution $stepExecution)
     {
-        $itemsToWrite = array();
-        $writeCount = 0;
+        $itemsToWrite  = array();
+        $writeCount    = 0;
 
         $this->initializeStepComponents($stepExecution);
 
-        while (($item = $this->reader->read($stepExecution)) !== null) {
-            if (false === $item) {
-                $this->dispatchStepExecutionEvent(EventInterface::INVALID_READER_EXECUTION, $stepExecution);
+        $stopExecution = false;
+        while (!$stopExecution) {
+
+            try {
+                $readItem = $this->reader->read();
+                if (null === $readItem) {
+                    $stopExecution = true;
+                    continue;
+                }
+
+            } catch (InvalidItemException $e) {
+                $this->handleStepExecutionWarning($this->stepExecution, $this->reader, $e);
+
                 continue;
             }
 
-            if (null !== $processedItem = $this->processor->process($item)) {
-                if (false === $processedItem) {
-                    continue;
-                }
+            $processedItem = $this->process($readItem);
+            if (null !== $processedItem) {
+
                 $itemsToWrite[] = $processedItem;
                 $writeCount++;
                 if (0 === $writeCount % $this->batchSize) {
-                    $this->writer->write($itemsToWrite);
+                    $this->write($itemsToWrite);
                     $itemsToWrite = array();
                 }
             }
         }
 
         if (count($itemsToWrite) > 0) {
-            $this->writer->write($itemsToWrite);
-            $itemsToWrite = array();
+            $this->write($itemsToWrite);
         }
     }
 
@@ -197,6 +206,8 @@ class ItemStep extends AbstractStep
      */
     protected function initializeStepComponents(StepExecution $stepExecution)
     {
+        $this->stepExecution = $stepExecution;
+
         if ($this->reader instanceof StepExecutionAwareInterface) {
             $this->reader->setStepExecution($stepExecution);
         }
@@ -208,5 +219,59 @@ class ItemStep extends AbstractStep
         if ($this->writer instanceof StepExecutionAwareInterface) {
             $this->writer->setStepExecution($stepExecution);
         }
+    }
+
+    /**
+     * @param mixed $readItem
+     *
+     * @return mixed processed item
+     */
+    protected function process($readItem)
+    {
+        try {
+            return $this->processor->process($readItem);
+
+        } catch (InvalidItemException $e) {
+            $this->handleStepExecutionWarning($this->stepExecution, $this->processor, $e);
+
+            return null;
+        }
+    }
+
+    /**
+     * @param array $processedItems
+     *
+     * @return null
+     */
+    protected function write($processedItems)
+    {
+        try {
+            $this->writer->write($processedItems);
+
+        } catch (InvalidItemException $e) {
+            $this->handleStepExecutionWarning($this->stepExecution, $this->writer, $e);
+        }
+    }
+
+    /**
+     * Handle step execution warning
+     *
+     * @param StepExecution $stepExecution
+     * @param object $element
+     * @param InvalidItemException $e
+     */
+    protected function handleStepExecutionWarning(
+        StepExecution $stepExecution,
+        $element,
+        InvalidItemException $e
+    ) {
+        if ($element instanceof AbstractConfigurableStepElement) {
+            $warningName = $element->getName();
+        } else {
+            $warningName = get_class($element);
+        }
+
+        $stepExecution->addWarning($warningName, $e->getMessage(), $e->getItem());
+        $this->dispatchInvalidItemEvent(get_class($element), $e->getMessage(), $e->getItem());
     }
 }

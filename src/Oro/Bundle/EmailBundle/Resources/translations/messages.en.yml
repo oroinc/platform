@@ -1,22 +1,13 @@
 oro:
     email:
-        controller:
-            emailtemplate:
-                saved:
-                    message: "Template saved"
-        form:
-            choose_template: "Choose a template..."
+        controller.emailtemplate.saved.message: "Template saved"
+        form.choose_template: "Choose a template..."
         datagrid:
             emailtemplate:
                 action:
                     update: "Update"
                     clone: "Clone"
                     delete: "Delete"
-                column:
-                    entity_name: "Entity name"
-                    name: "Template name"
-                    isSystem: "Is system"
-                    type: "Type"
                 filter:
                     type:
                         html: "HTML"
@@ -28,16 +19,46 @@ oro:
                     all: "All"
                 view:
                     system_templates: "System only"
-            email:
-                from_name: "From"
-                sentAt: "Sent"
-                subject: "Subject"
-                recipients: "Recipients"
+
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
+            unable_to_send_email: "Unable to send the email."
+
+        entity_label:        Email
+        entity_plural_label: Emails
+        entity_description:  Email message
+        id.label:            Id
+        created.label:       Created at
+        subject.label:       Subject
+        from_name.label:     From
+        received_at.label:   Received at
+        sent_at.label:       Sent at
+        importance.label:    Importance
+        internal_date.label: Internal date
+        message_id.label:    Message Id
+        x_message_id.label:  xMessage Id
+        x_thread_id.label:   xThread Id
+        recipients.label:    Recipients
+        folder.label:        Folder
+        email_body.label:    Body
+        from_email_address.label: From
+
+        emailtemplate:
+            entity_label:        Template
+            entity_plural_label: Templates
+            entity_description:  Represent email template
+            id.label:            Id
+            is_system.label:     Is system
+            is_editable.label:   Is editable
+            name.label:          Template name
+            parent.label:        Parent
+            subject.label:       Subject
+            content.label:       Content
+            entity_name.label:   Entity name
+            type.label:          Type
+            translations.label:  Translations
+
 "%subject% - Email": "%subject% - Email"
-"Emails": "Emails"
-"Email": "Email"
 "Subject": "Subject"
 "Sent": "Sent"
 "From": "From"
@@ -45,3 +66,7 @@ oro:
 "Cc": "Cc"
 "Bcc": "Bcc"
 "Attachments": "Attachments"
+"Body": "Body"
+"Send email": "Send email"
+"Send": "Send"
+

@@ -39,7 +39,6 @@ class Lead extends AbstractEntity implements Entity
         $this->website = $this->byId('orocrm_sales_lead_form_website');
         $this->employees = $this->byId('orocrm_sales_lead_form_numberOfEmployees');
         $this->industry = $this->byId('orocrm_sales_lead_form_industry');
-        $this->address = $this->byId('orocrm_sales_lead_form_address');
         $this->owner = $this->byXpath("//div[@id='s2id_orocrm_sales_lead_form_owner']/a");
 
         return $this;
@@ -87,7 +86,10 @@ class Lead extends AbstractEntity implements Entity
         $this->waitForAjax();
         $this->byXpath("//div[@id='select2-drop']/div/input")->value($contact);
         $this->waitForAjax();
-        $this->assertElementPresent("//div[@id='select2-drop']//div[contains(., '{$contact}')]", "Assigned to autocoplete doesn't return search value");
+        $this->assertElementPresent(
+            "//div[@id='select2-drop']//div[contains(., '{$contact}')]",
+            "Assigned to autocoplete doesn't return search value"
+        );
         $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$contact}')]")->click();
     }
 
@@ -181,12 +183,6 @@ class Lead extends AbstractEntity implements Entity
         $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
-
-    }
-
-    public function getOwner()
-    {
-        return;
     }
 
     public function setAddressLabel($value)
@@ -256,7 +252,10 @@ class Lead extends AbstractEntity implements Entity
         $this->waitForAjax();
         $this->byXpath("//div[@id='select2-drop']/div/input")->value($value);
         $this->waitForAjax();
-        $this->assertElementPresent("//div[@id='select2-drop']//div[contains(., '{$value}')]", "Country's autocoplete doesn't return search value");
+        $this->assertElementPresent(
+            "//div[@id='select2-drop']//div[contains(., '{$value}')]",
+            "Country's autocoplete doesn't return search value"
+        );
         $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$value}')]")->click();
         $this->waitForAjax();
 
@@ -280,7 +279,10 @@ class Lead extends AbstractEntity implements Entity
             $this->waitForAjax();
             $this->byXpath("//div[@id='select2-drop']/div/input")->value($value);
             $this->waitForAjax();
-            $this->assertElementPresent("//div[@id='select2-drop']//div[contains(., '{$value}')]", "Country's autocoplete doesn't return search value");
+            $this->assertElementPresent(
+                "//div[@id='select2-drop']//div[contains(., '{$value}')]",
+                "Country's autocoplete doesn't return search value"
+            );
             $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$value}')]")->click();
         }
 
@@ -314,9 +316,23 @@ class Lead extends AbstractEntity implements Entity
         return $this;
     }
 
+    public function checkStatus($status)
+    {
+        $this->assertElementPresent("//div[@class='status-enabled pull-left'][contains(., '{$status}')]");
+        return $this;
+    }
+
+    public function reactivate()
+    {
+        $this->byXPath("//div[@class='btn-group']/a[@id='transition-b2b_flow_lead-reactivate']")->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
+        return $this;
+    }
+
     public function edit()
     {
-        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Update lead']")->click();
+        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit lead']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->init();

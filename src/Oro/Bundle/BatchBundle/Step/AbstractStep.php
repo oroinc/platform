@@ -10,6 +10,7 @@ use Oro\Bundle\BatchBundle\Job\JobRepositoryInterface;
 use Oro\Bundle\BatchBundle\Job\JobInterruptedException;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\BatchBundle\Event\StepExecutionEvent;
+use Oro\Bundle\BatchBundle\Event\InvalidItemEvent;
 use Oro\Bundle\BatchBundle\Event\EventInterface;
 
 /**
@@ -47,7 +48,7 @@ abstract class AbstractStep implements StepInterface
     /**
      * Set the event dispatcher
      *
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param  EventDispatcherInterface $eventDispatcher
      * @return AbstractStep
      */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
@@ -60,7 +61,7 @@ abstract class AbstractStep implements StepInterface
     /**
      * Public setter for {@link JobRepositoryInterface}.
      *
-     * @param JobRepositoryInterface $jobRepository jobRepository is a mandatory dependence (no default).
+     * @param  JobRepositoryInterface $jobRepository jobRepository is a mandatory dependence (no default).
      * @return AbstractStep
      */
     public function setJobRepository(JobRepositoryInterface $jobRepository)
@@ -89,7 +90,7 @@ abstract class AbstractStep implements StepInterface
     /**
      * Set the name property
      *
-     * @param string $name
+     * @param  string       $name
      * @return AbstractStep
      */
     public function setName($name)
@@ -103,7 +104,7 @@ abstract class AbstractStep implements StepInterface
      * Extension point for subclasses to execute business logic. Subclasses should set the {@link ExitStatus} on the
      * {@link StepExecution} before returning.
      *
-     * @param StepExecution $stepExecution the current step context
+     * @param  StepExecution $stepExecution the current step context
      * @throws \Exception
      */
     abstract protected function doExecute(StepExecution $stepExecution);
@@ -135,6 +136,7 @@ abstract class AbstractStep implements StepInterface
 
         $stepExecution->setStartTime(new \DateTime());
         $stepExecution->setStatus(new BatchStatus(BatchStatus::STARTED));
+        $this->jobRepository->updateStepExecution($stepExecution);
 
         // Start with a default value that will be trumped by anything
         $exitStatus = new ExitStatus(ExitStatus::EXECUTING);
@@ -144,6 +146,9 @@ abstract class AbstractStep implements StepInterface
 
             $exitStatus = new ExitStatus(ExitStatus::COMPLETED);
             $exitStatus->logicalAnd($stepExecution->getExitStatus());
+
+            $this->jobRepository->updateStepExecution($stepExecution);
+
             // Check if someone is trying to stop us
             if ($stepExecution->isTerminateOnly()) {
                 throw new JobInterruptedException("JobExecution interrupted.");
@@ -158,6 +163,7 @@ abstract class AbstractStep implements StepInterface
             $exitStatus = $exitStatus->logicalAnd($this->getDefaultExitStatusForFailure($e));
 
             $stepExecution->addFailureException($e);
+            $this->jobRepository->updateStepExecution($stepExecution);
 
             if ($stepExecution->getStatus()->getValue() == BatchStatus::STOPPED) {
                 $this->dispatchStepExecutionEvent(EventInterface::STEP_EXECUTION_INTERRUPTED, $stepExecution);
@@ -168,13 +174,14 @@ abstract class AbstractStep implements StepInterface
 
         $stepExecution->setEndTime(new \DateTime());
         $stepExecution->setExitStatus($exitStatus);
+        $this->jobRepository->updateStepExecution($stepExecution);
 
         $this->dispatchStepExecutionEvent(EventInterface::STEP_EXECUTION_COMPLETED, $stepExecution);
     }
 
     /**
      * Determine the step status based on the exception.
-     * @param \Exception $e
+     * @param  \Exception $e
      * @return int
      */
     private static function determineBatchStatus(\Exception $e)
@@ -190,7 +197,7 @@ abstract class AbstractStep implements StepInterface
      * Default mapping from throwable to {@link ExitStatus}. Clients can modify the exit code using a
      * {@link StepExecutionListener}.
      *
-     * @param \Exception $e the cause of the failure
+     * @param  \Exception $e the cause of the failure
      * @return ExitStatus {@link ExitStatus}
      */
     private function getDefaultExitStatusForFailure(\Exception $e)
@@ -216,6 +223,12 @@ abstract class AbstractStep implements StepInterface
     {
         $event = new StepExecutionEvent($stepExecution);
         $this->dispatch($eventName, $event);
+    }
+
+    protected function dispatchInvalidItemEvent($class, $reason, array $item)
+    {
+        $event = new InvalidItemEvent($class, $reason, $item);
+        $this->dispatch(EventInterface::INVALID_ITEM, $event);
     }
 
     /**

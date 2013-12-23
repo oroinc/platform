@@ -1,0 +1,145 @@
+.icon-menu-bars:before {
+  content: "\f0c9";
+}
+
+#oroplatform-header {
+  .logo {
+    a {
+      text-transform: uppercase;
+      color: #fff;
+    }
+  }
+  .logo, #main-menu-toggle {
+    margin: 0 10px;
+    float: left;
+    font-weight: bold;
+    font-size: 17px;
+    .header-button;
+    &:active > [class^=icon-],
+    &:focus > [class^=icon-] {
+      .header-button-inactive;
+    }
+  }
+  #main-menu-toggle.open > [class^=icon-] {
+    .header-button-active;
+  }
+  .container {
+    .divider-vertical.small-divider {
+      display: none;
+    }
+  }
+  .nav.top-search {
+    .header-dropdown-shortcut {
+      .dropdown-menu {
+        left: auto;
+        right: 0px;
+        &:before {
+          left: auto;
+          right: 124px;
+        }
+        &:after {
+          left: auto;
+          right: 125px;
+        }
+      }
+    }
+    .header-dropdown-search {
+      .dropdown-menu {
+        left: auto;
+        right: 0px;
+        &:before {
+          left: auto;
+          right: 77px;
+        }
+        &:after {
+          left: auto;
+          right: 78px;
+        }
+      }
+    }
+  }
+  .nav.user-menu {
+    .dropdown {
+      .dropdown-menu {
+        left: auto;
+        right: 0px;
+        &:before {
+          right: 21px;
+        }
+        &:after {
+          right: 22px;
+        }
+      }
+    }
+    .dropdown.open > .dropdown-toggle > [class^=icon-] {
+      .header-button-active;
+    }
+  }
+  li {
+    .help {
+      display: none;
+    }
+  }
+  .dropup, .dropdown {
+    position: static;
+  }
+
+  input, textarea, .uneditable-input {
+    width: 275px;
+  }
+}
+
+.navbar .nav {
+  position: static;
+}
+
+#oroplatform-header .dropdown-menu {
+  left: 0px;
+  max-width: 320px;
+}
+
+#oroplatform-header #search-bar-button {
+  width: 80px !important;
+}
+
+#oroplatform-header .user-menu {
+  margin-right: -165px;
+}
+
+#oroplatform-header .top-search.shortcuts {
+  float: right !important;
+  margin-right: 70px;
+}
+
+#oroplatform-header .top-search.shortcuts .header-utility-dropdown {
+  margin-left: 15px;
+}
+
+#oroplatform-header .dropdown-toggle {
+  padding-top: 0px !important;
+}
+
+#oroplatform-header .icon-user,
+#oroplatform-header .icon-search,
+#oroplatform-header .icon-share-sign,
+#oroplatform-header .icon-menu-bars,
+#oroplatform-header .logo {
+  font-size: 24px !important;
+  line-height: 32px !important;
+  margin: 0px !important;
+  border: none !important;
+  margin-top: 12px !important;
+}
+
+#oroplatform-header .icon-user,
+#oroplatform-header .icon-search,
+#oroplatform-header .icon-share-sign,
+#oroplatform-header .icon-menu-bars {
+  text-align: center;
+  width: 32px !important;
+  height: 32px !important;
+}
+
+#oroplatform-header .logo {
+  font-size: 18px !important;
+}

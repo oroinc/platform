@@ -2,12 +2,15 @@ parameters:
     oro_ui.twig.ceil.class:              Oro\Bundle\UIBundle\Twig\CeilExtension
     oro_ui.twig.extension.class:         Oro\Bundle\UIBundle\Twig\UiExtension
     oro_ui.twig.md5.class:               Oro\Bundle\UIBundle\Twig\Md5Extension
+    oro_ui.twig.mobile.class:            Oro\Bundle\UIBundle\Twig\MobileExtension
     oro_ui.router.class:                 Oro\Bundle\UIBundle\Route\Router
     oro_ui.twig.widget.class:            Oro\Bundle\UIBundle\Twig\WidgetExtension
     oro_ui.twig.date.class:              Oro\Bundle\UIBundle\Twig\DateExtension
     oro_ui.twig.skype_button.class:      Oro\Bundle\UIBundle\Twig\SkypeButtonExtension
     oro_ui.view.listener.class:          Oro\Bundle\UIBundle\EventListener\TemplateListener
     oro_ui.twig.form.class:              Oro\Bundle\UIBundle\Twig\FormExtension
+
+    oro_ui.format_converter.date_time.jquery_ui.class: Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
 
 services:
     oro_ui.router:
@@ -30,6 +33,13 @@ services:
         class: %oro_ui.twig.md5.class%
         arguments:
             - @serializer
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.mobile_extension:
+        class: %oro_ui.twig.mobile.class%
+        arguments:
+            - @service_container
         tags:
             - { name: twig.extension }
 
@@ -63,3 +73,10 @@ services:
             - @service_container
         tags:
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
+
+    oro_ui.format_converter.date_time.jquery_ui:
+        class: %oro_ui.format_converter.date_time.jquery_ui.class%
+        arguments:
+            - @oro_locale.formatter.date_time
+        tags:
+            - { name: oro_locale.format_converter.date_time, alias: jquery_ui }

@@ -23,7 +23,7 @@ class RoleApiType extends AclRoleType
             'text',
             array(
                 'required' => true,
-                'label' => 'Role'
+                'label' => 'oro.user.role.label.label'
             )
         );
 
@@ -56,9 +56,6 @@ class RoleApiType extends AclRoleType
      */
     public function addEntityFields(FormBuilderInterface $builder)
     {
-        // add default flexible fields
-        parent::addEntityFields($builder);
-
         $builder->addEventSubscriber(new PatchSubscriber());
     }
 
@@ -69,9 +66,7 @@ class RoleApiType extends AclRoleType
     {
         parent::setDefaultOptions($resolver);
 
-        $resolver->setDefaults(array(
-            'csrf_protection' => false,
-        ));
+        $resolver->setDefaults(['csrf_protection' => false]);
     }
 
     /**

@@ -8,8 +8,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\FlexibleEntityBundle\Model\FlexibleValueInterface;
-
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class SearchHandler implements SearchHandlerInterface
@@ -227,7 +225,9 @@ class SearchHandler implements SearchHandlerInterface
     {
         $result = array();
 
-        $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);
+        if ($this->idFieldName) {
+            $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);
+        }
 
         foreach ($this->properties as $property) {
             $result[$property] = $this->getPropertyValue($property, $item);
@@ -254,10 +254,6 @@ class SearchHandler implements SearchHandlerInterface
             }
         } elseif (is_array($item) && array_key_exists($name, $item)) {
             $result = $item[$name];
-        }
-
-        if ($result instanceof FlexibleValueInterface) {
-            $result = $result->getData();
         }
 
         return $result;

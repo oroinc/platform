@@ -90,6 +90,22 @@ class SecurityFacade
     }
 
     /**
+     * Get permission for given class and method from the ACL annotation
+     *
+     * @param $class
+     * @param $method
+     * @return string
+     */
+    public function getClassMethodAnnotationPermission($class, $method)
+    {
+        $annotation = $this->annotationProvider->findAnnotation($class, $method);
+
+        if ($annotation) {
+            return $annotation->getPermission();
+        }
+    }
+
+    /**
      * Checks if an access to a resource is granted to the caller
      *
      * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id
@@ -118,5 +134,23 @@ class SecurityFacade
         }
 
         return $isGranted;
+    }
+
+    /**
+     * Get current user id.
+     *
+     * @return int
+     */
+    public function geLoggedUserId()
+    {
+        if (null === $token = $this->securityContext->getToken()) {
+            return 0;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            return 0;
+        }
+
+        return $user->getId();
     }
 }

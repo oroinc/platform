@@ -34,11 +34,12 @@ class TestListener implements \PHPUnit_Framework_TestListener
             $className = explode('\\', get_class($test));
             try {
                 $file = getcwd() . DIRECTORY_SEPARATOR . $this->directory . DIRECTORY_SEPARATOR . end($className);
-                $file .= '__' . $test->getName() . '__ ' . date('Y-m-d\TH-i-s') . '.png';
+                $file .= '__'
+                    . preg_replace('/[^A-Za-z0-9_\-]/', '_', $test->getName())
+                    . '__ ' . date('Y-m-d\TH-i-s') . '.png';
                 file_put_contents($file, $test->currentScreenshot());
             } catch (\Exception $e) {
-                $file = getcwd() . DIRECTORY_SEPARATOR . $this->directory . DIRECTORY_SEPARATOR . end($className);
-                $file .= '__' . $test->getName() . '__ ' . date('Y-m-d\TH-i-s') . '.txt';
+                $file .= '.txt';
                 file_put_contents(
                     $file,
                     "Screenshot generation doesn't work." . "\n" . $e->getMessage() . "\n" . $e->getTraceAsString()
@@ -68,6 +69,7 @@ class TestListener implements \PHPUnit_Framework_TestListener
         if ($suite instanceof PHPUnit_Extensions_SeleniumTestSuite ||
             in_array('selenium', $groups)
         ) {
+            $this->setSeleniumCoverageFlag();
             $this->runPhantom();
         }
     }
@@ -77,20 +79,49 @@ class TestListener implements \PHPUnit_Framework_TestListener
 
     }
 
+    private function setSeleniumCoverageFlag()
+    {
+        //create file in tmp folder
+        $fileName = getcwd() . DIRECTORY_SEPARATOR .
+            'app' . DIRECTORY_SEPARATOR .
+            'logs' . DIRECTORY_SEPARATOR .
+            'selenium.coverage';
+
+        if (file_exists($fileName)) {
+            unlink($fileName);
+        }
+
+        if (defined('PHPUNIT_SELENIUM_COVERAGE')) {
+            $file = fopen($fileName, "w");
+            fclose($file);
+        }
+    }
+
     private function runPhantom()
     {
         if (strtolower(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER) == 'phantomjs') {
             if (!$this->waitServerRun(1)) {
                 if (PHP_OS == 'WINNT') {
-                    pclose(popen("start /b " . PHPUNIT_TESTSUITE_BROWSER_PATH_WINNT . " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT, "r"));
+                    pclose(
+                        popen(
+                            "start /b " . PHPUNIT_TESTSUITE_BROWSER_PATH_WINNT .
+                            " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT,
+                            "r"
+                        )
+                    );
                 } else {
                     shell_exec(
-                        "nohup " . PHPUNIT_TESTSUITE_BROWSER_PATH_LINUX . " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT .
+                        "nohup " . PHPUNIT_TESTSUITE_BROWSER_PATH_LINUX .
+                        " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT .
                         " > /dev/null 2> /dev/null &"
                     );
                 }
             }
-            $this->waitServerRun(5, PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST, PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT);
+            $this->waitServerRun(
+                5,
+                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST,
+                PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT
+            );
         }
     }
 

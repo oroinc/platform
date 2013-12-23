@@ -52,9 +52,10 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->annotationsReader = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->annotationsReader =
+            $this->getMockBuilder('Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader')
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $this->configReader = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader')
             ->disableOriginalConstructor()
@@ -64,7 +65,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMockBuilder('Symfony\Bundle\FrameworkBundle\Translation\Translator')
+        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -83,6 +84,10 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->breadcrumbManager = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->translator->expects($this->any())
+            ->method('getTranslations')
+            ->will($this->returnValue(['messages' => []]));
 
         $this->titleService = new TitleService(
             $this->annotationsReader,
@@ -113,7 +118,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
 
         $this->serializer->expects($this->once())
             ->method('deserialize')
-            ->with($this->equalTo($data), $this->equalTo('Oro\Bundle\NavigationBundle\Title\StoredTitle'), $this->equalTo('json'))
+            ->with($data, 'Oro\Bundle\NavigationBundle\Title\StoredTitle', 'json')
             ->will($this->returnValue($storedTitleMock));
 
         $storedTitleMock->expects($this->once())
@@ -152,8 +157,14 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $testString = 'Test string';
         $testArray = array('test');
 
-        $this->assertInstanceOf('\Oro\Bundle\NavigationBundle\Provider\TitleService', $this->titleService->setSuffix($testString));
-        $this->assertInstanceOf('\Oro\Bundle\NavigationBundle\Provider\TitleService', $this->titleService->setPrefix($testString));
+        $this->assertInstanceOf(
+            '\Oro\Bundle\NavigationBundle\Provider\TitleService',
+            $this->titleService->setSuffix($testString)
+        );
+        $this->assertInstanceOf(
+            '\Oro\Bundle\NavigationBundle\Provider\TitleService',
+            $this->titleService->setPrefix($testString)
+        );
 
         $this->titleService->setParams($testArray);
         $this->assertEquals($testArray, $this->titleService->getParams());

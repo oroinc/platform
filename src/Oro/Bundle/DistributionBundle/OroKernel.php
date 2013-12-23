@@ -27,7 +27,7 @@ abstract class OroKernel extends Kernel
                     : new $class;
             }
         } else {
-            $file  = $this->getCacheDir() . '/bundles.php';
+            $file = $this->getCacheDir() . '/bundles.php';
             $cache = new ConfigCache($file, false);
 
             if (!$cache->isFresh($file)) {
@@ -45,52 +45,75 @@ abstract class OroKernel extends Kernel
 
     protected function collectBundles()
     {
-        $finder  = new Finder();
+        $finder = new Finder();
         $bundles = array();
 
         $finder
             ->files()
-            ->in(array(
-                $this->getRootDir() . '/../src',
-                $this->getRootDir() . '/../vendor',
-            ))
+            ->in(
+                array(
+                    $this->getRootDir() . '/../src',
+                    $this->getRootDir() . '/../vendor',
+                )
+            )
             ->name('bundles.yml');
 
         foreach ($finder as $file) {
             $import = Yaml::parse($file->getRealpath());
 
             foreach ($import['bundles'] as $bundle) {
-                $kernel   = false;
+                $kernel = false;
                 $priority = 0;
 
                 if (is_array($bundle)) {
-                    $class    = $bundle['name'];
-                    $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
-                    $priority = isset($bundle['priority']) ? (int) $bundle['priority'] : 0;
+                    $class = $bundle['name'];
+                    $kernel = isset($bundle['kernel']) && true == $bundle['kernel'];
+                    $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
                 } else {
-                    $class    = $bundle;
+                    $class = $bundle;
                 }
 
                 if (!isset($bundles[$class])) {
                     $bundles[$class] = array(
-                        'kernel'   => $kernel,
+                        'name' => $class,
+                        'kernel' => $kernel,
                         'priority' => $priority,
                     );
                 }
             }
         }
 
-        uasort($bundles, function ($a, $b) {
-            $p1 = (int) $a['priority'];
-            $p2 = (int) $b['priority'];
-
-            if ($p1 == $p2) {
-                return 0;
-            }
-
-            return ($p1 < $p2) ? -1 : 1;
-        });
+        uasort($bundles, array($this, 'compareBundles'));
 
         return $bundles;
+    }
+
+    public function compareBundles($a, $b)
+    {
+        // @todo: this is preliminary algorithm. we need to implement more sophisticated one,
+        // for example using bundle dependency info from composer.json
+        $p1 = (int)$a['priority'];
+        $p2 = (int)$b['priority'];
+
+        if ($p1 == $p2) {
+            $n1 = (string)$a['name'];
+            $n2 = (string)$b['name'];
+
+            // make sure OroCRM bundles follow Oro bundles
+            if (strpos($n1, 'Oro') === 0 && strpos($n2, 'Oro') === 0) {
+                if (strpos($n1, 'OroCRM') === 0) {
+                    return 1;
+                }
+                if (strpos($n2, 'OroCRM') === 0) {
+                    return -1;
+                }
+            }
+
+            // bundles with the same priorities are sorted alphabetically
+            return strcasecmp($n1, $n2);
+        }
+
+        // sort be priority
+        return ($p1 < $p2) ? -1 : 1;
     }
 }

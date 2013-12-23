@@ -17,19 +17,20 @@
     {{ form_javascript(form) }}
 {% endblock %}
 
+{% block percent_row %}
+    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (%)' %}
+    {{ form_row(form, {'type': 'text', 'label': label, '_isTranslatedLabel': true}) }}
+{% endblock %}
+
 {% block percent_widget %}
     {% set type = type|default('text') %}
-    <div class="input-append">
-        {% set type = type|default('text') %}
-        <input class="input-addon" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-        <span class="add-on">%</span>
-    </div>
+    {{ block('form_widget_simple') }}
 {% endblock %}
 
 {% block genemu_jqueryselect2_javascript %}
     <script type="text/javascript">
-        require(['jquery', 'oro/select2-config', 'jquery.select2'],
-        function($, Select2Config){
+        require(['underscore', 'jquery', 'oro/select2-config', 'jquery.select2'],
+        function(_, $, Select2Config){
             var $field = $('#{{ id }}');
 
             {% block genemu_jqueryselect2_javascript_prototype %}
@@ -58,9 +59,10 @@
             {% if excluded is not defined %}
                 {% set excluded = [] %}
             {% endif %}
-            if ($field.length && $field[0].tagName.toLowerCase() === 'input') {
+            if ($field.length) {
                 var configurator = new Select2Config(
                     select2Config,
+                    $field[0].tagName.toLowerCase(),
                     {{ url|json_encode|raw }},
                     {{ configs.per_page|default(10) }},
                     {{ excluded|json_encode|raw }}
@@ -245,6 +247,8 @@
             margin-left: 0;
             margin-right: 1.5%;
             margin-top: 15px;
+            height: 80px;
+            min-width: 290px;
         }
 
         #{{ id }}-container .entity-item h4 {
@@ -311,53 +315,197 @@
                     {% if tooltip_placement is defined %}data-placement="{{ tooltip_placement }}"{% endif %}
                     data-content="{{ tooltip }}"
                     data-toggle="popover"></i>
-                <script type="text/javascript">
-                    require(['jquery', 'bootstrap-tooltip'],
-                    function($) {
-                        var container = $('[for="{{ id }}"]');
-                        var handlePopoverMouseout = function (e, popover) {
-                            var popoverHandler = $(e.relatedTarget).closest('.popover');
-                            if (!popoverHandler.length) {
-                                popover.data('popover-timer',
-                                    setTimeout(function() {
-                                        popover.popover('hide');
-                                        popover.data('popover-active', false);
-                                    }, 500)
-                                );
-                            } else {
-                                popoverHandler.one('mouseout', function(evt) {
-                                    handlePopoverMouseout(evt, popover);
-                                });
-                            }
-                        };
-                        container.find('[data-toggle="popover"]')
-                            .popover({
-                                animation: true,
-                                delay: { show: 0, hide: 0 },
-                                html: true,
-                                trigger: 'manual'
-                            })
-                            .mouseover(function() {
-                                var popoverEl = $(this);
-                                clearTimeout(popoverEl.data('popover-timer'));
-                                if (!popoverEl.data('popover-active')) {
-                                    popoverEl.data('popover-active', true);
-                                    $(this).popover('show');
-                                }
-                            })
-                            .mouseout(function(e) {
-                                var popover = $(this);
-                                setTimeout(function() {
-                                    handlePopoverMouseout(e, popover);
-                                }, 500);
-                            });
-                    });
-                </script>
             {% endif %}
             {% if required and not isRadioLabel %}
                 <em>*</em>
             {% endif %}
-            {{ label|trans({}, translation_domain)|capitalize }}
+            {% if _isTranslatedLabel is defined and _isTranslatedLabel %}
+                {{ label }}
+            {% else %}
+                {{ label|trans({}, translation_domain)|capitalize }}
+            {% endif %}
         </label>
     {% endspaceless %}
 {% endblock form_label %}
+
+{% block oro_money_row %}
+    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (' ~ currency_symbol ~')' %}
+    {{ form_row(form, {'type': 'text', 'label': label, '_isTranslatedLabel': true}) }}
+{% endblock %}
+
+{% block oro_money_widget %}
+    {% set type = type|default('text') %}
+    {{ block('form_widget_simple') }}
+{% endblock %}
+
+{% block oro_date_widget %}
+    {% set actual_id = id %}
+    {% set selector_name = 'date_selector_' ~ id %}
+    {% set selector_id = selector_name %}
+
+    {# Actual date field that uses ISO format #}
+    {% set attr = attr|merge({'data-input-id': selector_id}) %}
+    <span style="display:none">{{ block('date_widget') }}</span>
+
+    {# Visible fake datepicker field that uses localized format #}
+    <input type="text"
+           name="{{ selector_name }}"
+           id="{{ selector_id }}"
+           placeholder="{{ placeholder|trans }}" />
+
+    <script type="text/javascript">
+        require(['jquery', 'oro/formatter/datetime', 'jquery-ui'],
+        function($, datetimeFormatter) {
+            var selector = $("#{{ selector_id }}");
+            var actual = $("#{{ actual_id }}");
+            var sync = function() {
+                selector.val(datetimeFormatter.formatDate(actual.val()));
+            };
+            actual.on('change', sync);
+            if (actual.val() && actual.val().length) {
+                sync();
+            }
+            selector.datepicker({
+                altField: '#{{ actual_id }}',
+                altFormat: 'yy-mm-dd',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: '-80:+1',
+                showButtonPanel: true
+            });
+            selector.keyup(
+                function () {
+                    var selectorValue = selector.val();
+                    if (datetimeFormatter.isDateValid(selectorValue)) {
+                        actual.val(datetimeFormatter.convertDateToBackendFormat(selectorValue));
+                    } else {
+                        actual.val('');
+                    }
+                }
+            );
+        });
+    </script>
+{% endblock oro_date_widget %}
+
+{% block oro_datetime_widget %}
+    {% set actual_id = id %}
+    {% set selector_name = 'datetime_selector_' ~ id %}
+    {% set selector_id = selector_name %}
+
+    {# Actual date field that uses ISO format #}
+    {% set attr = attr|merge({'data-input-id': selector_id}) %}
+    <span style="display:none">{{ block('datetime_widget') }}</span>
+
+    {# Visible fake datetimepicker field that uses localized format #}
+    <input type="text"
+           name="{{ selector_name }}"
+           id="{{ selector_id }}"
+           placeholder="{{ placeholder|trans }}" />
+
+    <script type="text/javascript">
+        require(['jquery', 'oro/formatter/datetime', 'jquery-ui-timepicker'],
+        function($, datetimeFormatter) {
+            var selector = $("#{{ selector_id }}");
+            var actual = $("#{{ actual_id }}");
+            var sync = function() {
+                selector.val(datetimeFormatter.formatDateTime(actual.val()));
+            };
+            actual.on('change', sync);
+            if (actual.val() && actual.val().length) {
+                sync();
+            }
+            selector.datetimepicker({
+                altField: '#{{ actual_id }}',
+                altFormat: 'yy-mm-dd',
+                altTimeFormat: 'HH:mm:ssz',
+                altFieldTimeOnly: false,
+                altSeparator: 'T',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: '-80:+1',
+                showButtonPanel: true
+            });
+            selector.keyup(
+                function () {
+                    var selectorValue = selector.val();
+                    if (datetimeFormatter.isDateTimeValid(selectorValue)) {
+                        actual.val(datetimeFormatter.convertDateTimeToBackendFormat(selectorValue));
+                    } else {
+                        actual.val('');
+                    }
+                }
+            );
+        });
+    </script>
+{% endblock oro_datetime_widget %}
+
+{% macro oro_collection_item_prototype(widget) %}
+    {% if 'prototype' in widget.vars|keys %}
+        {% set form = widget.vars.prototype %}
+        {% set name = widget.vars.prototype.vars.name %}
+    {% else %}
+        {% set form = widget %}
+        {% set name = widget.vars.full_name %}
+    {% endif %}
+    <div data-content="{{ name }}" data-validation-optional-group>
+        <div class="row-oro oro-multiselect-holder">
+            {{ form_widget(form) }}
+            <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+        </div>
+    </div>
+{% endmacro %}
+
+{% block oro_collection_widget %}
+    {% spaceless %}
+        {% set prototypeHtml = _self.oro_collection_item_prototype(form) %}
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
+        {% set id = id ~ '_collection' %}
+        <div class="row-oro">
+            <div {{ block('widget_container_attributes') }} data-prototype="{{ prototypeHtml|escape }}">
+                {% if form.children|length %}
+                    {% for child in form.children %}
+                        {{ _self.oro_collection_item_prototype(child) }}
+                    {% endfor %}
+                {% elseif show_form_when_empty %}
+                    {{ prototypeHtml|replace({'__name__': '0'})|raw }}
+                {% endif %}
+            </div>
+            <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
+        </div>
+        {{ _self.oro_collection_validate_primary_js(_context) }}
+    {% endspaceless %}
+{% endblock %}
+
+{% macro oro_collection_validate_primary_js(context) %}
+    {% if context.form.vars.prototype.primary is defined %}
+        <script type="text/javascript">
+            require(['jquery'],
+            function($){
+                $(function() {
+                    var container = $('#{{ context.id }}');
+                    /**
+                     * Allow only 1 primary checkbox to be checked.
+                     * This logic convert checkbox logic to logic used in radiobutton
+                     */
+                    container.on('click', '[name$="[primary]"]', function() {
+                        container.find('[name$="[primary]"]').each(function (idx, el) {
+                            el.checked = false;
+                        });
+                        this.checked = true;
+                    });
+                });
+            });
+        </script>
+    {% endif %}
+{% endmacro %}
+
+
+{% block oro_form_js_validation %}
+<script type="text/javascript">
+    require(['jquery', 'jquery.validate'],
+    function ($) {
+        var options = {{ js_options ? js_options|json_encode|raw : '{}' }};
+        $('#{{ form.vars.name }}').validate(options);
+    });
+</script>
+{% endblock %}

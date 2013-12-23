@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
@@ -13,10 +14,11 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * Country
  *
  * @ORM\Table("oro_dictionary_country", indexes={
- *      @ORM\Index(name="name_idx", columns={"name"})
+ *      @ORM\Index(name="country_name_idx", columns={"name"})
  * })
  * @ORM\Entity
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
+ * @Config()
  */
 class Country implements Translatable
 {

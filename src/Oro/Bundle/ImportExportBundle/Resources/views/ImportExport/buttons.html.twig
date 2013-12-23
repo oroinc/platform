@@ -1,24 +1,24 @@
 <div class="btn-group">
     {% if resource_granted('oro_importexport_import') %}
     <a type="button"
-        class="btn import-btn no-hash"
+        class="btn import-btn icons-holder-text no-hash"
         href="{{ path('oro_importexport_import_form', {'entity': entityClass}) }}">
-        <i class="icon-signin"></i>{{ 'Import'|trans }}
+        <i class="icon-signin hide-text">{{ 'Import'|trans }}</i>{{ 'Import'|trans }}
     </a>
     {% endif %}
 
     {% if resource_granted('oro_importexport_export') %}
     <a type="button"
-       class="btn export-btn no-hash"
+       class="btn export-btn icons-holder-text no-hash"
        href="{{ path('oro_importexport_export_instant', {'processorAlias': exportProcessor}) }}">
-        <i class="icon-signout"></i>{{ 'Export'|trans }}
+        <i class="icon-signout hide-text">{{ 'Export'|trans }}</i>{{ 'Export'|trans }}
     </a>
     {% endif %}
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'oro/translator', 'oro/dialog-widget', 'oro/messenger', 'oro/registry', 'oro/mediator'],
-    function($, __, DialogWidget, Messanger, registry, mediator) {
+    require(['jquery', 'oro/translator', 'oro/dialog-widget', 'oro/messenger', 'oro/mediator'],
+    function($, __, DialogWidget, messenger, mediator) {
         $('.import-btn').on('click', function(e) {
             e.preventDefault();
 
@@ -37,29 +37,20 @@
 
             {% if dataGridName is defined %}
             var datagridName = {{ dataGridName|json_encode|raw }};
-            var onGridAdd = function(datagrid) {
-                widget.on('importComplete', function(data) {
-                    if (data.success) {
-                        datagrid.collection.fetch();
-                    }
-                });
-            };
-            var datagrid = registry.getElement('datagrid', datagridName);
-            if (datagrid) {
-                onGridAdd(datagrid);
-            } else {
-                mediator.once("datagrid:created:" + datagridName, onGridAdd);
-            }
+            widget.on('importComplete', function (data) {
+                if (data.success) {
+                    mediator.trigger('datagrid:doReset:' + datagridName);
+                }
+            });
             {% endif %}
         });
 
         $('.export-btn').on('click', function(e) {
             e.preventDefault();
 
-            var exportStartedMessage = Messanger.notificationFlashMessage(
+            var exportStartedMessage = messenger.notificationMessage(
                 'info',
-                {{ 'Export started, please wait...'|trans|json_encode|raw }},
-                {delay: 0}
+                {{ 'Export started, please wait...'|trans|json_encode|raw }}
             );
 
             $.getJSON(this.href, function(data) {
@@ -74,12 +65,11 @@
                             = '<a href="' + data.url + '" target="_blank">{{ 'Download result file'|trans }}</a>';
                         $successMessage += ' ' + resultFileLink;
 
-                        Messanger.notificationFlashMessage('success', $successMessage, {delay: 0});
+                        messenger.notificationMessage('success', $successMessage);
                     } else {
-                        Messanger.notificationFlashMessage(
+                        messenger.notificationMessage(
                             'info',
-                            {{ 'No entities found for export.'|trans|json_encode|raw }},
-                            {delay: 0}
+                            {{ 'No entities found for export.'|trans|json_encode|raw }}
                         );
                     }
                 } else {
@@ -91,7 +81,7 @@
                         = '<a href="' + data.url + '" target="_blank">{{ 'Download error log'|trans }}</a>';
                     $errorMessage += ' ' + errorLogLink;
 
-                    Messanger.notificationFlashMessage('error', $errorMessage, {delay: 0});
+                    messenger.notificationMessage('error', $errorMessage);
                 }
             });
         });

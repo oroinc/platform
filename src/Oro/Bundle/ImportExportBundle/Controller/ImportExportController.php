@@ -30,6 +30,8 @@ class ImportExportController extends Controller
     const MAX_ERRORS_COUNT = 3;
 
     /**
+     * Take uploaded file and move it to temp dir
+     *
      * @Route("/import", name="oro_importexport_import_form")
      * @AclAncestor("oro_importexport_import")
      * @Template
@@ -68,6 +70,8 @@ class ImportExportController extends Controller
     }
 
     /**
+     * Validate import data
+     *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
      * @Template
@@ -104,7 +108,7 @@ class ImportExportController extends Controller
             $counts['process'] += $counts['replace'] = $context->getReplaceCount();
             $counts['process'] += $counts['update'] = $context->getUpdateCount();
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
-            $counts['process'] -= $counts['error_entries'] = $context->getErrorEntriesCount();
+            $counts['error_entries'] = $context->getErrorEntriesCount();
             $counts['errors'] += count($context->getErrors());
         }
 

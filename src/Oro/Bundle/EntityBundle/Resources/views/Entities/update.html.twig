@@ -1,13 +1,13 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
 
-{% oro_title_set({params : {"%entityName%": entity.id ? 'Item #'~entity.id : 'New '~entity_config.get('label') }}) %}
+{% oro_title_set({params : {"%entityName%": entity.id ? 'Item #'~entity.id : 'New '~entity_config.get('label')|trans }}) %}
 
 {% set formAction = path('oro_entity_update', {'entity_id': entity_id, id: entity.id}) %}
 
 {% set audit_entity_class = entity_config.getId.getClassName|replace('\\', '_') %}
 {% set audit_entity_id = entity.id %}
-{% set audit_title  = entity_config.get('label')|default('N/A') %}
+{% set audit_title  = (entity_config.get('label')|trans)|default('N/A') %}
 
 {% block navButtons %}
     {{ UI.button({'path' : path('oro_entity_index', {id: entity_id}), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
@@ -23,11 +23,11 @@
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
         'indexLabel': 'Entities',
-        'entityTitle': entity.id ? 'Item #'~entity.id|default('N/A') : 'New '~entity_config.get('label'),
+        'entityTitle': entity.id ? 'Item #'~entity.id|default('N/A') : 'New '~entity_config.get('label')|trans,
         'additional': [
             {
                 'indexPath'  : path('oro_entity_index', {id: entity_id}),
-                'indexLabel' : entity_config.get('label')|default('N/A')
+                'indexLabel' : (entity_config.get('label')|trans)|default('N/A')
             },
         ]
     } %}

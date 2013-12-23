@@ -1,6 +1,6 @@
 /* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/datafilter/text-filter'],
-function($, _, __, TextFilter) {
+define(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/datafilter/text-filter'],
+function($, _, __, app, TextFilter) {
     'use strict';
 
     /**
@@ -21,16 +21,16 @@ function($, _, __, TextFilter) {
                 '<div class="input-prepend">' +
                     '<div class="btn-group">' +
                         '<button class="btn dropdown-toggle" data-toggle="dropdown">' +
-                            '<%= first = _.first(_.values(choices)) %>' +
+                            '<%= selectedChoiceLabel %>' +
                             '<span class="caret"></span>' +
                         '</button>' +
                         '<ul class="dropdown-menu">' +
-                            '<% _.each(choices, function (hint, value) { %>' +
-                                '<li><a class="choice_value" href="#" data-value="<%= value %>"><%= hint %></a></li>' +
+                            '<% _.each(choices, function (option) { %>' +
+                                '<li<% if (selectedChoice == option.value) { %> class="active"<% } %>><a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a></li>' +
                             '<% }); %>' +
                         '</ul>' +
                         '<input type="text" name="value" value="">' +
-                        '<input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= _.invert(choices)[first] %>"/>' +
+                        '<input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>' +
                         '</div>' +
                     '</div>' +
                     '<button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>' +
@@ -48,27 +48,69 @@ function($, _, __, TextFilter) {
             type: 'input[type="hidden"]'
         },
 
-        /** @property */
-        choices: {},
+        /**
+         * Filter events
+         *
+         * @property
+         */
+        events: {
+            'keyup input': '_onReadCriteriaInputKey',
+            'keydown [type="text"]': '_preventEnterProcessing',
+            'click .filter-update': '_onClickUpdateCriteria',
+            'click .filter-criteria-selector': '_onClickCriteriaSelector',
+            'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
+            'click .disable-filter': '_onClickDisableFilter',
+            'click .choice_value': '_onClickChoiceValue'
+        },
 
         /**
-         * Empty value object
+         * Initialize.
          *
-         * @property {Object}
+         * @param {Object} options
          */
-        emptyValue: {
-            value: '',
-            type: ''
+        initialize: function() {
+            // init filter content options if it was not initialized so far
+            if (_.isUndefined(this.choices)) {
+                this.choices = [];
+            }
+            // temp code to keep backward compatible
+            if ($.isPlainObject(this.choices)) {
+                this.choices = _.map(this.choices, function(option, i) {
+                    return {value: i.toString(), label: option};
+                });
+            }
+
+            // init empty value object if it was not initialized so far
+            if (_.isUndefined(this.emptyValue)) {
+                this.emptyValue = {
+                    type: (_.isEmpty(this.choices) ? '' : _.first(this.choices).value),
+                    value: ''
+                };
+            }
+
+            TextFilter.prototype.initialize.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
         _renderCriteria: function(el) {
-            $(el).append(this.popupCriteriaTemplate({
-                name: this.name,
-                choices: this.choices
-            }));
+            var selectedChoice = this.emptyValue.type;
+            var selectedChoiceLabel = '';
+            if (!_.isEmpty(this.choices)) {
+                var foundChoice = _.find(this.choices, function(choice) {
+                        return (choice.value == selectedChoice);
+                    });
+                selectedChoiceLabel = foundChoice.label;
+            }
+            $(el).append(
+                this.popupCriteriaTemplate({
+                    name: this.name,
+                    choices: this.choices,
+                    selectedChoice: selectedChoice,
+                    selectedChoiceLabel: selectedChoiceLabel
+                })
+            );
             return this;
         },
 
@@ -76,14 +118,26 @@ function($, _, __, TextFilter) {
          * @inheritDoc
          */
         _getCriteriaHint: function() {
-            var value = this._getDisplayValue();
+            var option, hint,
+                value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
             if (!value.value) {
-                return this.defaultCriteriaHint;
-            } else if (_.has(this.choices, value.type)) {
-                return this.choices[value.type] + ' "' + value.value + '"'
+                hint = this.placeholder;
             } else {
-                return '"' + value.value + '"';
+                option = this._getChoiceOption(value.type);
+                hint = (option ? option.label + ' ' : '') + '"' + value.value + '"';
             }
+            return hint;
+        },
+
+        /**
+         * Fetches option object for corresponded value type
+         *
+         * @param {*|string} valueType
+         * @returns {{value: string, label: string}}
+         * @private
+         */
+        _getChoiceOption: function(valueType) {
+            return _.findWhere(this.choices, {value: valueType.toString()});
         },
 
         /**
@@ -110,24 +164,28 @@ function($, _, __, TextFilter) {
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (newValue.value || oldValue.value) {
+            if (!app.isEqualsLoosely(newValue, oldValue)) {
                 this.trigger('update');
             }
         },
 
         /**
-         * Filter events
-         *
-         * @property
+         * @inheritDoc
          */
-        events: {
-            'keyup input': '_onReadCriteriaInputKey',
-            'keydown [type="text"]': '_preventEnterProcessing',
-            'click .filter-update': '_onClickUpdateCriteria',
-            'click .filter-criteria-selector': '_onClickCriteriaSelector',
-            'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter',
-            'click .choice_value': '_onClickChoiceValue'
+        _onValueUpdated: function(newValue, oldValue) {
+            // synchronize choice selector with new value
+            var menu = this.$('.choicefilter .dropdown-menu');
+            menu.find('li a').each(function() {
+                var item = $(this);
+                if (item.data('value') == oldValue.type && item.parent().hasClass('active')) {
+                    item.parent().removeClass('active');
+                } else if (item.data('value') == newValue.type && !item.parent().hasClass('active')) {
+                    item.parent().addClass('active');
+                    menu.parent().find('button').html(item.html() + '<span class="caret"></span>');
+                }
+            });
+
+            TextFilter.prototype._onValueUpdated.apply(this, arguments);
         },
 
         /**

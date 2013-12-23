@@ -4,18 +4,35 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
-class RolesTest extends \PHPUnit_Extensions_Selenium2TestCase
+class RolesTest extends Selenium2TestCase
 {
     protected $coverageScriptUrl = PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE;
 
     protected $newRole = array('LABEL' => 'NEW_LABEL_', 'ROLE_NAME' => 'NEW_ROLE_');
 
     protected $defaultRoles = array(
-        'header' => array('ROLE' => 'ROLE', 'LABEL' => 'LABEL', '' => 'ACTION'),
-        'ROLE_MANAGER' => array('ROLE_MANAGER' => 'ROLE_MANAGER', 'Manager' => 'Manager', '...' => 'ACTION'),
-        'ROLE_ADMINISTRATOR' => array('ROLE_ADMINISTRATOR' => 'ROLE_ADMINISTRATOR', 'Administrator' => 'Administrator', '...' => 'ACTION'),
-        'ROLE_USER' => array('ROLE_USER' => 'ROLE_USER', 'User' => 'User', '...' => 'ACTION')
+        'header' => array(
+            'ROLE' => 'ROLE',
+            'LABEL' => 'LABEL',
+            '' => 'ACTION'
+        ),
+        'ROLE_MANAGER' => array(
+            'ROLE_MANAGER' => 'ROLE_MANAGER',
+            'Manager' => 'Manager',
+            '...' => 'ACTION'
+        ),
+        'ROLE_ADMINISTRATOR' => array(
+            'ROLE_ADMINISTRATOR' => 'ROLE_ADMINISTRATOR',
+            'Administrator' => 'Administrator',
+            '...' => 'ACTION'
+        ),
+        'ROLE_USER' => array(
+            'ROLE_USER' => 'ROLE_USER',
+            'User' => 'User',
+            '...' => 'ACTION'
+        )
     );
 
     protected function setUp()

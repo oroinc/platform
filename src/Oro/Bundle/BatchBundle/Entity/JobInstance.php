@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use JMS\Serializer\Annotation\Exclude;
 use Oro\Bundle\BatchBundle\Job\Job;
 
 /**
@@ -95,6 +96,7 @@ class JobInstance
     /**
      * @var Job
      * @Assert\Valid
+     * @Exclude
      */
     protected $job;
 
@@ -103,9 +105,10 @@ class JobInstance
      * @ORM\OneToMany(
      *      targetEntity="JobExecution",
      *      mappedBy="jobInstance",
-     *      cascade={"persist", "remove"},
+     *      cascade={"remove"},
      *      orphanRemoval=true
      * )
+     * @Exclude
      */
     protected $jobExecutions;
 
@@ -295,8 +298,17 @@ class JobInstance
         $this->job = $job;
 
         if ($job) {
+            // TODO: Provide an interface for injecting of configuration and refactor all related entities
+            // Waiting for the ImportExport fixes on the right uses of the configuration
+            // TODO: https://magecore.atlassian.net/browse/BAP-2601
+            // $this->rawConfiguration = $job->getConfiguration();
             $jobConfiguration = $job->getConfiguration();
-            $this->rawConfiguration = array_merge_recursive($this->rawConfiguration, $jobConfiguration);
+
+            if (is_array($this->rawConfiguration) && count($this->rawConfiguration) > 0) {
+                $this->rawConfiguration = array_merge($this->rawConfiguration, $jobConfiguration);
+            } else {
+                $this->rawConfiguration = $jobConfiguration;
+            }
         }
 
         return $this;
@@ -342,6 +354,48 @@ class JobInstance
         if ($this->jobExecutions->contains($jobExecution)) {
             $this->jobExecutions->removeElement($jobExecution);
         }
+
+        return $this;
+    }
+
+    /**
+     * Set alias
+     * Throws logic exception if alias property is already set.
+     *
+     * @param string $alias
+     *
+     * @throws \LogicException
+     *
+     * @return \Oro\Bundle\BatchBundle\Entity\JobInstance
+     */
+    public function setAlias($alias)
+    {
+        if ($this->alias !== null) {
+            throw new \LogicException('Alias already set in JobInstance');
+        }
+
+        $this->alias = $alias;
+
+        return $this;
+    }
+
+    /**
+     * Set connector
+     * Throws exception if connector property is already set.
+     *
+     * @param string $connector
+     *
+     * @throws \LogicException
+     *
+     * @return \Oro\Bundle\BatchBundle\Entity\JobInstance
+     */
+    public function setConnector($connector)
+    {
+        if ($this->connector !== null) {
+            throw new \LogicException('Connector already set in JobInstance');
+        }
+
+        $this->connector = $connector;
 
         return $this;
     }

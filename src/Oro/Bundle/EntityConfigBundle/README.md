@@ -15,12 +15,17 @@ oro_entity_config:
                     options:
                         default_value:      'Demo'               # sets the default value for 'demo_attr' attribute
 ```
-This configuration adds 'demo_attr' attribute with 'Demo' value to all configurable entities. The configurable entity is an entiry marked with @Config annotation. Also this code automatically adds a servive named **oro_entity_config.provider.acme** into DI container. You can use this service to get a value of 'demo_attr' attribute for particular entity. For example:
+This configuration adds 'demo_attr' attribute with 'Demo' value to all configurable entities. The configurable entity is an entity marked with @Config annotation. Also this code automatically adds a service named **oro_entity_config.provider.acme** into DI container. You can use this service to get a value of 'demo_attr' attribute for particular entity.
+To apply this changes execute **oro:entity-config:update** command:
+```bash
+php app/console oro:entity-config:update
+```
+An example how to get a value of a configuration attribute:
 ``` php
 <?php
     /** @var ConfigProvider $acmeConfigProvider */
     $acmeConfigProvider = $this->get('oro_entity_config.provider.acme');
-    
+
     // retrieve a value of 'demo_attr' attribute for 'AcmeBundle\Entity\SomeEntity' entity
     // the value of $demoAttr variable will be 'Demo'
     $demoAttr = $acmeConfigProvider->getConfig('AcmeBundle\Entity\SomeEntity')->get('demo_attr');
@@ -49,7 +54,7 @@ The result is demonstrated in the following code:
 <?php
     /** @var ConfigProvider $acmeConfigProvider */
     $acmeConfigProvider = $this->get('oro_entity_config.provider.acme');
-    
+
     // retrieve a value of 'demo_attr' attribute for 'AcmeBundle\Entity\SomeEntity' entity
     // the value of $demoAttr1 variable will be 'Demo'
     $demoAttr1 = $acmeConfigProvider->getConfig('AcmeBundle\Entity\SomeEntity')->get('demo_attr');
@@ -67,12 +72,17 @@ oro_entity_config:
                 demo_attr:                                       # adds an attribute named 'demo_attr'
                     options:
                         default_value:      'Demo'               # sets the default value for 'demo_attr' attribute
+
+                        translatable:       true                 # means that value of this attribute is translation key
+                                                                 # and actual value should be taken from translation table
+                                                                 # or in twig via "|trans" filter
+
                     grid:                                        # configure a data grid to display 'demo_attr' attribute
                         type:               string               # sets the attribute type
                         label:              'Demo Attr'          # sets the data grid column name
                         show_filter:        true                 # the next three lines configure a filter for 'Demo Attr' column
-                        filterable:         true 
-                        filter_type:        oro_grid_orm_string
+                        filterable:         true
+                        filter_type:        string
                         sortable:           true                 # allows an administrator to sort rows clicks on 'Demo Attr' column
                     form:
                         type:               text                 # sets the attribute type
@@ -119,3 +129,11 @@ php app/console oro:entity-config:init
 ```
 This command iterates through all entities and configs files and loads entity metadata into the database.
 This command is executed during the installation process and usually you do not need to execute it manually.
+
+Update configuration data
+-------------------------
+The following command can be used to update configurable entities:
+```bash
+php app/console oro:entity-config:update
+```
+Usually you need to execute this command only in 'dev' mode when new new configuration attribute or whole configuration scope is added.

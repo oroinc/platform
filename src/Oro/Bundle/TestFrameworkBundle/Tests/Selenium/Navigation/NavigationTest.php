@@ -3,8 +3,9 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
-class NavigationTest extends \PHPUnit_Extensions_Selenium2TestCase
+class NavigationTest extends Selenium2TestCase
 {
     protected $coverageScriptUrl = PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE;
 
@@ -71,7 +72,8 @@ class NavigationTest extends \PHPUnit_Extensions_Selenium2TestCase
         $login->waitForAjax();
         //Check that user, group and roles pages added
         $login->assertElementPresent(
-            "//div[@id='history-content'][//a[contains(., 'Users')]][//a[contains(., 'Roles')]][//a[contains(., 'Groups')]]",
+            "//div[@id='history-content'][//a[contains(., 'Users')]]" .
+            "[//a[contains(., 'Roles')]][//a[contains(., 'Groups')]]",
             'Not found in History tab'
         );
     }
@@ -95,7 +97,8 @@ class NavigationTest extends \PHPUnit_Extensions_Selenium2TestCase
         $login->waitForAjax();
         //Check that user, group and roles pages added
         $login->assertElementPresent(
-            "//div[@id='mostviewed-content'][//a[contains(., 'Users')]][//a[contains(., 'Roles')]][//a[contains(., 'Groups')]]",
+            "//div[@id='mostviewed-content'][//a[contains(., 'Users')]]" .
+            "[//a[contains(., 'Roles')]][//a[contains(., 'Groups')]]",
             'Not found in Most Viewed section'
         );
     }
@@ -127,7 +130,8 @@ class NavigationTest extends \PHPUnit_Extensions_Selenium2TestCase
             'Not found in favorites section'
         );
         //Remove Groups page from favorites
-        $login->byXPath("//div[@id='favorite-content'][//span[contains(., 'Groups')]]//button[@class='close']")->click();
+        $login->byXPath("//div[@id='favorite-content'][//span[contains(., 'Groups')]]//button[@class='close']")
+            ->click();
         $login->waitForAjax();
         //Check that page is deleted from favorites
         $login->assertElementNotPresent(

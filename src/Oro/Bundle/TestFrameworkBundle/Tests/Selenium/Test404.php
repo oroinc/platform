@@ -3,8 +3,9 @@
 namespace Oro\Bundle\TestsBundle\Tests\Selenium;
 
 use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
+use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
-class Test404 extends \PHPUnit_Extensions_Selenium2TestCase
+class Test404 extends Selenium2TestCase
 {
     protected $coverageScriptUrl = PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE;
 
@@ -29,7 +30,9 @@ class Test404 extends \PHPUnit_Extensions_Selenium2TestCase
             ->submit()
             ->openAclCheck()
             ->assertAcl('404', '404 - Not Found')
-            ->assertElementPresent("//div[@class='pagination-centered popup-box-errors'][contains(., '404 Not Found')]");
+            ->assertElementPresent(
+                "//div[@class='pagination-centered popup-box-errors'][contains(., '404 Not Found')]"
+            );
 
     }
 }

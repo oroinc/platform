@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -11,7 +12,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\UserBundle\Datagrid\RoleUserDatagridManager;
 
 /**
  * @Route("/role")
@@ -49,42 +49,6 @@ class RoleController extends Controller
     }
 
     /**
-     * Get grid users data
-     *
-     * @Route(
-     *      "/grid/{id}",
-     *      name="oro_user_role_user_grid",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0, "_format"="json"}
-     * )
-     * @AclAncestor("oro_user_user_view")
-     */
-    public function gridDataAction(Role $entity = null)
-    {
-        if (!$entity) {
-            $entity = new Role();
-        }
-
-        $datagridView = $this->getRoleUserDatagridManager($entity)->getDatagrid()->createView();
-
-        return $this->get('oro_grid.renderer')->renderResultsJsonResponse($datagridView);
-    }
-
-    /**
-     * @param  Role                    $role
-     * @return RoleUserDatagridManager
-     */
-    protected function getRoleUserDatagridManager(Role $role)
-    {
-        /** @var $result RoleUserDatagridManager */
-        $result = $this->get('oro_user.role_user_datagrid_manager');
-        $result->setRole($role);
-        $result->getRouteGenerator()->setRouteParameters(array('id' => $role->getId()));
-
-        return $result;
-    }
-
-    /**
      * @Route(
      *      "/{_format}",
      *      name="oro_user_role_index",
@@ -97,14 +61,11 @@ class RoleController extends Controller
      *      class="OroUserBundle:Role",
      *      permission="VIEW"
      * )
+     * @Template
      */
     public function indexAction(Request $request)
     {
-        $view = $this->get('oro_user.role_datagrid_manager')->getDatagrid()->createView();
-
-        return 'json' == $this->getRequest()->getRequestFormat()
-            ? $this->get('oro_grid.renderer')->renderResultsJsonResponse($view)
-            : $this->render('OroUserBundle:Role:index.html.twig', array('datagrid' => $view));
+        return array();
     }
 
     /**
@@ -136,7 +97,6 @@ class RoleController extends Controller
         return array(
             'form'     => $aclRoleHandler->createView(),
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
-            'datagrid' => $this->getRoleUserDatagridManager($entity)->getDatagrid()->createView(),
         );
     }
 }

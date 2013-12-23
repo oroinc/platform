@@ -23,10 +23,6 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                array(),
-                '\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException'
-            ),
-            array(
                 array(
                     'js_engine' => 'node',
                     'config' => array('waitSeconds' => -3),
@@ -78,7 +74,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                 ),
                 array(
                     'js_engine' => 'node',
-                    'config' => array(),
+                    'config' => array(
+                        'waitSeconds' => 0,
+                    ),
                     'web_root' => '%kernel.root_dir%/../web',
                     'build_path' => 'js/app.min.js',
                     'building_timeout' => 60,

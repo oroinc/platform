@@ -17,6 +17,7 @@ oro_entity_config:
                             block:          entity
                 label:
                     options:
+                        translatable:       true
                         priority:           20
                     constraints:
                         - NotBlank:         ~
@@ -26,7 +27,7 @@ oro_entity_config:
                     grid:
                         type:               html
                         label:              'Label'
-                        filter_type:        oro_grid_orm_string
+                        filter_type:        string
                         required:           true
                         sortable:           true
                         filterable:         true
@@ -40,6 +41,7 @@ oro_entity_config:
 
                 plural_label:
                     options:
+                        translatable:       true
                         priority:           35
                     constraints:
                         - Length:
@@ -53,6 +55,7 @@ oro_entity_config:
 
                 description:
                     options:
+                        translatable:       true
                         priority:           50
                     constraints:
                         - Length:
@@ -71,6 +74,7 @@ oro_entity_config:
             items:
                 label:
                     options:
+                        translatable:       true
                         priority:           10
                     constraints:
                         - NotBlank:         ~
@@ -78,13 +82,14 @@ oro_entity_config:
                             min:            2
                             max:            50
                     grid:
-                        type:               string
+                        type:               html
                         label:              'Label'
-                        filter_type:        oro_grid_orm_string
+                        filter_type:        string
                         required:           true
                         sortable:           true
                         filterable:         false
                         show_filter:        false
+                        template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
                         type:               text
                         options:
@@ -93,6 +98,7 @@ oro_entity_config:
 
                 description:
                     options:
+                        translatable:       true
                         priority:           30
                     constraints:
                         - Length:

@@ -1,0 +1,67 @@
+"My Calendar": "My Calendar"
+"Today calendar": "Today's Calendar"
+"Exclude this calendar": "Exclude this calendar"
+"Cancel": "Cancel"
+"Save": "Save"
+"Delete": "Delete"
+"Delete event": "Delete event"
+"Are you sure you want to delete this event?": "Are you sure you want to delete this event?"
+
+oro:
+    dashboard:
+        calendar:
+            new_event: New Event
+            view_calendar: My Calendar
+
+    calendar:
+        form.choose_user_to_add_calendar: "Choose a user to add a calendar ..."
+
+        control:
+            all_day: ""
+            today:   today
+            month:   month
+            week:    week
+            day:     day
+
+        #
+        # Oro/Bundle/CalendarBundle/Entity/Calendar
+        #
+        entity_label:        Calendar
+        entity_plural_label: Calendars
+        entity_description:  Represent calendar
+        id.label:            Id
+        name.label:          Name
+        events.label:        Event
+        connections.label:   Connection
+        owner.label:         Owner
+
+        #
+        # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
+        #
+        calendarevent:
+            entity_label:         Calendar event
+            entity_plural_label:  Calendar events
+            entity_description:   Represent calendar event
+            id.label:        Id
+            title.label:     Title
+            start.label:     Start
+            reminder.label:  Reminder
+            reminded.label:  Reminded
+            remind_at.label: Remind at
+            end.label:       End
+            calendar.label:  Calendar
+            all_day.label:   All day event
+
+        #
+        # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php
+        #
+        calendarconnection:
+            entity_label:        Calendar of other users
+            entity_plural_label: Calendars of other users
+            entity_description:  Represent calendar connection
+            id.label:                 Id
+            created_at.label:         Created
+            connected_calendar.label: Connected calendar
+            color.label:              Color
+            calendar.label:           Calendar
+            background_color.label:   Background

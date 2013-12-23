@@ -17,7 +17,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository")
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Email Notification", "plural_label"="Email Notifications"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""
@@ -72,7 +71,7 @@ class EmailNotification
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -88,14 +87,14 @@ class EmailNotification
     public function setEntityName($entityName)
     {
         $this->entityName = $entityName;
-    
+
         return $this;
     }
 
     /**
      * Get entityName
      *
-     * @return string 
+     * @return string
      */
     public function getEntityName()
     {
@@ -111,7 +110,7 @@ class EmailNotification
     public function setEvent(Event $event)
     {
         $this->event = $event;
-    
+
         return $this;
     }
 
@@ -134,7 +133,7 @@ class EmailNotification
     public function setTemplate(EmailTemplate $template)
     {
         $this->template = $template;
-    
+
         return $this;
     }
 
@@ -157,7 +156,7 @@ class EmailNotification
     public function setRecipientList(RecipientList $recipientList)
     {
         $this->recipientList = $recipientList;
-    
+
         return $this;
     }
 
@@ -172,44 +171,22 @@ class EmailNotification
     }
 
     /**
-     * Returns comma separated list
+     * Get recipient groups list
      *
-     * @return string
+     * @return ArrayCollection
      */
     public function getRecipientGroupsList()
     {
-        if (!$this->getRecipientList()) {
-            return '';
-        }
-
-        return implode(
-            ', ',
-            $this->getRecipientList()->getGroups()->map(
-                function (Group $group) {
-                    return $group->getName();
-                }
-            )->toArray()
-        );
+        return $this->recipientList ? $this->recipientList->getGroups() : new ArrayCollection();
     }
 
     /**
-     * Returns comma separated list
+     * Get recipient users list
      *
-     * @return string
+     * @return ArrayCollection
      */
     public function getRecipientUsersList()
     {
-        if (!$this->getRecipientList()) {
-            return '';
-        }
-
-        return implode(
-            ', ',
-            $this->getRecipientList()->getUsers()->map(
-                function (User $user) {
-                    return sprintf('%s <%s>', $user->getFullname(), $user->getEmail());
-                }
-            )->toArray()
-        );
+        return $this->recipientList ? $this->recipientList->getUsers() : new ArrayCollection();
     }
 }

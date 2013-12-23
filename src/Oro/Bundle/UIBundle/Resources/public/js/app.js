@@ -1,6 +1,5 @@
-/* global define */
-define(['jquery', 'underscore'],
-function($, _) {
+/*global define*/
+define(['jquery', 'underscore'], function ($, _) {
     'use strict';
 
     /**
@@ -35,7 +34,7 @@ function($, _) {
             var setValue = function (root, path, value) {
                 if (path.length > 1) {
                     var dir = path.shift();
-                    if (typeof root[dir] == 'undefined') {
+                    if (typeof root[dir] === 'undefined') {
                         root[dir] = path[0] == '' ? [] : {};
                     }
                     setValue(root[dir], path, value);
@@ -58,7 +57,7 @@ function($, _) {
                 var first = path[1];
                 if (path[2]) {
                     //case of 'array[level1]' || 'array[level1][level2]'
-                    path = path[2].match(/(?=\[(.*)\]$)/)[1].split('][')
+                    path = path[2].match(/(?=\[(.*)\]$)/)[1].split('][');
                 } else {
                     //case of 'name'
                     path = [];
@@ -103,7 +102,7 @@ function($, _) {
                 mirrorKey = keys[key];
 
                 if (baseKey in result) {
-                    result[mirrorKey] = result[baseKey]
+                    result[mirrorKey] = result[baseKey];
                     delete result[baseKey];
                 }
             }
@@ -119,10 +118,16 @@ function($, _) {
          */
         isEqualsLoosely: function (value1, value2) {
             if (!_.isObject(value1)) {
-                var equalsLoosely = (value1 || '') == (value2 || '');
-                var eitherNumber = _.isNumber(value1) || _.isNumber(value2);
-                var equalsNumbers = Number(value1) == Number(value2);
-                return equalsLoosely || (eitherNumber && equalsNumbers);
+                if (_.isNumber(value1) || _.isNumber(value2)) {
+                    var toNumber = function (v) {
+                        if (_.isString(v) && v == '') {
+                            return NaN;
+                        }
+                        return Number(v);
+                    };
+                    return (toNumber(value1) == toNumber(value2));
+                }
+                return ((value1 || '') == (value2 || ''));
 
             } else if (_.isObject(value1)) {
                 var valueKeys = _.keys(value1);
@@ -151,6 +156,13 @@ function($, _) {
          */
         deepClone: function(value) {
             return $.extend(true, {}, value);
-        }
+        },
+
+        /**
+         * Are we currently on mobile
+         */
+        isMobile: function () {
+            return $('body').hasClass('mobile-version');
+        },
     };
 });

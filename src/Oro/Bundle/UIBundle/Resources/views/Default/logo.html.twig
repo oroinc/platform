@@ -1,5 +1,24 @@
-<h1 class="logo">
+{% if isDesktopVersion() %}
+<h1 class="logo logo-{{ oro_theme_logo() ? 'image' : 'text' }}">
     <a href="{{ path('oro_default') }}" title="{{ oro_config_value('oro_ui.application_title') }}">
-        <i class="icon-home"></i> {{ oro_config_value('oro_ui.application_name') }}
+        {% if oro_theme_logo() %}
+            <img src="{{ asset(oro_theme_logo()) }}" alt="{{ oro_config_value('oro_ui.application_name')|escape }}">
+        {% else %}
+            <i class="icon-home"></i> {{ oro_config_value('oro_ui.application_name') }}
+        {% endif %}
     </a>
 </h1>
+{% else %}
+<span id="main-menu-toggle">
+    <i class="icon-menu-bars"></i>
+</span>
+<h1 class="logo">
+    <a href="{{ path('oro_default') }}" title="{{ oro_config_value('oro_ui.application_title') }}">
+        {% if oro_theme_logo() %}
+            <img src="{{ asset(oro_theme_logo()) }}" alt="{{ oro_config_value('oro_ui.application_name')|escape }}">
+        {% else %}
+            {{ oro_config_value('oro_ui.application_name') }}
+        {% endif %}
+    </a>
+</h1>
+{% endif %}

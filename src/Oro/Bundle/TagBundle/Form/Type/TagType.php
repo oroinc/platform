@@ -16,7 +16,10 @@ class TagType extends AbstractType
         $builder->add(
             'name',
             'text',
-            array('required' => true)
+            array(
+                'label'    => 'oro.tag.name.label',
+                'required' => true
+            )
         );
     }
 

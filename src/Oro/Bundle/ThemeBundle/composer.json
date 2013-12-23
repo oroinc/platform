@@ -1,0 +1,23 @@
+{
+    "name": "oro/theme-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Theme Bundle",
+    "keywords": ["BAP", "Theme"],
+    "homepage": "https://github.com/laboro/ThemeBundle",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/symfony": ">=2.3",
+        "oro/assetic-bundle": "@dev"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\ThemeBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/ThemeBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
