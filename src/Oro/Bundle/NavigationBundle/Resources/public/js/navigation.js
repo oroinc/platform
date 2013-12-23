@@ -301,7 +301,7 @@ define(function (require) {
              * Processing pinbar help link
              */
             mediator.bind("pinbar_help:shown", function () {
-                    this.processClicks(this.selectors.pinbarHelp);
+                this.processClicks(this.selectors.pinbarHelp);
             }, this);
 
             this.confirmModal = new Modal({

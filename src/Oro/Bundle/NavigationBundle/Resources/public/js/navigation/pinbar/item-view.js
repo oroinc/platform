@@ -109,6 +109,26 @@ function($, _, Backbone, app, Navigation, mediator, error) {
             this.$el.html(
                 this.templates[this.options.type](this.model.toJSON())
             );
+
+            var navigation = Navigation.getInstance(),
+                modelUrl = navigation.removeGridParams(this.model.get('url')) ,
+                $el = this.$el,
+                refreshHandler = function (obj) {
+                    if (modelUrl === obj.url) {
+                        $el.find('.pin-holder div > a > i').remove();
+                        mediator.off('hash_navigation_request:refresh', refreshHandler);
+                    }
+                };
+            ;
+            // if cache used highlight tab on content outdated event
+            mediator.on('content-manager:content-outdated', function (event) {
+                if (!event.isCurrentPage && modelUrl == event.url) {
+                    $el.find('.pin-holder div > a').find('i').remove().end()
+                        .html($el.find('.pin-holder div > a').html() + '<i class="icon-bell" style="color: #ffd631"></i>');
+                    mediator.on('hash_navigation_request:refresh', refreshHandler);
+                }
+            });
+
             this.setActiveItem();
             return this;
         }

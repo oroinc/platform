@@ -49,7 +49,13 @@ function (_, sync, mediator, messenger, __) {
          * Notifier object
          * @type {{close: function()}}
          */
-        notifier;
+        notifier,
+
+        /**
+         * Default template for notification message
+         * @type {Function}
+         */
+        defaultNotificationTemplate;
 
     /**
      * Remove restore params from url
@@ -105,7 +111,11 @@ function (_, sync, mediator, messenger, __) {
         if (notifier) {
             notifier.close();
         }
-        notifier = messenger.notificationMessage('warning', __("navigation.message.content.outdated", {title: title}));
+        notifier = messenger.notificationMessage(
+            'warning',
+            __("navigation.message.content.outdated", {title: title}),
+            { template: defaultNotificationTemplate }
+        );
     }
 
     /**
@@ -148,6 +158,7 @@ function (_, sync, mediator, messenger, __) {
                 };
                 mediator.on('hash_navigation_request:refresh', handler);
             }
+            mediator.trigger('content-manager:content-outdated', { url: url, isCurrentPage: url === currentUrl() });
         });
     }
 
