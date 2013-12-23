@@ -69,18 +69,15 @@ class Runner
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return string
      * @throws \Symfony\Component\Process\Exception\ProcessFailedException
      */
     protected function run($path)
     {
-        $finder = new PhpExecutableFinder();
-        $phpExec = $finder->find();
-
         if (file_exists($path)) {
             $process = (new ProcessBuilder())
-                ->setPrefix($phpExec)
+                ->setPrefix($this->getPhpExecutablePath())
                 ->setArguments([$path])
                 ->getProcess();
             $process->run();
@@ -140,5 +137,18 @@ class Runner
             return version_compare($aVersion, $bVersion);
         });
         return $files;
+    }
+
+    /**
+     * @return string
+     * @throws \RuntimeException when PHP cannot be found
+     */
+    protected function getPhpExecutablePath()
+    {
+        if ($path = (new PhpExecutableFinder())->find()) {
+            return $path;
+        }
+
+        throw new \RuntimeException('PHP cannot be found');
     }
 }
