@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DistributionBundle\Script;
 
-
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
