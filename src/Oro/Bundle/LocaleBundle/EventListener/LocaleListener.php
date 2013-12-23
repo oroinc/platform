@@ -42,7 +42,7 @@ class LocaleListener implements EventSubscriberInterface
 
         if ($this->isInstalled) {
             if (!$request->attributes->get('_locale')) {
-                $request->setLocale($this->localeSettings->getLocale());
+                $request->setLocale($this->localeSettings->getLanguage());
             }
             $this->setPhpDefaultLocale($this->localeSettings->getLocale());
         }
