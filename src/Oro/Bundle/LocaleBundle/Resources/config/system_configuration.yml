@@ -46,6 +46,17 @@ oro_system_configuration:
                 constraints:
                     - NotBlank: ~
 
+        oro_locale.languages:
+            type: oro_locale
+            priority: 35
+            options:
+                label: 'Supported languages'
+                tooltip: oro.locale.form.tooltip.languages
+                required: true
+                multiple: true
+                constraints:
+                    - NotBlank: ~
+
         oro_locale.timezone:
             type: oro_locale_timezone
             priority: 30
@@ -82,5 +93,6 @@ oro_system_configuration:
                                             - oro_locale.country
                                             - oro_locale.format_address_by_address_country
                                             - oro_locale.language
+                                            - oro_locale.languages
                                             - oro_locale.timezone
                                             - oro_locale.currency

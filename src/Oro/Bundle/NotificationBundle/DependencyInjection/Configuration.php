@@ -5,8 +5,6 @@ namespace Oro\Bundle\NotificationBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
-
 /**
  * This is the class that validates and merges configuration from your app/config files
  *
@@ -21,27 +19,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        /** @var ArrayNodeDefinition $rootNode */
-        $rootNode = $treeBuilder
-            ->root('oro_notification')
-            ->children()
-                ->arrayNode('email_templates')
-                    ->prototype('array')
-                        ->children()
-                            ->arrayNode('languages')
-                                ->cannotBeEmpty()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
-            ->end();
-
-        SettingsBuilder::append(
-            $rootNode,
-            [
-                'languages' => ['value' => ['en_US', 'fr_FR', 'uk_UA']],
-            ]
-        );
+        $treeBuilder->root('oro_notification');
 
         return $treeBuilder;
     }

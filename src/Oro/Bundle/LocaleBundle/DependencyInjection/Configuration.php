@@ -110,6 +110,7 @@ class Configuration implements ConfigurationInterface
                 'timezone' => array('value' => date_default_timezone_get()),
                 'format_address_by_address_country' => array('value' => true, 'type' => 'boolean'),
                 'qwerty' => array('value' => array(), 'type' => 'array'),
+                'languages' => ['value' => ['en_US', 'fr_FR', 'uk_UA'], 'type' => 'array'],
             )
         );
 
