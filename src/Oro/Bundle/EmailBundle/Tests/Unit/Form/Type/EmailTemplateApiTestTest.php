@@ -60,7 +60,7 @@ class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->once())
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber'));
+            ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
         $this->configManager->expects($this->once())
             ->method('get')

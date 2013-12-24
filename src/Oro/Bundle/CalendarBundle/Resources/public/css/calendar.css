@@ -2,7 +2,16 @@
     position: relative;
     padding-right: 10px;
 }
-
+.calendar-container .timeline {
+    position: absolute;
+    left: 65px;
+    border: none;
+    border-top: 2px solid #FF5E5E;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
+}
 .calendars {
     padding-left: 10px;
 }

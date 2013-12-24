@@ -17,13 +17,14 @@
     {{ form_javascript(form) }}
 {% endblock %}
 
+{% block percent_row %}
+    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (%)' %}
+    {{ form_row(form, {'type': 'text', 'label': label, '_isTranslatedLabel': true}) }}
+{% endblock %}
+
 {% block percent_widget %}
     {% set type = type|default('text') %}
-    <div class="input-append">
-        {% set type = type|default('text') %}
-        <input class="input-addon" type="{{ type }}" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
-        <span class="add-on">%</span>
-    </div>
+    {{ block('form_widget_simple') }}
 {% endblock %}
 
 {% block genemu_jqueryselect2_javascript %}
@@ -293,6 +294,9 @@
         {% if required %}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
         {% endif %}
+        {% if errors|length > 0 %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' validation-error')|trim}) %}
+        {% endif %}
         {% if label is empty %}
             {% set label = name|humanize %}
         {% endif %}
@@ -315,38 +319,25 @@
                     data-content="{{ tooltip }}"
                     data-toggle="popover"></i>
             {% endif %}
-            {% if required and not isRadioLabel %}
-                <em>*</em>
+            {% if _isTranslatedLabel is defined and _isTranslatedLabel %}
+                {{ label }}
+            {% else %}
+                {{ label|trans({}, translation_domain)|capitalize }}
             {% endif %}
-            {{ label|trans({}, translation_domain)|capitalize }}
+            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {% endspaceless %}
 {% endblock form_label %}
 
-{% block oro_money_currency_addon %}
-    <span class="add-on">{{ currency_symbol }}</span>
-{% endblock oro_money_currency_addon %}
+{% block oro_money_row %}
+    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (' ~ currency_symbol ~')' %}
+    {{ form_row(form, {'type': 'text', 'label': label, '_isTranslatedLabel': true}) }}
+{% endblock %}
 
 {% block oro_money_widget %}
-    {% spaceless %}
-        {% if currency_symbol_prepend is null %}
-            {% set div_input_class = '' %}
-        {% elseif currency_symbol_prepend == true %}
-            {% set div_input_class = 'input-prepend' %}
-        {% else %}
-            {% set div_input_class = 'input-append' %}
-        {% endif %}
-
-        {% set attr = attr|merge({'class': (attr.class|default('') ~ ' input-addon')|trim}) %}
-
-        <div class="{{ div_input_class }}">
-            {% set money_field = money_pattern %}
-            {% set money_field = money_field|replace({ '{{ widget }}': block('form_widget_simple') }) %}
-            {% set money_field = money_field|replace({ '{{ currency }}': block('oro_money_currency_addon') }) %}
-            {{ money_field|raw }}
-        </div>
-    {% endspaceless %}
-{% endblock oro_money_widget %}
+    {% set type = type|default('text') %}
+    {{ block('form_widget_simple') }}
+{% endblock %}
 
 {% block oro_date_widget %}
     {% set actual_id = id %}

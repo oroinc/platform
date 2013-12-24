@@ -86,17 +86,15 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var Region
      *
-     * @TODO Refactor in CRM-185
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\AddressBundle\Entity\Region", cascade={"persist"})
      * @ORM\JoinColumn(name="region_code", referencedColumnName="combined_code")
      * @Soap\ComplexType("string", nillable=true)
      */
-    protected $state;
+    protected $region;
 
     /**
      * @var string
      *
-     * @TODO Refactor in CRM-185
      * @ORM\Column(name="organization", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
@@ -105,11 +103,10 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var string
      *
-     * @TODO Refactor in CRM-185
-     * @ORM\Column(name="state_text", type="string", length=255, nullable=true)
+     * @ORM\Column(name="region_text", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
-    protected $stateText;
+    protected $regionText;
 
     /**
      * @var string
@@ -278,21 +275,6 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-     * Set state
-     *
-     * @TODO Refactor in CRM-185
-     * @deprecated Use setRegion
-     * @param Region $region
-     * @return AbstractAddress
-     */
-    public function setState($region)
-    {
-        $this->setRegion($region);
-
-        return $this;
-    }
-
-    /**
      * Set region
      *
      * @param Region $region
@@ -300,21 +282,9 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function setRegion($region)
     {
-        $this->state = $region;
+        $this->region = $region;
 
         return $this;
-    }
-
-    /**
-     * Get state
-     *
-     * @TODO Refactor in CRM-185
-     * @deprecated Use getRegion
-     * @return Region
-     */
-    public function getState()
-    {
-        return $this->getRegion();
     }
 
     /**
@@ -324,22 +294,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function getRegion()
     {
-        return $this->state;
-    }
-
-    /**
-     * Set state text
-     *
-     * @TODO Refactor in CRM-185
-     * @deprecated Use setRegionText
-     * @param string $regionText
-     * @return AbstractAddress
-     */
-    public function setStateText($regionText)
-    {
-        $this->setRegionText($regionText);
-
-        return $this;
+        return $this->region;
     }
 
     /**
@@ -350,21 +305,9 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function setRegionText($regionText)
     {
-        $this->stateText = $regionText;
+        $this->regionText = $regionText;
 
         return $this;
-    }
-
-    /**
-     * Get state test
-     *
-     * @TODO Refactor in CRM-185
-     * @deprecated Use getRegionText
-     * @return string
-     */
-    public function getStateText()
-    {
-        return $this->getRegionText();
     }
 
     /**
@@ -374,7 +317,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      */
     public function getRegionText()
     {
-        return $this->stateText;
+        return $this->regionText;
     }
 
     /**
@@ -398,28 +341,16 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     }
 
     /**
-     * Get state
-     *
-     * @TODO Refactor in CRM-185
-     * @deprecated Use getUniversalRegion
-     * @return Region|string
-     */
-    public function getUniversalState()
-    {
-        return $this->getUniversalRegion();
-    }
-
-    /**
      * Get region or region string
      *
      * @return Region|string
      */
     public function getUniversalRegion()
     {
-        if (!empty($this->stateText)) {
-            return $this->stateText;
+        if (!empty($this->regionText)) {
+            return $this->regionText;
         } else {
-            return $this->state;
+            return $this->region;
         }
     }
 
@@ -691,26 +622,16 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * @TODO Refactor in CRM-185
-     * @deprecated Use isRegionValid
-     * @param ExecutionContext $context
-     */
-    public function isStateValid(ExecutionContext $context)
-    {
-        $this->isRegionValid($context);
-    }
-
     public function isRegionValid(ExecutionContext $context)
     {
-        if ($this->getCountry() && $this->getCountry()->hasRegions() && !$this->state && !$this->stateText) {
-            // do not allow saving text state in case when state was checked from list
-            // except when in base data state text existed
-            // another way state_text field will be null, logic are placed in form listener
-            $propertyPath = $context->getPropertyPath() . '.state';
+        if ($this->getCountry() && $this->getCountry()->hasRegions() && !$this->region && !$this->regionText) {
+            // do not allow saving text region in case when region was checked from list
+            // except when in base data region text existed
+            // another way region_text field will be null, logic are placed in form listener
+            $propertyPath = $context->getPropertyPath() . '.region';
             $context->addViolationAt(
                 $propertyPath,
-                'State is required for country %country%',
+                'Region is required for country %country%',
                 array('%country%' => $this->getCountry()->getName())
             );
         }
@@ -755,8 +676,8 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
             && empty($this->street)
             && empty($this->street2)
             && empty($this->city)
-            && empty($this->state)
-            && empty($this->stateText)
+            && empty($this->region)
+            && empty($this->regionText)
             && empty($this->country)
             && empty($this->postalCode);
     }

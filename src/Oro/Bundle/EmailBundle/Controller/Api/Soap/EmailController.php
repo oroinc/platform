@@ -43,10 +43,15 @@ class EmailController extends SoapGetController
      */
     public function getEmailBodyAction($id)
     {
+        /** @var Email $entity */
         $entity = $this->getEntity($id);
         $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
 
-        return $entity->getEmailBody();
+        $result = $entity->getEmailBody();
+        if (!$result) {
+            throw new \SoapFault('NOT_FOUND', 'Email doesn\'t have body.');
+        }
+        return $result;
     }
 
     /**

@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
+use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Symfony\Component\Translation\Translator;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
@@ -15,8 +16,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
@@ -39,21 +38,24 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected $em;
 
     /**
-     * @var string
+     * @var OrmTranslationMetadataCache
      */
-    protected $translatorCacheDir;
+    protected $dbTranslationMetadataCache;
 
     /**
-     * @param ConfigManager $configManager
-     * @param Translator $translator
-     * @param $translatorCacheDir
+     * @param ConfigManager               $configManager
+     * @param Translator                  $translator
+     * @param OrmTranslationMetadataCache $dbTranslationMetadataCache
      */
-    public function __construct(ConfigManager $configManager, Translator $translator, $translatorCacheDir)
-    {
-        $this->configManager      = $configManager;
-        $this->translator         = $translator;
-        $this->translatorCacheDir = $translatorCacheDir;
-        $this->em                 = $configManager->getEntityManager();
+    public function __construct(
+        ConfigManager $configManager,
+        Translator $translator,
+        OrmTranslationMetadataCache $dbTranslationMetadataCache
+    ) {
+        $this->configManager              = $configManager;
+        $this->translator                 = $translator;
+        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
+        $this->em                         = $configManager->getEntityManager();
     }
 
     /**
@@ -97,12 +99,12 @@ class ConfigSubscriber implements EventSubscriberInterface
                     $messages = $this->translator->getTranslations()['messages'];
                     if (in_array($code, $translatable)) {
                         if (isset($messages[$value])) {
-                            $value = $messages[$value];
+                            $value                              = $messages[$value];
                             $data[$provider->getScope()][$code] = $value;
-                            $dataChanges = true;
+                            $dataChanges                        = true;
                         } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
                             $data[$provider->getScope()][$code] = $configModel->getFieldName();
-                            $dataChanges = true;
+                            $dataChanges                        = true;
                         }
                     }
                 }
@@ -147,16 +149,17 @@ class ConfigSubscriber implements EventSubscriberInterface
 
                 foreach ($data[$provider->getScope()] as $code => $value) {
                     if (in_array($code, $translatable)) {
+                        $key = $this->configManager->getProvider('entity')
+                            ->getConfig($className, $fieldName)
+                            ->get($code);
+
                         if ($value != $this->translator->getTranslations()['messages'][$config->get($code)]) {
                             /**
                              * save into translation table
                              */
-                            $key = $this->configManager->getProvider('entity')
-                                ->getConfig($className, $fieldName)
-                                ->get($code);
 
                             /** @var TranslationRepository $translationRepo */
-                            $translationRepo  = $this->em->getRepository(Translation::ENTITY_NAME);
+                            $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
 
                             /** @var Translation $translationValue */
                             $translationValue = $translationRepo->findValue($key, $this->translator->getLocale());
@@ -175,12 +178,9 @@ class ConfigSubscriber implements EventSubscriberInterface
                             $this->em->persist($translationValue);
 
                             /**
-                             * empty translations cache
+                             * mark translation cache dirty
                              */
-                            array_map(
-                                'unlink',
-                                glob($this->translatorCacheDir . 'catalogue.' . $this->translator->getLocale() . '.*')
-                            );
+                            $this->dbTranslationMetadataCache->updateTimestamp($this->translator->getLocale());
                         }
 
                         if (!$configModel->getId()) {

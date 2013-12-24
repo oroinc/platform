@@ -13,6 +13,8 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
+use Oro\Bundle\UserBundle\Entity\Role;
+
 /**
  * @NamePrefix("oro_api_")
  */
@@ -129,30 +131,47 @@ class GroupController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * Get group roles
-     *
-     * @param int $id Group id
-     *
-     * @ApiDoc(
-     *      description="Get group roles",
-     *      resource=true,
-     *      filters={
-     *          {"name"="id", "dataType"="integer"},
-     *      }
-     * )
-     * @AclAncestor("oro_user_group_view")
-     * @return \Symfony\Component\HttpFoundation\Response
+     * {@inheritdoc}
      */
-    /*public function getRolesAction($id)
+    protected function transformEntityField($field, &$value)
     {
-        $entity = $this->getManager()->find($id);
-
-        if (!$entity) {
-            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        switch ($field) {
+            case 'roles':
+                $result = array();
+                /** @var Role $role */
+                foreach ($value as $index => $role) {
+                    $result[$index] = array(
+                        'id' => $role->getId(),
+                        'role' => $role->getRole(),
+                        'label' => $role->getLabel(),
+                    );
+                }
+                $value = $result;
+                break;
+            case 'owner':
+                if ($value) {
+                    $value = array(
+                        'id' => $value->getId(),
+                        'name' => $value->getName()
+                    );
+                }
+                break;
+            default:
+                parent::transformEntityField($field, $value);
         }
+    }
 
-        return $this->handleView($this->view($entity->getRoles(), Codes::HTTP_OK));
-    }*/
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPreparedItem($entity)
+    {
+        $result = parent::getPreparedItem($entity);
+
+        unset($result['roles']);
+
+        return $result;
+    }
 
     /**
      * {@inheritdoc}

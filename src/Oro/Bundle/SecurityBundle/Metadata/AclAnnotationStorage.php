@@ -262,4 +262,21 @@ class AclAnnotationStorage implements \Serializable
             $this->annotations[$annotation->getId()] = $annotation;
         }
     }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return AclAnnotationStorage A new instance of a AclAnnotationStorage object
+     */
+    // @codingStandardsIgnoreStart
+    public static function __set_state($data)
+    {
+        $result              = new AclAnnotationStorage();
+        $result->annotations = $data['annotations'];
+        $result->classes     = $data['classes'];
+
+        return $result;
+    }
+    // @codingStandardsIgnoreEnd
 }

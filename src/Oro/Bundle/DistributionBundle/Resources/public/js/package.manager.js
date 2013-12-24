@@ -18,26 +18,18 @@ function PackageManager(Urls, util) {
 
     function installCompleteCallback(xhr) {
         var response = xhr.responseJSON;
-        console.log(response);
 
         switch (response.code) {
             case InstallStatus.INSTALLED:
-                console.log('Package installed');
-//                util.success('Package installed');
                 util.redirect(Urls.installed, 'Package installed');
 
                 break;
             case InstallStatus.ERROR:
-                console.log('Error!');
-                console.log(response.message);
                 util.error(response.message);
                 reflectUICallback();
 
                 break;
             case InstallStatus.CONFIRM:
-                console.log("Required packages: \n" + response.packages.join("\n"));
-                console.log('Confirm');
-                console.log('pm.install(' + JSON.stringify(response.params) + '); - will install everything required!');
                 var message = response.params.packageName + ' requires following packages: ' +
                     "\n" + response.packages.join("\n") +
                     "\n" + "\n" + 'Do you want to install them all?';
@@ -50,7 +42,6 @@ function PackageManager(Urls, util) {
                 );
                 break;
             default:
-                console.log('Unknown code');
                 util.error('Unknown error');
                 reflectUICallback();
         }
@@ -60,27 +51,20 @@ function PackageManager(Urls, util) {
 
     function uninstallCompleteCallback(xhr) {
         var response = xhr.responseJSON;
-        console.log(response);
 
         switch (response.code) {
             case UninstallStatus.UNINSTALLED:
-                console.log('Package uninstalled');
                 util.redirect(Urls.installed, 'Package uninstalled');
 
                 break;
 
             case UninstallStatus.ERROR:
-                console.log('Error!');
-                console.log(response.message);
                 util.error(response.message);
                 reflectUICallback();
 
                 break;
 
             case UninstallStatus.CONFIRM:
-                console.log("Dependent packages: \n" + response.packages.join("\n"));
-                console.log('Confirm');
-                console.log('pm.uninstall(' + JSON.stringify(response.params) + '); - will uninstall everything dependent!');
                 var message = 'Following packages depend on ' +
                     response.params.packageName + ':' +
                     "\n" + "\n" + response.packages.join("\n") +
@@ -95,7 +79,6 @@ function PackageManager(Urls, util) {
                 break;
 
             default:
-                console.log('Unknown code');
                 util.error('Unknown error');
                 reflectUICallback();
 
@@ -104,28 +87,23 @@ function PackageManager(Urls, util) {
 
     function updateCompleteCallback(xhr) {
         var response = xhr.responseJSON;
-        console.log(response);
 
         switch (response.code) {
             case UpdateStatus.UPDATED:
-                console.log('Package updated');
                 util.redirect(Urls.installed, 'Package updated');
 
                 break;
 
             case UpdateStatus.ERROR:
-                console.log('Error!');
-                console.log(response.message);
                 util.error(response.message);
+                reflectUICallback();
 
                 break;
 
             default:
-                console.log('Unknown code');
                 util.error('Unknown error');
+                reflectUICallback();
         }
-
-        reflectUICallback();
     }
 
     var pm= {
