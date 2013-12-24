@@ -88,7 +88,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
         $locale = 'uk_UA';
         $this->localeSettings->expects($this->once())
-            ->method('getLocale')
+            ->method('getLanguage')
             ->will($this->returnValue($locale));
         $notification->expects($this->once())
             ->method('getTemplate')

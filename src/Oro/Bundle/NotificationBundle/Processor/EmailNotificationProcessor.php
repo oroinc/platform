@@ -99,7 +99,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
-            $emailTemplate = $notification->getTemplate($this->localeSettings->getLocale());
+            $emailTemplate = $notification->getTemplate($this->localeSettings->getLanguage());
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(

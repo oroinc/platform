@@ -65,8 +65,8 @@ class EmailNotificationAdapter implements EmailNotificationInterface
                     $template->{'set' . ucfirst($translation->getField())}($translation->getContent());
                 }
             }
+            $template->setLocale($locale);
         }
-        $template->setLocale($locale);
 
         return $template;
     }
