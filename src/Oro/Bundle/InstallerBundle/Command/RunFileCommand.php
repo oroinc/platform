@@ -3,29 +3,28 @@
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ExecutePackageInstaller extends ContainerAwareCommand
+class RunFileCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('oro:package:execute-install')
-            ->setDescription('Install packages.')
+            ->setName('oro:package:run-file')
+            ->setDescription('Run file.')
             ->addArgument(
-                'package-install-file',
+                'package-file',
                 InputArgument::REQUIRED,
-                'Package install file'
+                'Package file'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $path = $input->getArgument('package-install-file');
-
         $installProvider = $this->getContainer()->get('oro_installer.installer_provider');
         $installProvider->runFile($path, $output, $this->getContainer());
+        $output->writeln(sprintf('%s has run!', $path));
     }
 }
