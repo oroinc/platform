@@ -207,7 +207,11 @@ class UpdateCommand extends InitCommand
 
             list($mode, $owner, $isExtend) = $this->parseFieldConfig($fieldConfig);
 
+            $config = false;
             if (! (bool) $fieldExistingConfig) {
+                /**
+                 * create NEW entity field model
+                 */
                 $extendManager->createField($className, $fieldName, $fieldConfig, $owner, $mode);
                 $this->setDefaultConfig($entityOptions, $className, $fieldName);
 
@@ -216,13 +220,18 @@ class UpdateCommand extends InitCommand
                 $config->set('is_extend', $isExtend);
 
                 $this->needDbUpdate = true;
-            } else {
+            } elseif ($force) {
+                /**
+                 * update EXISTING entity field model on --force
+                 */
                 $this->setDefaultConfig($entityOptions, $className, $fieldName);
 
                 $config = $configProvider->getConfig($className, $fieldName);
             }
 
-            $this->configManager->persist($config);
+            if ($config) {
+                $this->configManager->persist($config);
+            }
         }
     }
 
