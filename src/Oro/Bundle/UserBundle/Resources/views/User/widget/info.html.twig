@@ -1,0 +1,75 @@
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+{% import 'OroTagBundle::macros.html.twig' as tag %}
+{% import 'OroEntityExtendBundle::macros.html.twig' as entityExtend %}
+
+{% macro renderEmail(emailAddress, isPrimary) %}
+    {% import 'OroEmailBundle::macros.html.twig' as email %}
+    {% if isPrimary %}<strong>{% endif %}
+        {{ email.email_address_simple(emailAddress) }}
+    {% if isPrimary %}</strong>{% endif %}
+{% endmacro %}
+
+{% macro renderApiBlock(user) %}
+    <div style="padding-top: 2px">
+        <span class="api-key">{{ user.api ? user.api.apiKey : '' }}</span>
+        {% if resource_granted('oro_user_user_update') %}
+            <a class="btn btn-mini no-hash" id="btn-apigen" href="{{ path('oro_user_apigen', { id: user.id }) }}"
+               data-title="{{ 'Generate key'|trans }}" data-message="{{ 'Generate key was successful. New key:'|trans }}">
+                {{ 'Generate key'|trans }}
+            </a>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+<div class="widget-content">
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            {{ ui.renderProperty('oro.user.username.label'|trans, entity.username) }}
+
+            {% set birthday_string %}
+                {{ entity.birthday is empty ? 'N/A'|trans : entity.birthday|oro_format_date }}
+                {% if entity.birthday is not empty %}
+                    ({{ entity.birthday|age_string({'default': 'N/A'}) }})
+                {% endif %}
+            {% endset %}
+            {{ ui.renderProperty('oro.user.birthday.label'|trans, birthday_string) }}
+
+            {% set emails = [_self.renderEmail(entity.email, true)] %}
+            {% for emailEntity in entity.emails %}
+                {% set emails = emails|merge([_self.renderEmail(emailEntity.email)]) %}
+            {% endfor %}
+            {{ ui.renderProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
+
+            {{ entityExtend.renderDynamicFields(dynamic) }}
+        </div>
+
+        <div class="responsive-block">
+            {{ ui.renderProperty('oro.user.api.label'|trans, _self.renderApiBlock(entity)) }}
+
+            {% if resource_granted('oro_tag_view_tag_cloud') %}
+                {{ ui.renderProperty('oro.tag.entity_plural_label'|trans, tag.renderView(entity)) }}
+            {% endif %}
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery', 'oro/messenger'],
+        function($, messenger){
+            'use strict';
+            $(function () {
+                $(document).on('click', '#btn-apigen', function () {
+                    var el = $(this);
+
+                    $.get(el.attr('href'), function (data) {
+                        el.parent().find('.api-key').text(data);
+                        var messageText = el.attr('data-message') + ' <strong>' + data + '</strong>';
+                        messenger.notificationFlashMessage('success', messageText);
+                    });
+
+                    return false;
+                });
+            });
+        });
+    </script>
+</div>
+

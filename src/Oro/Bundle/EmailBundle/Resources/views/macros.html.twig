@@ -146,6 +146,35 @@
 {%- endmacro %}
 
 {#
+    Render email address with title
+    Parameters:
+        email - EmailInterface object or string
+        title (optional) - email title
+#}
+{%- macro email_address_simple(email, title) -%}
+    {% if email is not empty %}
+        {% set emailAddress = null %}
+        {# if email is an object implemented EmailInterface #}
+        {% if email.email is defined %}
+            {% if email.email is not empty %}
+                {% set emailAddress = email.email %}
+            {% endif %}
+            {# if email is a string #}
+        {% else %}
+            {% set emailAddress = email %}
+        {% endif %}
+
+        {% if title is empty %}
+            {% set title = emailAddress %}
+        {% endif %}
+
+        {% if emailAddress %}
+            <a href="mailto:{{ emailAddress|raw }}" title="{{ title|escape }}">{{ title }}</a>
+        {% endif %}
+    {% endif %}
+{%- endmacro -%}
+
+{#
     Render the given email recipients
     Parameters:
         recipients - an array of Oro\Bundle\EmailBundle\Entity\EmailRecipients
