@@ -64,10 +64,18 @@
     font: 14px/16px @baseFontFamily;
     color: #000;
     padding: 9px 10px;
-    width: 205px;
-    border-left-color:#ccc;
+    width: 300px;
+    .border-radius(5px);
     &:-ms-input-placeholder {
       color:#999
+    }
+  }
+  .add-on {
+    & + input[type="text"],
+    & + input[type="password"] {
+      width: 205px;
+      border-left-color:#ccc;
+      .border-radius(0 5px 5px 0);
     }
   }
   .forgot-pass {
