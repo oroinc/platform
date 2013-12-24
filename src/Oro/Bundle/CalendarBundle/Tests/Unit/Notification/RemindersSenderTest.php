@@ -104,6 +104,8 @@ class RemindersSenderTest extends \PHPUnit_Framework_TestCase
         $event1 = new CalendarEvent();
         $this->setUpEvent($event1, 1, $email1);
         $adapter1 = new EmailNotificationAdapter($template, $email1);
+        $this->assertEquals($template, $adapter1->getTemplate());
+        $this->assertEquals(array($email1), $adapter1->getRecipientEmails());
 
         // $event2 - fails with Exception
         $email2 = '2@example.com';

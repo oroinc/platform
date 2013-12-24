@@ -24,7 +24,7 @@ services:
 
     oro_email.form.type.emailtemplate:
         class: %oro_email.form.type.emailtemplate.class%
-        arguments: [ %oro_config.entities% ]
+        arguments: [ %oro_config.entities%, @oro_config.user, @oro_locale.settings ]
         tags:
             - { name: form.type, alias: oro_email_emailtemplate }
 

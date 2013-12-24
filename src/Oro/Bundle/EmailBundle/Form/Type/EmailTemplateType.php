@@ -7,7 +7,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 
 class EmailTemplateType extends AbstractType
 {
@@ -17,9 +19,21 @@ class EmailTemplateType extends AbstractType
     protected $entityNameChoices = array();
 
     /**
-     * @param array $entitiesConfig
+     * @var UserConfigManager
      */
-    public function __construct($entitiesConfig = array())
+    private $userConfig;
+
+    /**
+     * @var LocaleSettings
+     */
+    private $localeSettings;
+
+    /**
+     * @param array             $entitiesConfig
+     * @param UserConfigManager $userConfig
+     * @param LocaleSettings    $localeSettings
+     */
+    public function __construct($entitiesConfig, UserConfigManager $userConfig, LocaleSettings $localeSettings)
     {
         $this->entityNameChoices = array_map(
             function ($value) {
@@ -27,6 +41,8 @@ class EmailTemplateType extends AbstractType
             },
             $entitiesConfig
         );
+        $this->userConfig = $userConfig;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -71,12 +87,18 @@ class EmailTemplateType extends AbstractType
             )
         );
 
+        $lang = $this->localeSettings->getLanguage();
+        $notificationLangs = $this->userConfig->get('oro_locale.languages');
+        $notificationLangs = array_merge($notificationLangs, [$lang]);
+        $localeLabels = $this->localeSettings->getLocalesByCodes($notificationLangs, $lang);
         $builder->add(
             'translations',
             'oro_email_emailtemplate_translatation',
             array(
-                'label'    => 'oro.email.emailtemplate.translations.label',
-                'required' => false
+                'label' => 'oro.email.emailtemplate.translations.label',
+                'required' => false,
+                'locales' => $notificationLangs,
+                'labels' => $localeLabels,
             )
         );
 
