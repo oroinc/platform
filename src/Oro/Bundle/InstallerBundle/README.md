@@ -59,20 +59,23 @@ To provide demo fixtures for your bundle just place them in "YourBundle\DataFixt
 To add additional install scripts during install process you can use install.php files in your bundles and packages.
 This install files will be run before last clear cache during installation.
 
-This file must be started with @OroInstaller annotation with installer label witch will be shown during web install process.
+This file must be started with `@OroScript` annotation with installer label witch will be shown during web install process.
 
 Example:
 
 ``` php
 <?php
 /**
- * @OroInstaller("Your install label")
+ * @OroScript("Your install label")
  */
 
  // here you can add additional install logic.
 
 ```
 
-In installer script you have access to the symfony2 container through $container variable.
+The following variables are available in installer script:
+
+ - `$container` - Symfony2 DI container
+ - `$commandExecutor` - An instance of [CommandExecutor](./CommandExecutor.php) class. You can use it to execute Symfony console commands
 
 All outputs from installer script will be logged in oro_install.log file or will be shown in console in you use console installer.

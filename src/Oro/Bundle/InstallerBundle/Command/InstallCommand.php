@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
-use Oro\Bundle\InstallerBundle\InstallerProvider;
+use Oro\Bundle\InstallerBundle\ScriptManager;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -34,7 +35,11 @@ class InstallCommand extends ContainerAwareCommand
     {
         $forceInstall = $input->getOption('force');
 
-        $commandExecutor = new CommandExecutor($input, $output, $this->getApplication());
+        $commandExecutor = new CommandExecutor(
+            $input->hasOption('env') ? $input->getOption('env') : null,
+            $output,
+            $this->getApplication()
+        );
 
         // if there is application is not installed or no --force option
         if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')
@@ -222,7 +227,7 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:requirejs:build');
 
         // run installer scripts
-        $this->processInstallerScripts($output);
+        $this->processInstallerScripts($output, $commandExecutor);
 
         // update installed flag in parameters.yml
         $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
@@ -242,19 +247,17 @@ class InstallCommand extends ContainerAwareCommand
      * Process installer scripts
      *
      * @param OutputInterface $output
+     * @param CommandExecutor $commandExecutor
      */
-    protected function processInstallerScripts(OutputInterface $output)
+    protected function processInstallerScripts(OutputInterface $output, CommandExecutor $commandExecutor)
     {
-        /** @var InstallerProvider $installerProvider */
-        $installerProvider = $this->getContainer()->get('oro_installer.installer_provider');
-        $installerScripts  = $installerProvider->getInstallerScriptList();
-        if (!empty($installerScripts)) {
-            foreach ($installerScripts as $installerScript) {
-                $installerProvider->runInstallerScript(
-                    $installerScript['key'],
-                    $output,
-                    $this->getContainer()
-                );
+        $scriptExecutor = new ScriptExecutor($output, $this->getContainer(), $commandExecutor);
+        /** @var ScriptManager $scriptManager */
+        $scriptManager = $this->getContainer()->get('oro_installer.script_manager');
+        $scriptFiles  = $scriptManager->getScriptFiles();
+        if (!empty($scriptFiles)) {
+            foreach ($scriptFiles as $scriptFile) {
+                $scriptExecutor->runScript($scriptFile);
             }
         }
     }

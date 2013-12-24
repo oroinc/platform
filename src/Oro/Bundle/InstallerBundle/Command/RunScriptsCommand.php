@@ -31,8 +31,8 @@ class RunScriptsCommand extends ContainerAwareCommand
         $paths = $input->getArgument('scripts');
         foreach ($paths as $path) {
             $this->getContainer()
-                ->get('oro_installer.installer_provider')
-                ->runFile($path, $output, $this->getContainer());
+                ->get('oro_installer.script_manager')
+                ->runScript($path, $output, $this->getContainer());
             $output->writeln(sprintf('%s has run!', $path));
         }
     }

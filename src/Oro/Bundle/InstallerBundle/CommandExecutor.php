@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\InstallerBundle;
 
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
@@ -12,9 +11,9 @@ use Symfony\Component\Process\ProcessBuilder;
 class CommandExecutor
 {
     /**
-     * @var InputInterface
+     * @var string|null
      */
-    protected $input;
+    protected $env;
 
     /**
      * @var OutputInterface
@@ -29,13 +28,13 @@ class CommandExecutor
     /**
      * Constructor
      *
-     * @param InputInterface  $input
+     * @param string|null     $env
      * @param OutputInterface $output
      * @param Application     $application
      */
-    public function __construct(InputInterface $input, OutputInterface $output, Application $application)
+    public function __construct($env, OutputInterface $output, Application $application)
     {
-        $this->input  = $input;
+        $this->env  = $env;
         $this->output = $output;
         $this->application = $application;
     }
@@ -59,8 +58,8 @@ class CommandExecutor
             ),
             $params
         );
-        if ($this->input->hasOption('env') && $this->input->getOption('env') !== 'dev') {
-            $params['--env'] = $this->input->getOption('env');
+        if ($this->env && $this->env !== 'dev') {
+            $params['--env'] = $this->env;
         }
 
         if (array_key_exists('--process-isolation', $params)) {

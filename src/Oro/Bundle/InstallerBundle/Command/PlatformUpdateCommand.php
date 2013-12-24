@@ -24,7 +24,11 @@ class PlatformUpdateCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $commandExecutor = new CommandExecutor($input, $output, $this->getApplication());
+        $commandExecutor = new CommandExecutor(
+            $input->hasOption('env') ? $input->getOption('env') : null,
+            $output,
+            $this->getApplication()
+        );
         $commandExecutor->runCommand('oro:entity-config:update')
             ->runCommand('oro:entity-extend:init')
             ->runCommand('oro:entity-extend:update-config')
