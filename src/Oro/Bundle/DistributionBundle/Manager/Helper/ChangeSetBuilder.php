@@ -64,4 +64,4 @@ class ChangeSetBuilder
 
         return [$justInstalled, $justUpdated, $justUninstalled];
     }
-} 
+}

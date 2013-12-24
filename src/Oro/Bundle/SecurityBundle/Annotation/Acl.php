@@ -198,6 +198,7 @@ class Acl implements \Serializable
      * @param array $data Initialization array
      * @return Acl A new instance of a Acl object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         $result                 = new Acl();
@@ -211,4 +212,5 @@ class Acl implements \Serializable
 
         return $result;
     }
+    // @codingStandardsIgnoreEnd
 }

@@ -159,6 +159,7 @@ class OwnershipMetadata implements \Serializable
      * @param array $data Initialization array
      * @return OwnershipMetadata A new instance of a OwnershipMetadata object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         $result                  = new OwnershipMetadata();
@@ -168,4 +169,5 @@ class OwnershipMetadata implements \Serializable
 
         return $result;
     }
+    // @codingStandardsIgnoreEnd
 }
