@@ -117,8 +117,8 @@ class AclRoleHandler
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();
                 $removeUsers = $this->form->get('removeUsers')->getData();
-                // set role system name in role create process.
-                // if we edit role, system name (field role ) can't be changed.
+                // Set role system name in role create process.
+                // If we edit role, system name (field role) can't be changed.
                 if (!$role->getRole()) {
                     $role->setRole(strtoupper(trim(preg_replace('/[^\w\-]/i', '_', $role->getLabel()))));
                 }
