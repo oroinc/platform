@@ -7,7 +7,6 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
-use Symfony\Component\Intl\Intl;
 
 /**
  * This is the class that validates and merges configuration from your app/config files
@@ -111,6 +110,7 @@ class Configuration implements ConfigurationInterface
                 'timezone' => array('value' => date_default_timezone_get()),
                 'format_address_by_address_country' => array('value' => true, 'type' => 'boolean'),
                 'qwerty' => array('value' => array(), 'type' => 'array'),
+                'languages' => ['value' => ['en_US', 'fr_FR', 'uk_UA'], 'type' => 'array'],
             )
         );
 

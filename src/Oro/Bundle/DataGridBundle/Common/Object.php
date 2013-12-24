@@ -177,6 +177,53 @@ class Object implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Expects data format for array data
+     *
+     * {@inheritDoc}
+     */
+    public function offsetUnsetByPath($path)
+    {
+        $this->offsetSetByPath($path, null);
+
+        $parts = $this->explodeArrayPath($path);
+        if (count($parts) > 1) {
+            // extract last part
+            $lastPart = $parts[count($parts) - 1];
+            unset($parts[count($parts) - 1]);
+            $previousPath = $this->implodeArrayPath($parts);
+
+            // rewrite data
+            $previousValue = $this->accessor->getValue($this, $previousPath);
+            if ($previousValue && is_array($previousValue) && array_key_exists($lastPart, $previousValue)) {
+                unset($previousValue[$lastPart]);
+                $this->offsetSetByPath($previousPath, $previousValue);
+            }
+        } else {
+            $this->offsetUnset($parts[0]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     * @return array
+     */
+    protected function explodeArrayPath($path)
+    {
+        return explode('.', strtr($path, array('][' => '.', '[' => '', ']' => '')));
+    }
+
+    /**
+     * @param array $parts
+     * @return string
+     */
+    protected function implodeArrayPath(array $parts)
+    {
+        return '[' . implode('][', $parts) . ']';
+    }
+
+    /**
      * Merge additional params
      *
      * @param array $params

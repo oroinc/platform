@@ -293,23 +293,8 @@ define(function (require) {
             });
 
             view.$el.append(hoverView.render().$el);
-            var widgetWidth = hoverView.$el.width();
 
-            var windowWidth = $(window).width();
-
-            if ((cord.left + widgetWidth) > windowWidth) {
-                cord.left = windowWidth - widgetWidth;
-            }
-
-            var sidebarWidth = view.$el.width();
-            if (view.model.get('position') === constants.SIDEBAR_LEFT) {
-                cord.left += sidebarWidth;
-            } else {
-                cord.left -= sidebarWidth;
-            }
-
-            hoverView.setOffset(cord);
-
+            hoverView.setOffset({top: cord.top});
             view.hoverViews[cid] = hoverView;
         },
 

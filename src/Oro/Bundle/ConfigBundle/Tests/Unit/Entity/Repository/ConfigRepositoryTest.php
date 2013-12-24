@@ -35,8 +35,6 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
                 new ClassMetadata('Oro\Bundle\ConfigBundle\Entity\Config')
             )
         );
-
-        //new ConfigRepository($this->om, new ClassMetadata('Oro\Bundle\ConfigBundle\Entity\Config'));
     }
 
     /**
@@ -109,5 +107,17 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->assertEmpty($settings);
         }
+    }
+
+    /**
+     * Test getByEntity method
+     */
+    public function testGetByEntity()
+    {
+        $this->repository->expects($this->once())
+            ->method('findOneBy')
+            ->will($this->returnValue(false));
+
+        $this->repository->getByEntity('app', 0);
     }
 }
