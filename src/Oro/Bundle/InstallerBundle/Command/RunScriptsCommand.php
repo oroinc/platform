@@ -15,9 +15,9 @@ class RunScriptsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:platform:run-script')
-            ->setDescription('Run scripts.')
+            ->setDescription('Run php script files.')
             ->addArgument(
-                'script-files',
+                'scripts',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
                 'Script files'
             );
@@ -28,7 +28,7 @@ class RunScriptsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $paths = $input->getArgument('script-files');
+        $paths = $input->getArgument('scripts');
         foreach ($paths as $path) {
             $this->getContainer()
                 ->get('oro_installer.installer_provider')
