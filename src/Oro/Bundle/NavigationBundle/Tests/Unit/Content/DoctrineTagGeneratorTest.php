@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Content;
 
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator;
@@ -12,7 +13,8 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\NewEntityStub;
 
 class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_ENTITY_NAME = 'Oro\\Bundle\\NavigationBundle\\Tests\\Unit\\Content\\Stub\\EntityStub';
+    const TEST_ENTITY_NAME       = 'Oro\\Bundle\\NavigationBundle\\Tests\\Unit\\Content\\Stub\\EntityStub';
+    const TEST_ASSOCIATION_FIELD = 'testField';
 
     /** @var  DoctrineTagGenerator */
     protected $generator;
@@ -119,13 +121,31 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     public function generateDataProvider()
     {
         return [
-            'Should not generate any tags for new entity'                      => [new NewEntityStub(), false, 0],
-            'Should not generate only collection tag for new entity'           => [new NewEntityStub(), true, 1],
-            'Should generate one tag for managed entity'                       => [new EntityStub(), false, 1, true],
-            'Should generate two tag for managed entity when collection asked' => [new EntityStub(), true, 2, true],
-            'Should not generate tag when data taken from string'              => [self::TEST_ENTITY_NAME, false, 0],
-            'Should generate collection tag when data taken from string'       => [self::TEST_ENTITY_NAME, true, 1],
-            'Should take data from form and return tags for managed entity'    => [
+            'Should not generate any tags for new entity'                           => [new NewEntityStub(), false, 0],
+            'Should not generate only collection tag for new entity'                => [new NewEntityStub(), true, 1],
+            'Should generate one tag for managed entity'                            => [
+                new EntityStub(),
+                false,
+                1,
+                true
+            ],
+            'Should generate two tag for managed entity when collection asked'      => [
+                new EntityStub(),
+                true,
+                2,
+                true
+            ],
+            'Should not generate tag when data taken from string'                   => [
+                self::TEST_ENTITY_NAME,
+                false,
+                0
+            ],
+            'Should generate collection tag when data taken from string'            => [
+                self::TEST_ENTITY_NAME,
+                true,
+                1
+            ],
+            'Should take data from form and return tags for managed entity'         => [
                 $this->getFormMock(
                     new EntityStub()
                 ),
@@ -133,7 +153,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
                 2,
                 true
             ],
-            'Should take data from form and generate collection tag for new entity'  => [
+            'Should take data from form and generate collection tag for new entity' => [
                 $this->getFormMock(
                     new NewEntityStub()
                 ),
@@ -142,6 +162,37 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
                 false
             ],
         ];
+    }
+
+    public function testCollectNestingData()
+    {
+        $testData        = new EntityStub();
+        $testAssocEntity = new EntityStub();
+        $reflection      = new \ReflectionMethod($this->generator, 'collectNestedDataTags');
+        $reflection->setAccessible(true);
+        $this->uow->expects($this->once())->method('getEntityIdentifier')
+            ->will($this->returnValue(['someIdentifierValue']));
+
+        $metadata = new ClassMetadata(self::TEST_ENTITY_NAME);
+        $this->em->expects($this->once())->method('getClassMetadata')->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($metadata));
+
+        $metadata->associationMappings = [
+            self::TEST_ASSOCIATION_FIELD => [
+                'type' => ClassMetadata::TO_ONE
+            ]
+        ];
+
+        $field = $this->getMockBuilder('\ReflectionProperty')
+            ->disableOriginalConstructor()->getMock();
+        $field->expects($this->once())->method('getValue')->with($testData)
+            ->will($this->returnValue($testAssocEntity));
+        $metadata->reflFields[self::TEST_ASSOCIATION_FIELD] = $field;
+
+        $result = $reflection->invoke($this->generator, $testData);
+
+        $this->assertInternalType('array', $result, 'Should always return array');
+        $this->assertCount(1, $result, 'Should not generate collection tag for associations');
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Util\ClassUtils;
@@ -15,11 +16,7 @@ class DoctrineTagEventSubscriber implements EventSubscriber
     protected $isApplicationInstalled;
 
     /** @var array */
-    protected static $skipTrackingFor = [
-        'Oro\Bundle\DataAuditBundle\Entity\Audit',
-        'Oro\Bundle\DataAuditBundle\Entity\AuditData',
-        'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'
-    ];
+    protected $skipTrackingFor = [];
 
     /** @var TopicSender */
     protected $sender;
@@ -42,7 +39,8 @@ class DoctrineTagEventSubscriber implements EventSubscriber
     }
 
     /**
-     * Collect changes that were done and notifies subscribers via websockets
+     * Collect changes that were done
+     * Generates tags and store in protected variable
      *
      * @param OnFlushEventArgs $event
      */
@@ -71,7 +69,7 @@ class DoctrineTagEventSubscriber implements EventSubscriber
 
         $generator = $this->sender->getGenerator();
         foreach ($entities as $entity) {
-            if (!in_array(ClassUtils::getClass($entity), self::$skipTrackingFor)) {
+            if (!in_array(ClassUtils::getClass($entity), $this->skipTrackingFor)) {
                 // invalidate collection view pages only when entity has been added or removed
                 $includeCollectionTag = $uow->isScheduledForInsert($entity)
                     || $uow->isScheduledForDelete($entity);
@@ -89,8 +87,25 @@ class DoctrineTagEventSubscriber implements EventSubscriber
     /**
      * Send collected tags to publisher
      */
-    public function postFlush()
+    public function postFlush(PostFlushEventArgs $event)
     {
         $this->sender->send($this->collectedTags);
+    }
+
+    /**
+     * Add this method call to service declaration in case when you need
+     * to do not send update tags whenever your entity modified
+     *
+     * @param string $entityFQCN
+     *
+     * @throws \LogicException
+     */
+    public function markSkipped($entityFQCN)
+    {
+        if (is_string($entityFQCN) && class_exists($entityFQCN)) {
+            $this->skipTrackingFor[] = $entityFQCN;
+        } else {
+            throw new \LogicException('Invalid entity class name given');
+        }
     }
 }

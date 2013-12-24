@@ -36,11 +36,13 @@ class SimpleTagGeneratorTest extends \PHPUnit_Framework_TestCase
     public function supportsDataProvider()
     {
         return [
-            'simple array given'               => [['name' => 'tagSimpleName'], true],
-            'given array with name and params' => [['name' => 'tagSimpleName', 'params' => ['das']], true],
-            'given empty array w/o name'       => [[], false],
-            'given string'                     => ['testString', false],
-            'given object'                     => [new \StdClass(), false]
+            'simple array given'                          => [['name' => 'tagSimpleName'], true],
+            'given array with name and params'            => [['name' => 'tagSimpleName', 'params' => ['das']], true],
+            'given array with name and params and nested' =>
+                [['name' => 'tagSimpleName', 'params' => ['das'], 'children' => ['some nested data']], true],
+            'given empty array w/o name'                  => [[], false],
+            'given string'                                => ['testString', false],
+            'given object'                                => [new \StdClass(), false]
         ];
     }
 
@@ -49,11 +51,12 @@ class SimpleTagGeneratorTest extends \PHPUnit_Framework_TestCase
      *
      * @param mixed $data
      * @param bool  $includeCollectionTag
+     * @param bool  $processNestedData
      * @param int   $expectedCount
      */
-    public function testGenerate($data, $includeCollectionTag, $expectedCount)
+    public function testGenerate($data, $includeCollectionTag, $processNestedData, $expectedCount)
     {
-        $result = $this->generator->generate($data, $includeCollectionTag);
+        $result = $this->generator->generate($data, $includeCollectionTag, $processNestedData);
         $this->assertCount($expectedCount, $result);
     }
 
@@ -63,15 +66,25 @@ class SimpleTagGeneratorTest extends \PHPUnit_Framework_TestCase
     public function generateDataProvider()
     {
         return [
-            'should return tags by name param'                                  => [['name' => 'testName'], false, 1],
-            'should return tags by name param and params'                       => [
-                ['name' => 'testName', 'params' => ['test']],
-                false,
-                1
-            ],
-            'should return tags by name param with collection data '            => [['name' => 'testName'], true, 2],
+            'should return tags by name param'                                  =>
+                [['name' => 'testName'], false, false, 1],
+            'should return tags by name param and params'                       =>
+                [['name' => 'testName', 'params' => ['test']], false, false, 1],
+            'should return tags by name param with collection data '            =>
+                [['name' => 'testName'], true, false, 2],
             'should return tags by name param and params with collection data ' =>
-                [['name' => 'testName', 'params' => ['test']], true, 2],
+                [['name' => 'testName', 'params' => ['test']], true, false, 2],
+            'should process nested data'                                        =>
+                [['name' => 'testName', 'children' => [['name' => 'testName']]], false, true, 2],
+            'should process nested data only for one level'                     =>
+                [
+                    ['name'     => 'testName',
+                     'children' => [['name' => 'testName', 'children' => [['name' => 'testName']]]]
+                    ],
+                    false,
+                    true,
+                    2
+                ],
         ];
     }
 

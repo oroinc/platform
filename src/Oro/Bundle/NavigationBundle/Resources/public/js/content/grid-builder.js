@@ -17,16 +17,16 @@ define(['underscore', 'oro/content-manager'], function (_, ContentManager) {
 
     return {
         /** @property [] */
-        trackGrids: [],
+        allowedTracking: [],
 
         /**
-         * Adds grid to track list
+         * Adds grid to allowed list
          *
          * @param name
          */
-        addGridTrack: function (name) {
-            if (_.indexOf(this.trackGrids, name) === -1) {
-                this.trackGrids.push(name);
+        allowTracking: function (name) {
+            if (_.indexOf(this.allowedTracking, name) === -1) {
+                this.allowedTracking.push(name);
             }
         },
 
@@ -37,7 +37,7 @@ define(['underscore', 'oro/content-manager'], function (_, ContentManager) {
          * @param {String} gridName
          */
         init: function ($el, gridName) {
-            if (_.indexOf(this.trackGrids, gridName) !== -1) {
+            if (_.indexOf(this.allowedTracking, gridName) !== -1) {
                 methods.initHandler($el);
             }
         }

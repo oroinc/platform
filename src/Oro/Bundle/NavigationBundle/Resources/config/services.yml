@@ -187,6 +187,10 @@ services:
         arguments:
             - @oro_navigation.content.topic_sender
             - %installed%
+        calls:
+            - [ markSkipped, ['Oro\Bundle\DataAuditBundle\Entity\Audit']]
+            - [ markSkipped, ['Oro\Bundle\DataAuditBundle\Entity\AuditData']]
+            - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem']]
         tags:
             - { name: doctrine.event_subscriber, connection: default }
 

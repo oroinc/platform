@@ -24,10 +24,12 @@ class SimpleTagGenerator implements TagGeneratorInterface
         $params = isset($data[self::IDENTIFIER_KEY]) ? $data[self::IDENTIFIER_KEY] : [];
         $tags   = [implode('_', array_merge([$data[self::STATIC_NAME_KEY]], $params))];
 
-        if (!empty($data[self::NESTED_DATA_KEY]) && is_array($data[self::NESTED_DATA_KEY])) {
+        if ($processNestedData && !empty($data[self::NESTED_DATA_KEY]) && is_array($data[self::NESTED_DATA_KEY])) {
             foreach ($data[self::NESTED_DATA_KEY] as $child) {
-                // allowed one nested level
-                $tags = array_merge($tags, $this->generate($child));
+                if ($this->supports($child)) {
+                    // allowed one nested level
+                    $tags = array_merge($tags, $this->generate($child));
+                }
             }
         }
 

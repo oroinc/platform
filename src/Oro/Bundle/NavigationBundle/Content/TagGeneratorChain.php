@@ -22,7 +22,7 @@ class TagGeneratorChain
 
     /**
      * Delegate tag generation to registered strategies
-     * Strategy should be responsive for cache calls for the same data
+     * Strategy should be responsible for cache calls for the same data
      *
      * @param mixed $data
      * @param bool  $includeCollectionTag
