@@ -125,7 +125,7 @@ oro:
         groups.label:      Groups
         api.label:         API key
         statuses.label:    Statuses
-        emails.label:      Additional emails
+        emails.label:      Emails
         current_status.label: Current status
         business_units.label: Business Units
         confirmation_token.label: Confirmation token
