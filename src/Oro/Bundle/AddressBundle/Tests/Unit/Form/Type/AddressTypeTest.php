@@ -87,11 +87,11 @@ class AddressTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->at(13))
             ->method('add')
-            ->with('state', 'oro_region');
+            ->with('region', 'oro_region');
 
         $builder->expects($this->at(14))
             ->method('add')
-            ->with('state_text', 'hidden');
+            ->with('region_text', 'hidden');
 
         $builder->expects($this->at(15))
             ->method('add')
