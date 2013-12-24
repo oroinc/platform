@@ -1,41 +1,5 @@
 {% macro navigationContentTags(data, includeCollectionTag = false) %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/mediator'],
-        function ($, _, mediator) {
-            mediator.on('content-manager:content-tagged', function (e) {
-                var tagsDebugPanel = $('#footer .alert #tag-debug');
-                if (tagsDebugPanel.length === 0) {
-                    var el = document.createElement('div');
-                    el.id = 'tag-debug';
-                    el.style.display = 'inline-block';
-                    tagsDebugPanel = $(el);
-                    $('#footer .alert').append(tagsDebugPanel);
-                }
-
-                var html   = document.createDocumentFragment(),
-                    header = document.createElement('h5');
-                header.innerHTML = 'Tags: ';
-                header.style.display = 'inline-block';
-                header.style.padding = '0 20px';
-                header.style.margin = '0';
-
-                html.appendChild(header);
-                _.each(e.current, function (el) {
-                    _.each(el.tags, function (tag) {
-                        var tagEl = document.createElement('span');
-                        tagEl.innerHTML = tag;
-                        tagEl.className = 'badge badge-warning';
-                        html.appendChild(tagEl);
-                    });
-                });
-
-                tagsDebugPanel.html(html);
-            });
-            mediator.on('hash_navigation_request:start', function () {
-                $('#footer .alert #tag-debug span').remove();
-            });
-        });
-
         require([ 'oro/content-manager'],
         function (contentManager) {
             contentManager.tagContent({{ oro_navigation_get_content_tags(data, includeCollectionTag)|json_encode|raw }});

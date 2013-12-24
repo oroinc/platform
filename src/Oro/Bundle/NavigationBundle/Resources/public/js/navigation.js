@@ -599,6 +599,7 @@ define(function (require) {
         refreshPage: function() {
             contentManager.clearCache(this.url);
             this.loadPage();
+            mediator.trigger("hash_navigation_request:page_refreshed", { url: this.url, navigationInstance: this});
         },
 
         /**

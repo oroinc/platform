@@ -7,26 +7,12 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
-use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\NavigationBundle\Content\TopicSender;
 
 class DoctrineTagEventSubscriber implements EventSubscriber
 {
-    const UPDATE_TOPIC = 'oro/data/update';
-
-    /** @var TopicPublisher */
-    protected $publisher;
-
     /** @var bool */
     protected $isApplicationInstalled;
-
-    /** @var ServiceLink */
-    protected $generatorLink;
-
-    /** @var ServiceLink */
-    protected $securityContextLink;
 
     /** @var array */
     protected static $skipTrackingFor = [
@@ -35,18 +21,15 @@ class DoctrineTagEventSubscriber implements EventSubscriber
         'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem'
     ];
 
+    /** @var TopicSender */
+    protected $sender;
+
     /** @var array */
     protected $collectedTags = [];
 
-    public function __construct(
-        TopicPublisher $publisher,
-        ServiceLink $generatorLink,
-        ServiceLink $securityContextLink,
-        $isApplicationInstalled
-    ) {
-        $this->publisher              = $publisher;
-        $this->generatorLink          = $generatorLink;
-        $this->securityContextLink    = $securityContextLink;
+    public function __construct(TopicSender $sender, $isApplicationInstalled)
+    {
+        $this->sender                 = $sender;
         $this->isApplicationInstalled = $isApplicationInstalled;
     }
 
@@ -86,7 +69,7 @@ class DoctrineTagEventSubscriber implements EventSubscriber
             }
         }
 
-        $generator = $this->generatorLink->getService();
+        $generator = $this->sender->getGenerator();
         foreach ($entities as $entity) {
             if (!in_array(ClassUtils::getClass($entity), self::$skipTrackingFor)) {
                 // invalidate collection view pages only when entity has been added or removed
@@ -108,19 +91,6 @@ class DoctrineTagEventSubscriber implements EventSubscriber
      */
     public function postFlush()
     {
-        /** @var SecurityContextInterface $securityContext */
-        $securityContext = $this->securityContextLink->getService();
-        $userName        = $securityContext->getToken() && is_object($securityContext->getToken()->getUser())
-            ? $securityContext->getToken()->getUser()->getUserName() : null;
-
-        if (!empty($this->collectedTags)) {
-            $this->collectedTags = array_map(
-                function ($tag) use ($userName) {
-                    return ['username' => $userName, 'tagname' => $tag];
-                },
-                $this->collectedTags
-            );
-            $this->publisher->send(self::UPDATE_TOPIC, json_encode($this->collectedTags));
-        }
+        $this->sender->send($this->collectedTags);
     }
 }

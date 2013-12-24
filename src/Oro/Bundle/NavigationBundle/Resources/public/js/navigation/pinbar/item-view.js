@@ -72,6 +72,7 @@ function($, _, Backbone, app, Navigation, mediator, error) {
         },
 
         removeItem: function() {
+            mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
             this.isRemoved = true;
             this.remove();
         },
@@ -110,27 +111,28 @@ function($, _, Backbone, app, Navigation, mediator, error) {
                 this.templates[this.options.type](this.model.toJSON())
             );
 
+            // if cache used highlight tab on content outdated event
+            mediator.on('content-manager:content-outdated', this.outdatedContentHandler, this);
+            this.setActiveItem();
+            return this;
+        },
+
+        outdatedContentHandler: function (event) {
             var navigation = Navigation.getInstance(),
                 modelUrl = navigation.removeGridParams(this.model.get('url')) ,
                 $el = this.$el,
                 refreshHandler = function (obj) {
                     if (modelUrl === obj.url) {
-                        $el.find('.pin-holder div > a > i').remove();
-                        mediator.off('hash_navigation_request:refresh', refreshHandler);
+                        $el.find('.outdated-note').remove();
+                        mediator.off('hash_navigation_request:page_refreshed', refreshHandler);
                     }
                 };
-            ;
-            // if cache used highlight tab on content outdated event
-            mediator.on('content-manager:content-outdated', function (event) {
-                if (!event.isCurrentPage && modelUrl == event.url) {
-                    $el.find('.pin-holder div > a').find('i').remove().end()
-                        .html($el.find('.pin-holder div > a').html() + '<i class="icon-bell" style="color: #ffd631"></i>');
-                    mediator.on('hash_navigation_request:refresh', refreshHandler);
-                }
-            });
 
-            this.setActiveItem();
-            return this;
+            if (!event.isCurrentPage && modelUrl == event.url) {
+                $el.find('.outdated-note').remove();
+                $el.find('.pin-holder > div > a').prepend($('<i />', {class: 'icon-circle outdated-note'}));
+                mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
+            }
         }
     });
 });

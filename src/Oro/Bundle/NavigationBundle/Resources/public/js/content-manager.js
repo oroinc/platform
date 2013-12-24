@@ -49,13 +49,7 @@ function (_, sync, mediator, messenger, __) {
          * Notifier object
          * @type {{close: function()}}
          */
-        notifier,
-
-        /**
-         * Default template for notification message
-         * @type {Function}
-         */
-        defaultNotificationTemplate;
+        notifier;
 
     /**
      * Remove restore params from url
@@ -113,8 +107,7 @@ function (_, sync, mediator, messenger, __) {
         }
         notifier = messenger.notificationMessage(
             'warning',
-            __("navigation.message.content.outdated", {title: title}),
-            { template: defaultNotificationTemplate }
+            __("navigation.message.content.outdated", {title: title})
         );
     }
 

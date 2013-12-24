@@ -38,6 +38,7 @@ parameters:
     oro_navigation.breadcrumbs_manager.class:                  Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager
 
     oro_navigation.twig.content_tags.class:                    Oro\Bundle\NavigationBundle\Twig\ContentTagsExtension
+    oro_navigation.content.topic_sender.class:                 Oro\Bundle\NavigationBundle\Content\TopicSender
     oro_navigation.content.tag_generator_chain.class:          Oro\Bundle\NavigationBundle\Content\TagGeneratorChain
     oro_navigation.content.doctrine_tag_generator.class:       Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator
     oro_navigation.content.simple_tag_generator.class:         Oro\Bundle\NavigationBundle\Content\SimpleTagGenerator
@@ -184,12 +185,17 @@ services:
     oro_navigation.event.doctrine_tag_subscriber:
         class: %oro_navigation.event.doctrine_tag_subscriber.class%
         arguments:
-            - @oro_wamp.publisher
-            - @oro_navigation.content.tag_generator_chain.link
-            - @oro_navigation.content.security.context.linksss
+            - @oro_navigation.content.topic_sender
             - %installed%
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    oro_navigation.content.topic_sender:
+        class: %oro_navigation.content.topic_sender.class%
+        arguments:
+            - @oro_wamp.publisher
+            - @oro_navigation.content.tag_generator_chain.link
+            - @oro_navigation.content.security.context.linksss
 
     oro_navigation.content.tag_generator_chain.link:
         tags:
