@@ -97,6 +97,7 @@ class ActionMetadata implements AclClassInfo, \Serializable
      * @param array $data Initialization array
      * @return ActionMetadata A new instance of a ActionMetadata object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         $result        = new ActionMetadata();
@@ -106,4 +107,5 @@ class ActionMetadata implements AclClassInfo, \Serializable
 
         return $result;
     }
+    // @codingStandardsIgnoreEnd
 }
