@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Acl\Cache;
+namespace Oro\Bundle\SecurityBundle\Cache;
 
 use Doctrine\Common\Cache\FilesystemCache as BaseFilesystemCache;
 
@@ -16,8 +16,14 @@ class FilesystemCache extends BaseFilesystemCache
      */
     protected function getFilename($id)
     {
+        $namespace = $this->getNamespace();
+        if ($namespace && strpos($id, $namespace) === 0) {
+            $id = substr($id, strlen($namespace));
+        }
         $id = preg_replace('@[\\\/:"*?<>|]+@', '', $id);
 
-        return $this->directory . DIRECTORY_SEPARATOR . $id . $this->extension;
+        return $this->directory . DIRECTORY_SEPARATOR
+        . ($namespace ? preg_replace('@[\\\/:"*?<>|]+@', '', $namespace) . DIRECTORY_SEPARATOR : '')
+        . $id . $this->extension;
     }
 }

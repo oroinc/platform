@@ -146,6 +146,20 @@ class Config implements ConfigInterface
     }
 
     /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return Config A new instance of a Config object
+     */
+    public static function __set_state($data)
+    {
+        $result         = new Config($data['id']);
+        $result->values = $data['values'];
+
+        return $result;
+    }
+
+    /**
      * Creates a new object that is a copy of the current instance.
      */
     public function __clone()
