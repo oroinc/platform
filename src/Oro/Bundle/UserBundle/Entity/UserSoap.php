@@ -3,13 +3,14 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use JMS\Serializer\Annotation\Exclude;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\SoapBundle\Entity\SoapEntityInterface;
+
 /**
- * @ORM\MappedSuperclass()
+ * @Soap\Alias("Oro.Bundle.UserBundle.Entity.User")
  */
-class UserSoap extends User
+class UserSoap extends User implements SoapEntityInterface
 {
     /**
      * @Soap\ComplexType("int", nillable=true)
@@ -27,7 +28,7 @@ class UserSoap extends User
     protected $email;
 
     /**
-     * @Soap\ComplexType("string")
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $namePrefix;
 
@@ -37,7 +38,7 @@ class UserSoap extends User
     protected $firstName;
 
     /**
-     * @Soap\ComplexType("string")
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $middleName;
 
@@ -47,14 +48,19 @@ class UserSoap extends User
     protected $lastName;
 
     /**
-     * @Soap\ComplexType("string")
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $nameSuffix;
 
     /**
-     * @Exclude
+     * @Soap\ComplexType("date", nillable=true)
      */
-    protected $enabled = true;
+    protected $birthday;
+
+    /**
+     * @Soap\ComplexType("boolean")
+     */
+    protected $enabled;
 
     /**
      * @Soap\ComplexType("string", nillable=true)
@@ -67,14 +73,14 @@ class UserSoap extends User
     protected $lastLogin;
 
     /**
-     * @Exclude
+     * @Soap\ComplexType("int", nillable=true)
      */
-    protected $roles;
+    protected $owner;
 
     /**
-     * @Soap\ComplexType("int[]")
+     * @Soap\ComplexType("int[]", nillable=true)
      */
-    protected $rolesCollection;
+    protected $roles;
 
     /**
      * @Soap\ComplexType("int[]", nillable=true)
@@ -82,18 +88,48 @@ class UserSoap extends User
     protected $groups;
 
     /**
-     * @Soap\ComplexType("int", nillable=true)
+     * @param User $user
      */
-    protected $owner;
-
-
-    public function setRolesCollection($collection)
+    public function soapInit($user)
     {
-        $this->rolesCollection = $collection;
+        $this->id = $user->id;
+        $this->username = $user->username;
+        $this->email = $user->email;
+        $this->namePrefix = $user->namePrefix;
+        $this->firstName = $user->firstName;
+        $this->middleName = $user->middleName;
+        $this->lastName = $user->lastName;
+        $this->nameSuffix = $user->nameSuffix;
+        $this->birthday = $user->birthday;
+        $this->enabled = $user->enabled;
+        $this->plainPassword = $user->plainPassword;
+        $this->lastLogin = $user->lastLogin;
+        $this->owner = $user->owner ? $user->owner->getId() : null;
+
+        $this->roles = array();
+        foreach ($user->getRoles() as $role) {
+            $this->roles[] = $role->getId();
+        }
+
+        $this->groups = array();
+        foreach ($user->getGroups() as $group) {
+            $this->groups[] = $group->getId();
+        }
     }
 
-    public function getRolesCollection()
+    /**
+     * {@inheritdoc}
+     */
+    public function setRoles($roles)
     {
-        return $this->rolesCollection;
+        $this->roles = $roles;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoles()
+    {
+        return $this->roles;
     }
 }

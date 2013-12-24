@@ -278,38 +278,38 @@ class Contact extends AbstractEntity implements Entity
         return $this->byXpath("//div[@id = 's2id_orocrm_contact_form_addresses_{$addressId}_country']/a/span")->text();
     }
 
-    public function setAddressState($state, $addressId = 0)
+    public function setAddressRegion($region, $addressId = 0)
     {
-        //$xpath = "//input[@id='orocrm_contact_form_addresses_0_state_text']";
+        //$xpath = "//input[@id='orocrm_contact_form_addresses_0_region_text']";
         //if  ($this->isElementPresent("//div[@role='dialog']")) {
-        //    $xpath = "//input[@id='orocrm_contact_address_form_state_text']";
+        //    $xpath = "//input[@id='orocrm_contact_address_form_region_text']";
         //}
         //$this->byXpath($xpath)->clear();
         //$this->byXpath($xpath)->value($state);
 
-        $xpath = "//div[@id='s2id_orocrm_contact_form_addresses_{$addressId}_state']/a";
+        $xpath = "//div[@id='s2id_orocrm_contact_form_addresses_{$addressId}_region']/a";
         if ($this->isElementPresent("//div[@role='dialog']")) {
-            $xpath = "//div[@id='s2id_orocrm_contact_address_form_state']/a";
+            $xpath = "//div[@id='s2id_orocrm_contact_address_form_region']/a";
         }
         $xpath = $this->byXpath($xpath);
         $this->moveto($xpath);
 
         $xpath->click();
         $this->waitForAjax();
-        $this->byXpath("//div[@id='select2-drop']/div/input")->value($state);
+        $this->byXpath("//div[@id='select2-drop']/div/input")->value($region);
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@id='select2-drop']//div[contains(., '{$state}')]",
+            "//div[@id='select2-drop']//div[contains(., '{$region}')]",
             "Country's autocopmlete doesn't return search value"
         );
-        $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$state}')]")->click();
+        $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$region}')]")->click();
 
         return $this;
     }
 
-    public function getAddressState($addressId = 0)
+    public function getAddressRegion($addressId = 0)
     {
-        return $this->byXpath("//div[@id = 's2id_orocrm_contact_form_addresses_{$addressId}_state']/a/span")->text();
+        return $this->byXpath("//div[@id = 's2id_orocrm_contact_form_addresses_{$addressId}_region']/a/span")->text();
     }
 
     public function setAddress($data, $addressId = 0)
@@ -356,7 +356,7 @@ class Contact extends AbstractEntity implements Entity
         $values['city'] = $this->getAddressCity($addressId);
         $values['postalCode'] = $this->getAddressPostalCode($addressId);
         $values['country'] = $this->getAddressCountry($addressId);
-        $values['state'] = $this->getAddressState($addressId);
+        $values['region'] = $this->getAddressRegion($addressId);
 
         return $this;
     }

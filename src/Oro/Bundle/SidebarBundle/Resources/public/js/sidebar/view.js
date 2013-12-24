@@ -141,7 +141,7 @@ define(function (require) {
                     return;
                 }
                 if (widget.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                    widget.set('state', constants.WIDGET_MAXIMIZED);
+                    widget.set({ state: constants.WIDGET_MAXIMIZED }, { silent: true });
                 }
                 widgetView.render().delegateEvents();
                 $content.append(widgetView.$el);

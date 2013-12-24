@@ -53,9 +53,9 @@ abstract class AbstractEntity extends Page
             );
             $tagsPath->clear();
         } else {
-            if ($this->isElementPresent("//div[@id='tags-holder']")) {
+            if ($this->isElementPresent("//div[contains(@class, 'tags-holder')]")) {
                 $this->assertElementPresent(
-                    "//div[@id='tags-holder']//li[contains(., '{$tag}')]",
+                    "//div[contains(@class, 'tags-holder')]//li[contains(., '{$tag}')]",
                     'Tag is not assigned to entity'
                 );
             } else {

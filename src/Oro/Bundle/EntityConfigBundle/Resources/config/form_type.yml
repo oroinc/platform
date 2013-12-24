@@ -8,7 +8,7 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @translator
-            - @service_container
+            - @oro_translation.database_translation.metadata.cache
         tags:
             - { name: form.type, alias: oro_entity_config_type }
 

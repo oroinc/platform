@@ -7,5 +7,8 @@ oro_organziation_api:
     resource:     "@OroOrganizationBundle/Controller/Api/Rest/BusinessUnitController.php"
     type:         rest
     prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
     defaults:
         version:  latest

@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Cache;
-
-use Oro\Bundle\SecurityBundle\Acl\Cache\FilesystemCache;
+namespace Oro\Bundle\SecurityBundle\Tests\Unit\Cache;
 
 class FilesystemCacheTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +9,7 @@ class FilesystemCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFilename($id, $expectedFileName)
     {
-        $cache = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Cache\FilesystemCache')
+        $cache = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Cache\FilesystemCache')
             ->disableOriginalConstructor()
             ->setMethods(array('fetch'))
             ->getMock();

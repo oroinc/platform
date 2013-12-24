@@ -272,6 +272,10 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         mediator.bind("hash_navigation_request:complete", adjustReloaded);
 
         mediator.bind('layout:adjustHeight', adjustHeight);
+
+        if ($('body').hasClass('error-page')) {
+            adjustHeight();
+        }
     }());
 
     /* ============================================================
