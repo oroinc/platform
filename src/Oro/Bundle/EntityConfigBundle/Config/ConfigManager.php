@@ -579,6 +579,7 @@ class ConfigManager
 
     /**
      * @param string $className
+     * @param bool $force - if TRUE overwrite existing value from annotation
      *
      * @TODO: need refactoring. Join updateConfigEntityModel and updateConfigFieldModel.
      *        may be need introduce MetadataWithDefaultValuesInterface
@@ -586,7 +587,7 @@ class ConfigManager
      *        need refactor getConfig
      *        need to find out more appropriate name for this method
      */
-    public function updateConfigEntityModel($className)
+    public function updateConfigEntityModel($className, $force = false)
     {
         $metadata = $this->getEntityMetadata($className);
         foreach ($this->getProviders() as $provider) {
@@ -606,7 +607,7 @@ class ConfigManager
             $hasChanges = false;
             $config     = $provider->getConfig($className);
             foreach ($defaultValues as $code => $value) {
-                if (!$config->has($code)) {
+                if (!$config->has($code) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }
@@ -662,6 +663,7 @@ class ConfigManager
     /**
      * @param string $className
      * @param string $fieldName
+     * @param bool $force - if TRUE overwrite existing value from annotation
      *
      * @TODO: need refactoring. Join updateConfigEntityModel and updateConfigFieldModel.
      *        may be need introduce MetadataWithDefaultValuesInterface
@@ -669,7 +671,7 @@ class ConfigManager
      *        need refactor getConfig
      *        need to find out more appropriate name for this method
      */
-    public function updateConfigFieldModel($className, $fieldName)
+    public function updateConfigFieldModel($className, $fieldName, $force = false)
     {
         $metadata = $this->getFieldMetadata($className, $fieldName);
         foreach ($this->getProviders() as $provider) {
@@ -689,7 +691,7 @@ class ConfigManager
             $hasChanges = false;
             $config     = $provider->getConfig($className, $fieldName);
             foreach ($defaultValues as $code => $value) {
-                if (!$config->has($code)) {
+                if (!$config->has($code) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }

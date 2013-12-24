@@ -470,16 +470,16 @@ datagrid:
                         - f.type = '%oro_email.email_folder.entity.class%::INBOX'
         columns:
             receivedAt:
-                label: oro.email.datagrid.email.receivedAt
+                label: oro.email.received_at.label
                 frontend_type: datetime
             fromEmailAddress:
                 type: twig
-                label: oro.email.datagrid.email.from_name
+                label: oro.email.from_name.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
             subject:
                 type: twig
-                label: oro.email.datagrid.email.subject
+                label: oro.email.subject.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
         sorters:
@@ -496,16 +496,16 @@ datagrid:
                         - f.type = '%oro_email.email_folder.entity.class%::SENT'
         columns:
             sentAt:
-                label: oro.email.datagrid.email.sentAt
+                label: oro.email.sent_at.label
                 frontend_type: datetime
             recipients:
                 type: twig
-                label: oro.email.datagrid.email.recipients
+                label: oro.email.recipients.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             subject:
                 type: twig
-                label: oro.email.datagrid.email.subject
+                label: oro.email.subject.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
         sorters:

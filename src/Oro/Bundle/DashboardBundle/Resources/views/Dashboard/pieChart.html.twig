@@ -58,6 +58,9 @@
                     );
                 };
                 var drawChart = function () {
+                    if (!$chart.get(0).clientWidth) {
+                        return;
+                    }
                     var data = [
                         {# build chart data #}
                         {% block data %}

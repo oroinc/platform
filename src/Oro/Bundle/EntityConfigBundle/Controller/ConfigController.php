@@ -157,9 +157,6 @@ class ConfigController extends Controller
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
         $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
 
-        /** @var ConfigProvider $ownershipConfigProvider */
-        $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
-
         /**
          * TODO
          * refactor and place into Helper class
@@ -194,13 +191,9 @@ class ConfigController extends Controller
         return [
             'entity'           => $entity,
             'entity_config'    => $entityConfigProvider->getConfig($entity->getClassName()),
-            'entity_extend'    => $extendConfig,
             'entity_count'     => $entityCount,
-            'entity_ownership' => $ownershipConfigProvider->getConfig($entity->getClassName()),
-            'unique_key'       => $extendConfig->get('unique_key'),
             'link'             => $link,
             'entity_name'      => $entityName,
-            'module_name'      => $moduleName,
             'button_config'    => $layoutActions,
             'require_js'       => $requireJsModules,
         ];
@@ -380,5 +373,74 @@ class ConfigController extends Controller
         }
 
         return [$actions, $requireJsModules];
+    }
+
+    /**
+     * @Route("/widget/info/{id}", name="oro_entityconfig_widget_info")
+     * @Template
+     */
+    public function infoAction(EntityConfigModel $entity)
+    {
+        /**
+         * define Entity module and name
+         */
+        $entityName = $moduleName = '';
+        $className  = explode('\\', $entity->getClassName());
+        if (count($className) > 1) {
+            foreach ($className as $i => $name) {
+                if (count($className) - 1 == $i) {
+                    $entityName = $name;
+                } elseif (!in_array($name, ['Bundle', 'Entity'])) {
+                    $moduleName .= $name;
+                }
+            }
+        } else {
+            $entityName = $className[0];
+            $moduleName = 'Custom';
+        }
+
+        /** @var ConfigProvider $entityConfigProvider */
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+
+        /** @var ConfigProvider $extendConfigProvider */
+        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+        $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
+
+        /** @var ConfigProvider $ownershipConfigProvider */
+        $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
+
+        return [
+            'entity'           => $entity,
+            'entity_config'    => $entityConfigProvider->getConfig($entity->getClassName()),
+            'entity_extend'    => $extendConfig,
+            'entity_ownership' => $ownershipConfigProvider->getConfig($entity->getClassName()),
+            'entity_name'      => $entityName,
+            'module_name'      => $moduleName,
+        ];
+    }
+
+    /**
+     * @Route("/widget/unique_keys/{id}", name="oro_entityconfig_widget_unique_keys")
+     * @Template
+     */
+    public function uniqueKeysAction(EntityConfigModel $entity)
+    {
+        /** @var ConfigProvider $extendConfigProvider */
+        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+        $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
+
+        return [
+            'entity'     => $entity,
+            'unique_key' => $extendConfig->get('unique_key')
+        ];
+    }
+
+    /**
+     * @Route("/widget/entity_fields/{id}", name="oro_entityconfig_widget_entity_fields")
+     * @Template
+     */
+    public function entityFieldsAction(EntityConfigModel $entity)
+    {
+        return ['entity' => $entity];
     }
 }

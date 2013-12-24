@@ -18,6 +18,16 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function shouldRunValidInstallScriptWithPhpSystemCallAndReturnOutput()
+    {
+        $package = $this->createPackageMock();
+        $runner = new Runner($this->createInstallationManagerMock($package, __DIR__ . '/../Fixture/Script/shell'));
+        $this->assertEquals('This install code was run over shell', $runner->install($package));
+    }
+
+    /**
+     * @test
+     */
     public function shouldRunValidInstallScriptOfPackageAndReturnOutput()
     {
         $package = $this->createPackageMock();
@@ -46,6 +56,16 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
         $package = $this->createPackageMock();
         $runner = new Runner($this->createInstallationManagerMock($package, __DIR__ . '/../Fixture/Script/invalid'));
         $runner->install($package);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRunUninstallScriptWithPhpSystemCallAndReturnOutput()
+    {
+        $package = $this->createPackageMock();
+        $runner = new Runner($this->createInstallationManagerMock($package, __DIR__ . '/../Fixture/Script/shell'));
+        $this->assertEquals('This uninstall code was run over shell', $runner->uninstall($package));
     }
 
     /**
@@ -94,6 +114,16 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function shouldRunUpdateScriptWithPhpSystemCallAndReturnOutput()
+    {
+        $package = $this->createPackageMock();
+        $runner = new Runner($this->createInstallationManagerMock($package, __DIR__ . '/../Fixture/Script/shell'));
+        $this->assertEquals('This update code was run over shell', $runner->update($package, 'any version'));
+    }
+
+    /**
+     * @test
+     */
     public function shouldDoNothingWhenUpdateScriptIsAbsent()
     {
         $package = $this->createPackageMock();
@@ -116,7 +146,6 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     *
      */
     public function shouldRunMigrationScriptsUpToCurrentPackageVersionSimple()
     {
@@ -137,7 +166,6 @@ OUTPUT;
 
     /**
      * @test
-     *
      */
     public function shouldRunMigrationScriptsUpToCurrentPackageVersionComplex()
     {
@@ -150,6 +178,26 @@ OUTPUT;
             $this->createInstallationManagerMock(
                 $package,
                 __DIR__ . '/../Fixture/Script/valid/update-migrations/complex'
+            )
+        );
+
+        $this->assertEquals($expectedRunnerOutput, $runner->update($package, '0.1.9'));
+    }
+
+    /**
+     * @test
+     */
+    public function shouldAllowUsePhpPathInMigrationScripts()
+    {
+        $expectedRunnerOutput = <<<OUTPUT
+update 1 via shell
+update 2 via shell
+OUTPUT;
+        $package = $this->createPackageMock();
+        $runner = new Runner(
+            $this->createInstallationManagerMock(
+                $package,
+                __DIR__ . '/../Fixture/Script/shell/migrations'
             )
         );
 
