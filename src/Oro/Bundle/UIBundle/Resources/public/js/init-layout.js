@@ -273,7 +273,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
 
         mediator.bind('layout:adjustHeight', adjustHeight);
 
-        if (document['page-rendered']) {
+        if ($('body').hasClass('error-page')) {
             adjustHeight();
         }
     }());
