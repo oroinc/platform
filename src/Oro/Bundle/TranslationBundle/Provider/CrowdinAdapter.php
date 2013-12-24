@@ -128,14 +128,15 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    protected function request($uri, $data = array(), $method = 'GET')
+    protected function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
-        $result = parent::request($uri, $data, $method);
-        $result = new \SimpleXMLElement($result);
-
-        if ($result->getName() == 'error') {
-            $message = $result->message;
-            throw new \Exception($message, (int)$result->code);
+        $result = parent::request($uri, $data, $method, $curlOptions);
+        if (!isset($curlOptions[CURLOPT_FILE])) {
+            $result = new \SimpleXMLElement($result);
+            if ($result->getName() == 'error') {
+                $message = $result->message;
+                throw new \Exception($message, (int)$result->code);
+            }
         }
 
         return $result;
@@ -165,6 +166,28 @@ class CrowdinAdapter extends AbstractAPIAdapter
 
         return $this->createDirectories($dirs)
             ->uploadFiles($files, $mode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function download($path, $package = 'all')
+    {
+        $fileHandler = fopen($path, 'wb');
+        $result = $this->request(
+            sprintf('/project/%s/download/%s.zip', $this->projectId, $package),
+            [],
+            'GET',
+            [
+                CURLOPT_FILE           => $fileHandler,
+                CURLOPT_RETURNTRANSFER => false,
+                CURLOPT_HEADER         => false,
+            ]
+        );
+
+        fclose($fileHandler);
+
+        return $result;
     }
 
     /**

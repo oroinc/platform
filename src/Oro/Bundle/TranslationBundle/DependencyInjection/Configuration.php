@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\DependencyInjection;
 
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -30,16 +31,20 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->arrayNode('api')
+                    ->addDefaultsIfNotSet()
                     ->children()
                         ->arrayNode('crowdin')
+                            ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('key')->end()
-                                ->scalarNode('endpoint')->end()
+                                ->scalarNode('endpoint')
+                                    ->defaultValue('http://api.crowdin.net/api')
+                                ->end()
                             ->end()
                         ->end()
                     ->end()
                 ->end()
             ->end();
+
         return $treeBuilder;
     }
 }

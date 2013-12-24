@@ -6,7 +6,7 @@ use Symfony\Component\Finder\Finder;
 
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 
-class TranslationUploader
+class TranslationServiceProvider
 {
     /**
      * @var AbstractAPIAdapter
@@ -50,10 +50,22 @@ class TranslationUploader
     }
 
     /**
+     * @param string $pathToSave path to save translations
+     */
+    public function download($pathToSave)
+    {
+        $this->adapter->download($pathToSave);
+    }
+
+    /**
      * @param AbstractAPIAdapter $adapter
+     *
+     * @return $this
      */
     public function setAdapter(AbstractAPIAdapter $adapter)
     {
         $this->adapter = $adapter;
+
+        return $this;
     }
 }

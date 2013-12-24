@@ -17,10 +17,17 @@ abstract class AbstractAPIAdapter
      */
     protected $endpoint;
 
-    public function __construct($apiKey, $endpoint)
+    public function __construct($endpoint)
     {
-        $this->apiKey    = $apiKey;
         $this->endpoint  = $endpoint;
+    }
+
+    /**
+     * @param string $apiKey
+     */
+    public function setApiKey($apiKey)
+    {
+        $this->apiKey = $apiKey;
     }
 
     /**
@@ -34,22 +41,32 @@ abstract class AbstractAPIAdapter
     abstract public function upload($files, $mode = 'add');
 
     /**
+     * Download translations
+     *
+     * @param string $path save downloaded file to this path
+     * @param string $package
+     *
+     * @return mixed
+     */
+    abstract public function download($path, $package = 'all');
+
+    /**
      * Perform request
      *
      * @param        $uri
      * @param array  $data
      * @param string $method
+     * @param array  $curlOptions
      *
      * @throws \Exception
-     *
      * @return \SimpleXMLElement
      */
-    protected function request($uri, $data = array(), $method = 'GET')
+    protected function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
-        $requestParams = array(
-            CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
-            CURLOPT_RETURNTRANSFER => true,
-        );
+        $requestParams = [
+                CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
+                CURLOPT_RETURNTRANSFER => true,
+            ] + $curlOptions;
 
         if ($method == 'POST') {
             $requestParams[CURLOPT_POST] = true;
@@ -64,8 +81,9 @@ abstract class AbstractAPIAdapter
 
         $result = curl_exec($ch);
         if (!$result) {
-            $error = curl_errno($ch);
-            throw new \Exception($error);
+            $errorCode = curl_errno($ch);
+            $error = curl_error($ch);
+            throw new \Exception($error, $errorCode);
         }
         curl_close($ch);
 

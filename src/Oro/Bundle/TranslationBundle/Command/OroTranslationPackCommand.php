@@ -12,7 +12,8 @@ use Symfony\Component\Translation\Catalogue\MergeOperation;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\TranslationBundle\Provider\TranslationUploader;
+use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
+use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
@@ -51,6 +52,12 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         'API project ID, by default equal to project name'
                     ),
                     new InputOption(
+                        'api-key',
+                        'k',
+                        InputOption::VALUE_OPTIONAL,
+                        'API key'
+                    ),
+                    new InputOption(
                         'upload-mode',
                         'm',
                         InputOption::VALUE_OPTIONAL,
@@ -81,7 +88,13 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         'upload',
                         null,
                         InputOption::VALUE_NONE,
-                        'Create language pack for  uploading to translation service'
+                        'Upload language pack to translation service'
+                    ),
+                    new InputOption(
+                        'download',
+                        null,
+                        InputOption::VALUE_NONE,
+                        'Download all language packs from project at translation service'
                     ),
                 )
             )
@@ -103,9 +116,13 @@ EOF
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // check presence of action
-        if ($input->getOption('dump') !== true && $input->getOption('upload') !== true) {
-            $output->writeln('<info>You must choose action: e.g --dump or --upload</info>');
+        $modeOption = false;
+        foreach (['dump', 'upload', 'download'] as $option) {
+            $modeOption = $modeOption || $input->getOption($option) !== true;
+        }
 
+        if (!$modeOption) {
+            $output->writeln('<info>You must choose action: e.g --dump, --upload or --download</info>');
             return 1;
         }
 
@@ -116,15 +133,18 @@ EOF
             $this->dump($input, $output);
         }
 
+        $projectName = $input->getArgument('project');
+        $projectId = $input->getOption('project-id');
+        if (!$projectId) {
+            $input->setOption('project-id', strtolower($projectName));
+        }
+
         if ($input->getOption('upload') === true) {
-            $projectName = $input->getArgument('project');
-            $projectId = $input->getOption('project-id');
-
-            if (!$projectId) {
-                $input->setOption('project-id', strtolower($projectName));
-            }
-
             $this->upload($input, $output);
+        }
+
+        if ($input->getOption('download') === true) {
+            $this->download($input, $output);
         }
 
         return 0;
@@ -141,16 +161,9 @@ EOF
         $projectName        = $input->getArgument('project');
         $languagePackPath = $this->getLangPackDir($projectName);
 
-        /** @var  $adapter */
-        $adapter = $this->getContainer()->get(
-            sprintf('oro_translation.uploader.%s_adapter', $input->getArgument('adapter'))
-        );
-
-        $adapter->setProjectId($input->getOption('project-id'));
-
-        /** @var TranslationUploader $uploader */
+        /** @var TranslationServiceProvider $uploader */
         $uploader = $this->getContainer()->get('oro_translation.uploader');
-        $uploader->setAdapter($adapter);
+        $uploader->setAdapter($this->getAdapterFromInput($input));
 
         $uploader->upload(
             $languagePackPath,
@@ -159,6 +172,46 @@ EOF
                 $output->writeln(implode(', ', $logItem));
             }
         );
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    protected function download(InputInterface $input, OutputInterface $output)
+    {
+        $projectName        = $input->getArgument('project');
+        $languagePackPath   = rtrim($this->getLangPackDir($projectName), DIRECTORY_SEPARATOR) . '.zip';
+
+        /** @var TranslationServiceProvider $apiService */
+        $apiService = $this->getContainer()
+            ->get('oro_translation.service_provider')
+            ->setAdapter($this->getAdapterFromInput($input));
+
+        $apiService->download(
+            $languagePackPath,
+            function ($logItem) use ($output) {
+                $output->writeln(implode(', ', $logItem));
+            }
+        );
+    }
+
+    /**
+     * @param InputInterface $input
+     *
+     * @return AbstractAPIAdapter
+     */
+    protected function getAdapterFromInput(InputInterface $input)
+    {
+        /** @var AbstractAPIAdapter $adapter */
+        $adapter = $this->getContainer()->get(
+            sprintf('oro_translation.uploader.%s_adapter', $input->getArgument('adapter'))
+        );
+
+        $adapter->setProjectId($input->getOption('project-id'));
+        $adapter->setApiKey($input->getOption('api-key'));
+
+        return $adapter;
     }
 
     /**
