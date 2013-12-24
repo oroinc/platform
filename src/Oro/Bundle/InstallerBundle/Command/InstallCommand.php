@@ -6,10 +6,8 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\ArrayInput;
-
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\ProcessBuilder;
+use Oro\Bundle\InstallerBundle\Process\CommandExecutor;
+use Oro\Bundle\InstallerBundle\InstallerProvider;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -36,6 +34,8 @@ class InstallCommand extends ContainerAwareCommand
     {
         $forceInstall = $input->getOption('force');
 
+        $commandExecutor = new CommandExecutor($input, $output, $this->getApplication());
+
         // if there is application is not installed or no --force option
         if ($this->getContainer()->hasParameter('installed') && $this->getContainer()->getParameter('installed')
             && !$forceInstall
@@ -43,22 +43,27 @@ class InstallCommand extends ContainerAwareCommand
             throw new \RuntimeException('Oro Application already installed.');
         } elseif ($forceInstall) {
             // if --force option we have to clear cache
-            $this->runCommand('cache:clear', $input, $output);
+            $commandExecutor->runCommand('cache:clear');
         }
 
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
         $this
-            ->checkStep($input, $output)
-            ->setupStep($input, $output)
-            ->finalStep($input, $output);
+            ->checkStep($output)
+            ->setupStep($commandExecutor, $input, $output)
+            ->finalStep($commandExecutor, $input, $output);
 
         $output->writeln('');
         $output->writeln('<info>Oro Application has been successfully installed.</info>');
     }
 
-    protected function checkStep(InputInterface $input, OutputInterface $output)
+    /**
+     * @param OutputInterface $output
+     * @return InstallCommand
+     * @throws \RuntimeException
+     */
+    protected function checkStep(OutputInterface $output)
     {
         $output->writeln('<info>Oro requirements check:</info>');
 
@@ -87,10 +92,15 @@ class InstallCommand extends ContainerAwareCommand
     }
 
     /**
+     * @param CommandExecutor $commandExecutor
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @return InstallCommand
+     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function setupStep(InputInterface $input, OutputInterface $output)
+    protected function setupStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Setting up database.</info>');
 
@@ -100,28 +110,25 @@ class InstallCommand extends ContainerAwareCommand
 
         $input->setInteractive(false);
 
-        $this
-            ->runCommand('oro:entity-extend:clear', $input, $output)
-            ->runCommand('doctrine:schema:drop', $input, $output, array('--force' => true, '--full-database' => true))
-            ->runCommand('doctrine:schema:create', $input, $output)
-            ->runCommand('oro:entity-config:init', $input, $output)
-            ->runCommand('oro:entity-extend:init', $input, $output)
+        $commandExecutor
+            ->runCommand('oro:entity-extend:clear')
+            ->runCommand(
+                'doctrine:schema:drop',
+                array('--force' => true, '--full-database' => true)
+            )
+            ->runCommand('doctrine:schema:create')
+            ->runCommand('oro:entity-config:init')
+            ->runCommand('oro:entity-extend:init')
             ->runCommand(
                 'oro:entity-extend:update-config',
-                $input,
-                $output,
                 array('--process-isolation' => true)
             )
             ->runCommand(
                 'doctrine:schema:update',
-                $input,
-                $output,
                 array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
             )
             ->runCommand(
                 'doctrine:fixtures:load',
-                $input,
-                $output,
                 array('--process-isolation' => true, '--no-interaction' => true, '--append' => true)
             );
 
@@ -147,19 +154,19 @@ class InstallCommand extends ContainerAwareCommand
             return $value;
         };
 
-        $userName = isset($options['user-name'])
+        $userName      = isset($options['user-name'])
             ? $options['user-name']
             : $dialog->ask($output, '<question>Username:</question> ');
-        $userEmail = isset($options['user-email'])
+        $userEmail     = isset($options['user-email'])
             ? $options['user-email']
             : $dialog->ask($output, '<question>Email:</question> ');
         $userFirstName = isset($options['user-firstname'])
             ? $options['user-firstname']
             : $dialog->ask($output, '<question>First name:</question> ');
-        $userLastName = isset($options['user-lastname'])
+        $userLastName  = isset($options['user-lastname'])
             ? $options['user-lastname']
             : $dialog->ask($output, '<question>Last name:</question> ');
-        $userPassword = isset($options['user-password'])
+        $userPassword  = isset($options['user-password'])
             ? $options['user-password']
             : $dialog->askHiddenResponseAndValidate($output, '<question>Password:</question> ', $passValidator);
         $user
@@ -181,10 +188,8 @@ class InstallCommand extends ContainerAwareCommand
 
         // load demo fixtures
         if ($demo) {
-            $this->runCommand(
+            $commandExecutor->runCommand(
                 'oro:demo:fixtures:load',
-                $input,
-                $output,
                 array('--process-isolation' => true, '--process-timeout' => 300)
             );
         }
@@ -194,35 +199,42 @@ class InstallCommand extends ContainerAwareCommand
         return $this;
     }
 
-    protected function finalStep(InputInterface $input, OutputInterface $output)
+    /**
+     * @param CommandExecutor $commandExecutor
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @return InstallCommand
+     */
+    protected function finalStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
     {
         $output->writeln('<info>Preparing application.</info>');
 
         $input->setInteractive(false);
 
-        $this
-            ->runCommand('oro:search:create-index', $input, $output)
-            ->runCommand('oro:navigation:init', $input, $output)
-            ->runCommand('fos:js-routing:dump', $input, $output, array('--target' => 'web/js/routes.js'))
-            ->runCommand('oro:localization:dump', $input, $output)
-            ->runCommand('assets:install', $input, $output)
-            ->runCommand('assetic:dump', $input, $output)
-            ->runCommand('oro:translation:dump', $input, $output)
-            ->runCommand('oro:requirejs:build', $input, $output);
+        $commandExecutor
+            ->runCommand('oro:search:create-index')
+            ->runCommand('oro:navigation:init')
+            ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
+            ->runCommand('oro:localization:dump')
+            ->runCommand('assets:install')
+            ->runCommand('assetic:dump')
+            ->runCommand('oro:translation:dump')
+            ->runCommand('oro:requirejs:build');
 
         // run installer scripts
         $this->processInstallerScripts($output);
 
         // update installed flag in parameters.yml
-        $dumper = $this->getContainer()->get('oro_installer.yaml_persister');
-        $params = $dumper->parse();
+        $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
+        $params                        = $dumper->parse();
         $params['system']['installed'] = date('c');
         $dumper->dump($params);
 
         // clear the cache set installed flag in DI container
-        $this->runCommand('cache:clear', $input, $output);
+        $commandExecutor->runCommand('cache:clear');
 
         $output->writeln('');
+
         return $this;
     }
 
@@ -233,8 +245,9 @@ class InstallCommand extends ContainerAwareCommand
      */
     protected function processInstallerScripts(OutputInterface $output)
     {
+        /** @var InstallerProvider $installerProvider */
         $installerProvider = $this->getContainer()->get('oro_installer.installer_provider');
-        $installerScripts = $installerProvider->getInstallerScriptList();
+        $installerScripts  = $installerProvider->getInstallerScriptList();
         if (!empty($installerScripts)) {
             foreach ($installerScripts as $installerScript) {
                 $installerProvider->runInstallerScript(
@@ -249,8 +262,8 @@ class InstallCommand extends ContainerAwareCommand
     /**
      * Render requirements table
      *
-     * @param array  $collection
-     * @param string $header
+     * @param array           $collection
+     * @param string          $header
      * @param OutputInterface $output
      */
     protected function renderTable(array $collection, $header, OutputInterface $output)
@@ -275,78 +288,5 @@ class InstallCommand extends ContainerAwareCommand
         }
 
         $table->render($output);
-    }
-
-    /**
-     * Launches a command.
-     * If '--process-isolation' parameter is specified the command will be launched as a separate process.
-     * In this case you can parameter '--process-timeout' to set the process timeout
-     * in seconds. Default timeout is 60 seconds.
-     *
-     * @param string          $command
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param array           $params
-     * @return InstallCommand
-     */
-    protected function runCommand($command, InputInterface $input, OutputInterface $output, $params = array())
-    {
-        $params = array_merge(
-            array(
-                'command'    => $command,
-                '--no-debug' => true,
-            ),
-            $params
-        );
-        if ($input->hasOption('env') && $input->getOption('env') !== 'dev') {
-            $params['--env'] = $input->getOption('env');
-        }
-
-        if (array_key_exists('--process-isolation', $params)) {
-            unset($params['--process-isolation']);
-            $phpFinder = new PhpExecutableFinder();
-            $php = $phpFinder->find();
-            $pb = new ProcessBuilder();
-            $pb
-                ->add($php)
-                ->add($_SERVER['argv'][0]);
-
-            if (array_key_exists('--process-timeout', $params)) {
-                $pb->setTimeout($params['--process-timeout']);
-                unset($params['--process-timeout']);
-            }
-
-            foreach ($params as $param => $val) {
-                if ($param && '-' === $param[0]) {
-                    if ($val === true) {
-                        $pb->add($param);
-                    } else {
-                        $pb->add($param . '=' . $val);
-                    }
-                } else {
-                    $pb->add($val);
-                }
-            }
-
-            $process = $pb
-                ->inheritEnvironmentVariables(true)
-                ->getProcess();
-
-            $process->run(
-                function ($type, $data) use ($output) {
-                    $output->write($data);
-                }
-            );
-            $ret = $process->getExitCode();
-        } else {
-            $this->getApplication()->setAutoExit(false);
-            $ret = $this->getApplication()->run(new ArrayInput($params), $output);
-        }
-
-        if (0 !== $ret) {
-            $output->writeln(sprintf('<error>The command terminated with an error status (%s)</error>', $ret));
-        }
-
-        return $this;
     }
 }
