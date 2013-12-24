@@ -8,6 +8,9 @@ oro_notification_api_emailnotification:
     resource:     "@OroNotificationBundle/Controller/Api/Rest/EmailNotificationController.php"
     type:         rest
     prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
     defaults:
         version:  latest
 

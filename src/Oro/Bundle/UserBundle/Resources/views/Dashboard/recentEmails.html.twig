@@ -26,7 +26,7 @@
 {% block actions %}
     {% set actions = [{
         'url': path('oro_user_view', {'id': loggedUserId}),
-        'icon': 'envelope',
+        'type': 'link',
         'label': 'oro.dashboard.recent_emails.view_all'|trans
     }] %}
 

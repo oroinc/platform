@@ -47,7 +47,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Removes or adds a state field based on the country set.
+     * Removes or adds a region field based on the country set.
      *
      * @param FormEvent $event
      */
@@ -68,8 +68,8 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
         }
 
         if ($country->hasRegions()) {
-            if ($form->has('state')) {
-                $config = $form->get('state')->getConfig()->getOptions();
+            if ($form->has('region')) {
+                $config = $form->get('region')->getConfig()->getOptions();
                 unset($config['choice_list']);
                 unset($config['choices']);
             } else {
@@ -85,9 +85,9 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 
             $form->add(
                 $this->factory->createNamed(
-                    'state',
+                    'region',
                     'oro_region',
-                    $address->getState(),
+                    $address->getRegion(),
                     $config
                 )
             );
@@ -95,7 +95,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Removes or adds a state field based on the country set on submitted form.
+     * Removes or adds a region field based on the country set on submitted form.
      *
      * @param FormEvent $event
      */
@@ -110,7 +110,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
         if ($country && $country->hasRegions()) {
             $form = $event->getForm();
 
-            $config = $form->get('state')->getConfig()->getOptions();
+            $config = $form->get('region')->getConfig()->getOptions();
             unset($config['choice_list']);
             unset($config['choices']);
 
@@ -123,7 +123,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 
             $form->add(
                 $this->factory->createNamed(
-                    'state',
+                    'region',
                     'oro_region',
                     null,
                     $config
@@ -132,15 +132,15 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 
             if (!$form->getData()
                 || ($form->getData() && !$form->getData()->getRegionText())
-                || !empty($data['state'])
+                || !empty($data['region'])
             ) {
-                // do not allow saving text state in case when state was checked from list
-                // except when in base data state text existed
-                unset($data['state_text']);
+                // do not allow saving text region in case when region was checked from list
+                // except when in base data region text existed
+                unset($data['region_text']);
             }
         } else {
-            // do not allow saving state select in case when state was filled as text
-            unset($data['state']);
+            // do not allow saving region select in case when region was filled as text
+            unset($data['region']);
         }
 
         $event->setData($data);

@@ -1,0 +1,7 @@
+{% macro renderAddress(address) %}
+    {% if address.label %}
+        <b>{{ address.label }}</b>
+        <br />
+    {% endif %}
+    {{ address|oro_format_address }}
+{% endmacro %}

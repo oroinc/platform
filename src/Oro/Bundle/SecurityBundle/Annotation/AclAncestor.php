@@ -16,11 +16,15 @@ class AclAncestor implements \Serializable
     /**
      * Constructor
      *
-     * @param  array                     $data
+     * @param  array $data
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $data)
+    public function __construct(array $data = null)
     {
+        if ($data === null) {
+            return;
+        }
+
         $this->id = isset($data['value']) ? $data['value'] : null;
         if (empty($this->id) || strpos($this->id, ' ') !== false) {
             throw new \InvalidArgumentException('ACL id must not be empty or contain blank spaces.');
@@ -57,5 +61,19 @@ class AclAncestor implements \Serializable
         list(
             $this->id
             ) = unserialize($serialized);
+    }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return AclAncestor A new instance of a AclAncestor object
+     */
+    public static function __set_state($data)
+    {
+        $result     = new AclAncestor();
+        $result->id = $data['id'];
+
+        return $result;
     }
 }

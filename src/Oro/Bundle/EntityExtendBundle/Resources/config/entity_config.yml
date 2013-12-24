@@ -144,7 +144,7 @@ oro_entity_config:
                     entity_id:              true
                     aClass:                 'btn-danger entity-extend-apply'
                     void:                   true
-                    filter:                 { state: ['New', 'Requires update', 'Deleted'], upgradeable: true }
+                    filter:                 { upgradeable: true, state: ['New', 'Requires update', 'Deleted'] }
             items:
                 owner:
                     options:
@@ -272,6 +272,7 @@ oro_entity_config:
                 relation:
                     options:
                         allowed_type:       [oneToMany, manyToOne, manyToMany]
+                        serializable:       true
                         required_property:
                             config_id:
                                 field_name:  null
@@ -283,6 +284,9 @@ oro_entity_config:
                         options:
                             block:          entity
                             subblock:       properties
+                schema:
+                    options:
+                        serializable:       true
 
                 target_entity:
                     options:

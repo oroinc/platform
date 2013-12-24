@@ -34,11 +34,11 @@ class ConfigCache
 
     /**
      * @param ConfigIdInterface $configId
-     * @return bool|ConfigInterface
+     * @return ConfigInterface
      */
     public function loadConfigFromCache(ConfigIdInterface $configId)
     {
-        return unserialize($this->cache->fetch($this->buildConfigCacheKey($configId)));
+        return $this->cache->fetch($this->buildConfigCacheKey($configId));
     }
 
     /**
@@ -47,7 +47,7 @@ class ConfigCache
      */
     public function putConfigInCache(ConfigInterface $config)
     {
-        return $this->cache->save($this->buildConfigCacheKey($config->getId()), serialize($config));
+        return $this->cache->save($this->buildConfigCacheKey($config->getId()), $config);
     }
 
     /**

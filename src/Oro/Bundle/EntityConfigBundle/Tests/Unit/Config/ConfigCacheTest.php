@@ -36,7 +36,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
         $cacheProvider->expects($this->once())->method('deleteAll')->will($this->returnValue(true));
         $this->assertTrue($configCache->removeAll());
 
-        $cacheProvider->expects($this->once())->method('fetch')->will($this->returnValue(serialize($config)));
+        $cacheProvider->expects($this->once())->method('fetch')->will($this->returnValue($config));
         $this->assertEquals($config, $configCache->loadConfigFromCache($configId));
 
         $value = 'testValue';

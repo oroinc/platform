@@ -46,7 +46,7 @@ class RestUsersACLTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
-                "rolesCollection" => array("1")
+                "roles" => array("1")
             )
         );
 
@@ -83,7 +83,7 @@ class RestUsersACLTest extends WebTestCase
                 "enabled" => '1',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
-                "rolesCollection" => array("1")
+                "roles" => array("1")
             )
         );
 

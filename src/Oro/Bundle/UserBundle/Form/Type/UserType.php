@@ -63,9 +63,10 @@ class UserType extends AbstractType
         $this->setDefaultUserFields($builder);
         $builder
             ->add(
-                'rolesCollection',
+                'roles',
                 'entity',
                 array(
+                    'property_path' => 'rolesCollection',
                     'label' => 'oro.user.roles.label',
                     'class' => 'OroUserBundle:Role',
                     'property' => 'label',
@@ -147,9 +148,6 @@ class UserType extends AbstractType
                         : array('Registration', 'User', 'Default');
                 },
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'error_mapping' => array(
-                    'roles' => 'rolesCollection'
-                ),
                 'cascade_validation' => true
             )
         );

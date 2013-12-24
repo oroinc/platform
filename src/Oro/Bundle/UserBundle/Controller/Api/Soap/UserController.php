@@ -7,13 +7,16 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
 
+use Oro\Bundle\UserBundle\Entity\UserSoap;
+use Oro\Bundle\UserBundle\Entity\User;
+
 class UserController extends SoapController
 {
     /**
      * @Soap\Method("getUsers")
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\User[]")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\UserSoap[]")
      * @AclAncestor("oro_user_user_view")
      */
     public function cgetAction($page = 1, $limit = 10)
@@ -24,7 +27,7 @@ class UserController extends SoapController
     /**
      * @Soap\Method("getUser")
      * @Soap\Param("id", phpType="int")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\User")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\UserSoap")
      * @AclAncestor("oro_user_user_view")
      */
     public function getAction($id)
@@ -75,29 +78,29 @@ class UserController extends SoapController
     /**
      * @Soap\Method("getUserRoles")
      * @Soap\Param("id", phpType="int")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\Role[]")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\RoleSoap[]")
      * @AclAncestor("oro_user_role_view")
      */
     public function getRolesAction($id)
     {
-        return $this->getEntity($id)->getRoles();
+        return $this->transformToSoapEntities($this->getEntity($id)->getRoles());
     }
 
     /**
      * @Soap\Method("getUserGroups")
      * @Soap\Param("id", phpType="int")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\Group[]")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\GroupSoap[]")
      * @AclAncestor("oro_user_group_view")
      */
     public function getGroupsAction($id)
     {
-        return $this->getEntity($id)->getGroups();
+        return $this->transformToSoapEntities($this->getEntity($id)->getGroups());
     }
 
     /**
      * @Soap\Method("getUserBy")
      * @Soap\Param("filters", phpType="BeSimple\SoapCommon\Type\KeyValue\String[]")
-     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\User")
+     * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\UserSoap")
      * @AclAncestor("oro_user_user_view")
      */
     public function getByAction(array $filters)
@@ -112,7 +115,27 @@ class UserController extends SoapController
             throw new \SoapFault('NOT_FOUND', 'User cannot be found using specified filter');
         }
 
-        return $entity;
+        return $this->transformToSoapEntity($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array $data, $entity)
+    {
+        $result = parent::fixFormData($data, $entity);
+
+        unset($result['id']);
+        unset($result['lastLogin']);
+
+        if ($entity instanceof User &&
+            $entity->getId() &&
+            !$this->container->get('oro_security.security_facade')->isGranted('ASSIGN', $entity)
+        ) {
+            unset($result['owner']);
+        }
+
+        return $result;
     }
 
     /**
