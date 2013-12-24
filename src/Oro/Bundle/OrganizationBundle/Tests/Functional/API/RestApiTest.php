@@ -16,17 +16,17 @@ class RestApiTest extends WebTestCase
     /** @var Client */
     protected $client;
 
-    protected $fixtureData = array('business_unit' =>
-            array(
-                'name'          => 'BU Name',
-                'organization'  => '1',
-                'phone' => '123-123-123',
-                'website' => 'http://localhost',
-                'email' => 'email@email.localhost',
-                'fax' => '321-321-321',
-                'appendUsers' => array(1),
-                'owner' => '1',
-            )
+    protected $fixtureData = array(
+        'business_unit' => array(
+            'name' => 'BU Name',
+            'organization' => '1',
+            'phone' => '123-123-123',
+            'website' => 'http://localhost',
+            'email' => 'email@email.localhost',
+            'fax' => '321-321-321',
+            'appendUsers' => array(1),
+            'owner' => '1',
+        )
     );
 
     public function setUp()
@@ -40,7 +40,6 @@ class RestApiTest extends WebTestCase
      */
     public function testCreate()
     {
-
         $this->client->request(
             'POST',
             $this->client->generate('oro_api_post_businessunit'),
@@ -89,8 +88,9 @@ class RestApiTest extends WebTestCase
                 $this->assertEquals($this->fixtureData['business_unit']['fax'], $row['fax']);
                 $this->assertEquals($this->fixtureData['business_unit']['email'], $row['email']);
                 $this->assertEquals($this->fixtureData['business_unit']['website'], $row['website']);
-                $this->assertEquals('default', $row['organization']);
-                $this->assertEmpty($row['users']);
+                $this->assertArrayHasKey('organization', $row);
+                $this->assertEquals(1, $row['organization']['id']);
+                $this->assertEquals('default', $row['organization']['name']);
             }
         }
 
@@ -124,8 +124,9 @@ class RestApiTest extends WebTestCase
         $this->assertEquals($this->fixtureData['business_unit']['fax'], $responseData['fax']);
         $this->assertEquals($this->fixtureData['business_unit']['email'], $responseData['email']);
         $this->assertEquals($this->fixtureData['business_unit']['website'], $responseData['website']);
-        $this->assertEquals('default', $responseData['organization']);
-        $this->assertEmpty($responseData['users']);
+        $this->assertArrayHasKey('organization', $responseData);
+        $this->assertEquals(1, $responseData['organization']['id']);
+        $this->assertEquals('default', $responseData['organization']['name']);
     }
 
     /**

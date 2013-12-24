@@ -7,9 +7,7 @@ use Symfony\Component\Security\Core\Role\Role as BaseRole;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 
-use JMS\Serializer\Annotation\Type;
-
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -32,6 +30,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  *  }
  * )
+ * @JMS\ExclusionPolicy("ALL")
  */
 class Role extends BaseRole
 {
@@ -41,8 +40,8 @@ class Role extends BaseRole
      * @ORM\Id
      * @ORM\Column(type="smallint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int", nillable=true)
-     * @Type("integer")
+     * @JMS\Type("integer")
+     * @JMS\Expose
      */
     protected $id;
 
@@ -50,7 +49,8 @@ class Role extends BaseRole
      * @var string
      *
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $role;
 
@@ -58,8 +58,8 @@ class Role extends BaseRole
      * @var string
      *
      * @ORM\Column(type="string", length=30)
-     * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $label;
 
@@ -67,7 +67,6 @@ class Role extends BaseRole
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $owner;
 

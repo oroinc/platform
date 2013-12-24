@@ -93,6 +93,7 @@ class OwnerTree
      * @param array $data Initialization array
      * @return OwnerTree A new instance of a OwnerTree object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         $result = new OwnerTree();
@@ -102,6 +103,7 @@ class OwnerTree
 
         return $result;
     }
+    // @codingStandardsIgnoreEnd
 
     /**
      * Gets the owning organization id for the given user id

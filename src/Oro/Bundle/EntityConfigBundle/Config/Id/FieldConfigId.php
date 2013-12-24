@@ -124,6 +124,7 @@ class FieldConfigId implements ConfigIdInterface
      * @param array $data Initialization array
      * @return FieldConfigId A new instance of a FieldConfigId object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         return new FieldConfigId(
@@ -133,4 +134,5 @@ class FieldConfigId implements ConfigIdInterface
             $data['fieldType']
         );
     }
+    // @codingStandardsIgnoreEnd
 }

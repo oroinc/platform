@@ -5,8 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
@@ -24,7 +23,7 @@ class EmailBody
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Type("integer")
+     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -32,7 +31,7 @@ class EmailBody
      * @var \DateTime $created
      *
      * @ORM\Column(name="created", type="datetime")
-     * @Type("dateTime")
+     * @JMS\Type("dateTime")
      */
     protected $created;
 
@@ -41,7 +40,7 @@ class EmailBody
      *
      * @ORM\Column(name="body", type="text")
      * @Soap\ComplexType("string", name="content")
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $bodyContent;
 
@@ -50,7 +49,7 @@ class EmailBody
      *
      * @ORM\Column(name="body_is_text", type="boolean")
      * @Soap\ComplexType("boolean")
-     * @Type("boolean")
+     * @JMS\Type("boolean")
      */
     protected $bodyIsText;
 
@@ -58,7 +57,7 @@ class EmailBody
      * @var bool
      *
      * @ORM\Column(name="has_attachments", type="boolean")
-     * @Type("boolean")
+     * @JMS\Type("boolean")
      */
     protected $hasAttachments;
 
@@ -66,7 +65,7 @@ class EmailBody
      * @var bool
      *
      * @ORM\Column(name="persistent", type="boolean")
-     * @Type("boolean")
+     * @JMS\Type("boolean")
      */
     protected $persistent;
 
@@ -75,7 +74,7 @@ class EmailBody
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailBody")
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id")
-     * @Exclude
+     * @JMS\Exclude
      */
     protected $header;
 
@@ -85,7 +84,7 @@ class EmailBody
      * @ORM\OneToMany(targetEntity="EmailAttachment", mappedBy="emailBody",
      *      cascade={"persist", "remove"}, orphanRemoval=true)
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailAttachment[]")
-     * @Exclude
+     * @JMS\Exclude
      */
     protected $attachments;
 

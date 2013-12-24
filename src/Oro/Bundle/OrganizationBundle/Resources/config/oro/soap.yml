@@ -1,2 +1,3 @@
 classes:
     - Oro\Bundle\OrganizationBundle\Controller\Api\Soap\BusinessUnitController
+    - Oro\Bundle\OrganizationBundle\Controller\Api\Soap\OrganizationController

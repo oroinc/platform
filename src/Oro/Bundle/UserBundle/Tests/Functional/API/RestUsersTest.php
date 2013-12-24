@@ -33,7 +33,7 @@ class RestUsersTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
-                "rolesCollection" => array("3"),
+                "roles" => array("3"),
                 "owner" => "1",
             )
         );
@@ -98,8 +98,8 @@ class RestUsersTest extends WebTestCase
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
-        $this->assertEquals($request['user']['firstName'], $result['First Name']);
-        $this->assertEquals($request['user']['lastName'], $result['Last Name']);
+        $this->assertEquals($request['user']['firstName'], $result['firstName']);
+        $this->assertEquals($request['user']['lastName'], $result['lastName']);
     }
 
     public function testFilterUserNonExist()
