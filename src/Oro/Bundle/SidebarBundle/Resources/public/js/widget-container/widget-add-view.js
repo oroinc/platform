@@ -31,6 +31,7 @@ define(function (require) {
             options.content = _.template(widgetAddTemplate, {
                 'availableWidgets': options.sidebar.getAvailableWidgets()
             });
+            options.title = 'Select widget to add';
 
             Modal.prototype.initialize.apply(this, arguments);
         },

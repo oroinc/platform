@@ -1,11 +1,9 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Controller\Api\Soap;
 
-use Symfony\Component\Form\FormInterface;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class BusinessUnitController extends SoapController
@@ -14,7 +12,7 @@ class BusinessUnitController extends SoapController
      * @Soap\Method("getBusinessUnits")
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
-     * @Soap\Result(phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnit[]")
+     * @Soap\Result(phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnitSoap[]")
      * @AclAncestor("oro_business_unit_view")
      */
     public function cgetAction($page = 1, $limit = 10)
@@ -25,7 +23,7 @@ class BusinessUnitController extends SoapController
     /**
      * @Soap\Method("getBusinessUnit")
      * @Soap\Param("id", phpType = "int")
-     * @Soap\Result(phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
+     * @Soap\Result(phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnitSoap")
      * @AclAncestor("oro_business_unit_view")
      */
     public function getAction($id)
@@ -35,7 +33,7 @@ class BusinessUnitController extends SoapController
 
     /**
      * @Soap\Method("createBusinessUnit")
-     * @Soap\Param("business_unit", phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
+     * @Soap\Param("business_unit", phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnitSoap")
      * @Soap\Result(phpType = "int")
      * @AclAncestor("oro_business_unit_create")
      */
@@ -47,7 +45,7 @@ class BusinessUnitController extends SoapController
     /**
      * @Soap\Method("updateBusinessUnit")
      * @Soap\Param("id", phpType = "int")
-     * @Soap\Param("business_unit", phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
+     * @Soap\Param("business_unit", phpType = "Oro\Bundle\OrganizationBundle\Entity\BusinessUnitSoap")
      * @Soap\Result(phpType = "boolean")
      * @AclAncestor("oro_business_unit_update")
      */
@@ -65,6 +63,20 @@ class BusinessUnitController extends SoapController
     public function deleteAction($id)
     {
         return $this->handleDeleteRequest($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array $data, $entity)
+    {
+        $result = parent::fixFormData($data, $entity);
+
+        unset($result['id']);
+        unset($result['createdAt']);
+        unset($result['updatedAt']);
+
+        return $result;
     }
 
     /**

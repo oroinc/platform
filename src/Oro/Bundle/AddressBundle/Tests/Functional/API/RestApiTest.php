@@ -22,158 +22,6 @@ class RestApiTest extends WebTestCase
     }
 
     /**
-     * Test POST
-     *
-     */
-    public function testCreateAddress()
-    {
-        $requestData = array('address' =>
-            array(
-                'street'      => 'Some kind st.',
-                'city'        => 'Old York',
-                'state'       => 'US.AL',
-                'country'     => 'US',
-                'postalCode'  => '32422',
-            )
-        );
-
-        $this->client->request(
-            'POST',
-            $this->client->generate('oro_api_post_address'),
-            $requestData
-        );
-
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 201);
-
-        $responseData = $result->getContent();
-        $this->assertNotEmpty($responseData);
-        $responseData = json_decode($responseData, true);
-        $this->assertInternalType('array', $responseData);
-        $this->assertArrayHasKey('id', $responseData);
-
-        return $responseData['id'];
-    }
-
-    /**
-     * Test GET
-     *
-     * @depends testCreateAddress
-     */
-    public function testGetAddress($id)
-    {
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_api_get_address', array('id' => $id))
-        );
-
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 200);
-        $resultJson = json_decode($result->getContent(), true);
-
-        $this->assertNotEmpty($resultJson);
-        $this->assertArrayHasKey('id', $resultJson);
-
-        $this->assertEquals($id, $resultJson['id']);
-    }
-
-    /**
-     * Test GET
-     *
-     * @depends testCreateAddress
-     */
-    public function testGetAddresses($id)
-    {
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_api_get_addresses')
-        );
-
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 200);
-        $resultJson = json_decode($result->getContent(), true);
-
-        $this->assertNotEmpty($resultJson);
-        $this->assertArrayHasKey(0, $resultJson);
-        $this->assertArrayHasKey('id', $resultJson[0]);
-
-        $this->assertEquals($id, $resultJson[0]['id']);
-    }
-
-    /**
-     * Test PUT
-     *
-     * @depends testCreateAddress
-     */
-    public function testUpdateAddress($id)
-    {
-        // update
-        $requestData = array('address' =>
-            array(
-                'street'      => 'Updated street',
-                'street2'      => 'street2 UP'
-            )
-        );
-
-        $this->client->request(
-            'PUT',
-            $this->client->generate('oro_api_put_address', array('id' => $id)),
-            $requestData
-        );
-
-        $result = $this->client->getResponse();
-
-        ToolsAPI::assertJsonResponse($result, 204);
-
-        // open address by id
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_api_get_address', array('id' => $id))
-        );
-
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-
-        $result = json_decode($result->getContent(), true);
-
-        // compare result
-        foreach ($requestData['address'] as $key => $value) {
-            $this->assertEquals($value, $result[$key]);
-        }
-    }
-
-    /**
-     * Test DELETE
-     *
-     * @depends testCreateAddress
-     */
-    public function testDeleteAddress($id)
-    {
-        $this->client->request(
-            'DELETE',
-            $this->client->generate('oro_api_delete_address', array('id' => $id))
-        );
-
-        /** @var $result Response */
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
-
-        $this->client->request(
-            'GET',
-            $this->client->generate('oro_api_get_address', array('id' => $id))
-        );
-
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 404);
-    }
-
-    /**
      * @return array
      */
     public function testGetCountries()
@@ -199,7 +47,7 @@ class RestApiTest extends WebTestCase
         foreach ($countries as $country) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_country', array('id' => $country['iso2_code']))
+                $this->client->generate('oro_api_get_country', array('id' => $country['iso2code']))
             );
             /** @var $result Response */
             $result = $this->client->getResponse();
@@ -220,10 +68,10 @@ class RestApiTest extends WebTestCase
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
         $result = ToolsAPI::jsonToArray($result->getContent());
-        $this->assertEquals('US.LA', $result['combined_code']);
+        $this->assertEquals('US.LA', $result['combinedCode']);
     }
 
-    public function testGetCountryRegion()
+    public function testGetCountryRegions()
     {
         $this->client->request(
             'GET',
@@ -237,7 +85,7 @@ class RestApiTest extends WebTestCase
             $this->client->request(
                 'GET',
                 $this->client->generate('oro_api_get_region'),
-                array('id' => $region['combined_code'])
+                array('id' => $region['combinedCode'])
             );
             /** @var $result Response */
             $expectedResult = $this->client->getResponse();

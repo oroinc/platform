@@ -318,9 +318,9 @@
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
-                <elementProp name="oro_user_user_form[rolesCollection][]" elementType="HTTPArgument">
+                <elementProp name="oro_user_user_form[roles][]" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.name">oro_user_user_form[rolesCollection][]</stringProp>
+                  <stringProp name="Argument.name">oro_user_user_form[roles][]</stringProp>
                   <stringProp name="Argument.value">1</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
@@ -615,9 +615,9 @@
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>
                 </elementProp>
-                <elementProp name="oro_user_user_form[rolesCollection][]" elementType="HTTPArgument">
+                <elementProp name="oro_user_user_form[roles][]" elementType="HTTPArgument">
                   <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.name">oro_user_user_form[rolesCollection][]</stringProp>
+                  <stringProp name="Argument.name">oro_user_user_form[roles][]</stringProp>
                   <stringProp name="Argument.value">4</stringProp>
                   <stringProp name="Argument.metadata">=</stringProp>
                   <boolProp name="HTTPArgument.use_equals">true</boolProp>

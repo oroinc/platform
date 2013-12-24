@@ -2,19 +2,24 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\Rest\Util\Codes;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailApiEntityManager;
-use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 
 /**
  * @RouteResource("email")
@@ -67,6 +72,55 @@ class EmailController extends RestGetController
     public function getAction($id)
     {
         return $this->handleGetRequest($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function transformEntityField($field, &$value)
+    {
+        switch ($field) {
+            case 'fromEmailAddress':
+                if ($value) {
+                    /** @var EmailAddress $value */
+                    $value = $value->getEmail();
+                }
+                break;
+            case 'folder':
+                if ($value) {
+                    /** @var EmailFolder $value */
+                    $value = $value->getFullName();
+                }
+                break;
+            case 'emailBody':
+                if ($value) {
+                    /** @var EmailBody $value */
+                    $value = array(
+                        'content' => $value->getContent(),
+                        'isText' => $value->getBodyIsText(),
+                        'hasAttachments' => $value->getHasAttachments(),
+                    );
+                }
+                break;
+            case 'recipients':
+                if ($value) {
+                    $result = array();
+                    /** @var $recipient EmailRecipient */
+                    foreach ($value as $index => $recipient) {
+                        $result[$index] = array(
+                            'name' => $recipient->getName(),
+                            'type' => $recipient->getType(),
+                            'emailAddress' => $recipient->getEmailAddress() ?
+                                $recipient->getEmailAddress()->getEmail()
+                                : null,
+                        );
+                    }
+                    $value = $result;
+                }
+                break;
+            default:
+                parent::transformEntityField($field, $value);
+        }
     }
 
     /**

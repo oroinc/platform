@@ -4,10 +4,7 @@ parameters:
     oro_entity_config.config_audit_mamanger.class:              Oro\Bundle\EntityConfigBundle\Audit\AuditManager
     oro_entity_config.cache.cache.class:                        Oro\Bundle\EntityConfigBundle\Config\ConfigCache
     oro_entity_config.provider_bag.class:                       Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag
-
-    oro_entity_config.event_listener.option_set_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\OptionSetListener
-    oro_entity.translation.config_translator.class:             Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslator
-
+    oro_entity_config.event_listener.option_set_listener.class:        Oro\Bundle\EntityConfigBundle\EventListener\OptionSetListener
     oro_entity_config.event_listener.entityconfig_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigGridListener
     oro_entity_config.event_listener.entityfields_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
 
@@ -102,14 +99,3 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.audit-log-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.auditfield-log-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.before.auditfield-log-grid, method: onBuildBefore }
-
-
-    oro_entity.translation.config_translator.loader:
-        class: %oro_entity.translation.config_translator.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @translator
-        calls:
-            - [ registerResources, [ @translator ] ]
-        tags:
-            - { name: translation.loader, alias: php }

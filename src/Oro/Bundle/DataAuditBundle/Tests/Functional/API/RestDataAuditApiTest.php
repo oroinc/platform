@@ -38,7 +38,7 @@ class RestDataAuditApiTest extends WebTestCase
                 "middleName" => "middleName",
                 "lastName" => "lastName",
                 "nameSuffix" => "Sn.",
-                "rolesCollection" => array("2"),
+                "roles" => array("2"),
                 "owner" => "1",
             )
         );

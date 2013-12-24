@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 /**
@@ -20,7 +20,7 @@ class InternalEmailOrigin extends EmailOrigin
      *
      * @ORM\Column(name="internal_name", type="string", length=30)
      * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $name;
 
