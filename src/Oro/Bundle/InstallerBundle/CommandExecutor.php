@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\InstallerBundle\Process;
+namespace Oro\Bundle\InstallerBundle;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
