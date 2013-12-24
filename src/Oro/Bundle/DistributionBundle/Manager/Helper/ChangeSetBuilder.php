@@ -87,4 +87,4 @@ class ChangeSetBuilder
 
         return $package1->getSourceReference() == $package2->getSourceReference();
     }
-} 
+}
