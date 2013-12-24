@@ -13,17 +13,11 @@ security:
             prefix: sf2_acl_
 
     providers:
-        chain_provider:
-            chain:
-                providers:                  [in_memory, oro_user]
         oro_user:
-            id:                             oro_distribution.security.provider
-        in_memory:
-            memory:
-                users:                      []
+            entity: { class: OroDistributionBundle:User, property: username }
 
     encoders:
-        Oro\Bundle\UserBundle\Entity\User: sha512
+        Oro\Bundle\DistributionBundle\Entity\User: sha512
         Symfony\Component\Security\Core\User\User: plaintext
 
     firewalls:
@@ -36,14 +30,14 @@ security:
             security:                       false
 
         main:
-            pattern:                        ^/
-            provider:                       chain_provider
+            pattern:                          ^/
+            provider:                         oro_user
             form_login:
               check_path:                     oro_distribution_security_login_check
               login_path:                     oro_distribution_security_login
               default_target_path:            oro_distribution_package_listinstalled
               always_use_default_target_path: true
-            anonymous:                      ~
+            anonymous:                        ~
             logout:
               path:   /logout
               target: /
