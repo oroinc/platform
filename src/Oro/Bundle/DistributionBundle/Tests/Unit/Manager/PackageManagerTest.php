@@ -18,6 +18,7 @@ use Composer\Repository\RepositoryManager;
 use Composer\Repository\WritableArrayRepository;
 use Composer\Installer\InstallationManager;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
+use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
@@ -315,6 +316,141 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         unlink($tempComposerJson);
 
         $this->assertEquals($expectedJsonData, $updatedComposerData);
+    }
+
+    /**
+     * @test
+     */
+    public function throwVerboseExceptionWhenInstallationFailed()
+    {
+        $newPackageName = 'new-vendor/new-package';
+        $newPackageVersion = 'v3';
+        $newPackage = $this->getPackage($newPackageName, $newPackageVersion);
+
+        // temporary composer.json data
+        $composerJsonData = [
+            'require' => [
+                'vendor1/package1' => 'v1',
+                'vendor2/package2' => 'v2',
+            ]
+        ];
+
+        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        file_put_contents($tempComposerJson, json_encode($composerJsonData));
+
+        // composer and repository
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = new WritableArrayRepository($installedPackages = [$newPackage]);
+
+        $composer->expects($this->any())
+            ->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        $repositoryManager->expects($this->once())
+            ->method('getRepositories')
+            ->will($this->returnValue([$localRepository]));
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        $rootPackageMock = $composer->getPackage();
+
+        $composer->expects($this->once())
+            ->method('getPackage')
+            ->will($this->returnValue($rootPackageMock));
+
+        $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 1);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, null, $tempComposerJson);
+
+        try {
+            $manager->install($newPackage->getName());
+        } catch (VerboseException $e) {
+            $composerDataAfterFail = json_decode(file_get_contents($tempComposerJson), true);
+            unlink($tempComposerJson);
+
+            $this->assertEquals("{$newPackageName} can't be installed!", $e->getMessage());
+            return $this->assertEquals($composerJsonData, $composerDataAfterFail);
+        }
+
+        unlink($tempComposerJson);
+        $this->fail('Exception wasn\'t caught');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRemoveNewPackageFromJsonAndRethrowRunnerExceptionDuringInstallation()
+    {
+        $newPackageName = 'new-vendor/new-package';
+        $newPackageVersion = 'v3';
+        $newPackage = $this->getPackage($newPackageName, $newPackageVersion);
+
+        // temporary composer.json data
+        $composerJsonData = [
+            'require' => [
+                'vendor1/package1' => 'v1',
+                'vendor2/package2' => 'v2',
+            ]
+        ];
+
+        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        file_put_contents($tempComposerJson, json_encode($composerJsonData));
+
+        // composer and repository
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = $this->getMock('Composer\Repository\WritableArrayRepository');
+
+        $composer->expects($this->any())
+            ->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+
+        // Local repository
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        // Fetch previous installed
+        $localRepository->expects($this->at(0))
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue([]));
+        // Fetch packages after install
+        $localRepository->expects($this->at(1))
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue([$newPackage]));
+
+        // Package repositories
+        $repositoryManager->expects($this->once())
+            ->method('getRepositories')
+            ->will($this->returnValue([new WritableArrayRepository($installedPackages = [$newPackage])]));
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        $rootPackageMock = $composer->getPackage();
+
+        $composer->expects($this->once())
+            ->method('getPackage')
+            ->will($this->returnValue($rootPackageMock));
+
+        $scriptRunner = $this->createScriptRunnerMock();
+        $scriptRunner->expects($this->any())
+            ->method('install')
+            ->will($this->throwException($thrownException = new \Exception));
+
+        $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $scriptRunner, $tempComposerJson);
+
+        try {
+            $manager->install($newPackage->getName());
+        } catch (\Exception $e) {
+            $composerDataAfterFail = json_decode(file_get_contents($tempComposerJson), true);
+            unlink($tempComposerJson);
+
+            $this->assertSame($thrownException, $e);
+            return $this->assertEquals($composerJsonData, $composerDataAfterFail);
+        }
+
+        unlink($tempComposerJson);
+        $this->fail('Exception wasn\'t caught');
     }
 
     /**
