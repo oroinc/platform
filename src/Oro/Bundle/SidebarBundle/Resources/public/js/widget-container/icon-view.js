@@ -1,9 +1,15 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
 
-define(['jquery', 'underscore', 'backbone', 'text!oro/sidebar/widget-container/icon-template'
-    ], function ($, _, Backbone, iconTemplate) {
+define(function (require) {
     'use strict';
+
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var Backbone = require('backbone');
+
+    var iconTemplate = require('text!oro/sidebar/widget-container/icon-template');
+    var constants = require('oro/sidebar/constants');
 
     /**
      * @export  oro/sidebar/widget-controller/icon-view
@@ -29,6 +35,12 @@ define(['jquery', 'underscore', 'backbone', 'text!oro/sidebar/widget-container/i
 
             view.$el.html(view.template(model.toJSON()));
             view.$el.attr('data-cid', model.cid);
+
+            if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                view.$el.addClass('sidebar-icon-active');
+            } else {
+                view.$el.removeClass('sidebar-icon-active');
+            }
 
             return view;
         },
