@@ -3,7 +3,6 @@
 
 {% oro_title_set({params : {"%business_unit.name%": entity.name|default('N/A') }}) %}
 {% set audit_entity_class = 'Oro_Bundle_OrganizationBundle_Entity_BusinessUnit' %}
-{% set gridName = 'bu-view-users-grid' %}
 
 {% block navButtons %}
     {% if resource_granted('oro_business_unit_update') %}
@@ -35,41 +34,38 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% set id = 'business-unit-profile' %}
-    {% set dataSubBlocks = [] %}
-    {% set dataBlocks = [{
-        'title': 'General',
-        'class': 'active',
-        'subblocks': [
-            {
-                'title': 'Basic Information',
-                'data': [
-                    UI.attibuteRow('oro.organization.businessunit.name.label', entity.name),
-                    UI.attibuteRow('oro.organization.businessunit.phone.label', entity.phone),
-                    UI.attibuteRow('oro.organization.businessunit.organization.label', entity.organization),
-                    UI.attibuteRow('oro.organization.businessunit.website.label', entity.website),
-                    UI.attibuteRow('oro.organization.businessunit.email.label', entity.email),
-                    UI.attibuteRow('oro.organization.businessunit.fax.label', entity.fax),
-                ]
-            }
-        ]
-    }] %}
+    {% set businessUnitInformationWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_business_unit_widget_info', {id: entity.id})
+        }) }}
+    {% endset %}
 
-    {% set dataBlocks = dataBlocks|merge([{
-        'title': 'oro.organization.businessunit.users.label',
-        'subblocks':
-        [
-            {
-                'title' : null,
-                'useSpan': false,
-                'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entity.id}, { cssClass: 'inner-grid' })]
-            }
-        ]
-    }]) %}
+    {% set businessUnitEmailsWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_business_unit_widget_users', {id: entity.id}),
+            'cssClass': 'inner-grid'
+        }) }}
+    {% endset %}
 
-    {% set data = {
-        'dataBlocks': dataBlocks,
-    } %}
+    {% set dataBlocks = [
+        {
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [businessUnitInformationWidget]}
+            ]
+        },
+        {
+            'title': 'oro.organization.businessunit.users.label'|trans,
+            'subblocks': [
+                {'data' : [businessUnitEmailsWidget]}
+            ]
+        },
+    ] %}
 
+    {% set id = 'businessUnitView' %}
+    {% set data = { 'dataBlocks': dataBlocks } %}
     {{ parent() }}
 {% endblock content_data %}

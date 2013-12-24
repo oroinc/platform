@@ -189,8 +189,8 @@
             {% if (parameters.dataId is defined) %}
                 data-id="{{ parameters.dataId }}"
             {% endif %}
-            data-message="{{ parameters.dataMessage is defined ? parameters.dataMessage|trans : 'Are you sure you want to delete this %entity_label%?'|trans({ '%entity_label%' : parameters.entity_label ? parameters.entity_label|lower : 'item'|trans }) }}"
-            data-success-message="{{ parameters.successMessage is defined ? parameters.successMessage|trans : '%entity_label% deleted'|trans({ '%entity_label%' : parameters.entity_label ? parameters.entity_label : 'Item'|trans }) }}"
+            data-message="{{ parameters.dataMessage is defined ? parameters.dataMessage|trans : 'Are you sure you want to delete this %entity_label%?'|trans({ '%entity_label%' : parameters.entity_label is defined ? parameters.entity_label|lower : 'item'|trans }) }}"
+            data-success-message="{{ parameters.successMessage is defined ? parameters.successMessage|trans : '%entity_label% deleted'|trans({ '%entity_label%' : parameters.entity_label is defined ? parameters.entity_label : 'Item'|trans }) }}"
             {% if (parameters.dataUrl is defined) %}
                 data-url="{{ parameters.dataUrl }}"
             {% endif %}
@@ -347,7 +347,7 @@
                 <div class="form-horizontal">
             {% endif %}
                 {% for subblock in subblocks %}
-                    {{ _self.scrollSubblock(subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
+                    {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
                 {% endfor %}
             {% if isForm is defined and isForm == true %}
                 </fieldset>
@@ -502,3 +502,24 @@
         {% endif %}
     {% endif -%}
 {% endmacro %}
+
+{%- macro renderUrl(url, title, class) -%}
+    {% if title is empty %}
+        {% set title = url %}
+    {% endif %}
+    {% if class is empty %}
+        {% set class = '' %}
+    {% endif %}
+    {% if url is not empty %}
+        <a href="{{ url|raw }}" title="{{ title|escape }}" class="{{ class }}">{{ title }}</a>
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro renderPhone(phone, title) -%}
+    {% if title is empty %}
+        {% set title = phone %}
+    {% endif %}
+    {% if phone is not empty %}
+        <a href="tel:{{ phone|raw }}" title="{{ title|escape }}">{{ title }}</a>
+    {% endif %}
+{%- endmacro -%}

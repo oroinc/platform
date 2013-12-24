@@ -12,7 +12,7 @@ To mark an entity as ACL protected, the next config to the @Configurable annotat
 ``` php
 /**
 ...
-* @Configurable(
+* @Config(
 *  defaultValues={
     ...
 *      "security"={
@@ -27,6 +27,8 @@ To mark an entity as ACL protected, the next config to the @Configurable annotat
  */
  class MyEntity
 ```
+**NOTE:** after changing ACL in Config annotation you should run oro:entity-config:update command in console to apply changes
+
 **permissions** parameter is used is used to specify the access list for the entity. This parameter is optional.
 If it is not specified, or is "All", it is considered that the entity access to all available security permissions.
 

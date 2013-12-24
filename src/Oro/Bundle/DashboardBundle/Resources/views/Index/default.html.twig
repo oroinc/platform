@@ -22,7 +22,7 @@
 {% import _self as __ %}
 
 {% block content %}
-<div class="layout-content">
+<div class="layout-content dashboard-contailer">
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra">
             <div class="row">
@@ -53,7 +53,7 @@
                             function($, routing, Navigation){
                                 $(function () {
                                     $('#dashboard_selector').on('change', function (e) {
-                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}),
+                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}) + '?change_dashboard=true',
                                             navigation = Navigation.getInstance();
                                         if (navigation) {
                                             navigation.processRedirect({

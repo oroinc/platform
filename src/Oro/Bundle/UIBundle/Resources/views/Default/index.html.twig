@@ -27,18 +27,6 @@
                     require(['oro/app'], function(app){app.debug = true;});
                 {% endif %}
                 </script>
-                <!--[if lte IE 9]>
-                <link href="{{ asset('bundles/oroui/css/ie.css') }}" rel="stylesheet" media="all" />
-                <script type="text/javascript">
-                    require.config({shim: {'oroui/lib/jquery/jquery.placeholder': {deps: ['jquery']}}});
-                    require(['jquery', 'oroui/lib/html5', 'oroui/lib/jquery/jquery.placeholder'],
-                    function($){
-                        $(function() {
-                            $('input[placeholder], textarea[placeholder]').placeholder();
-                        });
-                    });
-                </script>
-                <![endif]-->
                 {% block hash_nav %}
                     {% placeholder hash_nav %}
                 {% endblock %}
@@ -94,10 +82,10 @@
             {% block main %}
                 <div id="main" >
                     {% block right_panel %}
-                        {% placeholder right_panel %}
+                        {% placeholder right_panel with {placement: 'right'} %}
                     {% endblock right_panel %}
                     {% block left_panel %}
-                        {% placeholder left_panel %}
+                        {% placeholder left_panel with {placement: 'left'} %}
                     {% endblock left_panel %}
                     {% block before_content %}
                     <div class="breadcrumb-pin">

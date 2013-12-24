@@ -1,0 +1,44 @@
+{% if isDesktopVersion() %}
+<div id="sidebar-{{ placement }}" class="sidebar sidebar-{{ placement }}"></div>
+
+<script type="text/javascript">
+    require(['jquery', 'oro/sidebar/sidebar/model', 'oro/sidebar/sidebar/view',
+        'oro/sidebar/widget-container/collection', 'oro/sidebar/constants'],
+    function($, SidebarModel, SidebarView, WidgetContainerCollection, constants) {
+        'use strict';
+
+        $(function () {
+            {%- set sidebarData -%}
+                {{ render(path('oro_api_get_sidebars', {'position': 'SIDEBAR_' ~ placement|upper}))|raw }}
+            {%- endset -%}
+            {% if sidebarData is not empty %}
+            var sidebarData = {{ sidebarData }};
+            {% else %}
+            var sidebarData = {position: constants.SIDEBAR_{{ placement|upper }} };
+            {% endif %}
+            var sidebarModel = new SidebarModel(sidebarData);
+            var widgets = new WidgetContainerCollection();
+            var availableWidgets = {{ oro_sidebar_get_available_widgets(placement)|json_encode|raw }};
+
+            sidebarModel.urlRoot = {{ path('oro_api_post_sidebars')|json_encode|raw }};
+            widgets.url = {{ path('oro_api_post_sidebarwidgets')|json_encode|raw }};
+
+            new SidebarView({
+                model: sidebarModel,
+                availableWidgets: availableWidgets,
+                widgets: widgets,
+                el: '#sidebar-{{ placement }}',
+                $main: $('#main')
+            });
+
+            widgets.reset({{ render(path('oro_api_get_sidebarwidgets', {'placement': placement})) }});
+
+            widgets.each(function (widget) {
+                var name = widget.get('widgetName');
+                var originalWidget = availableWidgets[name];
+                widget.update(originalWidget);
+            });
+        });
+    });
+</script>
+{% endif %}
