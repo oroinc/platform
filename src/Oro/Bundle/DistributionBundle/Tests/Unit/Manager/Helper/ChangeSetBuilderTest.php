@@ -8,8 +8,6 @@ use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 
 class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    use MockHelperTrait;
-
     /**
      * @test
      */
@@ -21,7 +19,7 @@ class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function should()
+    public function shouldReturnInstalledUpdatedAndUninstalledPackages()
     {
         $package1 = $this->createPackageMock('name1', 'ref1');
         $package2 = $this->createPackageMock('name2', 'ref2');
@@ -30,7 +28,7 @@ class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
         $package4 = $this->createPackageMock('name4', 'ref4');
 
         $previousInstalledPackages = [$package1, $package2, $package3];
-        $currentlyInstalledPackages = [          $package21, $package3, $package4];
+        $currentlyInstalledPackages = [$package21, $package3, $package4];
 
         $expectedInstalled = [$package4];
         $expectedUpdated = [$package21];
@@ -54,7 +52,7 @@ class ChangeSetBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected function createPackageMock($name, $sourceReference)
     {
-        $package = $this->createConstructorLessMock('Composer\Package\PackageInterface');
+        $package = $this->getMock('Composer\Package\PackageInterface');
         $package->expects($this->any())
             ->method('getName')
             ->will($this->returnValue($name));

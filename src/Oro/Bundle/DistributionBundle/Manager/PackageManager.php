@@ -51,7 +51,7 @@ class PackageManager
     /**
      * @var array
      */
-    protected $constantPackages;
+    protected $constantPackages = ['oro/platform', 'oro/platform-dist'];
 
     /**
      * @var Pool
@@ -77,8 +77,6 @@ class PackageManager
         $this->composerIO = $composerIO;
         $this->scriptRunner = $scriptRunner;
         $this->pathToComposerJson = $pathToComposerJson;
-
-        $this->constantPackages = ['oro/platform', 'oro/platform-dist'];
     }
 
     /**

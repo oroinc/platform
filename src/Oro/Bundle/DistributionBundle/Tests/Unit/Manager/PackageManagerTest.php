@@ -126,13 +126,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $packagistRepositoryMock->expects($this->never())
-            ->method('getProviderNames')
-            ->will($this->returnValue(['name7', 'name8']));
+            ->method('getProviderNames');
 
         $packagistRepositoryMock->expects($this->any())
             ->method('whatProvides')
             ->will($this->returnValue([]));
-
 
         // from composer repo without providers
         $composerRepositoryWithoutProvidersMock->expects($this->any())
@@ -501,26 +499,35 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
      * @test
      *
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Package
+     * @expectedExceptionMessage Package oro/platform is not deletable
      */
-    public function throwsExceptionWhenTryingToUninstallConstantPackage()
+    public function throwsExceptionWhenTryingToUninstallPlatform()
     {
         $manager = $this->createPackageManager();
-        $this->writeAttribute($manager, 'constantPackages', ['vendor1/package1']);
+        $manager->uninstall(['oro/platform']);
+    }
 
-        $manager->uninstall(['vendor1/package1']);
+    /**
+     * @test
+     *
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Package oro/platform-dist is not deletable
+     */
+    public function throwsExceptionWhenTryingToUninstallPlatformDist()
+    {
+        $manager = $this->createPackageManager();
+        $manager->uninstall(['oro/platform-dist']);
     }
 
     /**
      * @test
      */
-    public function shouldNotAllowToDeleteConstantPackages()
+    public function shouldNotAllowToDeletePlatformAndPlatformDist()
     {
         $manager = $this->createPackageManager();
-        $this->writeAttribute($manager, 'constantPackages', ['vendor1/package1']);
 
-        $this->assertTrue($manager->canBeDeleted('any-vendor/any-package'));
-        $this->assertFalse($manager->canBeDeleted('vendor1/package1'));
+        $this->assertFalse($manager->canBeDeleted('oro/platform'));
+        $this->assertFalse($manager->canBeDeleted('oro/platform-dist'));
     }
 
     /**
