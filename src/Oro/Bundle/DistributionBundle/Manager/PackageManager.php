@@ -15,7 +15,6 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
-use Composer\Script\ScriptEvents;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
@@ -57,6 +56,7 @@ class PackageManager
      * @var Pool
      */
     protected $pool;
+
 
     /**
      * @param Composer $composer
@@ -256,25 +256,31 @@ class PackageManager
         $previousInstalled = $this->getFlatListInstalledPackage();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
-        if ($this->doInstall($package->getName())) {
-            $installedPackages = $this->getInstalled();
-            $justInstalledPackages = array_filter(
-                $installedPackages,
-                function (PackageInterface $package) use ($previousInstalled) {
-                    return !in_array($package->getName(), $previousInstalled);
-                }
-            );
-            array_map(
-                function (PackageInterface $package) {
-                    $this->scriptRunner->install($package);
-                },
-                $justInstalledPackages
-            );
-        } else {
-            throw new VerboseException(
-                sprintf('%s can\'t be installed!', $packageName),
-                $this->composerIO->getOutput()
-            );
+
+        try {
+            if ($this->doInstall($package->getName())) {
+                $installedPackages = $this->getInstalled();
+                $justInstalledPackages = array_filter(
+                    $installedPackages,
+                    function (PackageInterface $package) use ($previousInstalled) {
+                        return !in_array($package->getName(), $previousInstalled);
+                    }
+                );
+                array_map(
+                    function (PackageInterface $package) {
+                        $this->scriptRunner->install($package);
+                    },
+                    $justInstalledPackages
+                );
+            } else {
+                throw new VerboseException(
+                    sprintf('%s can\'t be installed!', $packageName),
+                    $this->composerIO->getOutput()
+                );
+            }
+        } catch (\Exception $e) {
+            $this->removeFromComposerJson([$packageName]);
+            throw $e;
         }
     }
 
