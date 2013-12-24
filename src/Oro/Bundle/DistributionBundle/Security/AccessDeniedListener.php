@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-class AccessDeniedHandler
+class AccessDeniedListener
 {
     /**
      * @var \Symfony\Component\HttpFoundation\Session\Session

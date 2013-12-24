@@ -1,7 +1,7 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 
 {% oro_title_set({params : {
-    "%entityName%": entity_config.get('label')|default('N/A'),
+    "%entityName%": entity_config.get('label')|default('N/A')|trans,
     "%recordName%": 'Item #'~entity.id|default('N/A') },
 }) %}
 
@@ -9,8 +9,7 @@
     {% if resource_granted('EDIT', 'entity:'~entity_class) %}
         {{ UI.editButton({
             'path': path('oro_entity_update', { 'entity_id': parent, id: entity.id }),
-            'title': 'Edit user',
-            'label': 'Edit'
+            'entity_label': entity_config.get('label')|default('N/A')|trans
         }) }}
     {% endif %}
 {% endblock navButtons %}
@@ -61,7 +60,7 @@
             {% set value = data %}
         {% endif %}
 
-        {% set general_fields = general_fields|merge([_self.attibuteRow(key|capitalize, value)])%}
+        {% set general_fields = general_fields|merge([_self.attibuteRow(key|trans, value)])%}
     {% endfor %}
 
     {% set data = { 'dataBlocks': [{
