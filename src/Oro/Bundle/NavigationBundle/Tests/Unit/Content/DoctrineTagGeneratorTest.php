@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\NewEntityStub;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\PersistentCollectionStub;
 
 class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -164,35 +165,81 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testCollectNestingData()
+    /**
+     * @dataProvider collectNestingDataDataProvider
+     *
+     * @param array $associations
+     * @param array $mappings
+     * @param int   $expectedCount
+     */
+    public function testCollectNestingData($associations, $mappings, $expectedCount)
     {
-        $testData        = new EntityStub();
-        $testAssocEntity = new EntityStub();
-        $reflection      = new \ReflectionMethod($this->generator, 'collectNestedDataTags');
+        $testData   = new EntityStub();
+        $reflection = new \ReflectionMethod($this->generator, 'collectNestedDataTags');
         $reflection->setAccessible(true);
-        $this->uow->expects($this->once())->method('getEntityIdentifier')
+        $this->uow->expects($this->any())->method('getEntityIdentifier')
             ->will($this->returnValue(['someIdentifierValue']));
 
         $metadata = new ClassMetadata(self::TEST_ENTITY_NAME);
         $this->em->expects($this->once())->method('getClassMetadata')->with(self::TEST_ENTITY_NAME)
             ->will($this->returnValue($metadata));
 
-        $metadata->associationMappings = [
-            self::TEST_ASSOCIATION_FIELD => [
-                'type' => ClassMetadata::TO_ONE
-            ]
-        ];
+        $metadata->associationMappings = $mappings;
 
-        $field = $this->getMockBuilder('\ReflectionProperty')
-            ->disableOriginalConstructor()->getMock();
-        $field->expects($this->once())->method('getValue')->with($testData)
-            ->will($this->returnValue($testAssocEntity));
-        $metadata->reflFields[self::TEST_ASSOCIATION_FIELD] = $field;
+        foreach ($associations as $name => $dataValue) {
+            $field = $this->getMockBuilder('\ReflectionProperty')
+                ->disableOriginalConstructor()->getMock();
+            $field->expects($this->once())->method('getValue')->with($testData)
+                ->will($this->returnValue($dataValue));
+            $metadata->reflFields[$name] = $field;
+        }
 
         $result = $reflection->invoke($this->generator, $testData);
 
         $this->assertInternalType('array', $result, 'Should always return array');
-        $this->assertCount(1, $result, 'Should not generate collection tag for associations');
+        $this->assertCount($expectedCount, $result, 'Should not generate collection tag for associations');
+    }
+
+    /**
+     * @return array
+     */
+    public function collectNestingDataDataProvider()
+    {
+        return [
+            'should not return any data when no association on entity' => [[], [], 0],
+            'should collect one to one associations'                   =>
+                [
+                    [self::TEST_ASSOCIATION_FIELD => new EntityStub()],
+                    [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_ONE]],
+                    1
+                ],
+            'should collect all collection associations'               =>
+                [
+                    [
+                        self::TEST_ASSOCIATION_FIELD => new PersistentCollectionStub([
+                                new EntityStub(),
+                                new EntityStub()
+                            ])
+                    ],
+                    [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_MANY]],
+                    2
+                ],
+            'should process all associated values'                     =>
+                [
+                    [
+                        self::TEST_ASSOCIATION_FIELD . '_1' => new PersistentCollectionStub([
+                                new EntityStub(),
+                                new EntityStub()
+                            ]),
+                        self::TEST_ASSOCIATION_FIELD . '_2' => new EntityStub()
+                    ],
+                    [
+                        self::TEST_ASSOCIATION_FIELD . '_1' => ['type' => ClassMetadata::ONE_TO_MANY],
+                        self::TEST_ASSOCIATION_FIELD . '_2' => ['type' => ClassMetadata::ONE_TO_ONE]
+                    ],
+                    3
+                ],
+        ];
     }
 
     /**
