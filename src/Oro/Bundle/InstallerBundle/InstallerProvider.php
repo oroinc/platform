@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle;
 
-use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -34,28 +34,42 @@ class InstallerProvider
      * Run installer script by installer key
      *
      * @param string $scriptKey
-     * @param StreamOutput $output
+     * @param OutputInterface $output
      * @param ContainerInterface $containerInstance
      */
-    public function runInstallerScript($scriptKey, StreamOutput $output, ContainerInterface $containerInstance)
+    public function runInstallerScript($scriptKey, OutputInterface $output, ContainerInterface $containerInstance)
     {
         $script = $this->getInstallerScriptByKey($scriptKey);
         if ($script) {
             $output->writeln('');
             $output->writeln(sprintf('[%s] Launching "%s" installer script', date('Y-m-d H:i:s'), $script['file']));
 
-            if (is_file($script['file'])) {
-                ob_start();
-                $container = $containerInstance;
-                include($script['file']);
-                $scriptOutput = ob_get_contents();
-                ob_clean();
-                $output->writeln($scriptOutput);
-            } else {
-                $output->writeln('File "%s" not found', $script['file']);
-            }
+            $this->runFile($script['file'], $output, $containerInstance);
+
         } else {
             $output->writeln(sprintf('Installer "%s" was not found', $scriptKey));
+        }
+    }
+
+    /**
+     * Run installer script
+     *
+     * @param string $fileName
+     * @param OutputInterface $output
+     * @param ContainerInterface $containerInstance
+     */
+    public function runFile($fileName, OutputInterface $output, ContainerInterface $containerInstance)
+    {
+        if (is_file($fileName)) {
+            $output->writeln(sprintf('[%s] Launching "%s" file', date('Y-m-d H:i:s'), $fileName));
+            ob_start();
+            $container = $containerInstance;
+            include($fileName);
+            $scriptOutput = ob_get_contents();
+            ob_clean();
+            $output->writeln($scriptOutput);
+        } else {
+            $output->writeln('File "%s" not found', $fileName);
         }
     }
 
@@ -109,6 +123,23 @@ class InstallerProvider
         $this->checkInstallerScriptsLoaded();
 
         return $this->installerScripts;
+    }
+
+    /**
+     * Get package installs scripts for package path list
+     *
+     * @param $packagesPaths
+     * @return array
+     */
+    public function getInstallerScriptsForPackages($packagesPaths)
+    {
+        $scripts = [];
+        $i = 0;
+        foreach ($packagesPaths as $packagePath) {
+            $this->getInstallerScriptInfo($packagePath, $i, $scripts);
+        }
+
+        return $scripts;
     }
 
     /**
