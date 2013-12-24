@@ -168,6 +168,7 @@
 .sidebar-widget, .sidebar-icon {
     background: #e0e0e0 url('../images/divider.png') repeat-x 0 100%;
     width: 100%;
+    padding-bottom: 1px;
 }
 
 .sidebar-icon {
@@ -178,10 +179,6 @@
     height: 16px;
     width: 16px;
     margin: 7px;
-}
-
-.sidebar-widget {
-    z-index: 12;
 }
 .sidebar-widget-header{
     width: 100%;
@@ -272,16 +269,30 @@
     border-radius: 3px;
     background-color: #f4f4f4;
 }
-.sidebar>.sidebar-widget-pin{
+.sidebar-widget-popup{
     bottom: 75px;
     position: fixed;
     width: 0;
     overflow: visible;
 }
-.sidebar-widget-pin>.sidebar-widget {
+.sidebar-left .sidebar-widget-popup {
+    left: 33px;
+}
+.sidebar-left .sidebar-widget-popup .sidebar-widget{
+    left: 0;
+}
+.sidebar-right .sidebar-widget-popup {
+    right: 33px;
+}
+.sidebar-right .sidebar-widget-popup .sidebar-widget{
+    right: 0;
+}
+.sidebar-widget-popup .sidebar-widget {
+    position: absolute;
+    z-index: 12;
     width: 200px;
     padding-bottom: 2px;
 }
-.sidebar-widget-pin .sidebar-widget-content {
+.sidebar-widget-popup .sidebar-widget-content {
     overflow: auto;
 }
