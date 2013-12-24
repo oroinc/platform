@@ -1,6 +1,6 @@
 label: Demo Theme
 icon: bundles/oroui/themes/demo/images/favicon.ico
 styles:
-    - bundles/oroui/themes/demo/css/main.less
+    - bundles/oroui/themes/demo/css/less/main.less
     - bundles/oroui/themes/demo/css/style.css
 
