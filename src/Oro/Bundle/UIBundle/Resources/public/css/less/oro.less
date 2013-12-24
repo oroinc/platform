@@ -296,9 +296,6 @@ label, input, button, select, textarea { font-size:13px;}
       font-weight: normal;
       font-size: 13px;
       text-align:right;
-      &:after {
-        content:":";
-      }
     }
     .controls {
       margin-left:170px;
@@ -2828,7 +2825,6 @@ ul.inline-extra > li:first-child {
 }
 label.required em,
 .form-horizontal label.required em {
-  padding: 0 3px;
   color: #c30b25;
   font-size: 15px;
 }
@@ -3606,6 +3602,9 @@ div.uploader.focus,
   vertical-align: middle;
 }
 /* validation-error */
+label.validation-error {
+  color: #C81717 !important;
+}
 .validation-error .error {
   border:1px solid #e9322d;
   outline: 0;
