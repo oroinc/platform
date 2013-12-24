@@ -3,21 +3,25 @@
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 
-class PreInstallPackageCommand extends ContainerAwareCommand
+class PlatformUpdateCommand extends ContainerAwareCommand
 {
+    /**
+     * @inheritdoc
+     */
     protected function configure()
     {
-        $this
-            ->setName('oro:package:pre-install')
-            ->setDescription('Run pre install package commands.');
+        $this->setName('oro:platform:update')
+            ->setDescription('Execute platform update commands.');
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $commandExecutor = new CommandExecutor($input, $output, $this->getApplication());
