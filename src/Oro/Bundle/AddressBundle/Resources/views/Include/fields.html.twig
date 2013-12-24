@@ -7,17 +7,17 @@
     {% endif %}
 
     {% if country_field is not defined or country_field is empty %}
-        {% set country_field = name|replace({'state': 'country'}) %}
+        {% set country_field = name|replace({'region': 'country'}) %}
     {% endif %}
     {% set country_field = form.parent[country_field] %}
 
-    {% if state_text_field is not defined or state_text_field is empty %}
-        {% set state_text_field = name ~ "_text" %}
+    {% if region_text_field is not defined or region_text_field is empty %}
+        {% set region_text_field = name ~ "_text" %}
     {% endif %}
-    {% set state_text_field = form.parent[state_text_field] %}
+    {% set region_text_field = form.parent[region_text_field] %}
 
     {{ form_widget(form) }}
-    {% set showSelect = (choices is not empty and state_text_field.vars.value is empty) %}
+    {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
 
     <script type="text/javascript">
         require(['jquery', 'oro/region/view', 'oro/region/collection'],
@@ -27,7 +27,7 @@
                 new RegionView({
                     el: $('#{{ country_field.vars.id }}'),
                     target: $('#{{ id }}'),
-                    simpleEl: $('#{{ state_text_field.vars.id }}'),
+                    simpleEl: $('#{{ region_text_field.vars.id }}'),
                     collection: new RegionCollection(),
                     showSelect: {{ showSelect|json_encode }}
                 });
@@ -41,7 +41,7 @@
                 display: block;
             }
 
-            #{{ state_text_field.vars.id }} {
+            #{{ region_text_field.vars.id }} {
                 display: none;
             }
         {% else %}
@@ -49,7 +49,7 @@
                 display: none;
             }
 
-            #{{ state_text_field.vars.id }} {
+            #{{ region_text_field.vars.id }} {
                 display: block;
             }
         {% endif %}
@@ -101,8 +101,8 @@
     {{ form_row(form.street) }}
     {{ form_row(form.street2) }}
     {{ form_row(form.city) }}
-    {{ form_row(form.state_text) }}
-    {{ form_row(form.state) }}
+    {{ form_row(form.region_text) }}
+    {{ form_row(form.region) }}
     {{ form_row(form.postalCode) }}
     {{ form_rest(form) }}
 {%  endblock %}

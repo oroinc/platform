@@ -113,7 +113,7 @@ function(_, Backbone, __, mediator, messenger, dialogWidget,
                 this.addressEditDialog = new dialogWidget({
                     'url': url,
                     'title': title,
-                    'stateEnabled': false,
+                    'regionEnabled': false,
                     'incrementalPosition': false,
                     'dialogOptions': {
                         'modal': true,

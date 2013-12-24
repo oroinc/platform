@@ -1,4 +1,5 @@
 label: Oro Theme
-icon: bundles/oroui/themes/oro/favicon.ico
-styles: bundles/oroui/themes/oro/style.css
+icon: bundles/oroui/themes/oro/images/favicon.ico
+styles:
+  - bundles/oroui/themes/oro/css/style.css
 

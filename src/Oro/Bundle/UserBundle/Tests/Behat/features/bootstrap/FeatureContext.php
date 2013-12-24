@@ -81,7 +81,7 @@ class FeatureContext extends BehatWebContext
             case 'roles':
                 switch (strtolower($value)) {
                     case 'user':
-                        $form['oro_user_user_form[rolesCollection][0]'] = 2;
+                        $form['oro_user_user_form[roles][0]'] = 2;
                         break;
                 }
                 break;

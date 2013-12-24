@@ -31,7 +31,7 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
                   max: 255
     constraints:
         - Callback:
-            methods: [isStateValid]
+            methods: [isRegionValid]
 
 
 Oro\Bundle\AddressBundle\Entity\AbstractEmail:
