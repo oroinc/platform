@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class CalendarEventApiType extends CalendarEventType
 {

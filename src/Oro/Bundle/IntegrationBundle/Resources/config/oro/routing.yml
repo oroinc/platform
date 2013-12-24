@@ -7,5 +7,8 @@ oro_integration_bundle_channel_api:
     resource: "@OroIntegrationBundle/Controller/Api/Rest/ChannelController.php"
     type:     rest
     prefix:   api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
     defaults:
         version: latest

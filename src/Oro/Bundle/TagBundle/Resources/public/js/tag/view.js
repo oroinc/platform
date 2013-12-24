@@ -44,7 +44,6 @@ function(_, Backbone, Navigation, __, TagCollection) {
             this.$tagsHolder = this.$('.tags-holder');
 
             // process filter action binding
-            console.log(this.$el);
             this.$('.tag-sort-actions a').click(_.bind(this.filter, this));
         },
     

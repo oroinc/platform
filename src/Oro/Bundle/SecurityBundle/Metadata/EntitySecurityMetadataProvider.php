@@ -4,12 +4,9 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 
 class EntitySecurityMetadataProvider
 {
-    const CACHE_NAMESPACE = 'AclEntity';
-
     const ACL_SECURITY_TYPE = 'ACL';
 
     /**
@@ -49,9 +46,6 @@ class EntitySecurityMetadataProvider
         $this->securityConfigProvider = $securityConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->cache = $cache;
-        if ($this->cache !== null && $this->cache->getNamespace() === '') {
-            $this->cache->setNamespace(self::CACHE_NAMESPACE);
-        }
     }
 
     /**

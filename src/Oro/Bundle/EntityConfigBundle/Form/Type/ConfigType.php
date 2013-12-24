@@ -4,17 +4,17 @@ namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\Translator;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
 
 class ConfigType extends AbstractType
 {
@@ -27,17 +27,25 @@ class ConfigType extends AbstractType
      * @var Translator
      */
     protected $translator;
-    protected $contaner;
+
+    /**
+     * @var OrmTranslationMetadataCache
+     */
+    protected $dbTranslationMetadataCache;
+
     /**
      * @param ConfigManager $configManager
-     * @param Translator $translator
-     * @param Container $container
+     * @param Translator    $translator
+     * @param OrmTranslationMetadataCache $dbTranslationMetadataCache
      */
-    public function __construct(ConfigManager $configManager, Translator $translator, Container $container)
-    {
-        $this->configManager = $configManager;
-        $this->translator    = $translator;
-        $this->container     = $container;
+    public function __construct(
+        ConfigManager $configManager,
+        Translator $translator,
+        OrmTranslationMetadataCache $dbTranslationMetadataCache
+    ) {
+        $this->configManager              = $configManager;
+        $this->translator                 = $translator;
+        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
     /**
@@ -91,7 +99,7 @@ class ConfigType extends AbstractType
             new ConfigSubscriber(
                 $this->configManager,
                 $this->translator,
-                $this->container->getParameter('kernel.cache_dir') . '/translations/'
+                $this->dbTranslationMetadataCache
             )
         );
     }

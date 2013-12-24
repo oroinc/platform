@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
+
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @RouteResource("country")
  * @NamePrefix("oro_api_")
- * TODO: Discuss ACL impl.
  */
 class CountryController extends FOSRestController
 {
@@ -21,10 +23,10 @@ class CountryController extends FOSRestController
      * Get countries
      *
      * @ApiDoc(
-     *  description="Get countries",
-     *  resource=true
+     *      description="Get countries",
+     *      resource=true
      * )
-     * AclAncestor("oro_address")
+     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function cgetAction()
@@ -42,10 +44,10 @@ class CountryController extends FOSRestController
      * @param string $id
      *
      * @ApiDoc(
-     *  description="Get country",
-     *  resource=true
+     *      description="Get country",
+     *      resource=true
      * )
-     * AclAncestor("oro_address")
+     * @AclAncestor("oro_address_dictionaries_read")
      * @return Response
      */
     public function getAction($id)

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapApiCrudInterface;
-use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
-use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
+
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+
+use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
+use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 
 abstract class SoapController extends SoapGetController implements
     FormAwareInterface,
@@ -99,11 +100,30 @@ abstract class SoapController extends SoapGetController implements
             return;
         }
 
-        $data = $this->convertValueToArray($entityData);
-
-        $request->request->set($this->getForm()->getName(), $data);
+        $request->request->set(
+            $this->getForm()->getName(),
+            $this->fixFormData($this->convertValueToArray($entityData), $entity)
+        );
     }
 
+    /**
+     * Fixes form data
+     *
+     * @param array $data
+     * @param mixed $entity
+     * @return array
+     */
+    protected function fixFormData(array $data, $entity)
+    {
+        return $data;
+    }
+
+    /**
+     * Converts entity data to array
+     *
+     * @param mixed $value
+     * @return array
+     */
     protected function convertValueToArray($value)
     {
         // special case for ordered arrays

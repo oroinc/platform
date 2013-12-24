@@ -11,8 +11,7 @@ use Doctrine\ORM\EntityManager;
  */
 class OwnerTreeProvider
 {
-    const CACHE_NAMESPACE = 'OwnerTree';
-    const CACHE_KEY = 'OwnerTreeData';
+    const CACHE_KEY = 'data';
 
     /**
      * @var EntityManager
