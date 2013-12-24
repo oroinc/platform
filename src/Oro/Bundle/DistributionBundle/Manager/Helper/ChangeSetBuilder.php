@@ -8,60 +8,83 @@ class ChangeSetBuilder
     /**
      * @param PackageInterface[] $previousInstalled
      * @param PackageInterface[] $currentlyInstalled
+     *
      * @return array - [$installed, $updated, $uninstalled]
      */
     public function build(array $previousInstalled, array $currentlyInstalled)
     {
         $allPackages = array_unique(array_merge($previousInstalled, $currentlyInstalled), SORT_REGULAR);
 
-        $isExist = function (PackageInterface $p, array $arrayOfPackages, callable $equalsCallback) {
-            foreach ($arrayOfPackages as $pi) {
-                if ($equalsCallback($p, $pi)) {
-
-                    return true;
-                }
-            }
-
-            return false;
-        };
-
-        $equalsByName = function (PackageInterface $p1, PackageInterface $p2) {
-
-            return $p1->getName() == $p2->getName();
-        };
-
-        $equalsBySourceReference = function (PackageInterface $p1, PackageInterface $p2) {
-
-            return $p1->getSourceReference() == $p2->getSourceReference();
-        };
-
         $justInstalled = [];
         $justUpdated = [];
         $justUninstalled = [];
-        foreach ($allPackages as $p) {
-            if ($isExist($p, $currentlyInstalled, $equalsByName)
-                && !$isExist($p, $previousInstalled, $equalsByName)
+        foreach ($allPackages as $package) {
+            if ($this->inArray($package, $currentlyInstalled, [$this, 'equalsByName'])
+                && !$this->inArray($package, $previousInstalled, [$this, 'equalsByName'])
             ) {
 
-                $justInstalled[] = $p;
+                $justInstalled[] = $package;
 
-            } elseif (!$isExist($p, $currentlyInstalled, $equalsByName)
-                && $isExist($p, $previousInstalled, $equalsByName)
+            } elseif (!$this->inArray($package, $currentlyInstalled, [$this, 'equalsByName'])
+                && $this->inArray($package, $previousInstalled, [$this, 'equalsByName'])
             ) {
 
-                $justUninstalled[] = $p;
+                $justUninstalled[] = $package;
 
-            } elseif ($isExist($p, $currentlyInstalled, $equalsByName)
-                && $isExist($p, $previousInstalled, $equalsByName)
-                && $isExist($p, $currentlyInstalled, $equalsBySourceReference)
-                && !$isExist($p, $previousInstalled, $equalsBySourceReference)
+            } elseif ($this->inArray($package, $currentlyInstalled, [$this, 'equalsByName'])
+                && $this->inArray($package, $previousInstalled, [$this, 'equalsByName'])
+                && $this->inArray($package, $currentlyInstalled, [$this, 'equalsBySourceReference'])
+                && !$this->inArray($package, $previousInstalled, [$this, 'equalsBySourceReference'])
             ) {
 
-                $justUpdated[] = $p;
+                $justUpdated[] = $package;
 
             }
         }
 
         return [$justInstalled, $justUpdated, $justUninstalled];
+    }
+
+    /**
+     * @param PackageInterface $needle
+     * @param array $haystack
+     * @param callable $equalsCallback
+     *
+     * @return bool
+     */
+    protected function inArray(PackageInterface $needle, array $haystack, callable $equalsCallback)
+    {
+        foreach ($haystack as $package) {
+            if ($equalsCallback($needle, $package)) {
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param PackageInterface $package1
+     * @param PackageInterface $package2
+     *
+     * @return bool
+     */
+    protected function equalsByName(PackageInterface $package1, PackageInterface $package2)
+    {
+
+        return $package1->getName() == $package2->getName();
+    }
+
+    /**
+     * @param PackageInterface $package1
+     * @param PackageInterface $package2
+     *
+     * @return bool
+     */
+    protected function equalsBySourceReference(PackageInterface $package1, PackageInterface $package2)
+    {
+
+        return $package1->getSourceReference() == $package2->getSourceReference();
     }
 }
