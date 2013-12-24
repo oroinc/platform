@@ -1,24 +1,6 @@
 @import "../../../oroui/css/less/mixins";
 @dashboardBackgroundColor:  #f1f1f1;
 
-// Drop shadows
-.box-shadow(@shadow) {
-  -webkit-box-shadow: @shadow;
-  -moz-box-shadow: @shadow;
-  box-shadow: @shadow;
-}
-
-// Border Radius
-.border-radius(@radius) {
-  -webkit-border-radius: @radius;
-  -moz-border-radius: @radius;
-  border-radius: @radius;
-}
-
-.fullHeight() {
-  height: 100%;
-}
-
 .dashboard-selector-container {
   label {
     padding-top: 4px;
@@ -75,7 +57,7 @@
     background: #fff;
     display: block;
     width: 40%;
-    .fullHeight();
+    height: 100%;
     .widget-image {
       display: block !important;
       font-size: 64px;
@@ -98,7 +80,7 @@
     border-left: 1px solid #e5e5e5;
     width: 60%;
     margin-left: -1px;
-    .fullHeight();
+    height: 100%;
     ul {
       margin: 5px 0;
       li > a {
@@ -185,6 +167,10 @@
 
 .dashboard-btn{
   margin-left: 10px;
+}
+
+.dashboard-link{
+  font-weight: normal;
 }
 
 .chart-container {

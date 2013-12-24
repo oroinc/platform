@@ -70,6 +70,9 @@
                 {% endif %}
                 date: "{{ 'now'|date('Y-m-d') }}",
                 firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1,
+                {% if eventsOptions.firstHour is defined %}
+                firstHour: {{ eventsOptions.firstHour|json_encode|raw }},
+                {% endif %}
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),

@@ -1,0 +1,54 @@
+services:
+    oro_distribution.listener.access_denied:
+        class: %oro_distribution.security.access_denied_listener.class%
+        arguments: ["@session", "@router", "@security.context"]
+        tags:
+           - { name: kernel.event_listener, event: kernel.exception, method: onAccessDeniedException }
+
+security:
+    acl:
+        connection: default
+        cache:
+            id: security.acl.cache.doctrine
+            prefix: sf2_acl_
+
+    providers:
+        chain_provider:
+            chain:
+                providers:                  [in_memory, oro_user]
+        oro_user:
+            id:                             oro_distribution.security.provider
+        in_memory:
+            memory:
+                users:                      []
+
+    encoders:
+        Oro\Bundle\UserBundle\Entity\User: sha512
+        Symfony\Component\Security\Core\User\User: plaintext
+
+    firewalls:
+        dev:
+            pattern:                        ^/(_(profiler|wdt)|css|images|js)/
+            security:                       false
+
+        login:
+            pattern:                        ^/login$
+            security:                       false
+
+        main:
+            pattern:                        ^/
+            provider:                       chain_provider
+            form_login:
+              check_path:                     oro_distribution_security_login_check
+              login_path:                     oro_distribution_security_login
+              default_target_path:            oro_distribution_package_listinstalled
+              always_use_default_target_path: true
+            anonymous:                      ~
+            logout:
+              path:   /logout
+              target: /
+
+    access_control:
+        - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/packages, role: ROLE_ADMINISTRATOR }
+        - { path: ^/$, role: ROLE_ADMINISTRATOR }

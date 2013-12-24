@@ -347,7 +347,7 @@
                 <div class="form-horizontal">
             {% endif %}
                 {% for subblock in subblocks %}
-                    {{ _self.scrollSubblock(subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
+                    {{ _self.scrollSubblock(subblock.title is defined and subblock.title|length ? subblock.title : null, subblock.data, isForm, subblock.useSpan is defined ? subblock.useSpan : true, subblock.spanClass is defined ? subblock.spanClass : '') }}
                 {% endfor %}
             {% if isForm is defined and isForm == true %}
                 </fieldset>
@@ -502,3 +502,24 @@
         {% endif %}
     {% endif -%}
 {% endmacro %}
+
+{%- macro renderUrl(url, title, class) -%}
+    {% if title is empty %}
+        {% set title = url %}
+    {% endif %}
+    {% if class is empty %}
+        {% set class = '' %}
+    {% endif %}
+    {% if url is not empty %}
+        <a href="{{ url|raw }}" title="{{ title|escape }}" class="{{ class }}">{{ title }}</a>
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro renderPhone(phone, title) -%}
+    {% if title is empty %}
+        {% set title = phone %}
+    {% endif %}
+    {% if phone is not empty %}
+        <a href="tel:{{ phone|raw }}" title="{{ title|escape }}">{{ title }}</a>
+    {% endif %}
+{%- endmacro -%}
