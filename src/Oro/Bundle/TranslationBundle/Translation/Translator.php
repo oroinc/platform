@@ -7,13 +7,18 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 class Translator extends BaseTranslator
 {
     /**
+     * @var array
+     */
+    private $dynamicResources = [];
+
+    /**
      * Collector of translations
      *
      * Collects all translations for corresponded domains and locale,
      * takes in account fallback of locales.
      * Method is used for exposing of collected translations.
      *
-     * @param array $domains list of required domains, by default empty, means all domains
+     * @param array       $domains list of required domains, by default empty, means all domains
      * @param string|null $locale  locale of translations, by default is current locale
      * @return array
      */
@@ -27,13 +32,13 @@ class Translator extends BaseTranslator
             $this->loadCatalogue($locale);
         }
 
-        $fallbackCatalogues = array();
+        $fallbackCatalogues   = array();
         $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
         while ($catalogue = $catalogue->getFallbackCatalogue()) {
             $fallbackCatalogues[] = $catalogue;
         }
 
-        $domains = array_flip($domains);
+        $domains      = array_flip($domains);
         $translations = array();
         for ($i = count($fallbackCatalogues) - 1; $i >= 0; $i--) {
             $localeTranslations = $fallbackCatalogues[$i]->all();
@@ -51,5 +56,48 @@ class Translator extends BaseTranslator
         }
 
         return $translations;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addResource($format, $resource, $locale, $domain = null)
+    {
+        // remember dynamic resources
+        if ($resource instanceof DynamicResourceInterface) {
+            if (!isset($this->dynamicResources[$locale])) {
+                $this->dynamicResources[$locale] = [];
+            }
+            $this->dynamicResources[$locale][] = $resource;
+        }
+
+        parent::addResource($format, $resource, $locale, $domain);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function loadCatalogue($locale)
+    {
+        // check if any dynamic resource is changed and update translation catalogue if needed
+        if (!empty($this->dynamicResources)
+            && isset($this->dynamicResources[$locale])
+            && !empty($this->dynamicResources[$locale])
+        ) {
+            $catalogueFile = $this->options['cache_dir'] . '/catalogue.' . $locale . '.php';
+            if (is_file($catalogueFile)) {
+                $time = filemtime($catalogueFile);
+                /** @var DynamicResourceInterface $dynamicResource */
+                foreach ($this->dynamicResources[$locale] as $dynamicResource) {
+                    if (!$dynamicResource->isFresh($time)) {
+                        // remove translation catalogue to allow parent class to rebuild it
+                        unlink($catalogueFile);
+                        break;
+                    }
+                }
+            }
+        }
+
+        parent::loadCatalogue($locale);
     }
 }

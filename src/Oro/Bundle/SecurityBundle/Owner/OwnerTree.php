@@ -88,6 +88,22 @@ class OwnerTree
     }
 
     /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return OwnerTree A new instance of a OwnerTree object
+     */
+    public static function __set_state($data)
+    {
+        $result = new OwnerTree();
+        foreach ($data as $key => $val) {
+            $result->{$key} = $val;
+        }
+
+        return $result;
+    }
+
+    /**
      * Gets the owning organization id for the given user id
      *
      * @param  int|string      $userId
