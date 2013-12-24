@@ -83,4 +83,10 @@ class TagGeneratorChainTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    public function testSupports()
+    {
+        $chain = new TagGeneratorChain();
+        $this->assertTrue($chain->supports(null), 'Should support any value');
+    }
 }

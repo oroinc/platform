@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Content;
 
-class TagGeneratorChain
+class TagGeneratorChain implements TagGeneratorInterface
 {
     /** @var array|TagGeneratorInterface[] */
     protected $generators = [];
@@ -18,6 +18,14 @@ class TagGeneratorChain
             }
         );
         $this->generators = $generators;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($data)
+    {
+        return true;
     }
 
     /**
