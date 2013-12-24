@@ -24,10 +24,14 @@ class BuildBefore extends Event implements GridEventInterface
     /** @var DatagridConfiguration */
     protected $config;
 
-    public function __construct(DatagridInterface $datagrid, DatagridConfiguration $config)
+    /** @var array */
+    protected $parameters;
+
+    public function __construct(DatagridInterface $datagrid, DatagridConfiguration $config, array $parameters = [])
     {
-        $this->datagrid = $datagrid;
-        $this->config   = $config;
+        $this->datagrid   = $datagrid;
+        $this->config     = $config;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -39,12 +43,18 @@ class BuildBefore extends Event implements GridEventInterface
     }
 
     /**
-     * Getter for datagrid config
-     *
      * @return DatagridConfiguration
      */
     public function getConfig()
     {
         return $this->config;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
     }
 }
