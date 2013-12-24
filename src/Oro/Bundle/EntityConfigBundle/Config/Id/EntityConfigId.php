@@ -68,4 +68,15 @@ class EntityConfigId implements ConfigIdInterface
             $this->scope,
             ) = unserialize($serialized);
     }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return EntityConfigId A new instance of a EntityConfigId object
+     */
+    public static function __set_state($data)
+    {
+        return new EntityConfigId($data['className'], $data['scope']);
+    }
 }

@@ -6,7 +6,6 @@ use Doctrine\Common\Cache\CacheProvider;
 
 class ActionMetadataProvider
 {
-    const CACHE_NAMESPACE = 'AclAction';
     const CACHE_KEY = 'data';
 
     /**
@@ -38,9 +37,6 @@ class ActionMetadataProvider
     ) {
         $this->annotationProvider = $annotationProvider;
         $this->cache = $cache;
-        if ($this->cache !== null && $this->cache->getNamespace() === '') {
-            $this->cache->setNamespace(self::CACHE_NAMESPACE);
-        }
     }
 
     /**

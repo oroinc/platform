@@ -46,7 +46,7 @@ class Acl implements \Serializable
     /**
      * Constructor
      *
-     * @param  array                     $data
+     * @param  array $data
      * @throws \InvalidArgumentException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -67,11 +67,11 @@ class Acl implements \Serializable
             throw new \InvalidArgumentException(sprintf('ACL type must not be empty. Id: %s.', $this->id));
         }
 
-        $this->ignoreClassAcl = isset($data['ignore_class_acl']) ? (bool) $data['ignore_class_acl'] : false;
-        $this->permission = isset($data['permission']) ? $data['permission'] : '';
-        $this->class = isset($data['class']) ? $data['class'] : '';
-        $this->group = isset($data['group_name']) ? $data['group_name'] : '';
-        $this->label = isset($data['label']) ? $data['label'] : '';
+        $this->ignoreClassAcl = isset($data['ignore_class_acl']) ? (bool)$data['ignore_class_acl'] : false;
+        $this->permission     = isset($data['permission']) ? $data['permission'] : '';
+        $this->class          = isset($data['class']) ? $data['class'] : '';
+        $this->group          = isset($data['group_name']) ? $data['group_name'] : '';
+        $this->label          = isset($data['label']) ? $data['label'] : '';
     }
 
     /**
@@ -190,5 +190,25 @@ class Acl implements \Serializable
             $this->group,
             $this->label
             ) = unserialize($serialized);
+    }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return Acl A new instance of a Acl object
+     */
+    public static function __set_state($data)
+    {
+        $result                 = new Acl();
+        $result->id             = $data['id'];
+        $result->type           = $data['type'];
+        $result->class          = $data['class'];
+        $result->permission     = $data['permission'];
+        $result->ignoreClassAcl = $data['ignoreClassAcl'];
+        $result->group          = $data['group'];
+        $result->label          = $data['label'];
+
+        return $result;
     }
 }
