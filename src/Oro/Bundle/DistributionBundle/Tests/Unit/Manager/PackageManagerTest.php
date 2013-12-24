@@ -21,10 +21,12 @@ use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
+use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
 class PackageManagerTest extends \PHPUnit_Framework_TestCase
 {
     use MockHelperTrait;
+    use ReflectionHelperTrait;
 
     /**
      * @test
@@ -71,6 +73,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         // Remote repos
         $duplicatedPackageName = uniqid();
+        $packagistRepositoryMock = $this->createComposerRepositoryMock();
+        $this->writeAttribute($packagistRepositoryMock, 'url', 'http://packagist.org');
         $composerRepositoryMock = $this->createComposerRepositoryMock();
         $composerRepositoryWithoutProvidersMock = $this->createComposerRepositoryMock();
         $anyRepositoryExceptComposerRepository = new ArrayRepository(
@@ -89,6 +93,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         $composerRepositoryMock,
                         $composerRepositoryWithoutProvidersMock,
+                        $packagistRepositoryMock,
                         $anyRepositoryExceptComposerRepository
                     ]
                 )
@@ -114,6 +119,20 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composerRepositoryMock->expects($this->any())
             ->method('whatProvides')
             ->will($this->returnValue([$availablePackage1, $this->getPackage('name2', 1)]));
+
+        // packagist.org repository
+        $packagistRepositoryMock->expects($this->any())
+            ->method('hasProviders')
+            ->will($this->returnValue(true));
+
+        $packagistRepositoryMock->expects($this->never())
+            ->method('getProviderNames')
+            ->will($this->returnValue(['name7', 'name8']));
+
+        $packagistRepositoryMock->expects($this->any())
+            ->method('whatProvides')
+            ->will($this->returnValue([]));
+
 
         // from composer repo without providers
         $composerRepositoryWithoutProvidersMock->expects($this->any())
@@ -476,6 +495,32 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         unlink($tempComposerJson);
 
         $this->assertEquals($expectedJsonData, $updatedComposerData);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Package
+     */
+    public function throwsExceptionWhenTryingToUninstallConstantPackage()
+    {
+        $manager = $this->createPackageManager();
+        $this->writeAttribute($manager, 'constantPackages', ['vendor1/package1']);
+
+        $manager->uninstall(['vendor1/package1']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotAllowToDeleteConstantPackages()
+    {
+        $manager = $this->createPackageManager();
+        $this->writeAttribute($manager, 'constantPackages', ['vendor1/package1']);
+
+        $this->assertTrue($manager->canBeDeleted('any-vendor/any-package'));
+        $this->assertFalse($manager->canBeDeleted('vendor1/package1'));
     }
 
     /**
