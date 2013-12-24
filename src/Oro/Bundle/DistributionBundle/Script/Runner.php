@@ -76,10 +76,15 @@ class Runner
     protected function run($path)
     {
         if (file_exists($path)) {
+            $phpPath = $this->getPhpExecutablePath();
+
             $process = (new ProcessBuilder())
-                ->setPrefix($this->getPhpExecutablePath())
-                ->setArguments([$path])
+                ->setPrefix($phpPath)
+                ->add($path)
+                ->add('-p')
+                ->add($phpPath)
                 ->getProcess();
+
             $process->run();
 
             if (!$process->isSuccessful()) {
@@ -125,17 +130,23 @@ class Runner
             return $itemMatches[1];
 
         };
-        $files = array_filter($files, function ($item) use ($previousPackageVersion, $fetchItemVersion) {
-            $itemVersion = $fetchItemVersion($item);
+        $files = array_filter(
+            $files,
+            function ($item) use ($previousPackageVersion, $fetchItemVersion) {
+                $itemVersion = $fetchItemVersion($item);
 
-            return version_compare($itemVersion, $previousPackageVersion, '>');
-        });
-        usort($files, function ($a, $b) use ($fetchItemVersion) {
-            $aVersion = $fetchItemVersion($a);
-            $bVersion = $fetchItemVersion($b);
+                return version_compare($itemVersion, $previousPackageVersion, '>');
+            }
+        );
+        usort(
+            $files,
+            function ($a, $b) use ($fetchItemVersion) {
+                $aVersion = $fetchItemVersion($a);
+                $bVersion = $fetchItemVersion($b);
 
-            return version_compare($aVersion, $bVersion);
-        });
+                return version_compare($aVersion, $bVersion);
+            }
+        );
         return $files;
     }
 
