@@ -58,7 +58,8 @@ class DoctrineTagGenerator implements TagGeneratorInterface
      */
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
-        if (!isset($this->generatedTags[$this->getCacheIdentifier($data)])) {
+        $cacheKey = $this->getCacheIdentifier($data);
+        if (!isset($this->generatedTags[$cacheKey])) {
             $tags = [];
 
             if ($data instanceof FormInterface) {
@@ -89,10 +90,10 @@ class DoctrineTagGenerator implements TagGeneratorInterface
                 $tags[] = $this->convertToTag($class) . self::COLLECTION_SUFFIX;
             }
 
-            $this->generatedTags[$this->getCacheIdentifier($data)] = $tags;
+            $this->generatedTags[$cacheKey] = $tags;
         }
 
-        return $this->generatedTags[$this->getCacheIdentifier($data)];
+        return $this->generatedTags[$cacheKey];
     }
 
     /**
