@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -187,6 +188,12 @@ class UpdateCommand extends InitCommand
                 'owner',
                 isset($entityOptions['owner']) ? $entityOptions['owner'] : ExtendManager::OWNER_SYSTEM
             );
+
+            if (isset($entityOptions['owner']) && $entityOptions['owner'] == ExtendManager::OWNER_CUSTOM) {
+                $SecurityConfig = $this->configManager->getProvider('security')->getConfig($className);
+                $SecurityConfig->set('type', EntitySecurityMetadataProvider::ACL_SECURITY_TYPE);
+            }
+
             $entityConfig->set(
                 'is_extend',
                 isset($entityOptions['is_extend']) ? $entityOptions['is_extend'] : false
