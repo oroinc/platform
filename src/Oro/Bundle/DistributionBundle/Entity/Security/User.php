@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DistributionBundle\Entity\Security;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
@@ -122,7 +123,7 @@ class User implements AdvancedUserInterface, \Serializable
             $roles = array_merge($roles, $group->getRoles()->toArray());
         }
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
     }
 
     /**
@@ -146,7 +147,7 @@ class User implements AdvancedUserInterface, \Serializable
      */
     public function getUsername()
     {
-        $this->username;
+        return $this->username;
     }
 
     /**
