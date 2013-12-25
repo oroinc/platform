@@ -4,84 +4,86 @@
 
 {% block content %}
 <div class="layout-content">
-    <div class="navigation clearfix navbar-extra navbar-extra-right">
-        <div class="row">
-            <div class="span9">
-            {% block pageHeader %}
-                {% set hasAvatar = breadcrumbs.hasAvatar is defined and breadcrumbs.hasAvatar %}
-                <div class="clearfix customer-info well-small{% if not hasAvatar %} customer-simple{% endif %}">
-                    {% if hasAvatar %}
-                        <div class="visual">
-                            <img src="{{ breadcrumbs.imagePath ? breadcrumbs.imagePath | imagine_filter('avatar_med') : asset('bundles/oroui/img/info-user.png') }}" alt="{{ breadcrumbs.entityTitle }}"/>
-                        </div>
-                    {% endif %}
-                    <div class="customer-content pull-left">
-                        <div class="clearfix">
-                            {% block breadcrumbs %}
-                                <div class="pull-left">
-                                    {% if breadcrumbs.indexLabel is defined %}
-                                    <div class="sub-title">
-                                    {%- if breadcrumbs.indexPath is defined -%}
-                                        <a href="{{ breadcrumbs.indexPath }}">{{ breadcrumbs.indexLabel|trans }}</a>
-                                    {%- else -%}
-                                        {{ breadcrumbs.indexLabel|trans }}
-                                    {%- endif -%}
+    <div class="container-fluid page-title">
+        <div class="navigation clearfix navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="span9">
+                {% block pageHeader %}
+                    {% set hasAvatar = breadcrumbs.hasAvatar is defined and breadcrumbs.hasAvatar %}
+                    <div class="clearfix customer-info well-small{% if not hasAvatar %} customer-simple{% endif %}">
+                        {% if hasAvatar %}
+                            <div class="visual">
+                                <img src="{{ breadcrumbs.imagePath ? breadcrumbs.imagePath | imagine_filter('avatar_med') : asset('bundles/oroui/img/info-user.png') }}" alt="{{ breadcrumbs.entityTitle }}"/>
+                            </div>
+                        {% endif %}
+                        <div class="customer-content pull-left">
+                            <div class="clearfix">
+                                {% block breadcrumbs %}
+                                    <div class="pull-left">
+                                        {% if breadcrumbs.indexLabel is defined %}
+                                        <div class="sub-title">
+                                        {%- if breadcrumbs.indexPath is defined -%}
+                                            <a href="{{ breadcrumbs.indexPath }}">{{ breadcrumbs.indexLabel|trans }}</a>
+                                        {%- else -%}
+                                            {{ breadcrumbs.indexLabel|trans }}
+                                        {%- endif -%}
+                                        </div>
+                                        <span class="separator">/</span>
+                                        {% endif %}
+                                        {% if breadcrumbs.additional is defined %}
+                                            {% for breadcrumb in breadcrumbs.additional %}
+                                                <div class="sub-title"><a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel|trans }}</a></div>
+                                                <span class="separator">/</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
                                     </div>
-                                    <span class="separator">/</span>
+                                {% endblock breadcrumbs %}
+                            </div>
+                            <div class="clearfix">
+                                <ul class="inline">
+                                    {% block stats %}
+                                        <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+                                        <li>{{ 'Updated'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                    {% endblock stats %}
+                                    {% if isMobileVersion() %}
+                                        {% set ownerLink = UI.entityOwnerLink(entity) %}
+                                        {% if ownerLink %}
+                                            <li>{{ ownerLink }}</li>
+                                        {% endif %}
                                     {% endif %}
-                                    {% if breadcrumbs.additional is defined %}
-                                        {% for breadcrumb in breadcrumbs.additional %}
-                                            <div class="sub-title"><a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel|trans }}</a></div>
-                                            <span class="separator">/</span>
-                                        {% endfor %}
-                                    {% endif %}
-                                    <h1 class="user-name">{{ breadcrumbs.entityTitle }}</h1>
-                                </div>
-                            {% endblock breadcrumbs %}
+                                </ul>
+                            </div>
                         </div>
-                        <div class="clearfix">
-                            <ul class="inline">
-                                {% block stats %}
-                                    <li>{{ 'Created'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-                                    <li>{{ 'Updated'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
-                                {% endblock stats %}
-                                {% if isMobileVersion() %}
+                    </div>
+                {% endblock pageHeader %}
+                </div>
+                <div class="pull-right">
+                    <div class="pull-right title-buttons-container">
+                        {% placeholder view_navButtons_before with {entity: entity} %}
+                        {% block navButtons %}{% endblock navButtons %}
+                        {% placeholder view_navButtons_after with {entity: entity} %}
+                    </div>
+                    <div class="pull-right user-info-state">
+                        <ul class="inline-decorate">
+                            {% block pageActions %}
+                                {% if isDesktopVersion() %}
                                     {% set ownerLink = UI.entityOwnerLink(entity) %}
                                     {% if ownerLink %}
                                         <li>{{ ownerLink }}</li>
                                     {% endif %}
                                 {% endif %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            {% endblock pageHeader %}
-            </div>
-            <div class="pull-right">
-                <div class="pull-right title-buttons-container">
-                    {% placeholder view_navButtons_before with {entity: entity} %}
-                    {% block navButtons %}{% endblock navButtons %}
-                    {% placeholder view_navButtons_after with {entity: entity} %}
-                </div>
-                <div class="pull-right user-info-state">
-                    <ul class="inline-decorate">
-                        {% block pageActions %}
-                            {% if isDesktopVersion() %}
-                                {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                {% if ownerLink %}
-                                    <li>{{ ownerLink }}</li>
-                                {% endif %}
+                            {% endblock pageActions %}
+                            {% if (entity is defined and audit_entity_class is defined and resource_granted('oro_dataaudit_history')) %}
+                                {% placeholder change_history_block with {
+                                    'entity': audit_entity_class,
+                                    'id': entity.id,
+                                    'title': audit_title|default(entity),
+                                    'audit_path': audit_path|default('oro_dataaudit_history')
+                                } %}
                             {% endif %}
-                        {% endblock pageActions %}
-                        {% if (entity is defined and audit_entity_class is defined and resource_granted('oro_dataaudit_history')) %}
-                            {% placeholder change_history_block with {
-                                'entity': audit_entity_class,
-                                'id': entity.id,
-                                'title': audit_title|default(entity),
-                                'audit_path': audit_path|default('oro_dataaudit_history')
-                            } %}
-                        {% endif %}
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

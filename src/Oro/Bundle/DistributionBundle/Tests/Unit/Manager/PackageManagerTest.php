@@ -6,7 +6,6 @@ use Composer\Composer;
 use Composer\Installer;
 use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
-use Composer\IO\NullIO;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
@@ -24,6 +23,9 @@ use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class PackageManagerTest extends \PHPUnit_Framework_TestCase
 {
     use MockHelperTrait;

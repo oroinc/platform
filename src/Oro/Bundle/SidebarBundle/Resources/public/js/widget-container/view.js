@@ -12,7 +12,6 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
      * @extends Backbone.View
      */
     var WidgetView = Backbone.View.extend({
-        className: 'sidebar-widget-pin',
         templateMin: _.template(widgetMinTemplate),
         templateMax: _.template(widgetMaxTemplate),
 

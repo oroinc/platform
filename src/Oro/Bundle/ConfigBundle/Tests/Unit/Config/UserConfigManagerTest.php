@@ -28,6 +28,28 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
+    protected $loadedSettings = array(
+        'oro_user' => array(
+            'greeting' => array(
+                'value' => true,
+                'type'  => 'boolean',
+            ),
+            'level'    => array(
+                'value' => 20,
+                'type'  => 'scalar',
+            )
+        ),
+        'oro_test' => array(
+            'anysetting' => array(
+                'value' => 'anyvalue',
+                'type'  => 'scalar',
+            ),
+        ),
+    );
+
+    /**
+     * @var array
+     */
     protected $settings = array(
         'oro_user' => array(
             'level'    => array(
@@ -74,16 +96,17 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->addGroup($this->group1)
             ->addGroup($this->group2);
 
-        $this->object = $this->getMock(
-            'Oro\Bundle\ConfigBundle\Config\UserConfigManager',
-            array('loadStoredSettings'),
-            array($this->om, $this->settings)
-        );
+        $this->object = new UserConfigManager($this->om, $this->settings);
     }
 
     public function testSecurity()
     {
-        $object      = $this->object;
+        $object = $this->getMock(
+            'Oro\Bundle\ConfigBundle\Config\UserConfigManager',
+            array('loadStoredSettings'),
+            array($this->om, $this->settings)
+        );
+
         $object->expects($this->exactly(3))
             ->method('loadStoredSettings');
 
@@ -91,5 +114,32 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('user', $object->getScopedEntityName());
         $this->assertEquals(0, $object->getScopeId());
+    }
+
+    /**
+     * Test get loaded settings
+     */
+    public function testGetLoaded()
+    {
+        $loadedSettings = $this->loadedSettings;
+
+        $repository = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->at(0))
+            ->method('loadSettings')
+            ->with('user', 0, null)
+            ->will($this->returnValue($loadedSettings));
+        $repository->expects($this->at(1))
+            ->method('loadSettings')
+            ->with('app', 0, null)
+            ->will($this->returnValue($loadedSettings));
+
+        $this->om
+            ->expects($this->exactly(2))
+            ->method('getRepository')
+            ->will($this->returnValue($repository));
+
+        $this->object->get('oro_user.level');
     }
 }

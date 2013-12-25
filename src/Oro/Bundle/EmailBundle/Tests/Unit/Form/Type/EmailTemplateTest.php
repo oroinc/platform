@@ -11,9 +11,25 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
      */
     protected $type;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $localeSettings;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
     public function setUp()
     {
-        $this->type = new EmailTemplateType(array());
+        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->type = new EmailTemplateType(
+            [],
+            $this->configManager,
+            $this->localeSettings
+        );
     }
 
     public function tearDown()
@@ -44,6 +60,11 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->exactly(5))
             ->method('add');
+
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with('oro_locale.languages')
+            ->will($this->returnValue(['en', 'fr_FR']));
 
         $this->type->buildForm($builder, array());
     }

@@ -41,7 +41,10 @@ class SettingsBuilder
 
                     break;
                 case 'array':
-                    $child->arrayNode('value');
+                    $child->arrayNode('value')
+                        ->treatNullLike(array())
+                        ->prototype('scalar')->end()
+                        ->defaultValue(isset($setting['value'])? $setting['value'] : array());
 
                     break;
             }

@@ -54,10 +54,11 @@ class Builder
      * Create, configure and build datagrid
      *
      * @param DatagridConfiguration $config
+     * @param array $parameters
      *
      * @return DatagridInterface
      */
-    public function build(DatagridConfiguration $config)
+    public function build(DatagridConfiguration $config, array $parameters = [])
     {
         $class = $config->offsetGetByPath(self::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
@@ -67,7 +68,7 @@ class Builder
         /** @var DatagridInterface $datagrid */
         $datagrid = new $class($name, $acceptor);
 
-        $event = new BuildBefore($datagrid, $config);
+        $event = new BuildBefore($datagrid, $config, $parameters);
         $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
         // duplicate event dispatch with grid name
         $this->eventDispatcher->dispatch(BuildBefore::NAME . '.' . $name, $event);
@@ -82,7 +83,7 @@ class Builder
 
         $acceptor->processConfiguration();
 
-        $event = new BuildAfter($datagrid);
+        $event = new BuildAfter($datagrid, $parameters);
         $this->eventDispatcher->dispatch(BuildAfter::NAME, $event);
         // duplicate event dispatch with grid name
         $this->eventDispatcher->dispatch(BuildAfter::NAME . '.' . $name, $event);

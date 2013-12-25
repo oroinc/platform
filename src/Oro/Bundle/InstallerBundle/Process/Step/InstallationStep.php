@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
+use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -48,11 +50,20 @@ class InstallationStep extends AbstractStep
 
         // check if we have package installation step
         if (strpos($action, 'installerScript-') !== false) {
-            $this->container->get('oro_installer.installer_provider')->runInstallerScript(
-                str_replace('installerScript-', '', $action),
-                $this->getOutput(),
-                $this->container
+            $scriptFile = $this->container->get('oro_installer.script_manager')->getScriptFileByKey(
+                str_replace('installerScript-', '', $action)
             );
+
+            $scriptExecutor = new ScriptExecutor(
+                $this->getOutput(),
+                $this->container,
+                new CommandExecutor(
+                    $this->container->getParameter('kernel.environment'),
+                    $this->getOutput(),
+                    $this->getApplication()
+                )
+            );
+            $scriptExecutor->runScript($scriptFile);
 
             return new JsonResponse(array('result' => true));
         }
@@ -63,8 +74,8 @@ class InstallationStep extends AbstractStep
                 'loadFixtures' => $context->getStorage()->get('loadFixtures'),
                 'installerScripts' => $this
                         ->container
-                        ->get('oro_installer.installer_provider')
-                        ->getInstallerScriptsLabels(),
+                        ->get('oro_installer.script_manager')
+                        ->getScriptLabels(),
             )
         );
     }
