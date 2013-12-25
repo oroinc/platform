@@ -29,10 +29,17 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             $output,
             $this->getApplication()
         );
-        $commandExecutor->runCommand('oro:entity-config:update')
+        $commandExecutor
+            ->runCommand('oro:entity-config:update')
             ->runCommand('oro:entity-extend:init')
-            ->runCommand('oro:entity-extend:update-config')
-            ->runCommand('doctrine:schema:update')
+            ->runCommand(
+                'oro:entity-extend:update-config',
+                array('--process-isolation' => true)
+            )
+            ->runCommand(
+                'doctrine:schema:update',
+                array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
+            )
             ->runCommand('oro:search:create-index')
             ->runCommand('oro:navigation:init')
             ->runCommand('assets:install')

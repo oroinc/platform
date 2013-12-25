@@ -34,8 +34,8 @@ class CommandExecutor
      */
     public function __construct($env, OutputInterface $output, Application $application)
     {
-        $this->env  = $env;
-        $this->output = $output;
+        $this->env         = $env;
+        $this->output      = $output;
         $this->application = $application;
     }
 
@@ -45,8 +45,8 @@ class CommandExecutor
      * In this case you can parameter '--process-timeout' to set the process timeout
      * in seconds. Default timeout is 60 seconds.
      *
-     * @param string          $command
-     * @param array           $params
+     * @param string $command
+     * @param array  $params
      * @return CommandExecutor
      */
     public function runCommand($command, $params = array())
@@ -65,8 +65,8 @@ class CommandExecutor
         if (array_key_exists('--process-isolation', $params)) {
             unset($params['--process-isolation']);
             $phpFinder = new PhpExecutableFinder();
-            $php = $phpFinder->find();
-            $pb = new ProcessBuilder();
+            $php       = $phpFinder->find();
+            $pb        = new ProcessBuilder();
             $pb
                 ->add($php)
                 ->add($_SERVER['argv'][0]);
