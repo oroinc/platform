@@ -6,7 +6,7 @@ parameters:
     oro_installer.requirements.filesystem.class:  Oro\Bundle\InstallerBundle\Requirement\FilesystemRequirements
     oro_installer.yaml_persister.class:           Oro\Bundle\InstallerBundle\Persister\YamlPersister
     oro_installer.listener.request.class:         Oro\Bundle\InstallerBundle\EventListener\RequestListener
-    oro_installer.installer_provider.class:       Oro\Bundle\InstallerBundle\InstallerProvider
+    oro_installer.script_manager.class:           Oro\Bundle\InstallerBundle\ScriptManager
 
 services:
     oro_installer.scenario:
@@ -29,6 +29,6 @@ services:
             - %installed%
             - %kernel.debug%
 
-    oro_installer.installer_provider:
-        class: %oro_installer.installer_provider.class%
+    oro_installer.script_manager:
+        class: %oro_installer.script_manager.class%
         arguments: [@kernel]

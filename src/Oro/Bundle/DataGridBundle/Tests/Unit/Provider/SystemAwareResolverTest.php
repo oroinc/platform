@@ -18,7 +18,7 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function setUp()
     {
-        $this->container = $this->getMockForAbstractClass('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->resolver  = new SystemAwareResolver($this->container);
     }
 
@@ -33,8 +33,6 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testResolve($gridName, $gridDefinition, $expect)
     {
-        $this->markTestSkipped("TODO Fix");
-
         if ($gridName == 'test1') {
             $this->container->expects($this->once())
                 ->method('get')

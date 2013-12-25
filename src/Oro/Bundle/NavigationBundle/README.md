@@ -10,6 +10,7 @@ ACL implementation from Oro UserBundle.
 * [Your first menu](#first-menu)
 * [Rendering Menus](#rendering-menus)
 * [Hash Navigation](#hash-navigation)
+* [Content outdating notifications](./Resources/doc/content_outdating.md)
 
 <a name="installation"></a>
 
