@@ -56,7 +56,9 @@ define(function (require) {
             view.listenTo(widgets, 'reset', view.onWidgetsReset);
             view.listenTo(widgets, 'add', view.onWidgetAdded);
             view.listenTo(widgets, 'remove', view.onWidgetRemoved);
-            view.listenTo(widgets, 'all', view.render);
+            view.listenTo(widgets, 'reset', view.render);
+            view.listenTo(widgets, 'add', view.render);
+            view.listenTo(widgets, 'remove', view.render);
 
             view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
             view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
