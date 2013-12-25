@@ -54,10 +54,12 @@ class UpdateCommand extends InitCommand
     /**
      * Runs command
      *
-     * @param  InputInterface $input
+     * @param  InputInterface  $input
      * @param  OutputInterface $output
      * @throws \InvalidArgumentException
      * @return int|null|void
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -94,7 +96,7 @@ class UpdateCommand extends InitCommand
                         );
                     }
 
-                    $this->parseEntity($output, $className, $entityOptions, $force);
+                    $this->parseEntity($className, $entityOptions, $output, $force);
                 }
 
                 $this->configManager->flush();
@@ -155,12 +157,14 @@ class UpdateCommand extends InitCommand
     }
 
     /**
+     * @param string          $className     Entity's class name
+     * @param array           $entityOptions Entity's options
      * @param OutputInterface $output
-     * @param string $className       Entity's class name
-     * @param array $entityOptions    Entity's options
-     * @param bool $force             Flag to update existing entity model
+     * @param bool            $force         Flag to update existing entity model
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function parseEntity($output, $className, $entityOptions, $force)
+    protected function parseEntity($className, $entityOptions, $output, $force)
     {
         /** @var ExtendManager $extendManager */
         $extendManager  = $this->getContainer()->get('oro_entity_extend.extend.extend_manager');
@@ -208,7 +212,7 @@ class UpdateCommand extends InitCommand
             list($mode, $owner, $isExtend) = $this->parseFieldConfig($fieldConfig);
 
             $config = false;
-            if (! (bool) $fieldExistingConfig) {
+            if (!(bool)$fieldExistingConfig) {
                 /**
                  * create NEW entity field model
                  */

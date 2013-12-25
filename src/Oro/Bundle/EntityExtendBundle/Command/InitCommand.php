@@ -53,7 +53,7 @@ class InitCommand extends ContainerAwareCommand
 
                 foreach ($config as $className => $entityOptions) {
                     $className = class_exists($className) ? $className : 'Extend\\Entity\\' . $className;
-                    $this->parseEntity($className, $entityOptions);
+                    $this->parseEntity($className, $entityOptions, $output, false);
                 }
 
                 $this->configManager->flush();
@@ -88,11 +88,15 @@ class InitCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param $className
-     * @param $entityOptions
+     * @param string          $className     Entity's class name
+     * @param array           $entityOptions Entity's options
+     * @param OutputInterface $output
+     * @param bool            $force         Flag to update existing entity model
      * @throws \InvalidArgumentException
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function parseEntity($className, $entityOptions)
+    protected function parseEntity($className, $entityOptions, $output, $force)
     {
         /** @var ExtendManager $extendManager */
         $extendManager  = $this->getContainer()->get('oro_entity_extend.extend.extend_manager');
