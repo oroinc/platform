@@ -172,13 +172,14 @@
 }
 
 .sidebar-icon {
-    height: 30px;
+    height: 28px;
+    width: 28px;
 }
 
 .sidebar-icon img {
     height: 16px;
     width: 16px;
-    margin: 7px;
+    margin: 6px;
 }
 .sidebar-widget-header{
     width: 100%;
@@ -241,6 +242,7 @@
     height: 16px;
     width: 16px;
     color: #a9a8a8;
+    text-align: center;
 }
 .sidebar i[class^="icon-"]:before,
 .sidebar i[class*=" icon-"]:before{
