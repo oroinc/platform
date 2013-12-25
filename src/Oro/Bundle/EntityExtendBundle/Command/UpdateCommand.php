@@ -190,8 +190,8 @@ class UpdateCommand extends InitCommand
             );
 
             if (isset($entityOptions['owner']) && $entityOptions['owner'] == ExtendManager::OWNER_CUSTOM) {
-                $SecurityConfig = $this->configManager->getProvider('security')->getConfig($className);
-                $SecurityConfig->set('type', EntitySecurityMetadataProvider::ACL_SECURITY_TYPE);
+                $securityConfig = $this->configManager->getProvider('security')->getConfig($className);
+                $securityConfig->set('type', EntitySecurityMetadataProvider::ACL_SECURITY_TYPE);
             }
 
             $entityConfig->set(
