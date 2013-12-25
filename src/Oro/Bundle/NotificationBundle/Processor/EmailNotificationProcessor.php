@@ -11,7 +11,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
@@ -33,26 +33,34 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     protected $env = 'prod';
 
     /**
+     * @var LocaleSettings
+     */
+    private $localeSettings;
+
+    /**
      * Constructor
      *
-     * @param EmailRenderer   $emailRenderer
-     * @param \Swift_Mailer   $mailer
-     * @param EntityManager   $em
-     * @param string          $sendFrom
-     * @param LoggerInterface $logger
+     * @param EmailRenderer                                 $emailRenderer
+     * @param \Swift_Mailer                                 $mailer
+     * @param EntityManager                                 $em
+     * @param string                                        $sendFrom
+     * @param LoggerInterface                               $logger
+     * @param LocaleSettings $localeSettings
      */
     public function __construct(
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
         EntityManager $em,
         $sendFrom,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        LocaleSettings $localeSettings
     ) {
         parent::__construct($logger, $em);
 
         $this->renderer = $emailRenderer;
         $this->mailer   = $mailer;
         $this->sendFrom = $sendFrom;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -91,7 +99,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
-            $emailTemplate = $notification->getTemplate();
+            $emailTemplate = $notification->getTemplate($this->localeSettings->getLanguage());
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(

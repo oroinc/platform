@@ -12,9 +12,11 @@ interface EmailNotificationInterface
     /**
      * Gets a template can be used to prepare a notification message
      *
+     * @param null|string $locale
+     *
      * @return EmailTemplateInterface
      */
-    public function getTemplate();
+    public function getTemplate($locale = null);
 
     /**
      * Gets a list of email addresses can be used to send a notification message

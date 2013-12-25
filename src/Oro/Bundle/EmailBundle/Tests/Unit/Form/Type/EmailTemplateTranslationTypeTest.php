@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
+use Symfony\Component\Form\FormView;
 
 class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,6 +30,18 @@ class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('array'));
 
         $this->type->setDefaultOptions($resolver);
+    }
+
+    public function testBuildView()
+    {
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $view = new FormView();
+        $options = ['labels' => ['test' => 'test']];
+
+        $this->type->buildView($view, $form, $options);
+        $this->assertEquals($options['labels'], $view->vars['labels']);
     }
 
     public function testGetName()
