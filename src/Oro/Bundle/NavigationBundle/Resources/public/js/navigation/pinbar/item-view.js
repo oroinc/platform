@@ -121,9 +121,12 @@ function($, _, __, Backbone, app, Navigation, mediator, error) {
             var navigation = Navigation.getInstance(),
                 modelUrl = navigation.removeGridParams(this.model.get('url')) ,
                 $el = this.$el,
+                self = this,
                 refreshHandler = function (obj) {
                     if (modelUrl === obj.url) {
-                        $el.find('.pin-status-outdated').removeClass('pin-status-outdated');
+                        $noteEl = $el.find('.pin-status-outdated');
+                        self.markNormal($noteEl);
+
                         mediator.off('hash_navigation_request:page_refreshed', refreshHandler);
                     }
                 };
@@ -131,10 +134,20 @@ function($, _, __, Backbone, app, Navigation, mediator, error) {
             if (!event.isCurrentPage && modelUrl == event.url) {
                 var $noteEl = $el.find('.pin-status-normal');
                 if (!$noteEl.is('.pin-status-outdated')) {
-                    $noteEl.addClass('pin-status-outdated');
+                    this.markOutdated($noteEl);
                     mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
                 }
             }
+        },
+
+        markOutdated: function ($el) {
+            $el.addClass('pin-status-outdated')
+                .attr('title', __('Content of pinned page is outdated'));
+        },
+
+        markNormal: function ($el) {
+            $el.removeClass('pin-status-outdated')
+                .removeAttr('title');
         }
     });
 });
