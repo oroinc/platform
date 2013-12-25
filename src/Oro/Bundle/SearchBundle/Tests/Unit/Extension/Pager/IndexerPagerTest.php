@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension\Pager;
 
-use Oro\Bundle\SearchBundle\Datagrid\IndexerPager;
+use Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager;
 use Oro\Bundle\SearchBundle\Query\Query;
 
-class SearchPagerTest extends \PHPUnit_Framework_TestCase
+class IndexerPagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var IndexerPager
@@ -14,7 +14,6 @@ class SearchPagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped("TODO fix test or remove if not needed");
         $this->pager = new IndexerPager();
     }
 
@@ -25,13 +24,10 @@ class SearchPagerTest extends \PHPUnit_Framework_TestCase
 
     public function testSetQuery()
     {
-        $indexerQuery = $this->getMock(
-            'Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery',
-            array(),
-            array(),
-            '',
-            false
-        );
+        $indexerQuery = $this->getMockBuilder('Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->pager->setQuery($indexerQuery);
         $this->assertAttributeEquals($indexerQuery, 'query', $this->pager);
     }
