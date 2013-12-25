@@ -547,10 +547,7 @@ define(function (require) {
          * @return {*}
          */
         getCachedData: function(url) {
-            if (this.useCache) {
-                return contentManager.getPage(_.isUndefined(url) ? this.getHashUrl() : url);
-            }
-            return false;
+            return contentManager.getPage(_.isUndefined(url) ? this.getHashUrl() : url);
         },
 
         /**
@@ -764,8 +761,7 @@ define(function (require) {
             } else {
                 //clearing cache for current and redirect urls, e.g. form and grid page
                 contentManager.clearCache(this.url);
-                contentManager.clearCache(redirectUrl);
-                this.setLocation(redirectUrl);
+                this.setLocation(redirectUrl, {clearCache: true, useCache: this.getCachedData(redirectUrl) !== false});
             }
         },
 
@@ -1029,7 +1025,7 @@ define(function (require) {
             }
             if (this.enabled && !this.checkThirdPartyLink(url)) {
                 if (options.clearCache) {
-                    contentManager.clearCache();
+                    contentManager.clearCache(url);
                 }
                 this.useCache = false;
                 if (options.useCache) {
