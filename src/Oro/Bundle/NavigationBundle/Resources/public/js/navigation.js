@@ -723,7 +723,8 @@ define(function (require) {
                 if (app.debug) {
                     document.body.innerHTML = rawData;
                 } else {
-                    messenger.notificationFlashMessage('error', __('Sorry, page was not loaded correctly'));
+                    messenger.notificationMessage('error', __('Sorry, page was not loaded correctly'));
+                    this.loadingMask.hide();
                 }
             }
             this.triggerCompleteEvent();
@@ -776,7 +777,7 @@ define(function (require) {
             var message403 = 'You do not have permission to this action';
             if (app.debug) {
                 if (XMLHttpRequest.status == 403) {
-                    messenger.notificationFlashMessage('error', __(message403));
+                    messenger.notificationMessage('error', __(message403));
                     this.loadingMask.hide();
                 } else {
                     document.body.innerHTML = XMLHttpRequest.responseText;
@@ -787,7 +788,7 @@ define(function (require) {
                 if (XMLHttpRequest.status == 403) {
                     message = message403;
                 }
-                messenger.notificationFlashMessage('error', __(message));
+                messenger.notificationMessage('error', __(message));
                 this.loadingMask.hide();
             }
         },
