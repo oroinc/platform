@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
 
-class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
+class UTCDateTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var UTCTimeType
@@ -67,7 +67,7 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
                 'source' => new \DateTime('2013-01-01', new \DateTimeZone('Europe/Athens')),
                 'expected' => '2012-12-31',
             ),
-            'negatuive shift' => array(
+            'negative shift' => array(
                 'source' => new \DateTime('2013-01-01', new \DateTimeZone('America/Los_Angeles')),
                 'expected' => '2013-01-01',
             ),

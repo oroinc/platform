@@ -67,7 +67,7 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
                 'source' => new \DateTime('08:00:00', new \DateTimeZone('Europe/Athens')),
                 'expected' => '06:00:00',
             ),
-            'negatuive shift' => array(
+            'negative shift' => array(
                 'source' => new \DateTime('08:00:00', new \DateTimeZone('America/Los_Angeles')),
                 'expected' => '16:00:00',
             ),
