@@ -1,7 +1,7 @@
 /* jshint browser:true */
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/app', 'oro/navigation', 'oro/mediator', 'oro/error'],
-function($, _, Backbone, app, Navigation, mediator, error) {
+define(['jquery', 'underscore', 'oro/translator', 'backbone', 'oro/app', 'oro/navigation', 'oro/mediator', 'oro/error'],
+function($, _, __, Backbone, app, Navigation, mediator, error) {
     'use strict';
 
     /**
@@ -129,9 +129,15 @@ function($, _, Backbone, app, Navigation, mediator, error) {
                 };
 
             if (!event.isCurrentPage && modelUrl == event.url) {
-                $el.find('.outdated-note').remove();
-                $el.find('.pin-holder > div > a').prepend($('<i />', {class: 'icon-circle outdated-note'}));
-                mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
+                var $noteEl = $el.find('.outdated-note');
+                if (!$noteEl.length) {
+                    $noteEl = $('<i />', {
+                        class: 'icon-circle outdated-note',
+                        title: __('Content of pinned page is outdated')
+                    });
+                    $el.find('.pin-holder > div > a').prepend($noteEl);
+                    mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
+                }
             }
         }
     });
