@@ -289,10 +289,13 @@
 }
 .sidebar-widget-popup .sidebar-widget {
     position: absolute;
-    z-index: 12;
     width: 200px;
     padding-bottom: 2px;
 }
 .sidebar-widget-popup .sidebar-widget-content {
     overflow: auto;
+}
+.sidebar-widget-popup,
+.sidebar-widget-popup .sidebar-widget {
+    z-index: 12;
 }
