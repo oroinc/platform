@@ -20,7 +20,7 @@ class ContentTagsExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'oro_navigation_get_content_tags' => new \Twig_Function_Method($this, 'generate', [])
+            new \Twig_SimpleFunction('oro_navigation_get_content_tags', [$this, 'generate'])
         ];
     }
 
