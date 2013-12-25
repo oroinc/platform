@@ -21,7 +21,7 @@ class FixArrayToStringListenerTest extends \PHPUnit_Framework_TestCase
     {
         $event = new FormEvent($this->getMock('Symfony\Component\Form\Test\FormInterface'), $data);
         $listener = new FixArrayToStringListener($delimiter);
-        $listener->preBind($event);
+        $listener->preSubmit($event);
         $this->assertEquals($expectedData, $event->getData());
     }
 
@@ -46,6 +46,9 @@ class FixArrayToStringListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSubscribedEvents()
     {
-        $this->assertEquals(array(FormEvents::PRE_BIND => 'preBind'), FixArrayToStringListener::getSubscribedEvents());
+        $this->assertEquals(
+            array(FormEvents::PRE_SUBMIT => 'preSubmit'),
+            FixArrayToStringListener::getSubscribedEvents()
+        );
     }
 }
