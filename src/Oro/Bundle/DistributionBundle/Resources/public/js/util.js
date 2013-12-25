@@ -40,7 +40,7 @@ function Util(rootMessagesElements) {
         error: function (message) {
             displayMessage('error', message);
         },
-        confirm: function (message, continueCallback, continueLabel, cancelCallback) {
+        confirm: function (title, message, continueCallback, continueLabel, cancelCallback) {
             message = message.replace(/\n/g, '<br />');
             continueCallback = continueCallback || function () {
             };
@@ -49,6 +49,7 @@ function Util(rootMessagesElements) {
             };
 
             var dialogOptions = $.extend(true, defaultDialogOptions, {
+                title: title,
                 message: message,
                 buttons: {
                     cancel: {

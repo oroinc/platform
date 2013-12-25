@@ -30,14 +30,16 @@ function PackageManager(Urls, util) {
 
                 break;
             case InstallStatus.CONFIRM:
+                var title = 'Confirm installation of '+response.params.packageName;
                 var message = response.params.packageName + ' requires following packages: ' +
-                    "\n" + response.packages.join("\n") +
-                    "\n" + "\n" + 'Do you want to install them all?';
+                    "\n - " + response.packages.join("\n -") +
+                    "\n" + "\n" + 'All missing packages will be installed';
 
                 util.confirm(
+                    title,
                     message,
                     function(){pm.install(response.params)},
-                    'Yes, install',
+                    'Continue',
                     reflectUICallback
                 );
                 break;
