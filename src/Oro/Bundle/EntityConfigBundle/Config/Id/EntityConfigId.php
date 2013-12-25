@@ -75,8 +75,10 @@ class EntityConfigId implements ConfigIdInterface
      * @param array $data Initialization array
      * @return EntityConfigId A new instance of a EntityConfigId object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         return new EntityConfigId($data['className'], $data['scope']);
     }
+    // @codingStandardsIgnoreEnd
 }

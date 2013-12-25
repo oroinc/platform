@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\CronBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -19,25 +19,13 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 class JobController extends Controller
 {
     /**
-     * @Route(
-     *      "/{page}/{limit}",
-     *      name="oro_cron_job_index",
-     *      requirements={"page"="\d+", "limit"="\d+"},
-     *      defaults={"page"=1, "limit"=20}
-     * )
      * @Template
+     * @Route("/", name="oro_cron_job_index")
      * @AclAncestor("oro_jobs")
      */
-    public function indexAction($page, $limit)
+    public function indexAction()
     {
-        return array(
-            'pid'   => $this->get('oro_cron.job_daemon')->getPid(),
-            'pager' => $this->get('knp_paginator')->paginate(
-                $this->get('oro_cron.job_manager')->getListQuery(),
-                (int) $page,
-                (int) $limit
-            ),
-        );
+        return ['pid' => $this->get('oro_cron.job_daemon')->getPid()];
     }
 
     /**

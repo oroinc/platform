@@ -7,8 +7,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
-use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
-use Oro\Bundle\SearchBundle\Engine\AbstractEngine;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 
 class Indexer

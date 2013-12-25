@@ -69,6 +69,7 @@ class AclAncestor implements \Serializable
      * @param array $data Initialization array
      * @return AclAncestor A new instance of a AclAncestor object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         $result     = new AclAncestor();
@@ -76,4 +77,5 @@ class AclAncestor implements \Serializable
 
         return $result;
     }
+    // @codingStandardsIgnoreEnd
 }

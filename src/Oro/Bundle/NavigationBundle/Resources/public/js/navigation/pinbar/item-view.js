@@ -1,7 +1,7 @@
 /* jshint browser:true */
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/app', 'oro/navigation', 'oro/mediator', 'oro/error'],
-function($, _, Backbone, app, Navigation, mediator, error) {
+define(['jquery', 'underscore', 'oro/translator', 'backbone', 'oro/app', 'oro/navigation', 'oro/mediator', 'oro/error'],
+function($, _, __, Backbone, app, Navigation, mediator, error) {
     'use strict';
 
     /**
@@ -72,6 +72,7 @@ function($, _, Backbone, app, Navigation, mediator, error) {
         },
 
         removeItem: function() {
+            mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
             this.isRemoved = true;
             this.remove();
         },
@@ -109,8 +110,35 @@ function($, _, Backbone, app, Navigation, mediator, error) {
             this.$el.html(
                 this.templates[this.options.type](this.model.toJSON())
             );
+
+            // if cache used highlight tab on content outdated event
+            mediator.on('content-manager:content-outdated', this.outdatedContentHandler, this);
             this.setActiveItem();
             return this;
+        },
+
+        outdatedContentHandler: function (event) {
+            var navigation = Navigation.getInstance(),
+                modelUrl = navigation.removeGridParams(this.model.get('url')) ,
+                $el = this.$el,
+                refreshHandler = function (obj) {
+                    if (modelUrl === obj.url) {
+                        $el.find('.outdated-note').remove();
+                        mediator.off('hash_navigation_request:page_refreshed', refreshHandler);
+                    }
+                };
+
+            if (!event.isCurrentPage && modelUrl == event.url) {
+                var $noteEl = $el.find('.outdated-note');
+                if (!$noteEl.length) {
+                    $noteEl = $('<i />', {
+                        class: 'icon-circle outdated-note',
+                        title: __('Content of pinned page is outdated')
+                    });
+                    $el.find('.pin-holder > div > a').prepend($noteEl);
+                    mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
+                }
+            }
         }
     });
 });

@@ -4,7 +4,7 @@
 {% set step, platformSteps = 'administration', ['search', 'navigation', 'js-routing', 'localization', 'assets', 'assetic', 'translation', 'requirejs'] %}
 
 {% if loadFixtures %}
-    {% set platformSteps = ['fixtures']|merge(steps) %}
+    {% set platformSteps = ['fixtures']|merge(platformSteps) %}
 {% endif %}
 
 {% set steps = platformSteps %}

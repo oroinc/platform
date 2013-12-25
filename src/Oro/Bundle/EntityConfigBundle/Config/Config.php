@@ -151,6 +151,7 @@ class Config implements ConfigInterface
      * @param array $data Initialization array
      * @return Config A new instance of a Config object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         $result         = new Config($data['id']);
@@ -158,6 +159,7 @@ class Config implements ConfigInterface
 
         return $result;
     }
+    // @codingStandardsIgnoreEnd
 
     /**
      * Creates a new object that is a copy of the current instance.

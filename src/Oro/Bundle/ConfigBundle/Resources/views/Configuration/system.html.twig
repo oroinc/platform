@@ -2,6 +2,7 @@
 {% if form %}
     {% form_theme form with ['OroConfigBundle:Form:fields.html.twig', 'OroFormBundle:Form:fields.html.twig'] %}
 {% endif %}
+{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroConfigBundle::macros.html.twig' as configUI %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
@@ -33,6 +34,7 @@
         });
     </script>
 
+    {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
     <script type="text/javascript">
         /* jshint browser:true, devel:true */
         /* global require */
