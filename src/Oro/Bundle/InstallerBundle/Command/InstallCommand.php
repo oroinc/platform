@@ -18,8 +18,8 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->setName('oro:install')
             ->setDescription('Oro Application Installer.')
+            ->addOption('company-short-name', null, InputOption::VALUE_OPTIONAL, 'Company short name')
             ->addOption('company-name', null, InputOption::VALUE_OPTIONAL, 'Company name')
-            ->addOption('company-title', null, InputOption::VALUE_OPTIONAL, 'Company title')
             ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'User name')
             ->addOption('user-email', null, InputOption::VALUE_OPTIONAL, 'User email')
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
@@ -168,11 +168,11 @@ class InstallCommand extends ContainerAwareCommand
         $defaultCompanyName  = $configManager->get('oro_ui.application_name');
         $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
 
-        $companyTitle  = isset($options['company-title'])
-            ? $options['company-title']
-            : $dialog->ask($output, sprintf('<question>Company name (%s):</question> ', $defaultCompanyTitle));
-        $companyName   = isset($options['company-name'])
+        $companyTitle  = isset($options['company-name'])
             ? $options['company-name']
+            : $dialog->ask($output, sprintf('<question>Company name (%s):</question> ', $defaultCompanyTitle));
+        $companyName   = isset($options['company-short-name'])
+            ? $options['company-short-name']
             : $dialog->ask($output, sprintf('<question>Company short name (%s):</question> ', $defaultCompanyName));
         $userName      = isset($options['user-name'])
             ? $options['user-name']
