@@ -20,6 +20,8 @@
             <div class="box">
                 <h3 class="sub-title">{{ form.vars.label|trans }}</h3>
 
+                {{ form_row(form.company_name) }}
+                {{ form_row(form.company_title) }}
                 {{ form_row(form.username) }}
                 {{ form_row(form.plainPassword) }}
                 {{ form_row(form.email) }}
