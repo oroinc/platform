@@ -8,9 +8,6 @@ parameters:
     oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
     oro_distribution.composer_json:                           %kernel.root_dir%/../composer.json
 
-    oro_distribution.user_manager.class:                      Oro\Bundle\UserBundle\Entity\UserManager
-    oro_distribution.user.entity.class:                       Oro\Bundle\UserBundle\Entity\User
-    oro_distribution.security.provider.class:                 Oro\Bundle\UserBundle\Security\UserProvider
     oro_distribution.security.access_denied_listener.class:   Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
 
 services:
@@ -58,15 +55,3 @@ services:
         public: false
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
-
-
-    ### Security
-
-    oro_distribution.user_manager:
-        class:                        %oro_distribution.user_manager.class%
-        arguments:                    [%oro_distribution.user.entity.class%, "@doctrine.orm.entity_manager", "@security.encoder_factory"]
-
-    oro_distribution.security.provider:
-        class:                        %oro_distribution.security.provider.class%
-        public:                       false
-        arguments:                    ["@oro_distribution.user_manager"]

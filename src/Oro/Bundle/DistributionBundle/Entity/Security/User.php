@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Entity;
+namespace Oro\Bundle\DistributionBundle\Entity\Security;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
@@ -64,13 +64,13 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * @var Group[]
      *
-     * ORM\ManyToMany(targetEntity="Group")
-     * ORM\JoinTable(name="oro_user_access_group",
+     * @ORM\ManyToMany(targetEntity="Group")
+     * @ORM\JoinTable(name="oro_user_access_group",
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      */
-//    protected $groups;
+    protected $groups;
 
     public function __construct()
     {

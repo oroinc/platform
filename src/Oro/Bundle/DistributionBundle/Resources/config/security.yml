@@ -14,11 +14,10 @@ security:
 
     providers:
         oro_user:
-            entity: { class: OroDistributionBundle:User, property: username }
+            entity: { class: OroDistributionBundle:Security\User, property: username }
 
     encoders:
-        Oro\Bundle\DistributionBundle\Entity\User: sha512
-        Symfony\Component\Security\Core\User\User: plaintext
+        Oro\Bundle\DistributionBundle\Entity\Security\User: sha512
 
     firewalls:
         dev:

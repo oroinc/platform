@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Entity;
+namespace Oro\Bundle\DistributionBundle\Entity\Security;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\Role\RoleInterface;
