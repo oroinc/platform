@@ -211,7 +211,14 @@
         </div>
     {% endblock workflow_data %}
     </div>
+
     {% block navigation_content_tags %}
         {{ navigationMacro.navigationContentTags(workflowItem) }}
+        {% for attribute in workflow.attributeManager.managedEntityAttributes %}
+            {% set attributeName = attribute.name %}
+            {% if workflowItem.data[attributeName] is defined %}
+                {{ navigationMacro.navigationContentTags(workflowItem.data[attributeName]) }}
+            {% endif %}
+        {% endfor %}
     {% endblock %}
 {% endblock content %}
