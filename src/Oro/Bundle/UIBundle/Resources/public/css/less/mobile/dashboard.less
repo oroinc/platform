@@ -9,7 +9,6 @@
   }
 }
 .launchpad-widget-content {
-  padding: 0 @contentPadding @contentPadding;
   & > div {
     height: auto;
     .box-shadow(none);
@@ -39,9 +38,14 @@
     }
   }
 }
-.box-type1 .title{
-  padding: @topPadding @horizontalPadding @contentPadding / 2;
-}
-.dashboard-widget-content{
-  padding: 0 @horizontalPadding @bottomPadding * 2;
+.box-type1 {
+  margin: 0 @contentPadding @contentPadding;
+  border: 1px solid #b6b6b6;
+  .border-radius(3px);
+  .title{
+    padding: @contentPadding;
+  }
+  .calendar-container {
+    padding: 0;
+  }
 }
