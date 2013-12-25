@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,7 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
     protected $type;
 
     /**
-     * @var
+     * @var AbstractPlatform
      */
     protected $platform;
 
@@ -80,5 +81,13 @@ class UTCTimeTypeTest extends \PHPUnit_Framework_TestCase
         $expected = \DateTime::createFromFormat('H:i:s|', '08:00:00', new \DateTimeZone('UTC'));
 
         $this->assertEquals($expected, $this->type->convertToPHPValue($source, $this->platform));
+    }
+
+    /**
+     * @expectedException \Doctrine\DBAL\Types\ConversionException
+     */
+    public function testConvertToPHPValueException()
+    {
+        $this->type->convertToPHPValue('qwerty', $this->platform);
     }
 }

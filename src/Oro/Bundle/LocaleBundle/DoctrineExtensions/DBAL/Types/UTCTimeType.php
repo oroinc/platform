@@ -20,6 +20,7 @@ class UTCTimeType extends TimeType
             return null;
         }
 
+        /** @var \DateTime $value */
         $value->setTimeZone((self::$utc) ? self::$utc : (self::$utc = new \DateTimeZone('UTC')));
 
         return parent::convertToDatabaseValue($value, $platform);
