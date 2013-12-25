@@ -4,9 +4,9 @@ namespace Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\DateType;
+use Doctrine\DBAL\Types\TimeType;
 
-class UTCDateType extends DateType
+class UTCTimeType extends TimeType
 {
     /** @var null| \DateTimeZone  */
     static private $utc = null;
@@ -36,7 +36,7 @@ class UTCDateType extends DateType
         }
 
         $val = \DateTime::createFromFormat(
-            '!' . $platform->getDateFormatString(),
+            $platform->getTimeFormatString() . '|',
             $value,
             (self::$utc) ? self::$utc : (self::$utc = new \DateTimeZone('UTC'))
         );
