@@ -9,6 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -17,6 +18,8 @@ class InstallCommand extends ContainerAwareCommand
         $this
             ->setName('oro:install')
             ->setDescription('Oro Application Installer.')
+            ->addOption('company-name', null, InputOption::VALUE_OPTIONAL, 'Company name')
+            ->addOption('company-title', null, InputOption::VALUE_OPTIONAL, 'Company title')
             ->addOption('user-name', null, InputOption::VALUE_OPTIONAL, 'User name')
             ->addOption('user-email', null, InputOption::VALUE_OPTIONAL, 'User email')
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
@@ -103,6 +106,7 @@ class InstallCommand extends ContainerAwareCommand
      * @return InstallCommand
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function setupStep(CommandExecutor $commandExecutor, InputInterface $input, OutputInterface $output)
@@ -159,6 +163,17 @@ class InstallCommand extends ContainerAwareCommand
             return $value;
         };
 
+        /** @var ConfigManager $configManager */
+        $configManager       = $this->getContainer()->get('oro_config.global');
+        $defaultCompanyName  = $configManager->get('oro_ui.application_name');
+        $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
+
+        $companyName   = isset($options['company-name'])
+            ? $options['company-name']
+            : $dialog->ask($output, sprintf('<question>Company short name (%s):</question> ', $defaultCompanyName));
+        $companyTitle  = isset($options['company-title'])
+            ? $options['company-title']
+            : $dialog->ask($output, sprintf('<question>Company name (%s):</question> ', $defaultCompanyTitle));
         $userName      = isset($options['user-name'])
             ? $options['user-name']
             : $dialog->ask($output, '<question>Username:</question> ');
@@ -186,6 +201,15 @@ class InstallCommand extends ContainerAwareCommand
             ->addBusinessUnit($businessUnit);
 
         $container->get('oro_user.manager')->updateUser($user);
+
+        // update company name and title if specified
+        if (!empty($companyName) && $companyName !== $defaultCompanyName) {
+            $configManager->set('oro_ui.application_name', $companyName);
+        }
+        if (!empty($companyTitle) && $companyTitle !== $defaultCompanyTitle) {
+            $configManager->set('oro_ui.application_title', $companyTitle);
+        }
+        $configManager->flush();
 
         $demo = isset($options['sample-data'])
             ? strtolower($options['sample-data']) == 'y'
@@ -254,7 +278,7 @@ class InstallCommand extends ContainerAwareCommand
         $scriptExecutor = new ScriptExecutor($output, $this->getContainer(), $commandExecutor);
         /** @var ScriptManager $scriptManager */
         $scriptManager = $this->getContainer()->get('oro_installer.script_manager');
-        $scriptFiles  = $scriptManager->getScriptFiles();
+        $scriptFiles   = $scriptManager->getScriptFiles();
         if (!empty($scriptFiles)) {
             foreach ($scriptFiles as $scriptFile) {
                 $scriptExecutor->runScript($scriptFile);
