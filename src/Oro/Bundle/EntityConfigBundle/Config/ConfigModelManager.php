@@ -134,7 +134,9 @@ class ConfigModelManager
 
                 // if entity model found, load models for all fields of this entity and put them in the local cache
                 if ($result) {
-                    $fieldModels = $result->getFields();
+                    /** @var FieldConfigModel[] $fieldModels */
+                    $fieldModels = $this->getEntityManager()->getRepository(FieldConfigModel::ENTITY_NAME)
+                        ->findBy(['entity' => $result]);
                     foreach ($fieldModels as $fieldModel) {
                         $this->localCache->set(
                             $className . '::' . $fieldModel->getFieldName(),
