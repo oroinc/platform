@@ -1,10 +1,8 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid;
+namespace Oro\Bundle\SearchBundle\Tests\Unit\Extension\Pager;
 
-use Oro\Bundle\SearchBundle\Datagrid\IndexerQuery;
-use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Extension\Pager\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Result;
 
 class IndexerQueryTest extends \PHPUnit_Framework_TestCase
@@ -34,8 +32,6 @@ class IndexerQueryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped("TODO Fix or remove");
-
         $this->searchIndexer = $this->getMock(
             'Oro\Bundle\SearchBundle\Engine\Indexer',
             array('query'),

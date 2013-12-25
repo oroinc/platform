@@ -24,7 +24,7 @@ class ResultRecord implements ResultRecordInterface
                 }
             }
             if ($arrayData) {
-                $this->valueContainers[] = $arrayData;
+                array_unshift($this->valueContainers, $arrayData);
             }
         } elseif (is_object($data)) {
             $this->valueContainers[] = $data;

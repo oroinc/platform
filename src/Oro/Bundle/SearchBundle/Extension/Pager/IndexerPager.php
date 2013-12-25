@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Extension\Pager;
 
-use Doctrine\ORM\Query;
-
 use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\SearchBundle\Query\Query;
 
 class IndexerPager
 {
@@ -24,14 +23,14 @@ class IndexerPager
     protected $nbResults = 0;
 
     /**
-     * @var Query
+     * @var IndexerQuery
      */
     protected $query;
 
     /**
-     * @param Query $query
+     * @param IndexerQuery $query
      */
-    public function setQuery($query)
+    public function setQuery(IndexerQuery $query)
     {
         $this->query = $query;
     }

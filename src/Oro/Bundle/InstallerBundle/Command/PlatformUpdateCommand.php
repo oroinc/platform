@@ -16,7 +16,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:platform:update')
-            ->setDescription('Execute platform update commands.');
+            ->setDescription('Execute platform application update commands and init platform assets.');
     }
 
     /**
@@ -24,6 +24,11 @@ class PlatformUpdateCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $bundlesFile = $this->getContainer()->getParameter('kernel.cache_dir') . '/bundles.php';
+        if (is_file($bundlesFile)) {
+            unlink($bundlesFile);
+        }
+
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
             $output,
