@@ -123,19 +123,15 @@ function($, _, __, Backbone, app, Navigation, mediator, error) {
                 $el = this.$el,
                 refreshHandler = function (obj) {
                     if (modelUrl === obj.url) {
-                        $el.find('.outdated-note').remove();
+                        $el.find('.pin-status-outdated').removeClass('pin-status-outdated');
                         mediator.off('hash_navigation_request:page_refreshed', refreshHandler);
                     }
                 };
 
             if (!event.isCurrentPage && modelUrl == event.url) {
-                var $noteEl = $el.find('.outdated-note');
-                if (!$noteEl.length) {
-                    $noteEl = $('<i />', {
-                        class: 'icon-circle outdated-note',
-                        title: __('Content of pinned page is outdated')
-                    });
-                    $el.find('.pin-holder > div > a').prepend($noteEl);
+                var $noteEl = $el.find('.pin-status-normal');
+                if (!$noteEl.is('.pin-status-outdated')) {
+                    $noteEl.addClass('pin-status-outdated');
                     mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
                 }
             }
