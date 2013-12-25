@@ -3,3 +3,4 @@
 "Cancel": "Cancel"
 "navigation.message.content.outdated": "Content of {{ title }} page is outdated, please <a href='#' data-action='page-refresh'>refresh the page</a>"
 "Ok, got it.": "Ok, got it."
+"Content of pinned page is outdated": "Content of pinned page is outdated"
