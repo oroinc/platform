@@ -21,6 +21,8 @@ define(function (require) {
 
     var sidebarTemplate = require('text!oro/sidebar/sidebar/template');
 
+    var WIDGET_SORT_DELAY = 100;
+
     /**
      * @export  oro/sidebar/sidebar/view
      * @class oro.sidebar.sidebar.View
@@ -56,7 +58,9 @@ define(function (require) {
             view.listenTo(widgets, 'reset', view.onWidgetsReset);
             view.listenTo(widgets, 'add', view.onWidgetAdded);
             view.listenTo(widgets, 'remove', view.onWidgetRemoved);
-            view.listenTo(widgets, 'all', view.render);
+            view.listenTo(widgets, 'reset', view.render);
+            view.listenTo(widgets, 'add', view.render);
+            view.listenTo(widgets, 'remove', view.render);
 
             view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
             view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
@@ -116,6 +120,7 @@ define(function (require) {
                 revert: true,
                 axis: 'y',
                 containment: 'parent',
+                delay: WIDGET_SORT_DELAY,
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -151,6 +156,7 @@ define(function (require) {
                 revert: true,
                 axis: 'y',
                 containment: 'parent',
+                delay: WIDGET_SORT_DELAY,
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
