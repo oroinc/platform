@@ -43,13 +43,13 @@ class ScriptManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(3, count($scriptFiles));
 
         $files = [
-            '\Fixture\src\TestPackage\src\Test1Bundle\install.php',
-            '\Fixture\src\TestPackage\src\Test2Bundle\install.php',
-            '\Fixture\src\TestPackage\install.php'
+            '/Fixture/src/TestPackage/src/Test1Bundle/install.php',
+            '/Fixture/src/TestPackage/src/Test2Bundle/install.php',
+            '/Fixture/src/TestPackage/install.php'
         ];
         $i = 0;
         foreach ($scriptFiles as $scriptFile) {
-            $scriptFile = str_replace(__DIR__, '', $scriptFile);
+            $scriptFile = str_replace(DIRECTORY_SEPARATOR, '/', str_replace(__DIR__, '', $scriptFile));
             $this->assertEquals($files[$i], $scriptFile);
             $i++;
         }
