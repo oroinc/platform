@@ -49,13 +49,16 @@ class ScriptExecutor
         if (is_file($fileName)) {
             $tokens = [];
             if (preg_match(
-                '/@' . ScriptExecutor::ORO_SCRIPT_ANNOTATION . '\("([\w -]*)"\)/i',
+                '/@' . self::ORO_SCRIPT_ANNOTATION . '(\(("([\w -]*)")?\))?/i',
                 file_get_contents($fileName),
                 $tokens
             )
             ) {
+                $scriptLabel = count($tokens) === 4 && $tokens[3]
+                    ? sprintf('"%s" (%s)', $tokens[3], $fileName)
+                    : sprintf('"%s"', $fileName);
                 $this->output->writeln(
-                    sprintf('[%s] Launching "%s" script', date('Y-m-d H:i:s'), $fileName)
+                    sprintf('Launching %s script', $scriptLabel)
                 );
                 ob_start();
                 $container       = $this->container;
@@ -66,14 +69,16 @@ class ScriptExecutor
                 $this->output->writeln($scriptOutput);
             } else {
                 $this->output->writeln(
-                    'The "%s" script must contains @%s annotation',
-                    $fileName,
-                    ScriptExecutor::ORO_SCRIPT_ANNOTATION
+                    sprintf(
+                        'The "%s" script must contains @%s annotation',
+                        $fileName,
+                        self::ORO_SCRIPT_ANNOTATION
+                    )
                 );
             }
 
         } else {
-            $this->output->writeln('File "%s" not found', $fileName);
+            $this->output->writeln(sprintf('File "%s" not found', $fileName));
         }
     }
 }

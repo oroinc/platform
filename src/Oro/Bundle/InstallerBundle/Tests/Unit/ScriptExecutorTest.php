@@ -15,7 +15,7 @@ class ScriptExecutorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $output->expects($this->at(0))
             ->method('writeln')
-            ->with($this->stringContains(sprintf('Launching "%s" script', $testScriptFile)));
+            ->with($this->stringContains(sprintf('Launching "Test Package Installer" (%s) script', $testScriptFile)));
         $output->expects($this->at(1))
             ->method('writeln')
             ->with('Test Package Installer data');

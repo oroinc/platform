@@ -19,7 +19,7 @@ class RunScriptsCommand extends ContainerAwareCommand
         $this->setName('oro:platform:run-script')
             ->setDescription('Run php script files.')
             ->addArgument(
-                'scripts',
+                'script',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,
                 'Script files'
             );
@@ -40,7 +40,7 @@ class RunScriptsCommand extends ContainerAwareCommand
             $this->getContainer(),
             $commandExecutor
         );
-        $scriptFiles = $input->getArgument('scripts');
+        $scriptFiles = $input->getArgument('script');
         foreach ($scriptFiles as $scriptFile) {
             $scriptExecutor->runScript($scriptFile);
         }
