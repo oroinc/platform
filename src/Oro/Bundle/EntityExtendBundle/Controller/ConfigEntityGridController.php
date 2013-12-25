@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -153,6 +154,9 @@ class ConfigEntityGridController extends Controller
         $extendConfig->set('state', ExtendManager::STATE_NEW);
         $extendConfig->set('upgradeable', false);
         $extendConfig->set('is_extend', true);
+
+        $config = $configManager->getProvider('security')->getConfig($className);
+        $config->set('type', EntitySecurityMetadataProvider::ACL_SECURITY_TYPE);
 
         $configManager->persist($extendConfig);
 
