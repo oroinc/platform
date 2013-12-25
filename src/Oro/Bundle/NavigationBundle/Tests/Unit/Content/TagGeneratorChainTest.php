@@ -84,9 +84,28 @@ class TagGeneratorChainTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testSupports()
+    /**
+     * @dataProvider supportsDataProvider
+     *
+     * @param array $generators
+     * @param mixed $data
+     * @param bool  $result
+     */
+    public function testSupports(array $generators, $data, $result)
     {
-        $chain = new TagGeneratorChain();
-        $this->assertTrue($chain->supports(null), 'Should support any value');
+        $chain = new TagGeneratorChain($generators);
+        $this->assertEquals($result, $chain->supports($data));
+    }
+
+    /**
+     * @return array
+     */
+    public function supportsDataProvider()
+    {
+        return [
+            'should not supports if no one generator given' => [[], null, false],
+            'should support if any generator supports data' => [[new SimpleGeneratorStub('s')], 'testString', true],
+            'should not support if no generator supported'  => [[new SimpleGeneratorStub('s')], 'someBadString', false],
+        ];
     }
 }
