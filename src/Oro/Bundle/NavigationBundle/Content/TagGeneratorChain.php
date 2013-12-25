@@ -25,8 +25,8 @@ class TagGeneratorChain implements TagGeneratorInterface
      */
     public function supports($data)
     {
-        foreach ($this->generators as $provider) {
-            if ($provider->supports($data)) {
+        foreach ($this->generators as $generator) {
+            if ($generator->supports($data)) {
                 return true;
             }
         }

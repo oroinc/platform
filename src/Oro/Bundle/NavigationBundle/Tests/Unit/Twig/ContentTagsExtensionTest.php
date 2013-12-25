@@ -31,8 +31,15 @@ class ContentTagsExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFunctionDeclaration()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertArrayHasKey('oro_navigation_get_content_tags', $functions);
-        $this->assertContainsOnlyInstancesOf('\Twig_Function', $functions);
+        $required  = ['oro_navigation_get_content_tags'];
+        $defined   = [];
+        foreach ($functions as $function) {
+            if ($function instanceof \Twig_SimpleFunction && in_array($function->getName(), $required)) {
+                $defined[] = $function->getName();
+            }
+        }
+
+        $this->assertCount(0, array_diff($defined, $required), 'Required functions are not defined');
     }
 
     public function testNameConfigured()
