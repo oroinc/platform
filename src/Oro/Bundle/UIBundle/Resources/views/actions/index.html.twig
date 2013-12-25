@@ -22,7 +22,6 @@
             </div>
         </div>
     </div>
-
     {% block content_datagrid %}
         {% if gridName is defined %}
             {% if params is defined %}
@@ -30,11 +29,12 @@
             {% else %}
                 {{ dataGrid.renderGrid(gridName) }}
             {% endif %}
-        {% endif %}
-
-        {# fallback for OroGridBundle grids #}
-        {% if gridId is defined %}
-            {{ UI.gridBlock(gridId) }}
+            {# Only grids on index pages will be tagged #}
+            <script type="text/javascript">
+                require(['oro/content/grid-builder'], function (GridTagBuilder) {
+                    GridTagBuilder.allowTracking({{ gridName|json_encode|raw }});
+                });
+            </script>
         {% endif %}
     {% endblock content_datagrid %}
 {% endblock content %}
