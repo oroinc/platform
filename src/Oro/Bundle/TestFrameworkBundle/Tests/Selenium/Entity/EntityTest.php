@@ -60,6 +60,8 @@ class EntityTest extends Selenium2TestCase
      */
     public function testUpdateEntity($entityname)
     {
+        $this->markTestIncomplete('Need to rewrite this test to use filter by Name. BAP-2605');
+
         $newentityname = 'Update' . $entityname;
         $login = new Login($this);
         $login->setUsername(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
@@ -111,6 +113,8 @@ class EntityTest extends Selenium2TestCase
      */
     public function testDeleteEntity($entityname)
     {
+        $this->markTestIncomplete('Need to rewrite this test to use filter by Name. BAP-2605');
+
         $login = new Login($this);
         $login->setUsername(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->setPassword(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS)
