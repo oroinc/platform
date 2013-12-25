@@ -21,7 +21,7 @@ define(function (require) {
 
     var sidebarTemplate = require('text!oro/sidebar/sidebar/template');
 
-    var WIDGET_SORT_DELAY = 500;
+    var WIDGET_SORT_DELAY = 100;
 
     /**
      * @export  oro/sidebar/sidebar/view
