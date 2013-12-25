@@ -168,12 +168,12 @@ class InstallCommand extends ContainerAwareCommand
         $defaultCompanyName  = $configManager->get('oro_ui.application_name');
         $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
 
-        $companyName   = isset($options['company-name'])
-            ? $options['company-name']
-            : $dialog->ask($output, sprintf('<question>Company short name (%s):</question> ', $defaultCompanyName));
         $companyTitle  = isset($options['company-title'])
             ? $options['company-title']
             : $dialog->ask($output, sprintf('<question>Company name (%s):</question> ', $defaultCompanyTitle));
+        $companyName   = isset($options['company-name'])
+            ? $options['company-name']
+            : $dialog->ask($output, sprintf('<question>Company short name (%s):</question> ', $defaultCompanyName));
         $userName      = isset($options['user-name'])
             ? $options['user-name']
             : $dialog->ask($output, '<question>Username:</question> ');
