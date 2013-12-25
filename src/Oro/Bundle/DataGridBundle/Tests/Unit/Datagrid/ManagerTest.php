@@ -58,7 +58,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider datagridProvider
      */
-    public function testGetDataGrid($name, $expectedExceptionMessage)
+    public function testGetDataGrid($name, array $parameters = [], $expectedExceptionMessage = null)
     {
         if ($expectedExceptionMessage) {
             $this->setExpectedException('\RuntimeException', $expectedExceptionMessage);
@@ -67,10 +67,15 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
             $configurationClass = 'Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration';
             $this->builder->expects($this->once())->method('build')
-                ->with($this->isInstanceOf($configurationClass));
-            $this->requestParams->expects($this->once())->method('setRootParameter')->with($this->equalTo($name));
+                ->with($this->isInstanceOf($configurationClass), $this->equalTo($parameters));
+            $this->requestParams->expects($this->at(0))->method('setRootParameter')->with($this->equalTo($name));
+            $counter = 1;
+            foreach ($parameters as $key => $value) {
+                $this->requestParams->expects($this->at($counter))->method('set')->with($key, $value);
+                $counter++;
+            }
         }
-        $this->manager->getDatagrid($name);
+        $this->manager->getDatagrid($name, $parameters);
     }
 
     /**
@@ -81,10 +86,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         return [
             'test existing grid configuration'                   => [
                 self::TEST_NAME,
-                false
+                ['key' => 'value', 'key2' => 'value2']
             ],
             'test some not existing grid should throw exception' => [
                 'someName',
+                [],
                 'A configuration for "someName" datagrid was not found.'
             ]
         ];

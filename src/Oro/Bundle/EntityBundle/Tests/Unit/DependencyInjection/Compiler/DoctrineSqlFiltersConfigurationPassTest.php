@@ -18,9 +18,6 @@ class DoctrineSqlFiltersConfigurationPassTest extends \PHPUnit_Framework_TestCas
 
     protected function setUp()
     {
-        $this->markTestSkipped(
-            'Refactor tests after filter collection is refactored'
-        );
         $this->pass = new DoctrineSqlFiltersConfigurationPass();
     }
 
@@ -34,9 +31,6 @@ class DoctrineSqlFiltersConfigurationPassTest extends \PHPUnit_Framework_TestCas
             ->will($this->returnValue(true));
     }
 
-    /**
-     *
-     */
     public function testProcess()
     {
         $this->prepareContainer();
@@ -85,6 +79,7 @@ class DoctrineSqlFiltersConfigurationPassTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @expectedException \LogicException
+     * @expectedExceptionMessage Attribute filter_name is required for filter1 service
      */
     public function testProcessMissingFilterNameException()
     {
@@ -105,6 +100,7 @@ class DoctrineSqlFiltersConfigurationPassTest extends \PHPUnit_Framework_TestCas
 
     /**
      * @expectedException \LogicException
+     * @expectedExceptionMessage Attribute filter_name "filter2" for filter_name1 service is already used
      */
     public function testProcessDublicateFilterNameException()
     {

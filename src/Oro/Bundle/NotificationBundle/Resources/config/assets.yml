@@ -1,0 +1,3 @@
+css:
+  'user':
+      - 'bundles/oronotification/css/translation-widget.css'

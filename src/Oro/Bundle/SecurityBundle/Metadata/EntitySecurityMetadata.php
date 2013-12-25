@@ -136,6 +136,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
      * @param array $data Initialization array
      * @return EntitySecurityMetadata A new instance of a EntitySecurityMetadata object
      */
+    // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
         $result               = new EntitySecurityMetadata();
@@ -147,4 +148,5 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
 
         return $result;
     }
+    // @codingStandardsIgnoreEnd
 }

@@ -429,4 +429,15 @@ class LocaleSettingsTest extends \PHPUnit_Framework_TestCase
             $this->localeSettings->getCurrencySymbolByCurrency($notExistingCurrencyCode)
         );
     }
+
+    public function testGetLocaleByCode()
+    {
+        $locales = $this->localeSettings->getLocalesByCodes(['en', 'fr']);
+        $this->assertCount(2, $locales);
+
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with('test');
+        $this->localeSettings->get('test');
+    }
 }
