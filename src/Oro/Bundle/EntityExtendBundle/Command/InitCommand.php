@@ -58,9 +58,9 @@ class InitCommand extends ContainerAwareCommand
 
                 $this->configManager->flush();
 
-                $output->writeln('Done');
             }
         }
+        $output->writeln('Done');
 
         $this->getContainer()->get('oro_entity_extend.tools.dumper')->clear();
         $this->configManager->clearConfigurableCache();
@@ -108,7 +108,10 @@ class InitCommand extends ContainerAwareCommand
 
             $entityConfig = $configProvider->getConfig($className);
 
-            $entityConfig->set('owner', ExtendManager::OWNER_SYSTEM);
+            $entityConfig->set(
+                'owner',
+                isset($entityOptions['owner']) ? $entityOptions['owner'] : ExtendManager::OWNER_SYSTEM
+            );
 
             if (isset($entityOptions['is_extend'])) {
                 $entityConfig->set('is_extend', $entityOptions['is_extend']);
