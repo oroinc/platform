@@ -318,12 +318,12 @@
                     {% if tooltip_placement is defined %}data-placement="{{ tooltip_placement }}"{% endif %}
                     data-content="{{ tooltip }}"
                     data-toggle="popover"></i>
-            {% endif %}
-            {% if _isTranslatedLabel is defined and _isTranslatedLabel %}
+            {%- endif -%}
+            {%- if _isTranslatedLabel is defined and _isTranslatedLabel -%}
                 {{ label }}
-            {% else %}
+            {%- else -%}
                 {{ label|trans({}, translation_domain)|capitalize }}
-            {% endif %}
+            {%- endif -%}
             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {% endspaceless %}
