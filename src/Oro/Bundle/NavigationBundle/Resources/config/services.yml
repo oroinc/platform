@@ -191,6 +191,12 @@ services:
             - [ markSkipped, ['Oro\Bundle\DataAuditBundle\Entity\Audit']]
             - [ markSkipped, ['Oro\Bundle\DataAuditBundle\Entity\AuditData']]
             - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem']]
+            - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\Item']]
+            - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexText']]
+            - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexInteger']]
+            - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexDecimal']]
+            - [ markSkipped, ['Oro\Bundle\SearchBundle\Entity\IndexDatetime']]
+            - [ markSkipped, ['Oro\Bundle\NavigationBundle\Entity\PageState']]
         tags:
             - { name: doctrine.event_subscriber, connection: default }
 

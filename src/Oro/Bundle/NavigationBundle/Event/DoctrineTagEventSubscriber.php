@@ -90,6 +90,7 @@ class DoctrineTagEventSubscriber implements EventSubscriber
     public function postFlush(PostFlushEventArgs $event)
     {
         $this->sender->send($this->collectedTags);
+        $this->collectedTags = [];
     }
 
     /**
