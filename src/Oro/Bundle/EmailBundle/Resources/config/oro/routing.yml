@@ -9,5 +9,6 @@ oro_email_bundle_api:
     prefix:       api/rest/{version}
     requirements:
         version:  latest|v1
+        _format:  json
     defaults:
         version:  latest

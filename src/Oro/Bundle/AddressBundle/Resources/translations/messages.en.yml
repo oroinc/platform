@@ -9,7 +9,7 @@ oro:
     address:
         form:
             choose_country: "Choose a country..."
-            choose_state: "Choose a state..."
+            choose_region: "Choose a state..."
         region:
             entity_label:         State
             entity_plural_label:  States
@@ -22,7 +22,7 @@ oro:
             entity_label:         Country
             entity_plural_label:  Countries
             entity_description:   Represent address country
-            regions.label:        Regions
+            regions.label:        States
             name.label:           Name
             iso3_code.label:      ISO3 code
             iso2_code.label:      ISO2 code

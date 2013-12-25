@@ -1,21 +1,5 @@
-.pull-left {
-    float: left;
-}
-
-.menu a {
-    /*display: inline-block;*/
-    /*padding: 3px 5px;*/
-    /*margin: 0 5px;*/
-    /*color: #515e66;*/
-    /*text-decoration: underline;*/
-}
-
 .menu a:hover {
     text-decoration: none;
-}
-
-a.ajax {
-    /*font-style: italic;*/
 }
 
 .ajax-loading {
@@ -148,8 +132,8 @@ div.navbar-inner .help a:hover {
 .confirm-dialog.modal.fade.in {
     top: 25%;
     -webkit-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
-    -moz-box-shadow:    0px 0px 19px rgba(50, 50, 50, 0.75);
-    box-shadow:         0px 0px 19px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
+    box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
 }
 
 .confirm-dialog .modal-dialog .modal-content {
@@ -184,4 +168,13 @@ div.navbar-inner .help a:hover {
 
 .modal-backdrop, .modal-backdrop.fade.in {
     opacity: 0.5;
+}
+
+.desktop-version #oroplatform-header .logo {
+    font-size: 0;
+}
+
+.desktop-version #oroplatform-header .logo a {
+    display: inline-block;
+    font-size: 17px;
 }

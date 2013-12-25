@@ -24,14 +24,12 @@
 {% block content %}
 <div class="layout-content dashboard-contailer">
     <div class="container-fluid page-title">
-        <div class="navigation clearfix navbar-extra">
+        <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
                 {% block title %}
                 <div class="span9">
                     <div class="pull-left">
-                        <div class="container-fluid">
-                            <h1 class="oro-subtitle">{{ pageTitle|trans }}</h1>
-                        </div>
+                        <h1 class="oro-subtitle">{{ pageTitle|trans }}</h1>
                     </div>
                 </div>
                 {% endblock title %}
@@ -53,7 +51,7 @@
                             function($, routing, Navigation){
                                 $(function () {
                                     $('#dashboard_selector').on('change', function (e) {
-                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}),
+                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}) + '?change_dashboard=true',
                                             navigation = Navigation.getInstance();
                                         if (navigation) {
                                             navigation.processRedirect({

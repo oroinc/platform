@@ -145,11 +145,16 @@ function($, _, __, tools) {
         },
         highlight: function (element) {
             this.settings.unhighlight.call(this, element);
-            getErrorTarget(element).addClass('error').closest('.controls').addClass('validation-error');
+            var $el = getErrorTarget(element);
+            $el.addClass('error')
+                .closest('.controls').addClass('validation-error');
+            $el.closest('.control-group').find('label').addClass('validation-error');
         },
         unhighlight: function(element) {
-            $(element).closest('.error').removeClass('error')
-                .closest('.controls').removeClass('validation-error');
+            var $el = $(element);
+            $el.closest('.error').removeClass('error')
+                .closest('.control').removeClass('validation-error');
+            $el.closest('.control-group').find('label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
         ignore: ":hidden:not([type=hidden])"

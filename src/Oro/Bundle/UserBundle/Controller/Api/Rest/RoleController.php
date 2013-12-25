@@ -150,10 +150,29 @@ class RoleController extends RestController implements ClassResourceInterface
 
         return $this->handleView(
             $this->view(
-                $entity,
+                $entity ? $this->getPreparedItem($entity) : null,
                 $entity ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function transformEntityField($field, &$value)
+    {
+        switch ($field) {
+            case 'owner':
+                if ($value) {
+                    $value = array(
+                        'id' => $value->getId(),
+                        'name' => $value->getName()
+                    );
+                }
+                break;
+            default:
+                parent::transformEntityField($field, $value);
+        }
     }
 
     /**

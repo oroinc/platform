@@ -253,6 +253,7 @@ class ConfigFieldGridController extends Controller
         }
 
         $fieldConfig->set('state', ExtendManager::STATE_DELETED);
+        $configManager->persist($fieldConfig);
 
         $fields = $extendManager->getConfigProvider()->filter(
             function (ConfigInterface $config) {
@@ -264,14 +265,14 @@ class ConfigFieldGridController extends Controller
             $className
         );
 
+        $entityConfig = $extendManager->getConfigProvider()->getConfig($className);
         if (!count($fields)) {
-            $entityConfig = $extendManager->getConfigProvider()->getConfig($className);
-
             $entityConfig->set('upgradeable', false);
-            $configManager->persist($entityConfig);
+        } else {
+            $entityConfig->set('upgradeable', true);
         }
+        $configManager->persist($entityConfig);
 
-        $configManager->persist($fieldConfig);
         $configManager->flush();
 
         return new JsonResponse(array('message' => 'Item was removed.', 'successful' => true), Codes::HTTP_OK);

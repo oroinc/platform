@@ -42,8 +42,8 @@ class AddressType extends AbstractType
             ->add('street', 'text', array('required' => true))
             ->add('street2', 'text', array('required' => false))
             ->add('city', 'text', array('required' => true))
-            ->add('state', 'oro_region', array('required' => false))
-            ->add('state_text', 'hidden', array('required' => false))
+            ->add('region', 'oro_region', array('required' => false))
+            ->add('region_text', 'hidden', array('required' => false))
             ->add('postalCode', 'text', array('required' => true, 'label' => 'ZIP/Postal code'));
     }
 

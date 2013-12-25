@@ -53,14 +53,14 @@ class InitCommand extends ContainerAwareCommand
 
                 foreach ($config as $className => $entityOptions) {
                     $className = class_exists($className) ? $className : 'Extend\\Entity\\' . $className;
-                    $this->parseEntity($className, $entityOptions);
+                    $this->parseEntity($className, $entityOptions, $output, false);
                 }
 
                 $this->configManager->flush();
 
-                $output->writeln('Done');
             }
         }
+        $output->writeln('Done');
 
         $this->getContainer()->get('oro_entity_extend.tools.dumper')->clear();
         $this->configManager->clearConfigurableCache();
@@ -88,11 +88,15 @@ class InitCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param $className
-     * @param $entityOptions
+     * @param string          $className     Entity's class name
+     * @param array           $entityOptions Entity's options
+     * @param OutputInterface $output
+     * @param bool            $force         Flag to update existing entity model
      * @throws \InvalidArgumentException
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function parseEntity($className, $entityOptions)
+    protected function parseEntity($className, $entityOptions, $output, $force)
     {
         /** @var ExtendManager $extendManager */
         $extendManager  = $this->getContainer()->get('oro_entity_extend.extend.extend_manager');
@@ -108,7 +112,10 @@ class InitCommand extends ContainerAwareCommand
 
             $entityConfig = $configProvider->getConfig($className);
 
-            $entityConfig->set('owner', ExtendManager::OWNER_SYSTEM);
+            $entityConfig->set(
+                'owner',
+                isset($entityOptions['owner']) ? $entityOptions['owner'] : ExtendManager::OWNER_SYSTEM
+            );
 
             if (isset($entityOptions['is_extend'])) {
                 $entityConfig->set('is_extend', $entityOptions['is_extend']);

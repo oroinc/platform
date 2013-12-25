@@ -54,7 +54,7 @@ class EmailNotificationApiTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->at(5))
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber'));
+            ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'));
 
         $this->type->buildForm($builder, array());
     }

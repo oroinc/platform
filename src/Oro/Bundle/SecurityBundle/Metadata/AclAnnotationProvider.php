@@ -8,7 +8,6 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 
 class AclAnnotationProvider
 {
-    const CACHE_NAMESPACE = 'AclAnnotation';
     const CACHE_KEY = 'data';
 
     /**
@@ -34,9 +33,6 @@ class AclAnnotationProvider
     public function __construct(CacheProvider $cache = null)
     {
         $this->cache = $cache;
-        if ($this->cache !== null && $this->cache->getNamespace() === '') {
-            $this->cache->setNamespace(self::CACHE_NAMESPACE);
-        }
     }
 
     /**

@@ -126,11 +126,11 @@
         }] ) %}
     {% endif %}
 
-    {% if form.groups is defined or form.rolesCollection is defined %}
+    {% if form.groups is defined or form.roles is defined %}
         {% macro userRoles(form) %}
-            {% if form.rolesCollection is defined %}
+            {% if form.roles is defined %}
                 <div class="form-horizontal" id="roles-list">
-                    {{ form_row(form.rolesCollection, {attr: { class: 'horizontal' } }) }}
+                    {{ form_row(form.roles, {attr: { class: 'horizontal' } }) }}
                 </div>
             {% endif %}
         {% endmacro %}

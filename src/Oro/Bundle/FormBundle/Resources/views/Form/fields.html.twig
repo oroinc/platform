@@ -294,6 +294,9 @@
         {% if required %}
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
         {% endif %}
+        {% if errors|length > 0 %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' validation-error')|trim}) %}
+        {% endif %}
         {% if label is empty %}
             {% set label = name|humanize %}
         {% endif %}
@@ -315,15 +318,13 @@
                     {% if tooltip_placement is defined %}data-placement="{{ tooltip_placement }}"{% endif %}
                     data-content="{{ tooltip }}"
                     data-toggle="popover"></i>
-            {% endif %}
-            {% if required and not isRadioLabel %}
-                <em>*</em>
-            {% endif %}
-            {% if _isTranslatedLabel is defined and _isTranslatedLabel %}
+            {%- endif -%}
+            {%- if _isTranslatedLabel is defined and _isTranslatedLabel -%}
                 {{ label }}
-            {% else %}
+            {%- else -%}
                 {{ label|trans({}, translation_domain)|capitalize }}
-            {% endif %}
+            {%- endif -%}
+            <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
     {% endspaceless %}
 {% endblock form_label %}

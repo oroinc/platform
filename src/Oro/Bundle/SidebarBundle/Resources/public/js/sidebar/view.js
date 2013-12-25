@@ -21,6 +21,8 @@ define(function (require) {
 
     var sidebarTemplate = require('text!oro/sidebar/sidebar/template');
 
+    var WIDGET_SORT_DELAY = 100;
+
     /**
      * @export  oro/sidebar/sidebar/view
      * @class oro.sidebar.sidebar.View
@@ -56,7 +58,9 @@ define(function (require) {
             view.listenTo(widgets, 'reset', view.onWidgetsReset);
             view.listenTo(widgets, 'add', view.onWidgetAdded);
             view.listenTo(widgets, 'remove', view.onWidgetRemoved);
-            view.listenTo(widgets, 'all', view.render);
+            view.listenTo(widgets, 'reset', view.render);
+            view.listenTo(widgets, 'add', view.render);
+            view.listenTo(widgets, 'remove', view.render);
 
             view.listenTo(Backbone, 'showWidgetHover', view.onShowWidgetHover);
             view.listenTo(Backbone, 'removeWidget', view.onRemoveWidget);
@@ -116,6 +120,7 @@ define(function (require) {
                 revert: true,
                 axis: 'y',
                 containment: 'parent',
+                delay: WIDGET_SORT_DELAY,
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -141,7 +146,7 @@ define(function (require) {
                     return;
                 }
                 if (widget.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                    widget.set('state', constants.WIDGET_MAXIMIZED);
+                    widget.set({ state: constants.WIDGET_MAXIMIZED }, { silent: true });
                 }
                 widgetView.render().delegateEvents();
                 $content.append(widgetView.$el);
@@ -151,6 +156,7 @@ define(function (require) {
                 revert: true,
                 axis: 'y',
                 containment: 'parent',
+                delay: WIDGET_SORT_DELAY,
                 start: function (event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -293,23 +299,8 @@ define(function (require) {
             });
 
             view.$el.append(hoverView.render().$el);
-            var widgetWidth = hoverView.$el.width();
 
-            var windowWidth = $(window).width();
-
-            if ((cord.left + widgetWidth) > windowWidth) {
-                cord.left = windowWidth - widgetWidth;
-            }
-
-            var sidebarWidth = view.$el.width();
-            if (view.model.get('position') === constants.SIDEBAR_LEFT) {
-                cord.left += sidebarWidth;
-            } else {
-                cord.left -= sidebarWidth;
-            }
-
-            hoverView.setOffset(cord);
-
+            hoverView.setOffset({top: cord.top});
             view.hoverViews[cid] = hoverView;
         },
 

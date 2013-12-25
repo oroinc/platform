@@ -23,10 +23,10 @@ class Account extends AbstractEntity implements Entity
         $this->zipcode = $this->byId('orocrm_account_form_billingAddress_postalCode');
         $this->owner = $this->byXpath("//div[@id='s2id_orocrm_account_form_owner']/a");
 
-        if ($this->byId('orocrm_account_form_billingAddress_state_text')->displayed()) {
-            $this->state = $this->byId('orocrm_account_form_billingAddress_state_text');
+        if ($this->byId('orocrm_account_form_billingAddress_region_text')->displayed()) {
+            $this->state = $this->byId('orocrm_account_form_billingAddress_region_text');
         } else {
-            $this->state = $this->byXpath("//div[@id='s2id_orocrm_account_form_billingAddress_state']/a");
+            $this->state = $this->byXpath("//div[@id='s2id_orocrm_account_form_billingAddress_region']/a");
         }
 
         return $this;
@@ -73,9 +73,9 @@ class Account extends AbstractEntity implements Entity
             );
             $this->tags->clear();
         } else {
-            if ($this->isElementPresent("//div[@id='tags-holder']")) {
+            if ($this->isElementPresent("//div[contains(@class, 'tags-holder')]")) {
                 $this->assertElementPresent(
-                    "//div[@id='tags-holder']//li[contains(., '{$tag}')]",
+                    "//div[contains(@class, 'tags-holder')]//li[contains(., '{$tag}')]",
                     'Tag is not assigned to entity'
                 );
             } else {
@@ -154,12 +154,12 @@ class Account extends AbstractEntity implements Entity
         return $this;
     }
 
-    public function setState($state)
+    public function setRegion($state)
     {
-        if ($this->byId('orocrm_account_form_billingAddress_state_text')->displayed()) {
-            $this->state = $this->byId('orocrm_account_form_billingAddress_state_text');
+        if ($this->byId('orocrm_account_form_billingAddress_region_text')->displayed()) {
+            $this->state = $this->byId('orocrm_account_form_billingAddress_region_text');
         } else {
-            $this->state = $this->byXpath("//div[@id='s2id_orocrm_account_form_billingAddress_state']/a");
+            $this->state = $this->byXpath("//div[@id='s2id_orocrm_account_form_billingAddress_region']/a");
         }
 
         $this->state->click();

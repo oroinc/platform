@@ -60,7 +60,7 @@ class ActionMetadata implements AclClassInfo, \Serializable
      */
     public function __construct($name = '', $group = '', $label = '')
     {
-        $this->name = $name;
+        $this->name  = $name;
         $this->group = $group;
         $this->label = $label;
     }
@@ -90,4 +90,22 @@ class ActionMetadata implements AclClassInfo, \Serializable
             $this->label
             ) = unserialize($serialized);
     }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return ActionMetadata A new instance of a ActionMetadata object
+     */
+    // @codingStandardsIgnoreStart
+    public static function __set_state($data)
+    {
+        $result        = new ActionMetadata();
+        $result->name  = $data['name'];
+        $result->group = $data['group'];
+        $result->label = $data['label'];
+
+        return $result;
+    }
+    // @codingStandardsIgnoreEnd
 }
