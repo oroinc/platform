@@ -2,29 +2,17 @@
 namespace Oro\Bundle\MeasureBundle\Tests\Convert;
 
 use Oro\Bundle\MeasureBundle\Family\WeightFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\VolumeFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\TemperatureFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\SpeedFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\PowerFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\FrequencyFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\BinaryFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\AreaFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Family\LengthFamilyInterface;
-
 use Oro\Bundle\MeasureBundle\Convert\MeasureConverter;
-
 use Oro\Bundle\MeasureBundle\Exception\UnknownFamilyMeasureException;
-
 use Oro\Bundle\MeasureBundle\Exception\UnknownMeasureException;
-
 use Oro\Bundle\MeasureBundle\Exception\UnknownOperatorException;
 
 use Symfony\Component\Yaml\Yaml;
@@ -51,7 +39,7 @@ class MeasureConverterTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         // get measures configuration
-        $configFile = realpath(dirname(__FILE__) .'/../../Resources/config/measure.yml');
+        $configFile = realpath(dirname(__FILE__) . '/../../../Resources/config/measure.yml');
         $config = $this->initializeConfig($configFile);
 
         // initialize converter
@@ -60,24 +48,24 @@ class MeasureConverterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Initialize a configuration
-     * @param string $filepath
+     * @param string $filePath
      *
      * @throws \Exception
      *
-     * @return multitype
+     * @return mixed
      */
-    protected function initializeConfig($filepath)
+    protected function initializeConfig($filePath)
     {
-        if (!file_exists($filepath)) {
+        if (!file_exists($filePath)) {
             throw new \Exception('Config file not exists');
         }
 
-        return Yaml::parse($filepath);
+        return Yaml::parse($filePath);
     }
 
     /**
      * Initialize converter
-     * @param multitype $config
+     * @param mixed $config
      *
      * @throws \Exception
      *
@@ -116,7 +104,7 @@ class MeasureConverterTest extends \PHPUnit_Framework_TestCase
      * Data provider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      *
-     * @return multitype:multitype:number string
+     * @return mixed
      *
      * @static
      */
@@ -224,7 +212,7 @@ class MeasureConverterTest extends \PHPUnit_Framework_TestCase
             // Temperature tests
             array(
                 TemperatureFamilyInterface::FAMILY,
-                TemperatureFamilyInterface::CELCIUS,
+                TemperatureFamilyInterface::CELSIUS,
                 TemperatureFamilyInterface::FAHRENHEIT,
                 20,
                 68
