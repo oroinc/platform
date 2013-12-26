@@ -87,9 +87,12 @@
                         success: function (res) {
                             var successMessage = __('Sync was scheduled.'),
                                 url = routing.generate('oro_cron_job_view', {id: res.job_id}),
-                                jobViewLink = '<a href="' + url + '" target="_blank">' + __('Check progress.') + '</a>';
+                                jobViewLink = '<a href="' + url + '" class="job-view-link">' + __('Check progress.') + '</a>';
 
-                            messenger.notificationFlashMessage('success', [successMessage, jobViewLink].join(' '));
+                            messenger.notificationMessage('success', [successMessage, jobViewLink].join(' '));
+                            if (navigation) {
+                                navigation.processClicks($('.job-view-link'));
+                            }
                         },
                         error: function () {
                             messenger.notificationMessage('error', __('Error was occurred, please try later.'));
