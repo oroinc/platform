@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
 class Runner
@@ -18,11 +19,18 @@ class Runner
     protected $installationManager;
 
     /**
-     * @param InstallationManager $installationManager
+     * @var string|null
      */
-    public function __construct(InstallationManager $installationManager)
+    protected $applicationRootDir;
+
+    /**
+     * @param InstallationManager $installationManager
+     * @param string $applicationRootDir
+     */
+    public function __construct(InstallationManager $installationManager, $applicationRootDir = null)
     {
         $this->installationManager = $installationManager;
+        $this->applicationRootDir = $applicationRootDir;
     }
 
     /**
@@ -69,30 +77,68 @@ class Runner
     }
 
     /**
+     * @return string
+     * @throws ProcessFailedException
+     */
+    public function runPlatformUpdate()
+    {
+        $phpPath = $this->getPhpExecutablePath();
+        $command = sprintf('%s app/console oro:platform:update --env=prod', $phpPath);
+
+        return $this->runProcess($command);
+    }
+
+    /**
+     * Needed to be executed after package has been uninstalled so that main application (app/console) could be built
+     */
+    public function removeCachedFiles()
+    {
+        if (!$this->applicationRootDir) {
+            return;
+        }
+        $finder = new Finder();
+        $finder->files()
+            ->in($this->applicationRootDir)
+            ->name('bundles.php')
+            ->name('*ProjectContainer.php');
+
+        foreach ($finder as $file) {
+            /** @var SplFileInfo $file */
+            if (is_file($file->getPathname())) {
+                unlink($file->getPathname());
+            }
+        }
+    }
+
+    /**
      * @param string $path
      * @return string
-     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     * @throws ProcessFailedException
      */
     protected function run($path)
     {
         if (file_exists($path)) {
             $phpPath = $this->getPhpExecutablePath();
+            $command = sprintf('%s app/console oro:platform:run-script --env=prod %s', $phpPath, $path);
 
-            $process = (new ProcessBuilder())
-                ->setPrefix($phpPath)
-                ->add($path)
-                ->add('-p')
-                ->add($phpPath)
-                ->getProcess();
-
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                throw new ProcessFailedException($process);
-            }
-
-            return $process->getOutput();
+            return $this->runProcess($command);
         }
+    }
+
+    protected function runProcess($command)
+    {
+        $process = new Process($command);
+        $process->setWorkingDirectory($this->applicationRootDir);
+        $process->setTimeout(600);
+
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+//        echo $process->getOutput();
+        return $process->getOutput();
     }
 
     /**
