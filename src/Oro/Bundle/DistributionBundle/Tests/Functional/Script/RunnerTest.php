@@ -12,7 +12,7 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldBeConstructedWithInstallationManager()
     {
-        new Runner($this->createInstallationManagerMock());
+        new Runner($this->createInstallationManagerMock(), 'path/to/application/root/dir');
     }
 
     /**
