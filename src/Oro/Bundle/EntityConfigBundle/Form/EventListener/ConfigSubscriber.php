@@ -101,11 +101,13 @@ class ConfigSubscriber implements EventSubscriberInterface
                         if (isset($messages[$value])) {
                             $value                              = $messages[$value];
                             $data[$provider->getScope()][$code] = $value;
-                            $dataChanges                        = true;
                         } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
                             $data[$provider->getScope()][$code] = $configModel->getFieldName();
-                            $dataChanges                        = true;
+                        } else {
+                            $data[$provider->getScope()][$code] = '';
                         }
+
+                        $dataChanges = true;
                     }
                 }
             }
