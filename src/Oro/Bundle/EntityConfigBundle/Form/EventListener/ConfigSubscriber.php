@@ -71,10 +71,9 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     /**
      * Check for translatable values and preSet it on form
-     * if NO translations in DB -> retrieve translation from messages
-     * if NO, return:
-     *  field name (in case of FieldConfigModel)
-     *  translation key (in case of EntityConfigModel)
+     * if have NO translation in translation catalogue return:
+     *  - field name (in case of creating new FieldConfigModel)
+     *  - empty string (in case of editing FieldConfigModel)
      *
      * @param FormEvent $event
      */
