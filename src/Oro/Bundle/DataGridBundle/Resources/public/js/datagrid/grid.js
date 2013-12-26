@@ -69,6 +69,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             /** @property {oro.datagrid.ActionColumn} */
             actionsColumn: ActionColumn,
 
+            /** @property true when no one column configured to be shown in th grid */
             noColumnsFlag: false,
 
             /**
