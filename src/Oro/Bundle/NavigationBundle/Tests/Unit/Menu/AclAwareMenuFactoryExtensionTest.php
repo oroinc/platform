@@ -41,6 +41,9 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
+        $this->securityFacade->expects($this->any())
+            ->method('hasLoggedUser')
+            ->will($this->returnValue(true));
         $this->factoryExtension = new AclAwareMenuFactoryExtension($this->router, $this->securityFacade);
         $this->factory = new MenuFactory();
         $this->factory->addExtension($this->factoryExtension);
