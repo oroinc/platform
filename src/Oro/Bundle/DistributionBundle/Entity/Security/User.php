@@ -56,8 +56,8 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @ORM\ManyToMany(targetEntity="Role")
      * @ORM\JoinTable(name="oro_user_access_role",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")}
      * )
      */
     protected $roles;
@@ -67,8 +67,8 @@ class User implements AdvancedUserInterface, \Serializable
      *
      * @ORM\ManyToMany(targetEntity="Group")
      * @ORM\JoinTable(name="oro_user_access_group",
-     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id")}
      * )
      */
     protected $groups;
@@ -120,7 +120,7 @@ class User implements AdvancedUserInterface, \Serializable
 
         /** @var Group $group */
         foreach ($this->groups as $group) {
-            $roles = array_merge($roles, $group->getRoles()->toArray());
+            $roles = array_merge($roles, $group->getRoles());
         }
 
         return array_values(array_unique($roles));

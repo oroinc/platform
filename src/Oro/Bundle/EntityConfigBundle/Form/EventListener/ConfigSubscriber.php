@@ -71,10 +71,9 @@ class ConfigSubscriber implements EventSubscriberInterface
 
     /**
      * Check for translatable values and preSet it on form
-     * if NO translations in DB -> retrieve translation from messages
-     * if NO, return:
-     *  field name (in case of FieldConfigModel)
-     *  translation key (in case of EntityConfigModel)
+     * if have NO translation in translation catalogue return:
+     *  - field name (in case of creating new FieldConfigModel)
+     *  - empty string (in case of editing FieldConfigModel)
      *
      * @param FormEvent $event
      */
@@ -101,11 +100,13 @@ class ConfigSubscriber implements EventSubscriberInterface
                         if (isset($messages[$value])) {
                             $value                              = $messages[$value];
                             $data[$provider->getScope()][$code] = $value;
-                            $dataChanges                        = true;
                         } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
                             $data[$provider->getScope()][$code] = $configModel->getFieldName();
-                            $dataChanges                        = true;
+                        } else {
+                            $data[$provider->getScope()][$code] = '';
                         }
+
+                        $dataChanges = true;
                     }
                 }
             }

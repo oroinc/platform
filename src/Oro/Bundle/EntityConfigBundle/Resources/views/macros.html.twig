@@ -1,0 +1,31 @@
+{% macro renderDynamicFields(entity, entity_class) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
+    {% if dynamicFields is defined and dynamicFields|length %}
+        {% for item in dynamicFields %}
+            {% set itemValue = item.value %}
+            {% if itemValue is iterable %}
+                {% set data = '' %}
+                {% for value in itemValue.values %}
+                    {% if value.link is defined and value.link != false  %}
+                        {% set data = data ~ ui.renderUrl(value.link, value.title) %}
+                    {% else %}
+                        {% set data = data ~ value.title %}
+                    {% endif %}
+                    {% if not loop.last %}
+                        {% set data = data ~ ', ' %}
+                    {% endif %}
+                {% endfor %}
+                {% set itemValue = data %}
+            {% endif %}
+
+            {% if item.type == 'text' %}
+                {% set itemValue = itemValue|nl2br %}
+            {% elseif item.type == 'boolean' %}
+                {% set itemValue = itemValue ? 'Yes'|trans : 'No'|trans %}
+            {% endif %}
+
+            {{ ui.renderProperty(item.label|trans, itemValue) }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
