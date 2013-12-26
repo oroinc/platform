@@ -26,4 +26,4 @@ oro_menu_config:
 
 oro_titles:
     oro_cron_job_index: ~
-    oro_cron_job_view:  Job "%%command%%" (ID: %%id%%)
+    oro_cron_job_view:  Job %%command%% (ID: %%id%%)
