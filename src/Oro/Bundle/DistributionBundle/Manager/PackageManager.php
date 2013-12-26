@@ -57,7 +57,6 @@ class PackageManager
      */
     protected $pool;
 
-
     /**
      * @param Composer $composer
      * @param Installer $installer
@@ -70,7 +69,7 @@ class PackageManager
         Installer $installer,
         IOInterface $composerIO,
         Runner $scriptRunner,
-        $pathToComposerJson = null
+        $pathToComposerJson
     ) {
         $this->composer = $composer;
         $this->installer = $installer;
@@ -249,7 +248,8 @@ class PackageManager
      * @param string $packageName
      * @param string $packageVersion
      *
-     * @throws \Oro\Bundle\DistributionBundle\Exception\VerboseException
+     * @throws VerboseException
+     * @throws \Exception
      */
     public function install($packageName, $packageVersion = null)
     {
@@ -266,6 +266,7 @@ class PackageManager
                         return !in_array($package->getName(), $previousInstalled);
                     }
                 );
+                $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
                         $this->scriptRunner->install($package);
@@ -347,7 +348,8 @@ class PackageManager
             },
             $packageNames
         );
-
+        $this->scriptRunner->removeCachedFiles();
+        $this->scriptRunner->runPlatformUpdate();
     }
 
     /**
@@ -445,6 +447,7 @@ class PackageManager
 
                 return '';
             };
+            $this->scriptRunner->runPlatformUpdate();
             array_map(
                 function (PackageInterface $p) use ($fetchPreviousInstalledPackageVersion) {
                     $previousInstalledPackageVersion = $fetchPreviousInstalledPackageVersion($p->getName());
@@ -458,6 +461,7 @@ class PackageManager
                 },
                 $uninstalledPackages
             );
+            $this->scriptRunner->runPlatformUpdate();
             $justInstalledPackage = $this->findInstalledPackage($packageName);
             $this->updateComposerJsonFile($justInstalledPackage, $justInstalledPackage->getPrettyVersion());
         } else {
