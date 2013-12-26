@@ -373,7 +373,7 @@
 }
 .sidebar-widget-popup,
 .sidebar-widget-popup .sidebar-widget {
-    z-index: 12;
+    z-index: 1200;
 }
 .sidebar-widget-popup{
     background-color: #cecece;

@@ -48,4 +48,14 @@ class Role implements RoleInterface
     {
         return $this->role;
     }
+
+    /**
+     * Return the role name field
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->role;
+    }
 }

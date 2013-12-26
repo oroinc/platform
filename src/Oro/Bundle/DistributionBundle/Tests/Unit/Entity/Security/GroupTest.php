@@ -26,7 +26,7 @@ class GroupTest extends \PHPUnit_Framework_TestCase
     {
         $group = new Group();
         $roles = $group->getRoles();
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $roles);
+        $this->assertInternalType('array', $roles);
         $this->assertCount(0, $roles);
     }
 
@@ -36,7 +36,8 @@ class GroupTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnRoles()
     {
         $group = new Group();
-        $this->writeAttribute($group, 'roles', $roles = new ArrayCollection(['role1']));
-        $this->assertSame($roles, $group->getRoles());
+        $roles = ['role1', 'role2'];
+        $this->writeAttribute($group, 'roles', new ArrayCollection($roles));
+        $this->assertEquals($roles, $group->getRoles());
     }
 }
