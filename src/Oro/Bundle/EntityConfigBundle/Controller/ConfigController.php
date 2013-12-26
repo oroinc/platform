@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,12 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
@@ -312,13 +313,16 @@ class ConfigController extends Controller
                         ]
                     );
 
+                /** @var Translator $translator */
+                $translator = $this->get('translator');
+
                 foreach ($entityFields as $field) {
                     $label = $entityConfigProvider->getConfig($id, $field->getFieldName())->get('label');
                     if (!$label) {
                         $label = $field->getFieldName();
                     }
 
-                    $fields[$field->getFieldName()] = $label;
+                    $fields[$field->getFieldName()] = $translator->trans($label);
                 }
             }
         }
