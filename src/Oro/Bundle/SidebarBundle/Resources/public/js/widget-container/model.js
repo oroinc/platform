@@ -55,7 +55,7 @@ define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
          * Restores state of widget container
          */
         restoreState: function () {
-            this.set({ state: this.stateSnapshot }, { silent: true });
+            this.set({ state: this.stateSnapshot });
         },
 
         /**

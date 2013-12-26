@@ -1,10 +1,11 @@
 <?php
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
-use Doctrine\Tests\OrmTestCase;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\AST\SelectStatement;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker;
@@ -85,8 +86,8 @@ class AclHelperTest extends OrmTestCase
             [
                $this->getRequest1(),
                 [
-                    'Doctrine\Tests\Models\CMS\CmsUser' => ['id', [1 ,2, 3]],
-                    'Doctrine\Tests\Models\CMS\CmsAddress' => ['id', [1]]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [1 ,2, 3]],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1]]
                 ],
                 'resultHelper1',
                 'resultWalker1'
@@ -94,8 +95,8 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest2(),
                 [
-                    'Doctrine\Tests\Models\CMS\CmsUser' => [],
-                    'Doctrine\Tests\Models\CMS\CmsAddress' => ['id', [1]]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => [],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [1]]
                 ],
                 'resultHelper2',
                 'resultWalker2'
@@ -103,10 +104,10 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest3(),
                 [
-                    'Doctrine\Tests\Models\CMS\CmsArticle' => ['id', [10]],
-                    'Doctrine\Tests\Models\CMS\CmsComment' => ['id', [100]],
-                    'Doctrine\Tests\Models\CMS\CmsUser' => ['id', [3, 2, 1]],
-                    'Doctrine\Tests\Models\CMS\CmsAddress' => ['id', [150]]
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10]],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => ['id', [100]],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1]],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => ['id', [150]]
                 ],
                 'resultHelper3',
                 'resultWalker3'
@@ -115,8 +116,8 @@ class AclHelperTest extends OrmTestCase
             [
                 $this->getRequest4(),
                 [
-                    'Doctrine\Tests\Models\CMS\CmsArticle' => ['id', [10]],
-                    'Doctrine\Tests\Models\CMS\CmsUser' => ['id', [3, 2, 1]],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => ['id', [10]],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => ['id', [3, 2, 1]],
                 ],
                 'resultHelper4',
                 'resultWalker4'
@@ -128,7 +129,7 @@ class AclHelperTest extends OrmTestCase
     {
         return $this->getQueryBuilder()
             ->select('u')
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u');
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u');
     }
 
     protected function resultHelper0($hints)
@@ -159,7 +160,7 @@ class AclHelperTest extends OrmTestCase
     {
         return $this->getQueryBuilder()
             ->select('u')
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->join('u.address', 'address');
     }
 
@@ -171,7 +172,10 @@ class AclHelperTest extends OrmTestCase
         $this->assertEquals([1, 2, 3], $whereCondition->getValue());
         $joinCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getJoinConditions()[0];
         $this->assertEquals('address', $joinCondition->getEntityAlias());
-        $this->assertEquals('Doctrine\Tests\Models\CMS\CmsAddress', $joinCondition->getEntityClass());
+        $this->assertEquals(
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
+            $joinCondition->getEntityClass()
+        );
         $this->assertEquals([1], $joinCondition->getValue());
     }
 
@@ -186,7 +190,7 @@ class AclHelperTest extends OrmTestCase
         $this->assertEquals('u', $expression->expression->simpleArithmeticExpression->identificationVariable);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
         $this->assertEquals(
-            'Doctrine\Tests\Models\CMS\CmsAddress',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
             $join->joinAssociationDeclaration->abstractSchemaName
         );
         $this->assertEquals('address', $join->joinAssociationDeclaration->aliasIdentificationVariable);
@@ -196,7 +200,7 @@ class AclHelperTest extends OrmTestCase
     {
         return $this->getQueryBuilder()
             ->select('u')
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->join('u.address', 'address', 'WITH', 'address.id = u.id');
     }
 
@@ -213,7 +217,7 @@ class AclHelperTest extends OrmTestCase
         $this->assertNull($resultAst->whereClause);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
         $this->assertEquals(
-            'Doctrine\Tests\Models\CMS\CmsAddress',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
             $join->joinAssociationDeclaration->abstractSchemaName
         );
         $this->assertEquals(
@@ -231,15 +235,20 @@ class AclHelperTest extends OrmTestCase
     {
         $subRequest = $this->getQueryBuilder()
             ->select('users.id')
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'users')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'users')
             ->join('users.articles', 'articles')
             ->join('articles.comments', 'comments')
-            ->join('Doctrine\Tests\Models\CMS\CmsAddress', 'address', 'WITH', 'address.user = users.id AND address = 1')
+            ->join(
+                'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
+                'address',
+                'WITH',
+                'address.user = users.id AND address = 1'
+            )
             ->where('comments.id in (1, 2, 3)');
 
         $qb = $this->getQueryBuilder();
         $qb->select('u')
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where(
                 $qb->expr()->in('u.id', $subRequest->getDQL())
             );
@@ -256,11 +265,11 @@ class AclHelperTest extends OrmTestCase
         $subRequest = $conditions->getSubRequests()[0];
         $this->assertEquals([3, 2, 1], $subRequest->getWhereConditions()[0]->getValue());
         $this->assertEquals(
-            'Doctrine\Tests\Models\CMS\CmsArticle',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle',
             $subRequest->getJoinConditions()[0]->getEntityClass()
         );
         $this->assertEquals(
-            'Doctrine\Tests\Models\CMS\CmsComment',
+            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment',
             $subRequest->getJoinConditions()[1]->getEntityClass()
         );
         $this->assertEquals([150], $subRequest->getJoinConditions()[2]->getValue());
@@ -288,13 +297,13 @@ class AclHelperTest extends OrmTestCase
     {
         $qb = $this->getQueryBuilder();
         $qb->select('u')
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->join('u.articles', 'art')
             ->where('art.id in (1,2,3)')
             ->orWhere(
                 $qb->expr()->in(
                     'u.id',
-                    'SELECT users.id FROM Doctrine\Tests\Models\CMS\CmsUser users
+                    'SELECT users.id FROM Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser users
                        JOIN users.articles articles
                        WHERE articles.id in (1,2,3)
                     '
@@ -331,7 +340,7 @@ class AclHelperTest extends OrmTestCase
      */
     protected function getQueryBuilder()
     {
-        return new QueryBuilder($this->_getTestEntityManager());
+        return new QueryBuilder($this->getTestEntityManager());
     }
 
     /**
