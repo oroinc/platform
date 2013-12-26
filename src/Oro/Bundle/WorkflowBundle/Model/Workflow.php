@@ -440,6 +440,8 @@ class Workflow
                 $minStepIdx--;
                 $minStep = $step;
                 $steps[] = $step;
+            } elseif ($step->getName() === $minStep->getName()) {
+                $minStepIdx--;
             } else {
                 break;
             }
