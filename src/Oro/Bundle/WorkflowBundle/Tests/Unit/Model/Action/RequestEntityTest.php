@@ -320,6 +320,7 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
         $queryBuilder->expects($this->once())->method('orderBy')
             ->with($expectedOrder, trim($options['order_by']['createdDate']))->will($this->returnSelf());
         $queryBuilder->expects($this->once())->method('getQuery')->will($this->returnValue($query));
+        $queryBuilder->expects($this->once())->method('setMaxResults')->with($this->equalTo(1));
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())->method('createQueryBuilder')

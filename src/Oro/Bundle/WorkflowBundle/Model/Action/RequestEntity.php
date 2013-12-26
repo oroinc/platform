@@ -158,6 +158,8 @@ class RequestEntity extends AbstractAction
             $field = 'e.' . $field;
             $queryBuilder->orderBy($field, $direction);
         }
+        // should be one result
+        $queryBuilder->setMaxResults(1);
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }
