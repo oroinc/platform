@@ -30,3 +30,5 @@ oro:
             bind_entities.label:      Bind entities
             created.label:            Start Date
             updated.label:            Updated
+        action:
+            general: "Workflow manipulations"

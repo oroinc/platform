@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Security\Acl\Dbal\AclProvider;
 use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
 use Symfony\Component\Security\Acl\Model\MutableAclInterface as ACL;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
@@ -17,7 +18,6 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\Batch\BatchItem;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -54,11 +54,6 @@ class AclManager extends AbstractAclManager
     protected $aceProvider;
 
     /**
-     * @var string
-     */
-    protected $privilegeRepositoryClass;
-
-    /**
      * This array contains all requested ACLs and flags indicate which changes are queued
      * key = a string unique for each OID
      * value = BatchItem
@@ -74,14 +69,12 @@ class AclManager extends AbstractAclManager
      * @param AclExtensionSelector $extensionSelector
      * @param MutableAclProvider $aclProvider
      * @param AceManipulationHelper $aceProvider
-     * @param string|null $privilegeRepositoryClass
      */
     public function __construct(
         ObjectIdentityFactory $objectIdentityFactory,
         AclExtensionSelector $extensionSelector,
         MutableAclProvider $aclProvider = null,
-        AceManipulationHelper $aceProvider = null,
-        $privilegeRepositoryClass = null
+        AceManipulationHelper $aceProvider = null
     ) {
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->extensionSelector = $extensionSelector;
@@ -89,9 +82,6 @@ class AclManager extends AbstractAclManager
         $this->aceProvider = $aceProvider !== null
             ? $aceProvider
             : new AceManipulationHelper();
-        $this->privilegeRepositoryClass = $privilegeRepositoryClass !== null
-            ? $privilegeRepositoryClass
-            : 'Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository';
     }
 
     /**
@@ -166,16 +156,6 @@ class AclManager extends AbstractAclManager
         return $this->extensionSelector
             ->select($oid)
             ->getMaskBuilder($permission);
-    }
-
-    /**
-     * Gets a repository for ACL privileges
-     *
-     * @return AclPrivilegeRepository
-     */
-    public function getPrivilegeRepository()
-    {
-        return new $this->privilegeRepositoryClass($this);
     }
 
     /**

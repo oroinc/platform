@@ -53,3 +53,5 @@ oro:
             entity_description:   Represent address type
             name.label:           Name
             label.label:          Label
+        action:
+            read_dictionaries: "Read address dictionaries"

@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Persistence;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface as SID;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity as OID;
 use Symfony\Component\Security\Acl\Model\EntryInterface;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Symfony\Component\Security\Acl\Model\AclInterface;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
+use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
@@ -31,13 +34,18 @@ class AclPrivilegeRepository
     protected $manager;
 
     /**
-     * Constructor
-     *
-     * @param AclManager $manager
+     * @var TranslatorInterface
      */
-    final public function __construct(AclManager $manager)
+    protected $translator;
+
+    /**
+     * @param AclManager $manager
+     * @param TranslatorInterface $translator
+     */
+    final public function __construct(AclManager $manager, TranslatorInterface $translator)
     {
         $this->manager = $manager;
+        $this->translator = $translator;
     }
 
     /**
@@ -456,7 +464,10 @@ class AclPrivilegeRepository
                     return 1;
                 }
 
-                return strcmp($a->getIdentity()->getName(), $b->getIdentity()->getName());
+                return strcmp(
+                    $this->translator->trans($a->getIdentity()->getName()),
+                    $this->translator->trans($b->getIdentity()->getName())
+                );
             }
         );
 
