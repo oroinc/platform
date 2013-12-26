@@ -1,4 +1,5 @@
-{% macro renderDynamicFields(dynamicFields) %}
+{% macro renderDynamicFields(entity, entity_class) %}
+    {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for label, item in dynamicFields %}

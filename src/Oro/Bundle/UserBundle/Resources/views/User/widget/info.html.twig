@@ -40,7 +40,7 @@
             {% endfor %}
             {{ ui.renderProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
-            {{ entityExtend.renderDynamicFields(dynamic) }}
+            {{ entityExtend.renderDynamicFields(entity) }}
         </div>
 
         <div class="responsive-block">
