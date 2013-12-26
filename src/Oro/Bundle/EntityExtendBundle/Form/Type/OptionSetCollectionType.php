@@ -110,8 +110,6 @@ class OptionSetCollectionType extends AbstractType
             foreach ($delOptions as $key => $delOption) {
                 $em->remove($configModel->getOptions()->getValues()[$key]);
             }
-
-            $em->flush();
         }
     }
 
