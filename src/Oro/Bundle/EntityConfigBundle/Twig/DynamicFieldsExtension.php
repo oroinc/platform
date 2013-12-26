@@ -122,11 +122,6 @@ class DynamicFieldsExtension extends \Twig_Extension
             $fieldName = $fieldConfigId->getFieldName();
             $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
-            /** Prepare DateTime field type */
-            if ($value instanceof \DateTime) {
-                $value = $this->getValueForDateTime($value);
-            }
-
             /** Prepare OptionSet field type */
             if ($fieldConfigId->getFieldType() == 'optionSet') {
                 $value = $this->getValueForOptionSet($entity, $fieldConfigId);
@@ -138,11 +133,15 @@ class DynamicFieldsExtension extends \Twig_Extension
             }
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
-            $rowKey = $fieldConfig->get('label');
-            if (!$rowKey) {
-                $rowKey = $fieldName;
+            $label = $fieldConfig->get('label');
+            if (!$label) {
+                $label = $fieldName;
             }
-            $dynamicRow[$rowKey] = $value;
+            $dynamicRow[] = array(
+                'type'  => $fieldConfigId->getFieldType(),
+                'label' => $label,
+                'value' => $value,
+            );
         }
 
         return $dynamicRow;
@@ -164,7 +163,7 @@ class DynamicFieldsExtension extends \Twig_Extension
      */
     protected function getValueForOptionSet($entity, FieldConfigId $fieldConfig)
     {
-        /** @var OptionSetRelationRepository */
+        /** @var $optionSetRepository OptionSetRelationRepository */
         $optionSetRepository = $this->configManager
             ->getEntityManager()
             ->getRepository(OptionSetRelation::ENTITY_NAME);

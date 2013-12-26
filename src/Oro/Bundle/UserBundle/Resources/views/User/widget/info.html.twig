@@ -1,6 +1,6 @@
 {% import 'OroUIBundle::macros.html.twig' as ui %}
 {% import 'OroTagBundle::macros.html.twig' as tag %}
-{% import 'OroEntityExtendBundle::macros.html.twig' as entityExtend %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 {% macro renderEmail(emailAddress, isPrimary) %}
     {% import 'OroEmailBundle::macros.html.twig' as email %}
@@ -40,7 +40,7 @@
             {% endfor %}
             {{ ui.renderProperty('oro.user.emails.label'|trans, emails|join('<br />')) }}
 
-            {{ entityExtend.renderDynamicFields(entity) }}
+            {{ entityConfig.renderDynamicFields(entity) }}
         </div>
 
         <div class="responsive-block">

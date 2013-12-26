@@ -1,5 +1,5 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroEntityExtendBundle::macros.html.twig' as entityExtend %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 {% oro_title_set({params : {
     "%entityName%": entity_config.get('label')|default('N/A')|trans,
@@ -49,7 +49,7 @@
         'class': 'active',
         'subblocks': [{
             'title': 'General Information',
-            'data':  [entityExtend.renderDynamicFields(entity, entity_class)]
+            'data':  [entityConfig.renderDynamicFields(entity, entity_class)]
         }]
     }] } %}
 
