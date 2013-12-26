@@ -105,6 +105,7 @@ The templates hinting is enabled by default in development mode.
 Main RequireJS config at the moment placed in `src/Oro/Bundle/UIBundle/Resources/views/Default/require.js.config.html.twig` template. But it's possible to customize it for you needs:
 
  - Create your template like `MyBundle/Resources/views/require.js.config.html.twig`:
+
 ```html
 <script type="text/javascript">
     // get reference to original require.js configuration object
@@ -115,7 +116,9 @@ Main RequireJS config at the moment placed in `src/Oro/Bundle/UIBundle/Resources
     // ...
 </script>
 ```
+
  - In `MyBundle/Resources/config/placeholders.yml` define item for a placeholder `require_js_config`
+
 ```yml
 placeholders:
     requirejs_config_extend:
@@ -126,4 +129,5 @@ items:
     require_js_config:
         template: MyBundle::require.js.config.html.twig
 ```
+
  - And your script will be injected into a document's head, after main `require.js.config.html.twig` and right before `require.js` lib.
