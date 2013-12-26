@@ -15,6 +15,16 @@ trait ReflectionHelperTrait
     }
 
     /**
+     * @param mixed $class
+     * @param mixed $subclass
+     */
+    public function assertImplementsInterface($interface, $class)
+    {
+        $rc = new \ReflectionClass($class);
+        $this->assertTrue($rc->implementsInterface($interface));
+    }
+
+    /**
      * @param string|object $classOrObject
      * @param string $attributeName
      * @param mixed $attributeValue

@@ -17,7 +17,7 @@ class RunScriptsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:platform:run-script')
-            ->setDescription('Run php script files.')
+            ->setDescription('Run PHP script files in scope application container.')
             ->addArgument(
                 'script',
                 InputArgument::IS_ARRAY | InputArgument::REQUIRED,

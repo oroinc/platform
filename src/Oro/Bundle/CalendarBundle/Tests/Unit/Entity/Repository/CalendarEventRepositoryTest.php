@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity\Repository;
 
-use Doctrine\Tests\OrmTestCase;
-use Doctrine\Tests\Mocks\EntityManagerMock;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 
 class CalendarEventRepositoryTest extends OrmTestCase
@@ -23,7 +25,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             'Oro\Bundle\CalendarBundle\Entity'
         );
 
-        $this->em = $this->_getTestEntityManager();
+        $this->em = $this->getTestEntityManager();
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
         $this->em->getConfiguration()->setEntityNamespaces(
             array(

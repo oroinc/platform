@@ -3,7 +3,11 @@ placeholders:
         items:
             sync_js:
                 order: 310
+            maintenance_js:
+                order: 220
 
 items:
     sync_js:
         template: OroSyncBundle::sync_js.html.twig
+    maintenance_js:
+        template: OroSyncBundle::maintenance_js.html.twig

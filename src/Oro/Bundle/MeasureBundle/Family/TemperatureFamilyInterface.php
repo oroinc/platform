@@ -18,7 +18,7 @@ interface TemperatureFamilyInterface
     /**
      * @staticvar string
      */
-    const CELCIUS    = 'CELCIUS';
+    const CELSIUS    = 'CELSIUS';
 
     /**
      * @staticvar string

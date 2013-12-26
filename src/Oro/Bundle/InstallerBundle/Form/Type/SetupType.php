@@ -5,6 +5,7 @@ namespace Oro\Bundle\InstallerBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class SetupType extends AbstractType
 {
@@ -18,6 +19,27 @@ class SetupType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add(
+                'company_name',
+                'text',
+                array(
+                    'label'    => 'form.setup.company_name',
+                    'mapped'   => false,
+                    'constraints'   => array(
+                        new Assert\NotBlank(),
+                        new Assert\Length(array('max' => 15))
+                    ),
+                )
+            )
+            ->add(
+                'company_title',
+                'text',
+                array(
+                    'label'    => 'form.setup.company_title',
+                    'mapped'   => false,
+                    'required' => false,
+                )
+            )
             ->add(
                 'username',
                 'text',

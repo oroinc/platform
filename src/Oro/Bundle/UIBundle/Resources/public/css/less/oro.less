@@ -985,7 +985,7 @@ footer {
   text-shadow: 0 -1px 2px #37485f;
   line-height: 24px;
   font-size: @fontSizeSmall;
-  padding: 0 25px 0 11px;
+  padding: 0 25px 0 5px;
   border-right: 1px solid #2a2f36;
   margin: 0 -1px 0 0;
   position: relative;
@@ -2982,6 +2982,10 @@ div.uploader.focus,
       color: @errorClose;
     }
   }
+  .alert-warning {
+    background-image: none;
+    padding-left: 20px;
+  }
   .alert-empty {
     display: none;
   }
@@ -3262,7 +3266,7 @@ button.filter-update {
   float: left;
   background: none;
   margin: 0;
-  padding: 6px 15px 0;
+  padding: 6px 15px 0 20px;
 }
 .breadcrumb > li.active,
 .breadcrumb > li {
@@ -3539,3 +3543,15 @@ span.validation-faled {
   }
 }
 
+i.pin-status {
+  color: #464E59;
+  font-size: 6px;
+  vertical-align: middle;
+  line-height: 12px;
+  margin-right: 5px;
+  &.outdated {
+    color: #FECA67;
+    font-size: 8px;
+    margin-top: -2px;
+  }
+}
