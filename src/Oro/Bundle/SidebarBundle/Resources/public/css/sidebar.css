@@ -41,14 +41,10 @@
 .sidebar-right {
     right: 0;
     margin-left: 7px;
-    width: 33px;
 }
 
 .sidebar-maximized {
     width: 200px;
-}
-.sidebar-right .sidebar-add{
-    margin: 0 0 0 5px;
 }
 .sidebar-resize {
     background-color: #f1f1f1;
@@ -65,9 +61,8 @@
     height: 100%;
     width: 100%;
 }
-
-.sidebar-right .sidebar-content {
-    margin: 0 0 0 3px;
+.sidebar-right .sidebar-content > div {
+    margin-left: 3px;
 }
 .sidebar-left .sidebar-resize {
     right: 0;
@@ -79,17 +74,19 @@
 
 .sidebar-add {
     display: block;
-    width: 30px;
-    height: 30px;
+    width: 33px;
+    height: 33px;
 }
 
 .sidebar-add i {
     height: 16px;
     width: 16px;
-    margin-left: 8px;
-    margin-top: 8px;
+    margin-left: 9px;
+    margin-top: 9px;
 }
-
+.sidebar-right .sidebar-add i {
+    margin-left: 12px;
+}
 .sidebar-toggle {
     display: block;
     background-color: #e0e0e0;
