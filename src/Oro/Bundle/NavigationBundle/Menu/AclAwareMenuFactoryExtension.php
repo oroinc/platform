@@ -98,11 +98,8 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
      */
     protected function processAcl(array &$options = array())
     {
-        if (isset($options['check_access']) && $options['check_access'] == false) {
-            $needCheck = false;
-        } else {
-            $needCheck = true;
-        }
+        $needCheck = (!isset($options['check_access']) || $options['check_access'] === true)
+            && $this->securityFacade->hasLoggedUser();
 
         $isAllowed = self::DEFAULT_ACL_POLICY;
         if (array_key_exists(self::ACL_RESOURCE_ID_KEY, $options)) {

@@ -26,7 +26,6 @@ class ScriptExecutorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $scriptExecutor = new ScriptExecutor($output, $container, $commandExecutor);
 
-        var_dump($testScriptFile);
         $scriptExecutor->runScript($testScriptFile);
     }
 }

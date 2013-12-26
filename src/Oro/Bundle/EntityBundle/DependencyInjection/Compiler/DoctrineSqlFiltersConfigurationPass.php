@@ -21,9 +21,6 @@ class DoctrineSqlFiltersConfigurationPass implements CompilerPassInterface
             return;
         }
 
-        $em = $container->findDefinition(self::ENTITY_MANAGER_SERVICE_NAME);
-        $em->addMethodCall('setFilterCollection', array(new Reference(self::FILTER_COLLECTION_SERVICE_NAME)));
-
         $collectionDef = $container->getDefinition(self::FILTER_COLLECTION_SERVICE_NAME);
         foreach ($this->loadFilters($container) as $filter) {
             $collectionDef->addMethodCall(
@@ -34,6 +31,9 @@ class DoctrineSqlFiltersConfigurationPass implements CompilerPassInterface
                 $collectionDef->addMethodCall('enable', array($filter['filter_name']));
             }
         }
+
+        $em = $container->findDefinition(self::ENTITY_MANAGER_SERVICE_NAME);
+        $em->addMethodCall('setFilterCollection', array(new Reference(self::FILTER_COLLECTION_SERVICE_NAME)));
     }
 
     /**

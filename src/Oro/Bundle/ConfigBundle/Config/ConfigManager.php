@@ -33,6 +33,11 @@ class ConfigManager
     protected $storedSettings = array();
 
     /**
+     * @var array
+     */
+    protected $changedSettings = array();
+
+    /**
      *
      * @param ObjectManager $om
      * @param array         $settings
@@ -75,6 +80,60 @@ class ConfigManager
             $setting = $settings[$section][$key];
 
             return is_array($setting) && !$full ? $setting['value'] : $setting;
+        }
+    }
+
+    /**
+     * Set setting value. To save changes in a database you need to call flush method
+     *
+     * @param string $name Setting name, for example "oro_user.level"
+     * @param mixed $value Setting value
+     */
+    public function set($name, $value)
+    {
+        $entity = $this->getScopedEntityName();
+        $entityId = $this->getScopeId();
+        $this->loadStoredSettings($entity, $entityId);
+
+        $pair = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $section = $pair[0];
+        $key = $pair[1];
+
+        $this->storedSettings[$entity][$entityId][$section][$key] = $value;
+
+        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
+        $this->changedSettings[$changeKey] = ['value' => $value];
+    }
+
+    /**
+     * Reset setting value to default. To save changes in a database you need to call flush method
+     *
+     * @param string $name Setting name, for example "oro_user.level"
+     */
+    public function reset($name)
+    {
+        $entity = $this->getScopedEntityName();
+        $entityId = $this->getScopeId();
+        $this->loadStoredSettings($entity, $entityId);
+
+        $pair = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $section = $pair[0];
+        $key = $pair[1];
+
+        unset($this->storedSettings[$entity][$entityId][$section][$key]);
+
+        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
+        $this->changedSettings[$changeKey] = ['use_parent_scope_value' => true];
+    }
+
+    /**
+     * Save changes made with set or reset methods in a database
+     */
+    public function flush()
+    {
+        if (!empty($this->changedSettings)) {
+            $this->save($this->changedSettings);
+            $this->changedSettings = array();
         }
     }
 
