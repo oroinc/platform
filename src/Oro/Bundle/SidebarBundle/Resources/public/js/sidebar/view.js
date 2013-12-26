@@ -292,7 +292,7 @@ define(function (require) {
             view.hideAllWidgetHovers();
 
             widget.snapshotState();
-            widget.set('state', constants.WIDGET_MAXIMIZED_HOVER);
+            widget.set({ 'state': constants.WIDGET_MAXIMIZED_HOVER });
 
             var hoverView = new WidgetContainerView({
                 model: widget
