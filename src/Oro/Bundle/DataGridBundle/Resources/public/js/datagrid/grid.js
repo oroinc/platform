@@ -69,6 +69,8 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             /** @property {oro.datagrid.ActionColumn} */
             actionsColumn: ActionColumn,
 
+            noColumnsFlag: false,
+
             /**
              * @property {Object} Default properties values
              */
@@ -107,6 +109,10 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
 
                 if (!options.columns) {
                     throw new TypeError("'columns' is required");
+                }
+
+                if (options.columns.length == 0) {
+                    this.noColumnsFlag = true;
                 }
 
                 // Init properties values based on options and defaults
@@ -469,7 +475,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             renderNoDataBlock: function () {
                 var placeholders = {entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()},
                     template = _.isEmpty(this.collection.state.filters) ? 'oro.datagrid.noentities' :
-                        'oro.datagrid.noresults';
+                        'oro.datagrid.noresults',
+                    template = this.noColumnsFlag ? 'oro.datagrid.nocolumns' : template;
+
                 this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
                     hint: __(template, placeholders).replace('\n', '<br />')
                 }))).hide();
@@ -527,7 +535,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              * @private
              */
             _updateNoDataBlock: function () {
-                if (this.collection.models.length > 0) {
+                if (this.collection.models.length > 0 && !this.noColumnsFlag) {
                     this.$(this.selectors.toolbar).show();
                     this.$(this.selectors.grid).show();
                     this.$(this.selectors.filterBox).show();
