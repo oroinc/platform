@@ -27,7 +27,7 @@ class Runner
      * @param InstallationManager $installationManager
      * @param string $applicationRootDir
      */
-    public function __construct(InstallationManager $installationManager, $applicationRootDir = null)
+    public function __construct(InstallationManager $installationManager, $applicationRootDir)
     {
         $this->installationManager = $installationManager;
         $this->applicationRootDir = $applicationRootDir;
@@ -137,7 +137,6 @@ class Runner
             throw new ProcessFailedException($process);
         }
 
-//        echo $process->getOutput();
         return $process->getOutput();
     }
 
