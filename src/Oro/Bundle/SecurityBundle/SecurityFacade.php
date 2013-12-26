@@ -137,11 +137,11 @@ class SecurityFacade
     }
 
     /**
-     * Get current user id.
+     * Gets id of currently logged in user.
      *
-     * @return int
+     * @return int 0 if there is not currently logged in user; otherwise, a number greater than zero
      */
-    public function geLoggedUserId()
+    public function getLoggedUserId()
     {
         if (null === $token = $this->securityContext->getToken()) {
             return 0;
@@ -152,5 +152,15 @@ class SecurityFacade
         }
 
         return $user->getId();
+    }
+
+    /**
+     * Checks whether any user is currently logged in or not
+     *
+     * @return bool
+     */
+    public function hasLoggedUser()
+    {
+        return ($this->getLoggedUserId() !== 0);
     }
 }

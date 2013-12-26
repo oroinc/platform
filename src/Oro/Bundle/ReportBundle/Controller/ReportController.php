@@ -25,8 +25,12 @@ class ReportController extends Controller
     public function viewAction(Report $entity)
     {
         $reportType = strtolower($entity->getType()->getName());
+        $reportGroup = $this->get('oro_entity_config.provider.entity')
+            ->getConfig($entity->getEntity())
+            ->get('plural_label');
         $parameters = [
-            'entity' => $entity
+            'entity'      => $entity,
+            'reportGroup' => $reportGroup
         ];
 
         if ($reportType === 'table') {
