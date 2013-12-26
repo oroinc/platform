@@ -219,7 +219,16 @@ class OptionSelectType extends AbstractType
     {
         $configFieldModel = $this->configManager->getConfigFieldModel($entityClassName, $entityFieldName);
         $options          = $configFieldModel->getOptions()->toArray();
+        uasort(
+            $options,
+            function ($a, $b) {
+                if ($a->getPriority() === $b->getPriority()) {
+                    return 0;
+                }
 
+                return ($a->getPriority() < $b->getPriority()) ? -1 : 1;
+            }
+        );
         $result = [];
         foreach ($options as $option) {
             $result[$option->getId()] = $option->getLabel();

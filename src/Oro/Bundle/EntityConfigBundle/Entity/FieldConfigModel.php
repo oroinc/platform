@@ -45,7 +45,6 @@ class FieldConfigModel extends AbstractConfigModel
     /**
      * @var OptionSet[]|PersistentCollection
      * @ORM\OneToMany(targetEntity="OptionSet", mappedBy="field", cascade={"all"})
-     * @ORM\OrderBy({"priority" = "ASC"})
      */
     protected $options;
 
