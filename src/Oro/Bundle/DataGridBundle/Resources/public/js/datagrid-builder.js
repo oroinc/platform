@@ -30,7 +30,10 @@ define(function (require) {
                 return type + 'Cell';
             },
             actionType: function (type) {
-                return type + 'Acton';
+                return type + 'Action';
+            },
+            massActionType: function (type) {
+                return type + 'MassAction';
             }
         },
 
@@ -69,8 +72,8 @@ define(function (require) {
             collectModules: function () {
                 var modules = this.modules,
                     metadata = this.metadata,
-                    moduleName = function (template, type) {
-                        return template.replace('{{type}}', type);
+                    moduleName = function (template, type, module) {
+                        return module || template.replace('{{type}}', type);
                     };
                 // cells
                 _.each(metadata.columns, function (column) {
@@ -82,9 +85,9 @@ define(function (require) {
                     modules[helpers.actionType(action.type)] = moduleName(actionModuleName, action.type);
                 });
                 // mass actions
-                if (!$.isEmptyObject(metadata.massActions)) {
-                    modules[helpers.actionType('mass')] = moduleName(actionModuleName, 'mass');
-                }
+                _.each(_.values(metadata.massActions), function (action) {
+                    modules[helpers.massActionType(action.type)] = moduleName(actionModuleName, action.type, action.js_module);
+                });
             },
 
             /**
@@ -172,7 +175,7 @@ define(function (require) {
 
                 // mass actions
                 _.each(metadata.massActions, function (options, action) {
-                    massActions[action] = modules[helpers.actionType('mass')].extend(options);
+                    massActions[action] = modules[helpers.massActionType(options.type)].extend(options);
                 });
 
                 return {

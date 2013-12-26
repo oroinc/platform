@@ -37,6 +37,9 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /** @property {Boolean} */
         confirmation: false,
 
+        /** @type oro.Modal */
+        confirmModal: undefined,
+
         /** @property {String} */
         frontend_type: null,
 
@@ -121,6 +124,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          */
         execute: function() {
             var eventName = this.getEventName();
+            mediator.off(eventName, this.executeConfiguredAction);
             mediator.once(eventName, this.executeConfiguredAction, this);
             this._confirmationExecutor(
                 _.bind(
@@ -255,11 +259,14 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          * @return {oro.Modal}
          */
         getConfirmDialog: function(callback) {
-            return new Modal({
-                title: this.messages.confirm_title,
-                content: this.messages.confirm_content,
-                okText: this.messages.confirm_ok
-            }).on('ok', callback);
+            if (!this.confirmModal) {
+                this.confirmModal = new Modal({
+                    title: this.messages.confirm_title,
+                    content: this.messages.confirm_content,
+                    okText: this.messages.confirm_ok
+                }).on('ok', callback);
+            }
+            return this.confirmModal;
         }
     });
 });
