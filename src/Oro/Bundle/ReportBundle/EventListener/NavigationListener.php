@@ -4,8 +4,8 @@ namespace Oro\Bundle\ReportBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
-
 use Knp\Menu\MenuItem;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
@@ -22,15 +22,23 @@ class NavigationListener
     protected $entityConfigProvider = null;
 
     /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
+
+    /**
      * @param EntityManager  $entityManager
      * @param ConfigProvider $entityConfigProvider
+     * @param SecurityFacade $securityFacade
      */
     public function __construct(
         EntityManager $entityManager,
-        ConfigProvider $entityConfigProvider
+        ConfigProvider $entityConfigProvider,
+        SecurityFacade $securityFacade
     ) {
         $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->securityFacade       = $securityFacade;
     }
 
     /**
@@ -40,10 +48,18 @@ class NavigationListener
     {
         /** @var ItemInterface $reportsMenuItem */
         $reportsMenuItem = $event->getMenu()->getChild('reports_tab');
-        if ($reportsMenuItem) {
+        if ($reportsMenuItem && $this->securityFacade->hasLoggedUser()) {
             $reports = $this->em->getRepository('OroReportBundle:Report')
                 ->findBy([], ['name' => 'ASC']);
-            //todo: Add ACL Access level protection
+
+            if (!empty($reports)) {
+                foreach ($reports as $key => $report) {
+                    if (!$this->securityFacade->isGranted('VIEW', sprintf('entity:%s', $report->getEntity()))) {
+                        unset($reports[$key]);
+                    }
+                }
+            }
+
             if (!empty($reports)) {
                 $this->addDivider($reportsMenuItem);
                 $reportMenuData = [];

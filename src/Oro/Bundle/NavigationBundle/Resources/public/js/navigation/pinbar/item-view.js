@@ -121,24 +121,31 @@ function($, _, __, Backbone, app, Navigation, mediator, error) {
             var navigation = Navigation.getInstance(),
                 modelUrl = navigation.removeGridParams(this.model.get('url')) ,
                 $el = this.$el,
+                self = this,
                 refreshHandler = function (obj) {
                     if (modelUrl === obj.url) {
-                        $el.find('.outdated-note').remove();
+                        $noteEl = $el.find('.pin-status.outdated');
+                        self.markNormal($noteEl);
+
                         mediator.off('hash_navigation_request:page_refreshed', refreshHandler);
                     }
                 };
 
             if (!event.isCurrentPage && modelUrl == event.url) {
-                var $noteEl = $el.find('.outdated-note');
-                if (!$noteEl.length) {
-                    $noteEl = $('<i />', {
-                        class: 'icon-circle outdated-note',
-                        title: __('Content of pinned page is outdated')
-                    });
-                    $el.find('.pin-holder > div > a').prepend($noteEl);
+                var $noteEl = $el.find('.pin-status');
+                if (!$noteEl.is('.outdated')) {
+                    this.markOutdated($noteEl);
                     mediator.on('hash_navigation_request:page_refreshed', refreshHandler);
                 }
             }
+        },
+
+        markOutdated: function ($el) {
+            $el.addClass('outdated').attr('title', __('Content of pinned page is outdated'));
+        },
+
+        markNormal: function ($el) {
+            $el.removeClass('outdated').removeAttr('title');
         }
     });
 });

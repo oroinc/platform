@@ -32,11 +32,11 @@ class MeasureConverter
 
     /**
      * Set a family for the converter
-     * @param string $family
      *
-     * @return MeasureConverter
+     * @param $family
      *
-     * @throws Oro\Bundle\MeasureBundle\Exception\UnknownFamilyMeasureException
+     * @return $this
+     * @throws \Oro\Bundle\MeasureBundle\Exception\UnknownFamilyMeasureException
      */
     public function setFamily($family)
     {
@@ -68,13 +68,13 @@ class MeasureConverter
 
     /**
      * Convert a value in a base unit to the standard unit
-     * @param string $baseUnit Base unit for value
-     * @param double $value    Value to convert
+     *
+     * @param $baseUnit
+     * @param $value
      *
      * @return float
-     *
-     * @throws Oro\Bundle\MeasureBundle\Exception\UnknownOperatorException
-     * @throws Oro\Bundle\MeasureBundle\Exception\UnknownMeasureException
+     * @throws \Oro\Bundle\MeasureBundle\Exception\UnknownOperatorException
+     * @throws \Oro\Bundle\MeasureBundle\Exception\UnknownMeasureException
      */
     public function convertBaseToStandard($baseUnit, $value)
     {
@@ -119,13 +119,13 @@ class MeasureConverter
 
     /**
      * Convert a value in a standard unit to a final unit
-     * @param string $finalUnit Final unit for value
-     * @param double $value     Value to convert
      *
-     * @return double
+     * @param $finalUnit
+     * @param $value
      *
-     * @throws Oro\Bundle\MeasureBundle\Exception\UnknownOperatorException
-     * @throws Oro\Bundle\MeasureBundle\Exception\UnknownMeasureException
+     * @return float
+     * @throws \Oro\Bundle\MeasureBundle\Exception\UnknownOperatorException
+     * @throws \Oro\Bundle\MeasureBundle\Exception\UnknownMeasureException
      */
     public function convertStandardToResult($finalUnit, $value)
     {

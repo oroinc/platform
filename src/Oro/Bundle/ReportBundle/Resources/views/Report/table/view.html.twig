@@ -1,7 +1,7 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% oro_title_set({params : {"%report.name%": entity.name} }) %}
+{% oro_title_set({params : {"%report.name%": entity.name, "%report.group%": reportGroup} }) %}
 {% set pageTitle = entity.name %}
 
 {% block navButtons %}

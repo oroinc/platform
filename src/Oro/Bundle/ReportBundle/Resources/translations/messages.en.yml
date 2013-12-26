@@ -41,7 +41,7 @@ oro:
             choose_report_type:     Choose a report type...
 
         entity_label:        Report
-        entity_plural_label: Manage Reports
+        entity_plural_label: Reports
         entity_description:  Represent Report
         id.label:           Id
         type.label:         Report type
@@ -57,11 +57,11 @@ oro:
             entity_label:        Report Type
             entity_plural_label: Report Types
             entity_description:  Represent Report Type
-            name.label:
-            label.label:
+            name.label:          Name
+            label.label:         Label
 
-"Reports": Reports
 "New Report": New Report
+"Manage Reports": Manage Reports
 "Manage Reports - Reports": Manage Reports - Reports
 "Create Report - Reports": Create Report - Reports
 "%report.name% - Edit - Reports": %report.name% - Edit - Reports
