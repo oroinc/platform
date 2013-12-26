@@ -24,10 +24,13 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_ui');
 
         $rootNode->children()
+            ->booleanNode('show_pin_button_on_start_page')
+                ->defaultValue(true)
+            ->end()
             ->scalarNode('wrap_class')
                 ->cannotBeEmpty()
                 ->defaultValue('block-wrap')
-                ->end()
+            ->end()
             ->arrayNode('placeholders_items')
                 ->useAttributeAsKey('name')
                 ->prototype('array')
@@ -42,7 +45,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end()
-            ->end();
+        ->end();
 
         SettingsBuilder::append(
             $rootNode,
