@@ -120,6 +120,9 @@ function($, _, routing, messenger, __, Navigation, Modal) {
                 confirm.on('ok', function() {
                     performTransition(element);
                 });
+                confirm.on('cancel', function() {
+                    resetInProgress();
+                });
                 confirm.open();
             } else {
                 performTransition(element);

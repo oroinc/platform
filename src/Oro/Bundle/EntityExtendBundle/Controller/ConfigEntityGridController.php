@@ -42,7 +42,7 @@ class ConfigEntityGridController extends Controller
      * )
      * Acl(
      *      id="oro_entityextend_entity_unique_key",
-     *      label="Unique entity unique keys",
+     *      label="oro.entity_extend.action.config_entity_grid.unique",
      *      type="action",
      *      group_name=""
      * )
@@ -126,7 +126,7 @@ class ConfigEntityGridController extends Controller
      * @Route("/create", name="oro_entityextend_entity_create")
      * Acl(
      *      id="oro_entityextend_entity_create",
-     *      label="Create custom entity",
+     *      label="oro.entity_extend.action.config_entity_grid.create",
      *      type="action",
      *      group_name=""
      * )
@@ -215,7 +215,7 @@ class ConfigEntityGridController extends Controller
      * )
      * Acl(
      *      id="oro_entityextend_entity_remove",
-     *      label="Remove custom entity",
+     *      label="oro.entity_extend.action.config_entity_grid.remove",
      *      type="action",
      *      group_name=""
      * )
@@ -254,7 +254,7 @@ class ConfigEntityGridController extends Controller
      * )
      * Acl(
      *      id="oro_entityextend_entity_unremove",
-     *      label="Unremove custom entity",
+     *      label="oro.entity_extend.action.config_entity_grid.unremove",
      *      type="action",
      *      group_name=""
      * )

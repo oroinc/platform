@@ -65,13 +65,17 @@ services:
 
     oro_security.acl.manager:
         class: %oro_security.acl.manager.class%
-        scope: prototype
         arguments:
             - @oro_security.acl.object_identity_factory
             - @oro_security.acl.extension_selector
             - @?security.acl.dbal.provider
             - @oro_security.acl.ace_provider
-            - %oro_security.acl.privilege_repository.class%
+
+    oro_security.acl.privilege_repository:
+        class: %oro_security.acl.privilege_repository.class%
+        arguments:
+            - @oro_security.acl.manager
+            - @translator
 
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%

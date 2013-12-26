@@ -1,5 +1,12 @@
 oro:
     entity_config:
+        action:
+            manage: "Manage configurable entities"
+            view_entities: "View configurable entities"
+            update_entity: "Update configurable entity"
+            view_entity: "View configurable entity"
+            update_entity_field: "Update configurable entity field"
+            field_search: "Return varchar type field(s) in given entity"
         controller:
             config_entity:
                 message:
