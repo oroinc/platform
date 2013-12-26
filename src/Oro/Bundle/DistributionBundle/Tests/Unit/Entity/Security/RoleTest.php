@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity\Security;
 
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\DistributionBundle\Entity\Security\Role;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
@@ -36,5 +35,16 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         $role = new Role();
         $this->writeAttribute($role, 'role', $name = uniqid());
         $this->assertSame($name, $role->getRole());
+    }
+
+    /**
+     * @test
+     */
+    public function couldBeConvertedToStringAccordingRole()
+    {
+        $role = new Role();
+        $this->writeAttribute($role, 'role', $name = uniqid());
+
+        $this->assertEquals($name, (string) $role);
     }
 }
