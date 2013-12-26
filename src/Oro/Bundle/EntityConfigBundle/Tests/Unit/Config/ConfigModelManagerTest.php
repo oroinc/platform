@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Tests\OrmTestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
@@ -31,7 +31,7 @@ class ConfigModelManagerTest extends OrmTestCase
 
     public function setUp()
     {
-        $this->em = $this->_getTestEntityManager();
+        $this->em = $this->getTestEntityManager();
 
         $this->em->getConfiguration()->setEntityNamespaces(
             array(
@@ -63,7 +63,7 @@ class ConfigModelManagerTest extends OrmTestCase
 
     public function testCheckDatabaseFalse()
     {
-        $schema = $this->getMockBuilder('Doctrine\Tests\Mocks\SchemaManagerMock')
+        $schema = $this->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -75,7 +75,7 @@ class ConfigModelManagerTest extends OrmTestCase
 
     public function testCheckDatabaseException()
     {
-        $schema = $this->getMockBuilder('Doctrine\Tests\Mocks\SchemaManagerMock')
+        $schema = $this->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -87,7 +87,7 @@ class ConfigModelManagerTest extends OrmTestCase
 
     public function testCheckDatabase()
     {
-        $schema = $this->getMockBuilder('Doctrine\Tests\Mocks\SchemaManagerMock')
+        $schema = $this->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\SchemaManagerMock')
             ->disableOriginalConstructor()
             ->getMock();
 
