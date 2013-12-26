@@ -13,8 +13,6 @@
 "Actions": "Actions"
 "Step information saved": "Step information saved"
 
-
-
 oro:
     workflow:
         workflowitem:
@@ -32,3 +30,5 @@ oro:
             bind_entities.label:
             created.label:            Start Date
             updated.label:            Updated
+        action:
+            general: "Workflow manipulations"

@@ -166,9 +166,9 @@ class ImportExportController extends Controller
 
         if ($jobResult->isSuccessful()) {
             $this->removeImportFileName($processorAlias);
-            $message = $this->get('translator')->trans('oro_importexport.import.import_success');
+            $message = $this->get('translator')->trans('oro.importexport.import.success');
         } else {
-            $message = $this->get('translator')->trans('oro_importexport.import.import_error');
+            $message = $this->get('translator')->trans('oro.importexport.import.error');
         }
 
         $errorsUrl = null;
