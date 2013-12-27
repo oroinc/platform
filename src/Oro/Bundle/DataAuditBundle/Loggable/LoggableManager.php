@@ -22,6 +22,8 @@ use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
  */
 class LoggableManager
 {
+    protected static $userCache = array();
+
     /**
      * @var string
      */
@@ -266,9 +268,7 @@ class LoggableManager
 
         $this->checkAuditable($this->getEntityClassName($entity));
 
-        /** @var User $user */
-        $user = $this->em->getRepository('OroUserBundle:User')->findOneBy(array('username' => $this->username));
-
+        $user = $this->getLoadedUser();
         if (!$user) {
             return;
         }
@@ -375,6 +375,27 @@ class LoggableManager
             $this->em->persist($logEntry);
             $uow->computeChangeSet($logEntryMeta, $logEntry);
         }
+    }
+
+    /**
+     * @return User
+     */
+    protected function getLoadedUser()
+    {
+        $isInCache = array_key_exists($this->username, self::$userCache);
+        if (!$isInCache
+            || ($isInCache && !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username]))
+        ) {
+            $this->loadUser();
+        }
+        return self::$userCache[$this->username];
+    }
+
+    protected function loadUser()
+    {
+        self::$userCache[$this->username] = $this->em
+            ->getRepository('OroUserBundle:User')
+            ->findOneBy(array('username' => $this->username));
     }
 
     /**
