@@ -51,7 +51,8 @@ class InstallCommand extends ContainerAwareCommand
         ) {
             throw new \RuntimeException('Oro Application already installed.');
         } elseif ($forceInstall) {
-            // if --force option we have to clear cache
+            // if --force option we have to clear cache and set installed to false
+            $this->updateInstalledFlag(false);
             $commandExecutor->runCommand('cache:clear');
         }
 
@@ -277,11 +278,7 @@ class InstallCommand extends ContainerAwareCommand
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
 
-        // update installed flag in parameters.yml
-        $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
-        $params                        = $dumper->parse();
-        $params['system']['installed'] = date('c');
-        $dumper->dump($params);
+        $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
         $commandExecutor->runCommand('cache:clear');
@@ -289,6 +286,19 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('');
 
         return $this;
+    }
+
+    /**
+     * Update installed flag in parameters.yml
+     *
+     * @param bool|string $installed
+     */
+    protected function updateInstalledFlag($installed)
+    {
+        $dumper = $this->getContainer()->get('oro_installer.yaml_persister');
+        $params = $dumper->parse();
+        $params['system']['installed'] = $installed;
+        $dumper->dump($params);
     }
 
     /**

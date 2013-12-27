@@ -35,7 +35,10 @@ class DoctrineTagEventSubscriber implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
+        // Ignored code standards for doctrine constants
+        // @codingStandardsIgnoreStart
         return [Events::onFlush, Events::postFlush];
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -46,7 +49,7 @@ class DoctrineTagEventSubscriber implements EventSubscriber
      */
     public function onFlush(OnFlushEventArgs $event)
     {
-        if ($this->isApplicationInstalled === false) {
+        if (!$this->isApplicationInstalled) {
             return;
         }
 
