@@ -478,7 +478,7 @@ class LoggableManager
                 $this->addConfig($classMetadata);
             }
 
-            return true;
+            return $this->hasConfig($entityClassName);
         }
 
         return false;
