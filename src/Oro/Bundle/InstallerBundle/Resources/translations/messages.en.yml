@@ -59,6 +59,7 @@ process:
             init-config:   Init entities config
             init-extend:   Init extended entities
             update-config: Update extended entities config
+            workflows:     Load workflow definitions
         setup:
             header:        Administration setup
         installation:

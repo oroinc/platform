@@ -38,6 +38,8 @@ class SchemaStep extends AbstractStep
                     'doctrine:fixtures:load',
                     array('--no-interaction' => true, '--append' => true)
                 );
+            case 'workflows':
+                return $this->handleAjaxAction('oro:workflow:definitions:load');
         }
 
         return $this->render('OroInstallerBundle:Process/Step:schema.html.twig');
