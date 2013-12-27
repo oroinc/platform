@@ -55,9 +55,10 @@ class EntityCacheClearer implements CacheClearerInterface
      */
     public function forceClear()
     {
-        $entityCacheDir = sprintf('%s/%s', $this->entityCacheDir, str_replace('\\', '/', $this->entityCacheNamespace));
-        $className = sprintf($this->entityProxyNameTemplate, 'EmailAddress');
-        unlink(sprintf('%s/%s.php', $entityCacheDir, $className));
+        $this->clearEmailAddressCache(
+            sprintf('%s/%s', $this->entityCacheDir, str_replace('\\', '/', $this->entityCacheNamespace)),
+            $this->createFilesystem()
+        );
     }
 
     /**
