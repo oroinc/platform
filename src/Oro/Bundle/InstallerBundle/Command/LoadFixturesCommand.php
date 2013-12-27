@@ -71,7 +71,7 @@ class LoadFixturesCommand extends ContainerAwareCommand
                     $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
                 }
             );
-            //$executor->execute($loader->getFixtures(), true);
+            $executor->execute($loader->getFixtures(), true);
         }
 
         // load workflow definitions
