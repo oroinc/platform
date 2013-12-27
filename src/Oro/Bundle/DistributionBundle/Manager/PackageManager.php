@@ -88,12 +88,15 @@ class PackageManager
         $notificationUrl = new \ReflectionProperty('Composer\Package\Package', 'notificationUrl');
         $notificationUrl->setAccessible(true);
 
-        $packages = array_filter(
-            $this->getLocalRepository()->getCanonicalPackages(),
-            function (PackageInterface $package) use ($notificationUrl) {
-                return 'https://packagist.org/downloads/' != $notificationUrl->getValue($package);
-            }
+        $packages = array_values(
+            array_filter(
+                $this->getLocalRepository()->getCanonicalPackages(),
+                function (PackageInterface $package) use ($notificationUrl) {
+                    return 'https://packagist.org/downloads/' != $notificationUrl->getValue($package);
+                }
+            )
         );
+
         return $packages;
     }
 
@@ -273,6 +276,7 @@ class PackageManager
                     },
                     $justInstalledPackages
                 );
+                $this->scriptRunner->loadFixtures($justInstalledPackages);
             } else {
                 throw new VerboseException(
                     sprintf('%s can\'t be installed!', $packageName),
