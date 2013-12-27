@@ -5,6 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -70,7 +71,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->object = new ConfigManager($this->om, $this->settings);
+        $this->object = new ConfigManager($this->om, new ConfigDefinitionImmutableBag($this->settings));
     }
 
     /**
@@ -110,7 +111,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
             array('loadStoredSettings'),
-            array($this->om, $this->settings)
+            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $this->assertEquals($this->settings['oro_user']['greeting']['value'], $object->get('oro_user.greeting', true));
@@ -129,7 +130,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
             array('get'),
-            array($this->om, $this->settings)
+            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $testSetting = array(
@@ -170,7 +171,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
             array('getChanged'),
-            array($this->om, $this->settings)
+            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $changes = array(
@@ -237,7 +238,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
             array('get'),
-            array($this->om, $this->settings)
+            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $currentValue = array(
