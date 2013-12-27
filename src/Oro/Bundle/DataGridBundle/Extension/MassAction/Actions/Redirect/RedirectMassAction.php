@@ -15,8 +15,8 @@ class RedirectMassAction extends AbstractMassAction
      */
     public function setOptions(ActionConfiguration $options)
     {
-        if (empty($options['frontend_handle_type'])) {
-            $options['frontend_handle_type'] = 'redirect';
+        if (empty($options['frontend_handle'])) {
+            $options['frontend_handle'] = 'redirect';
         }
 
         if (empty($options['route_parameters'])) {

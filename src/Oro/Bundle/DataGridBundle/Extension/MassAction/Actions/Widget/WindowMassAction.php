@@ -11,8 +11,8 @@ class WindowMassAction extends WidgetMassAction
      */
     public function setOptions(ActionConfiguration $options)
     {
-        if (empty($options['frontend_handle_type'])) {
-            $options['frontend_handle_type'] = 'dialog';
+        if (empty($options['frontend_handle'])) {
+            $options['frontend_handle'] = 'dialog';
         }
 
         return parent::setOptions($options);

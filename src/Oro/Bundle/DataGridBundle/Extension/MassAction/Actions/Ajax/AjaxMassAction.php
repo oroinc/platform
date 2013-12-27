@@ -15,8 +15,8 @@ class AjaxMassAction extends AbstractMassAction
      */
     public function setOptions(ActionConfiguration $options)
     {
-        if (empty($options['frontend_handle_type'])) {
-            $options['frontend_handle_type'] = 'ajax';
+        if (empty($options['frontend_handle'])) {
+            $options['frontend_handle'] = 'ajax';
         }
 
         if (empty($options['route'])) {
