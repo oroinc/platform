@@ -9,7 +9,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 class Runner
 {
@@ -111,6 +110,53 @@ class Runner
     }
 
     /**
+     * @param PackageInterface[] $packages
+     *
+     * @return string
+     */
+    public function loadFixtures(array $packages)
+    {
+        $phpPath = $this->getPhpExecutablePath();
+        $paths = [];
+        foreach ($packages as $package) {
+            $paths[] = $this->installationManager->getInstallPath($package);
+        }
+        $commandPrefix = sprintf('%s app/console oro:package:fixtures:load --env=prod ', $phpPath);
+        $commands = $this->makeCommands($paths, $commandPrefix);
+        $output = '';
+        foreach ($commands as $command) {
+            $output .= $this->runCommand($command);
+        }
+
+        return $output;
+
+    }
+
+    /**
+     * @param array $paths
+     * @param string $commandPrefix
+     * @param int $commandSize - windows shell-command is limited by 8kb
+     *
+     * @return array of commands to be executed
+     */
+    protected function makeCommands(array $paths, $commandPrefix, $commandSize = 8000)
+    {
+        $commands = [];
+        $commandIndex = 0;
+
+        $commands[$commandIndex] = $commandPrefix;
+        foreach ($paths as $path) {
+            if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
+                $commands[$commandIndex] .= $path . ' ';
+            } else {
+                $commands[++$commandIndex] = $commandPrefix . $path . ' ';
+            }
+        }
+
+        return $commands;
+    }
+
+    /**
      * @param string $path
      * @return string
      * @throws ProcessFailedException
@@ -128,7 +174,7 @@ class Runner
     protected function runCommand($command)
     {
         $process = new Process($command);
-        $process->setWorkingDirectory(realpath($this->applicationRootDir.'/..')); // project root
+        $process->setWorkingDirectory(realpath($this->applicationRootDir . '/..')); // project root
         $process->setTimeout(600);
 
         $process->run();

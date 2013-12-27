@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Proxy;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
@@ -35,15 +34,9 @@ class DoctrineHelper
      */
     public function getEntityIdentifier($entity)
     {
-        if ($entity instanceof Proxy && !$entity->__isInitialized()) {
-            $identifierProperty = new \ReflectionProperty(get_class($entity), '_identifier');
-            $identifierProperty->setAccessible(true);
-            $identifier = $identifierProperty->getValue($entity);
-        } else {
-            $entityManager = $this->getEntityManager($entity);
-            $metadata = $entityManager->getClassMetadata(get_class($entity));
-            $identifier = $metadata->getIdentifierValues($entity);
-        }
+        $entityManager = $this->getEntityManager($entity);
+        $metadata = $entityManager->getClassMetadata(get_class($entity));
+        $identifier = $metadata->getIdentifierValues($entity);
 
         return $identifier;
     }

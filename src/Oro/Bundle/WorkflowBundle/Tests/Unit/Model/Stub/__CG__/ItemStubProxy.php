@@ -7,13 +7,6 @@ use Doctrine\Common\Persistence\Proxy;
 // @codingStandardsIgnoreStart
 class ItemStubProxy implements Proxy
 {
-    protected $_identifier;
-
-    public function __construct($identifier = null)
-    {
-        $this->_identifier = $identifier;
-    }
-
     public function __isInitialized()
     {
         return false;
