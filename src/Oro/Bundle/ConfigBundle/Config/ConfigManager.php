@@ -40,9 +40,9 @@ class ConfigManager
     /**
      *
      * @param ObjectManager       $om
-     * @param ConfigDefinitionBag $configDefinition
+     * @param ConfigDefinitionImmutableBag $configDefinition
      */
-    public function __construct(ObjectManager $om, ConfigDefinitionBag $configDefinition)
+    public function __construct(ObjectManager $om, ConfigDefinitionImmutableBag $configDefinition)
     {
         $this->om       = $om;
         $this->settings = $configDefinition->all();

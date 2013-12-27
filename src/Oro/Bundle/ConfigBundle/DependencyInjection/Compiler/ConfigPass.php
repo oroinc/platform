@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
-use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 
 class ConfigPass implements CompilerPassInterface
 {
@@ -17,21 +17,22 @@ class ConfigPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $processor = new Processor();
-        $settings  = [];
+        $settings = [];
 
         /** @var Extension $extension */
         foreach ($container->getExtensions() as $name => $extension) {
-            $configurationTree = $extension->getConfiguration([], $container);
-            $config            = $container->getExtensionConfig($name);
-            if (!($config && $configurationTree instanceof ConfigurationInterface)) {
-                // this extension was not called
+            $config = $container->getExtensionConfig($name);
+            // take last merged configuration from sub-container
+            $config = end($config);
+            if (!$config) {
                 continue;
             }
-            $config = $container->getParameterBag()->resolveValue($config);
-            $config = $processor->processConfiguration($configurationTree, $config);
 
             if (isset($config['settings'])) {
+                if (empty($config['settings'][SettingsBuilder::RESOLVED_KEY])) {
+                    throw new \LogicException('Direct passed "settings" are not allowed');
+                }
+
                 $settings[$name] = $config['settings'];
             }
         }

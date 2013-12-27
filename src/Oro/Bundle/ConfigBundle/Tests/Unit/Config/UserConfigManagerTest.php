@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Doctrine\Common\Persistence\ObjectRepository;
 
@@ -62,7 +63,7 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->object = new UserConfigManager($this->om, $this->settings);
+        $this->object = new UserConfigManager($this->om, new ConfigDefinitionImmutableBag($this->settings));
 
         $this->security   = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->group1     = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
@@ -96,7 +97,7 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->addGroup($this->group1)
             ->addGroup($this->group2);
 
-        $this->object = new UserConfigManager($this->om, $this->settings);
+        $this->object = new UserConfigManager($this->om, new ConfigDefinitionImmutableBag($this->settings));
     }
 
     public function testSecurity()
@@ -104,7 +105,7 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\UserConfigManager',
             array('loadStoredSettings'),
-            array($this->om, $this->settings)
+            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $object->expects($this->exactly(3))
