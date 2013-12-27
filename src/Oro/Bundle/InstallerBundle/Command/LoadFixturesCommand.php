@@ -31,6 +31,9 @@ class LoadFixturesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $packageDirectories = $input->getArgument('package');
+        foreach ($packageDirectories as $key => $packageDir) {
+            $packageDirectories[$key] = realpath($packageDir) . DIRECTORY_SEPARATOR;
+        }
 
         // prepare data fixture loader
         // we should load only fixtures from the specified packages
@@ -41,7 +44,7 @@ class LoadFixturesCommand extends ContainerAwareCommand
             $bundleDir = $bundle->getPath();
             // check if a current bundle is related to any specified package
             foreach ($packageDirectories as $packageDir) {
-                if (strpos($bundleDir, $packageDir) === 0) {
+                if (stripos($bundleDir, $packageDir) === 0) {
                     // check if a current bundle has fixtures
                     $fixtureDir = $bundleDir . '/DataFixtures/ORM';
                     if (is_dir($fixtureDir)) {
