@@ -30,7 +30,7 @@ class Runner
     public function __construct(InstallationManager $installationManager, $applicationRootDir)
     {
         $this->installationManager = $installationManager;
-        $this->applicationRootDir = $applicationRootDir;
+        $this->applicationRootDir = realpath($applicationRootDir);
     }
 
     /**
@@ -85,7 +85,7 @@ class Runner
         $phpPath = $this->getPhpExecutablePath();
         $command = sprintf('%s app/console oro:platform:update --env=prod', $phpPath);
 
-        return $this->runProcess($command);
+        return $this->runCommand($command);
     }
 
     /**
@@ -121,14 +121,14 @@ class Runner
             $phpPath = $this->getPhpExecutablePath();
             $command = sprintf('%s app/console oro:platform:run-script --env=prod %s', $phpPath, $path);
 
-            return $this->runProcess($command);
+            return $this->runCommand($command);
         }
     }
 
-    protected function runProcess($command)
+    protected function runCommand($command)
     {
         $process = new Process($command);
-        $process->setWorkingDirectory($this->applicationRootDir);
+        $process->setWorkingDirectory(realpath($this->applicationRootDir.'/..')); // project root
         $process->setTimeout(600);
 
         $process->run();
