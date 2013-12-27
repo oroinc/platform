@@ -3,10 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Redirect;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 
-class RedirectMassAction extends AbstractAction implements MassActionInterface
+class RedirectMassAction extends AbstractMassAction
 {
     /** @var array */
     protected $requiredOptions = ['route'];
@@ -16,7 +15,9 @@ class RedirectMassAction extends AbstractAction implements MassActionInterface
      */
     public function setOptions(ActionConfiguration $options)
     {
-        $options['frontend_type'] = 'redirect';
+        if (empty($options['frontend_handle_type'])) {
+            $options['frontend_handle_type'] = 'redirect';
+        }
 
         if (empty($options['route_parameters'])) {
             $options['route_parameters'] = [];

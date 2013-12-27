@@ -31,9 +31,6 @@ define(function (require) {
             },
             actionType: function (type) {
                 return type + 'Action';
-            },
-            massActionType: function (type) {
-                return type + 'MassAction';
             }
         },
 
@@ -72,8 +69,8 @@ define(function (require) {
             collectModules: function () {
                 var modules = this.modules,
                     metadata = this.metadata,
-                    moduleName = function (template, type, module) {
-                        return module || template.replace('{{type}}', type);
+                    moduleName = function (template, type) {
+                        return template.replace('{{type}}', type);
                     };
                 // cells
                 _.each(metadata.columns, function (column) {
@@ -82,11 +79,11 @@ define(function (require) {
                 });
                 // row actions
                 _.each(_.values(metadata.rowActions), function (action) {
-                    modules[helpers.actionType(action.type)] = moduleName(actionModuleName, action.type);
+                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
                 });
                 // mass actions
                 _.each(_.values(metadata.massActions), function (action) {
-                    modules[helpers.massActionType(action.type)] = moduleName(actionModuleName, action.type, action.js_module);
+                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
                 });
             },
 
@@ -170,12 +167,12 @@ define(function (require) {
 
                 // row actions
                 _.each(metadata.rowActions, function (options, action) {
-                    rowActions[action] = modules[helpers.actionType(options.type)].extend(options);
+                    rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
                 });
 
                 // mass actions
                 _.each(metadata.massActions, function (options, action) {
-                    massActions[action] = modules[helpers.massActionType(options.type)].extend(options);
+                    massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
                 });
 
                 return {

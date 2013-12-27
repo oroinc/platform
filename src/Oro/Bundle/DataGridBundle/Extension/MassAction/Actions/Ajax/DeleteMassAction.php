@@ -18,8 +18,8 @@ class DeleteMassAction extends AjaxMassAction
             $options['handler'] = 'oro_datagrid.extension.mass_action.handler.delete';
         }
 
-        if (empty($options['js_module'])) {
-            $options['js_module'] = 'oro/datagrid/delete-mass-action';
+        if (empty($options['frontend_type'])) {
+            $options['frontend_type'] = 'delete-mass';
         }
 
         return parent::setOptions($options);

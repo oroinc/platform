@@ -43,6 +43,9 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /** @property {String} */
         frontend_type: null,
 
+        /** @property {String} */
+        frontend_handle_type: null,
+
         /** @property {Object} */
         frontend_options: null,
 
@@ -139,9 +142,9 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         },
 
         executeConfiguredAction: function(action) {
-            if (action.frontend_type == 'ajax') {
+            if (action.frontend_handle_type == 'ajax') {
                 this._handleAjax(action);
-            } else if (action.frontend_type == 'redirect') {
+            } else if (action.frontend_handle_type == 'redirect') {
                 this._handleRedirect(action);
             } else {
                 this._handleWidget(action);
@@ -162,7 +165,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
             action.frontend_options.url = action.frontend_options.url || this.getLinkWithParameters();
             action.frontend_options.title = action.frontend_options.title || this.label;
-            require(['oro/' + action.frontend_type + '-widget'],
+            require(['oro/' + action.frontend_handle_type + '-widget'],
             function(WidgetType) {
                 var widget = new WidgetType(action.frontend_options);
                 widget.render();
