@@ -7,6 +7,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class SettingsBuilder
 {
+    const RESOLVED_KEY = 'resolved';
+
     /**
      *
      * @param ArrayNodeDefinition $root     Config root node
@@ -18,7 +20,9 @@ class SettingsBuilder
         $node    = $builder
             ->root('settings')
             ->addDefaultsIfNotSet()
-            ->children();
+            ->children()
+            // additional flag to ensure that values are processed by "configuration processor"
+            ->scalarNode(self::RESOLVED_KEY)->defaultTrue()->end();
 
         foreach ($settings as $name => $setting) {
             $child = $node

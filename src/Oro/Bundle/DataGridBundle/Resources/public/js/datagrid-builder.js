@@ -30,7 +30,7 @@ define(function (require) {
                 return type + 'Cell';
             },
             actionType: function (type) {
-                return type + 'Acton';
+                return type + 'Action';
             }
         },
 
@@ -79,12 +79,12 @@ define(function (require) {
                 });
                 // row actions
                 _.each(_.values(metadata.rowActions), function (action) {
-                    modules[helpers.actionType(action.type)] = moduleName(actionModuleName, action.type);
+                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
                 });
                 // mass actions
-                if (!$.isEmptyObject(metadata.massActions)) {
-                    modules[helpers.actionType('mass')] = moduleName(actionModuleName, 'mass');
-                }
+                _.each(_.values(metadata.massActions), function (action) {
+                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
+                });
             },
 
             /**
@@ -167,12 +167,12 @@ define(function (require) {
 
                 // row actions
                 _.each(metadata.rowActions, function (options, action) {
-                    rowActions[action] = modules[helpers.actionType(options.type)].extend(options);
+                    rowActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
                 });
 
                 // mass actions
                 _.each(metadata.massActions, function (options, action) {
-                    massActions[action] = modules[helpers.actionType('mass')].extend(options);
+                    massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
                 });
 
                 return {

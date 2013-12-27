@@ -20,6 +20,7 @@ oro:
         precision.label: Precision
         name.label:      Name
         currency.label:  Currency
+        business_units.label: Bussines units
 
         businessunit:
             entity_label:        Business Unit

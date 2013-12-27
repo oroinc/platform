@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EntityConfigBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
 
 class OptionSetRelationRepository extends EntityRepository
 {
     /**
      * @param int $fieldConfigId
      * @param int $entityId
-     * @return array
+     * @return OptionSetRelation[]
      */
     public function findByFieldId($fieldConfigId, $entityId)
     {
