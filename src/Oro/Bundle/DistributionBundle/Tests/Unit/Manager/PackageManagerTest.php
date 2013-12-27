@@ -311,7 +311,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($rootPackageMock));
 
         $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
-        $manager = $this->createPackageManager($composer, $composerInstaller, null, null, $tempComposerJson);
+        $runner = $this->createScriptRunnerMock();
+        $runner->expects($this->once())
+            ->method('loadFixtures');
+
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner, $tempComposerJson);
         $manager->install($newPackage->getName());
 
         $updatedComposerData = json_decode(file_get_contents($tempComposerJson), true);
