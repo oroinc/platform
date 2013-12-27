@@ -12,8 +12,6 @@ use Doctrine\Common\Collections\Collection;
 
 use JMS\Serializer\Annotation as JMS;
 
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
-
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
@@ -42,7 +40,6 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  * @ORM\Entity()
  * @ORM\Table(name="oro_user")
  * @ORM\HasLifecycleCallbacks()
- * @Oro\Loggable
  * @Config(
  *      routeName="oro_user_index",
  *      routeView="oro_user_view",
@@ -90,7 +87,6 @@ class User extends ExtendUser implements
      * @ORM\Column(type="string", length=255, unique=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $username;
 
@@ -100,7 +96,6 @@ class User extends ExtendUser implements
      * @ORM\Column(type="string", length=255, unique=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $email;
 
@@ -112,7 +107,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $namePrefix;
 
@@ -124,7 +118,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $firstName;
 
@@ -136,7 +129,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $middleName;
 
@@ -148,7 +140,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $lastName;
 
@@ -160,7 +151,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
      * @JMS\Type("string")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $nameSuffix;
 
@@ -170,7 +160,6 @@ class User extends ExtendUser implements
      * @ORM\Column(name="birthday", type="date", nullable=true)
      * @JMS\Type("DateTime")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $birthday;
 
@@ -196,7 +185,6 @@ class User extends ExtendUser implements
      * @ORM\Column(type="boolean")
      * @JMS\Type("boolean")
      * @JMS\Expose
-     * @Oro\Versioned
      */
     protected $enabled = true;
 
@@ -272,7 +260,6 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Oro\Versioned("getLabel")
      */
     protected $roles;
 
@@ -284,7 +271,6 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Oro\Versioned("getName")
      */
     protected $groups;
 
@@ -332,7 +318,6 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Oro\Versioned("getName")
      */
     protected $businessUnits;
 
