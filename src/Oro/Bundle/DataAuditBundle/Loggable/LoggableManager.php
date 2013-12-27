@@ -266,7 +266,9 @@ class LoggableManager
             return;
         }
 
-        $this->checkAuditable($this->getEntityClassName($entity));
+        if (!$this->checkAuditable($this->getEntityClassName($entity))) {
+            return;
+        }
 
         $user = $this->getLoadedUser();
         if (!$user) {
@@ -383,9 +385,7 @@ class LoggableManager
     protected function getLoadedUser()
     {
         $isInCache = array_key_exists($this->username, self::$userCache);
-        if (!$isInCache
-            || ($isInCache && !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username]))
-        ) {
+        if (!$isInCache || !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username])) {
             $this->loadUser();
         }
         return self::$userCache[$this->username];
@@ -448,8 +448,8 @@ class LoggableManager
 
     protected function checkAuditable($entityClassName)
     {
-        if (!$this->hasConfig($entityClassName)) {
-            return;
+        if ($this->hasConfig($entityClassName)) {
+            return true;
         }
 
         if ($this->auditConfigProvider->hasConfig($entityClassName)
@@ -478,7 +478,11 @@ class LoggableManager
             if (count($classMetadata->propertyMetadata)) {
                 $this->addConfig($classMetadata);
             }
+
+            return true;
         }
+
+        return false;
     }
 
     /**
