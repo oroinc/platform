@@ -278,106 +278,104 @@ class LoggableManager
 
         $uow = $this->em->getUnitOfWork();
 
-        if ($this->hasConfig($this->getEntityClassName($entity))) {
-            $meta       = $this->getConfig($entityClassName);
-            $entityMeta = $this->em->getClassMetadata($entityClassName);
+        $meta       = $this->getConfig($entityClassName);
+        $entityMeta = $this->em->getClassMetadata($entityClassName);
 
-            $logEntryMeta = $this->em->getClassMetadata($this->getLogEntityClass());
-            /** @var Audit $logEntry */
-            $logEntry = $logEntryMeta->newInstance();
-            $logEntry->setAction($action);
-            $logEntry->setObjectClass($meta->name);
-            $logEntry->setLoggedAt();
-            $logEntry->setUser($user);
-            $logEntry->setObjectName(method_exists($entity, '__toString') ? $entity->__toString() : $meta->name);
+        $logEntryMeta = $this->em->getClassMetadata($this->getLogEntityClass());
+        /** @var Audit $logEntry */
+        $logEntry = $logEntryMeta->newInstance();
+        $logEntry->setAction($action);
+        $logEntry->setObjectClass($meta->name);
+        $logEntry->setLoggedAt();
+        $logEntry->setUser($user);
+        $logEntry->setObjectName(method_exists($entity, '__toString') ? $entity->__toString() : $meta->name);
 
-            $entityId = $this->getIdentifier($entity);
+        $entityId = $this->getIdentifier($entity);
 
-            if (!$entityId && $action === self::ACTION_CREATE) {
-                $this->pendingLogEntityInserts[spl_object_hash($entity)] = $logEntry;
-            }
+        if (!$entityId && $action === self::ACTION_CREATE) {
+            $this->pendingLogEntityInserts[spl_object_hash($entity)] = $logEntry;
+        }
 
-            $logEntry->setObjectId($entityId);
+        $logEntry->setObjectId($entityId);
 
-            $newValues = array();
+        $newValues = array();
 
-            if ($action !== self::ACTION_REMOVE && count($meta->propertyMetadata)) {
-                foreach ($uow->getEntityChangeSet($entity) as $field => $changes) {
+        if ($action !== self::ACTION_REMOVE && count($meta->propertyMetadata)) {
+            foreach ($uow->getEntityChangeSet($entity) as $field => $changes) {
 
-                    if (!isset($meta->propertyMetadata[$field])) {
-                        continue;
+                if (!isset($meta->propertyMetadata[$field])) {
+                    continue;
+                }
+
+                $old = $changes[0];
+                $new = $changes[1];
+
+                // fix issues with DateTime
+                if ($old == $new) {
+                    continue;
+                }
+
+                if ($entityMeta->isSingleValuedAssociation($field) && $new) {
+                    $oid   = spl_object_hash($new);
+                    $value = $this->getIdentifier($new);
+
+                    if (!is_array($value) && !$value) {
+                        $this->pendingRelatedEntities[$oid][] = array(
+                            'log'   => $logEntry,
+                            'field' => $field
+                        );
                     }
 
-                    $old = $changes[0];
-                    $new = $changes[1];
-
-                    // fix issues with DateTime
-                    if ($old == $new) {
-                        continue;
-                    }
-
-                    if ($entityMeta->isSingleValuedAssociation($field) && $new) {
-                        $oid   = spl_object_hash($new);
-                        $value = $this->getIdentifier($new);
-
-                        if (!is_array($value) && !$value) {
-                            $this->pendingRelatedEntities[$oid][] = array(
-                                'log'   => $logEntry,
-                                'field' => $field
+                    $method = $meta->propertyMetadata[$field]->method;
+                    if ($old !== null) {
+                        // check if an object has the required method to avoid a fatal error
+                        if (!method_exists($old, $method)) {
+                            throw new \ReflectionException(
+                                sprintf('Try to call to undefined method %s::%s', get_class($old), $method)
                             );
                         }
-
-                        $method = $meta->propertyMetadata[$field]->method;
-                        if ($old !== null) {
-                            // check if an object has the required method to avoid a fatal error
-                            if (!method_exists($old, $method)) {
-                                throw new \ReflectionException(
-                                    sprintf('Try to call to undefined method %s::%s', get_class($old), $method)
-                                );
-                            }
-                            $old = $old->{$method}();
-                        }
-                        if ($new !== null) {
-                            // check if an object has the required method to avoid a fatal error
-                            if (!method_exists($new, $method)) {
-                                throw new \ReflectionException(
-                                    sprintf('Try to call to undefined method %s::%s', get_class($new), $method)
-                                );
-                            }
-                            $new = $new->{$method}();
-                        }
+                        $old = $old->{$method}();
                     }
-
-                    $newValues[$field] = array(
-                        'old' => $old,
-                        'new' => $new,
-                    );
+                    if ($new !== null) {
+                        // check if an object has the required method to avoid a fatal error
+                        if (!method_exists($new, $method)) {
+                            throw new \ReflectionException(
+                                sprintf('Try to call to undefined method %s::%s', get_class($new), $method)
+                            );
+                        }
+                        $new = $new->{$method}();
+                    }
                 }
 
-                $newValues = array_merge($newValues, $this->collectionLogData);
-                $logEntry->setData($newValues);
+                $newValues[$field] = array(
+                    'old' => $old,
+                    'new' => $new,
+                );
             }
 
-            if ($action === self::ACTION_UPDATE && 0 === count($newValues)) {
-                return;
-            }
-
-            $version = 1;
-
-            if ($action !== self::ACTION_CREATE) {
-                $version = $this->getNewVersion($logEntryMeta, $entity);
-
-                if (empty($version)) {
-                    // was versioned later
-                    $version = 1;
-                }
-            }
-
-            $logEntry->setVersion($version);
-
-            $this->em->persist($logEntry);
-            $uow->computeChangeSet($logEntryMeta, $logEntry);
+            $newValues = array_merge($newValues, $this->collectionLogData);
+            $logEntry->setData($newValues);
         }
+
+        if ($action === self::ACTION_UPDATE && 0 === count($newValues)) {
+            return;
+        }
+
+        $version = 1;
+
+        if ($action !== self::ACTION_CREATE) {
+            $version = $this->getNewVersion($logEntryMeta, $entity);
+
+            if (empty($version)) {
+                // was versioned later
+                $version = 1;
+            }
+        }
+
+        $logEntry->setVersion($version);
+
+        $this->em->persist($logEntry);
+        $uow->computeChangeSet($logEntryMeta, $logEntry);
     }
 
     /**
