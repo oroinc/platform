@@ -50,6 +50,10 @@ abstract class AbstractAction implements ActionInterface
         $this->options = $options;
         $this->assertHasRequiredOptions();
 
+        if (empty($options['frontend_type']) && !empty($options['type'])) {
+            $options['frontend_type'] = $options['type'];
+        }
+
         return $this;
     }
 
