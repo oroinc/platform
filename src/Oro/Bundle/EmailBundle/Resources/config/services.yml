@@ -54,7 +54,6 @@ services:
             - { name: kernel.cache_warmer, priority: 30 }
 
     oro_email.entity.cache.clearer:
-        public: false
         class: %oro_email.entity.cache.clearer.class%
         arguments:
             - %oro_email.entity.cache_dir%
