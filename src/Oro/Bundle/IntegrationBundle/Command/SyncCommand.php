@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Command;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -21,6 +22,7 @@ use Oro\Bundle\CronBundle\Command\CronCommandInterface;
  */
 class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
 {
+    const COMMAND_NAME   = 'oro:cron:channels:sync';
     const SYNC_PROCESSOR = 'oro_integration.sync.processor';
 
     /**
@@ -37,7 +39,13 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
     public function configure()
     {
         $this
-            ->setName('oro:cron:channels:sync')
+            ->setName(self::COMMAND_NAME)
+            ->addOption(
+                'channel-id',
+                'c',
+                InputOption::VALUE_OPTIONAL,
+                'If option exists sync will be performed for given channel id'
+            )
             ->setDescription('Runs synchronization for each configured channel');
     }
 
@@ -47,23 +55,34 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
      * @param  InputInterface  $input
      * @param  OutputInterface $output
      *
+     * @throws \InvalidArgumentException
      * @return int|null|void
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $strategy = $this->getContainer()
+        $channelId = $input->getOption('channel-id');
+        $strategy  = $this->getContainer()
             ->get('oro_integration.logger.strategy');
         $strategy->setLogger(new OutputLogger($output));
+        $repo = $this->getContainer()->get('doctrine.orm.entity_manager')
+            ->getRepository('OroIntegrationBundle:Channel');
 
-        if ($this->isJobRunning()) {
+        if ($this->isJobRunning($channelId)) {
             $strategy->warning('Job already running. Terminating....');
 
             return 0;
         }
 
-        $channels = $this->getContainer()->get('doctrine.orm.entity_manager')
-            ->getRepository('OroIntegrationBundle:Channel')
-            ->getConfiguredChannelsForSync();
+        if ($channelId) {
+            $channel = $repo->getOrLoadById($channelId);
+            if (!$channel) {
+                throw new \InvalidArgumentException('Channel with given ID not found');
+            }
+            $channels = [$channel];
+        } else {
+            $channels = $repo->getConfiguredChannelsForSync();
+        }
+
 
         /** @var Channel $channel */
         foreach ($channels as $channel) {
@@ -90,20 +109,32 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
     /**
      * Check is job running (from previous schedule)
      *
+     * @param null|int $channelId
+     *
      * @return bool
      */
-    protected function isJobRunning()
+    protected function isJobRunning($channelId)
     {
         $qb = $this->getContainer()->get('doctrine.orm.entity_manager')
             ->getRepository('JMSJobQueueBundle:Job')
-            ->createQueryBuilder('j');
-
-        $running = $qb
+            ->createQueryBuilder('j')
             ->select('count(j.id)')
             ->andWhere('j.command=:commandName')
-            ->andWhere($qb->expr()->in('j.state', [Job::STATE_RUNNING]))
+            ->andWhere('j.state=:stateName')
             ->setParameter('commandName', $this->getName())
-            ->getQuery()
+            ->setParameter('stateName', Job::STATE_RUNNING);
+
+        if ($channelId) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $qb->expr()->like('j.args', ':channelIdType1'),
+                    $qb->expr()->like('j.args', ':channelIdType2')
+                )
+            )->setParameter('channelIdType1', '%--channel-id=' . $channelId . '%')
+             ->setParameter('channelIdType2', '%-c=' . $channelId . '%');
+        }
+
+        $running = $qb->getQuery()
             ->getSingleScalarResult();
 
         return $running > 1;

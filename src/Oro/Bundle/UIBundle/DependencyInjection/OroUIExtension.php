@@ -26,6 +26,7 @@ class OroUIExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
+        $container->setParameter('oro_ui.show_pin_button_on_start_page', $config['show_pin_button_on_start_page']);
         $container->setParameter('oro_ui.wrap_class', $config['wrap_class']);
 
         $this->placeholdersConfig($config, $container);

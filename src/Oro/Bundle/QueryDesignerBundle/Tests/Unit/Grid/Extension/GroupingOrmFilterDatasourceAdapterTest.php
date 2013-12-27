@@ -3,7 +3,9 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Tests\OrmTestCase;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 
@@ -11,25 +13,25 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 {
     public function testNoRestrictions()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0',
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u WHERE u.id = 0',
             $qb->getDQL()
         );
     }
 
     public function testOneRestriction()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -37,16 +39,17 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND u.name = 1',
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND u.name = 1',
             $qb->getDQL()
         );
     }
 
     public function testSeveralRestrictions()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -56,7 +59,8 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND '
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND '
             . '((u.name = 1 OR u.name = 2) AND u.name = 3)',
             $qb->getDQL()
         );
@@ -64,9 +68,9 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 
     public function testEmptyGroup()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -75,16 +79,17 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0',
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0',
             $qb->getDQL()
         );
     }
 
     public function testOneRestrictionInGroup()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -94,16 +99,17 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND u.name = 1',
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND u.name = 1',
             $qb->getDQL()
         );
     }
 
     public function testSeveralRestrictionsInGroup()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -115,7 +121,8 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND '
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND '
             . '((u.name = 1 OR u.name = 2) AND u.name = 3)',
             $qb->getDQL()
         );
@@ -123,9 +130,9 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 
     public function testNestedGroupsWithOneRestrictionInNestedGroup()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -140,7 +147,8 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND '
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND '
             . '(u.name = 1 OR u.name = 2)',
             $qb->getDQL()
         );
@@ -148,9 +156,9 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 
     public function testNestedGroupsWithSameCondition()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -166,7 +174,8 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND '
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND '
             . '(u.name = 1 OR (u.name = 2 OR u.name = 3))',
             $qb->getDQL()
         );
@@ -174,9 +183,9 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 
     public function testNestedGroupsWithDifferentConditions()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -192,7 +201,8 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND '
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND '
             . '(u.name = 1 OR (u.name = 2 AND u.name = 3))',
             $qb->getDQL()
         );
@@ -200,9 +210,9 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
 
     public function testComplexExpr()
     {
-        $qb = new QueryBuilder($this->_getTestEntityManager());
+        $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['u.id'])
-            ->from('Doctrine\Tests\Models\CMS\CmsUser', 'u')
+            ->from('Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
             ->where('u.id = 0');
         $ds = new GroupingOrmFilterDatasourceAdapter($qb);
 
@@ -229,7 +239,8 @@ class GroupingOrmFilterDatasourceAdapterTest extends OrmTestCase
         $ds->applyRestrictions();
 
         $this->assertEquals(
-            'SELECT u.id FROM Doctrine\Tests\Models\CMS\CmsUser u WHERE u.id = 0 AND '
+            'SELECT u.id FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser u '
+            . 'WHERE u.id = 0 AND '
             . '(u.name = 1 AND '
             . '((u.name = 2 AND (u.name = 3 OR u.name = 4)) OR u.name = 5 OR (u.name = 6 AND u.name = 7)) AND '
             . 'u.name = 8)',
