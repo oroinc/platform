@@ -266,7 +266,8 @@ class LoggableManager
             return;
         }
 
-        if (!$this->checkAuditable($this->getEntityClassName($entity))) {
+        $entityClassName = $this->getEntityClassName($entity);
+        if (!$this->hasConfig($entityClassName) || !$this->checkAuditable($entityClassName)) {
             return;
         }
 
@@ -278,8 +279,8 @@ class LoggableManager
         $uow = $this->em->getUnitOfWork();
 
         if ($this->hasConfig($this->getEntityClassName($entity))) {
-            $meta       = $this->getConfig($this->getEntityClassName($entity));
-            $entityMeta = $this->em->getClassMetadata($this->getEntityClassName($entity));
+            $meta       = $this->getConfig($entityClassName);
+            $entityMeta = $this->em->getClassMetadata($entityClassName);
 
             $logEntryMeta = $this->em->getClassMetadata($this->getLogEntityClass());
             /** @var Audit $logEntry */
@@ -385,7 +386,9 @@ class LoggableManager
     protected function getLoadedUser()
     {
         $isInCache = array_key_exists($this->username, self::$userCache);
-        if (!$isInCache || !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username])) {
+        if (!$isInCache
+            || ($isInCache && !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username]))
+        ) {
             $this->loadUser();
         }
         return self::$userCache[$this->username];
@@ -448,10 +451,6 @@ class LoggableManager
 
     protected function checkAuditable($entityClassName)
     {
-        if ($this->hasConfig($entityClassName)) {
-            return true;
-        }
-
         if ($this->auditConfigProvider->hasConfig($entityClassName)
             && $this->auditConfigProvider->getConfig($entityClassName)->is('auditable')
         ) {
