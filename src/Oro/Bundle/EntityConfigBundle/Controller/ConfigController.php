@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,12 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
@@ -26,7 +27,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
  * TODO: Discuss ACL impl., currently management of configurable entities can be on or off only
  * @Acl(
  *      id="oro_entityconfig_manage",
- *      label="Manage configurable entities",
+ *      label="oro.entity_config.action.manage",
  *      type="action",
  *      group_name=""
  * )
@@ -39,7 +40,7 @@ class ConfigController extends Controller
      * @Route("/", name="oro_entityconfig_index")
      * Acl(
      *      id="oro_entityconfig",
-     *      label="View configurable entities",
+     *      label="oro.entity_config.action.view_entities",
      *      type="action",
      *      group_name=""
      * )
@@ -72,7 +73,7 @@ class ConfigController extends Controller
      * @Route("/update/{id}", name="oro_entityconfig_update")
      * Acl(
      *      id="oro_entityconfig_update",
-     *      label="Update configurable entity",
+     *      label="oro.entity_config.action.update_entity",
      *      type="action",
      *      group_name=""
      * )
@@ -121,7 +122,7 @@ class ConfigController extends Controller
      * @Route("/view/{id}", name="oro_entityconfig_view")
      * Acl(
      *      id="oro_entityconfig_view",
-     *      label="View configurable entity",
+     *      label="oro.entity_config.action.view_entity",
      *      type="action",
      *      group_name=""
      * )
@@ -223,7 +224,7 @@ class ConfigController extends Controller
      * @Route("/field/update/{id}", name="oro_entityconfig_field_update")
      * Acl(
      *      id="oro_entityconfig_field_update",
-     *      label="Update configurable entity field",
+     *      label="oro.entity_config.action.update_entity_field",
      *      type="action",
      *      group_name=""
      * )
@@ -284,7 +285,7 @@ class ConfigController extends Controller
      * @Route("/field/search/{id}", name="oro_entityconfig_field_search", defaults={"id"=0})
      * Acl(
      *      id="oro_entityconfig_field_search",
-     *      label="Return varchar type field(s) in given entity",
+     *      label="oro.entity_config.action.field_search",
      *      type="action",
      *      group_name=""
      * )
@@ -312,13 +313,16 @@ class ConfigController extends Controller
                         ]
                     );
 
+                /** @var Translator $translator */
+                $translator = $this->get('translator');
+
                 foreach ($entityFields as $field) {
                     $label = $entityConfigProvider->getConfig($id, $field->getFieldName())->get('label');
                     if (!$label) {
                         $label = $field->getFieldName();
                     }
 
-                    $fields[$field->getFieldName()] = $label;
+                    $fields[$field->getFieldName()] = $translator->trans($label);
                 }
             }
         }

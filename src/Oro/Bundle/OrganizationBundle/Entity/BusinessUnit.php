@@ -54,7 +54,7 @@ class BusinessUnit implements NotificationEmailInterface
     /**
      * @var Organization
      *
-     * @ORM\ManyToOne(targetEntity="Organization")
+     * @ORM\ManyToOne(targetEntity="Organization", inversedBy="businessUnits")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      */
     protected $organization;

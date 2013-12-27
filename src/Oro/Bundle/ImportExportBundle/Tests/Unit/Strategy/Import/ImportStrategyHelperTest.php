@@ -172,7 +172,7 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(10));
             $this->translator->expects($this->once())
                 ->method('trans')
-                ->with('oro.importexport.import_error %number%', array('%number%' => 10))
+                ->with('oro.importexport.import.error %number%', array('%number%' => 10))
                 ->will($this->returnValue('TranslatedError 10'));
             $expectedPrefix = 'TranslatedError 10';
         }

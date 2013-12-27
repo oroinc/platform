@@ -4,10 +4,14 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
-use Doctrine\Tests\Mocks\ConnectionMock;
-use Doctrine\Tests\Mocks\EntityManagerMock;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+
 use Symfony\Component\DependencyInjection\Container;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\ConnectionMock;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverMock;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -131,7 +135,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $classMetadata->expects($this->once())->method('getName')->will($this->returnValue(DemoEntity::ENTITY_NAME));
 
-        $connectionMock       = new ConnectionMock(array(), new \Doctrine\Tests\Mocks\DriverMock());
+        $connectionMock       = new ConnectionMock(array(), new DriverMock());
         $emMock               = EntityManagerMock::create($connectionMock);
         $persistentCollection = new PersistentCollection($emMock, $classMetadata, new ArrayCollection);
 

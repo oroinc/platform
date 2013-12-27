@@ -1,2 +1,4 @@
-"oro.config.controller.config.saved.message": "Configuration saved"
+oro.config.module_label: "System configuration"
+oro.config.controller.config.saved.message: "Configuration saved"
+
 "Settings": "Settings"

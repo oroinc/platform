@@ -57,8 +57,8 @@ oro:
             entity_label:        Report Type
             entity_plural_label: Report Types
             entity_description:  Represent Report Type
-            name.label:
-            label.label:
+            name.label:          Name
+            label.label:         Label
 
 "New Report": New Report
 "Manage Reports": Manage Reports

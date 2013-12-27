@@ -1,5 +1,5 @@
 oro_jobs:
-    label: Jobs management
+    label: oro.cron.action.jobs_management
     type: action
     group_name: ""
     bindings: ~

@@ -3,10 +3,9 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Widget;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Action\Actions\AbstractAction;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 
-class WidgetMassAction extends AbstractAction implements MassActionInterface
+class WidgetMassAction extends AbstractMassAction
 {
     /** @var array */
     protected $requiredOptions = ['route', 'frontend_type'];
@@ -16,7 +15,6 @@ class WidgetMassAction extends AbstractAction implements MassActionInterface
      */
     public function setOptions(ActionConfiguration $options)
     {
-
         if (empty($options['frontend_options'])) {
             $options['frontend_options'] = [];
         }

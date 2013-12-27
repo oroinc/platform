@@ -12,6 +12,9 @@ function(_, messenger, __, Modal, AbstractAction) {
      */
     return AbstractAction.extend({
         /** @property {Object} */
+        messages: {},
+
+        /** @property {Object} */
         defaultMessages: {
             confirm_title: __('Mass Action Confirmation'),
             confirm_content: __('Are you sure you want to do this?'),
@@ -64,19 +67,6 @@ function(_, messenger, __, Modal, AbstractAction) {
         _onAjaxSuccess: function(data, textStatus, jqXHR) {
             this.datagrid.resetSelectionState();
             AbstractAction.prototype._onAjaxSuccess.apply(this, arguments);
-        },
-
-        /**
-         * Get view for confirm modal
-         *
-         * @return {oro.Modal}
-         */
-        getConfirmDialog: function(callback) {
-            return new Modal({
-                title: this.messages.confirm_title,
-                content: this.messages.confirm_content,
-                okText: this.messages.confirm_ok
-            }).on('ok', callback);
         }
     });
 });
