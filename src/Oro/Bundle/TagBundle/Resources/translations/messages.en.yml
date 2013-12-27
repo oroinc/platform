@@ -19,3 +19,11 @@ oro:
         created_by.label: Created by
         updated.label:    Updated
         updated_by.label: Updated by
+
+        action:
+            assign_unassign: "Tag assign/unassign"
+            unassign_global: "Unassign all tags from entities"
+            view_cloud: "View tag cloud"
+
+        tagging:
+            entity_label: Tagging

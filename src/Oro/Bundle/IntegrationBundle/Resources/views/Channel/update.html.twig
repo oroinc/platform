@@ -23,6 +23,14 @@
     {% endif %}
 
     {{ UI.button({'path' : path('oro_integration_channel_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
+    {% if entity.id %}
+        {{ UI.clientButton({
+            'dataUrl': path('oro_integration_channel_schedule', { 'id': entity.id }) ,
+            'aCss':   'no-hash schedule-button btn-primary',
+            'title' : 'Schedule sync',
+            'label' : 'Schedule sync'
+        }) }}
+    {% endif %}
     {{ UI.saveAndStayButton('oro_integration_channel_update') }}
     {{ UI.buttonType({'type': 'button', 'class': 'btn-success', 'label': 'Save and Close', 'action': 'save'}) }}
 {% endblock navButtons %}
@@ -61,4 +69,42 @@
         'dataBlocks': dataBlocks,
     } %}
     {{ parent() }}
+    <script type="text/javascript">
+        require(['jquery', 'oro/translator', 'routing', 'oro/messenger', 'oro/navigation'],
+        function ($, __, routing, messenger, Navigation) {
+            $(function () {
+                $('.schedule-button').click(function (e) {
+                    e.preventDefault();
+
+                    var url = $(this).data('url');
+
+                    var navigation = Navigation.getInstance();
+                    if (navigation) {
+                        navigation.loadingMask.show();
+                    }
+
+                    $.ajax(url, {
+                        success: function (res) {
+                            var successMessage = __('Sync was scheduled.'),
+                                url = routing.generate('oro_cron_job_view', {id: res.job_id}),
+                                jobViewLink = '<a href="' + url + '" class="job-view-link">' + __('Check progress.') + '</a>';
+
+                            messenger.notificationMessage('success', [successMessage, jobViewLink].join(' '));
+                            if (navigation) {
+                                navigation.processClicks($('.job-view-link'));
+                            }
+                        },
+                        error: function () {
+                            messenger.notificationMessage('error', __('Error was occurred, please try later.'));
+                        },
+                        dataType: 'json'
+                    }).always(function () {
+                        if (navigation) {
+                            navigation.loadingMask.hide();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 {% endblock content_data %}

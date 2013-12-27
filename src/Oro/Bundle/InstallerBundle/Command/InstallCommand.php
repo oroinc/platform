@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Console\Helper\DialogHelper;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -50,7 +51,8 @@ class InstallCommand extends ContainerAwareCommand
         ) {
             throw new \RuntimeException('Oro Application already installed.');
         } elseif ($forceInstall) {
-            // if --force option we have to clear cache
+            // if --force option we have to clear cache and set installed to false
+            $this->updateInstalledFlag(false);
             $commandExecutor->runCommand('cache:clear');
         }
 
@@ -113,6 +115,7 @@ class InstallCommand extends ContainerAwareCommand
     {
         $output->writeln('<info>Setting up database.</info>');
 
+        /** @var DialogHelper $dialog */
         $dialog    = $this->getHelperSet()->get('dialog');
         $container = $this->getContainer();
         $options   = $input->getOptions();
@@ -155,40 +158,62 @@ class InstallCommand extends ContainerAwareCommand
             ->getRepository('OroOrganizationBundle:BusinessUnit')
             ->findOneBy(array('name' => 'Main'));
 
-        $passValidator = function ($value) {
+        /** @var ConfigManager $configManager */
+        $configManager       = $this->getContainer()->get('oro_config.global');
+        $defaultCompanyName  = $configManager->get('oro_ui.application_name');
+        $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
+
+        $passValidator        = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
             }
 
             return $value;
         };
+        $companyNameValidator = function ($value) use (&$defaultCompanyName) {
+            $len = strlen(trim($value));
+            if ($len === 0 && empty($defaultCompanyName)) {
+                throw new \Exception('The company short name must not be empty');
+            }
+            if ($len > 15) {
+                throw new \Exception('The company short name must be not more than 15 characters long');
+            }
 
-        /** @var ConfigManager $configManager */
-        $configManager       = $this->getContainer()->get('oro_config.global');
-        $defaultCompanyName  = $configManager->get('oro_ui.application_name');
-        $defaultCompanyTitle = $configManager->get('oro_ui.application_title');
+            return $value;
+        };
 
         $companyTitle  = isset($options['company-name'])
             ? $options['company-name']
-            : $dialog->ask($output, sprintf('<question>Company name (%s):</question> ', $defaultCompanyTitle));
+            : $dialog->ask(
+                $output,
+                $this->buildQuestion('Company name', $defaultCompanyTitle)
+            );
         $companyName   = isset($options['company-short-name'])
             ? $options['company-short-name']
-            : $dialog->ask($output, sprintf('<question>Company short name (%s):</question> ', $defaultCompanyName));
+            : $dialog->askAndValidate(
+                $output,
+                $this->buildQuestion('Company short name', $defaultCompanyName),
+                $companyNameValidator
+            );
         $userName      = isset($options['user-name'])
             ? $options['user-name']
-            : $dialog->ask($output, '<question>Username:</question> ');
+            : $dialog->ask($output, $this->buildQuestion('Username'));
         $userEmail     = isset($options['user-email'])
             ? $options['user-email']
-            : $dialog->ask($output, '<question>Email:</question> ');
+            : $dialog->ask($output, $this->buildQuestion('Email'));
         $userFirstName = isset($options['user-firstname'])
             ? $options['user-firstname']
-            : $dialog->ask($output, '<question>First name:</question> ');
+            : $dialog->ask($output, $this->buildQuestion('First name'));
         $userLastName  = isset($options['user-lastname'])
             ? $options['user-lastname']
-            : $dialog->ask($output, '<question>Last name:</question> ');
+            : $dialog->ask($output, $this->buildQuestion('Last name'));
         $userPassword  = isset($options['user-password'])
             ? $options['user-password']
-            : $dialog->askHiddenResponseAndValidate($output, '<question>Password:</question> ', $passValidator);
+            : $dialog->askHiddenResponseAndValidate(
+                $output,
+                $this->buildQuestion('Password'),
+                $passValidator
+            );
         $user
             ->setUsername($userName)
             ->setEmail($userEmail)
@@ -253,11 +278,7 @@ class InstallCommand extends ContainerAwareCommand
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
 
-        // update installed flag in parameters.yml
-        $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
-        $params                        = $dumper->parse();
-        $params['system']['installed'] = date('c');
-        $dumper->dump($params);
+        $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
         $commandExecutor->runCommand('cache:clear');
@@ -265,6 +286,33 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('');
 
         return $this;
+    }
+
+    /**
+     * Update installed flag in parameters.yml
+     *
+     * @param bool|string $installed
+     */
+    protected function updateInstalledFlag($installed)
+    {
+        $dumper = $this->getContainer()->get('oro_installer.yaml_persister');
+        $params = $dumper->parse();
+        $params['system']['installed'] = $installed;
+        $dumper->dump($params);
+    }
+
+    /**
+     * Returns a string represents a question for console dialog helper
+     *
+     * @param string      $text
+     * @param string|null $defaultValue
+     * @return string
+     */
+    protected function buildQuestion($text, $defaultValue = null)
+    {
+        return empty($defaultValue)
+            ? sprintf('<question>%s:</question> ', $text)
+            : sprintf('<question>%s (%s):</question> ', $text, $defaultValue);
     }
 
     /**

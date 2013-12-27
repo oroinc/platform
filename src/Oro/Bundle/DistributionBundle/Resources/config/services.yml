@@ -31,7 +31,7 @@ services:
     oro_distribution.script_runner:
         class: %oro_distribution.script_runner.class%
         public: false
-        arguments: [@oro_distribution.composer.installation_manager]
+        arguments: [@oro_distribution.composer.installation_manager, %kernel.root_dir%]
 
     oro_distribution.composer.io:
         class: %oro_distribution.composer.io.class%

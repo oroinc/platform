@@ -131,7 +131,9 @@ class CustomEntityGridListener extends AbstractConfigGridListener
 
             // get already defined items
             $items = $config->offsetGetByPath($path, []);
-            $items = array_merge_recursive($items, $additionalColumnSettings[$itemName]);
+            if (!empty($additionalColumnSettings[$itemName])) {
+                $items = array_merge_recursive($items, $additionalColumnSettings[$itemName]);
+            }
 
             // set new item set with dynamic columns/sorters/filters
             $config->offsetSetByPath($path, $items);

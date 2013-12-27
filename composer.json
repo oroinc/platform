@@ -3,6 +3,12 @@
     "description": "Business Application Platform (BAP)",
     "homepage": "https://github.com/orocrm/platform.git",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Oro, Inc",
+            "homepage": "http://www.orocrm.com"
+        }
+    ],
     "require": {
         "php": ">=5.4.4",
         "ext-intl": "*",
@@ -12,7 +18,7 @@
         "ext-mysql": "*",
         "lib-ICU": ">=4.8",
         "symfony/symfony": "v2.3.6",
-        "doctrine/orm": "2.3.x-dev",
+        "doctrine/orm": "2.4.*@dev",
         "doctrine/doctrine-bundle": "1.2.x-dev",
         "doctrine/data-fixtures": "1.0.0",
         "doctrine/doctrine-fixtures-bundle": "2.2.0",

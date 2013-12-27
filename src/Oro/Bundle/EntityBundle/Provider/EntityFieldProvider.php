@@ -103,7 +103,15 @@ class EntityFieldProvider
         $em        = $this->getManagerForClass($className);
         $this->addFields($result, $className, $em, $translate);
         if ($withRelations) {
-            $this->addRelations($result, $className, $em, $withEntityDetails, $deepLevel - 1, $lastDeepLevelRelations);
+            $this->addRelations(
+                $result,
+                $className,
+                $em,
+                $withEntityDetails,
+                $deepLevel - 1,
+                $lastDeepLevelRelations,
+                $translate
+            );
         }
         $this->sortFields($result);
 
@@ -168,6 +176,7 @@ class EntityFieldProvider
      * @param bool          $withEntityDetails
      * @param int           $relationDeepLevel
      * @param bool          $lastDeepLevelRelations
+     * @param bool          $translate
      */
     protected function addRelations(
         array &$result,
@@ -175,7 +184,8 @@ class EntityFieldProvider
         EntityManager $em,
         $withEntityDetails,
         $relationDeepLevel,
-        $lastDeepLevelRelations
+        $lastDeepLevelRelations,
+        $translate
     ) {
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
@@ -194,7 +204,8 @@ class EntityFieldProvider
                         $targetClassName,
                         $withEntityDetails,
                         $relationDeepLevel,
-                        $lastDeepLevelRelations
+                        $lastDeepLevelRelations,
+                        $translate
                     );
                 }
             }
@@ -213,6 +224,7 @@ class EntityFieldProvider
      * @param bool   $withEntityDetails
      * @param int    $relationDeepLevel
      * @param bool   $lastDeepLevelRelations
+     * @param bool   $translate
      */
     protected function addRelation(
         array &$result,
@@ -223,17 +235,18 @@ class EntityFieldProvider
         $relatedEntityName,
         $withEntityDetails,
         $relationDeepLevel,
-        $lastDeepLevelRelations
+        $lastDeepLevelRelations,
+        $translate
     ) {
         $relation = array(
             'name'                => $name,
             'type'                => $type,
-            'label'               => $label,
+            'label'               => $translate ? $this->translator->trans($label) : $label,
             'relation_type'       => $relationType,
             'related_entity_name' => $relatedEntityName
         );
         if ($withEntityDetails) {
-            $entity = $this->entityProvider->getEntity($relatedEntityName);
+            $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
             foreach ($entity as $key => $val) {
                 if (!in_array($key, ['name'])) {
                     $relation['related_entity_' . $key] = $val;
@@ -252,7 +265,8 @@ class EntityFieldProvider
                     $withEntityDetails && ($relationDeepLevel > 0 || $lastDeepLevelRelations),
                     $withEntityDetails,
                     $relationDeepLevel,
-                    $lastDeepLevelRelations
+                    $lastDeepLevelRelations,
+                    $translate
                 );
         }
 

@@ -34,3 +34,5 @@ oro:
             stop:
                 fail:     Failed to stop daemon
                 success:  Daemon stopped
+        action:
+            jobs_management: Jobs management

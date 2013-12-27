@@ -124,11 +124,7 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Gets configuration data for the given class or field.
-     *
-     * @param string      $className
-     * @param string|null $fieldName
-     * @return ConfigInterface
+     * {@inheritdoc}
      */
     public function getConfig($className, $fieldName = null)
     {
@@ -136,10 +132,7 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Gets configuration data for an object (class or field) which is represented by the given id.
-     *
-     * @param ConfigIdInterface $configId
-     * @return ConfigInterface
+     * {@inheritdoc}
      */
     public function getConfigById(ConfigIdInterface $configId)
     {
@@ -227,14 +220,9 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Filters configuration data of all classes (if $className is not specified)
-     * or all fields of the given $className using the given callback function.
-     *
-     * @param callable    $callback The callback function to use
-     * @param string|null $className
-     * @return array|ConfigInterface[]
+     * {@inheritdoc}
      */
-    public function filter(\Closure $callback, $className = null)
+    public function filter($callback, $className = null)
     {
         return array_filter($this->getConfigs($className), $callback);
     }
@@ -311,9 +299,7 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Gets the name of the scope this provider works with.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getScope()
     {
