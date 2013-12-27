@@ -4,7 +4,8 @@ function PackageManager(Urls, util) {
     var InstallStatus = {INSTALLED: 0, ERROR: 1, CONFIRM: 2};
     var UpdateStatus = {UPDATED: 0, ERROR: 1};
 
-    var reflectUICallback = function(){};
+    var reflectUICallback = function () {
+    };
 
     function sendRequest(url, params, completeCallback) {
         $.ajax({
@@ -30,15 +31,23 @@ function PackageManager(Urls, util) {
 
                 break;
             case InstallStatus.CONFIRM:
-                var title = 'Confirm installation of '+response.params.packageName;
+                var title = 'Confirm installation of ' + response.params.packageName;
+                var requirementsList = '';
+                for (var i = 0; i < response.requirements.length; i++) {
+                    var r = response.requirements[i];
+                    requirementsList += "\n - " + r.name;
+                    requirementsList += r.installed?' [installed]':'';
+                }
                 var message = response.params.packageName + ' requires following packages: ' +
-                    "\n - " + response.packages.join("\n -") +
+                    requirementsList +
                     "\n" + "\n" + 'All missing packages will be installed';
 
                 util.confirm(
                     title,
                     message,
-                    function(){pm.install(response.params)},
+                    function () {
+                        pm.install(response.params)
+                    },
                     'Continue',
                     reflectUICallback
                 );
@@ -73,7 +82,9 @@ function PackageManager(Urls, util) {
                     "\n" + "\n" + 'Do you want to uninstall them all?';
                 util.confirm(
                     message,
-                    function(){pm.uninstall(response.params)},
+                    function () {
+                        pm.uninstall(response.params)
+                    },
                     'Yes, delete',
                     reflectUICallback
                 );
@@ -108,17 +119,17 @@ function PackageManager(Urls, util) {
         }
     }
 
-    var pm= {
+    var pm = {
         install: function (params, _reflectUICallback) {
-            reflectUICallback=_reflectUICallback || reflectUICallback;
+            reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.install, params, installCompleteCallback);
         },
         uninstall: function (params, _reflectUICallback) {
-            reflectUICallback=_reflectUICallback || reflectUICallback;
+            reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.uninstall, params, uninstallCompleteCallback);
         },
         update: function (params, _reflectUICallback) {
-            reflectUICallback=_reflectUICallback || reflectUICallback;
+            reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.update, params, updateCompleteCallback);
         }
     };

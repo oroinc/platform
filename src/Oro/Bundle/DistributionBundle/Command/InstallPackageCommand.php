@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\DistributionBundle\Command;
 
+use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -44,7 +45,16 @@ class InstallPackageCommand extends ContainerAwareCommand
         }
 
         if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName, $packageVersion)) {
-            $output->writeln(sprintf("Package requires: \n%s", implode("\n", $requirements)));
+            $requirementsString = array_reduce(
+                $requirements,
+                function ($result, PackageRequirement $requirement) {
+                    $result .= PHP_EOL . $requirement->getName();
+
+                    return $result;
+                },
+                ''
+            );
+            $output->writeln(sprintf("Package requires:%s", $requirementsString));
 
             /** @var DialogHelper $dialog */
             $dialog = $this->getHelperSet()->get('dialog');
