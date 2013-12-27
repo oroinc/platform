@@ -401,6 +401,9 @@ class ConfigManager
         $this->auditManager->log();
 
         foreach ($models as $model) {
+            if ($model->getType() == 'optionSet') {
+                $model->setOptions($config->get('set_options'));
+            }
             $this->getEntityManager()->persist($model);
         }
 
