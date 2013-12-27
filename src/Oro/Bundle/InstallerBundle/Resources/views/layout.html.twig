@@ -40,6 +40,7 @@
                 $.ajaxQueue({
                     url: '?action=' + this,
                 }).done(function(data) {
+                            debugger;
                     var curRes = typeof data.result != 'undefined' && data.result;
                         finRes = finRes || curRes;
 
@@ -56,6 +57,7 @@
                         $('a.primary').removeClass('disabled').attr('href', url);
                     }
                 }).fail(function() {
+                            debugger;
                     stepCon
                         .removeClass('icon-wait')
                         .addClass('icon-no')
