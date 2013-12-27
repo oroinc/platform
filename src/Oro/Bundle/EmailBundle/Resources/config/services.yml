@@ -44,7 +44,6 @@ parameters:
 
 services:
     oro_email.entity.cache.warmer:
-        public: false
         class: %oro_email.entity.cache.warmer.class%
         arguments:
             - @oro_email.email.owner.provider.storage
