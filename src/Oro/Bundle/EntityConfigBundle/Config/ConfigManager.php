@@ -383,6 +383,10 @@ class ConfigManager
                 $models[$configKey] = $model;
             }
 
+            if ($model instanceof FieldConfigModel && $model->getType() == 'optionSet' && $config->has('set_options')) {
+                $model->setOptions($config->get('set_options'));
+            }
+
             //TODO::refactoring
             $serializableValues = $this->getProvider($config->getId()->getScope())
                 ->getPropertyConfig()
@@ -401,9 +405,6 @@ class ConfigManager
         $this->auditManager->log();
 
         foreach ($models as $model) {
-            if ($model->getType() == 'optionSet') {
-                $model->setOptions($config->get('set_options'));
-            }
             $this->getEntityManager()->persist($model);
         }
 

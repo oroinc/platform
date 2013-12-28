@@ -53,9 +53,7 @@ class OptionSetType extends AbstractType
         $data = $event->getData();
         if (is_null($data->getLabel())) {
             $event->getForm()->get('label')->addError(
-                new FormError(
-                    'Option value should bot be blank'
-                )
+                new FormError('This value should not be blank.')
             );
         }
     }
