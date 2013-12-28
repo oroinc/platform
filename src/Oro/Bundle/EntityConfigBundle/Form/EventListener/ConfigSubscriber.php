@@ -13,7 +13,8 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
@@ -79,33 +80,23 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public function preSetData(FormEvent $event)
     {
-        $form        = $event->getForm();
+        $configModel = $event->getForm()->getConfig()->getOption('config_model');
         $data        = $event->getData();
-        $options     = $form->getConfig()->getOptions();
-        $configModel = $options['config_model'];
+
         $dataChanges = false;
-
         foreach ($this->configManager->getProviders() as $provider) {
-            if (isset($data[$provider->getScope()])) {
-
-                $type = PropertyConfigContainer::TYPE_FIELD;
-                if ($configModel instanceof EntityConfigModel) {
-                    $type = PropertyConfigContainer::TYPE_ENTITY;
-                }
-                $translatable = $provider->getPropertyConfig()->getTranslatableValues($type);
-
-                foreach ($data[$provider->getScope()] as $code => $value) {
-                    $messages = $this->translator->getTranslations()['messages'];
+            $scope = $provider->getScope();
+            if (isset($data[$scope])) {
+                $translatable = $this->getTranslatableValues($configModel, $provider);
+                foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
-                        if (isset($messages[$value])) {
-                            $value                              = $messages[$value];
-                            $data[$provider->getScope()][$code] = $value;
+                        if ($this->translator->hasTrans($value)) {
+                            $data[$scope][$code] = $this->translator->trans($value);
                         } elseif (!$configModel->getId() && $configModel instanceof FieldConfigModel) {
-                            $data[$provider->getScope()][$code] = $configModel->getFieldName();
+                            $data[$scope][$code] = $configModel->getFieldName();
                         } else {
-                            $data[$provider->getScope()][$code] = '';
+                            $data[$scope][$code] = '';
                         }
-
                         $dataChanges = true;
                     }
                 }
@@ -122,10 +113,7 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public function postSubmit(FormEvent $event)
     {
-        $options     = $event->getForm()->getConfig()->getOptions();
-        $configModel = $options['config_model'];
-        $data        = $event->getData();
-
+        $configModel = $event->getForm()->getConfig()->getOption('config_model');
         if ($configModel instanceof FieldConfigModel) {
             $className = $configModel->getEntity()->getClassName();
             $fieldName = $configModel->getFieldName();
@@ -134,65 +122,37 @@ class ConfigSubscriber implements EventSubscriberInterface
             $className = $configModel->getClassName();
         }
 
+        $data = $event->getData();
         foreach ($this->configManager->getProviders() as $provider) {
-            if (isset($data[$provider->getScope()])) {
-
+            $scope = $provider->getScope();
+            if (isset($data[$scope])) {
                 $config = $provider->getConfig($className, $fieldName);
 
-                /**
-                 * config translations
-                 */
-                $type = PropertyConfigContainer::TYPE_FIELD;
-                if ($configModel instanceof EntityConfigModel) {
-                    $type = PropertyConfigContainer::TYPE_ENTITY;
-                }
-                $translatable = $provider->getPropertyConfig()->getTranslatableValues($type);
-
-                foreach ($data[$provider->getScope()] as $code => $value) {
+                // config translations
+                $translatable = $this->getTranslatableValues($configModel, $provider);
+                foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
                         $key = $this->configManager->getProvider('entity')
                             ->getConfig($className, $fieldName)
                             ->get($code);
 
-                        if ($value != $this->translator->getTranslations()['messages'][$config->get($code)]) {
-                            /**
-                             * save into translation table
-                             */
-
-                            /** @var TranslationRepository $translationRepo */
-                            $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
-
-                            /** @var Translation $translationValue */
-                            $translationValue = $translationRepo->findValue($key, $this->translator->getLocale());
-                            if (!$translationValue) {
-                                /** @var Translation $translationValue */
-                                $translationValue = new Translation();
-                                $translationValue
-                                    ->setKey($key)
-                                    ->setLocale($this->translator->getLocale())
-                                    ->setValue($value)
-                                    ->setDomain('messages');
-                            } else {
-                                $translationValue->setValue($value);
-                            }
-
-                            $this->em->persist($translationValue);
-
-                            /**
-                             * mark translation cache dirty
-                             */
-                            $this->dbTranslationMetadataCache->updateTimestamp($this->translator->getLocale());
+                        if ($event->getForm()->isValid() && $value != $this->translator->trans($config->get($code))) {
+                            $locale = $this->translator->getLocale();
+                            // save into translation table
+                            $this->saveTranslationValue($key, $value, $locale);
+                            // mark translation cache dirty
+                            $this->dbTranslationMetadataCache->updateTimestamp($locale);
                         }
 
                         if (!$configModel->getId()) {
-                            $data[$provider->getScope()][$code] = $key;
+                            $data[$scope][$code] = $key;
                         } else {
-                            unset($data[$provider->getScope()][$code]);
+                            unset($data[$scope][$code]);
                         }
                     }
                 }
 
-                $config->setValues($data[$provider->getScope()]);
+                $config->setValues($data[$scope]);
                 $this->configManager->persist($config);
             }
         }
@@ -200,5 +160,47 @@ class ConfigSubscriber implements EventSubscriberInterface
         if ($event->getForm()->isValid()) {
             $this->configManager->flush();
         }
+    }
+
+    /**
+     * Get translatable property's codes
+     *
+     * @param AbstractConfigModel $configModel
+     * @param ConfigProvider      $provider
+     * @return array
+     */
+    protected function getTranslatableValues(AbstractConfigModel $configModel, ConfigProvider $provider)
+    {
+        $type = $configModel instanceof FieldConfigModel
+            ? PropertyConfigContainer::TYPE_FIELD
+            : PropertyConfigContainer::TYPE_ENTITY;
+
+        return $provider->getPropertyConfig()->getTranslatableValues($type);
+    }
+
+    /**
+     * Update existing translation value or create new one if it is not exist
+     *
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     */
+    protected function saveTranslationValue($key, $value, $locale)
+    {
+        /** @var TranslationRepository $translationRepo */
+        $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
+        /** @var Translation $translationValue */
+        $translationValue = $translationRepo->findValue($key, $locale);
+        if (!$translationValue) {
+            $translationValue = new Translation();
+            $translationValue
+                ->setKey($key)
+                ->setValue($value)
+                ->setLocale($locale)
+                ->setDomain(TranslationRepository::DEFAULT_DOMAIN);
+        } else {
+            $translationValue->setValue($value);
+        }
+        $this->em->persist($translationValue);
     }
 }

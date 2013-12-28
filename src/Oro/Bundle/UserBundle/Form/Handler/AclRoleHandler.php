@@ -1,11 +1,13 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormInterface;
+
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
@@ -42,6 +44,11 @@ class AclRoleHandler
     protected $aclManager;
 
     /**
+     * @var AclPrivilegeRepository
+     */
+    protected $privilegeRepository;
+
+    /**
      * @var array
      */
     protected $privilegeConfig;
@@ -62,6 +69,14 @@ class AclRoleHandler
     public function setAclManager(AclManager $aclManager)
     {
         $this->aclManager = $aclManager;
+    }
+
+    /**
+     * @param AclPrivilegeRepository $privilegeRepository
+     */
+    public function setAclPrivilegeRepository(AclPrivilegeRepository $privilegeRepository)
+    {
+        $this->privilegeRepository = $privilegeRepository;
     }
 
     /**
@@ -89,8 +104,8 @@ class AclRoleHandler
     public function createForm(Role $role)
     {
         foreach ($this->privilegeConfig as $configName => $config) {
-            $this->privilegeConfig[$configName]['permissions'] = $this->aclManager
-                ->getPrivilegeRepository()->getPermissionNames($config['types']);
+            $this->privilegeConfig[$configName]['permissions']
+                = $this->privilegeRepository->getPermissionNames($config['types']);
         }
 
         $this->form = $this->formFactory->create(
@@ -150,7 +165,7 @@ class AclRoleHandler
     protected function setRolePrivileges(Role $role)
     {
         /** @var ArrayCollection $privileges */
-        $privileges = $this->aclManager->getPrivilegeRepository()->getPrivileges($this->aclManager->getSid($role));
+        $privileges = $this->privilegeRepository->getPrivileges($this->aclManager->getSid($role));
 
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $sortedPrivileges = $this->filterPrivileges($privileges, $config['types']);
@@ -187,7 +202,7 @@ class AclRoleHandler
             $formPrivileges = array_merge($formPrivileges, $privileges);
         }
 
-        $this->aclManager->getPrivilegeRepository()->savePrivileges(
+        $this->privilegeRepository->savePrivileges(
             $this->aclManager->getSid($role),
             new ArrayCollection($formPrivileges)
         );

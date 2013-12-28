@@ -124,7 +124,7 @@ class ImportStrategyHelper
     {
         if (null === $errorPrefix) {
             $errorPrefix = $this->translator->trans(
-                'oro.importexport.import_error %number%',
+                'oro.importexport.import.error %number%',
                 array(
                     '%number%' => $context->getReadOffset()
                 )

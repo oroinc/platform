@@ -6,13 +6,15 @@ use Doctrine\ORM\EntityRepository;
 
 class TranslationRepository extends EntityRepository
 {
+    const DEFAULT_DOMAIN = 'messages';
+
     /**
      * @param string $key
      * @param string $locale
      * @param string $domain
      * @return array
      */
-    public function findValue($key, $locale, $domain = 'messages')
+    public function findValue($key, $locale, $domain = self::DEFAULT_DOMAIN)
     {
         return $this->findOneBy(
             [
@@ -23,7 +25,7 @@ class TranslationRepository extends EntityRepository
         );
     }
 
-    public function findValues($locale, $domain = 'messages')
+    public function findValues($locale, $domain = self::DEFAULT_DOMAIN)
     {
         return $this->findBy(
             [

@@ -183,6 +183,15 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function shouldRunUpdatePlatformCommandWithoutErrors()
+    {
+        $runner = $this->createRunner();
+        $runner->runPlatformUpdate();
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|PackageInterface
      */
     protected function createPackageMock()
@@ -232,8 +241,8 @@ OUTPUT;
      * @param $targetDir
      * @return Runner
      */
-    protected function createRunner($package, $targetDir)
+    protected function createRunner($package = null, $targetDir = null)
     {
-        return new Runner($this->createInstallationManagerMock($package, $targetDir), '..');
+        return new Runner($this->createInstallationManagerMock($package, $targetDir), '.');
     }
 }

@@ -1,17 +1,17 @@
 oro_tag_assign_unassign:
-    label: Tag assign/unassign
+    label: oro.tag.action.assign_unassign
     type: action
     group_name: ""
     bindings: ~
 
 oro_tag_unassign_global:
-    label: Unassign all tags from entities
+    label: oro.tag.action.unassign_global
     type: action
     group_name: ""
     bindings: ~
 
 oro_tag_view_tag_cloud:
-    label:  View tag cloud
+    label: oro.tag.action.view_cloud
     type: action
     group_name: ""
     bindings: ~
