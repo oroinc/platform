@@ -26,12 +26,20 @@ services:
           - @oro_distribution.composer.installer
           - @oro_distribution.composer.io
           - @oro_distribution.script_runner
+          - @logger
           - %oro_distribution.composer_json%
+        tags:
+            - { name: monolog.logger, channel: oro_distribution }
 
     oro_distribution.script_runner:
         class: %oro_distribution.script_runner.class%
         public: false
-        arguments: [@oro_distribution.composer.installation_manager, %kernel.root_dir%]
+        arguments:
+            - @oro_distribution.composer.installation_manager
+            - @logger
+            - %kernel.root_dir%
+        tags:
+            - { name: monolog.logger, channel: oro_distribution }
 
     oro_distribution.composer.io:
         class: %oro_distribution.composer.io.class%
@@ -55,3 +63,4 @@ services:
         public: false
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
+

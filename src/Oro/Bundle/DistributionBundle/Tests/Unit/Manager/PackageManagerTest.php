@@ -22,6 +22,7 @@ use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -315,7 +316,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $runner->expects($this->once())
             ->method('loadFixtures');
 
-        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner, $tempComposerJson);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner, null, $tempComposerJson);
         $manager->install($newPackage->getName());
 
         $updatedComposerData = json_decode(file_get_contents($tempComposerJson), true);
@@ -367,7 +368,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($rootPackageMock));
 
         $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 1);
-        $manager = $this->createPackageManager($composer, $composerInstaller, null, null, $tempComposerJson);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, null, null, $tempComposerJson);
 
         try {
             $manager->install($newPackage->getName());
@@ -443,7 +444,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->throwException($thrownException = new \Exception));
 
         $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
-        $manager = $this->createPackageManager($composer, $composerInstaller, null, $scriptRunner, $tempComposerJson);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $scriptRunner, null, $tempComposerJson);
 
         try {
             $manager->install($newPackage->getName());
@@ -628,7 +629,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->with($installedPackages[1]);
 
         // Ready Steady Go!
-        $manager = $this->createPackageManager($composer, null, null, $runner, $tempComposerJson);
+        $manager = $this->createPackageManager($composer, null, null, $runner, null, $tempComposerJson);
         $manager->uninstall($packageNamesToBeRemoved);
 
         $updatedComposerData = json_decode(file_get_contents($tempComposerJson), true);
@@ -862,6 +863,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $composerInstaller,
             null,
             $runner,
+            null,
             tempnam(sys_get_temp_dir(), uniqid())
         );
         $manager->update($packageName);
@@ -895,6 +897,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             $composerInstaller,
             new BufferIO(),
             $this->createScriptRunnerMock(),
+            null,
             tempnam(sys_get_temp_dir(), uniqid())
         );
         $manager->update($packageName);
@@ -1081,6 +1084,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         Installer $installer = null,
         IOInterface $io = null,
         Runner $scriptRunner = null,
+        LoggerInterface $logger = null,
         $pathToComposerJson = null
     ) {
         if (!$composer) {
@@ -1095,8 +1099,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         if (!$scriptRunner) {
             $scriptRunner = $this->createScriptRunnerMock();
         }
-
-        return new PackageManager($composer, $installer, $io, $scriptRunner, $pathToComposerJson);
+        if(!$logger)
+        {
+            $logger = $this->createLoggerMock();
+        }
+        return new PackageManager($composer, $installer, $io, $scriptRunner, $logger, $pathToComposerJson);
     }
 
     /**
@@ -1149,5 +1156,13 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     protected function createPackageMock()
     {
         return $this->getMock('Composer\Package\PackageInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     */
+    protected function createLoggerMock()
+    {
+        return $this->getMock('Psr\Log\LoggerInterface');
     }
 }

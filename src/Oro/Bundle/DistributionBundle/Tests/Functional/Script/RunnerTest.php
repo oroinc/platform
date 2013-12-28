@@ -4,20 +4,17 @@ namespace Oro\Bundle\DistributionBundle\Tests\Functional\Script;
 use Composer\Installer\InstallationManager;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Composer\Package\PackageInterface;
+use Psr\Log\LoggerInterface;
 
 class RunnerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        $this->markTestSkipped('Skipped');
-    }
 
     /**
      * @test
      */
     public function shouldBeConstructedWithInstallationManager()
     {
-        new Runner($this->createInstallationManagerMock(), 'path/to/application/root/dir');
+        new Runner($this->createInstallationManagerMock(), $this->createLoggerMock(), 'path/to/application/root/dir');
     }
 
     /**
@@ -27,7 +24,11 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid';
-        $runner = $this->createRunner($package, $targetDir);
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(2))
+            ->method('info');
+
+        $runner = $this->createRunner($package, $targetDir, $logger);
         $expectedOutput = $this->formatExpectedResult(
             'Valid install script',
             $targetDir . '/install.php',
@@ -43,7 +44,12 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     public function shouldDoNothingWhenInstallScriptIsAbsent()
     {
         $package = $this->createPackageMock();
-        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/empty');
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->once())
+            ->method('info')
+            ->with($this->stringContains('There is no '));
+        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/empty', $logger);
+
         $this->assertNull($runner->install($package));
     }
 
@@ -56,7 +62,12 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     public function throwExceptionWhenProcessFailed()
     {
         $package = $this->createPackageMock();
-        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/invalid');
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->once())
+            ->method('error')
+            ->with($this->stringContains('The command '));
+        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/invalid', $logger);
+
         $runner->install($package);
     }
 
@@ -67,7 +78,10 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid';
-        $runner = $this->createRunner($package, $targetDir);
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(2))
+            ->method('info');
+        $runner = $this->createRunner($package, $targetDir, $logger);
         $expectedOutput = $this->formatExpectedResult(
             'Valid uninstall script',
             $targetDir . '/uninstall.php',
@@ -83,7 +97,12 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     public function shouldDoNothingWhenUninstallScriptIsAbsent()
     {
         $package = $this->createPackageMock();
-        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/empty');
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->once())
+            ->method('info')
+            ->with($this->stringContains('There is no '));
+        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/empty', $logger);
+
         $this->assertNull($runner->uninstall($package));
     }
 
@@ -96,7 +115,12 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     public function throwExceptionWhenProcessFailedDuringUninstalling()
     {
         $package = $this->createPackageMock();
-        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/invalid');
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->once())
+            ->method('error')
+            ->with($this->stringContains('The command '));
+        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/invalid', $logger);
+
         $runner->uninstall($package);
     }
 
@@ -107,7 +131,10 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid';
-        $runner = $this->createRunner($package, $targetDir);
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(2))
+            ->method('info');
+        $runner = $this->createRunner($package, $targetDir, $logger);
         $expectedOutput = $this->formatExpectedResult(
             'Valid update script',
             $targetDir . '/update.php',
@@ -123,7 +150,12 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     public function shouldDoNothingWhenUpdateScriptIsAbsent()
     {
         $package = $this->createPackageMock();
-        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/empty');
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->once())
+            ->method('info')
+            ->with($this->stringContains('There is no '));
+        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/empty', $logger);
+
         $this->assertNull($runner->update($package, 'any version'));
     }
 
@@ -136,7 +168,12 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     public function throwExceptionWhenProcessFailedDuringUpdating()
     {
         $package = $this->createPackageMock();
-        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/invalid');
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->once())
+            ->method('error')
+            ->with($this->stringContains('The command '));
+        $runner = $this->createRunner($package, __DIR__ . '/../Fixture/Script/invalid', $logger);
+
         $runner->update($package, 'any version');
     }
 
@@ -147,7 +184,10 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid/update-migrations/simple';
-        $runner = $this->createRunner($package, $targetDir);
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(4))
+            ->method('info');
+        $runner = $this->createRunner($package, $targetDir, $logger);
         $expectedRunnerOutput = $this->formatExpectedResult(
             'Simple migration 2 script',
             $targetDir . '/update_2.php',
@@ -168,7 +208,10 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid/update-migrations/complex';
-        $runner = $this->createRunner($package, $targetDir);
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(4))
+            ->method('info');
+        $runner = $this->createRunner($package, $targetDir, $logger);
         $expectedRunnerOutput = $this->formatExpectedResult(
             'Complex migration 0_1_9_1 script',
             $targetDir . '/update_0.1.9.1.php',
@@ -187,7 +230,11 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldRunUpdatePlatformCommandWithoutErrors()
     {
-        $runner = $this->createRunner();
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(2))
+            ->method('info');
+        $runner = $this->createRunner(null, null, $logger);
+
         $runner->runPlatformUpdate();
     }
 
@@ -237,12 +284,25 @@ OUTPUT;
     }
 
     /**
-     * @param $package
-     * @param $targetDir
+     * @param PackageInterface $package
+     * @param string $targetDir
+     * @param LoggerInterface $logger
+     *
      * @return Runner
      */
-    protected function createRunner($package = null, $targetDir = null)
+    protected function createRunner(PackageInterface $package = null, $targetDir = null, LoggerInterface $logger=null)
     {
-        return new Runner($this->createInstallationManagerMock($package, $targetDir), '.');
+        if (!$logger) {
+            $logger = $this->createLoggerMock();
+        }
+        return new Runner($this->createInstallationManagerMock($package, $targetDir), $logger, '.');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     */
+    protected function createLoggerMock()
+    {
+        return $this->getMock('Psr\Log\LoggerInterface');
     }
 }
