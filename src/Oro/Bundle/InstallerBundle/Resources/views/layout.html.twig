@@ -24,7 +24,8 @@
         });
 
         function ajaxQueue(actions, url) {
-            var finRes = true;
+            var finRes  = true,
+                aborted = false;
 
             $.each(actions, function(i) {
                 var stepCon = $('#step-' + this);
@@ -37,10 +38,15 @@
                         .closest('tr').find('td:last').text('{{ 'progress'|trans }}');
                 }
 
-                $.ajaxQueue({
+                var promise = $.ajaxQueue({
                     url: '?action=' + this,
+                    beforeSend: function (jqXHR) {
+                        if (!finRes) {
+                            aborted = true;
+                            jqXHR.abort();
+                        }
+                    }
                 }).done(function(data) {
-                            debugger;
                     var curRes = typeof data.result != 'undefined' && data.result;
                         finRes = finRes || curRes;
 
@@ -54,14 +60,25 @@
                             .find('span').addClass('icon-wait');
 
                     if (i == actions.length - 1 && finRes) {
+                        $('a.back').removeClass('disabled');
                         $('a.primary').removeClass('disabled').attr('href', url);
                     }
                 }).fail(function() {
-                            debugger;
-                    stepCon
-                        .removeClass('icon-wait')
-                        .addClass('icon-no')
-                        .closest('tr').find('td:last').text('{{ 'failed'|trans }}');
+                    if (aborted) {
+                        stepCon
+                            .removeClass('icon-wait')
+                            .addClass('icon-warning')
+                            .closest('tr').find('td:last').text('{{ 'skipped'|trans }}');
+                    } else {
+                        finRes = false;
+                        stepCon
+                            .removeClass('icon-wait')
+                            .addClass('icon-no')
+                            .closest('tr').find('td:last').text('{{ 'failed'|trans }}');
+                    }
+                    if (i == actions.length - 1) {
+                        $('a.back').removeClass('disabled');
+                    }
                 });
             });
         }

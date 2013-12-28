@@ -4,6 +4,7 @@ wait:                     Waiting
 progress:                 In progress...
 passed:                   Done
 failed:                   Failed
+skipped:                  Skipped
 
 form:
     configuration:
