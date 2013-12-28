@@ -38,7 +38,7 @@
                         .closest('tr').find('td:last').text('{{ 'progress'|trans }}');
                 }
 
-                var promise = $.ajaxQueue({
+                $.ajaxQueue({
                     url: '?action=' + this,
                     beforeSend: function (jqXHR) {
                         if (!finRes) {
