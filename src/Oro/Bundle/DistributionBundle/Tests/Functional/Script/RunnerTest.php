@@ -7,17 +7,12 @@ use Composer\Package\PackageInterface;
 
 class RunnerTest extends \PHPUnit_Framework_TestCase
 {
-    protected function setUp()
-    {
-        $this->markTestSkipped('Skipped');
-    }
-
     /**
      * @test
      */
     public function shouldBeConstructedWithInstallationManager()
     {
-        new Runner($this->createInstallationManagerMock(), 'path/to/application/root/dir');
+        new Runner($this->createInstallationManagerMock(), 'path/to/application/root/dir', 'test');
     }
 
     /**
@@ -192,6 +187,33 @@ class RunnerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @test
+     */
+    public function shouldRemoveCachedFiles()
+    {
+        $tempDir = sys_get_temp_dir() . '/platform-app-tmp';
+        if (is_dir($tempDir)) {
+            rmdir($tempDir);
+        }
+        mkdir($tempDir);
+
+        $bundlesFileName = $tempDir . '/bundles.php';
+        $containerFileName = $tempDir . '/' . uniqid() . 'ProjectContainer.php';
+        touch($bundlesFileName);
+        touch($containerFileName);
+
+        //guard
+        $this->assertFileExists($bundlesFileName);
+        $this->assertFileExists($containerFileName);
+
+        $runner = $this->createRunner(null, null, $tempDir);
+        $runner->removeCachedFiles();
+
+        $this->assertFileNotExists($bundlesFileName);
+        $this->assertFileNotExists($containerFileName);
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|PackageInterface
      */
     protected function createPackageMock()
@@ -237,12 +259,14 @@ OUTPUT;
     }
 
     /**
-     * @param $package
-     * @param $targetDir
+     * @param PackageInterface $package
+     * @param string $targetDir
+     * @param string $applicationRootDir
+     *
      * @return Runner
      */
-    protected function createRunner($package = null, $targetDir = null)
+    protected function createRunner($package = null, $targetDir = null, $applicationRootDir = '.')
     {
-        return new Runner($this->createInstallationManagerMock($package, $targetDir), '.');
+        return new Runner($this->createInstallationManagerMock($package, $targetDir), $applicationRootDir, 'test');
     }
 }
