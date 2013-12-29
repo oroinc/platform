@@ -33,7 +33,10 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        if (!$this->entryPoint || !$this->securityFacade->isGranted('ROLE_ADMINISTRATOR')) {
+        if (!$this->entryPoint
+            || !$this->securityFacade->hasLoggedUser()
+            || !$this->securityFacade->isGranted('ROLE_ADMINISTRATOR')
+        ) {
             return;
         }
 
