@@ -59,8 +59,10 @@
                     {% for author in package.authors %}
                         <div>
                             {{ author.name }}
-                            <br/>
-                            <a href="mailto:{{ author.email }}">{{ author.email }}</a>
+                            {% if author.email is defined %}
+                                <br/>
+                                <a href="mailto:{{ author.email }}">{{ author.email }}</a>
+                            {% endif %}
                         </div>
                     {% else %}
                         <em>unknown</em>
