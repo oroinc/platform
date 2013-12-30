@@ -132,13 +132,16 @@ class EntityFieldProvider
         // only configurable entities are supported
         if ($this->entityConfigProvider->hasConfig($className)) {
             $metadata = $em->getClassMetadata($className);
-            foreach ($metadata->getFieldNames() as $fieldName) {
+
+            /** @var FieldConfigId[] $entityFields */
+            $entityFields = $this->entityConfigProvider->getIds($className);
+            foreach ($entityFields as $field) {
                 $this->addField(
                     $result,
-                    $fieldName,
-                    $metadata->getTypeOfField($fieldName),
-                    $this->getFieldLabel($className, $fieldName),
-                    $metadata->isIdentifier($fieldName),
+                    $field->getFieldName(),
+                    $field->getFieldType(),
+                    $this->getFieldLabel($className, $field->getFieldName()),
+                    $metadata->isIdentifier($field->getFieldName()),
                     $translate
                 );
             }
