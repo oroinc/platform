@@ -13,7 +13,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 
 use JMS\Serializer\Annotation as Serializer;
 
-use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**

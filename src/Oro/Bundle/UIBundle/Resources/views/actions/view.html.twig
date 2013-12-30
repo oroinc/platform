@@ -74,9 +74,10 @@
                                     {% endif %}
                                 {% endif %}
                             {% endblock pageActions %}
-                            {% if (entity is defined and audit_entity_class is defined and resource_granted('oro_dataaudit_history')) %}
+                            {% if entity is defined and audit_entity_class is defined %}
                                 {% placeholder change_history_block with {
-                                    'entity': audit_entity_class,
+                                    'entity': entity,
+                                    'entity_class': audit_entity_class,
                                     'id': entity.id,
                                     'title': audit_title|default(entity),
                                     'audit_path': audit_path|default('oro_dataaudit_history')
