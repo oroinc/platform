@@ -123,10 +123,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function putAction($id)
     {
-        // remove auxiliary attributes if any
-        $this->getRequest()->request->remove('editable');
-        $this->getRequest()->request->remove('removable');
-
         return $this->handleUpdateRequest($id);
     }
 
@@ -150,10 +146,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function postAction()
     {
-        // remove auxiliary attributes if any
-        $this->getRequest()->request->remove('editable');
-        $this->getRequest()->request->remove('removable');
-
         return $this->handleCreateRequest();
     }
 
@@ -203,5 +195,19 @@ class CalendarEventController extends RestController implements ClassResourceInt
     public function getFormHandler()
     {
         return $this->get('oro_calendar.calendar_event.form.handler.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array &$data, $entity)
+    {
+        parent::fixFormData($data, $entity);
+
+        // remove auxiliary attributes if any
+        unset($data['editable']);
+        unset($data['removable']);
+
+        return true;
     }
 }
