@@ -2,11 +2,29 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Functional\Script;
 
 use Composer\Installer\InstallationManager;
-use Oro\Bundle\DistributionBundle\Script\Runner;
 use Composer\Package\PackageInterface;
 
-class RunnerTest extends \PHPUnit_Framework_TestCase
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
+use Oro\Bundle\DistributionBundle\Script\Runner;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+
+class RunnerTest extends WebTestCase
 {
+    /**
+     * @var Client
+     */
+    protected $client;
+
+    /**
+     * @var string
+     */
+    protected $applicationRootDir;
+
+    public function setUp()
+    {
+        $this->client = static::createClient();
+        $this->applicationRootDir = $this->client->getKernel()->getRootDir();
+    }
 
     /**
      * @test
@@ -263,11 +281,14 @@ OUTPUT;
      * @param PackageInterface $package
      * @param string $targetDir
      * @param string $applicationRootDir
-     *
      * @return Runner
      */
-    protected function createRunner($package = null, $targetDir = null, $applicationRootDir = '.')
+    protected function createRunner($package = null, $targetDir = null, $applicationRootDir = null)
     {
-        return new Runner($this->createInstallationManagerMock($package, $targetDir), $applicationRootDir, 'test');
+        return new Runner(
+            $this->createInstallationManagerMock($package, $targetDir),
+            $applicationRootDir ? $applicationRootDir : $this->applicationRootDir,
+            'test'
+        );
     }
 }
