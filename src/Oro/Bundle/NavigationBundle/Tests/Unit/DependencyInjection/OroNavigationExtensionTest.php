@@ -89,6 +89,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
     public function loadConfigurationDataProvider()
     {
         $settings = array(
+            'resolved' => true,
             'maxItems' => array(
                 'value' => 20,
                 'scope' => 'app'
@@ -104,7 +105,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
             'breadcrumb_menu' => array(
                 'value' => 'application_menu',
                 'scope' => 'app'
-            )
+            ),
+            'resolved'  => true,
         );
         $defaultItemParameters = array(
             'translateParameters' => array(),

@@ -188,6 +188,9 @@ class Workflow extends AbstractEntity implements Entity
         $this->byXpath("//button[normalize-space(text()) = 'Submit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
+        //processing redirect
+        $this->waitPageToLoad();
+        $this->waitForAjax();
         return $this;
     }
 }
