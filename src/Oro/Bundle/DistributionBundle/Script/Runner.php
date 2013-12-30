@@ -4,6 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Script;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
+
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -174,7 +175,12 @@ class Runner
     {
         if (file_exists($path)) {
             $phpPath = $this->getPhpExecutablePath();
-            $command = sprintf('%s app/console oro:platform:run-script --env=%s %s', $phpPath, $this->environment, $path);
+            $command = sprintf(
+                '%s app/console oro:platform:run-script --env=%s %s',
+                $phpPath,
+                $this->environment,
+                $path
+            );
 
             return $this->runCommand($command);
         }
