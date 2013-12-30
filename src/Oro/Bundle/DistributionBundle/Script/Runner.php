@@ -170,9 +170,9 @@ class Runner
         $commands[$commandIndex] = $commandPrefix;
         foreach ($paths as $path) {
             if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
-                $commands[$commandIndex] .= $path . ' ';
+                $commands[$commandIndex] .=  ' ' . $path ;
             } else {
-                $commands[++$commandIndex] = $commandPrefix . $path . ' ';
+                $commands[++$commandIndex] = $commandPrefix . ' ' . $path ;
             }
         }
 
