@@ -68,14 +68,14 @@ class GroupController extends SoapController
     /**
      * {@inheritdoc}
      */
-    protected function fixFormData(array $data, $entity)
+    protected function fixFormData(array &$data, $entity)
     {
-        $result = parent::fixFormData($data, $entity);
+        parent::fixFormData($data, $entity);
 
-        unset($result['id']);
-        unset($result['lastLogin']);
+        unset($data['id']);
+        unset($data['lastLogin']);
 
-        return $result;
+        return true;
     }
 
     /**

@@ -104,12 +104,31 @@ abstract class RestController extends RestGetController implements
     protected function fixRequestAttributes($entity)
     {
         $request = $this->container->get('request');
-        $data = $request->get($this->getForm()->getName());
+        $formName = $this->getForm()->getName();
+        $data = empty($formName)
+            ? $request->request->all()
+            : $request->request->get($formName);
 
-        if (is_array($data)) {
-            $data = $this->fixFormData($data, $entity);
+        if (is_array($data) && $this->fixFormData($data, $entity)) {
+            if (empty($formName)) {
+                // save fixed values for unnamed form
+                foreach ($request->request->keys() as $key) {
+                    if (array_key_exists($key, $data)) {
+                        $request->request->set($key, $data[$key]);
+                    } else {
+                        $request->request->remove($key);
+                    }
+                }
+                foreach ($data as $key => $val) {
+                    if (!$request->request->has($key)) {
+                        $request->request->set($key, $data[$key]);
+                    }
+                }
+            } else {
+                // save fixed values for named form
+                $request->request->set($this->getForm()->getName(), $data);
+            }
         }
-        $request->request->set($this->getForm()->getName(), $data);
     }
 
     /**
@@ -117,11 +136,11 @@ abstract class RestController extends RestGetController implements
      *
      * @param array $data
      * @param mixed $entity
-     * @return array
+     * @return bool true if any changes in $data array was made; otherwise, false.
      */
-    protected function fixFormData(array $data, $entity)
+    protected function fixFormData(array &$data, $entity)
     {
-        return $data;
+        return false;
     }
 
     /**

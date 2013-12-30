@@ -100,10 +100,9 @@ abstract class SoapController extends SoapGetController implements
             return;
         }
 
-        $request->request->set(
-            $this->getForm()->getName(),
-            $this->fixFormData($this->convertValueToArray($entityData), $entity)
-        );
+        $data = $this->convertValueToArray($entityData);
+        $this->fixFormData($data, $entity);
+        $request->request->set($this->getForm()->getName(), $data);
     }
 
     /**
@@ -111,11 +110,11 @@ abstract class SoapController extends SoapGetController implements
      *
      * @param array $data
      * @param mixed $entity
-     * @return array
+     * @return bool true if any changes in $data array was made; otherwise, false.
      */
-    protected function fixFormData(array $data, $entity)
+    protected function fixFormData(array &$data, $entity)
     {
-        return $data;
+        return false;
     }
 
     /**
