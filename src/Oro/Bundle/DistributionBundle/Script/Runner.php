@@ -94,7 +94,7 @@ class Runner
         $phpPath = $this->getPhpExecutablePath();
 
         $command = sprintf(
-            '%s %s/app/console oro:platform:update --env=%s',
+            '%s %s/console oro:platform:update --env=%s',
             $phpPath,
             $this->applicationRootDir,
             $this->environment
@@ -139,7 +139,7 @@ class Runner
         }
 
         $commandPrefix = sprintf(
-            '%s %s/app/console oro:package:fixtures:load --env=%s',
+            '%s %s/console oro:package:fixtures:load --env=%s',
             $phpPath,
             $this->applicationRootDir,
             $this->environment
@@ -190,11 +190,11 @@ class Runner
             $phpPath = $this->getPhpExecutablePath();
 
             $command = sprintf(
-                '%s %s/app/console oro:platform:run-script --env=%s %s',
+                '%s %s/console oro:platform:run-script "%s" --env=%s',
                 $phpPath,
                 $this->applicationRootDir,
-                $this->environment,
-                $path
+                $path,
+                $this->environment
             );
 
             return $this->runCommand($command);
