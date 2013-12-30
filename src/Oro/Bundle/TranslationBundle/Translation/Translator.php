@@ -59,6 +59,38 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * Checks if the given message has a translation.
+     *
+     * @param string $id         The message id (may also be an object that can be cast to string)
+     * @param string $domain     The domain for the message
+     * @param string $locale     The locale
+     *
+     * @return string The translated string
+     */
+    public function hasTrans($id, $domain = null, $locale = null)
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        }
+
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
+        if (!isset($this->catalogues[$locale])) {
+            $this->loadCatalogue($locale);
+        }
+
+        $catalogue = $this->catalogues[$locale];
+        $result = $catalogue->defines($id, $domain);
+        while (!$result && $catalogue = $catalogue->getFallbackCatalogue()) {
+            $result = $catalogue->defines($id, $domain);
+        }
+
+        return $result;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function addResource($format, $resource, $locale, $domain = null)

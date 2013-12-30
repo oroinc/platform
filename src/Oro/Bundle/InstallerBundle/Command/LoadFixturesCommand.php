@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class LoadFixturesCommand extends ContainerAwareCommand
 {
@@ -30,10 +31,22 @@ class LoadFixturesCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // prepare directories of specified packages
         $packageDirectories = $input->getArgument('package');
         foreach ($packageDirectories as $key => $packageDir) {
             $packageDirectories[$key] = realpath($packageDir) . DIRECTORY_SEPARATOR;
         }
+
+        // a function which allows filter fixtures by the given packages
+        $filterByPackage = function ($path) use (&$packageDirectories) {
+            foreach ($packageDirectories as $packageDir) {
+                if (stripos($path, $packageDir) === 0) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
 
         // prepare data fixture loader
         // we should load only fixtures from the specified packages
@@ -41,20 +54,12 @@ class LoadFixturesCommand extends ContainerAwareCommand
         $loader      = new ContainerAwareLoader($container);
         $hasFixtures = false;
         foreach ($container->get('kernel')->getBundles() as $bundle) {
-            $bundleDir = $bundle->getPath();
-            // check if a current bundle is related to any specified package
-            foreach ($packageDirectories as $packageDir) {
-                if (stripos($bundleDir, $packageDir) === 0) {
-                    // check if a current bundle has fixtures
-                    $fixtureDir = $bundleDir . '/DataFixtures/ORM';
-                    if (is_dir($fixtureDir)) {
-                        // register fixtures if both conditions success
-                        $loader->loadFromDirectory($fixtureDir);
-                        $hasFixtures = true;
-                    }
-                    break;
-                }
+            $fixtureDir = $bundle->getPath() . '/DataFixtures/ORM';
+            if (is_dir($fixtureDir) && $filterByPackage($fixtureDir)) {
+                $loader->loadFromDirectory($fixtureDir);
+                $hasFixtures = true;
             }
+            break;
         }
 
         // load data fixtures
@@ -68,5 +73,29 @@ class LoadFixturesCommand extends ContainerAwareCommand
             );
             $executor->execute($loader->getFixtures(), true);
         }
+
+        // load workflow definitions
+        $this->loadWorkflowDefinitions($input, $output);
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    protected function loadWorkflowDefinitions(InputInterface $input, OutputInterface $output)
+    {
+        $commandExecutor = new CommandExecutor(
+            $input->hasOption('env') ? $input->getOption('env') : null,
+            $output,
+            $this->getApplication()
+        );
+
+        $commandExecutor->runCommand(
+            'oro:workflow:definitions:load',
+            array_merge(
+                $input->getArgument('package'),
+                array('--process-isolation' => true)
+            )
+        );
     }
 }

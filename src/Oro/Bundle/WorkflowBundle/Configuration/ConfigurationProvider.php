@@ -41,10 +41,11 @@ class ConfigurationProvider
     }
 
     /**
+     * @param callable|null $filter
      * @return array
      * @throws InvalidConfigurationException
      */
-    public function getWorkflowDefinitionConfiguration()
+    public function getWorkflowDefinitionConfiguration(\Closure $filter = null)
     {
         $configDirectories = $this->getConfigDirectories();
 
@@ -55,6 +56,10 @@ class ConfigurationProvider
         /** @var $file \SplFileInfo */
         foreach ($finder as $file) {
             $realPathName = $file->getRealPath();
+            if ($filter !== null && !$filter($realPathName)) {
+                continue;
+            }
+
             $configData = Yaml::parse($realPathName);
 
             try {

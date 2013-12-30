@@ -6,6 +6,9 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -116,9 +119,41 @@ class OptionSetCollectionType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            array(
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'prototype' => true,
+                'prototype_name' => '__name__',
+                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
+                'show_form_when_empty' => true
+            )
+        );
+        $resolver->setRequired(array('type'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars = array_replace(
+            $view->vars,
+            array(
+                'show_form_when_empty' => $options['show_form_when_empty']
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
-        return 'oro_collection';
+        return 'collection';
     }
 
     /**

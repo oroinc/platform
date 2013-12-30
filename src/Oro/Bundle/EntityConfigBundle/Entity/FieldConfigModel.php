@@ -141,4 +141,14 @@ class FieldConfigModel extends AbstractConfigModel
     {
         return $this->options;
     }
+
+    /**
+     * @param ArrayCollection|PersistentCollection|OptionSet[] $options
+     * @return $this
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+        return $this;
+    }
 }

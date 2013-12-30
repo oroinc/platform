@@ -40,7 +40,7 @@ function Util(rootMessagesElements) {
         error: function (message) {
             displayMessage('error', message);
         },
-        confirm: function (message, continueCallback, continueLabel, cancelCallback) {
+        confirm: function (title, message, continueCallback, continueLabel, cancelCallback) {
             message = message.replace(/\n/g, '<br />');
             continueCallback = continueCallback || function () {
             };
@@ -49,6 +49,7 @@ function Util(rootMessagesElements) {
             };
 
             var dialogOptions = $.extend(true, defaultDialogOptions, {
+                title: title,
                 message: message,
                 buttons: {
                     cancel: {
@@ -64,14 +65,14 @@ function Util(rootMessagesElements) {
             bootbox.dialog(dialogOptions);
         },
         redirect: function (url, message) {
-            $.cookie('message', message);
+            $.cookie('message', message, {path: '/'});
             window.location = url;
         },
         displayCookieMessage: function () {
             var message = $.cookie('message');
             if (message) {
                 this.success(message);
-                $.removeCookie('message');
+                $.removeCookie('message', {path: '/'});
             }
         }
     };
