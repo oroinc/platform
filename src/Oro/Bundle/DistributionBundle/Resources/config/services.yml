@@ -64,10 +64,11 @@ services:
 
     ### Menu
 
-    oro_distribution.listener.navigation_listener:
-        class: %oro_distribution.listener.navigation_listener.class%
-        arguments:
-            - @security.context
-            - %oro_distribution.entry_point%
-        tags:
-            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+#todo: uncomment this then package installer will be completed
+#    oro_distribution.listener.navigation_listener:
+#        class: %oro_distribution.listener.navigation_listener.class%
+#        arguments:
+#            - @security.context
+#            - %oro_distribution.entry_point%
+#        tags:
+#            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
