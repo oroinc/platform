@@ -594,10 +594,12 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composer = $this->createComposerMock();
         $repositoryManager = $this->createRepositoryManagerMock();
         $installationManager = $this->createInstallationManagerMock();
-        $localRepository = new WritableArrayRepository($installedPackages = [
-            $this->getPackage($packageNamesToBeRemoved[0], 'v2'),
-            $this->getPackage($packageNamesToBeRemoved[1], 'v2')
-        ]);
+        $localRepository = new WritableArrayRepository(
+            $installedPackages = [
+                $this->getPackage($packageNamesToBeRemoved[0], 'v2'),
+                $this->getPackage($packageNamesToBeRemoved[1], 'v2')
+            ]
+        );
 
         $composer->expects($this->any())
             ->method('getRepositoryManager')

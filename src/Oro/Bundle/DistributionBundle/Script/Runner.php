@@ -92,7 +92,13 @@ class Runner
     public function runPlatformUpdate()
     {
         $phpPath = $this->getPhpExecutablePath();
-        $command = sprintf('%s app/console oro:platform:update --env=%s', $phpPath, $this->environment);
+
+        $command = sprintf(
+            '%s %s/app/console oro:platform:update --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
 
         return $this->runCommand($command);
     }
@@ -131,7 +137,14 @@ class Runner
         foreach ($packages as $package) {
             $paths[] = $this->installationManager->getInstallPath($package);
         }
-        $commandPrefix = sprintf('%s app/console oro:package:fixtures:load --env=%s', $phpPath, $this->environment);
+
+        $commandPrefix = sprintf(
+            '%s %s/app/console oro:package:fixtures:load --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
         $commands = $this->makeCommands($paths, $commandPrefix);
         $output = '';
         foreach ($commands as $command) {
@@ -175,9 +188,11 @@ class Runner
     {
         if (file_exists($path)) {
             $phpPath = $this->getPhpExecutablePath();
+
             $command = sprintf(
-                '%s app/console oro:platform:run-script --env=%s %s',
+                '%s %s/app/console oro:platform:run-script --env=%s %s',
                 $phpPath,
+                $this->applicationRootDir,
                 $this->environment,
                 $path
             );
