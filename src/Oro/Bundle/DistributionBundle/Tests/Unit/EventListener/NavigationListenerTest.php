@@ -15,7 +15,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldBeConstructedWithSecurityFacade()
     {
-        new NavigationListener($this->createSecurityFacadeMock());
+        new NavigationListener($this->createSecurityContextMock());
     }
 
     /**
@@ -24,7 +24,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function couldBeConstructedWithEntryPoint()
     {
         new NavigationListener(
-            $this->createSecurityFacadeMock(),
+            $this->createSecurityContextMock(),
             $entryPoint = '/install.php'
         );
     }
@@ -34,7 +34,7 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfEntryPointWasNotDefined()
     {
-        $listener = new NavigationListener($this->createSecurityFacadeMock());
+        $listener = new NavigationListener($this->createSecurityContextMock());
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -43,12 +43,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfNotUserDoesNotHaveRoleAdministrator()
     {
-        $security = $this->createSecurityFacadeMock();
+        $security = $this->createSecurityContextMock();
         $listener = new NavigationListener($security, '/install.php');
-
-        $security->expects($this->once())
-            ->method('hasLoggedUser')
-            ->will($this->returnValue(true));
 
         $security->expects($this->once())
             ->method('isGranted')
@@ -63,12 +59,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfMenuDoesNotHaveSystemTab()
     {
-        $security = $this->createSecurityFacadeMock();
+        $security = $this->createSecurityContextMock();
         $listener = new NavigationListener($security, '/install.php');
-
-        $security->expects($this->once())
-            ->method('hasLoggedUser')
-            ->will($this->returnValue(true));
 
         $security->expects($this->once())
             ->method('isGranted')
@@ -94,12 +86,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldAddMenuItem()
     {
-        $security = $this->createSecurityFacadeMock();
+        $security = $this->createSecurityContextMock();
         $listener = new NavigationListener($security, $entryPoint = '/install.php');
-
-        $security->expects($this->once())
-            ->method('hasLoggedUser')
-            ->will($this->returnValue(true));
 
         $security->expects($this->once())
             ->method('isGranted')
@@ -152,8 +140,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createSecurityFacadeMock()
+    protected function createSecurityContextMock()
     {
-        return $this->createConstructorLessMock('Oro\Bundle\SecurityBundle\SecurityFacade');
+        return $this->createConstructorLessMock('Symfony\Component\Security\Core\SecurityContext');
     }
 }
