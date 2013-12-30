@@ -34,7 +34,11 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldDoNotAddMenuItemIfEntryPointWasNotDefined()
     {
-        $listener = new NavigationListener($this->createSecurityContextMock());
+        $security = $this->createSecurityContextMock();
+        $listener = new NavigationListener($security);
+
+        $security->expects($this->never())
+            ->method('isGranted');
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -44,13 +48,13 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function shouldDoNotAddMenuItemIfNotUserDoesNotHaveRoleAdministrator()
     {
         $security = $this->createSecurityContextMock();
-        $listener = new NavigationListener($security, '/install.php');
 
         $security->expects($this->once())
             ->method('isGranted')
             ->with('ROLE_ADMINISTRATOR')
             ->will($this->returnValue(false));
 
+        $listener = new NavigationListener($security, '/install.php');
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -142,6 +146,6 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createSecurityContextMock()
     {
-        return $this->createConstructorLessMock('Symfony\Component\Security\Core\SecurityContext');
+        return $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
     }
 }

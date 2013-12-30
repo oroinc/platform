@@ -4,12 +4,12 @@ namespace Oro\Bundle\DistributionBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 class NavigationListener
 {
     /**
-     * @var SecurityContext
+     * @var SecurityContextInterface
      */
     protected $securityContext;
 
@@ -19,10 +19,10 @@ class NavigationListener
     protected $entryPoint;
 
     /**
-     * @param SecurityContext $securityContext
+     * @param SecurityContextInterface $securityContext
      * @param null|string $entryPoint
      */
-    public function __construct(SecurityContext $securityContext, $entryPoint = null)
+    public function __construct(SecurityContextInterface $securityContext, $entryPoint = null)
     {
         $this->securityContext = $securityContext;
         $this->entryPoint = $entryPoint;
