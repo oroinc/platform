@@ -527,6 +527,16 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $this->entityConfigProvider->expects($this->any())
+            ->method('getIds')
+            ->will(
+                $this->returnCallback(
+                    function ($className) use (&$config) {
+                        return $this->getEntityIds($className, $config);
+                    }
+                )
+            );
+
     }
 
     /**
@@ -679,5 +689,15 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $entityFieldConfig->setValues($values);
 
         return $entityFieldConfig;
+    }
+
+    protected function getEntityIds($entityClassName, $config)
+    {
+        $result = [];
+        foreach ($config[$entityClassName]['fields'] as $fieldName => $fieldConfig) {
+            $result[] = new FieldConfigId($entityClassName, 'entity', $fieldName, $fieldConfig['type']);
+        }
+
+        return $result;
     }
 }
