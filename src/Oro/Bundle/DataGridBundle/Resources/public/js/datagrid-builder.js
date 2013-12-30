@@ -91,11 +91,17 @@ define(function (require) {
              * Build grid
              */
             buildGrid: function () {
-                var options, collection, grid;
+                var options, collection, grid, obj;
 
-                // create collection
-                options = methods.combineCollectionOptions.call(this);
-                collection = new PageableCollection(this.$el.data('data'), options);
+                // collection can be stored in the page cache
+                mediator.trigger('datagrid_collection_set_before', obj = {});
+                if (obj.collection) {
+                    collection = obj.collection;
+                } else {
+                    // otherwise, create collection from metadata
+                    options = methods.combineCollectionOptions.call(this);
+                    collection = new PageableCollection(this.$el.data('data'), options);
+                }
 
                 // create grid
                 options = methods.combineGridOptions.call(this);
