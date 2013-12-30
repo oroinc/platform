@@ -1,0 +1,377 @@
+.sidebar {
+    background: #e0e0e0 url("../images/divider.png") repeat-x 0 0;
+    top: 66px;
+    bottom: 0;
+    width: 33px;
+    position: absolute;
+    z-index: 1000;
+    overflow-y: auto;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.sidebar-maximized .sidebar-widget-close{
+    display: none;
+}
+.sidebar-wrap {
+    height: 100%;
+    position: relative;
+}
+
+.sidebar-wrap-1 {
+    overflow: hidden;
+    padding-bottom: 22px;
+}
+
+.sidebar-wrap-2 {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.sidebar-left {
+    left: 0;
+    margin-right: 7px;
+}
+
+.sidebar-right {
+    right: 0;
+    margin-left: 7px;
+}
+
+.sidebar-maximized {
+    width: 200px;
+}
+.sidebar-resize {
+    background-color: #f1f1f1;
+    border-left: 1px solid #c7c7c7;
+    border-right: 1px solid #c7c7c7;
+    height: 100%;
+    position: absolute;
+    width: 5px;
+    z-index: 1100;
+}
+
+.sidebar-resize a {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+.sidebar-right .sidebar-content {
+    margin-left: 5px;
+}
+.sidebar-left .sidebar-resize {
+    right: 0;
+}
+
+.sidebar-right .sidebar-resize {
+    left: 0;
+}
+
+.sidebar-add {
+    display: block;
+    width: 28px;
+    text-align: center;
+    margin-top: 3px;
+}
+.sidebar-left .sidebar-add {
+    margin-right: 5px;
+}
+.sidebar-right .sidebar-add {
+    margin-left: 5px;
+}
+.sidebar-add i {
+    height: 16px;
+    width: 100%;
+    margin: 0;
+    line-height: 16px;
+}
+.sidebar-toggle {
+    display: block;
+    background-color: #e0e0e0;
+    border-top: 1px solid #c3c3c3;
+    border-bottom: 1px solid #c3c3c3;
+    width: 100%;
+    height: 22px;
+    position: absolute;
+    bottom: 0;
+}
+
+.sidebar-toggle-holder{
+   border-top: 1px solid #d6d6d6;
+}
+.sidebar-toggle a {
+    position: absolute;
+    height: 22px;
+
+    width: 30px;
+    bottom: 0;
+}
+
+.sidebar-left .sidebar-toggle a {
+    right: 5px;
+    bottom: -1px;
+}
+.sidebar-left .sidebar-toggle a i{
+    right: 7px;
+    bottom: 4px;
+}
+.sidebar-right .sidebar-toggle a {
+    bottom: -1px;
+    left: 5px;
+}
+.sidebar-right .sidebar-toggle a i{
+    left: 7px;
+    bottom: 4px;
+}
+.sidebar-left i.icon-backward{
+    display: none !important;
+}
+.sidebar-left i.icon-forward{
+    display: block !important;
+}
+.sidebar-right i.icon-backward{
+    display: block !important;
+}
+.sidebar-right i.icon-forward{
+    display: none !important;
+}
+.sidebar-right.sidebar-maximized i.icon-backward{
+    display: none !important;
+}
+.sidebar-right.sidebar-maximized i.icon-forward{
+    display: block !important;
+}
+.sidebar-left.sidebar-maximized i.icon-backward{
+    display: block !important;
+}
+.sidebar-left.sidebar-maximized i.icon-forward{
+    display: none !important;
+}
+.sidebar-toggle i {
+    position: absolute;
+    bottom: 0;
+}
+
+.sidebar-left .sidebar-toggle i {
+    right: 0px;
+}
+
+.sidebar-right .sidebar-toggle i {
+    left: 0px;
+}
+
+.sidebar-widget, .sidebar-icon {
+    background: #e0e0e0 url('../images/divider.png') repeat-x 0 100%;
+    width: 100%;
+    padding-bottom: 1px;
+}
+
+.sidebar-icon {
+    height: 28px;
+    width: 28px;
+    cursor: pointer;
+}
+
+.sidebar-icon img {
+    height: 16px;
+    width: 16px;
+    margin: 6px;
+    filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 3.5+ */
+    -webkit-filter: grayscale(100%);
+    -moz-filter: grayscale(100%);
+    -o-filter: grayscale(100%);
+    -ms-filter: grayscale(100%);
+    filter: grayscale(100%);
+}
+.sidebar-widget-header{
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.sidebar-widget-popup .sidebar-widget-header-toggle{
+    display: none;
+}
+.sidebar-icon-active{
+    background-color: #cccccc;
+}
+.sidebar-icon:hover img,
+.sidebar-icon.sidebar-icon-active img,
+.sidebar-widget-popup .sidebar-widget img{
+    filter: none;
+    -webkit-filter: grayscale(0%);
+}
+#sidebar-left .sidebar-widget-popup .sidebar-widget:after{
+    border-right: 8px solid #bbb;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    content: "";
+    display: inline-block;
+    left: -8px;
+    position: absolute;
+    top: 8px;
+    z-index: 99999;
+}
+#sidebar-right .sidebar-widget-popup .sidebar-widget:after{
+    border-left: 8px solid #bbb;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    content: "";
+    display: inline-block;
+    right: -8px;
+    position: absolute;
+    top: 8px;
+    z-index: 99999;
+}
+.sidebar-widget-header{
+    background: #c4c4c4;
+    border-bottom: 1px solid #aaaaaa;
+}
+.sidebar-widget-popup .sidebar-widget-header{
+    margin: 0 0 10px;
+    background: #c4c4c4;
+    border-bottom: 1px solid #aaaaaa;
+}
+#sidebar-left .sidebar-widget-popup .sidebar-widget{
+    border: 1px solid #aaaaaa;
+    -webkit-box-shadow:  2px 3px 6px -2px rgba(0, 0, 0, 0.4);
+    box-shadow:  2px 3px 6px -2px rgba(0, 0, 0, 0.4);
+}
+#sidebar-right .sidebar-widget-popup .sidebar-widget{
+    border: 1px solid #aaaaaa;
+    -webkit-box-shadow:  -2px 3px 6px -2px rgba(0, 0, 0, 0.4);
+    box-shadow:  -2px 3px 6px -2px rgba(0, 0, 0, 0.4);
+}
+.sidebar-widget-popup .sidebar-widget-content{
+    border: 0;
+}
+.sidebar-widget,
+.sidebar-widget-popup {
+    z-index: 1200;
+}
+.sidebar-widget-header{
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.sidebar-widget-header-title{
+    float: left;
+    text-align: left;
+    line-height: 14px;
+}
+.sidebar-widget-header-title .sidebar-widget-header-toggle{
+    width: 12px;
+    overflow: hidden;
+    float: left;
+    margin-top: 3px;
+}
+.sidebar-widget-header-title > img{
+    float: left;
+    margin: 2px 5px 0 0;
+}
+.sidebar-widget-header-title .widget-title{
+    display: inline-block;
+    text-overflow: ellipsis;
+    width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.sidebar-widget-header {
+    color: #555;
+    font-weight: bolder;
+    padding: 3px 5px 5px;
+}
+
+.sidebar-widget-header img {
+    height: 16px;
+    width: 16px;
+}
+
+.sidebar-widget-header a, .sidebar-toggle a, .sidebar-add a {
+    color: #fff;
+}
+.sidebar-widget-header a i{
+    padding: 0;
+    margin: 0;
+}
+.sidebar-widget-header-wrap {
+    position: absolute;
+    right: 7px;
+}
+.sidebar-maximized .sidebar-widget-header-wrap{
+    right: 10px;
+}
+.sidebar-widget-header-wrap a{
+    margin: 0 1px;
+}
+.sidebar .widget-title{
+    color: #444;
+    text-transform: uppercase;
+    font-size: 11px;
+    margin-top: 3px;
+}
+.sidebar-widget-header-toggle > i {
+    height: 16px;
+    width: 16px;
+    color: #a9a8a8;
+}
+.sidebar i[class^="icon-"]:before,
+.sidebar i[class*=" icon-"]:before{
+    color: #444444;
+}
+.sidebar-add i[class^="icon-"]:before,
+.sidebar-add i[class*=" icon-"]:before{
+    text-shadow: 1px 1px 1px #fff;
+}
+.sidebar-toggle i[class^="icon-"]:before,
+.sidebar-toggle i[class*=" icon-"]:before{
+    font-size: 8px;
+    line-height: 12px;
+
+}
+.sidebar-widget-header-wrap i[class^="icon-"]:before,
+.sidebar-widget-header-wrap i[class*=" icon-"]:before{
+    color: #444444;
+}
+.sidebar-widget-content {
+    color: #444;
+    margin: 0 8px 8px;
+    padding: 10px;
+    border: 1px solid #dbdbdb;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #f4f4f4;
+}
+.sidebar-widget-popup{
+    bottom: 75px;
+    position: fixed;
+    width: 0;
+    overflow: visible;
+}
+.sidebar-left .sidebar-widget-popup {
+    left: 33px;
+}
+.sidebar-left .sidebar-widget-popup .sidebar-widget{
+    left: 0;
+}
+.sidebar-right .sidebar-widget-popup {
+    right: 33px;
+}
+.sidebar-right .sidebar-widget-popup .sidebar-widget{
+    right: 0;
+}
+.sidebar-widget-popup .sidebar-widget {
+    position: absolute;
+    width: 200px;
+    padding-bottom: 2px;
+}
+.sidebar-widget-popup .sidebar-widget-content {
+    overflow: auto;
+}
+.sidebar-widget-popup{
+    background-color: #cecece;
+}

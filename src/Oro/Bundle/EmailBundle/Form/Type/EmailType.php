@@ -15,10 +15,14 @@ class EmailType extends AbstractType
     {
         $builder
             ->add('gridName', 'hidden', array('required' => false))
-            ->add('from', 'oro_email_email_address', array('required' => true))
+            ->add(
+                'from',
+                'oro_email_email_address',
+                array('required' => true, 'label' => 'oro.email.from_email_address.label')
+            )
             ->add('to', 'oro_email_email_address', array('required' => true, 'multiple' => true))
-            ->add('subject', 'text', array('required' => true))
-            ->add('body', 'textarea', array('required' => false));
+            ->add('subject', 'text', array('required' => true, 'label' => 'oro.email.subject.label'))
+            ->add('body', 'textarea', array('required' => false, 'label' => 'oro.email.email_body.label'));
     }
 
     /**
@@ -28,10 +32,10 @@ class EmailType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'data_class'           => 'Oro\Bundle\EmailBundle\Form\Model\Email',
-                'intention'            => 'email',
-                'csrf_protection'      => true,
-                'cascade_validation'   => true,
+                'data_class'         => 'Oro\Bundle\EmailBundle\Form\Model\Email',
+                'intention'          => 'email',
+                'csrf_protection'    => true,
+                'cascade_validation' => true,
             )
         );
     }

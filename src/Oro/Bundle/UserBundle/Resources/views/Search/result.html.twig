@@ -24,11 +24,11 @@
 {% endif %}
 
 {% set title = entity ? entity|oro_format_name : indexer_item.recordTitle %}
-{% set entityType = entity_output.name|trans({}, 'config') %}
+{% set entityType = entity_output.name|trans %}
 
 {% set entityInfo = [
-    {'title': 'Created', 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
-    {'title': 'Updated', 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
-    {'title': 'Last logged in', 'value': entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'},
-    {'title': 'Login count', 'value': entity.loginCount|default(0)}
+    {'title': 'oro.user.created_at.label', 'value': entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.user.updated_at.label', 'value': entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'},
+    {'title': 'oro.user.last_login.label', 'value': entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'},
+    {'title': 'oro.user.login_count.label', 'value': entity.loginCount|default(0)}
 ] %}

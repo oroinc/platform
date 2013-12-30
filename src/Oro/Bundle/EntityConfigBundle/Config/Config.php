@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * The aim of this class is to store configuration data for each configurable object (entity or field).
@@ -142,6 +144,22 @@ class Config implements ConfigInterface
     {
         list($this->id, $this->values) = unserialize($serialized);
     }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return Config A new instance of a Config object
+     */
+    // @codingStandardsIgnoreStart
+    public static function __set_state($data)
+    {
+        $result         = new Config($data['id']);
+        $result->values = $data['values'];
+
+        return $result;
+    }
+    // @codingStandardsIgnoreEnd
 
     /**
      * Creates a new object that is a copy of the current instance.

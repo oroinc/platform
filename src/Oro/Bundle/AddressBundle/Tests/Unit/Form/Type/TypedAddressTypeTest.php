@@ -65,7 +65,6 @@ class TypedAddressTypeTest extends \PHPUnit_Framework_TestCase
                 'primary',
                 'checkbox',
                 array(
-                    'label' => 'Primary',
                     'required' => false
                 )
             )

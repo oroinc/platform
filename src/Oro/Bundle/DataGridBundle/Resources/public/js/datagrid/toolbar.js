@@ -4,6 +4,8 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/datagrid/pagination-inp
 function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
     'use strict';
 
+    var $ = Backbone.$;
+
     /**
      * Datagrid toolbar widget
      *
@@ -13,30 +15,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
      */
     return Backbone.View.extend({
         /** @property */
-        template:_.template(
-            '<div class="grid-toolbar">' +
-                '<div class="pull-left">' +
-                    '<div class="mass-actions-panel btn-group icons-holder"></div>' +
-                    '<div class="btn-group icons-holder" style="display: none;">' +
-                        '<button class="btn"><i class="icon-edit hide-text"><%- _.__("edit") %></i></button>' +
-                        '<button class="btn"><i class="icon-copy hide-text"><%- _.__("copy") %></i></button>' +
-                        '<button class="btn"><i class="icon-trash hide-text"><%- _.__("remove") %></i></button>' +
-                    '</div>' +
-                    '<div class="btn-group" style="display: none;">' +
-                        '<button data-toggle="dropdown" class="btn dropdown-toggle"><%- _.__("Status") %>: <strong><%- _.__("All") %></strong><span class="caret"></span></button>' +
-                        '<ul class="dropdown-menu">' +
-                            '<li><a href="#"><%- _.__("only short") %></a></li>' +
-                            '<li><a href="#"><%- _.__("this is long text for test") %></a></li>' +
-                        '</ul>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="pull-right">' +
-                    '<div class="actions-panel pull-right form-horizontal"></div>' +
-                    '<div class="page-size pull-right form-horizontal"></div>' +
-                '</div>' +
-                '<div class="pagination pagination-centered"></div>' +
-            '</div>'
-        ),
+        template: '#template-datagrid-toolbar',
 
         /** @property */
         pagination: PaginationInput,
@@ -89,6 +68,8 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
                 this.massActionsPanel.setActions(options.massActions);
             }
 
+            this.template = _.template($(options.template || this.template).html());
+
             Backbone.View.prototype.initialize.call(this, options);
         },
 
@@ -134,8 +115,9 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
         render: function() {
             this.$el.empty();
             this.$el.append(this.template());
+            var $pagination = this.pagination.render().$el.attr('class', this.$('.pagination').attr('class'));
 
-            this.$('.pagination').replaceWith(this.pagination.render().$el);
+            this.$('.pagination').replaceWith($pagination);
             this.$('.page-size').append(this.pageSize.render().$el);
             this.$('.actions-panel').append(this.actionsPanel.render().$el);
             this.$('.mass-actions-panel').append(this.massActionsPanel.render().$el);

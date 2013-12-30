@@ -1,11 +1,21 @@
 {% extends 'OroInstallerBundle::layout.html.twig' %}
 {% use 'OroInstallerBundle::progress.html.twig' %}
 
-{% set step, steps = 'administration', ['search', 'navigation', 'js-routing', 'localization', 'assets', 'assetic', 'assetic-oro', 'translation', 'requirejs', 'finish'] %}
+{% set step, platformSteps = 'administration', ['search', 'navigation', 'js-routing', 'localization', 'assets', 'assetic', 'translation', 'requirejs'] %}
 
 {% if loadFixtures %}
-    {% set steps = ['fixtures']|merge(steps) %}
+    {% set platformSteps = ['fixtures']|merge(platformSteps) %}
 {% endif %}
+
+{% set steps = platformSteps %}
+
+{% if installerScripts is not empty %}
+    {% for stepName in installerScripts|keys %}
+        {% set steps = steps|merge(['installerScript-' ~ stepName]) %}
+    {% endfor %}
+{% endif %}
+
+{% set steps = steps|merge(['finish']) %}
 
 {% block title %}{{ 'process.step.installation.header'|trans }} - {{ parent() }}{% endblock %}
 
@@ -25,12 +35,24 @@
              </tr>
          </thead>
          <tbody>
-             {% for step in steps %}
+             {% for step in platformSteps %}
              <tr>
                  <td><span id="step-{{ step }}"></span>{{ ('process.step.installation.' ~ step)|trans }}</td>
                  <td>&nbsp;</td>
              </tr>
              {% endfor %}
+             {% if installerScripts is not empty %}
+                 {% for stepKey, stepLabel in installerScripts %}
+                     <tr>
+                         <td><span id="step-installerScript-{{ stepKey }}"></span>{{ stepLabel|trans }}</td>
+                         <td>&nbsp;</td>
+                     </tr>
+                 {% endfor %}
+             {% endif %}
+             <tr>
+                 <td><span id="step-finish"></span>{{ 'process.step.installation.finish'|trans }}</td>
+                 <td>&nbsp;</td>
+             </tr>
          </tbody>
     </table>
 
@@ -51,7 +73,7 @@
     <script type="text/javascript">
         $(function() {
             ajaxQueue(
-                [{% for step in steps %}'{{ step}}'{{ loop.last ? '' : ', ' }}{% endfor %}],
+                [{% for step in steps %}'{{ step }}'{{ loop.last ? '' : ', ' }}{% endfor %}],
                 '{{ path('sylius_flow_forward', { scenarioAlias: 'oro_installer', stepName: 'installation' }) }}'
             );
         });

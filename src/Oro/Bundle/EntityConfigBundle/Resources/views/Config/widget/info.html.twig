@@ -1,0 +1,39 @@
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+
+<div class="widget-content">
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            {% set iconContent = [
+                '<div class="clearfix-oro"><p class="control-label"><i class="',
+                    entity_config.get('icon'),
+                ' hide-text"></i> (',
+                    entity_config.get('icon'),
+                ')</p></div>'
+            ] %}
+
+            {{ ui.renderProperty('Name'|trans, entity_name) }}
+            {{ ui.renderAttribute('Icon'|trans, iconContent|join) }}
+            {{ ui.renderProperty(
+                'Label'|trans,
+                (entity_config.get('label') == entity_config.get('label')|trans)
+                    ? ''
+                    : entity_config.get('label')|trans
+            ) }}
+            {{ ui.renderProperty(
+                'Plural Label'|trans,
+                (entity_config.get('plural_label') == entity_config.get('plural_label')|trans)
+                    ? ''
+                    : entity_config.get('plural_label')|trans
+            ) }}
+            {{ ui.renderProperty('Type'|trans, entity_extend.get('owner')) }}
+            {{ ui.renderProperty(
+                'Description'|trans,
+                (entity_config.get('description') == entity_config.get('description')|trans)
+                    ? ''
+                    : entity_config.get('description')|trans
+            ) }}
+            {{ ui.renderProperty('Ownership Type'|trans, entity_ownership.get('owner_type')) }}
+            {{ ui.renderProperty('Module'|trans, module_name) }}
+        </div>
+    </div>
+</div>

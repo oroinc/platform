@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 
 class DbSpool extends \Swift_ConfigurableSpool
@@ -21,11 +22,6 @@ class DbSpool extends \Swift_ConfigurableSpool
      * @var string
      */
     protected $entityClass;
-
-    /**
-     * @var bool
-     */
-    protected $flushOnQueue = false;
 
     public function __construct(EntityManager $em, $entityClass)
     {
@@ -72,10 +68,14 @@ class DbSpool extends \Swift_ConfigurableSpool
         $mailObject->setStatus(self::STATUS_READY);
 
         try {
-            $this->em->persist($mailObject);
-            if ($this->flushOnQueue) {
-                $this->em->flush($mailObject);
-            }
+            $this->em->getUnitOfWork()->computeChangeSet(
+                $this->em->getClassMetadata($this->entityClass),
+                $mailObject
+            );
+            $this->em
+                ->getUnitOfWork()
+                ->getEntityPersister($this->entityClass)
+                ->addInsert($mailObject);
         } catch (\Exception $e) {
             throw new \Swift_IoException("Unable to persist object for enqueuing message");
         }
@@ -126,13 +126,5 @@ class DbSpool extends \Swift_ConfigurableSpool
         }
 
         return $count;
-    }
-
-    /**
-     * @param bool $flush
-     */
-    public function setFlushOnQueue($flush)
-    {
-        $this->flushOnQueue = $flush;
     }
 }

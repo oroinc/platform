@@ -284,10 +284,13 @@ $.widget( "ui.dialog", $.ui.dialog, {
     },
 
     _moveToVisible: function() {
-        var offset = this.widget().offset();
-        this._setOptions({
-            position: [offset.left, offset.top]
-        });
+        var $widget = this.widget();
+        if ($widget.length > 0) {
+            var offset = $widget.offset();
+            this._setOptions({
+                position: [offset.left, offset.top]
+            });
+        }
         return this;
     },
 

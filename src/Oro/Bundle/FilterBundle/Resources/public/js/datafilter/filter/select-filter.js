@@ -301,13 +301,6 @@ function(_, __, AbstractFilter, MultiselectDecorator) {
         /**
          * @inheritDoc
          */
-        _isNewValueUpdated: function(newValue) {
-            return !_.isEqual(this.getValue().value || '', newValue.value);
-        },
-
-        /**
-         * @inheritDoc
-         */
         _onValueUpdated: function(newValue, oldValue) {
             AbstractFilter.prototype._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');

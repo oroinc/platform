@@ -21,7 +21,7 @@ class SearchController extends Controller
      * @Acl(
      *      id="oro_search",
      *      type="action",
-     *      label="Search",
+     *      label="oro.search.module_name",
      *      group_name=""
      * )
      */

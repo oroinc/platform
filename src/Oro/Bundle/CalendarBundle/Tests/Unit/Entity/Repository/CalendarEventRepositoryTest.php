@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity\Repository;
 
-use Doctrine\Tests\OrmTestCase;
-use Doctrine\Tests\Mocks\EntityManagerMock;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
+
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 
 class CalendarEventRepositoryTest extends OrmTestCase
@@ -23,7 +25,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             'Oro\Bundle\CalendarBundle\Entity'
         );
 
-        $this->em = $this->_getTestEntityManager();
+        $this->em = $this->getTestEntityManager();
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
         $this->em->getConfiguration()->setEntityNamespaces(
             array(
@@ -43,7 +45,10 @@ class CalendarEventRepositoryTest extends OrmTestCase
             'SELECT c.id as calendar, e.id, e.title, e.start, e.end, e.allDay, e.reminder'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
-            . ' WHERE (e.start >= :start AND e.end < :end) AND'
+            . ' WHERE ('
+            . '(e.start < :start AND e.end >= :start) OR '
+            . '(e.start <= :end AND e.end > :end) OR'
+            . '(e.start >= :start AND e.end < :end)) AND'
             . ' c.id IN('
             . 'SELECT ac.id'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\Calendar c1'
@@ -67,7 +72,10 @@ class CalendarEventRepositoryTest extends OrmTestCase
             'SELECT c.id as calendar, e.id, e.title, e.start, e.end, e.allDay, e.reminder'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
-            . ' WHERE (e.start >= :start AND e.end < :end) AND c.id = :id'
+            . ' WHERE ('
+            . '(e.start < :start AND e.end >= :start) OR '
+            . '(e.start <= :end AND e.end > :end) OR'
+            . '(e.start >= :start AND e.end < :end)) AND c.id = :id'
             . ' ORDER BY c.id, e.start ASC',
             $qb->getQuery()->getDQL()
         );

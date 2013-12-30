@@ -12,20 +12,7 @@ function($, _, Backbone, __) {
      */
     return Backbone.View.extend({
         /** @property */
-        template: _.template(
-            '<label class="control-label"><%- _.__("View per page") %>: &nbsp;</label>' +
-            '<div class="btn-group ">' +
-                '<button data-toggle="dropdown" class="btn dropdown-toggle <% if (disabled) { %>disabled<% } %>">' +
-                    '<%=  currentSizeLabel %><span class="caret"></span>' +
-                '</button>' +
-                '<ul class="dropdown-menu pull-right">' +
-                    '<% _.each(items, function (item) { %>' +
-                        '<li><a href="#" data-size="' + '<% if (item.size == undefined) { %><%= item %><% } else { %><%= item.size %><% } %>' + '">' +
-                        '<% if (item.label == undefined) { %><%= item %><% } else { %><%= item.label %><% } %></a></li>' +
-                    '<% }); %>' +
-                '</ul>' +
-            '</div>'
-        ),
+        template: '#template-datagrid-toolbar-page-size',
 
         /** @property */
         events: {
@@ -59,6 +46,7 @@ function($, _, Backbone, __) {
                 this.items = options.items;
             }
 
+            this.template = _.template($(options.template || this.template).html());
             this.collection = options.collection;
             this.listenTo(this.collection, "add", this.render);
             this.listenTo(this.collection, "remove", this.render);

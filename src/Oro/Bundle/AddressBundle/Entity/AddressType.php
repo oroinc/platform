@@ -5,7 +5,7 @@ namespace Oro\Bundle\AddressBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * AddressType
@@ -13,6 +13,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * @ORM\Entity
  * @ORM\Table(name="oro_address_type")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation")
+ * @Config()
  */
 class AddressType implements Translatable
 {
@@ -24,7 +25,6 @@ class AddressType implements Translatable
      *
      * @ORM\Column(name="name", type="string", length=16)
      * @ORM\Id
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $name;
 
@@ -33,7 +33,6 @@ class AddressType implements Translatable
      *
      * @ORM\Column(name="label", type="string", length=255, unique=true)
      * @Gedmo\Translatable
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $label;
 

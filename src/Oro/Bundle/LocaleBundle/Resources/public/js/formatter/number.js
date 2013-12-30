@@ -46,7 +46,7 @@ function(numeral, localeSettings) {
             },
             addPrefixSuffix: function(formattedNumber, options, originalNumber) {
                 var prefix = '', suffix  = '';
-                if (originalNumber > 0) {
+                if (originalNumber >= 0) {
                     prefix = options.positive_prefix;
                     suffix = options.positive_suffix;
                 } else if (originalNumber < 0)  {

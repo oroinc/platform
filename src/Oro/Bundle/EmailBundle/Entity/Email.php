@@ -5,8 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation as JMS;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -20,7 +19,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  *  @Config(
  *  defaultValues={
- *      "entity"={"label"="Email", "plural_label"="Emails"},
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE",
@@ -42,7 +40,7 @@ class Email
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      * @Soap\ComplexType("int")
-     * @Type("integer")
+     * @JMS\Type("integer")
      */
     protected $id;
 
@@ -50,7 +48,7 @@ class Email
      * @var \DateTime
      *
      * @ORM\Column(name="created", type="datetime")
-     * @Type("dateTime")
+     * @JMS\Type("dateTime")
      */
     protected $created;
 
@@ -59,7 +57,7 @@ class Email
      *
      * @ORM\Column(name="subject", type="string", length=500)
      * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $subject;
 
@@ -68,7 +66,7 @@ class Email
      *
      * @ORM\Column(name="from_name", type="string", length=255)
      * @Soap\ComplexType("string", name="from")
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $fromName;
 
@@ -77,7 +75,7 @@ class Email
      *
      * @ORM\ManyToOne(targetEntity="EmailAddress", fetch="EAGER")
      * @ORM\JoinColumn(name="from_email_address_id", referencedColumnName="id", nullable=false)
-     * @Exclude
+     * @JMS\Exclude
      */
     protected $fromEmailAddress;
 
@@ -95,7 +93,7 @@ class Email
      *
      * @ORM\Column(name="received", type="datetime")
      * @Soap\ComplexType("dateTime")
-     * @Type("dateTime")
+     * @JMS\Type("dateTime")
      */
     protected $receivedAt;
 
@@ -104,7 +102,7 @@ class Email
      *
      * @ORM\Column(name="sent", type="datetime")
      * @Soap\ComplexType("dateTime")
-     * @Type("dateTime")
+     * @JMS\Type("DateTime")
      */
     protected $sentAt;
 
@@ -113,7 +111,7 @@ class Email
      *
      * @ORM\Column(name="importance", type="integer")
      * @Soap\ComplexType("int")
-     * @Type("integer")
+     * @JMS\Type("integer")
      */
     protected $importance;
 
@@ -121,7 +119,7 @@ class Email
      * @var \DateTime
      *
      * @ORM\Column(name="internaldate", type="datetime")
-     * @Type("dateTime")
+     * @JMS\Type("DateTime")
      */
     protected $internalDate;
 
@@ -130,7 +128,7 @@ class Email
      *
      * @ORM\Column(name="message_id", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $messageId;
 
@@ -139,7 +137,7 @@ class Email
      *
      * @ORM\Column(name="x_message_id", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $xMessageId;
 
@@ -148,7 +146,7 @@ class Email
      *
      * @ORM\Column(name="x_thread_id", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
-     * @Type("string")
+     * @JMS\Type("string")
      */
     protected $xThreadId;
 
@@ -158,7 +156,7 @@ class Email
      * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emails")
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id")
      * @Soap\ComplexType("Oro\Bundle\EmailBundle\Entity\EmailFolder")
-     * @Exclude
+     * @JMS\Exclude
      */
     protected $folder;
 
@@ -166,7 +164,7 @@ class Email
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailBody", mappedBy="header", cascade={"persist", "remove"}, orphanRemoval=true)
-     * @Exclude
+     * @JMS\Exclude
      */
     protected $emailBody;
 

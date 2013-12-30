@@ -75,7 +75,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $this->subscriber->preSetData($eventMock));
     }
 
-    public function testPreSetDataHasState()
+    public function testPreSetDataHasRegion()
     {
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
@@ -92,7 +92,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getCountry')
             ->will($this->returnValue($countryMock));
         $addressMock->expects($this->once())
-            ->method('getState');
+            ->method('getRegion');
 
         $configMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
         $configMock->expects($this->once())
@@ -108,11 +108,11 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $formMock->expects($this->once())
             ->method('has')
-            ->with($this->equalTo('state'))
+            ->with($this->equalTo('region'))
             ->will($this->returnValue(true));
         $formMock->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('state'))
+            ->with($this->equalTo('region'))
             ->will($this->returnValue($fieldMock));
         $formMock->expects($this->once())
             ->method('add');
@@ -139,7 +139,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->subscriber->preSetData($eventMock));
     }
 
-    public function testPreSetDataNoState()
+    public function testPreSetDataNoRegion()
     {
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
@@ -156,14 +156,14 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getCountry')
             ->will($this->returnValue($countryMock));
         $addressMock->expects($this->once())
-            ->method('getState');
+            ->method('getRegion');
 
         $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $formMock->expects($this->once())
             ->method('has')
-            ->with($this->equalTo('state'))
+            ->with($this->equalTo('region'))
             ->will($this->returnValue(false));
         $formMock->expects($this->never())
             ->method('get');
@@ -217,7 +217,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()->getMock();
-        $formMock->expects($this->once())->method('get')->with($this->equalTo('state'))
+        $formMock->expects($this->once())->method('get')->with($this->equalTo('region'))
             ->will($this->returnValue($fieldMock));
         $formMock->expects($this->once())->method('add');
 
@@ -227,7 +227,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->formBuilder->expects($this->once())->method('createNamed')
             ->will($this->returnValue($newFieldMock));
 
-        $startData = array('state_text' => 'stateText', 'country' => self::TEST_COUNTRY_NAME);
+        $startData = array('region_text' => 'regionText', 'country' => self::TEST_COUNTRY_NAME);
         $eventMock->expects($this->once())->method('getData')
             ->will($this->returnValue($startData));
         $eventMock->expects($this->once())->method('getForm')
@@ -240,7 +240,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Cover scenario when country has not any stored state and state filled as text field
+     * Cover scenario when country has not any stored region and region filled as text field
      */
     public function testPreSubmitDataTextScenario()
     {
@@ -261,12 +261,14 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repository));
 
 
-        $startData = array('state' => 'someState', 'state_text' => 'stateText', 'country' => self::TEST_COUNTRY_NAME);
+        $startData = array(
+            'region' => 'someRegion', 'region_text' => 'regionText', 'country' => self::TEST_COUNTRY_NAME
+        );
         $eventMock->expects($this->once())->method('getData')
             ->will($this->returnValue($startData));
 
         $eventMock->expects($this->once())->method('setData')
-            ->with(array_intersect_key($startData, array('state_text' => null, 'country' => self::TEST_COUNTRY_NAME)));
+            ->with(array_intersect_key($startData, array('region_text' => null, 'country' => self::TEST_COUNTRY_NAME)));
 
         $this->subscriber->preSubmit($eventMock);
     }

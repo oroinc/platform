@@ -29,23 +29,22 @@ class AddressType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->countryAndRegionSubscriber);
-
         $builder
             ->add('id', 'hidden')
-            ->add('label', 'text', array('required' => false, 'label' => 'Label'))
-            ->add('namePrefix', 'text', array('required' => false, 'label' => 'Name Prefix'))
-            ->add('firstName', 'text', array('required' => false, 'label' => 'First Name'))
-            ->add('middleName', 'text', array('required' => false, 'label' => 'Middle Name'))
-            ->add('lastName', 'text', array('required' => false, 'label' => 'Last Name'))
-            ->add('nameSuffix', 'text', array('required' => false, 'label' => 'Name Suffix'))
-            ->add('organization', 'text', array('required' => false, 'label' => 'Organization'))
-            ->add('country', 'oro_country', array('required' => true, 'label' => 'Country'))
-            ->add('street', 'text', array('required' => true, 'label' => 'Street'))
-            ->add('street2', 'text', array('required' => false, 'label' => 'Street 2'))
-            ->add('city', 'text', array('required' => true, 'label' => 'City'))
-            ->add('state', 'oro_region', array('required' => false, 'label' => 'State'))
-            ->add('state_text', 'hidden', array('required' => false, 'label' => 'Custom State'))
-            ->add('postalCode', 'text', array('required' => true, 'label' => 'ZIP/Postal code'));
+            ->add('label', 'text', array('required' => false, 'label' => 'oro.address.label.label'))
+            ->add('namePrefix', 'text', array('required' => false, 'label' => 'oro.address.name_prefix.label'))
+            ->add('firstName', 'text', array('required' => false, 'label' => 'oro.address.first_name.label'))
+            ->add('middleName', 'text', array('required' => false, 'label' => 'oro.address.middle_name.label'))
+            ->add('lastName', 'text', array('required' => false, 'label' => 'oro.address.last_name.label'))
+            ->add('nameSuffix', 'text', array('required' => false, 'label' => 'oro.address.name_suffix.label'))
+            ->add('organization', 'text', array('required' => false, 'label' => 'oro.address.organization.label'))
+            ->add('country', 'oro_country', array('required' => true, 'label' => 'oro.address.country.label'))
+            ->add('street', 'text', array('required' => true, 'label' => 'oro.address.street.label'))
+            ->add('street2', 'text', array('required' => false, 'label' => 'oro.address.street2.label'))
+            ->add('city', 'text', array('required' => true, 'label' => 'oro.address.city.label'))
+            ->add('region', 'oro_region', array('required' => false, 'label' => 'oro.address.region.label'))
+            ->add('region_text', 'hidden', array('required' => false, 'label' => 'oro.address.region_text.label'))
+            ->add('postalCode', 'text', array('required' => true, 'label' => 'oro.address.postal_code.label'));
     }
 
     /**

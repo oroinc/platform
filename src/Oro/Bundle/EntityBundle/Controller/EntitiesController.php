@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\Controller;
 
 use Doctrine\Common\Inflector\Inflector;
-use Doctrine\ORM\PersistentCollection;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,11 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSetRelation;
-use Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -157,12 +152,6 @@ class EntitiesController extends Controller
      *      defaults={"entity_id"=0, "id"=0}
      * )
      * @Template()
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * TODO: will be refactored via twig extension
      */
     public function viewAction($entity_id, $id)
     {
@@ -171,124 +160,12 @@ class EntitiesController extends Controller
 
         /** @var OroEntityManager $em */
         $em = $this->getDoctrine()->getManager();
-
-        /** @var \Oro\Bundle\EntityConfigBundle\Config\ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
-
-        $entityConfigProvider   = $this->get('oro_entity_config.provider.entity');
-        $extendConfigProvider   = $this->get('oro_entity_config.provider.extend');
-        $viewConfigProvider     = $this->get('oro_entity_config.provider.view');
-        $extendEntityRepository = $em->getRepository($extendEntityName);
-        $record                 = $extendEntityRepository->find($id);
-
-        $fields = $viewConfigProvider->filter(
-            function (ConfigInterface $config) use ($extendConfigProvider) {
-                $extendConfig = $extendConfigProvider->getConfigById($config->getId());
-
-                return
-                    $config->is('is_displayable')
-                    && $extendConfig->is('is_deleted', false)
-                    && !$extendConfig->is('state', ExtendManager::STATE_NEW)
-                    && !(
-                        in_array($extendConfig->getId()->getFieldType(), array('oneToMany', 'manyToOne', 'manyToMany'))
-                        && $extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
-                    );
-            },
-            $extendEntityName
-        );
-
-        $result = [];
-        foreach ($fields as $field) {
-            $value = $record->{'get' . Inflector::classify($field->getId()->getFieldName())}();
-
-            /** Prepare OptionSet field type */
-            if ($field->getId()->getFieldType() == 'optionSet') {
-                /** @var OptionSetRelationRepository */
-                $osr = $em->getRepository(OptionSetRelation::ENTITY_NAME);
-
-                $model = $extendConfigProvider->getConfigManager()->getConfigFieldModel(
-                    $field->getId()->getClassName(),
-                    $field->getId()->getFieldName()
-                );
-
-                $value = $osr->findByFieldId($model->getId(), $id);
-                array_walk(
-                    $value,
-                    function (&$item) {
-                        $item = ['title' => $item->getOption()->getLabel()];
-                    }
-                );
-
-                $value['values'] = $value;
-            }
-
-            /** Prepare DateTime field type */
-            if ($value instanceof \DateTime) {
-                $dateFormat = 'Y-m-d';
-                if ($this->get('oro_config.global')->get('oro_locale.date_format')) {
-                    $dateFormat = $this->get('oro_config.global')->get('oro_locale.date_format');
-                }
-                $configFormat = $dateFormat;
-                $value        = $value->format($configFormat);
-            }
-
-            /** Prepare Relation field type */
-            if ($value instanceof PersistentCollection) {
-                $collection     = $value;
-                $extendConfig   = $extendConfigProvider->getConfigById($field->getId());
-                $titleFieldName = $extendConfig->get('target_title');
-                $targetEntity   = $extendConfig->get('target_entity');
-
-                /** generate link for related entities collection */
-                $route = $routeParams = false;
-                if (class_exists($extendConfig->get('target_entity'))) {
-                    /** @var EntityMetadata $metadata */
-                    $metadata = $configManager->getEntityMetadata($targetEntity);
-                    if ($metadata && $metadata->routeView) {
-                        $route       = $metadata->routeView;
-                        $routeParams = ['id' => null];
-                    }
-
-                    $relationExtendConfig = $extendConfigProvider->getConfig($targetEntity);
-                    if ($relationExtendConfig->is('owner', ExtendManager::OWNER_CUSTOM)) {
-                        $route       = 'oro_entity_view';
-                        $routeParams = ['entity_id' => str_replace('\\', '_', $targetEntity), 'id' => null];
-                    }
-                }
-
-                $value = array(
-                    'route'        => $route,
-                    'route_params' => $routeParams,
-                    'values'       => []
-                );
-
-                foreach ($collection as $item) {
-                    $title = [];
-                    foreach ($titleFieldName as $fieldName) {
-                        $title[] = $item->{Inflector::camelize('get_' . $fieldName)}();
-                    }
-
-                    $routeParams['id'] = $item->getId();
-                    $value['values'][] = [
-                        'id'    => $item->getId(),
-                        'link'  => $route ? $this->generateUrl($route, $routeParams) : false,
-                        'title' => implode(' ', $title)
-                    ];
-                }
-            }
-
-            $fieldConfig = $entityConfigProvider->getConfigById($field->getId());
-            $label       = $field->getId()->getFieldName();
-            if ($fieldConfig->get('label')) {
-                $label = $fieldConfig->get('label');
-            }
-            $result[$label] = $value;
-        }
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+        $record = $em->getRepository($extendEntityName)->find($id);
 
         return [
             'parent'        => $entity_id,
             'entity'        => $record,
-            'entity_fields' => $result,
             'id'            => $id,
             'entity_config' => $entityConfigProvider->getConfig($extendEntityName),
             'entity_class'  => $extendEntityName,

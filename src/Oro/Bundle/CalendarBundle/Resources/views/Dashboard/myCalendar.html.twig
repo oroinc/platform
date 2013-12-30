@@ -1,0 +1,58 @@
+{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
+{% import 'OroCalendarBundle::macros.html.twig' as c %}
+
+{% block content %}
+    {% set calendarId = 'calendar-' ~ widgetId %}
+    <div id="{{ calendarId }}">
+        <div class="calendar-events"></div>
+    </div>
+    {% set eventsOptions = {
+        'containerSelector': '.calendar-events',
+        'itemFormTemplateSelector': '#template-calendar-event-' ~ widgetId,
+        'defaultView': 'agendaDay',
+        'firstHour': firstHour,
+        'renderCompleteCallback': 'function (calendar) {'
+            ~ ' var allDayEventCount = 0;'
+            ~ ' calendar.getCollection().each(function (model) { if (model.get("allDay")) { allDayEventCount++; } });'
+            ~ ' var suggestedContentHeight = Math.round(calendar.getCalendarElement().width() * 0.5);'
+            ~ ' var contentHeight = allDayEventCount < 5 ? suggestedContentHeight : (allDayEventCount * 20) + suggestedContentHeight;'
+            ~ ' calendar.getCalendarElement().fullCalendar("option", "contentHeight", contentHeight);'
+            ~ ' }'
+    } %}
+    {{ c.calendar_event_form_template('template-calendar-event-' ~ widgetId, event_form) }}
+    {{ c.renderCalendar('#' ~ calendarId, entity, startDate, endDate, calendar, eventsOptions) }}
+
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'oro/widget-manager'],
+        function($, _, widgetManager){
+            widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
+                widget.on('renderComplete', function(el) {
+                    widget.getAction('new-event', 'adopted', function(newEventAction) {
+                        newEventAction.on('click', function (e) {
+                            var currentDate = new Date();
+                            $('#{{ calendarId }}').data('calendar').select(currentDate, currentDate);
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block actions %}
+    {% set actions = [
+        {
+            'icon': 'plus-sign',
+            'label': 'oro.dashboard.calendar.new_event'|trans,
+            'data': {'action-name': 'new-event'}
+        },
+        {
+            'type': 'link',
+            'label': 'oro.dashboard.calendar.view_calendar'|trans,
+            'url': path('oro_calendar_view_default')
+        }
+    ] %}
+
+    {{ parent() }}
+{% endblock %}
+

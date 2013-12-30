@@ -4,8 +4,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Email Origin
@@ -14,6 +13,7 @@ use JMS\Serializer\Annotation\Exclude;
  * @ORM\Entity
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="name", type="string", length=30)
+ * @JMS\ExclusionPolicy("ALL")
  */
 abstract class EmailOrigin
 {
@@ -23,7 +23,8 @@ abstract class EmailOrigin
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Type("integer")
+     * @JMS\Type("integer")
+     * @JMS\Expose
      */
     protected $id;
 
@@ -31,7 +32,6 @@ abstract class EmailOrigin
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailFolder", mappedBy="origin", cascade={"persist", "remove"}, orphanRemoval=true)
-     * @Exclude
      */
     protected $folders;
 

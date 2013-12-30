@@ -13,21 +13,20 @@ function($, _, TagView) {
         tagsOverlayTemplate: _.template(
             '<div class="controls">' +
                 '<div class="well well-small">' +
-                    '<div id="tags-holder"></div>' +
+                    '<div class="tags-holder"></div>' +
                 '</div>' +
             '</div>'
         ),
 
         /** @property {Object} */
-        options: {
-            filter: null,
-            tagsOverlayId: '#tags-overlay',
+        options: _.extend({}, TagView.prototype.options, {
             autocompleteFieldId: null,
             fieldId: null,
             ownFieldId: null,
             unassign: false,
-            unassignGlobal: false
-        },
+            unassignGlobal: false,
+            tagOverlayId: null
+        }),
 
         /**
          * Initialize widget
@@ -54,14 +53,19 @@ function($, _, TagView) {
                 throw new TypeError("'ownFieldId' is required");
             }
 
+            this.$tagOverlayId = $(this.options.tagOverlayId);
+            this._renderOverlay();
+
             TagView.prototype.initialize.apply(this, arguments);
 
-            this._renderOverlay();
             this._prepareCollections();
-            this.listenTo(this.getCollection(), 'add', this.render);
-            this.listenTo(this.getCollection(), 'add', this._updateHiddenInputs);
-            this.listenTo(this.getCollection(), 'remove', this.render);
-            this.listenTo(this.getCollection(), 'remove', this._updateHiddenInputs);
+
+            var onCollectionChange = _.bind(function() {
+                this.render();
+                this._updateHiddenInputs();
+            }, this);
+            this.listenTo(this.getCollection(), 'add', onCollectionChange);
+            this.listenTo(this.getCollection(), 'remove', onCollectionChange);
 
             $(this.options.autocompleteFieldId).on('change', _.bind(this._addItem, this));
         },
@@ -73,19 +77,18 @@ function($, _, TagView) {
          */
         render: function() {
             TagView.prototype.render.apply(this, arguments);
+            var _this = this;
 
             if ((this.options.filter === 'owner' && this.options.unassign) ||
                 (this.options.filter !== 'owner' && this.options.unassignGlobal)) {
-                $(this.options.tagsOverlayId).find('span.label').each(function(i, el) {
+                this.$tagsHolder.find('span.label').each(function(i, el) {
                     var $el = $(el);
 
-                    $el.append($('<span class="select2-search-choice-close"></span>'));
+                    var closeSpan = $('<span class="select2-search-choice-close"/>');
+                    closeSpan.click(_.bind(_this._removeItem, _this));
+                    $el.append(closeSpan);
                     $el.addClass('with-button');
                 });
-
-                $(this.options.tagsOverlayId)
-                    .find('span.label .select2-search-choice-close')
-                    .click(_.bind(this._removeItem, this));
             }
         },
 
@@ -133,7 +136,7 @@ function($, _, TagView) {
          * @private
          */
         _renderOverlay: function() {
-            $(this.options.tagsOverlayId).append(this.tagsOverlayTemplate());
+            this.$tagOverlayId.append(this.tagsOverlayTemplate());
             return this;
         },
 

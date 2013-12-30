@@ -1,17 +1,17 @@
 oro_importexport:
-    label: General import/action operations
+    label: oro.importexport.action.general
     type: action
     group_name: ""
     bindings: ~
 
 oro_importexport_import:
-    label: Import entities
+    label: oro.importexport.action.import
     type: action
     group_name: ""
     bindings: ~
 
 oro_importexport_export:
-    label: Export entities
+    label: oro.importexport.action.export
     type: action
     group_name: ""
     bindings: ~

@@ -99,7 +99,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
             ->method('doExecute')
             ->will($this->throwException($exception));
 
-        $this->job->addStep($mockStep);
+        $this->job->addStep('name', $mockStep);
 
         $this->job->execute($jobExecution);
 
@@ -139,7 +139,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $step->setJobRepository($this->jobRepository);
 
         $this->job->setJobRepository($this->jobRepository);
-        $this->job->addStep($step);
+        $this->job->addStep('name', $step);
         $this->job->execute($jobExecution);
 
         $this->assertEquals(BatchStatus::STOPPED, $jobExecution->getStatus()->getValue(), 'Batch status stopped');
@@ -165,7 +165,7 @@ class JobTest extends \PHPUnit_Framework_TestCase
         $step->setJobRepository($this->jobRepository);
 
         $this->job->setJobRepository($this->jobRepository);
-        $this->job->addStep($step);
+        $this->job->addStep('name', $step);
         $this->job->execute($jobExecution);
 
         $this->assertEquals(BatchStatus::FAILED, $jobExecution->getStatus()->getValue(), 'Batch status stopped');
@@ -187,95 +187,49 @@ class JobTest extends \PHPUnit_Framework_TestCase
 
     public function testGetConfiguration()
     {
-        $reader    = $this->getReaderMock(array('reader_foo' => 'bar'), array('reader_foo'));
-        $processor = $this->getProcessorMock(array('processor_foo' => 'bar'), array('processor_foo'));
-        $writer    = $this->getWriterMock(array('writer_foo' => 'bar'), array('writer_foo'));
+        $expectedConfiguration = array(
+            'reader_foo' => 'bar',
+            'processor_foo' => 'bar',
+            'writer_foo' => 'bar',
+        );
+        $reader    = $this->getReaderMock($expectedConfiguration, array('reader_foo'));
+        $processor = $this->getProcessorMock($expectedConfiguration, array('processor_foo'));
+        $writer    = $this->getWriterMock($expectedConfiguration, array('writer_foo'));
 
         $step = $this->getItemStep('export', $reader, $processor, $writer);
 
-        $this->job->addStep($step);
-        $expectedConfiguration = array(
-            'export' => array(
-                'reader' => array(
-                    'reader_foo' => 'bar'
-                ),
-                'processor' => array(
-                    'processor_foo' => 'bar'
-                ),
-                'writer' => array(
-                    'writer_foo' => 'bar'
-                )
-            )
-        );
+        $this->job->addStep('name', $step);
 
         $this->assertEquals($expectedConfiguration, $this->job->getConfiguration());
     }
 
     public function testSetConfiguration()
     {
+        $config =array(
+            'reader_foo' => 'reader_bar',
+            'processor_foo' => 'processor_bar',
+            'writer_foo' => 'writer_bar',
+        );
+
         $reader    = $this->getReaderMock(array(), array('reader_foo'));
         $processor = $this->getProcessorMock(array(), array('processor_foo'));
         $writer    = $this->getWriterMock(array(), array('writer_foo'));
 
         $reader->expects($this->once())
             ->method('setConfiguration')
-            ->with(array('reader_foo' => 'reader_bar'));
+            ->with($config);
 
         $processor->expects($this->once())
             ->method('setConfiguration')
-            ->with(array('processor_foo' => 'processor_bar'));
+            ->with($config);
 
         $writer->expects($this->once())
             ->method('setConfiguration')
-            ->with(array('writer_foo' => 'writer_bar'));
+            ->with($config);
 
         $itemStep = $this->getItemStep('export', $reader, $processor, $writer);
-        $this->job->addStep($itemStep);
-        $this->job->setConfiguration(
-            array(
-                'export' => array(
-                    'reader' => array(
-                        'reader_foo' => 'reader_bar',
-                    ),
-                    'processor' => array(
-                        'processor_foo' => 'processor_bar',
-                    ),
-                    'writer' => array(
-                        'writer_foo' => 'writer_bar',
-                    )
-                )
-            )
-        );
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testSetConfigurationWithDifferentSteps()
-    {
-        $reader    = $this->getReaderMock(array(), array('reader_foo'));
-        $processor = $this->getProcessorMock(array(), array('processor_foo'));
-        $writer    = $this->getWriterMock(array(), array('writer_foo'));
-
-        $step = $this->getItemStep('export', $reader, $processor, $writer);
-
-        $this->job->addStep($step);
-        $this->job->setConfiguration(
-            array(
-                'unknown' => array(),
-                'export' => array(
-                    'reader' => array(
-                        'reader_foo' => 'reader_bar',
-                    ),
-                    'processor' => array(
-                        'processor_foo' => 'processor_bar',
-                    ),
-                    'writer' => array(
-                        'writer_foo' => 'writer_bar',
-                    )
-                )
-            )
-        );
+        $this->job->addStep('name', $itemStep);
+        $this->job->setConfiguration($config);
     }
 
     public function testAddStep()
@@ -289,10 +243,10 @@ class JobTest extends \PHPUnit_Framework_TestCase
             array('my_mock_step2')
         );
 
-        $this->job->addStep($mockStep1);
-        $this->job->addStep($mockStep2);
+        $this->job->addStep('name1', $mockStep1);
+        $this->job->addStep('name2', $mockStep2);
 
-        $this->assertEquals(array( $mockStep1, $mockStep2), $this->job->getSteps());
+        $this->assertEquals(array($mockStep1, $mockStep2), $this->job->getSteps());
     }
 
     public function testSetSteps()

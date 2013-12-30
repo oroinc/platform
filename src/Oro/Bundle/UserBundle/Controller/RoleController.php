@@ -49,42 +49,6 @@ class RoleController extends Controller
     }
 
     /**
-     * Get grid users data
-     *
-     * @Route(
-     *      "/grid/{id}",
-     *      name="oro_user_role_user_grid",
-     *      requirements={"id"="\d+"},
-     *      defaults={"id"=0, "_format"="json"}
-     * )
-     * @AclAncestor("oro_user_user_view")
-     */
-    public function gridDataAction(Role $entity = null)
-    {
-        if (!$entity) {
-            $entity = new Role();
-        }
-
-        $datagridView = $this->getRoleUserDatagridManager($entity)->getDatagrid()->createView();
-
-        return $this->get('oro_grid.renderer')->renderResultsJsonResponse($datagridView);
-    }
-
-    /**
-     * @param  Role                    $role
-     * @return RoleUserDatagridManager
-     */
-    protected function getRoleUserDatagridManager(Role $role)
-    {
-        /** @var $result RoleUserDatagridManager */
-        $result = $this->get('oro_user.role_user_datagrid_manager');
-        $result->setRole($role);
-        $result->getRouteGenerator()->setRouteParameters(array('id' => $role->getId()));
-
-        return $result;
-    }
-
-    /**
      * @Route(
      *      "/{_format}",
      *      name="oro_user_role_index",

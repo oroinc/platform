@@ -1,6 +1,7 @@
+/*jshint devel: true, multistr: true*/
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/multiselect-decorator'],
-function($, _, Backbone, mediator, MultiselectDecorator) {
+define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/multiselect-decorator', 'oro/app'],
+function($, _, Backbone, mediator, MultiselectDecorator, app) {
     'use strict';
 
     /**
@@ -23,33 +24,14 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
         filters: {},
 
         /**
-         * Container tag name
-         *
-         * @property
+         * Template selector
          */
-        tagName: 'div',
+        templateSelector: '#filter-container',
 
         /**
-         * Container classes
-         *
-         * @property
+         * Template
          */
-        className: 'filter-box oro-clearfix-width',
-
-        /**
-         * Filter list template
-         *
-         * @property
-         */
-        addButtonTemplate: _.template(
-            '<select id="add-filter-select" multiple>' +
-                '<% _.each(filters, function (filter, name) { %>' +
-                    '<option value="<%= name %>" <% if (filter.enabled) { %>selected<% } %>>' +
-                        '<%= filter.label %>' +
-                    '</option>' +
-                '<% }); %>' +
-            '</select>'
-        ),
+        template: null,
 
         /**
          * Filter list input selector
@@ -81,7 +63,9 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
 
         /** @property */
         events: {
-            'change #add-filter-select': '_onChangeFilterSelect'
+            'change #add-filter-select': '_onChangeFilterSelect',
+            'click #reset-filter-button': '_onReset',
+            'click a.dropdown-toggle': '_onDropdownToggle'
         },
 
         /**
@@ -91,8 +75,9 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
          * @param {Object} [options.filters]
          * @param {String} [options.addButtonHint]
          */
-        initialize: function(options)
-        {
+        initialize: function (options) {
+            this.template = _.template($(this.templateSelector).html());
+
             if (options.filters) {
                 this.filters = options.filters;
             }
@@ -115,6 +100,10 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
                     this.stopListening(filter, "disable", this._onFilterDisabled);
                 }, this);
             }, this);
+
+            if (app.isMobile()) {
+                this.collection.on('beforeFetch', this.closeDropdown, this);
+            }
         },
 
         /**
@@ -257,7 +246,9 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
+            var $container = $(this.template({ filters: this.filters }));
+            this.setElement($container);
+
             var fragment = document.createDocumentFragment();
 
             _.each(this.filters, function(filter) {
@@ -271,10 +262,9 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
             this.trigger("rendered");
 
             if (_.isEmpty(this.filters)) {
-                this.$el.hide();
+                $container.hide();
             } else {
-                this.$el.append(this.addButtonTemplate({filters: this.filters}));
-                this.$el.append(fragment);
+                $container.find('.filter-container').append(fragment);
                 this._initializeSelectWidget();
             }
 
@@ -358,6 +348,31 @@ function($, _, Backbone, mediator, MultiselectDecorator) {
                 top: buttonPosition.top + button.outerHeight(),
                 left: widgetLeftOffset
             });
+        },
+
+        /**
+         * Reset button click handler
+         */
+        _onReset: function () {
+            mediator.trigger('datagrid:doReset:' + this.collection.inputName);
+        },
+
+        /**
+         * Dropdown button toggle handler
+         * @param e
+         * @private
+         */
+        _onDropdownToggle: function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.$el.find('.dropdown').toggleClass('oro-open');
+        },
+
+        /**
+         * Close dropdown
+         */
+        closeDropdown: function () {
+            this.$el.find('.dropdown').removeClass('oro-open');
         }
     });
 });

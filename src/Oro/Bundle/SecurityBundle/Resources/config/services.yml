@@ -2,7 +2,6 @@ parameters:
     oro_security.security_facade.class:                        Oro\Bundle\SecurityBundle\SecurityFacade
     oro_security.acl.manager.class:                            Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager
     oro_security.acl.sid_manager.class:                        Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager
-    oro_security.acl.cache.class:                              Oro\Bundle\SecurityBundle\Acl\Cache\FilesystemCache
     oro_security.acl.ace_provider.class:                       Oro\Bundle\SecurityBundle\Acl\Persistence\AceManipulationHelper
     oro_security.acl.privilege_repository.class:               Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository
     oro_security.acl.extension_selector.class:                 Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
@@ -27,7 +26,6 @@ parameters:
     oro_security.action_metadata_provider.class:               Oro\Bundle\SecurityBundle\Metadata\ActionMetadataProvider
 
     oro_security.acl.annotation_provider.class:                Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider
-    oro_security.acl.annotation_provider.cache.class:          Doctrine\Common\Cache\FilesystemCache
     oro_security.acl.annotation_loader.class:                  Oro\Bundle\SecurityBundle\Annotation\Loader\AclAnnotationLoader
     oro_security.acl.yaml_config_loader.class:                 Oro\Bundle\SecurityBundle\Annotation\Loader\AclYamlConfigLoader
 
@@ -39,7 +37,6 @@ parameters:
     oro_security.entity_security_metadata_provider.cache.warmer.class:  Oro\Bundle\SecurityBundle\Cache\EntitySecurityMetadataCacheWarmer
     oro_security.entity_security_metadata_provider.cache.clearer.class: Oro\Bundle\SecurityBundle\Cache\EntitySecurityMetadataCacheClearer
 
-    oro_security.listener.config_subscriber.class:             Oro\Bundle\SecurityBundle\EventListener\ConfigSubscriber
     oro_security.listener.controller.class:                    Oro\Bundle\SecurityBundle\EventListener\ControllerListener
 
     oro_security.twig.security_extension:                      Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension
@@ -51,7 +48,6 @@ parameters:
     oro_security.acl_helper.class:                             Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper
     oro_security.orm.ownership_sql_walker_builder.class:       Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder
     oro_security.ownership_tree_provider.class:                Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider
-    oro_security.ownership_tree_provider.cache.class:          Doctrine\Common\Cache\FilesystemCache
     oro_security.ownership_tree.cache.warmer.class:            Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
     oro_security.ownership_tree.cache.clearer.class:           Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
@@ -69,13 +65,17 @@ services:
 
     oro_security.acl.manager:
         class: %oro_security.acl.manager.class%
-        scope: prototype
         arguments:
             - @oro_security.acl.object_identity_factory
             - @oro_security.acl.extension_selector
             - @?security.acl.dbal.provider
             - @oro_security.acl.ace_provider
-            - %oro_security.acl.privilege_repository.class%
+
+    oro_security.acl.privilege_repository:
+        class: %oro_security.acl.privilege_repository.class%
+        arguments:
+            - @oro_security.acl.manager
+            - @translator
 
     oro_security.acl.sid_manager:
         class: %oro_security.acl.sid_manager.class%
@@ -88,9 +88,9 @@ services:
 
     security.acl.cache.doctrine.cache_impl:
         public: false
-        class: %oro_security.acl.cache.class%
-        arguments:
-            - %kernel.cache_dir%/oro_acl
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_acl" ] ]
 
     oro_security.acl.ace_provider:
         public: false
@@ -194,7 +194,9 @@ services:
 
     oro_security.entity_security_metadata_provider.cache:
         public: false
-        parent: oro_security.owner.ownership_metadata_provider.cache
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_acl_entities.cache" ] ]
 
     oro_security.action_metadata_provider:
         public: false
@@ -205,7 +207,9 @@ services:
 
     oro_security.action_metadata_provider.cache:
         public: false
-        parent: oro_security.acl.annotation_provider.cache
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_acl_actions.cache" ] ]
 
     oro_security.acl.annotation_provider:
         class: %oro_security.acl.annotation_provider.class%
@@ -214,9 +218,9 @@ services:
 
     oro_security.acl.annotation_provider.cache:
         public: false
-        class: %oro_security.acl.annotation_provider.cache.class%
-        arguments:
-            - %kernel.cache_dir%/oro_acl_annotations
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_acl_annotations.cache" ] ]
 
     oro_security.acl.annotation_loader:
         public: false
@@ -291,11 +295,6 @@ services:
         tags:
             - { name: kernel.cache_clearer }
 
-    oro_security.listener.config_subscriber:
-        class: %oro_security.listener.config_subscriber.class%
-        tags:
-            - { name: kernel.event_subscriber}
-
     oro_security.listener.controller:
         class: %oro_security.listener.controller.class%
         arguments:
@@ -345,9 +344,9 @@ services:
 
     oro_security.ownership_tree_provider.cache:
         public: false
-        class: %oro_security.ownership_tree_provider.cache.class%
-        arguments:
-           - %kernel.cache_dir%/oro_acl_owner_tree
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_acl_owner_tree.cache" ] ]
 
     oro_security.ownership_tree.cache.warmer:
         public: false

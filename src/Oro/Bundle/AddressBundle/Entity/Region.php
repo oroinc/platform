@@ -4,11 +4,13 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 
-use Oro\Bundle\AddressBundle\Entity\Country;
+use JMS\Serializer\Annotation as JMS;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Region
@@ -18,6 +20,8 @@ use Oro\Bundle\AddressBundle\Entity\Country;
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
+ * @Config()
+ * @JMS\ExclusionPolicy("ALL")
  */
 class Region implements Translatable
 {
@@ -26,16 +30,20 @@ class Region implements Translatable
      *
      * @ORM\Id
      * @ORM\Column(name="combined_code", type="string", length=16)
-     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     * @JMS\SerializedName("combinedCode")
+     * @JMS\Expose
      */
     protected $combinedCode;
 
     /**
-     * @var string
+     * @var Country
      *
      * @ORM\ManyToOne(targetEntity="Country", inversedBy="regions", cascade={"persist"})
      * @ORM\JoinColumn(name="country_code", referencedColumnName="iso2_code")
-     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     * @JMS\Accessor(getter="getCountryIso2Code")
+     * @JMS\Expose
      */
     protected $country;
 
@@ -43,7 +51,8 @@ class Region implements Translatable
      * @var string
      *
      * @ORM\Column(name="code", type="string", length=32)
-     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $code;
 
@@ -51,8 +60,9 @@ class Region implements Translatable
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @Soap\ComplexType("string", nillable=true)
      * @Gedmo\Translatable
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $name;
 
@@ -67,6 +77,17 @@ class Region implements Translatable
     public function __construct($combinedCode)
     {
         $this->combinedCode = $combinedCode;
+    }
+
+    /**
+     * @param string $combinedCode
+     * @return $this
+     */
+    public function setCombinedCode($combinedCode)
+    {
+        $this->combinedCode = $combinedCode;
+
+        return $this;
     }
 
     /**
@@ -100,6 +121,16 @@ class Region implements Translatable
     public function getCountry()
     {
         return $this->country;
+    }
+
+    /**
+     * Get country ISO2 code
+     *
+     * @return Country
+     */
+    public function getCountryIso2Code()
+    {
+        return $this->country ? $this->country->getIso2Code() : null;
     }
 
     /**

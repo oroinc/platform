@@ -39,6 +39,7 @@ class RegionType extends AbstractType
         $resolver
             ->setDefaults(
                 array(
+                    'label'         => 'oro.address.region.entity_label',
                     'class'         => 'OroAddressBundle:Region',
                     'property'      => 'name',
                     'query_builder' => null,
@@ -46,7 +47,7 @@ class RegionType extends AbstractType
                     'country'       => null,
                     'country_field' => null,
                     'configs' => array(
-                        'placeholder' => 'oro.address.form.choose_state',
+                        'placeholder' => 'oro.address.form.choose_region',
                     ),
                     'empty_value' => '',
                     'empty_data'  => null

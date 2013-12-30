@@ -13,6 +13,7 @@ class ConfigManager
 {
     const SECTION_VIEW_SEPARATOR  = '___';
     const SECTION_MODEL_SEPARATOR = '.';
+    const SCOPE_NAME = 'app';
 
     /**
      * @var ObjectManager
@@ -32,14 +33,19 @@ class ConfigManager
     protected $storedSettings = array();
 
     /**
-     *
-     * @param ObjectManager $om
-     * @param array         $settings
+     * @var array
      */
-    public function __construct(ObjectManager $om, $settings = array())
+    protected $changedSettings = array();
+
+    /**
+     *
+     * @param ObjectManager       $om
+     * @param ConfigDefinitionImmutableBag $configDefinition
+     */
+    public function __construct(ObjectManager $om, ConfigDefinitionImmutableBag $configDefinition)
     {
         $this->om       = $om;
-        $this->settings = $settings;
+        $this->settings = $configDefinition->all();
     }
 
     /**
@@ -48,7 +54,7 @@ class ConfigManager
      * @param  string $name Setting name, for example "oro_user.level"
      * @param bool $default
      * @param bool $full
-     * @return mixed
+     * @return array|string
      */
     public function get($name, $default = false, $full = false)
     {
@@ -74,6 +80,60 @@ class ConfigManager
             $setting = $settings[$section][$key];
 
             return is_array($setting) && !$full ? $setting['value'] : $setting;
+        }
+    }
+
+    /**
+     * Set setting value. To save changes in a database you need to call flush method
+     *
+     * @param string $name Setting name, for example "oro_user.level"
+     * @param mixed $value Setting value
+     */
+    public function set($name, $value)
+    {
+        $entity = $this->getScopedEntityName();
+        $entityId = $this->getScopeId();
+        $this->loadStoredSettings($entity, $entityId);
+
+        $pair = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $section = $pair[0];
+        $key = $pair[1];
+
+        $this->storedSettings[$entity][$entityId][$section][$key] = $value;
+
+        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
+        $this->changedSettings[$changeKey] = ['value' => $value];
+    }
+
+    /**
+     * Reset setting value to default. To save changes in a database you need to call flush method
+     *
+     * @param string $name Setting name, for example "oro_user.level"
+     */
+    public function reset($name)
+    {
+        $entity = $this->getScopedEntityName();
+        $entityId = $this->getScopeId();
+        $this->loadStoredSettings($entity, $entityId);
+
+        $pair = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $section = $pair[0];
+        $key = $pair[1];
+
+        unset($this->storedSettings[$entity][$entityId][$section][$key]);
+
+        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
+        $this->changedSettings[$changeKey] = ['use_parent_scope_value' => true];
+    }
+
+    /**
+     * Save changes made with set or reset methods in a database
+     */
+    public function flush()
+    {
+        if (!empty($this->changedSettings)) {
+            $this->save($this->changedSettings);
+            $this->changedSettings = array();
         }
     }
 
@@ -149,9 +209,10 @@ class ConfigManager
     }
 
     /**
-     * @param $entity
-     * @param $entityId
-     * @param null $section
+     * @param string      $entity
+     * @param int         $entityId
+     * @param null|string $section
+     *
      * @return bool
      */
     public function loadStoredSettings($entity, $entityId, $section = null)
@@ -160,9 +221,20 @@ class ConfigManager
             return false;
         }
 
-        $this->storedSettings[$entity][$entityId] = $this->om
+        $config = $this->om
             ->getRepository('OroConfigBundle:Config')
             ->loadSettings($entity, $entityId, $section);
+
+        // TODO: optimize it
+        // merge app settings with scope settings
+        if ($entity != static::SCOPE_NAME) {
+            $appConfig = $this->om
+                ->getRepository('OroConfigBundle:Config')
+                ->loadSettings(static::SCOPE_NAME, 0, $section);
+            $config = array_merge($appConfig, $config);
+        }
+
+        $this->storedSettings[$entity][$entityId] = $config;
 
         return true;
     }
@@ -198,7 +270,7 @@ class ConfigManager
      */
     public function getScopedEntityName()
     {
-        return 'app';
+        return static::SCOPE_NAME;
     }
 
     /**

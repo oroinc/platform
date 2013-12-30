@@ -12,15 +12,15 @@ define(['underscore', 'backbone', 'oro/mediator', 'oro/translator'],
         _.extend(formState.prototype, {
             UNLOAD_EVENT: 'beforeunload.configFormState',
             LOAD_EVENT: 'ready.configFormState',
-            FORM_SELECTOR: '.system-configuration-container form:first',
             CONFIRMATION_MESSAGE: __('You have unsaved changes, are you sure that you want to leave?'),
 
             data: null,
-
+            form: null,
 
             initialize: function () {
                 mediator.once('hash_navigation_request:start', this._onDestroyHandler, this);
 
+                this.form = $('.system-configuration-container').parents('form');
                 $(window).on(this.LOAD_EVENT, _.bind(this._collectHandler, this));
                 this._collectHandler();
 
@@ -51,12 +51,10 @@ define(['underscore', 'backbone', 'oro/mediator', 'oro/translator'],
              * @returns {*}
              */
             getState: function () {
-                var form = $(this.FORM_SELECTOR);
-
-                if (form.length) {
+                if (this.form.length) {
                     return JSON.stringify(
                         _.reject(
-                            $(this.FORM_SELECTOR).serializeArray(),
+                            this.form.serializeArray(),
                             function (el) {
                                 return el.name == 'input_action';
                             }

@@ -1,0 +1,32 @@
+oro:
+    integration:
+        datagrid:
+            column:
+                name: Name
+                type: Type
+            action:
+                update: Update
+                delete: Delete
+
+        controller:
+            channel:
+                message:
+                    saved: Channel succesfully saved
+
+        channel_type:
+            simple:
+                label: Simple
+
+        transport:
+            simple: Simple
+
+        channel:
+            entity_label:        Channel
+            entity_plural_label: Channels
+            entity_description:  Represent channel
+            id.label:         Id
+            type.label:       Type
+            transport.label:  Transport type
+            statuses.label:   Statuses
+            name.label:       Name
+            connectors.label: Connectors
