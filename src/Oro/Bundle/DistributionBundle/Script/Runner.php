@@ -23,13 +23,20 @@ class Runner
     protected $applicationRootDir;
 
     /**
+     * @var string
+     */
+    protected $environment;
+
+    /**
      * @param InstallationManager $installationManager
      * @param string $applicationRootDir
+     * @param string $environment
      */
-    public function __construct(InstallationManager $installationManager, $applicationRootDir)
+    public function __construct(InstallationManager $installationManager, $applicationRootDir, $environment)
     {
         $this->installationManager = $installationManager;
         $this->applicationRootDir = realpath($applicationRootDir);
+        $this->environment = $environment;
     }
 
     /**
@@ -70,8 +77,10 @@ class Runner
             }
         }
         if (!$output) {
+
             return null;
         }
+
         return implode(PHP_EOL, $output);
     }
 
@@ -82,7 +91,7 @@ class Runner
     public function runPlatformUpdate()
     {
         $phpPath = $this->getPhpExecutablePath();
-        $command = sprintf('%s app/console oro:platform:update --env=prod', $phpPath);
+        $command = sprintf('%s app/console oro:platform:update --env=%s', $phpPath, $this->environment);
 
         return $this->runCommand($command);
     }
@@ -121,7 +130,7 @@ class Runner
         foreach ($packages as $package) {
             $paths[] = $this->installationManager->getInstallPath($package);
         }
-        $commandPrefix = sprintf('%s app/console oro:package:fixtures:load --env=prod ', $phpPath);
+        $commandPrefix = sprintf('%s app/console oro:package:fixtures:load --env=%s', $phpPath, $this->environment);
         $commands = $this->makeCommands($paths, $commandPrefix);
         $output = '';
         foreach ($commands as $command) {
@@ -165,7 +174,7 @@ class Runner
     {
         if (file_exists($path)) {
             $phpPath = $this->getPhpExecutablePath();
-            $command = sprintf('%s app/console oro:platform:run-script --env=prod %s', $phpPath, $path);
+            $command = sprintf('%s app/console oro:platform:run-script --env=%s %s', $phpPath, $this->environment, $path);
 
             return $this->runCommand($command);
         }

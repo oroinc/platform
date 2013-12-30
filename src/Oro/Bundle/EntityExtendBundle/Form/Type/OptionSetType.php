@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class OptionSetType extends AbstractType
@@ -38,6 +41,21 @@ class OptionSetType extends AbstractType
                     'required' => false,
                 ]
             );
+
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            array($this, 'postSubmit')
+        );
+    }
+
+    public function postSubmit(FormEvent $event)
+    {
+        $data = $event->getData();
+        if (is_null($data->getLabel())) {
+            $event->getForm()->get('label')->addError(
+                new FormError('This value should not be blank.')
+            );
+        }
     }
 
     /**
