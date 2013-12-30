@@ -38,7 +38,26 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new NavigationListener($security);
 
         $security->expects($this->never())
+            ->method('getToken');
+        $security->expects($this->never())
             ->method('isGranted');
+        $listener->onNavigationConfigure($this->createEventMock());
+    }
+
+    /**
+     * @test
+     */
+    public function shouldDoNotAddMenuItemIfNoLoggedInUser()
+    {
+        $security = $this->createSecurityContextMock();
+
+        $security->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(null));
+        $security->expects($this->never())
+            ->method('isGranted');
+
+        $listener = new NavigationListener($security, '/install.php');
         $listener->onNavigationConfigure($this->createEventMock());
     }
 
@@ -49,6 +68,9 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $security = $this->createSecurityContextMock();
 
+        $security->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(true));
         $security->expects($this->once())
             ->method('isGranted')
             ->with('ROLE_ADMINISTRATOR')
@@ -66,6 +88,9 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $security = $this->createSecurityContextMock();
         $listener = new NavigationListener($security, '/install.php');
 
+        $security->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(true));
         $security->expects($this->once())
             ->method('isGranted')
             ->will($this->returnValue(true));
@@ -93,6 +118,9 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $security = $this->createSecurityContextMock();
         $listener = new NavigationListener($security, $entryPoint = '/install.php');
 
+        $security->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue(true));
         $security->expects($this->once())
             ->method('isGranted')
             ->will($this->returnValue(true));

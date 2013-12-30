@@ -34,6 +34,7 @@ class NavigationListener
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->entryPoint
+            || !$this->securityContext->getToken()
             || !$this->securityContext->isGranted('ROLE_ADMINISTRATOR')
         ) {
             return;
