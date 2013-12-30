@@ -26,4 +26,13 @@ oro:
             view_cloud: "View tag cloud"
 
         tagging:
-            entity_label: Tagging
+            entity_label:        Tagging
+            entity_plural_label: Taggings
+            entity_description:  Represent tagging
+            alias.label:       Alias
+            created.label:     Created
+            entity_name.label: Entity name
+            id.label:          Id
+            owner.label:       Owner
+            record_id.label:   Record
+            tag.label:         Tag
