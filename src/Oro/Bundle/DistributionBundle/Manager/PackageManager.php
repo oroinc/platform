@@ -13,9 +13,9 @@ use Composer\Package\PackageInterface;
 use Composer\Package\Version\VersionParser;
 use Composer\Repository\ComposerRepository;
 use Composer\Repository\CompositeRepository;
-use Composer\Repository\PackageRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
@@ -85,8 +85,6 @@ class PackageManager
      */
     public function getInstalled()
     {
-        $packages = [];
-
         $notificationUrl = new \ReflectionProperty('Composer\Package\Package', 'notificationUrl');
         $notificationUrl->setAccessible(true);
 
