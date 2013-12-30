@@ -164,11 +164,11 @@ class RunnerTest extends WebTestCase
         $runner = $this->createRunner($package, $targetDir);
         $expectedRunnerOutput = $this->formatExpectedResult(
             'Simple migration 2 script',
-            $targetDir . '/update_2.php',
+            $targetDir . DIRECTORY_SEPARATOR . 'update_2.php',
             'update 2'
         ) . PHP_EOL . $this->formatExpectedResult(
             'Simple migration 3 script',
-            $targetDir . '/update_3.php',
+            $targetDir . DIRECTORY_SEPARATOR . 'update_3.php',
             'update 3'
         );
 
@@ -185,11 +185,11 @@ class RunnerTest extends WebTestCase
         $runner = $this->createRunner($package, $targetDir);
         $expectedRunnerOutput = $this->formatExpectedResult(
             'Complex migration 0_1_9_1 script',
-            $targetDir . '/update_0.1.9.1.php',
+            $targetDir . DIRECTORY_SEPARATOR . 'update_0.1.9.1.php',
             'update 0.1.9.1'
         ) . PHP_EOL . $this->formatExpectedResult(
             'Complex migration 0_1_10 script',
-            $targetDir . '/update_0.1.10.php',
+            $targetDir . DIRECTORY_SEPARATOR . 'update_0.1.10.php',
             'update 0.1.10'
         );
 
