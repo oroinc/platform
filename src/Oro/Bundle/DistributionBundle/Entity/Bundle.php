@@ -28,7 +28,7 @@ class Bundle
     /**
      * @var string[]
      */
-    protected $dependencies = [];
+    protected $dependencies = array();
 
     /**
      * @param string[] $dependencies

@@ -87,13 +87,13 @@ class RoleController extends SoapController
     /**
      * {@inheritdoc}
      */
-    protected function fixFormData(array $data, $entity)
+    protected function fixFormData(array &$data, $entity)
     {
-        $result = parent::fixFormData($data, $entity);
+        parent::fixFormData($data, $entity);
 
-        unset($result['role']);
+        unset($data['role']);
 
-        return $result;
+        return true;
     }
 
     /**

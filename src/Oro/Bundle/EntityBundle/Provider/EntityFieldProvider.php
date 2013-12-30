@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class EntityFieldProvider
 {
@@ -70,7 +71,7 @@ class EntityFieldProvider
      * @param bool $withEntityDetails      Indicates whether details of related entity should be returned as well.
      * @param int $deepLevel               The maximum deep level of related entities.
      * @param bool $lastDeepLevelRelations The maximum deep level of related entities.
-     * @param bool $translate              Flag means that label, plurel lable should be translated
+     * @param bool $translate              Flag means that label, plural label should be translated
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
@@ -195,13 +196,18 @@ class EntityFieldProvider
                 if ($this->entityConfigProvider->hasConfig($targetClassName)) {
                     $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
                     $targetMetadata  = $em->getClassMetadata($targetClassName);
+
+                    $fieldLabel = $this->getFieldLabel($className, $associationName);
+                    $relationData = array(
+                        'name' => $associationName,
+                        'type' => $targetMetadata->getTypeOfField($targetFieldName),
+                        'label' => $translate ? $this->translator->trans($fieldLabel) : $fieldLabel,
+                        'relation_type' => $this->getRelationType($className, $associationName),
+                        'related_entity_name' => $targetClassName
+                    );
                     $this->addRelation(
                         $result,
-                        $associationName,
-                        $targetMetadata->getTypeOfField($targetFieldName),
-                        $this->getFieldLabel($className, $associationName),
-                        $this->getRelationType($className, $associationName),
-                        $targetClassName,
+                        $relationData,
                         $withEntityDetails,
                         $relationDeepLevel,
                         $lastDeepLevelRelations,
@@ -215,12 +221,8 @@ class EntityFieldProvider
     /**
      * Adds a relation to $result
      *
-     * @param array  $result
-     * @param string $name
-     * @param string $type
-     * @param string $label
-     * @param string $relationType
-     * @param string $relatedEntityName
+     * @param array $result
+     * @param array $relation
      * @param bool   $withEntityDetails
      * @param int    $relationDeepLevel
      * @param bool   $lastDeepLevelRelations
@@ -228,23 +230,14 @@ class EntityFieldProvider
      */
     protected function addRelation(
         array &$result,
-        $name,
-        $type,
-        $label,
-        $relationType,
-        $relatedEntityName,
+        array $relation,
         $withEntityDetails,
         $relationDeepLevel,
         $lastDeepLevelRelations,
         $translate
     ) {
-        $relation = array(
-            'name'                => $name,
-            'type'                => $type,
-            'label'               => $translate ? $this->translator->trans($label) : $label,
-            'relation_type'       => $relationType,
-            'related_entity_name' => $relatedEntityName
-        );
+        $name = $relation['name'];
+        $relatedEntityName = $relation['related_entity_name'];
         if ($withEntityDetails) {
             $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
             foreach ($entity as $key => $val) {
@@ -321,7 +314,9 @@ class EntityFieldProvider
     protected function getRelationType($className, $fieldName)
     {
         if ($this->entityConfigProvider->hasConfig($className, $fieldName)) {
-            return $this->entityConfigProvider->getConfig($className, $fieldName)->getId()->getFieldType();
+            /** @var FieldConfigId $configId */
+            $configId = $this->entityConfigProvider->getConfig($className, $fieldName)->getId();
+            return $configId->getFieldType();
         }
 
         return '';

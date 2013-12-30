@@ -52,7 +52,7 @@ class PackageManager
     /**
      * @var array
      */
-    protected $constantPackages = ['oro/platform', 'oro/platform-dist'];
+    protected $constantPackages = array('oro/platform', 'oro/platform-dist');
 
     /**
      * @var Pool
@@ -232,7 +232,7 @@ class PackageManager
         return array_reduce(
             $nonPlatformLinks,
             function (array $requirements, Link $link) use ($installedPackages) {
-                $name           = $link->getTarget();
+                $name = $link->getTarget();
                 $requirements[] = new PackageRequirement($name, in_array($name, $installedPackages));
                 return $requirements;
             },
@@ -532,7 +532,7 @@ class PackageManager
     /**
      * @param array $require
      */
-    protected function updateRootPackage(array $require = [])
+    protected function updateRootPackage(array $require = array())
     {
         $rootPackage = $this->composer->getPackage();
         $rootPackage->setRequires(
