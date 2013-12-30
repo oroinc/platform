@@ -104,7 +104,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
             'breadcrumb_menu' => array(
                 'value' => 'application_menu',
                 'scope' => 'app'
-            )
+            ),
+            'resolved'  => true,
         );
         $defaultItemParameters = array(
             'translateParameters' => array(),

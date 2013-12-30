@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\DataFixtures\ORM;
 
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Finder\Finder;
+
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -164,8 +164,8 @@ class LoadCountryData extends AbstractTranslatableEntityFixture
                     }
                 }
             }
-
         }
+        
         $manager->flush();
         $manager->clear();
     }
