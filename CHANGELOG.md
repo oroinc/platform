@@ -1,3 +1,20 @@
+CHANGELOG for 1.0.0-rc1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-rc1 versions.
+
+* 1.0.0-rc1 (2013-12-30)
+ * Table reports creation wizard
+ * Manageable labels of entities and entity fields
+ * Record updates notification
+ * Sidebars widgets
+ * Mobile Web
+ * Package Definition and Management
+ * Themes
+ * Notifications for owners
+ * --force option for oro:install
+ * Remove old Grid bundle
+ * Basic dashboards
+
 CHANGELOG for 1.0.0-beta5
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-beta5 versions.
