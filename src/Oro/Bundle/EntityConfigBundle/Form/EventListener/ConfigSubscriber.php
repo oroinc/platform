@@ -136,7 +136,9 @@ class ConfigSubscriber implements EventSubscriberInterface
                             ->getConfig($className, $fieldName)
                             ->get($code);
 
-                        if ($event->getForm()->isValid() && $value != $this->translator->trans($config->get($code))) {
+                        if ($event->getForm()->get($scope)->get($code)->isValid()
+                            && $value
+                            && $value != $this->translator->trans($config->get($code))) {
                             $locale = $this->translator->getLocale();
                             // save into translation table
                             $this->saveTranslationValue($key, $value, $locale);
