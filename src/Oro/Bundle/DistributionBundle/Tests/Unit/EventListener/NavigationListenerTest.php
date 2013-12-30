@@ -24,7 +24,8 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     public function couldBeConstructedWithEntryPoint()
     {
         new NavigationListener(
-            $this->createSecurityFacadeMock(), $entryPoint = '/install.php'
+            $this->createSecurityFacadeMock(),
+            $entryPoint = '/install.php'
         );
     }
 
@@ -46,6 +47,10 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
         $listener = new NavigationListener($security, '/install.php');
 
         $security->expects($this->once())
+            ->method('hasLoggedUser')
+            ->will($this->returnValue(true));
+
+        $security->expects($this->once())
             ->method('isGranted')
             ->with('ROLE_ADMINISTRATOR')
             ->will($this->returnValue(false));
@@ -60,6 +65,10 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $security = $this->createSecurityFacadeMock();
         $listener = new NavigationListener($security, '/install.php');
+
+        $security->expects($this->once())
+            ->method('hasLoggedUser')
+            ->will($this->returnValue(true));
 
         $security->expects($this->once())
             ->method('isGranted')
@@ -87,6 +96,10 @@ class NavigationListenerTest extends \PHPUnit_Framework_TestCase
     {
         $security = $this->createSecurityFacadeMock();
         $listener = new NavigationListener($security, $entryPoint = '/install.php');
+
+        $security->expects($this->once())
+            ->method('hasLoggedUser')
+            ->will($this->returnValue(true));
 
         $security->expects($this->once())
             ->method('isGranted')
