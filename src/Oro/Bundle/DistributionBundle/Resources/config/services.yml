@@ -67,7 +67,7 @@ services:
     oro_distribution.listener.navigation_listener:
         class: %oro_distribution.listener.navigation_listener.class%
         arguments:
-            - @oro_security.security_facade
+            - @security.context
             - %oro_distribution.entry_point%
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

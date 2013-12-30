@@ -3,15 +3,15 @@
 namespace Oro\Bundle\DistributionBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+use Symfony\Component\Security\Core\SecurityContext;
 
 class NavigationListener
 {
     /**
-     * @var \Oro\Bundle\SecurityBundle\SecurityFacade
+     * @var SecurityContext
      */
-    protected $securityFacade;
+    protected $securityContext;
 
     /**
      * @var string
@@ -19,12 +19,12 @@ class NavigationListener
     protected $entryPoint;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param SecurityContext $securityContext
      * @param null|string $entryPoint
      */
-    public function __construct(SecurityFacade $securityFacade, $entryPoint = null)
+    public function __construct(SecurityContext $securityContext, $entryPoint = null)
     {
-        $this->securityFacade = $securityFacade;
+        $this->securityContext = $securityContext;
         $this->entryPoint = $entryPoint;
     }
 
@@ -34,8 +34,7 @@ class NavigationListener
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         if (!$this->entryPoint
-            || !$this->securityFacade->hasLoggedUser()
-            || !$this->securityFacade->isGranted('ROLE_ADMINISTRATOR')
+            || !$this->securityContext->isGranted('ROLE_ADMINISTRATOR')
         ) {
             return;
         }
