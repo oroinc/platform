@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -16,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table("oro_business_unit")
  * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @Oro\Loggable
  * @Config(
  *  defaultValues={
  *      "ownership"={
@@ -45,6 +47,7 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @Oro\Versioned
      */
     protected $name;
 
@@ -60,6 +63,7 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="phone", type="string", length=100, nullable=true)
+     * @Oro\Versioned
      */
     protected $phone;
 
@@ -67,6 +71,7 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="website", type="string", length=255, nullable=true)
+     * @Oro\Versioned
      */
     protected $website;
 
@@ -74,6 +79,7 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255, nullable=true)
+     * @Oro\Versioned
      */
     protected $email;
 
@@ -81,6 +87,7 @@ class BusinessUnit implements NotificationEmailInterface
      * @var string
      *
      * @ORM\Column(name="fax", type="string", length=255, nullable=true)
+     * @Oro\Versioned
      */
     protected $fax;
 

@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -19,6 +20,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  *  }
  * )
+ * @Oro\Loggable()
  */
 class Channel
 {
@@ -35,6 +37,7 @@ class Channel
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @Oro\Versioned()
      */
     protected $name;
 
@@ -42,6 +45,7 @@ class Channel
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255)
+     * @Oro\Versioned()
      */
     protected $type;
 
@@ -57,6 +61,7 @@ class Channel
     /**
      * @var []
      * @ORM\Column(name="connectors", type="array")
+     * @Oro\Versioned()
      */
     protected $connectors;
 
