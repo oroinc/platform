@@ -1,3 +1,11 @@
-<li><a class="no-hash" href="{{ path(audit_path, {entity:entity, id:id}) }}"
-     id="view-activity-btn" title="{{ title }} - {{ 'Change History'|trans }}">{{ 'Change History'|trans }}</a></li>
+{% if entity is auditable and resource_granted('oro_dataaudit_history') %}
+    <li>
+        <a class="no-hash"
+           href="{{ path(audit_path, {entity:entity_class, id:id}) }}"
+           id="view-activity-btn"
+           title="{{ title }} - {{ 'Change History'|trans }}">
+            {{ 'Change History'|trans }}
+        </a>
+    </li>
+{% endif %}
 

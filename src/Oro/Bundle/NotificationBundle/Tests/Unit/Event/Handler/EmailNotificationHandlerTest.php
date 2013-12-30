@@ -24,9 +24,13 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
         $notifications = array($notification);
-        $notificationsForProcessor = array(new EmailNotificationAdapter($entity, $notification, $em));
+        $notificationsForProcessor = array(new EmailNotificationAdapter($entity, $notification, $em, $configProvider));
 
         $processor = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor')
             ->disableOriginalConstructor()
@@ -35,7 +39,7 @@ class EmailNotificationHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('process')
             ->with($this->identicalTo($entity), $this->equalTo($notificationsForProcessor));
 
-        $handler = new EmailNotificationHandler($processor, $em);
+        $handler = new EmailNotificationHandler($processor, $em, $configProvider);
         $handler->handle($event, $notifications);
     }
 }

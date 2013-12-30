@@ -10,6 +10,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Type;
 
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 
 class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
@@ -82,9 +83,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     {
         $configuration = new Configuration();
 
-        $this->markTestSkipped("TODO Fix");
-
-        $configuration->addEntityNamespace('Stub', 'Oro\Bundle\GridBundle\Tests\Unit\Datagrid\ORM\Stub');
+        $configuration->addEntityNamespace('Stub', 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub');
 
         $classMetadata = new ClassMetadata('Entity');
         $classMetadata->mapField(array('fieldName' => 'a', 'columnName' => 'a'));
@@ -127,8 +126,14 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
             ->method('getDatabasePlatform')
             ->will($this->returnValue($platform));
 
+        /** @var UnitOfWork $unitOfWork */
+        $unitOfWork = $this->getMockBuilder('UnitOfWork')
+            ->setMethods(array('getEntityPersister'))
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(array('getConfiguration', 'getClassMetadata', 'getConnection'))
+            ->setMethods(array('getConfiguration', 'getClassMetadata', 'getConnection', 'getUnitOfWork'))
             ->disableOriginalConstructor()
             ->getMock();
         $entityManager->expects($this->any())
@@ -140,6 +145,9 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
         $entityManager->expects($this->any())
             ->method('getConnection')
             ->will($this->returnValue($connection));
+        $entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
 
         return array($entityManager, $connection, $statement);
     }

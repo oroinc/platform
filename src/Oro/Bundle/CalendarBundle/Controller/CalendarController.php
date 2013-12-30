@@ -62,8 +62,7 @@ class CalendarController extends Controller
         /** @var CalendarDateTimeConfigProvider $calendarConfigProvider */
         $calendarConfigProvider = $this->get('oro_calendar.provider.calendar_config');
 
-        $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $dateRange = $calendarConfigProvider->getDateRange($currentDate);
+        $dateRange = $calendarConfigProvider->getDateRange();
 
         $result = array(
             'event_form' => $this->get('oro_calendar.calendar_event.form')->createView(),
@@ -76,8 +75,6 @@ class CalendarController extends Controller
                         'required' => true,
                         'configs'  => array(
                             'placeholder' => 'oro.calendar.form.choose_user_to_add_calendar',
-                            /* @todo: Must be removed. I have to do this because oro_user_select sets 400px */
-                            'width' => 'off'
                         )
                     )
                 )
@@ -87,7 +84,7 @@ class CalendarController extends Controller
                 'selectable' => $securityFacade->isGranted('oro_calendar_event_create'),
                 'editable' => $securityFacade->isGranted('oro_calendar_event_update'),
                 'removable' => $securityFacade->isGranted('oro_calendar_event_delete'),
-                'timezoneOffset' => $calendarConfigProvider->getTimezoneOffset($currentDate)
+                'timezoneOffset' => $calendarConfigProvider->getTimezoneOffset()
             ),
             'startDate' => $dateRange['startDate'],
             'endDate' => $dateRange['endDate'],

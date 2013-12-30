@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\NotificationBundle\Processor;
 
+use JMS\JobQueueBundle\Entity\Job;
+
 use Psr\Log\LoggerInterface;
+
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\HttpFoundation\ParameterBag;
+
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
@@ -28,26 +33,34 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     protected $env = 'prod';
 
     /**
+     * @var LocaleSettings
+     */
+    private $localeSettings;
+
+    /**
      * Constructor
      *
-     * @param EmailRenderer   $emailRenderer
-     * @param \Swift_Mailer   $mailer
-     * @param EntityManager   $em
-     * @param string          $sendFrom
-     * @param LoggerInterface $logger
+     * @param EmailRenderer                                 $emailRenderer
+     * @param \Swift_Mailer                                 $mailer
+     * @param EntityManager                                 $em
+     * @param string                                        $sendFrom
+     * @param LoggerInterface                               $logger
+     * @param LocaleSettings $localeSettings
      */
     public function __construct(
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
         EntityManager $em,
         $sendFrom,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        LocaleSettings $localeSettings
     ) {
         parent::__construct($logger, $em);
 
         $this->renderer = $emailRenderer;
         $this->mailer   = $mailer;
         $this->sendFrom = $sendFrom;
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -86,7 +99,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
-            $emailTemplate = $notification->getTemplate();
+            $emailTemplate = $notification->getTemplate($this->localeSettings->getLanguage());
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
@@ -121,6 +134,13 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $this->notify($params);
             $this->addJob(self::SEND_COMMAND);
         }
+
+        /**
+         * Usage of EntityManager->flush is not safe here, cause this can happen in
+         * event listener postUpdate, onFlush, etc
+         */
+        $this->getEntityPersister(AbstractNotificationProcessor::JOB_ENTITY)
+             ->executeInserts();
     }
 
     /**
@@ -145,6 +165,13 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $this->mailer->send($message);
         }
 
+        /**
+         * Usage of EntityManager->flush is not safe here, cause this can happen in
+         * event listener postUpdate, onFlush, etc
+         */
+        $this->getEntityPersister(AbstractNotificationProcessor::SPOOL_ITEM_ENTITY)
+             ->executeInserts();
+
         return true;
     }
 
@@ -153,17 +180,16 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      *
      * @param string $command
      * @param array  $commandArgs
-     * @param bool $needFlush
-     * @return boolean|integer
+     * @return Job
      */
-    protected function addJob($command, $commandArgs = array(), $needFlush = false)
+    protected function addJob($command, $commandArgs = [])
     {
         $commandArgs = array_merge(
-            array(
+            [
                 '--message-limit=' . $this->messageLimit,
                 '--env=' . $this->env,
                 '--mailer=db_spool_mailer',
-            ),
+            ],
             $commandArgs
         );
 
@@ -171,6 +197,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $commandArgs[] = '--no-debug';
         }
 
-        return parent::addJob($command, $commandArgs, $needFlush);
+        return parent::addJob($command, $commandArgs);
     }
 }

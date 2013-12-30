@@ -33,7 +33,7 @@ class FormFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $useParentOptions = array('required' => false, 'label' => 'Default');
+        $useParentOptions = array('required' => false, 'label' => 'Use default');
         $builder->add('use_parent_scope_value', 'checkbox', $useParentOptions);
 
         if ($options['target_field'] instanceof FieldNodeDefinition) {

@@ -7,6 +7,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class SettingsBuilder
 {
+    const RESOLVED_KEY = 'resolved';
+
     /**
      *
      * @param ArrayNodeDefinition $root     Config root node
@@ -18,7 +20,9 @@ class SettingsBuilder
         $node    = $builder
             ->root('settings')
             ->addDefaultsIfNotSet()
-            ->children();
+            ->children()
+            // additional flag to ensure that values are processed by "configuration processor"
+            ->scalarNode(self::RESOLVED_KEY)->defaultTrue()->end();
 
         foreach ($settings as $name => $setting) {
             $child = $node
@@ -26,9 +30,11 @@ class SettingsBuilder
                 ->addDefaultsIfNotSet()
                 ->children();
 
-            $type = isset($setting['type']) && in_array($setting['type'], array('scalar', 'boolean', 'array'))
-                ? $setting['type']
-                : 'scalar';
+            if (isset($setting['type']) && in_array($setting['type'], array('scalar', 'boolean', 'array'))) {
+                $type = $setting['type'];
+            } else {
+                $type = 'scalar';
+            }
 
             switch ($type) {
                 case 'scalar':
@@ -41,7 +47,10 @@ class SettingsBuilder
 
                     break;
                 case 'array':
-                    $child->arrayNode('value');
+                    $child->arrayNode('value')
+                        ->treatNullLike(array())
+                        ->prototype('scalar')->end()
+                        ->defaultValue(isset($setting['value'])? $setting['value'] : array());
 
                     break;
             }

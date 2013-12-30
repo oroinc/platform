@@ -19,6 +19,9 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $configProvider;
+
     protected function setUp()
     {
         $this->entity = new \stdClass();
@@ -28,8 +31,16 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->adapter = new EmailNotificationAdapter($this->entity, $this->emailNotification, $this->em);
+        $this->adapter = new EmailNotificationAdapter(
+            $this->entity,
+            $this->emailNotification,
+            $this->em,
+            $this->configProvider
+        );
     }
 
     protected function tearDown()
@@ -42,13 +53,38 @@ class EmailNotificationAdapterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTemplate()
     {
-        $template = "test";
+        $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
 
         $this->emailNotification->expects($this->once())
             ->method('getTemplate')
             ->will($this->returnValue($template));
 
-        $this->assertEquals($template, $this->adapter->getTemplate());
+
+        $translation = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation');
+        $translation->expects($this->once())
+            ->method('getLocale')
+            ->will($this->returnValue('en'));
+
+        $translation->expects($this->once())
+            ->method('getField')
+            ->will($this->returnValue('subject'));
+
+        $translation->expects($this->once())
+            ->method('getContent')
+            ->will($this->returnValue('testContent'));
+
+        $template->expects($this->once())
+            ->method('setSubject')
+            ->with('testContent');
+
+        $template->expects($this->once())
+            ->method('getTranslations')
+            ->will($this->returnValue([$translation]));
+
+        $template->expects($this->once())
+            ->method('setLocale');
+
+        $this->assertEquals($template, $this->adapter->getTemplate('en'));
     }
 
     public function testGetRecipientEmails()

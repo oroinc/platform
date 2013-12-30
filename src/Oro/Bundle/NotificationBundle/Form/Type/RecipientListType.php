@@ -28,43 +28,33 @@ class RecipientListType extends AbstractType
         $builder->add(
             'users',
             'oro_user_multiselect',
-            array(
-                'required' => false
-            )
+            [
+                'required' => false,
+                'label'    => 'oro.user.entity_plural_label'
+            ]
         );
 
         // groups
         $builder->add(
             'groups',
             'entity',
-            array(
-                'class'         => 'OroUserBundle:Group',
+            [
+                'label'       => 'oro.user.group.entity_plural_label',
+                'class'       => 'OroUserBundle:Group',
                 'property'      => 'name',
                 'multiple'      => true,
                 'expanded'      => true,
                 'empty_value'   => '',
                 'empty_data'    => null,
                 'required'      => false,
-            )
+            ]
         );
 
         // custom email
-        $builder->add(
-            'email',
-            'email',
-            array(
-                'required'      => false
-            )
-        );
+        $builder->add('email', 'email', ['required' => false]);
 
         // owner
-        $builder->add(
-            'owner',
-            'checkbox',
-            array(
-                'required'      => false
-            )
-        );
+        $builder->add('owner', 'checkbox', ['required' => false]);
     }
 
     /**
@@ -77,7 +67,7 @@ class RecipientListType extends AbstractType
                 'data_class'           => 'Oro\Bundle\NotificationBundle\Entity\RecipientList',
                 'intention'            => 'recipientlist',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'    => true,
+                'cascade_validation'   => true,
             )
         );
     }

@@ -183,12 +183,6 @@ class Lead extends AbstractEntity implements Entity
         $this->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
 
         return $this;
-
-    }
-
-    public function getOwner()
-    {
-        return;
     }
 
     public function setAddressLabel($value)
@@ -273,14 +267,14 @@ class Lead extends AbstractEntity implements Entity
         return $this->byXpath("//div[@id = 's2id_orocrm_sales_lead_form_address_country']/a/span")->text();
     }
 
-    public function setAddressState($value)
+    public function setAddressRegion($value)
     {
-        if ($this->byId("orocrm_sales_lead_form_address_state_text")->displayed()) {
-            $this->state = $this->byId("orocrm_sales_lead_form_address_state_text");
+        if ($this->byId("orocrm_sales_lead_form_address_region_text")->displayed()) {
+            $this->state = $this->byId("orocrm_sales_lead_form_region_region_text");
             $this->state->clear();
             $this->state->value($value);
         } else {
-            $this->state = $this->byXpath("//div[@id='s2id_orocrm_sales_lead_form_address_state']/a");
+            $this->state = $this->byXpath("//div[@id='s2id_orocrm_sales_lead_form_address_region']/a");
             $this->state->click();
             $this->waitForAjax();
             $this->byXpath("//div[@id='select2-drop']/div/input")->value($value);
@@ -295,9 +289,9 @@ class Lead extends AbstractEntity implements Entity
         return $this;
     }
 
-    public function getAddressState()
+    public function getAddressRegion()
     {
-        return $this->byXpath("//div[@id = 's2id_orocrm_sales_lead_form_address_state']/a/span")->text();
+        return $this->byXpath("//div[@id = 's2id_orocrm_sales_lead_form_address_region']/a/span")->text();
     }
 
     public function setAddress($data)
@@ -317,14 +311,28 @@ class Lead extends AbstractEntity implements Entity
         $values['city'] = $this->getAddressCity();
         $values['zipCode'] = $this->getAddressZipCode();
         $values['country'] = $this->getAddressCountry();
-        $values['state'] = $this->getAddressState();
+        $values['region'] = $this->getAddressRegion();
 
+        return $this;
+    }
+
+    public function checkStatus($status)
+    {
+        $this->assertElementPresent("//div[@class='status-enabled pull-left'][contains(., '{$status}')]");
+        return $this;
+    }
+
+    public function reactivate()
+    {
+        $this->byXPath("//div[@class='btn-group']/a[@id='transition-b2b_flow_lead-reactivate']")->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
         return $this;
     }
 
     public function edit()
     {
-        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Update lead']")->click();
+        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit lead']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->init();

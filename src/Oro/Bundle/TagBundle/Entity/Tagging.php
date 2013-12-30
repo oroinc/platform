@@ -6,17 +6,28 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table(
  *     name="oro_tag_tagging",
  *     uniqueConstraints={
- *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id", "created_by"})
+ *        @ORM\UniqueConstraint(name="tagging_idx", columns={"tag_id", "entity_name", "record_id", "user_owner_id"})
  *    }
  * )
  * @ORM\Entity
+ * @Config(
+ *  mode="hidden",
+ *  defaultValues={
+ *      "ownership"={
+ *          "owner_type"="USER",
+ *          "owner_field_name"="owner",
+ *          "owner_column_name"="user_owner_id"
+ *      }
+ *  }
+ * )
  */
-class Tagging implements ContainAuthorInterface
+class Tagging
 {
     /**
      * @var integer $id
@@ -36,9 +47,9 @@ class Tagging implements ContainAuthorInterface
     /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="created_by", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
-    protected $createdBy;
+    protected $owner;
 
     /**
      * @var \Datetime $created
@@ -166,19 +177,21 @@ class Tagging implements ContainAuthorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return User
      */
-    public function getCreatedBy()
+    public function getOwner()
     {
-        return $this->createdBy;
+        return $this->owner;
     }
 
     /**
-     * {@inheritDoc}
+     * @param User $owner
+     *
+     * @return $this
      */
-    public function setCreatedBy(User $user)
+    public function setOwner(User $owner)
     {
-        $this->createdBy = $user;
+        $this->owner = $owner;
 
         return $this;
     }

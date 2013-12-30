@@ -34,10 +34,10 @@
             <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post">
                 <fieldset class="form-horizontal">
                     {{ form_row(form.gridName) }}
-                    {{ form_row(form.from, {'label': 'From'}) }}
-                    {{ form_row(form.to, {'label': 'To'}) }}
-                    {{ form_row(form.subject, {'label': 'Subject'}) }}
-                    {{ form_row(form.body, {'label': 'Body', 'attr': {'class': 'email-body'} }) }}
+                    {{ form_row(form.from) }}
+                    {{ form_row(form.to) }}
+                    {{ form_row(form.subject) }}
+                    {{ form_row(form.body, {'attr': {'class': 'email-body'} }) }}
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>

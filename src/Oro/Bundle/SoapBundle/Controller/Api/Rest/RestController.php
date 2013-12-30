@@ -3,14 +3,14 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiCrudInterface;
-use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
-use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
-use Symfony\Component\HttpFoundation\Response;
-
 use Doctrine\Common\Util\ClassUtils;
 
 use FOS\Rest\Util\Codes;
+
+use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
+use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 
 abstract class RestController extends RestGetController implements
     FormAwareInterface,
@@ -92,7 +92,55 @@ abstract class RestController extends RestGetController implements
      */
     protected function processForm($entity)
     {
+        $this->fixRequestAttributes($entity);
         return $this->getFormHandler()->process($entity);
+    }
+
+    /**
+     * Convert REST request to format applicable for form.
+     *
+     * @param object $entity
+     */
+    protected function fixRequestAttributes($entity)
+    {
+        $request = $this->container->get('request');
+        $formName = $this->getForm()->getName();
+        $data = empty($formName)
+            ? $request->request->all()
+            : $request->request->get($formName);
+
+        if (is_array($data) && $this->fixFormData($data, $entity)) {
+            if (empty($formName)) {
+                // save fixed values for unnamed form
+                foreach ($request->request->keys() as $key) {
+                    if (array_key_exists($key, $data)) {
+                        $request->request->set($key, $data[$key]);
+                    } else {
+                        $request->request->remove($key);
+                    }
+                }
+                foreach ($data as $key => $val) {
+                    if (!$request->request->has($key)) {
+                        $request->request->set($key, $data[$key]);
+                    }
+                }
+            } else {
+                // save fixed values for named form
+                $request->request->set($this->getForm()->getName(), $data);
+            }
+        }
+    }
+
+    /**
+     * Fixes form data
+     *
+     * @param array $data
+     * @param mixed $entity
+     * @return bool true if any changes in $data array was made; otherwise, false.
+     */
+    protected function fixFormData(array &$data, $entity)
+    {
+        return false;
     }
 
     /**

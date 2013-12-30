@@ -74,3 +74,19 @@
 .ui-dialog .ui-dialog-titlebar ::selection {
     background-color: transparent;
 }
+
+#dialog-extend-fixed-container {
+    display: flex;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flex;
+
+    flex-wrap: wrap-reverse;
+    -webkit-flex-wrap: wrap-reverse;
+    -moz-flex-wrap: wrap-reverse;
+    -ms-flex-wrap: wrap-reverse;
+}
+
+.ui-dialog-minimized {
+    margin: 4px 2px 0px 2px !important;
+}

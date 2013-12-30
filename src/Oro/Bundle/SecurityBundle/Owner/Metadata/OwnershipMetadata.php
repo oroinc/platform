@@ -7,10 +7,10 @@ namespace Oro\Bundle\SecurityBundle\Owner\Metadata;
  */
 class OwnershipMetadata implements \Serializable
 {
-    const OWNER_TYPE_NONE = 0;
-    const OWNER_TYPE_ORGANIZATION = 1;
+    const OWNER_TYPE_NONE          = 0;
+    const OWNER_TYPE_ORGANIZATION  = 1;
     const OWNER_TYPE_BUSINESS_UNIT = 2;
-    const OWNER_TYPE_USER = 3;
+    const OWNER_TYPE_USER          = 3;
 
     /**
      * @var integer
@@ -152,4 +152,22 @@ class OwnershipMetadata implements \Serializable
             $this->ownerColumnName
             ) = unserialize($serialized);
     }
+
+    /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return OwnershipMetadata A new instance of a OwnershipMetadata object
+     */
+    // @codingStandardsIgnoreStart
+    public static function __set_state($data)
+    {
+        $result                  = new OwnershipMetadata();
+        $result->ownerType       = $data['ownerType'];
+        $result->ownerFieldName  = $data['ownerFieldName'];
+        $result->ownerColumnName = $data['ownerColumnName'];
+
+        return $result;
+    }
+    // @codingStandardsIgnoreEnd
 }

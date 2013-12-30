@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,12 +11,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
@@ -26,7 +27,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
  * TODO: Discuss ACL impl., currently management of configurable entities can be on or off only
  * @Acl(
  *      id="oro_entityconfig_manage",
- *      label="Manage configurable entities",
+ *      label="oro.entity_config.action.manage",
  *      type="action",
  *      group_name=""
  * )
@@ -39,7 +40,7 @@ class ConfigController extends Controller
      * @Route("/", name="oro_entityconfig_index")
      * Acl(
      *      id="oro_entityconfig",
-     *      label="View configurable entities",
+     *      label="oro.entity_config.action.view_entities",
      *      type="action",
      *      group_name=""
      * )
@@ -72,7 +73,7 @@ class ConfigController extends Controller
      * @Route("/update/{id}", name="oro_entityconfig_update")
      * Acl(
      *      id="oro_entityconfig_update",
-     *      label="Update configurable entity",
+     *      label="oro.entity_config.action.update_entity",
      *      type="action",
      *      group_name=""
      * )
@@ -121,7 +122,7 @@ class ConfigController extends Controller
      * @Route("/view/{id}", name="oro_entityconfig_view")
      * Acl(
      *      id="oro_entityconfig_view",
-     *      label="View configurable entity",
+     *      label="oro.entity_config.action.view_entity",
      *      type="action",
      *      group_name=""
      * )
@@ -157,9 +158,6 @@ class ConfigController extends Controller
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
         $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
 
-        /** @var ConfigProvider $ownershipConfigProvider */
-        $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
-
         /**
          * TODO
          * refactor and place into Helper class
@@ -194,13 +192,9 @@ class ConfigController extends Controller
         return [
             'entity'           => $entity,
             'entity_config'    => $entityConfigProvider->getConfig($entity->getClassName()),
-            'entity_extend'    => $extendConfig,
             'entity_count'     => $entityCount,
-            'entity_ownership' => $ownershipConfigProvider->getConfig($entity->getClassName()),
-            'unique_key'       => $extendConfig->get('unique_key'),
             'link'             => $link,
             'entity_name'      => $entityName,
-            'module_name'      => $moduleName,
             'button_config'    => $layoutActions,
             'require_js'       => $requireJsModules,
         ];
@@ -230,7 +224,7 @@ class ConfigController extends Controller
      * @Route("/field/update/{id}", name="oro_entityconfig_field_update")
      * Acl(
      *      id="oro_entityconfig_field_update",
-     *      label="Update configurable entity field",
+     *      label="oro.entity_config.action.update_entity_field",
      *      type="action",
      *      group_name=""
      * )
@@ -291,7 +285,7 @@ class ConfigController extends Controller
      * @Route("/field/search/{id}", name="oro_entityconfig_field_search", defaults={"id"=0})
      * Acl(
      *      id="oro_entityconfig_field_search",
-     *      label="Return varchar type field(s) in given entity",
+     *      label="oro.entity_config.action.field_search",
      *      type="action",
      *      group_name=""
      * )
@@ -319,13 +313,16 @@ class ConfigController extends Controller
                         ]
                     );
 
+                /** @var Translator $translator */
+                $translator = $this->get('translator');
+
                 foreach ($entityFields as $field) {
                     $label = $entityConfigProvider->getConfig($id, $field->getFieldName())->get('label');
                     if (!$label) {
                         $label = $field->getFieldName();
                     }
 
-                    $fields[$field->getFieldName()] = $label;
+                    $fields[$field->getFieldName()] = $translator->trans($label);
                 }
             }
         }
@@ -380,5 +377,74 @@ class ConfigController extends Controller
         }
 
         return [$actions, $requireJsModules];
+    }
+
+    /**
+     * @Route("/widget/info/{id}", name="oro_entityconfig_widget_info")
+     * @Template
+     */
+    public function infoAction(EntityConfigModel $entity)
+    {
+        /**
+         * define Entity module and name
+         */
+        $entityName = $moduleName = '';
+        $className  = explode('\\', $entity->getClassName());
+        if (count($className) > 1) {
+            foreach ($className as $i => $name) {
+                if (count($className) - 1 == $i) {
+                    $entityName = $name;
+                } elseif (!in_array($name, ['Bundle', 'Entity'])) {
+                    $moduleName .= $name;
+                }
+            }
+        } else {
+            $entityName = $className[0];
+            $moduleName = 'Custom';
+        }
+
+        /** @var ConfigProvider $entityConfigProvider */
+        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
+
+        /** @var ConfigProvider $extendConfigProvider */
+        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+        $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
+
+        /** @var ConfigProvider $ownershipConfigProvider */
+        $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
+
+        return [
+            'entity'           => $entity,
+            'entity_config'    => $entityConfigProvider->getConfig($entity->getClassName()),
+            'entity_extend'    => $extendConfig,
+            'entity_ownership' => $ownershipConfigProvider->getConfig($entity->getClassName()),
+            'entity_name'      => $entityName,
+            'module_name'      => $moduleName,
+        ];
+    }
+
+    /**
+     * @Route("/widget/unique_keys/{id}", name="oro_entityconfig_widget_unique_keys")
+     * @Template
+     */
+    public function uniqueKeysAction(EntityConfigModel $entity)
+    {
+        /** @var ConfigProvider $extendConfigProvider */
+        $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
+        $extendConfig         = $extendConfigProvider->getConfig($entity->getClassName());
+
+        return [
+            'entity'     => $entity,
+            'unique_key' => $extendConfig->get('unique_key')
+        ];
+    }
+
+    /**
+     * @Route("/widget/entity_fields/{id}", name="oro_entityconfig_widget_entity_fields")
+     * @Template
+     */
+    public function entityFieldsAction(EntityConfigModel $entity)
+    {
+        return ['entity' => $entity];
     }
 }

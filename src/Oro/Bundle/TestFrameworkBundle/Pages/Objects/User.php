@@ -38,7 +38,7 @@ class User extends AbstractEntity implements Entity
         $this->last_name = $this->byId('oro_user_user_form_lastName');
         $this->email = $this->byId('oro_user_user_form_email');
         $this->groups = $this->byId('oro_user_user_form_groups');
-        $this->roles = $this->byId('oro_user_user_form_rolesCollection');
+        $this->roles = $this->byId('oro_user_user_form_roles');
         $this->owner = $this->select($this->byId('oro_user_user_form_owner'));
 
         return $this;
@@ -153,9 +153,9 @@ class User extends AbstractEntity implements Entity
             );
             $this->tags->clear();
         } else {
-            if ($this->isElementPresent("//div[@id='tags-holder']")) {
+            if ($this->isElementPresent("//div[contains(@class, 'tags-holder')]")) {
                 $this->assertElementPresent(
-                    "//div[@id='tags-holder']//li[contains(., '{$tag}')]",
+                    "//div[contains(@class, 'tags-holder')]//li[contains(., '{$tag}')]",
                     'Tag is not assigned to entity'
                 );
             } else {
@@ -201,11 +201,6 @@ class User extends AbstractEntity implements Entity
 
     }
 
-    public function getRoles()
-    {
-
-    }
-
     public function setGroups($groups = array())
     {
         foreach ($groups as $group) {
@@ -215,11 +210,6 @@ class User extends AbstractEntity implements Entity
         }
 
         return $this;
-    }
-
-    public function getGroups()
-    {
-
     }
 
     public function edit()
@@ -247,7 +237,7 @@ class User extends AbstractEntity implements Entity
         $this->byXpath("//ul[@class='dropdown-menu']//a[contains(normalize-space(.), 'My User')]")->click();
         $this->waitPageToLoad();
         $this->assertElementPresent(
-            "//div[label[normalize-space(text()) = 'User name']]//div/p[normalize-space(text()) = '$userName']"
+            "//div[label[normalize-space(text()) = 'Username']]//div/p[normalize-space(text()) = '$userName']"
         );
         return $this;
     }
@@ -257,7 +247,7 @@ class User extends AbstractEntity implements Entity
         $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit profile']")->click();
         $this->waitPageToLoad();
         $this->assertElementPresent(
-            "//div[@id='oro_user_user_form_rolesCollection']//input[@checked='checked' and @disabled='disabled']",
+            "//div[@id='oro_user_user_form_roles']//input[@checked='checked' and @disabled='disabled']",
             'Role selector are not disabled for user'
         );
     }

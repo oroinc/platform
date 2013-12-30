@@ -168,7 +168,7 @@ class EntityAclExtension extends AbstractAclExtension
             if ($metadata->isUserOwned()) {
                 $minLevel = AccessLevel::BASIC_LEVEL;
             } elseif ($metadata->isBusinessUnitOwned()) {
-                $minLevel = AccessLevel::DEEP_LEVEL;
+                $minLevel = AccessLevel::LOCAL_LEVEL;
             } elseif ($metadata->isOrganizationOwned()) {
                 $minLevel = AccessLevel::GLOBAL_LEVEL;
             }

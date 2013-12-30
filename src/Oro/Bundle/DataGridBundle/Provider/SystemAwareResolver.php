@@ -7,12 +7,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SystemAwareResolver implements ContainerAwareInterface
 {
-    /**W
+    /**
      * @var ContainerInterface
      */
     protected $container;
 
-    /** @var array parent configuration array node */
+    /**
+     * @var array parent configuration array node
+     */
     protected $parentNode;
 
     public function __construct(ContainerInterface $container)
@@ -22,8 +24,7 @@ class SystemAwareResolver implements ContainerAwareInterface
 
     /**
      * @param string $datagridName
-     * @param array  $datagridDefinition
-     *
+     * @param array $datagridDefinition
      * @return array
      */
     public function resolve($datagridName, $datagridDefinition)
@@ -71,6 +72,8 @@ class SystemAwareResolver implements ContainerAwareInterface
      * @param string $val value to be resolved/replaced
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function resolveSystemCall($datagridName, $key, $val)
     {
@@ -81,9 +84,8 @@ class SystemAwareResolver implements ContainerAwareInterface
         }
 
         switch (true) {
-            case preg_match('#%([\w\._]+)%#', $val, $match):
+            case preg_match('#^%([\w\._]+)%$#', $val, $match):
                 $val = $this->container->getParameter($match[1]);
-                break;
             // static call class:method or class::const
             case preg_match('#%([\w\._]+)%::([\w\._]+)#', $val, $match):
                 // with class as param
@@ -95,12 +97,16 @@ class SystemAwareResolver implements ContainerAwareInterface
 
                 $method = $match[2];
                 if (is_callable([$class, $method])) {
-                    $val = $class::$method($datagridName, $key);
-                }
-                if (defined("$class::$method")) {
+                    $_val = $class::$method($datagridName, $key);
+                    if (is_scalar($_val) && $match[0] !== $val) {
+                        $val = str_replace($match[0], (string)$_val, $val);
+                    } else {
+                        $val = $_val;
+                    }
+                } elseif (defined("$class::$method")) {
                     $_val = constant("$class::$method");
-                    if (is_string($_val)) {
-                        $val = str_replace($match[0], $_val, $val);
+                    if (is_scalar($_val) && $match[0] !== $val) {
+                        $val = str_replace($match[0], (string)$_val, $val);
                     } else {
                         $val = $_val;
                     }
@@ -110,13 +116,18 @@ class SystemAwareResolver implements ContainerAwareInterface
             case preg_match('#@([\w\._]+)->([\w\._]+)#', $val, $match):
                 $service = $match[1];
                 $method  = $match[2];
-                $val     = $this->container
+                $_val    = $this->container
                     ->get($service)
                     ->$method(
                         $datagridName,
                         $key,
                         $this->parentNode
                     );
+                if (is_scalar($_val) && $match[0] !== $val) {
+                    $val = str_replace($match[0], (string)$_val, $val);
+                } else {
+                    $val = $_val;
+                }
                 break;
             // service pass @service
             case preg_match('#@([\w\._]+)#', $val, $match):

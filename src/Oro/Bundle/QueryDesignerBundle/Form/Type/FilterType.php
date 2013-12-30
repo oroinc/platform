@@ -32,11 +32,12 @@ class FilterType extends AbstractType
                         $form->getConfig()->getOption('column_choice_type'),
                         null,
                         array(
-                            'required'        => true,
-                            'entity'          => $form->getConfig()->getOption('entity'),
-                            'with_relations'  => true,
-                            'deep_level'      => 1,
-                            'auto_initialize' => false
+                            'required'           => true,
+                            'entity'             => $form->getConfig()->getOption('entity'),
+                            'skip_load_entities' => true,
+                            'with_relations'     => true,
+                            'deep_level'         => 1,
+                            'auto_initialize'    => false
                         )
                     )
                 );

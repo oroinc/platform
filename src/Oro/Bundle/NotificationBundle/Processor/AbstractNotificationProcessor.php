@@ -3,11 +3,16 @@
 namespace Oro\Bundle\NotificationBundle\Processor;
 
 use Psr\Log\LoggerInterface;
+
 use Doctrine\ORM\EntityManager;
+
 use JMS\JobQueueBundle\Entity\Job;
 
 abstract class AbstractNotificationProcessor
 {
+    const JOB_ENTITY        = 'JMS\JobQueueBundle\Entity\Job';
+    const SPOOL_ITEM_ENTITY = 'Oro\Bundle\NotificationBundle\Entity\SpoolItem';
+
     /**
      * @var LoggerInterface
      */
@@ -35,10 +40,9 @@ abstract class AbstractNotificationProcessor
      *
      * @param string $command
      * @param array $commandArgs
-     * @param boolean $needFlush
-     * @return boolean|integer
+     * @return Job
      */
-    protected function addJob($command, $commandArgs = array(), $needFlush = false)
+    protected function addJob($command, $commandArgs = array())
     {
         $currJob = $this->em
             ->createQuery("SELECT j FROM JMSJobQueueBundle:Job j WHERE j.command = :command AND j.state <> :state")
@@ -48,12 +52,32 @@ abstract class AbstractNotificationProcessor
 
         if (!$currJob) {
             $job = new Job($command, $commandArgs);
-            $this->em->persist($job);
-            if ($needFlush) {
-                $this->em->flush($job);
-            }
+            $this->insertJob($job);
         }
 
-        return $currJob ? $currJob->getId() : true;
+        return $currJob ? $currJob : $job;
+    }
+
+    /**
+     * @param $job
+     */
+    protected function insertJob(Job $job)
+    {
+        $this->em->getUnitOfWork()->computeChangeSet(
+            $this->em->getClassMetadata(self::JOB_ENTITY),
+            $job
+        );
+
+        $this->getEntityPersister(self::JOB_ENTITY)->addInsert($job);
+    }
+
+    /**
+     * @param string $entityName
+     *
+     * @return \Doctrine\ORM\Persisters\BasicEntityPersister
+     */
+    protected function getEntityPersister($entityName)
+    {
+        return $this->em->getUnitOfWork()->getEntityPersister($entityName);
     }
 }

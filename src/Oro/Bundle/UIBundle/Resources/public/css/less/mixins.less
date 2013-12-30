@@ -1,14 +1,11 @@
+@import "../../lib/bootstrap/variables";
+@import "../../lib/bootstrap/mixins";
+@import "variables";
+
 .box-sizing(@sizing: content-box ) {
   -webkit-box-sizing: @sizing;
   -moz-box-sizing: @sizing;
   box-sizing: @sizing;
-}
-.opacity(@float, @decimal) {
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=@float)";
-  filter: "alpha(opacity=@float)";
-  -moz-opacity: @decimal;
-  -khtml-opacity: @decimal;
-  opacity: @decimal;
 }
 
 .forScreen (@size; background; @value: none) {

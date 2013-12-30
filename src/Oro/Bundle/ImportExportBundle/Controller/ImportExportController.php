@@ -30,6 +30,8 @@ class ImportExportController extends Controller
     const MAX_ERRORS_COUNT = 3;
 
     /**
+     * Take uploaded file and move it to temp dir
+     *
      * @Route("/import", name="oro_importexport_import_form")
      * @AclAncestor("oro_importexport_import")
      * @Template
@@ -68,6 +70,8 @@ class ImportExportController extends Controller
     }
 
     /**
+     * Validate import data
+     *
      * @Route("/import/validate/{processorAlias}", name="oro_importexport_import_validate")
      * @AclAncestor("oro_importexport_import")
      * @Template
@@ -162,9 +166,9 @@ class ImportExportController extends Controller
 
         if ($jobResult->isSuccessful()) {
             $this->removeImportFileName($processorAlias);
-            $message = $this->get('translator')->trans('oro_importexport.import.import_success');
+            $message = $this->get('translator')->trans('oro.importexport.import.success');
         } else {
-            $message = $this->get('translator')->trans('oro_importexport.import.import_error');
+            $message = $this->get('translator')->trans('oro.importexport.import.error');
         }
 
         $errorsUrl = null;

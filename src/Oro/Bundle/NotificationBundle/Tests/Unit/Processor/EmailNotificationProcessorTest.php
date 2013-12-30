@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Processor;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
-use Monolog\Logger;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +19,9 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $mailer;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $localeSettings;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
@@ -38,12 +43,16 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->logger = $this->getMockBuilder('Monolog\Logger')
             ->disableOriginalConstructor()->getMock();
 
+        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()->getMock();
+
         $this->processor = new EmailNotificationProcessor(
             $this->twig,
             $this->mailer,
             $this->entityManager,
             'a@a.com',
-            $this->logger
+            $this->logger,
+            $this->localeSettings
         );
         $this->processor->setEnv('prod');
         $this->processor->setMessageLimit(10);
@@ -68,22 +77,28 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $object = $this->getMock('Oro\Bundle\TagBundle\Entity\ContainAuthorInterface');
+        $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
-        $notifications = array($notification);
+        $notifications = [$notification];
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $template->expects($this->once())
             ->method('getType')
             ->will($this->returnValue('html'));
+
+        $locale = 'uk_UA';
+        $this->localeSettings->expects($this->once())
+            ->method('getLanguage')
+            ->will($this->returnValue($locale));
         $notification->expects($this->once())
             ->method('getTemplate')
+            ->with($locale)
             ->will($this->returnValue($template));
 
         $this->twig->expects($this->once())
             ->method('compileMessage')
-            ->with($this->identicalTo($template), $this->equalTo(array('entity' => $object)))
-            ->will($this->returnValue(array('subject', 'body')));
+            ->with($this->identicalTo($template), $this->equalTo(['entity' => $object]))
+            ->will($this->returnValue(['subject', 'body']));
 
         $emails = array('email@a.com');
         $notification->expects($this->once())
@@ -99,12 +114,22 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processor->process($object, $notifications);
     }
 
+    public function testNotify()
+    {
+        $refl = new \ReflectionObject($this->processor);
+        $method = $refl->getMethod('notify');
+        $method->setAccessible(true);
+
+        $params = new ParameterBag();
+        $this->assertFalse($method->invoke($this->processor, $params));
+    }
+
     /**
      * Test processor with exception and empty recipients
      */
     public function testProcessErrors()
     {
-        $object = $this->getMock('Oro\Bundle\TagBundle\Entity\ContainAuthorInterface');
+        $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
         $notifications = array($notification);
 
@@ -125,6 +150,23 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->mailer->expects($this->never())
             ->method('send');
+
+        $basicPersister = $this->getMockBuilder('\Doctrine\ORM\Persisters\BasicEntityPersister')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $basicPersister->expects($this->once())
+            ->method('executeInserts');
+
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $uow->expects($this->once())
+            ->method('getEntityPersister')
+            ->will($this->returnValue($basicPersister));
+
+        $this->entityManager->expects($this->once())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
 
         $this->processor->process($object, $notifications);
     }
@@ -152,8 +194,28 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('createQuery')
             ->will($this->returnValue($query));
 
+        $basicPersister = $this->getMockBuilder('\Doctrine\ORM\Persisters\BasicEntityPersister')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $basicPersister->expects($this->once())
+            ->method('addInsert');
+
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $uow->expects($this->once())
+            ->method('computeChangeSet');
         $this->entityManager->expects($this->once())
-            ->method('persist');
+            ->method('getClassMetadata')
+            ->will($this->returnValue(new ClassMetadata('JMS\JobQueueBundle\Entity\Job')));
+        $uow->expects($this->exactly(3))
+            ->method('getEntityPersister')
+            ->will($this->returnValue($basicPersister));
+
+        $this->entityManager->expects($this->exactly(4))
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
         $this->entityManager->expects($this->never())
             ->method('flush');
     }

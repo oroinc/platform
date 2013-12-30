@@ -1,0 +1,97 @@
+{% extends 'OroDistributionBundle::base.html.twig' %}
+
+{% block title %}Installed Packages{% endblock %}
+
+{% block menu %}
+    <a class="btn btn-primary btn-large" id="install-new-package" href="{{ path('oro_distribution_package_listavailable') }}">
+        <i class="icon-settings"></i>
+        Install New Package
+    </a>
+{% endblock %}
+
+
+{% block body %}
+
+    <table class="table">
+        <col width="30%" valign="top"/>
+        <col width="10%" valign="top"/>
+        <col width="10%" valign="top"/>
+        <col width="15%" valign="top"/>
+        <col width="15%" valign="top"/>
+        <col width="15%" valign="top"/>
+        <thead>
+        <tr>
+            <th>Package</th>
+            <th>Type</th>
+            <th>License</th>
+            <th>Author</th>
+            <th>Current Version</th>
+            <th>Latest Version</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>
+                    <strong>{{ item.package.prettyName }}</strong>
+                    <br/>
+                    {{ item.package.description }}
+                </td>
+                <td>{{ item.package.type }}</td>
+                <td>
+                    {% for license in item.package.license %}
+                        {{ license }}
+                    {% else %}
+                        <em>unknown</em>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for author in item.package.authors %}
+                        <div>
+                            {{ author.name }}
+                            {% if author.email is defined %}
+                                <br/>
+                                <a href="mailto:{{ author.email }}">{{ author.email }}</a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <em>unknown</em>
+                    {% endfor %}
+                </td>
+                <td>
+                    {{ item.update.currentVersionString|default(item.package.prettyVersion) }}
+                    {% if item.canBeDeleted %}
+                        <br />
+                        <a href="#" class="ajax uninstall"
+                           data-action="uninstall"
+                           data-params='{"packageName": "{{ item.package.prettyName }}" }'>
+                            <i class="icon-remove"></i>
+                            Uninstall
+                        </a>
+
+                    {% endif %}
+                </td>
+                <td>
+                    {% if item.update %}
+                        {{ item.update.upToDateVersionString }}
+                        <br />
+                        <a href="#" class="ajax update"
+                           data-action="update"
+                           data-params='{"packageName": "{{ item.package.prettyName }}" }'>
+                            <i class="icon-refresh"></i>
+                            Update
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6"><em>Nothing installed</em></td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+
+{% endblock %}
+

@@ -33,6 +33,8 @@ form:
             port:         Port
     setup:
         email:            Email
+        company_name:     Company short name
+        company_title:    Company name
         username:         Username
         firstname:        First name
         lastname:         Last name
@@ -57,6 +59,7 @@ process:
             init-config:   Init entities config
             init-extend:   Init extended entities
             update-config: Update extended entities config
+            workflows:     Load workflow definitions
         setup:
             header:        Administration setup
         installation:
@@ -68,9 +71,8 @@ process:
             localization:  Dump localization
             assets:        Install assets
             assetic:       Dump assetic
-            assetic-oro:   Dump Oro assetic
             translation:   Prepare translations
-            requirejs:     Optimize RequireJS resources (this process might take few minutes)
+            requirejs:     Optimize JS resources (optional)
             finish:        Clear cache to finalize installation
         final:
             header:        Finish

@@ -32,7 +32,7 @@ class ApplyController extends Controller
      * )
      * Acl(
      *      id="oro_entityextend_update",
-     *      label="Apply entityconfig changes",
+     *      label="oro.entity_extend.action.apply_changes",
      *      type="action",
      *      group_name=""
      * )

@@ -13,6 +13,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @RouteResource("businessunit")
@@ -37,12 +38,12 @@ class BusinessUnitController extends RestController implements ClassResourceInte
      * )
      * @ApiDoc(
      *      description="Get all business units items",
-     *      resource=true
+     *      resource=true,
+     *      filters={
+     *          {"name"="page", "dataType"="integer"},
+     *          {"name"="limit", "dataType"="integer"}
+     *      }
      * )
-     * filters={
-     *      {"name"="page", "dataType"="integer"},
-     *      {"name"="limit", "dataType"="integer"}
-     *  }
      * @AclAncestor("oro_business_unit_view")
      * @return Response
      */
@@ -100,6 +101,48 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     public function getAction($id)
     {
         return $this->handleGetRequest($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function transformEntityField($field, &$value)
+    {
+        switch ($field) {
+            case 'organization':
+                if ($value) {
+                    /** @var Organization $value */
+                    $value = array(
+                        'id' => $value->getId(),
+                        'name' => $value->getName(),
+                        'currency' => $value->getCurrency(),
+                        'precision' => $value->getPrecision(),
+                    );
+                }
+                break;
+            case 'owner':
+                if ($value) {
+                    $value = array(
+                        'id' => $value->getId(),
+                        'name' => $value->getName()
+                    );
+                }
+                break;
+            default:
+                parent::transformEntityField($field, $value);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPreparedItem($entity)
+    {
+        $result = parent::getPreparedItem($entity);
+
+        unset($result['users']);
+
+        return $result;
     }
 
     /**

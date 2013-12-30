@@ -7,7 +7,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 class ConfigurationController extends Controller
@@ -22,7 +21,7 @@ class ConfigurationController extends Controller
      * @Acl(
      *      id="oro_config_system",
      *      type="action",
-     *      label="System configuration",
+     *      label="oro.config.module_label",
      *      group_name=""
      * )
      */
@@ -42,6 +41,11 @@ class ConfigurationController extends Controller
                     'success',
                     $this->get('translator')->trans('oro.config.controller.config.saved.message')
                 );
+
+                // outdate content tags, it's only special case for generation that are not covered by NavigationBundle
+                $tagableData = ['name' => 'system_configuration', 'params' => [$activeGroup, $activeSubGroup]];
+                $sender      = $this->get('oro_navigation.content.topic_sender');
+                $sender->send($sender->getGenerator()->generate($tagableData));
             }
         }
 

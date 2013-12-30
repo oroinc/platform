@@ -15,6 +15,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 class OroNavigationExtension extends Extension
 {
+    const MENU_CONFIG_KEY = 'oro_menu_config';
+    const TITLES_KEY = 'oro_titles';
+
     /**
      * {@inheritDoc}
      */
@@ -25,24 +28,26 @@ class OroNavigationExtension extends Extension
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
-            if (is_file($file = dirname($reflection->getFilename()).'/Resources/config/navigation.yml')) {
+            if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/navigation.yml')) {
                 $bundleConfig = Yaml::parse(realpath($file));
 
-                // merge entity configs
-                if (isset($bundleConfig['oro_menu_config'])) {
-                    foreach ($bundleConfig['oro_menu_config'] as $entity => $entityConfig) {
-                        if (isset($entitiesConfig['oro_menu_config'][$entity])) {
-                            $entitiesConfig['oro_menu_config'][$entity] =
-                                array_replace_recursive($entitiesConfig['oro_menu_config'][$entity], $entityConfig);
-                        } else {
-                            $entitiesConfig['oro_menu_config'][$entity] = $entityConfig;
-                        }
-                    }
+                // Merge menu from bundle configuration
+                if (isset($bundleConfig[self::MENU_CONFIG_KEY])) {
+                    $this->mergeMenuConfig($entitiesConfig, $bundleConfig[self::MENU_CONFIG_KEY]);
                 }
 
-                if (isset($bundleConfig['oro_titles'])) {
-                    $titlesConfig += is_array($bundleConfig['oro_titles']) ? $bundleConfig['oro_titles'] : array();
+                // Merge titles from bundle configuration
+                if (isset($bundleConfig[self::TITLES_KEY])) {
+                    $titlesConfig += is_array($bundleConfig[self::TITLES_KEY])
+                        ? $bundleConfig[self::TITLES_KEY]
+                        : array();
                 }
+            }
+        }
+        // Merge menu from application configuration
+        if (is_array($configs)) {
+            foreach ($configs as $configPart) {
+                $this->mergeMenuConfig($entitiesConfig, $configPart);
             }
         }
 
@@ -52,7 +57,111 @@ class OroNavigationExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
-        $container->setParameter('oro_menu_config', $config);
-        $container->setParameter('oro_titles', $titlesConfig);
+
+        $container
+            ->getDefinition('oro_menu.configuration_builder')
+            ->addMethodCall('setConfiguration', array($config));
+        $container
+            ->getDefinition('oro_menu.twig.extension')
+            ->addMethodCall('setMenuConfiguration', array($config));
+
+        $container
+            ->getDefinition('oro_navigation.title_config_reader')
+            ->addMethodCall('setConfigData', array($titlesConfig));
+        $container
+            ->getDefinition('oro_navigation.title_service')
+            ->addMethodCall('setTitles', array($titlesConfig));
+
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+    }
+
+    /**
+     * Merge menu configuration.
+     *
+     * @param array $config
+     * @param array $configPart
+     */
+    protected function mergeMenuConfig(array &$config, array &$configPart)
+    {
+        if (array_key_exists('tree', $configPart)) {
+            foreach ($configPart['tree'] as $type => &$menuPartConfig) {
+                if (isset($config[self::MENU_CONFIG_KEY]['tree'][$type])
+                    && is_array($config[self::MENU_CONFIG_KEY]['tree'][$type])
+                    && is_array($menuPartConfig)
+                ) {
+                    $this->reorganizeTree($config[self::MENU_CONFIG_KEY]['tree'][$type], $menuPartConfig);
+                }
+            }
+        }
+
+        foreach ($configPart as $entity => $entityConfig) {
+            if (isset($config[self::MENU_CONFIG_KEY][$entity])) {
+                $config[self::MENU_CONFIG_KEY][$entity] =
+                    array_replace_recursive($config[self::MENU_CONFIG_KEY][$entity], $entityConfig);
+            } else {
+                $config[self::MENU_CONFIG_KEY][$entity] = $entityConfig;
+            }
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param array $configPart
+     */
+    protected function reorganizeTree(array &$config, array &$configPart)
+    {
+        if (!empty($configPart['children'])) {
+            foreach ($configPart['children'] as $childName => &$childConfig) {
+                if (isset($childConfig['merge_strategy']) && $childConfig['merge_strategy'] != 'append') {
+                    if (isset($childConfig['merge_strategy']) && $childConfig['merge_strategy'] == 'move') {
+                        $existingItem = $this->getMenuItemByName($config, $childName);
+                        if (!empty($existingItem['children'])) {
+                            $childChildren = isset($childConfig['children']) ? $childConfig['children'] : array();
+                            $childConfig['children']
+                                = array_merge($existingItem['children'], $childChildren);
+                        }
+                    }
+                    $this->removeItem($config, $childName);
+                } elseif (is_array($childConfig)) {
+                    $this->reorganizeTree($config, $childConfig);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param string $childName
+     */
+    protected function removeItem(array &$config, $childName)
+    {
+        if (!empty($config['children'])) {
+            foreach ($config['children'] as $key => &$configRow) {
+                if ($key === $childName) {
+                    unset($config['children'][$childName]);
+                } elseif (is_array($configRow)) {
+                    $this->removeItem($configRow, $childName);
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array $config
+     * @param $childName
+     * @return array|null
+     */
+    protected function getMenuItemByName(array $config, $childName)
+    {
+        if (!empty($config['children'])) {
+            foreach ($config['children'] as $key => $configRow) {
+                if ($key === $childName) {
+                    return $config['children'][$childName];
+                } elseif (is_array($configRow)) {
+                    return $this->getMenuItemByName($configRow, $childName);
+                }
+            }
+        }
+        return null;
     }
 }

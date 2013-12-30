@@ -2,7 +2,9 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
 {% set entityId = form.vars.value.id %}
-{% set title = entityId ? 'Update Group'|trans : 'New Group'|trans %}
+{% set title = entityId
+    ? 'Update'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans
+    : 'New'|trans ~ ' ' ~ 'oro.user.group.entity_label'|trans %}
 {% oro_title_set({params : { "%group%": form.vars.value.name } }) %}
 {% set gridName = 'group-users-grid' %}
 {% set formAction = entityId ? path('oro_user_group_update', { 'id': entityId}) : path('oro_user_group_create') %}
@@ -15,12 +17,8 @@
             'aCss': 'no-hash remove-button',
             'dataId': entityId,
             'id': 'btn-remove-group',
-            'dataMessage': 'Are you sure you want to delete this group?'|trans,
-            'successMessage': 'Group removed'|trans,
-            'title': 'Delete group',
-            'label': 'Delete'
-        })
-        }}
+            'entity_label': 'oro.user.group.entity_label'|trans
+        }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.button({'path' : path('oro_user_group_index'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
@@ -33,10 +31,9 @@
         {% set breadcrumbs = {
             'entity':      form.vars.value,
             'indexPath':   path('oro_user_group_index'),
-            'indexLabel': 'Groups'|trans,
+            'indexLabel': 'oro.user.group.entity_plural_label'|trans,
             'entityTitle': form.vars.value.name
-        }
-        %}
+        } %}
         {{ parent() }}
     {% else %}
         {% include 'OroUIBundle::page_title_block.html.twig' %}
@@ -45,43 +42,36 @@
 
 {% block content_data %}
     {% set id = 'group-profile' %}
-
     {% set dataBlocks = [{
-            'title': 'General'|trans,
-            'class': 'active',
-            'subblocks': [
-                {
-                    'title': '',
-                    'data': [
-                        form_widget(form.appendUsers, {'id': 'groupAppendUsers'}),
-                        form_widget(form.removeUsers, {'id': 'groupRemoveUsers'}),
-                        form_row(form.name)
-                    ]
-                }
-            ]
-        }]
-    %}
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': '',
+                'data': [
+                    form_widget(form.appendUsers, {'id': 'groupAppendUsers'}),
+                    form_widget(form.removeUsers, {'id': 'groupRemoveUsers'}),
+                    form_row(form.name)
+                ]
+            }
+        ]
+    }] %}
 
-    {% set dataBlocks = dataBlocks|merge(
-        [{
-            'title' : 'Users'|trans,
-            'subblocks':
-            [
-                {
-                    'title' : null,
-                    'useSpan': false,
-                    'data' : [dataGrid.renderGrid(gridName, {group_id: entityId}, { cssClass: 'inner-grid' })]
-                }
-            ]
-        }]
-    )
-    %}
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'oro.user.entity_plural_label'|trans,
+        'subblocks':
+        [
+            {
+                'title' : null,
+                'useSpan': false,
+                'data' : [dataGrid.renderGrid(gridName, {group_id: entityId}, { cssClass: 'inner-grid' })]
+            }
+        ]
+    }]) %}
 
-    {% set data =
-        {
-            'formErrors': form_errors(form)? form_errors(form) : null,
-            'dataBlocks': dataBlocks,
-        }
-    %}
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
     {{ parent() }}
 {% endblock content_data %}

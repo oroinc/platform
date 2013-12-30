@@ -1,0 +1,26 @@
+oro_menu_config:
+    items:
+        reports_tab:
+            label: oro.report.entity_plural_label
+            uri: '#'
+            extras:
+                position: 30
+
+        manage_reports:
+            label: 'Manage Reports'
+            route: 'oro_report_index'
+            extras:
+                position: 10
+
+    tree:
+        application_menu:
+            children:
+                reports_tab:
+                    children:
+                        manage_reports: ~
+
+oro_titles:
+    oro_report_index:  ~
+    oro_report_view:   %%report.name%% - %%report.group%% - Reports
+    oro_report_create: Create Report - Reports
+    oro_report_update: %%report.name%% - Edit - Reports

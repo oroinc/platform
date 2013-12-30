@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\UserBundle\Form\EventListener\UserApiSubscriber;
-use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class UserApiType extends UserType
 {
@@ -32,7 +32,7 @@ class UserApiType extends UserType
         $resolver->setDefaults(
             array(
                 'csrf_protection' => false,
-                'validation_groups'    => array('ProfileAPI', 'Default'),
+                'validation_groups' => array('ProfileAPI', 'Default'),
             )
         );
     }

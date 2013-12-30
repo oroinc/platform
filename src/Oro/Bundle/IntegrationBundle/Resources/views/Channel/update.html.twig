@@ -1,0 +1,110 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% form_theme form with ['OroIntegrationBundle:Form:fields.html.twig'] %}
+
+{% set entity = form.vars.value %}
+{% set formAction = entity.id ? path('oro_integration_channel_update', { id: entity.id }) : path('oro_integration_channel_create') %}
+
+{% if entity.id %}
+    {% oro_title_set({params : {"%channel.name%": entity.name } }) %}
+{% endif %}
+
+{% block navButtons %}
+    {% if entity.id and resource_granted('oro_integration_channel_delete') %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_api_delete_channel', {'id': entity.id}),
+            'dataRedirect': path('oro_integration_channel_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-channel',
+            'dataId': entity.id,
+            'entity_label': 'oro.integration.channel.entity_label'|trans
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+
+    {{ UI.button({'path' : path('oro_integration_channel_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
+    {% if entity.id %}
+        {{ UI.clientButton({
+            'dataUrl': path('oro_integration_channel_schedule', { 'id': entity.id }) ,
+            'aCss':   'no-hash schedule-button btn-primary',
+            'title' : 'Schedule sync',
+            'label' : 'Schedule sync'
+        }) }}
+    {% endif %}
+    {{ UI.saveAndStayButton('oro_integration_channel_update') }}
+    {{ UI.buttonType({'type': 'button', 'class': 'btn-success', 'label': 'Save and Close', 'action': 'save'}) }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set title = 'Create'|trans ~ ' ' ~ 'oro.integration.channel.entity_label'|trans %}
+    {% if entity.id %}
+        {% set breadcrumbs = {
+            'entity':      entity,
+            'indexPath':   path('oro_integration_channel_index'),
+            'indexLabel':  'oro.integration.channel.entity_label'|trans,
+            'entityTitle': entity.name|default('N/A')
+        } %}
+        {{ parent() }}
+    {% else %}
+        {% include 'OroUIBundle::page_title_block.html.twig' %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block stats %}{% endblock %}
+
+{% block content_data %}
+    {% set id = 'channel-update' %}
+    {% set formData = form_widget(form) %}
+    {% set dataBlocks = [{
+        'title': 'General',
+        'class': 'active',
+        'subblocks': [{
+            'title': 'Basic Information',
+            'data':  [formData]
+        }]
+    }] %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+    <script type="text/javascript">
+        require(['jquery', 'oro/translator', 'routing', 'oro/messenger', 'oro/navigation'],
+        function ($, __, routing, messenger, Navigation) {
+            $(function () {
+                $('.schedule-button').click(function (e) {
+                    e.preventDefault();
+
+                    var url = $(this).data('url');
+
+                    var navigation = Navigation.getInstance();
+                    if (navigation) {
+                        navigation.loadingMask.show();
+                    }
+
+                    $.ajax(url, {
+                        success: function (res) {
+                            var successMessage = __('Sync was scheduled.'),
+                                url = routing.generate('oro_cron_job_view', {id: res.job_id}),
+                                jobViewLink = '<a href="' + url + '" class="job-view-link">' + __('Check progress.') + '</a>';
+
+                            messenger.notificationMessage('success', [successMessage, jobViewLink].join(' '));
+                            if (navigation) {
+                                navigation.processClicks($('.job-view-link'));
+                            }
+                        },
+                        error: function () {
+                            messenger.notificationMessage('error', __('Error was occurred, please try later.'));
+                        },
+                        dataType: 'json'
+                    }).always(function () {
+                        if (navigation) {
+                            navigation.loadingMask.hide();
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock content_data %}

@@ -1,7 +1,9 @@
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/navigation', 'oro/translator', 'oro/tag/collection'],
-function($, _, Backbone, Navigation, __, TagCollection) {
+define(['underscore', 'backbone', 'oro/navigation', 'oro/translator', 'oro/tag/collection'],
+function(_, Backbone, Navigation, __, TagCollection) {
     'use strict';
+
+    var $ = Backbone.$;
 
     /**
      * @export  oro/tag/view
@@ -15,7 +17,7 @@ function($, _, Backbone, Navigation, __, TagCollection) {
     
         /** @property */
         template: _.template(
-            '<ul id="tag-list" class="inline">' +
+            '<ul class="inline tag-list">' +
                 '<% _.each(models, function(tag, i) { %>' +
                     '<li data-id="<%= tag.get("id") %>">' +
                         '<% if (tag.get("url").length > 0) { %>' +
@@ -38,9 +40,11 @@ function($, _, Backbone, Navigation, __, TagCollection) {
             this.collection = new TagCollection();
             this.listenTo(this.getCollection(), 'reset', this.render);
             this.listenTo(this, 'filter', this.render);
-    
+
+            this.$tagsHolder = this.$('.tags-holder');
+
             // process filter action binding
-            $('#tag-sort-actions a').click(_.bind(this.filter, this));
+            this.$('.tag-sort-actions a').click(_.bind(this.filter, this));
         },
     
         /**
@@ -77,13 +81,13 @@ function($, _, Backbone, Navigation, __, TagCollection) {
          * @returns {}
          */
         render: function() {
-            $('#tags-holder').html(
+            this.$tagsHolder.html(
                 this.template(this.getCollection().getFilteredCollection(this.options.filter))
             );
             // process tag click redirect
             var navigation = Navigation.getInstance();
             if (navigation) {
-                navigation.processClicks($('#tag-list a'));
+                navigation.processClicks(this.$('.tag-list a'));
             }
     
             return this;

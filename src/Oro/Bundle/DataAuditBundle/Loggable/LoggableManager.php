@@ -3,7 +3,6 @@ namespace Oro\Bundle\DataAuditBundle\Loggable;
 
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Util\ClassUtils;
@@ -16,15 +15,14 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
 
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexible;
-use Oro\Bundle\FlexibleEntityBundle\Entity\Mapping\AbstractEntityFlexibleValue;
-
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * TODO: This class should be refactored  (BAP-978)
  */
 class LoggableManager
 {
+    protected static $userCache = array();
+
     /**
      * @var string
      */
@@ -74,13 +72,6 @@ class LoggableManager
      * @var array
      */
     protected $collectionLogData = array();
-
-    /**
-     * Stack of logged flexible entities
-     *
-     * @var array
-     */
-    protected $loggedObjects = array();
 
     /**
      * @var ConfigProvider
@@ -226,14 +217,17 @@ class LoggableManager
     protected function calculateCollectionData(PersistentCollection $collection)
     {
         $ownerEntity = $collection->getOwner();
+        $ownerEntityClassName = $this->getEntityClassName($ownerEntity);
 
-        if ($this->hasConfig(get_class($ownerEntity))) {
-            $meta              = $this->getConfig(get_class($ownerEntity));
+        if ($this->hasConfig($ownerEntityClassName)) {
+            $meta              = $this->getConfig($ownerEntityClassName);
             $collectionMapping = $collection->getMapping();
 
             if (isset($meta->propertyMetadata[$collectionMapping['fieldName']])) {
                 $method = $meta->propertyMetadata[$collectionMapping['fieldName']]->method;
 
+                // calculate collection changes
+                // TODO: Fix bug with collection diff calculation. https://magecore.atlassian.net/browse/BAP-2724
                 $newCollection = $collection->toArray();
                 $oldCollection = $collection->getSnapshot();
 
@@ -251,7 +245,9 @@ class LoggableManager
                     }
                 );
 
-                $this->collectionLogData[$collectionMapping['fieldName']] = array(
+                $entityIdentifier = $this->getEntityIdentifierString($ownerEntity);
+                $fieldName = $collectionMapping['fieldName'];
+                $this->collectionLogData[$ownerEntityClassName][$entityIdentifier][$fieldName] = array(
                     'old' => $oldData,
                     'new' => $newData,
                 );
@@ -274,147 +270,159 @@ class LoggableManager
             return;
         }
 
-        $this->checkAuditable($this->getEntityClassName($entity));
+        $entityClassName = $this->getEntityClassName($entity);
+        if (!$this->hasConfig($entityClassName) || !$this->checkAuditable($entityClassName)) {
+            return;
+        }
 
-        /** @var User $user */
-        $user = $this->em->getRepository('OroUserBundle:User')->findOneBy(array('username' => $this->username));
-
+        $user = $this->getLoadedUser();
         if (!$user) {
             return;
         }
 
         $uow = $this->em->getUnitOfWork();
 
-        if ($this->hasConfig($this->getEntityClassName($entity))) {
-            $meta       = $this->getConfig($this->getEntityClassName($entity));
-            $entityMeta = $this->em->getClassMetadata($this->getEntityClassName($entity));
+        $meta       = $this->getConfig($entityClassName);
+        $entityMeta = $this->em->getClassMetadata($entityClassName);
 
-            $logEntryMeta = $this->em->getClassMetadata($this->getLogEntityClass());
-            /** @var Audit $logEntry */
-            $logEntry = $logEntryMeta->newInstance();
+        $logEntryMeta = $this->em->getClassMetadata($this->getLogEntityClass());
+        /** @var Audit $logEntry */
+        $logEntry = $logEntryMeta->newInstance();
+        $logEntry->setAction($action);
+        $logEntry->setObjectClass($meta->name);
+        $logEntry->setLoggedAt();
+        $logEntry->setUser($user);
+        $logEntry->setObjectName(method_exists($entity, '__toString') ? $entity->__toString() : $meta->name);
 
-            // do not store log entries for flexible attributes - add them to a parent entity instead
-            if ($entity instanceof AbstractEntityFlexibleValue) {
-                if ($action !== self::ACTION_REMOVE && !$this->logFlexible($entity)) {
-                    $flexibleEntityMeta = $this->em->getClassMetadata($this->getEntityClassName($entity));
+        $entityId = $this->getIdentifier($entity);
 
-                    // if no "parent" object has been saved previously - get it from attribute and save it's log
-                    $value = $flexibleEntityMeta->reflFields['entity']->getValue($entity);
-                    if ($value instanceof AbstractEntityFlexible) {
-                        $this->createLogEntity($action, $flexibleEntityMeta->reflFields['entity']->getValue($entity));
-                    }
+        if (!$entityId && $action === self::ACTION_CREATE) {
+            $this->pendingLogEntityInserts[spl_object_hash($entity)] = $logEntry;
+        }
 
-                    $this->logFlexible($entity);
+        $logEntry->setObjectId($entityId);
+
+        $newValues = array();
+
+        if ($action !== self::ACTION_REMOVE && count($meta->propertyMetadata)) {
+            foreach ($uow->getEntityChangeSet($entity) as $field => $changes) {
+
+                if (!isset($meta->propertyMetadata[$field])) {
+                    continue;
                 }
 
-                return;
+                if ($entityMeta->hasAssociation($field)) {
+                    continue;
+                }
+
+                $old = $changes[0];
+                $new = $changes[1];
+
+                if ($old == $new) {
+                    continue;
+                }
+
+                if ($old instanceof \DateTime && $new instanceof \DateTime
+                    && $old->getTimestamp() == $new->getTimestamp()
+                ) {
+                    continue;
+                }
+
+                if ($entityMeta->isSingleValuedAssociation($field) && $new) {
+                    $oid   = spl_object_hash($new);
+                    $value = $this->getIdentifier($new);
+
+                    if (!is_array($value) && !$value) {
+                        $this->pendingRelatedEntities[$oid][] = array(
+                            'log'   => $logEntry,
+                            'field' => $field
+                        );
+                    }
+
+                    $method = $meta->propertyMetadata[$field]->method;
+                    if ($old !== null) {
+                        // check if an object has the required method to avoid a fatal error
+                        if (!method_exists($old, $method)) {
+                            throw new \ReflectionException(
+                                sprintf('Try to call to undefined method %s::%s', get_class($old), $method)
+                            );
+                        }
+                        $old = $old->{$method}();
+                    }
+                    if ($new !== null) {
+                        // check if an object has the required method to avoid a fatal error
+                        if (!method_exists($new, $method)) {
+                            throw new \ReflectionException(
+                                sprintf('Try to call to undefined method %s::%s', get_class($new), $method)
+                            );
+                        }
+                        $new = $new->{$method}();
+                    }
+                }
+
+                $newValues[$field] = array(
+                    'old' => $old,
+                    'new' => $new,
+                );
             }
 
-            $logEntry->setAction($action);
-            $logEntry->setObjectClass($meta->name);
-            $logEntry->setLoggedAt();
-            $logEntry->setUser($user);
-            $logEntry->setObjectName(method_exists($entity, '__toString') ? $entity->__toString() : $meta->name);
-
-            $entityId = $this->getIdentifier($entity);
-
-            if (!$entityId && $action === self::ACTION_CREATE) {
-                $this->pendingLogEntityInserts[spl_object_hash($entity)] = $logEntry;
-            }
-
-            $logEntry->setObjectId($entityId);
-
-            $newValues = array();
-
-            if ($action !== self::ACTION_REMOVE && count($meta->propertyMetadata)) {
-                foreach ($uow->getEntityChangeSet($entity) as $field => $changes) {
-
+            $entityIdentifier = $this->getEntityIdentifierString($entity);
+            if (!empty($this->collectionLogData[$entityClassName][$entityIdentifier])) {
+                $collectionData = $this->collectionLogData[$entityClassName][$entityIdentifier];
+                foreach ($collectionData as $field => $changes) {
                     if (!isset($meta->propertyMetadata[$field])) {
                         continue;
                     }
 
-                    $old = $changes[0];
-                    $new = $changes[1];
-
-                    // fix issues with DateTime
-                    if ($old == $new) {
-                        continue;
+                    if ($changes['old'] != $changes['new']) {
+                        $newValues[$field] = $changes;
                     }
-
-                    if ($entityMeta->isSingleValuedAssociation($field) && $new) {
-                        $oid   = spl_object_hash($new);
-                        $value = $this->getIdentifier($new);
-
-                        if (!is_array($value) && !$value) {
-                            $this->pendingRelatedEntities[$oid][] = array(
-                                'log'   => $logEntry,
-                                'field' => $field
-                            );
-                        }
-
-                        $method = $meta->propertyMetadata[$field]->method;
-                        if ($old !== null) {
-                            // check if an object has the required method to avoid a fatal error
-                            if (!method_exists($old, $method)) {
-                                throw new \ReflectionException(
-                                    sprintf('Try to call to undefined method %s::%s', get_class($old), $method)
-                                );
-                            }
-                            $old = $old->{$method}();
-                        }
-                        if ($new !== null) {
-                            // check if an object has the required method to avoid a fatal error
-                            if (!method_exists($new, $method)) {
-                                throw new \ReflectionException(
-                                    sprintf('Try to call to undefined method %s::%s', get_class($new), $method)
-                                );
-                            }
-                            $new = $new->{$method}();
-                        }
-                    }
-
-                    $newValues[$field] = array(
-                        'old' => $old,
-                        'new' => $new,
-                    );
-                }
-
-                $newValues = array_merge($newValues, $this->collectionLogData);
-                $logEntry->setData($newValues);
-            }
-
-            if ($action === self::ACTION_UPDATE
-                && 0 === count($newValues)
-                && !($entity instanceof AbstractEntityFlexible)
-            ) {
-                return;
-            }
-
-            $version = 1;
-
-            if ($action !== self::ACTION_CREATE) {
-                $version = $this->getNewVersion($logEntryMeta, $entity);
-
-                if (empty($version)) {
-                    // was versioned later
-                    $version = 1;
                 }
             }
 
-            $logEntry->setVersion($version);
+            $logEntry->setData($newValues);
+        }
 
-            $this->em->persist($logEntry);
-            $uow->computeChangeSet($logEntryMeta, $logEntry);
+        if ($action === self::ACTION_UPDATE && 0 === count($newValues)) {
+            return;
+        }
 
-            // save logged data for possible future handling of flexible attributes
-            if ($entity instanceof AbstractEntityFlexible) {
-                $this->loggedObjects[] = array(
-                    'object' => $entity,
-                    'log'    => $logEntry,
-                    'meta'   => $logEntryMeta,
-                );
+        $version = 1;
+
+        if ($action !== self::ACTION_CREATE) {
+            $version = $this->getNewVersion($logEntryMeta, $entity);
+
+            if (empty($version)) {
+                // was versioned later
+                $version = 1;
             }
         }
+
+        $logEntry->setVersion($version);
+
+        $this->em->persist($logEntry);
+        $uow->computeChangeSet($logEntryMeta, $logEntry);
+    }
+
+    /**
+     * @return User
+     */
+    protected function getLoadedUser()
+    {
+        $isInCache = array_key_exists($this->username, self::$userCache);
+        if (!$isInCache
+            || ($isInCache && !$this->em->getUnitOfWork()->isInIdentityMap(self::$userCache[$this->username]))
+        ) {
+            $this->loadUser();
+        }
+        return self::$userCache[$this->username];
+    }
+
+    protected function loadUser()
+    {
+        self::$userCache[$this->username] = $this->em
+            ->getRepository('OroUserBundle:User')
+            ->findOneBy(array('username' => $this->username));
     }
 
     /**
@@ -425,87 +433,6 @@ class LoggableManager
     protected function getLogEntityClass()
     {
         return $this->logEntityClass;
-    }
-
-    /**
-     * Add flexible attribute log to a parent entity's log entry
-     *
-     * @param  AbstractEntityFlexibleValue $entity
-     * @return boolean                     True if value has been saved, false otherwise
-     */
-    protected function logFlexible(AbstractEntityFlexibleValue $entity)
-    {
-        $uow = $this->em->getUnitOfWork();
-
-        foreach ($this->loggedObjects as &$lo) {
-            if ($lo['object']->getValues()->contains($entity)) {
-                $logEntry = $lo['log'];
-                $changes  = current($uow->getEntityChangeSet($entity));
-                $oldData  = $changes[0];
-                $newData  = $entity->getData();
-
-                if ($newData instanceof Collection) {
-
-                    $newDataArray = $newData->toArray();
-                    $oldDataArray = $newData->getSnapshot();
-
-                    $newData = implode(
-                        ', ',
-                        array_map(
-                            function ($item) {
-                                return (string) $item;
-                            },
-                            $newDataArray
-                        )
-                    );
-
-                    $oldData = implode(
-                        ', ',
-                        array_map(
-                            function ($item) {
-                                return (string) $item;
-                            },
-                            $oldDataArray
-                        )
-                    );
-
-                } elseif ($newData instanceof \DateTime) {
-                    if ($oldData instanceof \DateTime) {
-                        $oldData = $oldData->format(\DateTime::ISO8601);
-                    }
-                    $newData = $newData->format(\DateTime::ISO8601);
-
-                } elseif (is_object($newData)) {
-                    $oldData = (string) $oldData;
-                    $newData = (string) $newData;
-                }
-
-                // special case for, as an example, decimal values
-                // do not store changeset d:123 and s:3:"123"
-                if ($oldData == $newData) {
-                    return true;
-                }
-
-                $data = array_merge(
-                    (array) $logEntry->getData(),
-                    array(
-                        $entity->getAttribute()->getCode() => array(
-                            'old' => $oldData,
-                            'new' => $newData,
-                        )
-                    )
-                );
-
-                $logEntry->setData($data);
-
-                $this->em->persist($logEntry);
-                $uow->recomputeSingleEntityChangeSet($lo['meta'], $logEntry);
-
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -540,7 +467,7 @@ class LoggableManager
      */
     protected function getIdentifier($entity, $entityMeta = null)
     {
-        $entityMeta      = $entityMeta ? $entityMeta : $this->em->getClassMetadata(get_class($entity));
+        $entityMeta      = $entityMeta ? $entityMeta : $this->em->getClassMetadata($this->getEntityClassName($entity));
         $identifierField = $entityMeta->getSingleIdentifierFieldName($entityMeta);
 
         return $entityMeta->getReflectionProperty($identifierField)->getValue($entity);
@@ -548,10 +475,6 @@ class LoggableManager
 
     protected function checkAuditable($entityClassName)
     {
-        if (!$this->hasConfig($entityClassName)) {
-            return;
-        }
-
         if ($this->auditConfigProvider->hasConfig($entityClassName)
             && $this->auditConfigProvider->getConfig($entityClassName)->is('auditable')
         ) {
@@ -577,8 +500,11 @@ class LoggableManager
 
             if (count($classMetadata->propertyMetadata)) {
                 $this->addConfig($classMetadata);
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
@@ -588,9 +514,21 @@ class LoggableManager
     private function getEntityClassName($entity)
     {
         if (is_object($entity)) {
-            return get_class($entity);
+            return ClassUtils::getClass($entity);
         }
 
         return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @return string
+     */
+    protected function getEntityIdentifierString($entity)
+    {
+        $className = $this->getEntityClassName($entity);
+        $metadata = $this->em->getClassMetadata($className);
+
+        return serialize($metadata->getIdentifierValues($entity));
     }
 }

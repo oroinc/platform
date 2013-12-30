@@ -50,6 +50,8 @@ class BatchCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -61,7 +63,7 @@ class BatchCommand extends ContainerAwareCommand
         }
 
         $code = $input->getArgument('code');
-        $jobInstance = $this->getEntityManager()->getRepository('OroBatchBundle:JobInstance')->findOneByCode($code);
+        $jobInstance = $this->getJobManager()->getRepository('OroBatchBundle:JobInstance')->findOneByCode($code);
         if (!$jobInstance) {
             throw new \InvalidArgumentException(sprintf('Could not find job instance "%s".', $code));
         }
@@ -76,11 +78,36 @@ class BatchCommand extends ContainerAwareCommand
             );
         }
 
-        $this->validate($input, $jobInstance);
+        $validator = $this->getValidator();
+
+        // Override mail notifier recipient email
+        if ($email = $input->getOption('email')) {
+            $errors = $validator->validateValue($email, new Assert\Email());
+            if (count($errors) > 0) {
+                throw new \RuntimeException(
+                    sprintf('Email "%s" is invalid: %s', $email, $this->getErrorMessages($errors))
+                );
+            }
+            $this
+                ->getMailNotifier()
+                ->setRecipientEmail($email);
+        }
+
+        // We merge the JobInstance from the JobManager EntitManager to the DefaultEntityManager
+        // in order to be able to have a working UniqueEntity validation
+        $defaultJobInstance = $this->getDefaultEntityManager()->merge($jobInstance);
+        $defaultJobInstance->setJob($job);
+
+        $errors = $validator->validate($defaultJobInstance, array('Default', 'Execution'));
+        if (count($errors) > 0) {
+            throw new \RuntimeException(
+                sprintf('Job "%s" is invalid: %s', $code, $this->getErrorMessages($errors))
+            );
+        }
 
         $executionId = $input->getArgument('execution');
         if ($executionId) {
-            $jobExecution = $this->getEntityManager()->getRepository('OroBatchBundle:JobExecution')->find($executionId);
+            $jobExecution = $this->getJobManager()->getRepository('OroBatchBundle:JobExecution')->find($executionId);
             if (!$jobExecution) {
                 throw new \InvalidArgumentException(sprintf('Could not find job execution "%s".', $executionId));
             }
@@ -96,11 +123,7 @@ class BatchCommand extends ContainerAwareCommand
 
         $job->execute($jobExecution);
 
-        $this->getEntityManager()->persist($jobInstance);
-        $this->getEntityManager()->flush($jobInstance);
-
-        $this->getEntityManager()->persist($jobExecution);
-        $this->getEntityManager()->flush($jobExecution);
+        $job->getJobRepository()->updateJobExecution($jobExecution);
 
         if (ExitStatus::COMPLETED === $jobExecution->getExitStatus()->getExitCode()) {
             $output->writeln(
@@ -117,42 +140,26 @@ class BatchCommand extends ContainerAwareCommand
                 )
             );
         }
-    }
 
-    /**
-     * Validate job instance
-     */
-    protected function validate(InputInterface $input, JobInstance $jobInstance)
-    {
-        $validator = $this->getValidator();
-
-        // Override mail notifier recipient email
-        if ($email = $input->getOption('email')) {
-            $errors = $validator->validateValue($email, new Assert\Email());
-            if (count($errors) > 0) {
-                throw new \RuntimeException(
-                    sprintf('Email "%s" is invalid: %s', $email, $this->getErrorMessages($errors))
-                );
-            }
-            $this
-                ->getMailNotifier()
-                ->setRecipientEmail($email);
-        }
-
-        $errors = $validator->validate($jobInstance, array('Default', 'Execution'));
-        if (count($errors) > 0) {
-            throw new \RuntimeException(
-                sprintf('Job "%s" is invalid: %s', $code, $this->getErrorMessages($errors))
-            );
-        }
+        // FIXME: Workaround, waiting for https://github.com/symfony/SwiftmailerBundle/pull/64
+        // to be merged
+        $this->flushMailQueue();
     }
 
     /**
      * @return EntityManager
      */
-    protected function getEntityManager()
+    protected function getJobManager()
     {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return $this->getContainer()->get('oro_batch.job_repository')->getJobManager();
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getDefaultEntityManager()
+    {
+        return $this->getContainer()->get('doctrine')->getEntityManager();
     }
 
     /**
@@ -215,5 +222,36 @@ class BatchCommand extends ContainerAwareCommand
         }
 
         throw new \InvalidArgumentException($error);
+    }
+
+    /**
+     * @see Symfony\Bundle\SwiftmailerBundle\EventListener\EmailSenderListener::onKernelTerminate
+     * and https://github.com/symfony/SwiftmailerBundle/pull/64
+     */
+    public function flushMailQueue()
+    {
+        if (!$this->getContainer()->has('mailer')) {
+            return;
+        }
+
+        $mailers = array_keys($this->getContainer()->getParameter('swiftmailer.mailers'));
+        foreach ($mailers as $name) {
+            if ($this->getContainer() instanceof IntrospectableContainerInterface ?
+                $this->getContainer()->initialized(sprintf('swiftmailer.mailer.%s', $name)) : true) {
+                if ($this->getContainer()->getParameter(sprintf('swiftmailer.mailer.%s.spool.enabled', $name))) {
+                    $mailer = $this->getContainer()->get(sprintf('swiftmailer.mailer.%s', $name));
+                    $transport = $mailer->getTransport();
+                    if ($transport instanceof \Swift_Transport_SpoolTransport) {
+                        $spool = $transport->getSpool();
+                        if ($spool instanceof \Swift_MemorySpool) {
+                            $spool->flushQueue(
+                                $this->getContainer()->get(sprintf('swiftmailer.mailer.%s.transport.real', $name))
+                            );
+                        }
+                    }
+                }
+            }
+        }
+ 
     }
 }

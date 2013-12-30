@@ -1,0 +1,18 @@
+oro_dashboard_config:
+    widgets:
+        quick_launchpad:
+            route:      oro_dashboard_itemized_widget
+            route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad }
+
+    dashboards:
+        main:
+            label:      oro.dashboard.title.main
+            position:   20
+            widgets:
+                quick_launchpad:
+                    position:   10
+        quick_launchpad:
+            label:      oro.dashboard.title.quick_launchpad
+            twig:       OroDashboardBundle:Index:quickLaunchpad.html.twig
+            position:   10
+

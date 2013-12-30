@@ -2,11 +2,11 @@
 /* global define */
 define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oro/loading-mask',
     'oro/calendar/event/collection', 'oro/calendar/event/model', 'oro/calendar/event/view',
-    'oro/calendar/connection/collection', 'oro/calendar/connection/view', 'oro/formatter/datetime',
-    'jquery.fullcalendar'],
+    'oro/calendar/connection/collection', 'oro/calendar/connection/view', 'oro/calendar/color-manager',
+    'oro/formatter/datetime', 'jquery.fullcalendar'],
 function(_, Backbone, __, app, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
-         ConnectionCollection, ConnectionView, dateTimeFormatter) {
+         ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -57,6 +57,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         fullCalendar: null,
         eventView: null,
         loadingMask: null,
+        colorManager: null,
 
         initialize: function() {
             // init event collection
@@ -72,6 +73,8 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             this.listenTo(this.getCollection(), 'add', this.onEventAdded);
             this.listenTo(this.getCollection(), 'change', this.onEventChanged);
             this.listenTo(this.getCollection(), 'destroy', this.onEventDeleted);
+
+            this.colorManager = new ColorManager();
         },
 
         getEventsView: function (model) {
@@ -239,7 +242,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             fcEvent.start = dateTimeFormatter.unformatBackendDateTime(fcEvent.start);
             fcEvent.end = dateTimeFormatter.unformatBackendDateTime(fcEvent.end);
             // set an event text and background colors the same as the owning calendar
-            var colors = this.connectionsView.getCalendarColors(fcEvent.calendar);
+            var colors = this.colorManager.getCalendarColors(fcEvent.calendar);
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
         },
@@ -315,13 +318,6 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         initializeFullCalendar: function () {
             // prepare options for jQuery FullCalendar control
             var options = {
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'month,agendaWeek,agendaDay',
-                    ignoreTimezone: false,
-                    allDayDefault: false
-                },
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
@@ -334,18 +330,15 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                     } else {
                         this._hideMask();
                     }
-                }, this),
-                allDayText: __('all-day'),
-                buttonText: {
-                    today: __('today'),
-                    month: __('month'),
-                    week: __('week'),
-                    day: __('day')
-                }
+                }, this)
             };
             var keys = ['date', 'defaultView', 'editable', 'selectable',
+                'header', 'allDayText', 'allDaySlot', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
-                'firstDay', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort'];
+                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
+                'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
+                'contentHeight'
+            ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
                 if (_.isString(options.date)) {
@@ -364,6 +357,16 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                     this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.35);
                 }
             }, this);
+
+            var that = this;
+            options.viewDisplay = function(view) {
+                that.setTimeline();
+                setInterval(function () { that.setTimeline(); }, 5 * 60 * 1000);
+            };
+            options.windowResize = function(view) {
+                that.setTimeline();
+            };
+
             // create jQuery FullCalendar control
             this.getCalendarElement().fullCalendar(options);
             this.enableEventLoading = true;
@@ -384,7 +387,8 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 el: connectionsContainer,
                 collection: this.options.connectionsOptions.collection,
                 calendar: this.options.calendar,
-                itemTemplateSelector: this.options.connectionsOptions.itemTemplateSelector
+                itemTemplateSelector: this.options.connectionsOptions.itemTemplateSelector,
+                colorManager: this.colorManager
             });
 
             this.listenTo(this.connectionsView, 'connectionAdd', this.onConnectionAddedOrDeleted);
@@ -392,14 +396,80 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             this.listenTo(this.connectionsView, 'connectionRemove', this.onConnectionAddedOrDeleted);
         },
 
+        loadConnectionColors: function () {
+            var lastBackgroundColor = null;
+            this.options.connectionsOptions.collection.each(_.bind(function (connection) {
+                var obj = connection.toJSON();
+                this.colorManager.applyColors(obj, function () {
+                    return lastBackgroundColor;
+                });
+                this.colorManager.setCalendarColors(obj.calendar, obj.color, obj.backgroundColor);
+                lastBackgroundColor = obj.backgroundColor;
+            }, this));
+        },
+
         render: function() {
             // init views
             this.initCalendarContainer();
-            this.initializeConnectionsView();
+            if (_.isUndefined(this.options.connectionsOptions.containerTemplateSelector)) {
+                // connections management is not required - just load connections' colors and forged about connections
+                this.loadConnectionColors();
+                delete this.options.connectionsOptions;
+            } else {
+                this.initializeConnectionsView();
+            }
             // initialize jQuery FullCalendar control
             this.initializeFullCalendar();
 
             return this;
+        },
+
+        setTimeline: function() {
+            var calendarElement = this.getCalendarElement();
+            var curTime = new Date();
+            curTime = new Date(curTime.getTime()
+                + curTime.getTimezoneOffset() * 60000
+                + this.options.eventsOptions.timezoneOffset * 60000);
+            // this function is called every 5 minutes
+            if (curTime.getHours() == 0 && curTime.getMinutes() <= 5) {
+                // the day has changed
+                var todayElement = calendarElement.find('.fc-today');
+                todayElement.removeClass('fc-today');
+                todayElement.removeClass('fc-state-highlight');
+                todayElement.next().addClass('fc-today');
+                todayElement.next().addClass('fc-state-highlight');
+            }
+
+            var parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
+            var timelineElement = parentDiv.children('.timeline');
+            if (timelineElement.length == 0) {
+                // if timeline isn't there, add it
+                timelineElement = $('<hr>').addClass('timeline');
+                parentDiv.prepend(timelineElement);
+            }
+
+            var curCalView = calendarElement.fullCalendar('getView');
+            if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
+                timelineElement.show();
+            } else {
+                timelineElement.hide();
+            }
+
+            var curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+            var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
+            var topLoc = Math.floor(parentDiv.height() * percentOfDay);
+            timelineElement.css('top', topLoc + 'px');
+
+            if (curCalView.name == 'agendaWeek') {
+                // week view, don't want the timeline to go the whole way across
+                var dayCol = calendarElement.find('.fc-today:visible');
+                if (dayCol.position() != null) {
+                    timelineElement.css({
+                        left: (dayCol.position().left - 1) + 'px',
+                        width: (dayCol.width() + 2) + 'px'
+                    });
+                }
+            }
         }
     });
 });

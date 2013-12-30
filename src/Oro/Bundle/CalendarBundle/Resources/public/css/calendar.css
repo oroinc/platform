@@ -2,22 +2,41 @@
     position: relative;
     padding-right: 10px;
 }
-
+.calendar-container .timeline {
+    position: absolute;
+    left: 65px;
+    border: none;
+    border-top: 2px solid #FF5E5E;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 999;
+}
 .calendars {
     padding-left: 10px;
 }
 
 .calendars li {
-    color: #fff;
-    background-color: #80a8e7;
-    border: 1px solid #80a8e7;
-    -webkit-border-radius: 4px;
-       -moz-border-radius: 4px;
-            border-radius: 4px;
+    color: #444;
+}
+.calendars li .calendar-color{
+    width: 14px;
+    height: 14px;
+    -webkit-border-radius: 2px;
+    border-radius: 2px;
+    margin:2px 0 0;
+    float: left;
 }
 .calendars .media-body {
     margin-top: 2px;
     margin-left: 10px;
+}
+.calendars .media-body.usser-calendar{
+    font-size: 13px;
+    line-height: 17px;
+    font-weight: bold;
+    color: #444 !important;
+    margin-top: 0;
 }
 .calendars .icons-holder .icons-holder-text [class^="icon-"] {
     margin-right: 1px;
@@ -31,8 +50,104 @@
     display: none;
 }
 .calendars form .select2-container {
-    /* @todo: I'm not sure that it is good idea to set max-width here.
-              But I have no choice because default max-width is 290px */
-    max-width: 100%;
-    width: 100%;
+
+}
+.calendar-container .fc-grid th {
+    text-align: center;
+    color: #777;
+    font-weight: normal;
+}
+.calendar-container .fc-state-default {
+    background-color: #efefef;
+    background-image: -moz-linear-gradient(top, #fcfcfc, #efefef);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#fcfcfc), to(#efefef));
+    background-image: -webkit-linear-gradient(top, #fcfcfc, #efefef);
+    background-image: -o-linear-gradient(top, #fcfcfc, #efefef);
+    background-image: linear-gradient(to bottom, #fcfcfc, #efefef);
+    background-repeat: repeat-x;
+    border-color: #aeaeae;
+    color: #666;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.calendar-container .fc-state-hover,
+.calendar-container .fc-state-down,
+.calendar-container .fc-state-active,
+.calendar-container .fc-state-disabled {
+    color: #333;
+    background-color: #d1d1d1;
+    background-image: -moz-linear-gradient(top, #d1d1d1, #ebebeb);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#d1d1d1), to(#ebebeb));
+    background-image: -webkit-linear-gradient(top, #d1d1d1, #ebebeb);
+    background-image: -o-linear-gradient(top, #d1d1d1, #ebebeb);
+    background-image: linear-gradient(to bottom, #d1d1d1, #ebebeb);
+}
+.calendar-container .fc-state-disabled{
+    background-color: #ebebeb;
+    background-image: -moz-linear-gradient(top, #ebebeb, #ebebeb);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ebebeb), to(#ebebeb));
+    background-image: -webkit-linear-gradient(top, #ebebeb, #ebebeb);
+    background-image: -o-linear-gradient(top, #ebebeb, #ebebeb);
+    background-image: linear-gradient(to bottom, #ebebeb, #ebebeb);
+}
+.calendar-container .fc-button {
+    position: relative;
+    display: inline-block;
+    padding: 0 .6em;
+    overflow: hidden;
+    height: 30px;
+    line-height: 27px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.calendar-container .fc-state-hover {
+    color: #333333;
+    text-decoration: none;
+    background-position: 0 0;
+    -webkit-transition: none;
+    -moz-transition: none;
+    -o-transition: none;
+    transition: none;
+}
+.calendar-container .fc-header-title{
+    line-height: 18px;
+}
+.calendar-container .fc-header-title h2{
+    margin: 0;
+    font-size: 22px;
+    line-height: 30px;
+}
+#calendar{
+    overflow: hidden;
+    border-top: 1px solid #f2f2f2;
+    background-color: #f6f6f6;
+}
+#calendar .calendar-container{
+    padding-top: 15px;
+}
+.calendar-container .fc-event-title{
+    font-weight: bold;
+}
+.calendar-container .fc-border-separate thead th{
+    min-height: 50px;
+    color: #777;
+    font-weight: bold;
+}
+#calendar > .span2{
+    width: 15.8936%;
+}
+#calendar > .span2 .calendars{
+    padding: 10px 15px 0;
+}
+#calendar > .span10{
+    background-color: #fff;
+    width: 83.9787%;
+    padding-left: 1.11766%;
+    margin: 0;
+}
+#calendar .calendar-events {
+}
+.connection-container .media > .pull-right{
+    margin-top: -3px;
 }

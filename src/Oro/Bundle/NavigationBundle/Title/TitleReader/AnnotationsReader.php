@@ -6,49 +6,40 @@ use Doctrine\Common\Annotations\Reader as CommonAnnotationsReader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class AnnotationsReader extends Reader
+class AnnotationsReader implements ReaderInterface
 {
-    /**
-     * @var \Doctrine\Common\Annotations\Reader
-     */
+    const ANNOTATION_CLASS = 'Oro\\Bundle\\NavigationBundle\\Annotation\\TitleTemplate';
+
+    /** @var CommonAnnotationsReader */
     private $reader;
 
-    /**
-     * @var array
-     */
-    private $routes = array();
+    /** @var array */
+    protected $bundles = [];
 
-    const ANNOTATION_CLASS = 'Oro\Bundle\NavigationBundle\Annotation\TitleTemplate';
+    /** @var array */
+    private $routes = [];
 
     public function __construct(KernelInterface $kernel, CommonAnnotationsReader $reader)
     {
-        parent::__construct($kernel);
-
-        $this->reader = $reader;
+        $this->bundles = $kernel->getBundles();
+        $this->reader  = $reader;
     }
 
     /**
      * Get Route/Title information from controller annotations
      *
      * @param  array $routes
+     *
      * @return array()
      */
     public function getData(array $routes)
     {
         $this->prepareRoutesArray($routes);
-
         $directories = $this->getScanDirectories();
-        if (!$directories) {
-            return array();
+        if (empty($directories)) {
+            return [];
         }
-
         $files = $this->findFiles('*.php', $directories);
-
-        foreach ($files as $index => $file) {
-            if (strpos($file, 'AnnotationsReader') !== false || strpos($file, 'Annotation') !== false) {
-                unset($files[$index]);
-            }
-        }
 
         return $this->findTitlesAnnotations($files);
     }
@@ -62,7 +53,7 @@ class AnnotationsReader extends Reader
      */
     private function findTitlesAnnotations(array $files)
     {
-        $titles = array();
+        $titles = [];
 
         foreach ($files as $file) {
             $className = $this->getClassName($file);
@@ -73,8 +64,8 @@ class AnnotationsReader extends Reader
                 foreach ($reflection->getMethods() as $reflectionMethod) {
                     $title = $this->reader->getMethodAnnotation($reflectionMethod, self::ANNOTATION_CLASS);
                     if (is_object($title)) {
-                        $titles[$this->getDefaultRouteName($reflection, $reflectionMethod)] = $title->getTitleTemplate(
-                        );
+                        $route          = $this->getDefaultRouteName($reflection, $reflectionMethod);
+                        $titles[$route] = $title->getTitleTemplate();
                     }
                 }
             }
@@ -99,7 +90,7 @@ class AnnotationsReader extends Reader
     /**
      * Gets the default route name for a class method.
      *
-     * @param \ReflectionClass $class
+     * @param \ReflectionClass  $class
      * @param \ReflectionMethod $method
      *
      * @throws \RuntimeException if route doesn't exist
@@ -146,8 +137,9 @@ class AnnotationsReader extends Reader
     }
 
     /**
-     * @param $filePattern
+     * @param       $filePattern
      * @param array $dirs
+     *
      * @return array
      */
     private function findFiles($filePattern, array $dirs)
@@ -159,12 +151,34 @@ class AnnotationsReader extends Reader
             ->in($dirs)
             ->ignoreVCS(true);
 
-        $result = array();
+        $result = [];
         /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             $result[] = $file->getRealPath();
         }
 
         return $result;
+    }
+
+    /**
+     * Get dir array of bundles
+     *
+     * @return array
+     */
+    protected function getScanDirectories()
+    {
+        $directories = [];
+
+        /** @var $bundle \Symfony\Component\HttpKernel\Bundle\BundleInterface */
+        foreach ($this->bundles as $bundle) {
+            // assume that controllers always in Controller directory
+            // this needs just for performance purposes
+            $directory = $bundle->getPath() . DIRECTORY_SEPARATOR . 'Controller';
+            if (is_dir($directory)) {
+                $directories[] = $directory;
+            }
+        }
+
+        return $directories;
     }
 }

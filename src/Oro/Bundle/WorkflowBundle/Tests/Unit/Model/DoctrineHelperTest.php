@@ -129,10 +129,6 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'entity' => new ItemStub(),
                 'class'  => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
             ),
-            'entity proxy' => array(
-                'entity' => new ItemStubProxy(self::TEST_IDENTIFIER),
-                'class'  => 'ItemStubProxy',
-            ),
         );
     }
 

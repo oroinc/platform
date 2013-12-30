@@ -1,5 +1,5 @@
-define(['jquery', 'routing', 'oro/messenger', 'oro/translator', 'oro/navigation', 'oro/modal'],
-function($, routing, messenger, __, Navigation, Modal) {
+define(['jquery', 'underscore', 'routing', 'oro/messenger', 'oro/translator', 'oro/navigation', 'oro/modal'],
+function($, _, routing, messenger, __, Navigation, Modal) {
     'use strict';
 
     var navigation = Navigation.getInstance();
@@ -79,7 +79,7 @@ function($, routing, messenger, __, Navigation, Modal) {
         if (element.data('dialog-url')) {
             require(['oro/dialog-widget'],
             function(DialogWidget) {
-                var transitionFormWidget = new DialogWidget({
+                var dialogOptions = {
                     title: element.data('transition-label') || element.html(),
                     url: element.data('dialog-url'),
                     stateEnabled: false,
@@ -91,7 +91,18 @@ function($, routing, messenger, __, Navigation, Modal) {
                         width: 475,
                         autoResize: true
                     }
-                });
+                };
+                var additionalOptions = element.data('dialog-options');
+                if (additionalOptions) {
+                    if (additionalOptions.dialogOptions !== undefined) {
+                        additionalOptions.dialogOptions = _.extend(
+                            dialogOptions.dialogOptions,
+                            additionalOptions.dialogOptions
+                        );
+                    }
+                    dialogOptions = _.extend(dialogOptions, additionalOptions);
+                }
+                var transitionFormWidget = new DialogWidget(dialogOptions);
                 transitionFormWidget.on('widgetRemove', resetInProgress);
                 transitionFormWidget.on('formSave', function(data) {
                     transitionFormWidget.remove();
@@ -108,6 +119,9 @@ function($, routing, messenger, __, Navigation, Modal) {
                 });
                 confirm.on('ok', function() {
                     performTransition(element);
+                });
+                confirm.on('cancel', function() {
+                    resetInProgress();
                 });
                 confirm.open();
             } else {

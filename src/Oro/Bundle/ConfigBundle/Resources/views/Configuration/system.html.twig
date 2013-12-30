@@ -2,14 +2,39 @@
 {% if form %}
     {% form_theme form with ['OroConfigBundle:Form:fields.html.twig', 'OroFormBundle:Form:fields.html.twig'] %}
 {% endif %}
+{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroConfigBundle::macros.html.twig' as configUI %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set pageTitle = 'Configuration' %}
 
 {% block content %}
-    {{ configUI.renderTitleAndSearch(pageTitle, []) }}
-    {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
+    {% set saveButton = UI.saveAndStayButton('', 'Save Settings'|trans) %}
+    {% set restoreButton = UI.buttonType({
+        type: 'reset',
+        label: 'Restore Defaults'|trans
+    }) %}
+    {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
+    <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post"
+          data-collect="true">
+        {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
+        {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
+    </form>
+    {{ oro_form_js_validation(form) }}
 
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
+                var $form = $(this).closest('form'),
+                    $notDefault = $form.find('.parent-scope-checkbox :checkbox:not(:checked)');
+                e.preventDefault();
+                $form.get(0).reset();
+                $notDefault.filter(':checked').trigger('change');
+            });
+        });
+    </script>
+
+    {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
     <script type="text/javascript">
         /* jshint browser:true, devel:true */
         /* global require */

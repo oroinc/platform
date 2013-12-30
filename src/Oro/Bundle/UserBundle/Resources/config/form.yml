@@ -17,6 +17,7 @@ parameters:
     oro_user.form.handler.group.class:          Oro\Bundle\UserBundle\Form\Handler\GroupHandler
     oro_user.form.handler.status.class:         Oro\Bundle\UserBundle\Form\Handler\StatusHandler
     oro_user.form.handler.acl_role.class:       Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler
+    oro_user.form.type.user_acl_select.class:   Oro\Bundle\UserBundle\Form\Type\UserAclSelectType
 
 services:
     oro_user.form.user:
@@ -123,6 +124,11 @@ services:
         tags:
             - { name: form.type, alias: oro_user_select }
 
+    oro_user.form.type.user_acl_select:
+        class: %oro_user.form.type.user_acl_select.class%
+        tags:
+            - { name: form.type, alias: oro_user_acl_select }
+
     oro_user.form.type.user_multiselect:
         class: %oro_user.form.type.user_multiselect.class%
         arguments:
@@ -183,6 +189,9 @@ services:
         scope:                        prototype
         arguments:                    ["@form.factory", %oro_user.privileges%]
         calls:
-                    - [setAclManager, ["@oro_security.acl.manager"]]
-                    - [setEntityManager, ["@doctrine.orm.entity_manager"]]
-                    - [setRequest, ["@request"]]
+            - [setAclManager, ["@oro_security.acl.manager"]]
+            - [setAclPrivilegeRepository, ["@oro_security.acl.privilege_repository"]]
+            - [setEntityManager, ["@doctrine.orm.entity_manager"]]
+            - [setRequest, ["@request"]]
+
+

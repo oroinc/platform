@@ -1,0 +1,24 @@
+{
+    "name": "oro/integration-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP Integration Bundle",
+    "keywords": ["BAP", "Integration"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4",
+        "symfony/symfony": "2.3.*",
+        "doctrine/orm": ">=2.3,<2.4-dev"
+    },
+    "autoload": {
+        "psr-0": {
+            "Oro\\Bundle\\IntegrationBundle": ""
+        }
+    },
+    "target-dir": "Oro/Bundle/IntegrationBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

@@ -1,0 +1,12 @@
+<div title="Add widget">
+    <div class="sidebar-widgetadd-widgets">
+        <ol>
+            <% _.each(availableWidgets, function (widget, name) { %>
+            <li class="ui-state-default" data-widget-name="<%= name %>">
+                <img src="<%= widget.icon %>"/>
+                <span><%= widget.title %></span>
+            </li>
+            <% }); %>
+        </ol>
+    </div>
+</div>

@@ -88,6 +88,24 @@ class OwnerTree
     }
 
     /**
+     * The __set_state handler
+     *
+     * @param array $data Initialization array
+     * @return OwnerTree A new instance of a OwnerTree object
+     */
+    // @codingStandardsIgnoreStart
+    public static function __set_state($data)
+    {
+        $result = new OwnerTree();
+        foreach ($data as $key => $val) {
+            $result->{$key} = $val;
+        }
+
+        return $result;
+    }
+    // @codingStandardsIgnoreEnd
+
+    /**
      * Gets the owning organization id for the given user id
      *
      * @param  int|string      $userId
@@ -208,6 +226,48 @@ class OwnerTree
         return isset($this->subordinateBusinessUnitIds[$businessUnitId])
             ? $this->subordinateBusinessUnitIds[$businessUnitId]
             : array();
+    }
+
+    /**
+     * Gets all user business unit ids with subordinate business unit ids
+     *
+     * @param int $userId
+     * @return array  of int|string
+     */
+    public function getUserSubordinateBusinessUnitIds($userId)
+    {
+        $buIds = $this->getUserBusinessUnitIds($userId);
+        $resultBuIds = array_merge($buIds, []);
+        foreach ($buIds as $buId) {
+            $diff = array_diff(
+                $this->getSubordinateBusinessUnitIds($buId),
+                $resultBuIds
+            );
+            if (!empty($diff)) {
+                $resultBuIds = array_merge($resultBuIds, $diff);
+            }
+        }
+
+        return $resultBuIds;
+    }
+
+    /**
+     * Gets all user business unit ids by user organization ids
+     *
+     * @param int $userId
+     * @return array  of int|string
+     */
+    public function getBusinessUnitsIdByUserOrganizations($userId)
+    {
+        $resultBuIds = [];
+        foreach ($this->getUserOrganizationIds($userId) as $orgId) {
+            $buIds = $this->getOrganizationBusinessUnitIds($orgId);
+            if (!empty($buIds)) {
+                $resultBuIds = array_merge($resultBuIds, $buIds);
+            }
+        }
+
+        return $resultBuIds;
     }
 
     /**
