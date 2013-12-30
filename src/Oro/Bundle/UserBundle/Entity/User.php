@@ -418,7 +418,7 @@ class User extends ExtendUser implements
             $this->enabled,
             $this->confirmationToken,
             $this->id
-            ) = unserialize($serialized);
+        ) = unserialize($serialized);
     }
 
     /**
@@ -667,8 +667,8 @@ class User extends ExtendUser implements
 
     public function isPasswordRequestNonExpired($ttl)
     {
-        return $this->getPasswordRequestedAt() instanceof \DateTime &&
-        $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        return $this->getPasswordRequestedAt() instanceof \DateTime
+            && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
     /**

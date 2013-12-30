@@ -222,7 +222,6 @@ class LoggableManager
         if ($this->hasConfig($ownerEntityClassName)) {
             $meta              = $this->getConfig($ownerEntityClassName);
             $collectionMapping = $collection->getMapping();
-            $doctrineMetadata  = $this->em->getClassMetadata($ownerEntityClassName);
 
             if (isset($meta->propertyMetadata[$collectionMapping['fieldName']])) {
                 $method = $meta->propertyMetadata[$collectionMapping['fieldName']]->method;
@@ -246,7 +245,7 @@ class LoggableManager
                     }
                 );
 
-                $entityIdentifier = serialize($doctrineMetadata->getIdentifierValues($ownerEntity));
+                $entityIdentifier = $this->getEntityIdentifierString($ownerEntity);
                 $fieldName = $collectionMapping['fieldName'];
                 $this->collectionLogData[$ownerEntityClassName][$entityIdentifier][$fieldName] = array(
                     'old' => $oldData,
@@ -367,7 +366,7 @@ class LoggableManager
                 );
             }
 
-            $entityIdentifier = serialize($entityMeta->getIdentifierValues($entity));
+            $entityIdentifier = $this->getEntityIdentifierString($entity);
             if (!empty($this->collectionLogData[$entityClassName][$entityIdentifier])) {
                 $collectionData = $this->collectionLogData[$entityClassName][$entityIdentifier];
                 foreach ($collectionData as $field => $changes) {
@@ -519,5 +518,17 @@ class LoggableManager
         }
 
         return $entity;
+    }
+
+    /**
+     * @param object $entity
+     * @return string
+     */
+    protected function getEntityIdentifierString($entity)
+    {
+        $className = $this->getEntityClassName($entity);
+        $metadata = $this->em->getClassMetadata($className);
+
+        return serialize($metadata->getIdentifierValues($entity));
     }
 }
