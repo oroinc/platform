@@ -1,4 +1,11 @@
 oro_system_configuration:
+    fields:
+        oro_translation.available_translations:
+            type:  oro_translation_available_translations
+            options:
+                label: 'Available translations'
+            is_parent_scope_available: false
+
     tree:
         system_configuration:
             platform:
@@ -8,4 +15,5 @@ oro_system_configuration:
                             localization:
                                 children:
                                     language_settings:
-                                        children: []
+                                        children:
+                                            - oro_translation.available_translations

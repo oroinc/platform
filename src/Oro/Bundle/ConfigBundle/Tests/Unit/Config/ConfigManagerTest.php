@@ -5,10 +5,10 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
@@ -16,6 +16,7 @@ use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
@@ -262,7 +263,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $config = Yaml::parse(file_get_contents($configPath));
 
-        $processor = new ProcessorDecorator();
+        $processor = new ProcessorDecorator(new Processor());
         $config = $processor->process($config);
 
         $subscriber    = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')

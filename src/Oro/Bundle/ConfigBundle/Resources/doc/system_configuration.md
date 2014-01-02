@@ -38,6 +38,7 @@ Field declaration have required property `type`.
 `tooltip` - show additional info about field
 `acl_resource` - determines acl resource to check permissions to change config field value(optional)
 `priority` - sort order for displaying(optional)
+`is_parent_scope_available` - should "use default checkbox" be shown(optional, default: true)
 
 Also `options` available property here, it's just a proxy to form type definition
 

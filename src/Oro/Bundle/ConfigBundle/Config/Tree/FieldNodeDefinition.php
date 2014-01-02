@@ -80,7 +80,7 @@ class FieldNodeDefinition extends AbstractNodeDefinition
             ),
             array_intersect_key(
                 $this->getOptions(),
-                array_flip(array('label', 'required', 'block', 'subblock', 'tooltip'))
+                array_flip(array('label', 'required', 'block', 'subblock', 'tooltip', 'is_parent_scope_available'))
             )
         );
     }

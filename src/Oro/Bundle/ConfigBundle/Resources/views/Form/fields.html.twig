@@ -14,32 +14,4 @@
             {{ form_label(form.use_parent_scope_value) }}
         </div>
     </div>
-
-    <script type="text/javascript">
-        /* jshint browser:true, devel:true */
-        /* global require */
-        require(['jquery', 'underscore'],
-                function ($, _) {
-                    'use strict';
-
-                    $(function () {
-                        var checkboxEl = $('#{{ form.use_parent_scope_value.vars.id }}');
-                        var valueEls = $('#{{ valueContainerId }}').find(':input');
-
-                        checkboxEl.change(function () {
-                            var value = $(this).is(':checked');
-                            valueEls.each(function (i, el) {
-                                $(el)
-                                        .prop('disabled', value)
-                                        .data('disabled', value);
-
-                                if (!_.isUndefined($.uniform) && _.contains($.uniform.elements, el)) {
-                                    $(el).uniform('update');
-                                }
-                            });
-                        });
-                    });
-                }
-        );
-    </script>
 {% endblock %}

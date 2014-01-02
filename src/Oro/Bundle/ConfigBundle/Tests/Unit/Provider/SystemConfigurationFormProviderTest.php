@@ -3,8 +3,8 @@ namespace ConfigBundle\Tests\Provider;
 
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
@@ -177,7 +177,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
     {
         $config = Yaml::parse(file_get_contents($path));
 
-        $processor = new ProcessorDecorator();
+        $processor = new ProcessorDecorator(new Processor());
 
         return $processor->process($config);
     }

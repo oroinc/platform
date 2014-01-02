@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -19,7 +20,7 @@ class SystemConfigurationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $config    = array();
-        $processor = new ProcessorDecorator();
+        $processor = new ProcessorDecorator(new Processor());
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
