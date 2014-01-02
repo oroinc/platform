@@ -64,19 +64,6 @@ function(_, messenger, __, Modal, AbstractAction) {
         _onAjaxSuccess: function(data, textStatus, jqXHR) {
             this.datagrid.resetSelectionState();
             AbstractAction.prototype._onAjaxSuccess.apply(this, arguments);
-        },
-
-        /**
-         * Get view for confirm modal
-         *
-         * @return {oro.Modal}
-         */
-        getConfirmDialog: function(callback) {
-            return new Modal({
-                title: this.messages.confirm_title,
-                content: this.messages.confirm_content,
-                okText: this.messages.confirm_ok
-            }).on('ok', callback);
         }
     });
 });

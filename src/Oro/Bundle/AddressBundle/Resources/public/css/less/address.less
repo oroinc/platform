@@ -1,3 +1,5 @@
+@import "../../../oroui/css/less/mixins";
+
 .map-box {
   /*background: url("../../img/vertical-separator.png") repeat-y 40% 0;*/
   &:after {
@@ -19,6 +21,10 @@
     width: 60%;
     height: 420px;
   }
+  .map-address-list, .map-visual-frame {
+    .forScreen(@smallScreen, width, 100%);
+    .forScreen(@smallScreen, height, auto);
+  }
   .map-visual {
     height: 420px;
     margin-left: 5px;
@@ -33,9 +39,7 @@
   .map-item {
     border-bottom:1px solid #eee;
     padding: 15px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
+    .box-sizing(border-box);
     width: 100%;
     cursor:pointer;
     &:hover {
@@ -92,8 +96,7 @@
       height:auto;
       border: 0;
       background: 0;
-      -webkit-box-shadow: none;
-      box-shadow: none;
+      .box-shadow(none);
       padding: 0;
       [class^='icon-'] {
         &:before {
@@ -106,15 +109,6 @@
           }
         }
       }
-    }
-  }
-}
-
-@media only screen and (max-width: @smallScreen) {
-  .map-box {
-    .map-address-list, .map-visual-frame {
-      width: 100%;
-      height: auto;
     }
   }
 }

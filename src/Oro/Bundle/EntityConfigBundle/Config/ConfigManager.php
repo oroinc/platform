@@ -230,17 +230,27 @@ class ConfigManager
     }
 
     /**
-     * @param $scope
-     * @param $className
+     * @param string $scope
+     * @param string $className
+     * @param bool   $withHidden
      * @return array
      */
-    public function getIds($scope, $className = null)
+    public function getIds($scope, $className = null, $withHidden = false)
     {
         if (!$this->modelManager->checkDatabase()) {
             return [];
         }
 
-        $entityModels = $this->modelManager->getModels($className);
+        if ($withHidden) {
+            $entityModels = $this->modelManager->getModels($className);
+        } else {
+            $entityModels = array_filter(
+                $this->modelManager->getModels($className),
+                function (AbstractConfigModel $model) {
+                    return $model->getMode() != ConfigModelManager::MODE_HIDDEN;
+                }
+            );
+        }
 
         return array_map(
             function (AbstractConfigModel $model) use ($scope) {
@@ -381,6 +391,10 @@ class ConfigManager
                 $model = $this->modelManager->getModelByConfigId($config->getId());
 
                 $models[$configKey] = $model;
+            }
+
+            if ($model instanceof FieldConfigModel && $model->getType() == 'optionSet' && $config->has('set_options')) {
+                $model->setOptions($config->get('set_options'));
             }
 
             //TODO::refactoring

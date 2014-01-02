@@ -30,6 +30,7 @@ class DateTimeFormatConverterRegistryTest extends \PHPUnit_Framework_TestCase
         $converter = $this->createFormatConverter();
         $this->registry->addFormatConverter($name, $converter);
         $this->assertAttributeEquals(array($name => $converter), 'converters', $this->registry);
+        $this->assertCount(1, $this->registry->getFormatConverters());
     }
 
     /**

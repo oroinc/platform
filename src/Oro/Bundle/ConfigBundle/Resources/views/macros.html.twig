@@ -27,7 +27,7 @@
 {% macro renderScrollData(data, form, activeTabName = false, activeSubTabName = false) %}
     {% import _self as __ %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <div class="system-configuration-container left-sidebar-container">
+    <div class="system-configuration-container left-panel-container">
         <div class="placeholder">
             <div class="scrollable-container">
                 {% if activeSubTabName and form != false %}
@@ -66,7 +66,7 @@
 #}
 {% macro renderTabs(data, activeTabName = false, activeSubTabName = false) %}
     {% import _self as __ %}
-    <div class="sidebar">
+    <div class="left-panel">
         <div class="system-configuration-search">
             {#div class="clearfix">
                 <div class="input-append">

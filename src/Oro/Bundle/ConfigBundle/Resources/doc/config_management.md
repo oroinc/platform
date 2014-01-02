@@ -45,7 +45,21 @@ public function getConfigTreeBuilder()
 }
 ```
 
-`type` above could be `scalar` (which is default) or `boolean`.
+`type` above could be `scalar` (which is default), `boolean` or `array`.
+This call will append additional nodes to bundle config tree.
+
+After tree will be processed in Extension class, need to pass configuration data to container.
+Array with `settings` - key should be set using `Containerbuilder#prependExtensionConfiguration method`.
+
+**Example:**
+``` php
+     public function load(array $configs, ContainerBuilder $container)
+     {
+         // ....
+         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+         // ...
+     }
+```
 
 ### View ###
 

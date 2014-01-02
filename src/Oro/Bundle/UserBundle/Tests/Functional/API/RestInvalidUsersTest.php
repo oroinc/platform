@@ -34,7 +34,7 @@ class RestInvalidUsersTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
-                "rolesCollection" => array("1")
+                "roles" => array("1")
             )
         );
         $this->client->request(
@@ -59,7 +59,7 @@ class RestInvalidUsersTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
-                "rolesCollection" => array("1")
+                "roles" => array("1")
             )
         );
         $this->client->request(

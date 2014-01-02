@@ -1,4 +1,5 @@
 parameters:
+    oro_config.config_definition_bag.class:                                      Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag
     oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\ConfigManager
     oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserConfigManager
     oro_config.twig_extension.class:                                             Oro\Bundle\ConfigBundle\Twig\ConfigExtension
@@ -12,9 +13,16 @@ parameters:
     oro_config.type.config_checkbox.class:                                       Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
 
 services:
+    oro_config.config_definition_bag:
+        class: %oro_config.config_definition_bag.class%
+        arguments:
+            - []
+
     oro_config.user:
         class:                        %oro_config.user.class%
-        arguments:                    ["@doctrine.orm.entity_manager"]
+        arguments:
+           - @doctrine.orm.entity_manager
+           - @oro_config.config_definition_bag
         calls:
              - [setSecurity, ["@security.context"]]
         tags:
@@ -22,7 +30,9 @@ services:
 
     oro_config.global:
         class:                        %oro_config.global.class%
-        arguments:                    ["@doctrine.orm.entity_manager"]
+        arguments:
+           - @doctrine.orm.entity_manager
+           - @oro_config.config_definition_bag
         tags:
             -  { name: oro_config.manager }
 

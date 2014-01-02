@@ -3,6 +3,7 @@ oro_windows_api:
     type: rest
     prefix: api/rest/{version}/
     requirements:
-        version: latest|v1
+        version:  latest|v1
+        _format:  json
     defaults:
         version: latest

@@ -23,12 +23,19 @@
                     <div>{{ error|trans }}</div>
                 </div>
             {% endif %}
+            {%- set usernameLabel = 'Username'|trans %}
+            {%- set passwordLabel = 'Password'|trans %}
+            {%- set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
             <div class="input-prepend">
-                <span class="add-on">{{ 'Username'|trans }}</span>
+                {% if showLabels %}
+                <span class="add-on">{{ usernameLabel }}</span>
+                {% endif %}
                 <input type="text" id="prependedInput" class="span2" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
             </div>
             <div class="input-prepend">
-                <span class="add-on">{{ 'Password'|trans }}</span>
+                {% if showLabels %}
+                <span class="add-on">{{ passwordLabel }}</span>
+                {% endif %}
                 <input type="password" id="prependedInput2" class="span2" name="_password" required="required" placeholder="{{ 'Password'|trans }}" autocomplete="off" />
             </div>
             <label class="checkbox oro-remember-me">

@@ -89,6 +89,7 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
     public function loadConfigurationDataProvider()
     {
         $settings = array(
+            'resolved' => true,
             'maxItems' => array(
                 'value' => 20,
                 'scope' => 'app'

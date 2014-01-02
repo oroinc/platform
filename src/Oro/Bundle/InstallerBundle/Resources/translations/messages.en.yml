@@ -4,6 +4,7 @@ wait:                     Waiting
 progress:                 In progress...
 passed:                   Done
 failed:                   Failed
+skipped:                  Skipped
 
 form:
     configuration:
@@ -33,6 +34,8 @@ form:
             port:         Port
     setup:
         email:            Email
+        company_name:     Company short name
+        company_title:    Company name
         username:         Username
         firstname:        First name
         lastname:         Last name
@@ -57,6 +60,7 @@ process:
             init-config:   Init entities config
             init-extend:   Init extended entities
             update-config: Update extended entities config
+            workflows:     Load workflow definitions
         setup:
             header:        Administration setup
         installation:

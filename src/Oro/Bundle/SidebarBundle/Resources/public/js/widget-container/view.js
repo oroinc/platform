@@ -12,7 +12,6 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
      * @extends Backbone.View
      */
     var WidgetView = Backbone.View.extend({
-        className: 'sidebar-widget-pin',
         templateMin: _.template(widgetMinTemplate),
         templateMax: _.template(widgetMaxTemplate),
 
@@ -53,6 +52,12 @@ define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/s
                     view.contentView.setElement($widgetContent);
                     view.contentView.render();
                 });
+            }
+
+            if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
+                view.$el.addClass('sidebar-widget-popup');
+            } else {
+                view.$el.removeClass('sidebar-widget-popup');
             }
 
             return view;

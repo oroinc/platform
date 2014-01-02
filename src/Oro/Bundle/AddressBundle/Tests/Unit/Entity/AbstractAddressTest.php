@@ -43,8 +43,8 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             'street' => array('street', 'street'),
             'street2' => array('street2', 'street2'),
             'city' => array('city', 'city'),
-            'state' => array('state', $regionMock),
-            'stateText' => array('stateText', 'test state'),
+            'region' => array('region', $regionMock),
+            'regionText' => array('regionText', 'test region'),
             'postalCode' => array('postalCode', '12345'),
             'organization' => array('organization', 'Oro Inc.'),
             'country' => array('country', $countryMock),
@@ -172,7 +172,7 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
                     'firstName' => 'FirstName',
                     'lastName' => 'LastName',
                     'street' => 'Street',
-                    'state' => $this->createMockRegion('Kharkivs\'ka oblast\''),
+                    'region' => $this->createMockRegion('Kharkivs\'ka oblast\''),
                     'postalCode' => '12345',
                     'country' => $this->createMockCountry('Ukraine'),
                 ),
@@ -212,19 +212,19 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         return $result;
     }
 
-    public function testStateText()
+    public function testRegionText()
     {
         $address = $this->createAddress();
         $region = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Region')
             ->disableOriginalConstructor()
             ->getMock();
-        $address->setState($region);
-        $this->assertEquals($region, $address->getState());
-        $address->setStateText('text state');
-        $this->assertEquals('text state', $address->getUniversalState());
+        $address->setRegion($region);
+        $this->assertEquals($region, $address->getRegion());
+        $address->setRegionText('text region');
+        $this->assertEquals('text region', $address->getUniversalRegion());
     }
 
-    public function testIsStateValidNoCountry()
+    public function testIsRegionValidNoCountry()
     {
         $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
             ->disableOriginalConstructor()
@@ -233,10 +233,10 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             ->method('addViolationAt');
 
         $address = $this->createAddress();
-        $address->isStateValid($context);
+        $address->isRegionValid($context);
     }
 
-    public function testIsStateValidNoRegion()
+    public function testIsRegionValidNoRegion()
     {
         $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
             ->disableOriginalConstructor()
@@ -253,10 +253,10 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
 
         $address = $this->createAddress();
         $address->setCountry($country);
-        $address->isStateValid($context);
+        $address->isRegionValid($context);
     }
 
-    public function testIsStateValid()
+    public function testIsRegionValid()
     {
         $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
             ->disableOriginalConstructor()
@@ -277,14 +277,14 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
         $context->expects($this->once())
             ->method('addViolationAt')
             ->with(
-                'test.state',
-                'State is required for country %country%',
+                'test.region',
+                'Region is required for country %country%',
                 array('%country%' => 'Country')
             );
 
         $address = $this->createAddress();
         $address->setCountry($country);
-        $address->isStateValid($context);
+        $address->isRegionValid($context);
     }
 
     public function testIsEmpty()
@@ -322,8 +322,8 @@ class AbstractAddressTest extends \PHPUnit_Framework_TestCase
             'street' => array('street', 'street'),
             'street2' => array('street2', 'street2'),
             'city' => array('city', 'city'),
-            'state' => array('state', $regionMock),
-            'stateText' => array('stateText', 'test state'),
+            'region' => array('region', $regionMock),
+            'regionText' => array('regionText', 'test region'),
             'postalCode' => array('postalCode', '12345'),
             'country' => array('country', $countryMock),
         );

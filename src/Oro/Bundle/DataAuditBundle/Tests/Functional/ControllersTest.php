@@ -54,7 +54,7 @@ class ControllersTest extends WebTestCase
         $form['oro_user_user_form[birthday]'] = $this->userData['birthday'];
         $form['oro_user_user_form[email]'] = $this->userData['email'];
         $form['oro_user_user_form[groups][1]'] = 2;
-        $form['oro_user_user_form[rolesCollection][1]'] = true;
+        $form['oro_user_user_form[roles][1]'] = true;
         $form['oro_user_user_form[owner]'] = 1;
 
         $this->client->followRedirects(true);

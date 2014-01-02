@@ -1,20 +1,28 @@
 parameters:
-    translator.class: Oro\Bundle\TranslationBundle\Translation\Translator
-    oro_translation.controller.class: Oro\Bundle\TranslationBundle\Controller\Controller
-    oro_translation.extractor.php_code_extractor.class: Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
+    translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
+    oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
+    oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
+    oro_translation.database_translation.loader.class:          Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
+    oro_translation.database_translation.metadata.cache.class:  Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache
+    oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
-    oro_translation.service_provider.class: Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
+    oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
 
-    oro_translation.adapter.class: Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
+    oro_translation.adapter.class:                              Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
 
 services:
     oro_translation.controller:
         class: %oro_translation.controller.class%
-        arguments: [@translator, @templating, OroTranslationBundle:Translation:translation.js.twig, ""]
+        arguments:
+            - @translator
+            - @templating
+            - OroTranslationBundle:Translation:translation.js.twig
+            - ""
 
     oro_translation.extractor.php_code_extractor:
         class: %oro_translation.extractor.php_code_extractor.class%
-        arguments: [@service_container]
+        arguments:
+            - @service_container
         tags:
             - { name: translation.extractor, alias: oro_translation_php_extractor }
 
@@ -27,3 +35,29 @@ services:
         class: %oro_translation.adapter.class%
         arguments:
             - %oro_translation.api.crowdin.endpoint%
+
+    oro_translation.database_translation.metadata.cache:
+        class: %oro_translation.database_translation.metadata.cache.class%
+        arguments:
+            - @oro_translation.database_translation.metadata.cache_impl
+
+    oro_translation.database_translation.metadata.cache_impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_database_translation_metadata.cache" ] ]
+
+    oro_translation.database_translation.loader:
+        class: %oro_translation.database_translation.loader.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: translation.loader, alias: oro_database_translation }
+
+    oro_translation.listener.request:
+        class: %oro_translation.listener.request.class%
+        arguments:
+            - @translator
+            - @oro_translation.database_translation.metadata.cache
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest}

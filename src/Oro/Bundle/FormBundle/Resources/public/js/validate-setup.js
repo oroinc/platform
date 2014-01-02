@@ -124,6 +124,18 @@ function($, _, __, tools) {
         return func.apply(this, _.rest(arguments));
     });
 
+    // fixes focus on select2 element
+    $.validator.prototype.focusInvalid = _.wrap($.validator.prototype.focusInvalid, function (func) {
+        var $elem = $(this.findLastActive() || (this.errorList.length && this.errorList[0].element) || []);
+        if (this.settings.focusInvalid && $elem.is('.select2[type=hidden]')) {
+            $elem.parent().find('input.select2-focusser')
+                .focus()
+                .trigger("focusin");
+        } else {
+            func.apply(this, _.rest(arguments));
+        }
+    });
+
     /**
      * Loader for custom validation methods
      *
@@ -145,11 +157,16 @@ function($, _, __, tools) {
         },
         highlight: function (element) {
             this.settings.unhighlight.call(this, element);
-            getErrorTarget(element).addClass('error').closest('.controls').addClass('validation-error');
+            var $el = getErrorTarget(element);
+            $el.addClass('error')
+                .closest('.controls').addClass('validation-error');
+            $el.closest('.control-group').find('label').addClass('validation-error');
         },
         unhighlight: function(element) {
-            $(element).closest('.error').removeClass('error')
-                .closest('.controls').removeClass('validation-error');
+            var $el = $(element);
+            $el.closest('.error').removeClass('error')
+                .closest('.control').removeClass('validation-error');
+            $el.closest('.control-group').find('label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden
         ignore: ":hidden:not([type=hidden])"

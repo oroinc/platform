@@ -13,64 +13,67 @@
     <title>{% block title %}  {% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block stylesheet %}
-    <link rel="stylesheet" type="text/css" href="/css/oro.css"/>
-    <link rel="stylesheet" type="text/css" href="/bundles/oroinstaller/css/style.css"/>
-    <link rel="stylesheet" type="text/css" href="/bundles/orodistribution/css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/oro.css"/>
+        <link rel="stylesheet" type="text/css" href="/bundles/oroinstaller/css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="/bundles/orodistribution/css/style.css"/>
     {% endblock %}
 
     {% block javascripts %}
-    <script type="text/javascript" src="/bundles/oroinstaller/lib/jquery-2.0.3.min.js"></script>
-    <script type="text/javascript" src="/bundles/orodistribution/js/loader.js"></script>
-    <script type="text/javascript" src="/bundles/orodistribution/js/util.js"></script>
-    <script type="text/javascript" src="/bundles/orodistribution/js/package.manager.js"></script>
-    <script type="text/javascript" src="/bundles/orodistribution/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/bundles/orodistribution/js/bootbox.min.js"></script>
-    <script type="text/javascript" src="/bundles/orodistribution/js/jquery.cookie.js"></script>
+        <script type="text/javascript" src="/bundles/oroinstaller/lib/jquery-2.0.3.min.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/loader.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/util.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/package.manager.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/bootbox.min.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/jquery.cookie.js"></script>
 
-    <script type="text/javascript">
+        <script type="text/javascript">
 
-        $(function () {
+            $(function () {
 
-            $(document).ajaxError(function (e) {
-                loader.displayOriginalElement();
-                util.error('Ajax error');
-            });
-
-            var Urls = {
-                install: "{{ path('oro_distribution_package_install') }}",
-                uninstall: "{{ path('oro_distribution_package_uninstall') }}",
-                update: "{{ path('oro_distribution_package_update') }}",
-                available: "{{ path('oro_distribution_package_listavailable') }}",
-                installed: "{{ path('oro_distribution_package_listinstalled') }}"
-            };
-
-            var loader = new Loader($('.ajax-loading'));
-            var util = new Util($('#alerts'));
-            var pm = new PackageManager(Urls, util);
-
-            $('.ajax').on('click', function () {
-                var me = $(this);
-                var action = me.data('action');
-                var params = me.data('params');
-                loader.setClickedElement(me);
-                loader.displayLoadingProgress();
-                pm[action](params, function(){
+                $(document).ajaxError(function (e) {
                     loader.displayOriginalElement();
+                    util.error('Ajax error');
                 });
 
-                return false;
-            });
+                var Urls = {
+                    install: "{{ path('oro_distribution_package_install') }}",
+                    uninstall: "{{ path('oro_distribution_package_uninstall') }}",
+                    update: "{{ path('oro_distribution_package_update') }}",
+                    available: "{{ path('oro_distribution_package_listavailable') }}",
+                    installed: "{{ path('oro_distribution_package_listinstalled') }}"
+                };
 
-            util.displayCookieMessage();
-        });
-    </script>
+                var loader = new Loader($('.ajax-loading'));
+                var util = new Util($('#alerts'));
+                var pm = new PackageManager(Urls, util);
+
+                $('.ajax').on('click', function () {
+                    var me = $(this);
+                    var action = me.data('action');
+                    var params = me.data('params');
+                    loader.setClickedElement(me);
+                    loader.displayLoadingProgress();
+                    pm[action](params, function () {
+                        loader.displayOriginalElement();
+                    });
+
+                    return false;
+                });
+
+                util.displayCookieMessage();
+            });
+        </script>
     {% endblock %}
 </head>
 <body class="desktop-version">
 <header id="oroplatform-header">
     <div class="navbar-inner">
         <h1 class="logo">
-            <a href="#">Oro Installer</a>
+            <a href="/"><i class="icon-home"></i></a>
+            <a href="{{ path('index') }}">
+                Oro Installer
+            </a>
         </h1>
 
         <div class="pull-right help">

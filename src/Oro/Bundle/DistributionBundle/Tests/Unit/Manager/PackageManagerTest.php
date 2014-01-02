@@ -6,7 +6,6 @@ use Composer\Composer;
 use Composer\Installer;
 use Composer\IO\BufferIO;
 use Composer\IO\IOInterface;
-use Composer\IO\NullIO;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
@@ -17,14 +16,21 @@ use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryManager;
 use Composer\Repository\WritableArrayRepository;
 use Composer\Installer\InstallationManager;
+use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
+use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Script\Runner;
+use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class PackageManagerTest extends \PHPUnit_Framework_TestCase
 {
     use MockHelperTrait;
+    use ReflectionHelperTrait;
 
     /**
      * @test
@@ -71,6 +77,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         // Remote repos
         $duplicatedPackageName = uniqid();
+        $packagistRepositoryMock = $this->createComposerRepositoryMock();
+        $this->writeAttribute($packagistRepositoryMock, 'url', 'http://packagist.org');
         $composerRepositoryMock = $this->createComposerRepositoryMock();
         $composerRepositoryWithoutProvidersMock = $this->createComposerRepositoryMock();
         $anyRepositoryExceptComposerRepository = new ArrayRepository(
@@ -89,6 +97,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
                     [
                         $composerRepositoryMock,
                         $composerRepositoryWithoutProvidersMock,
+                        $packagistRepositoryMock,
                         $anyRepositoryExceptComposerRepository
                     ]
                 )
@@ -114,6 +123,18 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composerRepositoryMock->expects($this->any())
             ->method('whatProvides')
             ->will($this->returnValue([$availablePackage1, $this->getPackage('name2', 1)]));
+
+        // packagist.org repository
+        $packagistRepositoryMock->expects($this->any())
+            ->method('hasProviders')
+            ->will($this->returnValue(true));
+
+        $packagistRepositoryMock->expects($this->never())
+            ->method('getProviderNames');
+
+        $packagistRepositoryMock->expects($this->any())
+            ->method('whatProvides')
+            ->will($this->returnValue([]));
 
         // from composer repo without providers
         $composerRepositoryWithoutProvidersMock->expects($this->any())
@@ -149,7 +170,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldReturnPackageRequirementsWithoutPlatformRequirements()
     {
-        $expectedRequirements = ['requirement1', 'requirement2'];
         $platformRequirement = 'php-64bit';
         $packageName = 'vendor/package';
         $packageVersion = '*';
@@ -161,14 +181,16 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $requirementLinkMock2 = $this->createComposerPackageLinkMock();
         $platformRequirementLinkMock = $this->createComposerPackageLinkMock();
 
+        $installedPackage = $this->getPackage('installed/package', 1);
+
         // non platform requirements
         $requirementLinkMock1->expects($this->exactly(2))
             ->method('getTarget')
-            ->will($this->returnValue($expectedRequirements[0]));
+            ->will($this->returnValue('requirement1'));
 
         $requirementLinkMock2->expects($this->exactly(2))
             ->method('getTarget')
-            ->will($this->returnValue($expectedRequirements[1]));
+            ->will($this->returnValue('requirement2'));
 
         // platform dependency
         $platformRequirementLinkMock->expects($this->once())
@@ -196,18 +218,24 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         // composer and repository config
         $composer = $this->createComposerMock();
         $repositoryManagerMock = $this->createRepositoryManagerMock();
-        $composer->expects($this->once())
+        $composer->expects($this->exactly(2))
             ->method('getRepositoryManager')
             ->will($this->returnValue($repositoryManagerMock));
 
-        $localRepository = new WritableArrayRepository([$packageMock]);
+        $localRepository = new WritableArrayRepository([$packageMock, $this->getPackage('requirement2', 1)]);
 
         $repositoryManagerMock->expects($this->once())
             ->method('getRepositories')
             ->will($this->returnValue([$localRepository]));
-
+        $repositoryManagerMock->expects($this->once())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
 
         $manager = $this->createPackageManager($composer);
+        $expectedRequirements = [
+            new PackageRequirement('requirement1', false),
+            new PackageRequirement('requirement2', true)
+        ];
 
         $this->assertEquals($expectedRequirements, $manager->getRequirements($packageName, $packageVersion));
     }
@@ -291,13 +319,152 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($rootPackageMock));
 
         $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
-        $manager = $this->createPackageManager($composer, $composerInstaller, null, null, $tempComposerJson);
+        $runner = $this->createScriptRunnerMock();
+        $runner->expects($this->once())
+            ->method('loadFixtures');
+
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner, $tempComposerJson);
         $manager->install($newPackage->getName());
 
         $updatedComposerData = json_decode(file_get_contents($tempComposerJson), true);
         unlink($tempComposerJson);
 
         $this->assertEquals($expectedJsonData, $updatedComposerData);
+    }
+
+    /**
+     * @test
+     */
+    public function throwVerboseExceptionWhenInstallationFailed()
+    {
+        $newPackageName = 'new-vendor/new-package';
+        $newPackageVersion = 'v3';
+        $newPackage = $this->getPackage($newPackageName, $newPackageVersion);
+
+        // temporary composer.json data
+        $composerJsonData = [
+            'require' => [
+                'vendor1/package1' => 'v1',
+                'vendor2/package2' => 'v2',
+            ]
+        ];
+
+        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        file_put_contents($tempComposerJson, json_encode($composerJsonData));
+
+        // composer and repository
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = new WritableArrayRepository($installedPackages = [$newPackage]);
+
+        $composer->expects($this->any())
+            ->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        $repositoryManager->expects($this->once())
+            ->method('getRepositories')
+            ->will($this->returnValue([$localRepository]));
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        $rootPackageMock = $composer->getPackage();
+
+        $composer->expects($this->once())
+            ->method('getPackage')
+            ->will($this->returnValue($rootPackageMock));
+
+        $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 1);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, null, $tempComposerJson);
+
+        try {
+            $manager->install($newPackage->getName());
+        } catch (VerboseException $e) {
+            $composerDataAfterFail = json_decode(file_get_contents($tempComposerJson), true);
+            unlink($tempComposerJson);
+
+            $this->assertEquals("{$newPackageName} can't be installed!", $e->getMessage());
+            return $this->assertEquals($composerJsonData, $composerDataAfterFail);
+        }
+
+        unlink($tempComposerJson);
+        $this->fail('Exception wasn\'t caught');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldRemoveNewPackageFromJsonAndRethrowRunnerExceptionDuringInstallation()
+    {
+        $newPackageName = 'new-vendor/new-package';
+        $newPackageVersion = 'v3';
+        $newPackage = $this->getPackage($newPackageName, $newPackageVersion);
+
+        // temporary composer.json data
+        $composerJsonData = [
+            'require' => [
+                'vendor1/package1' => 'v1',
+                'vendor2/package2' => 'v2',
+            ]
+        ];
+
+        $tempComposerJson = tempnam(sys_get_temp_dir(), 'composer.json');
+        file_put_contents($tempComposerJson, json_encode($composerJsonData));
+
+        // composer and repository
+        $composer = $this->createComposerMock();
+        $repositoryManager = $this->createRepositoryManagerMock();
+        $localRepository = $this->getMock('Composer\Repository\WritableArrayRepository');
+
+        $composer->expects($this->any())
+            ->method('getRepositoryManager')
+            ->will($this->returnValue($repositoryManager));
+
+        // Local repository
+        $repositoryManager->expects($this->any())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
+        // Fetch previous installed
+        $localRepository->expects($this->at(0))
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue([]));
+        // Fetch packages after install
+        $localRepository->expects($this->at(1))
+            ->method('getCanonicalPackages')
+            ->will($this->returnValue([$newPackage]));
+
+        // Package repositories
+        $repositoryManager->expects($this->once())
+            ->method('getRepositories')
+            ->will($this->returnValue([new WritableArrayRepository($installedPackages = [$newPackage])]));
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
+        $rootPackageMock = $composer->getPackage();
+
+        $composer->expects($this->once())
+            ->method('getPackage')
+            ->will($this->returnValue($rootPackageMock));
+
+        $scriptRunner = $this->createScriptRunnerMock();
+        $scriptRunner->expects($this->any())
+            ->method('install')
+            ->will($this->throwException($thrownException = new \Exception));
+
+        $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
+        $manager = $this->createPackageManager($composer, $composerInstaller, null, $scriptRunner, $tempComposerJson);
+
+        try {
+            $manager->install($newPackage->getName());
+        } catch (\Exception $e) {
+            $composerDataAfterFail = json_decode(file_get_contents($tempComposerJson), true);
+            unlink($tempComposerJson);
+
+            $this->assertSame($thrownException, $e);
+            return $this->assertEquals($composerJsonData, $composerDataAfterFail);
+        }
+
+        unlink($tempComposerJson);
+        $this->fail('Exception wasn\'t caught');
     }
 
     /**
@@ -427,10 +594,12 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composer = $this->createComposerMock();
         $repositoryManager = $this->createRepositoryManagerMock();
         $installationManager = $this->createInstallationManagerMock();
-        $localRepository = new WritableArrayRepository($installedPackages = [
-            $this->getPackage($packageNamesToBeRemoved[0], 'v2'),
-            $this->getPackage($packageNamesToBeRemoved[1], 'v2')
-        ]);
+        $localRepository = new WritableArrayRepository(
+            $installedPackages = [
+                $this->getPackage($packageNamesToBeRemoved[0], 'v2'),
+                $this->getPackage($packageNamesToBeRemoved[1], 'v2')
+            ]
+        );
 
         $composer->expects($this->any())
             ->method('getRepositoryManager')
@@ -467,6 +636,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $runner->expects($this->at(1))
             ->method('uninstall')
             ->with($installedPackages[1]);
+        $runner->expects($this->once())
+            ->method('removeCachedFiles');
 
         // Ready Steady Go!
         $manager = $this->createPackageManager($composer, null, null, $runner, $tempComposerJson);
@@ -476,6 +647,41 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         unlink($tempComposerJson);
 
         $this->assertEquals($expectedJsonData, $updatedComposerData);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Package oro/platform is not deletable
+     */
+    public function throwsExceptionWhenTryingToUninstallPlatform()
+    {
+        $manager = $this->createPackageManager();
+        $manager->uninstall(['oro/platform']);
+    }
+
+    /**
+     * @test
+     *
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Package oro/platform-dist is not deletable
+     */
+    public function throwsExceptionWhenTryingToUninstallPlatformDist()
+    {
+        $manager = $this->createPackageManager();
+        $manager->uninstall(['oro/platform-dist']);
+    }
+
+    /**
+     * @test
+     */
+    public function shouldNotAllowToDeletePlatformAndPlatformDist()
+    {
+        $manager = $this->createPackageManager();
+
+        $this->assertFalse($manager->canBeDeleted('oro/platform'));
+        $this->assertFalse($manager->canBeDeleted('oro/platform-dist'));
     }
 
     /**

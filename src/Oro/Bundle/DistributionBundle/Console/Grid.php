@@ -32,7 +32,7 @@ class Grid
      * @param int $countColumns
      * @param array $delimiters
      */
-    public function __construct($countColumns, array $delimiters = [])
+    public function __construct($countColumns, array $delimiters = array())
     {
         $this->rows = [];
         $this->defaultDelimiter = ':';

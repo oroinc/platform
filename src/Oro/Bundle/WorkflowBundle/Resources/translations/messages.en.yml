@@ -13,8 +13,6 @@
 "Actions": "Actions"
 "Step information saved": "Step information saved"
 
-
-
 oro:
     workflow:
         workflowitem:
@@ -25,10 +23,12 @@ oro:
             id.label:                 Id
             workflow_name.label:      Workflow Name
             current_step_name.label:  Current Step
-            transition_records.label:
-            serialized_data.label:
-            definition.label:
-            closed.label:
-            bind_entities.label:
+            transition_records.label: Transition records
+            serialized_data.label:    Serialized data
+            definition.label:         Definition
+            closed.label:             Closed
+            bind_entities.label:      Bind entities
             created.label:            Start Date
             updated.label:            Updated
+        action:
+            general: "Workflow manipulations"

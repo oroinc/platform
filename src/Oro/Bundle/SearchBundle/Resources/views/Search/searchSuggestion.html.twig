@@ -5,7 +5,7 @@
         <li>
             <a href="{{ item.record_url }}">
                 <span class="name"><strong>{{ item.record_string }}</strong></span>
-                {{ oro_config_entity(item.entity_name).name|trans({}, 'config') }}
+                {{ oro_config_entity(item.entity_name).name|trans }}
             </a>
         </li>
         {% endfor %}

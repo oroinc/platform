@@ -1,6 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with [
     'OroFormBundle:Form:fields.html.twig',
+    'OroEmailBundle:Form:fields.html.twig',
 ]%}
 {% import 'OroEmailBundle::macros.html.twig' as _emailMacros %}
 {% set title = form.vars.value.id

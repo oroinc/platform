@@ -4,11 +4,12 @@ namespace Oro\Bundle\DistributionBundle\Script;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
+
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 class Runner
 {
@@ -18,11 +19,25 @@ class Runner
     protected $installationManager;
 
     /**
-     * @param InstallationManager $installationManager
+     * @var string|null
      */
-    public function __construct(InstallationManager $installationManager)
+    protected $applicationRootDir;
+
+    /**
+     * @var string
+     */
+    protected $environment;
+
+    /**
+     * @param InstallationManager $installationManager
+     * @param string $applicationRootDir
+     * @param string $environment
+     */
+    public function __construct(InstallationManager $installationManager, $applicationRootDir, $environment)
     {
         $this->installationManager = $installationManager;
+        $this->applicationRootDir = realpath($applicationRootDir);
+        $this->environment = $environment;
     }
 
     /**
@@ -63,36 +78,142 @@ class Runner
             }
         }
         if (!$output) {
+
             return null;
         }
+
         return implode(PHP_EOL, $output);
+    }
+
+    /**
+     * @return string
+     * @throws ProcessFailedException
+     */
+    public function runPlatformUpdate()
+    {
+        $phpPath = $this->getPhpExecutablePath();
+
+        $command = sprintf(
+            '"%s" "%s/console" oro:platform:update --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
+        return $this->runCommand($command);
+    }
+
+    /**
+     * Needed to be executed after package has been uninstalled so that main application (app/console) could be built
+     */
+    public function removeCachedFiles()
+    {
+        if (!$this->applicationRootDir) {
+            return;
+        }
+        $finder = new Finder();
+        $finder->files()
+            ->in($this->applicationRootDir)
+            ->name('bundles.php')
+            ->name('*ProjectContainer.php');
+
+        foreach ($finder as $file) {
+            /** @var SplFileInfo $file */
+            if (is_file($file->getPathname())) {
+                unlink($file->getPathname());
+            }
+        }
+    }
+
+    /**
+     * @param PackageInterface[] $packages
+     *
+     * @return string
+     */
+    public function loadFixtures(array $packages)
+    {
+        $phpPath = $this->getPhpExecutablePath();
+        $paths = [];
+        foreach ($packages as $package) {
+            $paths[] = $this->installationManager->getInstallPath($package);
+        }
+
+        $commandPrefix = sprintf(
+            '"%s" "%s/console" oro:package:fixtures:load --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
+        $commands = $this->makeCommands($paths, $commandPrefix);
+        $output = '';
+        foreach ($commands as $command) {
+            $output .= $this->runCommand($command);
+        }
+
+        return $output;
+
+    }
+
+    /**
+     * @param array $paths
+     * @param string $commandPrefix
+     * @param int $commandSize - windows shell-command is limited by 8kb
+     *
+     * @return array of commands to be executed
+     */
+    protected function makeCommands(array $paths, $commandPrefix, $commandSize = 8000)
+    {
+        $commands = [];
+        $commandIndex = 0;
+
+        $commands[$commandIndex] = $commandPrefix;
+        foreach ($paths as $path) {
+            if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
+                $commands[$commandIndex] .=  ' ' . $path ;
+            } else {
+                $commands[++$commandIndex] = $commandPrefix . ' ' . $path ;
+            }
+        }
+
+        return $commands;
     }
 
     /**
      * @param string $path
      * @return string
-     * @throws \Symfony\Component\Process\Exception\ProcessFailedException
+     * @throws ProcessFailedException
      */
     protected function run($path)
     {
         if (file_exists($path)) {
             $phpPath = $this->getPhpExecutablePath();
 
-            $process = (new ProcessBuilder())
-                ->setPrefix($phpPath)
-                ->add($path)
-                ->add('-p')
-                ->add($phpPath)
-                ->getProcess();
+            $command = sprintf(
+                '"%s" "%s/console" oro:platform:run-script "%s" --env=%s',
+                $phpPath,
+                $this->applicationRootDir,
+                $path,
+                $this->environment
+            );
 
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                throw new ProcessFailedException($process);
-            }
-
-            return $process->getOutput();
+            return $this->runCommand($command);
         }
+    }
+
+    protected function runCommand($command)
+    {
+        $process = new Process($command);
+        $process->setWorkingDirectory(realpath($this->applicationRootDir . '/..')); // project root
+        $process->setTimeout(600);
+
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        return $process->getOutput();
     }
 
     /**

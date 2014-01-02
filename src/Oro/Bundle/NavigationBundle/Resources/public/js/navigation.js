@@ -17,6 +17,7 @@ define(function (require) {
     var PagestateModel = require('oro/navigation/pagestate/model');
     var PageableCollection = require('oro/pageable-collection');
     var widgetManager = require('oro/widget-manager');
+    var contentManager = require('oro/content-manager');
     var _jqueryForm = require('jquery.form');
 
     var Navigation;
@@ -96,19 +97,32 @@ define(function (require) {
             gridContainer:       '.grid-container',
             pinButtons:          '.minimize-button, .favorite-button'
         },
+
+        /**
+         * Cached jQuery objects by selectors from selectors property
+         * @property {Object}
+         */
         selectorCached: {},
 
-        /** @property {oro.LoadingMask} */
+        /**
+         * @property {oro.LoadingMask}
+         */
         loadingMask: '',
 
-        /** @property {String} */
+        /**
+         * @property {string}
+         */
         baseUrl: '',
 
-        /** @property {String} */
+        /**
+         * @property {string}
+         */
         headerId: '',
 
-        /** @property {Object} */
-        headerObject: '',
+        /**
+         * @property {Object}
+         */
+        headerObject: {},
 
         /**
          * State data for grids
@@ -144,21 +158,203 @@ define(function (require) {
 
         maxCachedPages: 10,
 
-        contentCache: [],
-
-        contentCacheUrls: [],
-
         tempCache: '',
 
         formState: '',
 
-        cacheTimer: null,
-
         confirmModal: null,
 
-        notificationMessage: null,
+        /**
+         * Initialize hash navigation
+         *
+         * @param options
+         */
+        initialize: function (options) {
+            var selectors = this.selectorCached;
+            _.each(this.selectors, function (selector, name) {
+                selectors[name] = $(selector);
+            });
 
-        outdatedMessage: '',
+            if (!options.baseUrl || !options.headerId) {
+                throw new TypeError("'baseUrl' and 'headerId' are required");
+            }
+
+            this.baseUrl =  options.baseUrl;
+            this.headerId = options.headerId;
+            this.headerObject[this.headerId] = true;
+            this.url = this.getHashUrl();
+            if (!window.location.hash) {
+                //skip ajax page refresh for the current page
+                this.skipAjaxCall = true;
+            }
+
+            this.init();
+            contentManager.init(this.url, options.userName || false);
+
+            Backbone.Router.prototype.initialize.apply(this, arguments);
+        },
+
+        /**
+         * Init
+         */
+        init: function() {
+            /**
+             * Processing all links in grid after grid load
+             */
+            mediator.bind("grid_load:complete", function (collection) {
+                this.updateCachedContent('grid', {'collection': collection});
+                if (pinbarView) {
+                    var item = pinbarView.getItemForCurrentPage(true);
+                    if (item.length && this.useCache) {
+                        contentManager.addPage(this.getHashUrl(), this.tempCache);
+                    }
+                }
+                this.processGridLinks();
+            }, this);
+
+            /**
+             * Loading grid collection from cache
+             */
+            mediator.bind("datagrid_collection_set_before", function (obj) {
+                var data = this.getCachedData();
+                if (data.states) {
+                    var girdState = data.states.getObjectCache('grid');
+                    if (girdState.collection) {
+                        obj.collection = girdState.collection.clone();
+                    }
+                }
+            }, this);
+
+            /**
+             * Updating grid collection in cache
+             */
+            mediator.bind("datagrid_collection_set_after", function (collection) {
+                var data = this.getCachedData();
+                if (data.states) {
+                    var girdState = data.states.getObjectCache('grid');
+                    girdState.collection = collection;
+                } else { //updating temp cache with collection
+                    this.updateCachedContent('grid', {collection: collection});
+                }
+            }, this);
+
+            /**
+             * Trigger updateState event for grid collection if page was loaded from cache
+             */
+            mediator.bind("datagrid_filters:rendered", function (collection) {
+                if (this.getCachedData() && this.encodedStateData) {
+                    collection.trigger('updateState', collection);
+                }
+            }, this);
+
+            /**
+             * Clear page cache for unpinned page
+             */
+            mediator.bind("pinbar_item_remove_before", function (item) {
+                var url = this.removeGridParams(item.get('url'));
+                contentManager.clearCache(url);
+            }, this);
+
+            /**
+             * Add "pinned" page to cache
+             */
+            mediator.bind("pinbar_item_minimized", function () {
+                this.useCache = true;
+                contentManager.addPage(this.getHashUrl(), this.tempCache);
+            }, this);
+
+            /**
+             * Add "pinned" page to cache
+             */
+            mediator.bind("pagestate_collected", function (pagestateModel) {
+                this.updateCachedContent('form', {'form_data': pagestateModel.get('pagestate').data});
+                if (this.useCache) {
+                    contentManager.addPage(this.getHashUrl(), this.tempCache);
+                }
+            }, this);
+
+            /**
+             * Processing navigate action execute
+             */
+            mediator.bind("grid_action:navigateAction:preExecute", function (action, options) {
+                this.setLocation(action.getLink());
+                options.doExecute = false;
+            }, this);
+
+            /**
+             * Checking for grid route and updating it's state
+             */
+            mediator.bind("grid_route:loaded", function (route) {
+                this.gridRoute = route;
+                if (!this.skipGridStateChange) {
+                    this.gridChangeState();
+                }
+                this.processGridLinks();
+            }, this);
+
+            /**
+             * Processing links in 3 dots menu after item is added (e.g. favourites)
+             */
+            mediator.bind("navigaion_item:added", function (item) {
+                this.processClicks(item.find(this.selectors.links));
+            }, this);
+
+            /**
+             * Processing links in search result dropdown
+             */
+            mediator.bind("top_search_request:complete", function () {
+                this.processClicks($(this.selectorCached.searchDropdown).find(this.selectors.links));
+            }, this);
+
+            /**
+             * Processing pinbar help link
+             */
+            mediator.bind("pinbar_help:shown", function () {
+                this.processClicks(this.selectors.pinbarHelp);
+            }, this);
+
+            this.confirmModal = new Modal({
+                title: __('Refresh Confirmation'),
+                content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
+                okText: __('Ok, got it.'),
+                className: 'modal modal-primary',
+                okButtonClass: 'btn-primary btn-large',
+                cancelText: __('Cancel')
+            });
+            this.confirmModal.on('ok', _.bind(function() {
+                this.refreshPage();
+            }, this));
+
+            $(document).on('click.action.data-api', '[data-action=page-refresh]', _.bind(function(e) {
+                var formState, data = this.getCachedData();
+                e.preventDefault();
+                if (data.states) {
+                    formState = data.states.getObjectCache('form');
+                    /**
+                     *  saving form state for future restore after content refresh, uncomment after new page states logic is
+                     *  implemented
+                     */
+                    //this.formState = formState;
+                }
+                if (formState && formState['form_data'].length) {
+                    this.confirmModal.open();
+                } else {
+                    this.refreshPage();
+                }
+            }, this));
+
+            /**
+             * Processing all links
+             */
+            this.processClicks(this.selectorCached.links);
+            this.disableEmptyLinks(this.selectorCached.menu.find(this.selectors.scrollLinks));
+
+            this.processForms(this.selectors.forms);
+            this.processAnchors(this.selectorCached.container.find(this.selectors.scrollLinks));
+
+            this.loadingMask = new LoadingMask();
+            this.renderLoadingMask();
+        },
 
         /**
          * Routing default action
@@ -167,6 +363,7 @@ define(function (require) {
          * @param {String} encodedStateData
          */
         defaultAction: function(page, encodedStateData) {
+            this.beforeAction();
             this.beforeDefaultAction();
             this.encodedStateData = encodedStateData;
             this.url = page;
@@ -177,6 +374,21 @@ define(function (require) {
                 this.loadPage();
             }
             this.skipAjaxCall = false;
+        },
+
+        /**
+         * Before any navigation changes triggers event
+         */
+        beforeAction: function() {
+            mediator.trigger("hash_navigation_request:before", this);
+        },
+
+        /**
+         * Shows that content changing is in a process
+         * @returns {boolean}
+         */
+        isInAction: function() {
+            return this.loadingMask.displayed;
         },
 
         beforeDefaultAction: function() {
@@ -204,36 +416,6 @@ define(function (require) {
             }
         },
 
-        /**
-         * Initialize hash navigation
-         *
-         * @param options
-         */
-        initialize: function(options) {
-            for (var selector in this.selectors) if (this.selectors.hasOwnProperty(selector)) {
-                this.selectorCached[selector] = $(this.selectors[selector]);
-            }
-
-            options = options || {};
-            if (!options.baseUrl) {
-                throw new TypeError("'baseUrl' is required");
-            }
-
-            this.baseUrl =  options.baseUrl;
-            this.headerId = options.headerId;
-            var header = {};
-            header[this.headerId] = true;
-            this.headerObject = header;
-            if (window.location.hash === '') {
-                //skip ajax page refresh for the current page
-                this.skipAjaxCall = true;
-            }
-
-            this.init();
-
-            Backbone.Router.prototype.initialize.apply(this, arguments);
-        },
-
         getPagestate: function() {
             if (!this.pagestate) {
                 this.pagestate = new PagestateView({
@@ -254,7 +436,6 @@ define(function (require) {
                     widgetManager.resetWidgets();
                     this.tempCache = cacheData;
                     this.handleResponse(cacheData, {fromCache: true});
-                    this.validatePageCache(cacheData);
                     this.afterRequest();
                 } else {
                     var pageUrl = this.baseUrl + this.url;
@@ -298,7 +479,7 @@ define(function (require) {
                                 this.afterRequest();
                             }
                             if (useCache) {
-                                this.addCurrentPageToCache();
+                                contentManager.addPage(this.getHashUrl(), this.tempCache);
                             }
                         }, this)
                     });
@@ -323,115 +504,6 @@ define(function (require) {
                 pagestate.updateState(formState['form_data']);
                 pagestate.restore();
                 pagestate.needServerRestore = false;
-            }
-        },
-
-        initCacheTimer: function() {
-            this.clearCacheTimer();
-            this.cacheTimer = setInterval(_.bind(function() {
-                var cacheData = this.getCachedData();
-                if (cacheData) {
-                    if (!cacheData.is_entity_page) {
-                        //validating grid states only for non-entity pages
-                        var hasGridCache = this.validateGridStates(cacheData);
-                        //validating content md5 only if no cached grids found on page
-                        if (!hasGridCache) {
-                            this.validateMd5Request(cacheData);
-                        }
-                    } else {
-                        this.validateMd5Request(cacheData);
-                    }
-                }
-            }, this), 5000);
-        },
-
-        clearCacheTimer: function() {
-            clearInterval(this.cacheTimer);
-        },
-
-        /**
-         * Validate page cache comparing cached content md5 with the one from server
-         *
-         * @param cacheData
-         */
-        validateMd5Request: function(cacheData) {
-            var pageUrl = this.baseUrl + this.url;
-            var url = this.url;
-            var params = {};
-            params[this.headerId] = true;
-            params['hash-navigation-md5'] = true;
-            $.ajax({
-                url: pageUrl,
-                data: params,
-                error: _.bind(function (jqXHR, textStatus, errorThrown) {
-                }, this),
-
-                success: _.bind(function (data, textStatus, jqXHR) {
-                    if (this.getCorrectedData(data).content_md5 !== cacheData.content_md5) {
-                        this.showOutdatedMessage(url);
-                    }
-                }, this)
-            });
-        },
-
-        /**
-         * Validate grid state based on grid collection
-         *
-         * @param cacheData
-         * @return true if grid cache is found and false otherwise
-         */
-        validateGridStates: function(cacheData) {
-            if (cacheData.states) {
-                var formState = cacheData.states.getObjectCache('form');
-                var girdState = cacheData.states.getObjectCache('grid');
-                //grid states on form pages are not validated
-                if (girdState['collection'] && !formState['form_data']) {
-                    var collection = girdState['collection'].clone();
-                    var cachedCollection = girdState['collection'];
-                    var url = this.url;
-                    var options = {ignoreSaveStateInUrl: true};
-                    /**
-                     * Comparing cached collection with fetched from server
-                     */
-                    options.success = _.bind(function () {
-                        if (!_.isEqual(cachedCollection.toJSON(),collection.toJSON())) {
-                            this.showOutdatedMessage(url);
-                        }
-                    }, this);
-                    options.error = _.bind(this.showOutdatedMessage, this, url);
-                    collection.fetch(options);
-                    return true;
-                }
-            }
-
-            return false;
-        },
-
-        /**
-         * Validate page cache to check if its up to date. Comparing grid state(if any) and content md5
-         *
-         * @param cacheData
-         */
-        validatePageCache: function(cacheData) {
-            this.validateGridStates(cacheData);
-            this.validateMd5Request(cacheData);
-        },
-
-        /**
-         * Show "refresh page" message
-         *
-         * @param url
-         */
-        showOutdatedMessage: function(url) {
-            this.clearCacheTimer();
-            if (this.useCache && this.url === url) {
-                if (!this.notificationMessage) {
-                    var message = __("Content of the page is outdated, please %click here% to refresh the page");
-                    this.outdatedMessage = message.replace(/%(.*)%/,"<span class='page-refresh'>$1</span>");
-                } else {
-                    this.notificationMessage.close();
-                }
-                this.notificationMessage = messenger.notificationMessage('warning', this.outdatedMessage);
             }
         },
 
@@ -478,33 +550,13 @@ define(function (require) {
         },
 
         /**
-         * Add current page to permanent cache
-         */
-        addCurrentPageToCache: function() {
-            var url = this.getHashUrl();
-            this.clearPageCache(this.removePageStateParam(url));
-            this.contentCacheUrls.push(this.removePageStateParam(url));
-            this.contentCache[this.contentCacheUrls.length - 1] = this.tempCache;
-        },
-
-        /**
          * Get cache data for url
-         * @param url
+         *
+         * @param {string=} url
          * @return {*}
          */
         getCachedData: function(url) {
-            if (this.useCache) {
-                if (_.isUndefined(url)) {
-                    url = this.getHashUrl();
-                }
-                var i;
-                if ((i = _.indexOf(this.contentCacheUrls, this.removePageStateParam(url))) !== -1) {
-                    if (this.contentCache[i]) {
-                        return this.contentCache[i];
-                    }
-                }
-            }
-            return false;
+            return contentManager.getPage(_.isUndefined(url) ? this.getHashUrl() : url);
         },
 
         /**
@@ -520,262 +572,12 @@ define(function (require) {
         },
 
         /**
-         * Reorder cache history to put current page to the end
-         *
-         * @param pos
-         */
-        reorderCache: function(pos) {
-            var tempUrl = this.contentCacheUrls[pos];
-            var tempContent = this.contentCache[pos];
-            for (var i = pos + 1; i < this.contentCacheUrls.length; i++) {
-                this.contentCacheUrls[i - 1] = this.contentCacheUrls[i];
-            }
-            this.contentCacheUrls[this.contentCacheUrls.length - 1] = tempUrl;
-            for (i = pos + 1; i < this.contentCache.length; i++) {
-                this.contentCache[i - 1] = this.contentCache[i];
-            }
-            this.contentCache[this.contentCacheUrls.length - 1] = tempContent;
-        },
-
-        /**
-         * Clear cache data
-         *
-         * @param url
-         */
-        clearPageCache: function(url) {
-            if (!_.isUndefined(url)) {
-                url = this.removePageStateParam(url);
-                var j = _.indexOf(this.contentCacheUrls, url);
-                if (j !== -1) {
-                    this.contentCacheUrls.splice(j, 1);
-                    this.contentCache.splice(j, 1);
-                }
-            } else {
-                this.contentCacheUrls = [];
-                this.contentCache = [];
-            }
-        },
-
-        /**
-         * Remove restore params from url
-         *
-         * @param url
-         * @return {String|XML|void}
-         */
-        removePageStateParam: function(url) {
-            return url.replace(/[\?&]restore=1/g,'');
-        },
-
-        /**
-         * Init
-         */
-        init: function() {
-            /**
-             * Processing all links in grid after grid load
-             */
-            mediator.bind(
-                "grid_load:complete",
-                function (collection) {
-                    this.updateCachedContent('grid', {'collection': collection});
-                    if (pinbarView) {
-                        var item = pinbarView.getItemForCurrentPage(true);
-                        if (item.length && this.useCache) {
-                            this.addCurrentPageToCache();
-                        }
-                    }
-                    this.processGridLinks();
-                },
-                this
-            );
-
-            /**
-             * Loading grid collection from cache
-             */
-            mediator.bind(
-                "datagrid_collection_set_after",
-                function (datagridCollection) {
-                    var data = this.getCachedData();
-                    if (data.states) {
-                        var girdState = data.states.getObjectCache('grid');
-                        if (girdState['collection']) {
-                            datagridCollection.collection = girdState['collection'].clone();
-                        } else {
-                            girdState['collection'] = datagridCollection.collection;
-                        }
-                    } else { //updating temp cache with collection
-                        this.updateCachedContent('grid', {'collection': datagridCollection.collection});
-                    }
-                },
-                this
-            );
-
-            /**
-             * Trigger updateState event for grid collection if page was loaded from cache
-             */
-            mediator.bind(
-                "datagrid_filters:rendered",
-                function (collection) {
-                    if (this.getCachedData() && this.encodedStateData) {
-                        collection.trigger('updateState', collection);
-                    }
-                },
-                this
-            );
-
-            /**
-             * Clear page cache for unpinned page
-             */
-            mediator.bind(
-                "pinbar_item_remove_before",
-                function (item) {
-                    var url = this.removeGridParams(item.get('url'));
-                    this.clearPageCache(url);
-                },
-                this
-            );
-
-            /**
-             * Add "pinned" page to cache
-             */
-            mediator.bind(
-                "pinbar_item_minimized",
-                function () {
-                    this.useCache = true;
-                    this.addCurrentPageToCache();
-                },
-                this
-            );
-
-            /**
-             * Add "pinned" page to cache
-             */
-            mediator.bind(
-                "pagestate_collected",
-                function (pagestateModel) {
-                    this.updateCachedContent('form', {'form_data': pagestateModel.get('pagestate').data});
-                    if (this.useCache) {
-                        this.addCurrentPageToCache();
-                    }
-                },
-                this
-            );
-
-            /**
-             * Processing navigate action execute
-             */
-            mediator.bind(
-                "grid_action:navigateAction:preExecute",
-                function (action, options) {
-                    this.setLocation(action.getLink());
-
-                    options.doExecute = false;
-                },
-                this
-            );
-
-            /**
-             * Checking for grid route and updating it's state
-             */
-            mediator.bind(
-                "grid_route:loaded",
-                function (route) {
-                    this.gridRoute = route;
-                    if (!this.skipGridStateChange) {
-                        this.gridChangeState();
-                    }
-                    this.processGridLinks();
-                },
-                this
-            );
-
-            /**
-             * Processing links in 3 dots menu after item is added (e.g. favourites)
-             */
-            mediator.bind(
-                "navigation_item:added",
-                function (item) {
-                    this.processClicks(item.find(this.selectors.links));
-                },
-                this
-            );
-
-            /**
-             * Processing links in search result dropdown
-             */
-            mediator.bind(
-                "top_search_request:complete",
-                function () {
-                    this.processClicks($(this.selectorCached.searchDropdown).find(this.selectors.links));
-                },
-                this
-            );
-
-            /**
-             * Processing pinbar help link
-             */
-            mediator.bind(
-                "pinbar_help:shown",
-                function () {
-                    this.processClicks(this.selectors.pinbarHelp);
-                },
-                this
-            );
-
-            this.confirmModal = new Modal({
-                title: __('Refresh Confirmation'),
-                content: __('Your local changes will be lost. Are you sure you want to refresh the page?'),
-                okText: __('Ok, got it.'),
-                className: 'modal modal-primary',
-                okButtonClass: 'btn-primary btn-large',
-                cancelText: __('Cancel')
-            });
-            this.confirmModal.on('ok', _.bind(function() {
-                this.refreshPage();
-            }, this));
-
-            $(document).on('click', '.page-refresh', _.bind(function() {
-                    var data = this.getCachedData();
-                    var formState;
-                    if (data.states) {
-                        formState = data.states.getObjectCache('form');
-                        /**
-                         *  saving form state for future restore after content refresh, uncomment after new page states logic is
-                         *  implemented
-                         */
-                        //this.formState = formState;
-                    }
-                if (formState && formState['form_data'].length) {
-                        this.confirmModal.open();
-                    } else {
-                        this.refreshPage();
-                    }
-                }, this)
-            );
-
-            /**
-             * Processing all links
-             */
-            this.processClicks(this.selectorCached.links);
-            this.disableEmptyLinks(this.selectorCached.menu.find(this.selectors.scrollLinks));
-
-            this.processForms();
-            this.processAnchors(this.selectorCached.container.find(this.selectors.scrollLinks));
-
-            this.loadingMask = new LoadingMask();
-            this.renderLoadingMask();
-        },
-
-        /**
          *  Triggered before hash navigation ajax request
          */
         beforeRequest: function() {
             this.loadingMask.show();
             this.gridRoute = ''; //clearing grid router
             this.tempCache = '';
-            clearInterval(this.cacheTimer);
-            if (this.notificationMessage) {
-                this.notificationMessage.close();
-            }
             /**
              * Backbone event. Fired before navigation ajax request is started
              * @event hash_navigation_request:start
@@ -788,7 +590,6 @@ define(function (require) {
          */
         afterRequest: function() {
             this.formState = '';
-            this.initCacheTimer();
         },
 
         /**
@@ -802,8 +603,9 @@ define(function (require) {
         },
 
         refreshPage: function() {
-            this.clearPageCache(this.url);
+            contentManager.clearCache(this.url);
             this.loadPage();
+            mediator.trigger("hash_navigation_request:page_refreshed", { url: this.url, navigationInstance: this});
         },
 
         /**
@@ -930,7 +732,8 @@ define(function (require) {
                 if (app.debug) {
                     document.body.innerHTML = rawData;
                 } else {
-                    this.showMessage(__('Sorry, page was not loaded correctly'));
+                    messenger.notificationMessage('error', __('Sorry, page was not loaded correctly'));
+                    this.loadingMask.hide();
                 }
             }
             this.triggerCompleteEvent();
@@ -967,9 +770,8 @@ define(function (require) {
                 window.location.replace(redirectUrl + delimiter + '_rand=' + Math.random());
             } else {
                 //clearing cache for current and redirect urls, e.g. form and grid page
-                this.clearPageCache(this.url);
-                this.clearPageCache(redirectUrl);
-                this.setLocation(redirectUrl);
+                contentManager.clearCache(this.url);
+                this.setLocation(redirectUrl, {clearCache: true, useCache: this.getCachedData(redirectUrl) !== false});
             }
         },
 
@@ -984,7 +786,7 @@ define(function (require) {
             var message403 = 'You do not have permission to this action';
             if (app.debug) {
                 if (XMLHttpRequest.status == 403) {
-                    this.showMessage(__(message403));
+                    messenger.notificationMessage('error', __(message403));
                     this.loadingMask.hide();
                 } else {
                     document.body.innerHTML = XMLHttpRequest.responseText;
@@ -995,13 +797,9 @@ define(function (require) {
                 if (XMLHttpRequest.status == 403) {
                     message = message403;
                 }
-                this.showMessage(__(message));
+                messenger.notificationMessage('error', __(message));
                 this.loadingMask.hide();
             }
-        },
-
-        showMessage: function(message) {
-            messenger.notificationFlashMessage('error', message);
         },
 
         /**
@@ -1019,13 +817,11 @@ define(function (require) {
          */
         addMessages: function(messages) {
             this.selectorCached.flashMessages.find('.flash-messages-holder').empty();
-            for (var type in messages) {
-                if (messages.hasOwnProperty(type)) {
-                    for (var i = 0; i < messages[type].length; i++) {
-                        messenger.notificationFlashMessage(type, messages[type][i]);
-                    }
-                }
-            }
+            _.each(messages, function (messages, type) {
+                _.each(messages, function (message) {
+                    messenger.notificationFlashMessage(type, message);
+                });
+            });
         },
 
         /**
@@ -1192,9 +988,9 @@ define(function (require) {
 
         /**
          * Returns real url part from the hash
-         * @param  {Boolean} includeGrid
-         * @param  {Boolean} useRaw
-         * @return {String}
+         * @param  {boolean=} includeGrid
+         * @param  {boolean=} useRaw
+         * @return {string}
          */
         getHashUrl: function(includeGrid, useRaw) {
             var url = this.url;
@@ -1239,7 +1035,7 @@ define(function (require) {
             }
             if (this.enabled && !this.checkThirdPartyLink(url)) {
                 if (options.clearCache) {
-                    this.clearPageCache();
+                    contentManager.clearCache(url);
                 }
                 this.useCache = false;
                 if (options.useCache) {

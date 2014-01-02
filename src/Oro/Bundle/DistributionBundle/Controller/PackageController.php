@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DistributionBundle\Controller;
 
+use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -69,19 +70,6 @@ class PackageController extends Controller
     }
 
     /**
-     * @Route("/packages/ajax-test")
-     */
-    public function ajaxTestAction()
-    {
-        $request = $this->getRequest();
-        $text = $request->get('text');
-        $response = new Response(json_encode(array('text' => $text)));
-        $response->headers->set('Content-Type', 'application/json');
-        sleep(3);
-        return $response;
-    }
-
-    /**
      * @Route("/package/uninstall")
      */
     public function uninstallAction()
@@ -89,8 +77,8 @@ class PackageController extends Controller
         $this->setUpEnvironment();
 
         $params = $this->getRequest()->get('params');
-        $packageName = $params['packageName'];
-        $forceDependentsUninstalling = isset($params['force']) ? (bool)$params['force'] : false;
+        $packageName = $this->getParamValue($params, 'packageName', null);
+        $forceDependentsUninstalling = $this->getParamValue($params, 'force', false);
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
@@ -137,9 +125,9 @@ class PackageController extends Controller
         $this->setUpEnvironment();
 
         $params = $this->getRequest()->get('params');
-        $packageName = isset($params['packageName']) ? $params['packageName'] : null;
-        $packageVersion = isset($params['version']) ? $params['version'] : null;
-        $forceDependenciesInstalling = isset($params['force']) ? (bool)$params['force'] : false;
+        $packageName = $this->getParamValue($params, 'packageName', null);
+        $packageVersion = $this->getParamValue($params, 'version', null);
+        $forceDependenciesInstalling = $this->getParamValue($params, 'force', false);
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
@@ -162,7 +150,12 @@ class PackageController extends Controller
                 $params['force'] = true;
                 $responseContent = [
                     'code' => self::CODE_CONFIRM,
-                    'packages' => $requirements,
+                    'requirements' => array_map(
+                        function (PackageRequirement $pr) {
+                            return $pr->toArray();
+                        },
+                        $requirements
+                    ),
                     'params' => $params
                 ];
                 $response->setContent(json_encode($responseContent));
@@ -202,7 +195,7 @@ class PackageController extends Controller
         $this->setUpEnvironment();
 
         $params = $this->getRequest()->get('params');
-        $packageName = $params['packageName'];
+        $packageName = $this->getParamValue($params, 'packageName', null);
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
@@ -262,5 +255,17 @@ class PackageController extends Controller
     protected function getPackageManager()
     {
         return $this->container->get('oro_distribution.package_manager');
+    }
+
+    /**
+     * @param array $params
+     * @param string $paramName
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    protected function getParamValue(array $params, $paramName, $defaultValue)
+    {
+        return isset($params[$paramName]) ? $params[$paramName] : $defaultValue;
     }
 }

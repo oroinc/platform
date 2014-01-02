@@ -7,7 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * WorkflowDefinitionEntity
  *
- * @ORM\Table(name="oro_workflow_definition_entity")
+ * @ORM\Table(
+ *      name="oro_workflow_definition_entity",
+ *      indexes={
+ *          @ORM\Index(name="oro_workflow_definition_entity_class_idx", columns={"class_name"})
+ *      }
+ * )
  * @ORM\Entity
  */
 class WorkflowDefinitionEntity
@@ -24,7 +29,7 @@ class WorkflowDefinitionEntity
     /**
      * @var string
      *
-     * @ORM\Column(name="className", type="string", length=255)
+     * @ORM\Column(name="class_name", type="string", length=255)
      */
     protected $className;
 

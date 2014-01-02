@@ -10,10 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
-
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 
@@ -21,6 +18,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\ImapConfigurationOwnerInterface;
@@ -35,9 +33,6 @@ use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
 use Oro\Bundle\UserBundle\Model\ExtendUser;
-use Oro\Bundle\UserBundle\Entity\Status;
-use Oro\Bundle\UserBundle\Entity\Email;
-use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -59,12 +54,14 @@ use Oro\Bundle\UserBundle\Entity\EntityUploadedImageInterface;
  *              "owner_field_name"="owner",
  *              "owner_column_name"="business_unit_owner_id"
  *          },
+ *          "dataaudit"={"auditable"=true},
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
  *          }
  *      }
  * )
+ * @JMS\ExclusionPolicy("ALL")
  */
 class User extends ExtendUser implements
     AdvancedUserInterface,
@@ -84,8 +81,8 @@ class User extends ExtendUser implements
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Soap\ComplexType("int", nillable=true)
-     * @Type("integer")
+     * @JMS\Type("integer")
+     * @JMS\Expose
      */
     protected $id;
 
@@ -93,9 +90,10 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string", length=255, unique=true)
-     * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $username;
 
@@ -103,9 +101,10 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string", length=255, unique=true)
-     * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $email;
 
@@ -115,9 +114,10 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="name_prefix", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $namePrefix;
 
@@ -127,9 +127,10 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="first_name", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $firstName;
 
@@ -139,9 +140,10 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="middle_name", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $middleName;
 
@@ -151,9 +153,10 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="last_name", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string")
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $lastName;
 
@@ -163,9 +166,10 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="name_suffix", type="string", length=255, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
-     * @Type("string")
+     * @JMS\Type("string")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $nameSuffix;
 
@@ -173,9 +177,10 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="birthday", type="date", nullable=true)
-     * @Soap\ComplexType("date", nillable=true)
-     * @Type("date")
+     * @JMS\Type("DateTime")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $birthday;
 
@@ -185,7 +190,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="image", type="string", length=255, nullable=true)
-     * @Exclude
      */
     protected $image;
 
@@ -193,8 +197,6 @@ class User extends ExtendUser implements
      * Image filename
      *
      * @var UploadedFile
-     *
-     * @Exclude
      */
     protected $imageFile;
 
@@ -202,9 +204,10 @@ class User extends ExtendUser implements
      * @var boolean
      *
      * @ORM\Column(type="boolean")
-     * @Soap\ComplexType("boolean")
-     * @Type("boolean")
+     * @JMS\Type("boolean")
+     * @JMS\Expose
      * @Oro\Versioned
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $enabled = true;
 
@@ -214,7 +217,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
-     * @Exclude
      */
     protected $salt;
 
@@ -224,7 +226,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
-     * @Exclude
      */
     protected $password;
 
@@ -232,9 +233,6 @@ class User extends ExtendUser implements
      * Plain password. Used for model validation. Must not be persisted.
      *
      * @var string
-     *
-     * @Soap\ComplexType("string", nillable=true)
-     * @Exclude
      */
     protected $plainPassword;
 
@@ -244,7 +242,6 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="confirmation_token", type="string", nullable=true)
-     * @Exclude
      */
     protected $confirmationToken;
 
@@ -252,7 +249,6 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="password_requested", type="datetime", nullable=true)
-     * @Exclude
      */
     protected $passwordRequestedAt;
 
@@ -260,8 +256,8 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
-     * @Soap\ComplexType("dateTime", nillable=true)
-     * @Type("dateTime")
+     * @JMS\Type("DateTime")
+     * @JMS\Expose
      */
     protected $lastLogin;
 
@@ -269,7 +265,6 @@ class User extends ExtendUser implements
      * @var int
      *
      * @ORM\Column(name="login_count", type="integer", options={"default"=0, "unsigned"=true})
-     * @Exclude
      */
     protected $loginCount;
 
@@ -277,7 +272,6 @@ class User extends ExtendUser implements
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit", cascade={"persist"})
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $owner;
 
@@ -289,9 +283,8 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Soap\ComplexType("int[]", nillable=true)
-     * @Exclude
      * @Oro\Versioned("getLabel")
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $roles;
 
@@ -303,9 +296,8 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Soap\ComplexType("int[]", nillable=true)
-     * @Exclude
      * @Oro\Versioned("getName")
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $groups;
 
@@ -353,8 +345,8 @@ class User extends ExtendUser implements
      *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
-     * @Exclude
      * @Oro\Versioned("getName")
+     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
      */
     protected $businessUnits;
 
@@ -365,7 +357,6 @@ class User extends ExtendUser implements
      *     targetEntity="Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin", cascade={"all"}
      * )
      * @ORM\JoinColumn(name="imap_configuration_id", referencedColumnName="id", onDelete="SET NULL", nullable=true)
-     * @Exclude
      */
     protected $imapConfiguration;
 
@@ -676,8 +667,8 @@ class User extends ExtendUser implements
 
     public function isPasswordRequestNonExpired($ttl)
     {
-        return $this->getPasswordRequestedAt() instanceof \DateTime &&
-               $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        return $this->getPasswordRequestedAt() instanceof \DateTime
+            && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
     /**
