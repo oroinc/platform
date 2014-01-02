@@ -3,9 +3,6 @@
 namespace {{ namespace }};
 
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
-use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
@@ -14,7 +11,6 @@ class {{ className }} extends EmailAddress
 {% for owner in owners %}
     /**
      * @var EmailOwnerInterface
-     * @Exclude
      */
     private ${{ owner.fieldName }};
 {% endfor %}
