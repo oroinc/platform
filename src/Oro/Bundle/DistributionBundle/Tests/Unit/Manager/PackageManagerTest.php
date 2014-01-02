@@ -181,7 +181,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $requirementLinkMock2 = $this->createComposerPackageLinkMock();
         $platformRequirementLinkMock = $this->createComposerPackageLinkMock();
 
-        $installedPackage = $this->getPackage('installed/package', 1);
 
         // non platform requirements
         $requirementLinkMock1->expects($this->exactly(2))
@@ -211,7 +210,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $packageMock->expects($this->once())
             ->method('getNames')
             ->will($this->returnValue([$packageName]));
-        $packageMock->expects($this->once())
+        $packageMock->expects($this->any())
             ->method('getStability')
             ->will($this->returnValue('stable'));
 
