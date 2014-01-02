@@ -14,11 +14,18 @@ class TranslationServiceProvider
     protected $adapter;
 
     /**
-     * @param AbstractAPIAdapter $adapter
+     * @var JsTranslationDumper
      */
-    public function __construct(AbstractAPIAdapter $adapter = null)
+    protected $jsTranslationDumper;
+
+    /**
+     * @param AbstractAPIAdapter  $adapter
+     * @param JsTranslationDumper $jsTranslationDumper
+     */
+    public function __construct(AbstractAPIAdapter $adapter, JsTranslationDumper $jsTranslationDumper)
     {
         $this->adapter = $adapter;
+        $this->jsTranslationDumper = $jsTranslationDumper;
     }
 
     /**
@@ -69,8 +76,9 @@ class TranslationServiceProvider
 
         if ($isExtracted) {
             unlink($pathToSave);
-            $this->apply('./app/Resources/', $targetDir);
+            $appliedLocales = $this->apply('./app/Resources/', $targetDir);
             $this->cleanup($targetDir);
+            $this->jsTranslationDumper->dumpTranslations($appliedLocales, $progressCallback);
         }
 
         return $isExtracted && $isDownloaded;
@@ -148,9 +156,12 @@ class TranslationServiceProvider
 
     /**
      * Apply downloaded and extracted language packs to Symfony, in app/Resources dir
+     * Returns applied locale codes
      *
      * @param string $targetDir
      * @param string $sourceDir
+     *
+     * @return array
      */
     protected function apply($targetDir, $sourceDir)
     {
@@ -159,6 +170,7 @@ class TranslationServiceProvider
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
+        $appliedLocales = [];
         foreach ($iterator as $fileInfo) {
             if ($iterator->getDepth() < 1) {
                 continue;
@@ -169,6 +181,17 @@ class TranslationServiceProvider
                 '',
                 $fileInfo->getPathname()
             );
+
+            $locale = str_replace(
+                '-',
+                '_',
+                preg_replace(
+                    '#' . $sourceDir . '[/|\\\]+([^/]+)[/|\\\]+.*#',
+                    '$1',
+                    $fileInfo->getPathname()
+                )
+            );
+            $appliedLocales[$locale] = $locale;
 
             if ($fileInfo->isDir() && !file_exists($target)) {
                 mkdir($target);
@@ -184,6 +207,8 @@ class TranslationServiceProvider
                 );
             }
         }
+
+        return $appliedLocales;
     }
 
     /**
