@@ -1,0 +1,11 @@
+oro_system_configuration:
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            localization:
+                                children:
+                                    language_settings:
+                                        children: []

@@ -3,7 +3,8 @@ oro_system_configuration:
         localization:
             title: 'Localization'
             icon:  'icon-flag'
-
+        language_settings:
+            title: 'Language Settings'
         locale_settings:
             title: 'Localization options'
 
@@ -92,7 +93,10 @@ oro_system_configuration:
                                             - oro_locale.locale
                                             - oro_locale.country
                                             - oro_locale.format_address_by_address_country
-                                            - oro_locale.language
-                                            - oro_locale.languages
                                             - oro_locale.timezone
                                             - oro_locale.currency
+                                    language_settings:
+                                        priority: 90
+                                        children:
+                                            - oro_locale.language
+                                            - oro_locale.languages

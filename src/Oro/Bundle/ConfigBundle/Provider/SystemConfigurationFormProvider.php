@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
@@ -9,7 +11,7 @@ use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-class SystemConfigurationFormProvider extends FormProvider
+class SystemConfigurationFormProvider extends Provider
 {
     const TREE_NAME                    = 'system_configuration';
     const CORRECT_FIELDS_NESTING_LEVEL = 5;
@@ -17,14 +19,11 @@ class SystemConfigurationFormProvider extends FormProvider
     /** @var FormFactoryInterface */
     protected $factory;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     public function __construct($config, FormFactoryInterface $factory, SecurityFacade $securityFacade)
     {
-        parent::__construct($config);
+        parent::__construct($config, $securityFacade);
 
-        $this->factory    = $factory;
+        $this->factory        = $factory;
         $this->securityFacade = $securityFacade;
     }
 
@@ -102,14 +101,22 @@ class SystemConfigurationFormProvider extends FormProvider
     }
 
     /**
-     * Check ACL resource
-     *
-     * @param string $resourceName
-     *
-     * @return bool
+     * @param FormBuilderInterface $form
+     * @param FieldNodeDefinition  $fieldDefinition
      */
-    protected function checkIsGranted($resourceName)
+    protected function addFieldToForm(FormBuilderInterface $form, FieldNodeDefinition $fieldDefinition)
     {
-        return $this->securityFacade->isGranted($resourceName);
+        if ($fieldDefinition->getAclResource() && !$this->checkIsGranted($fieldDefinition->getAclResource())) {
+            // field is not allowed to be shown, do nothing
+            return;
+        }
+
+        $name = str_replace(
+            ConfigManager::SECTION_MODEL_SEPARATOR,
+            ConfigManager::SECTION_VIEW_SEPARATOR,
+            $fieldDefinition->getName()
+        );
+
+        $form->add($name, 'oro_config_form_field_type', $fieldDefinition->toFormFieldOptions());
     }
 }
