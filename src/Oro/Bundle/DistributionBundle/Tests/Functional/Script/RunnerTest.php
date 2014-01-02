@@ -319,11 +319,8 @@ class RunnerTest extends WebTestCase
      */
     protected function formatExpectedResult($annotationLabel, $pathToFile, $scriptOutput)
     {
-        $format = <<<OUTPUT
-Launching "%s" (%s) script
-%s
-
-OUTPUT;
+        $format = 'Launching "%s" (%s) script' . PHP_EOL
+            . '%s'. PHP_EOL;
 
         return sprintf($format, $annotationLabel, $pathToFile, $scriptOutput);
     }
