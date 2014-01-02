@@ -602,7 +602,7 @@ class PackageManager
      */
     protected function updateComposerJsonFile(PackageInterface $package, $version = null)
     {
-        $this->logger->info(sprintf('Updating composer %s : %s', $package->getPrettyName(), $version));
+        $this->logger->info(sprintf('Updating composer.json %s : %s', $package->getPrettyName(), $version));
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
         $composerData['require'][$package->getName()] = $version ? : $package->getPrettyVersion();
