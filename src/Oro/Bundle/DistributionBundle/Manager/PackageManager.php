@@ -15,6 +15,8 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\CompositeRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryInterface;
+
+use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
@@ -51,7 +53,7 @@ class PackageManager
     /**
      * @var array
      */
-    protected $constantPackages = ['oro/platform', 'oro/platform-dist'];
+    protected $constantPackages = array('oro/platform', 'oro/platform-dist');
 
     /**
      * @var Pool
@@ -93,8 +95,6 @@ class PackageManager
      */
     public function getInstalled()
     {
-        $packages = [];
-
         $notificationUrl = new \ReflectionProperty('Composer\Package\Package', 'notificationUrl');
         $notificationUrl->setAccessible(true);
 
@@ -222,7 +222,7 @@ class PackageManager
      * @param string $packageName
      * @param string $packageVersion
      *
-     * @return string[]
+     * @return PackageRequirement[]
      */
     public function getRequirements($packageName, $packageVersion = null)
     {
@@ -237,10 +237,13 @@ class PackageManager
             }
         );
 
+        $installedPackages = $this->getFlatListInstalledPackages();
+
         return array_reduce(
             $nonPlatformLinks,
-            function (array $requirements, Link $link) {
-                $requirements[] = $link->getTarget();
+            function (array $requirements, Link $link) use ($installedPackages) {
+                $name = $link->getTarget();
+                $requirements[] = new PackageRequirement($name, in_array($name, $installedPackages));
                 return $requirements;
             },
             []
@@ -267,7 +270,7 @@ class PackageManager
     public function install($packageName, $packageVersion = null)
     {
         $this->logger->info(sprintf('%s (%s) installing begin', $packageName, $packageVersion));
-        $previousInstalled = $this->getFlatListInstalledPackage();
+        $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
 
@@ -551,7 +554,7 @@ class PackageManager
     /**
      * @param array $require
      */
-    protected function updateRootPackage(array $require = [])
+    protected function updateRootPackage(array $require = array())
     {
         $rootPackage = $this->composer->getPackage();
         $rootPackage->setRequires(
@@ -567,7 +570,7 @@ class PackageManager
     /**
      * @return array
      */
-    protected function getFlatListInstalledPackage()
+    protected function getFlatListInstalledPackages()
     {
         return array_reduce(
             $this->getInstalled(),

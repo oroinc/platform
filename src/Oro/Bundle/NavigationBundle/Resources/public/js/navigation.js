@@ -215,17 +215,26 @@ define(function (require) {
             /**
              * Loading grid collection from cache
              */
-            mediator.bind("datagrid_collection_set_after", function (datagridCollection) {
+            mediator.bind("datagrid_collection_set_before", function (obj) {
                 var data = this.getCachedData();
                 if (data.states) {
                     var girdState = data.states.getObjectCache('grid');
-                    if (girdState['collection']) {
-                        datagridCollection.collection = girdState['collection'].clone();
-                    } else {
-                        girdState['collection'] = datagridCollection.collection;
+                    if (girdState.collection) {
+                        obj.collection = girdState.collection.clone();
                     }
+                }
+            }, this);
+
+            /**
+             * Updating grid collection in cache
+             */
+            mediator.bind("datagrid_collection_set_after", function (collection) {
+                var data = this.getCachedData();
+                if (data.states) {
+                    var girdState = data.states.getObjectCache('grid');
+                    girdState.collection = collection;
                 } else { //updating temp cache with collection
-                    this.updateCachedContent('grid', {'collection': datagridCollection.collection});
+                    this.updateCachedContent('grid', {collection: collection});
                 }
             }, this);
 
@@ -543,7 +552,7 @@ define(function (require) {
         /**
          * Get cache data for url
          *
-         * @param {string} url
+         * @param {string=} url
          * @return {*}
          */
         getCachedData: function(url) {
@@ -979,8 +988,8 @@ define(function (require) {
 
         /**
          * Returns real url part from the hash
-         * @param  {?boolean} includeGrid
-         * @param  {?boolean} useRaw
+         * @param  {boolean=} includeGrid
+         * @param  {boolean=} useRaw
          * @return {string}
          */
         getHashUrl: function(includeGrid, useRaw) {

@@ -68,15 +68,15 @@ class BusinessUnitController extends SoapController
     /**
      * {@inheritdoc}
      */
-    protected function fixFormData(array $data, $entity)
+    protected function fixFormData(array &$data, $entity)
     {
-        $result = parent::fixFormData($data, $entity);
+        parent::fixFormData($data, $entity);
 
-        unset($result['id']);
-        unset($result['createdAt']);
-        unset($result['updatedAt']);
+        unset($data['id']);
+        unset($data['createdAt']);
+        unset($data['updatedAt']);
 
-        return $result;
+        return true;
     }
 
     /**

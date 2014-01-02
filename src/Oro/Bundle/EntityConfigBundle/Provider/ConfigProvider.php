@@ -177,15 +177,16 @@ class ConfigProvider implements ConfigProviderInterface
      * the given $className, which can be managed by this provider.
      *
      * @param string|null $className
+     * @param bool $withHidden
      * @return array|ConfigIdInterface[]
      */
-    public function getIds($className = null)
+    public function getIds($className = null, $withHidden = false)
     {
         if ($className) {
             $className = $this->getClassName($className);
         }
 
-        return $this->configManager->getIds($this->getScope(), $className);
+        return $this->configManager->getIds($this->getScope(), $className, $withHidden);
     }
 
     /**
@@ -193,13 +194,14 @@ class ConfigProvider implements ConfigProviderInterface
      * the given $className.
      *
      * @param string|null $className
+     * @param bool $withHidden
      * @return array|ConfigInterface[]
      */
-    public function getConfigs($className = null)
+    public function getConfigs($className = null, $withHidden = false)
     {
         $result = array();
 
-        foreach ($this->getIds($className) as $configId) {
+        foreach ($this->getIds($className, $withHidden) as $configId) {
             $result[] = $this->getConfigById($configId);
         }
 

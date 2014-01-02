@@ -16,6 +16,7 @@ use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryManager;
 use Composer\Repository\WritableArrayRepository;
 use Composer\Installer\InstallationManager;
+use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
@@ -170,7 +171,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function shouldReturnPackageRequirementsWithoutPlatformRequirements()
     {
-        $expectedRequirements = ['requirement1', 'requirement2'];
         $platformRequirement = 'php-64bit';
         $packageName = 'vendor/package';
         $packageVersion = '*';
@@ -182,14 +182,16 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $requirementLinkMock2 = $this->createComposerPackageLinkMock();
         $platformRequirementLinkMock = $this->createComposerPackageLinkMock();
 
+        $installedPackage = $this->getPackage('installed/package', 1);
+
         // non platform requirements
         $requirementLinkMock1->expects($this->exactly(2))
             ->method('getTarget')
-            ->will($this->returnValue($expectedRequirements[0]));
+            ->will($this->returnValue('requirement1'));
 
         $requirementLinkMock2->expects($this->exactly(2))
             ->method('getTarget')
-            ->will($this->returnValue($expectedRequirements[1]));
+            ->will($this->returnValue('requirement2'));
 
         // platform dependency
         $platformRequirementLinkMock->expects($this->once())
@@ -217,18 +219,24 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         // composer and repository config
         $composer = $this->createComposerMock();
         $repositoryManagerMock = $this->createRepositoryManagerMock();
-        $composer->expects($this->once())
+        $composer->expects($this->exactly(2))
             ->method('getRepositoryManager')
             ->will($this->returnValue($repositoryManagerMock));
 
-        $localRepository = new WritableArrayRepository([$packageMock]);
+        $localRepository = new WritableArrayRepository([$packageMock, $this->getPackage('requirement2', 1)]);
 
         $repositoryManagerMock->expects($this->once())
             ->method('getRepositories')
             ->will($this->returnValue([$localRepository]));
-
+        $repositoryManagerMock->expects($this->once())
+            ->method('getLocalRepository')
+            ->will($this->returnValue($localRepository));
 
         $manager = $this->createPackageManager($composer);
+        $expectedRequirements = [
+            new PackageRequirement('requirement1', false),
+            new PackageRequirement('requirement2', true)
+        ];
 
         $this->assertEquals($expectedRequirements, $manager->getRequirements($packageName, $packageVersion));
     }
@@ -587,10 +595,12 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composer = $this->createComposerMock();
         $repositoryManager = $this->createRepositoryManagerMock();
         $installationManager = $this->createInstallationManagerMock();
-        $localRepository = new WritableArrayRepository($installedPackages = [
-            $this->getPackage($packageNamesToBeRemoved[0], 'v2'),
-            $this->getPackage($packageNamesToBeRemoved[1], 'v2')
-        ]);
+        $localRepository = new WritableArrayRepository(
+            $installedPackages = [
+                $this->getPackage($packageNamesToBeRemoved[0], 'v2'),
+                $this->getPackage($packageNamesToBeRemoved[1], 'v2')
+            ]
+        );
 
         $composer->expects($this->any())
             ->method('getRepositoryManager')
@@ -627,6 +637,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $runner->expects($this->at(1))
             ->method('uninstall')
             ->with($installedPackages[1]);
+        $runner->expects($this->once())
+            ->method('removeCachedFiles');
 
         // Ready Steady Go!
         $manager = $this->createPackageManager($composer, null, null, $runner, null, $tempComposerJson);

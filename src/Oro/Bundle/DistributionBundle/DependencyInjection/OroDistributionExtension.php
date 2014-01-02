@@ -26,6 +26,10 @@ class OroDistributionExtension extends Extension
 
         $this->mergeAsseticBundles($container);
         $this->mergeTwigResources($container);
+
+        if ($config = $this->processConfiguration(new Configuration(), $configs)) {
+            $container->setParameter('oro_distribution.entry_point', $config['entry_point']);
+        }
     }
 
     protected function mergeAsseticBundles(ContainerBuilder $container)

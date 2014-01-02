@@ -8,6 +8,9 @@ parameters:
     oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
     oro_distribution.composer_json:                           %kernel.root_dir%/../composer.json
 
+    oro_distribution.listener.navigation_listener.class:      Oro\Bundle\DistributionBundle\EventListener\NavigationListener
+    oro_distribution.entry_point:                             ~
+
     oro_distribution.security.access_denied_listener.class:   Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
 
 services:
@@ -38,6 +41,7 @@ services:
             - @oro_distribution.composer.installation_manager
             - @logger
             - %kernel.root_dir%
+            - %kernel.environment%
         tags:
             - { name: monolog.logger, channel: oro_distribution }
 
@@ -64,3 +68,11 @@ services:
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
 
+    ### Menu
+    oro_distribution.listener.navigation_listener:
+        class: %oro_distribution.listener.navigation_listener.class%
+        arguments:
+            - @security.context
+            - %oro_distribution.entry_point%
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

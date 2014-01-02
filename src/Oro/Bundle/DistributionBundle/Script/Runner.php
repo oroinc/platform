@@ -29,15 +29,22 @@ class Runner
     protected $logger;
 
     /**
+     * @var string
+     */
+    protected $environment;
+
+    /**
      * @param InstallationManager $installationManager
      * @param LoggerInterface $logger
      * @param string $applicationRootDir
+     * @param string $environment
      */
-    public function __construct(InstallationManager $installationManager, LoggerInterface $logger, $applicationRootDir)
+    public function __construct(InstallationManager $installationManager, LoggerInterface $logger, $applicationRootDir, $environment)
     {
         $this->installationManager = $installationManager;
-        $this->applicationRootDir = realpath($applicationRootDir);
         $this->logger = $logger;
+        $this->applicationRootDir = realpath($applicationRootDir);
+        $this->environment = $environment;
     }
 
     /**
@@ -78,8 +85,10 @@ class Runner
             }
         }
         if (!$output) {
+
             return null;
         }
+
         return implode(PHP_EOL, $output);
     }
 
@@ -90,7 +99,13 @@ class Runner
     public function runPlatformUpdate()
     {
         $phpPath = $this->getPhpExecutablePath();
-        $command = sprintf('%s app/console oro:platform:update --env=prod', $phpPath);
+
+        $command = sprintf(
+            '%s %s/console oro:platform:update --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
 
         return $this->runCommand($command);
     }
@@ -129,7 +144,14 @@ class Runner
         foreach ($packages as $package) {
             $paths[] = $this->installationManager->getInstallPath($package);
         }
-        $commandPrefix = sprintf('%s app/console oro:package:fixtures:load --env=prod ', $phpPath);
+
+        $commandPrefix = sprintf(
+            '%s %s/console oro:package:fixtures:load --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
         $commands = $this->makeCommands($paths, $commandPrefix);
         $output = '';
         foreach ($commands as $command) {
@@ -155,9 +177,9 @@ class Runner
         $commands[$commandIndex] = $commandPrefix;
         foreach ($paths as $path) {
             if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
-                $commands[$commandIndex] .= $path . ' ';
+                $commands[$commandIndex] .=  ' ' . $path ;
             } else {
-                $commands[++$commandIndex] = $commandPrefix . $path . ' ';
+                $commands[++$commandIndex] = $commandPrefix . ' ' . $path ;
             }
         }
 
@@ -173,7 +195,14 @@ class Runner
     {
         if (file_exists($path)) {
             $phpPath = $this->getPhpExecutablePath();
-            $command = sprintf('%s app/console oro:platform:run-script --env=prod %s', $phpPath, $path);
+
+            $command = sprintf(
+                '%s %s/console oro:platform:run-script "%s" --env=%s',
+                $phpPath,
+                $this->applicationRootDir,
+                $path,
+                $this->environment
+            );
 
             return $this->runCommand($command);
         }

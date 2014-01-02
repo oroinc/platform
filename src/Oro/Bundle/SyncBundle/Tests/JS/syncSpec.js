@@ -60,21 +60,14 @@ function (sync, requirejsExposure) {
 
             it('setup connection_established handler', function () {
                 connectionLostHandler();
-                expect(service.off).toHaveBeenCalledWith('connection_established', jasmine.any(Function));
+                expect(service.off).toHaveBeenCalled();
+                expect(service.off.mostRecentCall.args[1]).toEqual(jasmine.any(Function));
                 expect(service.once).toHaveBeenCalledWith('connection_established', jasmine.any(Function));
                 expect(service.once.mostRecentCall.args[1]).toEqual(service.off.mostRecentCall.args[1]);
                 // check connection established handler
                 (service.once.mostRecentCall.args[1])();
                 expect(messenger.notificationFlashMessage).toHaveBeenCalled();
             });
-        });
-
-        it('check private method checkService', function () {
-            var checkService = exposure.retrieve('checkService');
-            exposure.substitute('service').by(undefined);
-            expect(checkService).toThrow();
-            exposure.substitute('service').by({});
-            expect(checkService).not.toThrow();
         });
 
         describe('model changes subscription', function () {
@@ -217,10 +210,6 @@ function (sync, requirejsExposure) {
             it('sync.reconnect', function () {
                 sync.reconnect();
                 expect(service.connect).toHaveBeenCalled();
-            });
-
-            it('sync.getService', function () {
-                expect(sync.getService()).toBe(service);
             });
         });
     });

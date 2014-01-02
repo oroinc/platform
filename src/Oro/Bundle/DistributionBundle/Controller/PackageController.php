@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DistributionBundle\Controller;
 
+use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -149,7 +150,12 @@ class PackageController extends Controller
                 $params['force'] = true;
                 $responseContent = [
                     'code' => self::CODE_CONFIRM,
-                    'packages' => $requirements,
+                    'requirements' => array_map(
+                        function (PackageRequirement $pr) {
+                            return $pr->toArray();
+                        },
+                        $requirements
+                    ),
                     'params' => $params
                 ];
                 $response->setContent(json_encode($responseContent));

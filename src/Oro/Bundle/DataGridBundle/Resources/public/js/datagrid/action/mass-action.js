@@ -12,9 +12,6 @@ function(_, messenger, __, Modal, AbstractAction) {
      */
     return AbstractAction.extend({
         /** @property {Object} */
-        messages: {},
-
-        /** @property {Object} */
         defaultMessages: {
             confirm_title: __('Mass Action Confirmation'),
             confirm_content: __('Are you sure you want to do this?'),
