@@ -59,7 +59,6 @@ class LoadFixturesCommand extends ContainerAwareCommand
                 $loader->loadFromDirectory($fixtureDir);
                 $hasFixtures = true;
             }
-            break;
         }
 
         // load data fixtures
