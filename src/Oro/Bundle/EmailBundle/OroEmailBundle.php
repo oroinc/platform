@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle;
 
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 
@@ -15,33 +15,57 @@ use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 
 class OroEmailBundle extends Bundle
 {
+    const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
+    const CACHED_ENTITIES_DIR_NAME = 'oro_entities';
+
+    /**
+     * Constructor
+     *
+     * @param KernelInterface $kernel
+     */
+    public function __construct(KernelInterface $kernel)
+    {
+        // register email address proxy class loader
+        $loader = new UniversalClassLoader();
+        $loader->registerNamespaces(
+            [
+                self::ENTITY_PROXY_NAMESPACE =>
+                    $kernel->getCacheDir() . DIRECTORY_SEPARATOR . self::CACHED_ENTITIES_DIR_NAME
+            ]
+        );
+        $loader->register();
+    }
+
     /**
      * {@inheritdoc}
      */
     public function build(ContainerBuilder $container)
     {
-        parent::build($container);
-
         $container->addCompilerPass(new EmailOwnerConfigurationPass());
         $this->addDoctrineOrmMappingsPass($container);
         $container->addCompilerPass(new EmailBodyLoaderPass());
     }
 
     /**
-     * Add a compiler pass handles annotations of extended entities
+     * Add a compiler pass handles ORM mappings of email address proxy
      *
      * @param ContainerBuilder $container
      */
     protected function addDoctrineOrmMappingsPass(ContainerBuilder $container)
     {
-        $cacheDir = sprintf('%s/emails', $container->getParameter('kernel.root_dir'));
-        $entityCacheNamespace = 'OroEmail\Cache\OroEmailBundle\Entity';
+        $entityCacheDir = sprintf(
+            '%s%s%s%s%s',
+            $container->getParameter('kernel.cache_dir'),
+            DIRECTORY_SEPARATOR,
+            self::CACHED_ENTITIES_DIR_NAME,
+            DIRECTORY_SEPARATOR,
+            str_replace('\\', DIRECTORY_SEPARATOR, self::ENTITY_PROXY_NAMESPACE)
+        );
 
-        $container->setParameter('oro_email.entity.cache_dir', $cacheDir);
-        $container->setParameter('oro_email.entity.cache_namespace', $entityCacheNamespace);
+        $container->setParameter('oro_email.entity.cache_dir', $entityCacheDir);
+        $container->setParameter('oro_email.entity.cache_namespace', self::ENTITY_PROXY_NAMESPACE);
         $container->setParameter('oro_email.entity.proxy_name_template', '%sProxy');
 
-        $entityCacheDir = sprintf('%s/%s', $cacheDir, str_replace('\\', '/', $entityCacheNamespace));
         // Ensure the cache directory exists
         $fs = new Filesystem();
         if (!is_dir($entityCacheDir)) {
@@ -49,35 +73,9 @@ class OroEmailBundle extends Bundle
         }
 
         $container->addCompilerPass(
-            $this->createAnnotationMappingDriver(
-                array($entityCacheNamespace),
-                array($entityCacheDir)
+            DoctrineOrmMappingsPass::createYamlMappingDriver(
+                [$entityCacheDir => self::ENTITY_PROXY_NAMESPACE]
             )
         );
-    }
-
-    /**
-     * Create DoctrineOrmMappingsPass object
-     *
-     * @param array       $namespaces         List of namespaces that are handled with annotation mapping
-     * @param array       $directories        List of directories to look for annotated classes
-     * @param string[]    $managerParameters  List of parameters that could which object manager name your bundle uses.
-     *                                        This compiler pass will automatically append the parameter name for the
-     *                                        default entity manager to this list.
-     * @param bool|string $enabledParameter   Service container parameter that must be present to enable the mapping
-     *                                        Set to false to not do any check, optional.
-     *
-     * @return DoctrineOrmMappingsPass
-     */
-    protected function createAnnotationMappingDriver(
-        array $namespaces,
-        array $directories,
-        array $managerParameters = array(),
-        $enabledParameter = false
-    ) {
-        $reader = new Reference('annotation_reader');
-        $driver = new Definition('Doctrine\ORM\Mapping\Driver\AnnotationDriver', array($reader, $directories));
-
-        return new DoctrineOrmMappingsPass($driver, $namespaces, $managerParameters, $enabledParameter);
     }
 }

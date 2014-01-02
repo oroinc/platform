@@ -57,7 +57,6 @@ services:
         class: %oro_email.entity.cache.clearer.class%
         arguments:
             - %oro_email.entity.cache_dir%
-            - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
         tags:
             - { name: kernel.cache_clearer }

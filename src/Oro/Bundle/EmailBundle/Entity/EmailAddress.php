@@ -10,6 +10,7 @@ use JMS\Serializer\Annotation as JMS;
  * This class is dynamically extended based of email owner providers.
  * For details see
  *   - Resources/cache/Entity/EmailAddress.php.twig
+ *   - Resources/cache/Entity/EmailAddress.orm.yml.twig
  *   - Cache/EmailAddressCacheWarmer.php
  *   - Cache/EmailAddressCacheClearer.php
  *   - Entity/Provider/EmailOwnerProviderStorage.php
@@ -28,7 +29,7 @@ abstract class EmailAddress
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      */
-    protected $id;
+    private $id;
 
     /**
      * @var \DateTime
@@ -36,7 +37,7 @@ abstract class EmailAddress
      * @ORM\Column(name="created", type="datetime")
      * @JMS\Type("dateTime")
      */
-    protected $created;
+    private $created;
 
     /**
      * @var \DateTime
@@ -44,7 +45,7 @@ abstract class EmailAddress
      * @ORM\Column(name="updated", type="datetime")
      * @JMS\Type("dateTime")
      */
-    protected $updated;
+    private $updated;
 
     /**
      * @var string
@@ -52,15 +53,15 @@ abstract class EmailAddress
      * @ORM\Column(name="email", type="string", length=255)
      * @JMS\Type("string")
      */
-    protected $email;
+    private $email;
 
     /**
-     * @var \DateTime
+     * @var bool
      *
      * @ORM\Column(name="has_owner", type="boolean")
      * @JMS\Type("boolean")
      */
-    protected $hasOwner = false;
+    private $hasOwner = false;
 
     /**
      * Get id
@@ -70,6 +71,19 @@ abstract class EmailAddress
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set id
+     *
+     * @param integer $id
+     * @return EmailAddress
+     */
+    protected function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -83,6 +97,19 @@ abstract class EmailAddress
     }
 
     /**
+     * Set entity created date/time
+     *
+     * @param \DateTime $createdAt
+     * @return EmailAddress
+     */
+    protected function setCreatedAt($createdAt)
+    {
+        $this->created = $createdAt;
+
+        return $this;
+    }
+
+    /**
      * Get entity updated date/time
      *
      * @return \DateTime
@@ -90,6 +117,19 @@ abstract class EmailAddress
     public function getUpdatedAt()
     {
         return $this->updated;
+    }
+
+    /**
+     * Set entity updated date/time
+     *
+     * @param \DateTime $updatedAt
+     * @return EmailAddress
+     */
+    protected function setUpdatedAt($updatedAt)
+    {
+        $this->updated = $updatedAt;
+
+        return $this;
     }
 
     /**
@@ -106,7 +146,7 @@ abstract class EmailAddress
      * Set email address.
      *
      * @param string $email
-     * @return $this
+     * @return EmailAddress
      */
     public function setEmail($email)
     {
@@ -139,7 +179,7 @@ abstract class EmailAddress
      * Set email owner
      *
      * @param EmailOwnerInterface|null $owner
-     * @return $this
+     * @return EmailAddress
      */
     public function setOwner(EmailOwnerInterface $owner = null)
     {
