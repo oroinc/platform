@@ -12,31 +12,18 @@ function($, _, __, app, TextFilter) {
      */
     return TextFilter.extend({
         /**
-         * Template for filter criteria
+         * Template selector for filter criteria
          *
-         * @property {function(Object, ?Object=): String}
+         * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div class="choicefilter">' +
-                '<div class="input-prepend">' +
-                    '<div class="btn-group">' +
-                        '<button class="btn dropdown-toggle" data-toggle="dropdown">' +
-                            '<%= selectedChoiceLabel %>' +
-                            '<span class="caret"></span>' +
-                        '</button>' +
-                        '<ul class="dropdown-menu">' +
-                            '<% _.each(choices, function (option) { %>' +
-                                '<li<% if (selectedChoice == option.value) { %> class="active"<% } %>><a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a></li>' +
-                            '<% }); %>' +
-                        '</ul>' +
-                        '<input type="text" name="value" value="">' +
-                        '<input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>' +
-                        '</div>' +
-                    '</div>' +
-                    '<button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>' +
-                '</div>' +
-            '</div>'
-        ),
+        popupCriteriaTemplateSelector: '#choice-filter-popup-criteria-template',
+
+        /**
+         * Simple template selector for filter criteria
+         *
+         * @property
+         */
+        simplePopupCriteriaTemplateSelector: '#choice-filter-popup-criteria-simple-template',
 
         /**
          * Selectors for filter criteria elements
@@ -68,7 +55,10 @@ function($, _, __, app, TextFilter) {
          *
          * @param {Object} options
          */
-        initialize: function() {
+        initialize: function(options) {
+            options = _.pick(options || {}, 'choices');
+            _.extend(this, options);
+
             // init filter content options if it was not initialized so far
             if (_.isUndefined(this.choices)) {
                 this.choices = [];

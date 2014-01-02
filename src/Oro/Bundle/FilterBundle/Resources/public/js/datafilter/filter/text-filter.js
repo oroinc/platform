@@ -16,33 +16,34 @@ function($, _, __, AbstractFilter) {
      */
     return AbstractFilter.extend({
         /** @property */
-        template: _.template(
-            '<button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">' +
-                '<% if (showLabel) { %><%= label %>: <% } %>' +
-                '<strong class="filter-criteria-hint"><%= criteriaHint %></strong>' +
-                '<span class="caret"></span>' +
-            '</button>' +
-            '<% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>' +
-            '<div class="filter-criteria dropdown-menu" />'
-        ),
+        template: '',
 
         /**
          * Template for filter criteria
          *
          * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div>' +
-                '<div>' +
-                    '<input type="text" name="value" value=""/>' +
-                '</div>' +
-                '<div class="oro-action">' +
-                    '<div class="btn-group">' +
-                        '<button type="button" class="btn btn-primary filter-update"><%- _.__("Update") %></button>' +
-                    '</div>' +
-                '</div>' +
-            '</div>'
-        ),
+        popupCriteriaTemplate: '',
+
+        /** @property */
+        templateSelector: '#text-filter-template',
+
+        /** @property */
+        simpleTemplateSelector: '#text-filter-simple-template',
+
+        /**
+         * Template selector for filter criteria
+         *
+         * @property
+         */
+        popupCriteriaTemplateSelector: '#text-filter-popup-criteria-template',
+
+        /**
+         * Simple template selector for filter criteria
+         *
+         * @property
+         */
+        simplePopupCriteriaTemplateSelector: '#text-filter-popup-criteria-simple-template',
 
         /**
          * @property {Boolean}
@@ -94,7 +95,18 @@ function($, _, __, AbstractFilter) {
          *
          * @param {Object} options
          */
-        initialize: function() {
+        initialize: function (options) {
+            options = _.pick(options || {}, 'simple');
+            _.extend(this, options);
+
+            var templateSrc = $(this.simple ?
+                this.simpleTemplateSelector : this.templateSelector).text();
+            var popupCriteriaTemplateSrc = $(this.simple ?
+                this.simplePopupCriteriaTemplateSelector : this.popupCriteriaTemplateSelector).text();
+
+            this.template = _.template(templateSrc);
+            this.popupCriteriaTemplate = _.template(popupCriteriaTemplateSrc);
+
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
@@ -122,7 +134,7 @@ function($, _, __, AbstractFilter) {
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
-            if (e.which == 13) {
+            if (e.which === 13) {
                 this._hideCriteria();
                 this.setValue(this._formatRawValue(this._readDOMValue()));
             }
@@ -204,7 +216,7 @@ function($, _, __, AbstractFilter) {
                     showLabel: this.showLabel,
                     criteriaHint: this._getCriteriaHint(),
                     nullLink: this.nullLink,
-                    canDisable: this.canDisable
+                    canDisable: !this.simple && this.canDisable
                 })
             );
 
@@ -248,6 +260,9 @@ function($, _, __, AbstractFilter) {
          * @protected
          */
         _showCriteria: function() {
+            if (this.simple) {
+                return;
+            }
             this.$(this.criteriaSelector).show();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -262,6 +277,9 @@ function($, _, __, AbstractFilter) {
          * @protected
          */
         _hideCriteria: function() {
+            if (this.simple) {
+                return;
+            }
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {

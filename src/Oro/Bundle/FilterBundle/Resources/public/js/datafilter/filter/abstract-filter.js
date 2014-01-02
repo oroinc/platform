@@ -95,19 +95,9 @@ function($, _, Backbone, app) {
          * @param {Boolean} [options.enabled]
          */
         initialize: function(options) {
-            options = options || {};
-            if (_.has(options, 'enabled')) {
-                this.enabled = options.enabled;
-            }
-            if (_.has(options, 'canDisable')) {
-                this.canDisable = options.canDisable;
-            }
-            if (_.has(options, 'placeholder')) {
-                this.placeholder = options.placeholder;
-            }
-            if (_.has(options, 'showLabel')) {
-                this.showLabel = options.showLabel;
-            }
+            options = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label');
+            _.extend(this, options);
+
             this.defaultEnabled = this.enabled;
 
             // init empty value object if it was not initialized so far
