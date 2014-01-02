@@ -32,7 +32,8 @@ class RunnerTest extends WebTestCase
      */
     public function shouldBeConstructedWithInstallationManager()
     {
-        new Runner($this->createInstallationManagerMock(), $this->createLoggerMock(), 'path/to/application/root/dir', 'test');
+        new Runner($this->createInstallationManagerMock(), $this->createLoggerMock(
+        ), 'path/to/application/root/dir', 'test');
     }
 
     /**
@@ -320,7 +321,7 @@ class RunnerTest extends WebTestCase
     protected function formatExpectedResult($annotationLabel, $pathToFile, $scriptOutput)
     {
         $format = 'Launching "%s" (%s) script' . PHP_EOL
-            . '%s'. PHP_EOL;
+            . '%s' . PHP_EOL;
 
         return sprintf($format, $annotationLabel, $pathToFile, $scriptOutput);
     }
@@ -341,11 +342,15 @@ class RunnerTest extends WebTestCase
      *
      * @return Runner
      */
-    protected function createRunner(PackageInterface $package = null, LoggerInterface $logger=null, $targetDir = null, $applicationRootDir = null)
-    {
+    protected function createRunner(
+        PackageInterface $package = null,
+        LoggerInterface $logger = null,
+        $targetDir = null,
+        $applicationRootDir = null
+    ) {
         return new Runner(
             $this->createInstallationManagerMock($package, $targetDir),
-            $logger?:$this->createLoggerMock(),
+            $logger ? : $this->createLoggerMock(),
             $applicationRootDir ? $applicationRootDir : $this->applicationRootDir,
             'test'
         );

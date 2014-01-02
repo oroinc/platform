@@ -212,7 +212,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $packageMock->expects($this->once())
             ->method('getNames')
             ->will($this->returnValue([$packageName]));
-        $packageMock->expects($this->once())
+        $packageMock->expects($this->any())
             ->method('getStability')
             ->will($this->returnValue('stable'));
 
