@@ -180,20 +180,22 @@ EOF
      */
     protected function download(InputInterface $input, OutputInterface $output)
     {
-        $projectName        = $input->getArgument('project');
-        $languagePackPath   = rtrim($this->getLangPackDir($projectName), DIRECTORY_SEPARATOR) . '.zip';
+        $projectName      = $input->getArgument('project');
+        $languagePackPath = rtrim($this->getLangPackDir($projectName), DIRECTORY_SEPARATOR) . '.zip';
 
         /** @var TranslationServiceProvider $apiService */
         $apiService = $this->getContainer()
             ->get('oro_translation.service_provider')
             ->setAdapter($this->getAdapterFromInput($input));
 
-        $apiService->download(
+        $result = $apiService->download(
             $languagePackPath,
             function ($logItem) use ($output) {
                 $output->writeln(implode(', ', $logItem));
             }
         );
+
+        $output->writeln(sprintf("Download %s", $result ? 'successfull' : 'failed'));
     }
 
     /**

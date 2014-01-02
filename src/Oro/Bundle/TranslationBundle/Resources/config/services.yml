@@ -7,7 +7,6 @@ parameters:
     oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
     oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
-
     oro_translation.adapter.class:                              Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
 
 services:

@@ -164,7 +164,8 @@ class CrowdinAdapter extends AbstractAPIAdapter
             }
         }
 
-        return $this->createDirectories($dirs)
+        return $this
+            ->createDirectories($dirs)
             ->uploadFiles($files, $mode);
     }
 
