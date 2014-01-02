@@ -11,8 +11,8 @@ function(_, __, DeleteConfirmation, MassAction) {
      * @extends oro.datagrid.MassAction
      */
     return MassAction.extend({
-        /** @property {Object} */
-        messages: {},
+        /** @property {Function} */
+        confirmModalConstructor: DeleteConfirmation,
 
         /** @property {Object} */
         defaultMessages: {
@@ -22,27 +22,6 @@ function(_, __, DeleteConfirmation, MassAction) {
             success: __('Selected items were removed.'),
             error: __('Selected items were not removed.'),
             empty_selection: __('Please, select items to remove.')
-        },
-
-        initialize: function(options) {
-            MassAction.prototype.initialize.apply(this, arguments);
-        },
-
-        /**
-         * Get view for confirm modal
-         *
-         * @return {oro.Modal}
-         */
-        getConfirmDialog: function(callback) {
-            if (!this.confirmModal) {
-                this.confirmModal = new DeleteConfirmation({
-                    title: this.messages.confirm_title,
-                    content: this.messages.confirm_content,
-                    okText: this.messages.confirm_ok
-                });
-                this.confirmModal.on('ok', callback);
-            }
-            return this.confirmModal;
         }
     });
 });

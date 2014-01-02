@@ -12,17 +12,20 @@ define(['underscore', 'oro/messenger', 'oro/translator', 'oro/delete-confirmatio
          */
         return ModelAction.extend({
 
-            /** @type oro.Modal */
-            errorModal: undefined,
+            /** @property {Function} */
+            confirmModalConstructor: DeleteConfirmation,
 
-            /** @type oro.Modal */
-            confirmModal: undefined,
+            defaultMessages: {
+                confirm_title: __('Delete Confirmation'),
+                confirm_content: __('Are you sure you want to delete this item?'),
+                confirm_ok: __('Yes, Delete')
+            },
 
             /**
              * Execute delete model
              */
             execute: function() {
-                this.getConfirmDialog().open();
+                this.getConfirmDialog(_.bind(this.doDelete, this)).open();
             },
 
             /**
@@ -41,21 +44,6 @@ define(['underscore', 'oro/messenger', 'oro/translator', 'oro/delete-confirmatio
                         messenger.notificationFlashMessage('success', messageText);
                     }
                 });
-            },
-
-            /**
-             * Get view for confirm modal
-             *
-             * @return {oro.Modal}
-             */
-            getConfirmDialog: function() {
-                if (!this.confirmModal) {
-                    this.confirmModal = new DeleteConfirmation({
-                        content: __('Are you sure you want to delete this item?')
-                    });
-                    this.confirmModal.on('ok', _.bind(this.doDelete, this));
-                }
-                return this.confirmModal;
             },
 
             /**
