@@ -2,21 +2,21 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Symfony\Component\Finder\Finder;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
-use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
+use Symfony\Component\Finder\Finder;
 
 class TranslationServiceProvider
 {
-    /**
-     * @var AbstractAPIAdapter
-     */
+    /** @var AbstractAPIAdapter */
     protected $adapter;
 
-    /**
-     * @var JsTranslationDumper
-     */
+    /** @var JsTranslationDumper */
     protected $jsTranslationDumper;
+
+    /** @var NullLogger */
+    protected $logger;
 
     /**
      * @param AbstractAPIAdapter  $adapter
@@ -26,6 +26,8 @@ class TranslationServiceProvider
     {
         $this->adapter = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
+
+        $this->setLogger(new NullLogger());
     }
 
     /**
@@ -33,11 +35,10 @@ class TranslationServiceProvider
      *
      * @param string $dir
      * @param string $mode add or update
-     * @param callable $progressCallback
      *
      * @return mixed
      */
-    public function upload($dir, $mode = 'add', \Closure $progressCallback = null)
+    public function upload($dir, $mode = 'add')
     {
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
 
@@ -49,36 +50,31 @@ class TranslationServiceProvider
             $files[ $apiPath ] = (string)$file;
         }
 
-        if (!is_null($progressCallback)) {
-            $this->adapter->setProgressCallback($progressCallback);
-        }
-
         return $this->adapter->upload($files, $mode);
     }
 
     /**
-     * @param string   $pathToSave path to save translations
-     * @param callable $progressCallback
+     * @param string      $pathToSave path to save translations
+     * @param null|string $locale
      *
      * @return bool
      */
-    public function download($pathToSave, \Closure $progressCallback = null)
+    public function download($pathToSave, $locale = null)
     {
-        if (!is_null($progressCallback)) {
-            $this->adapter->setProgressCallback($progressCallback);
-        }
-
         $targetDir = dirname($pathToSave);
         $this->cleanup($targetDir);
 
-        $isDownloaded = $this->adapter->download($pathToSave);
-        $isExtracted  = $this->unzip($pathToSave, $targetDir);
+        $isDownloaded = $this->adapter->download($pathToSave, $locale);
+        $isExtracted  = $this->unzip(
+            $pathToSave,
+            is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
+        );
 
         if ($isExtracted) {
             unlink($pathToSave);
-            $appliedLocales = $this->apply('./app/Resources/', $targetDir);
+            $appliedLocales = $this->apply('./app/Resources/', $targetDir, $locale);
             $this->cleanup($targetDir);
-            $this->jsTranslationDumper->dumpTranslations($appliedLocales, $progressCallback);
+            $this->jsTranslationDumper->dumpTranslations($appliedLocales);
         }
 
         return $isExtracted && $isDownloaded;
@@ -89,9 +85,8 @@ class TranslationServiceProvider
      * so first we have to download pack and merge with local
      *
      * @param string   $dir
-     * @param callable $progressCallback
      */
-    public function update($dir, \Closure $progressCallback = null)
+    public function update($dir)
     {
 
     }
@@ -160,10 +155,11 @@ class TranslationServiceProvider
      *
      * @param string $targetDir
      * @param string $sourceDir
+     * @param string $locale
      *
      * @return array
      */
-    protected function apply($targetDir, $sourceDir)
+    protected function apply($targetDir, $sourceDir, $locale)
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($sourceDir, \FilesystemIterator::SKIP_DOTS),
@@ -219,6 +215,23 @@ class TranslationServiceProvider
     public function setAdapter(AbstractAPIAdapter $adapter)
     {
         $this->adapter = $adapter;
+
+        return $this;
+    }
+
+    /**
+     * Sets a logger
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return $this
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+
+        $this->adapter->setLogger($this->logger);
+        $this->jsTranslationDumper->setLogger($this->logger);
 
         return $this;
     }

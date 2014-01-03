@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Exception\IOException;
 
@@ -28,7 +30,10 @@ class JsTranslationDumper
     /**
      * @var string
      */
-    private $jsTranslationRoute;
+    protected $jsTranslationRoute;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @param Controller $translationController
@@ -56,13 +61,12 @@ class JsTranslationDumper
 
     /**
      * @param array         $locales
-     * @param callable|null $loggerClosure
      *
      * @return bool
      * @throws \Symfony\Component\Filesystem\Exception\IOException
      * @throws \RuntimeException
      */
-    public function dumpTranslations($locales = [], \Closure $loggerClosure = null)
+    public function dumpTranslations($locales = [])
     {
         if (empty($locales)) {
             $locales[] = $this->defaultLocale;
@@ -74,20 +78,19 @@ class JsTranslationDumper
         foreach ($locales as $locale) {
             $target = strtr($targetPattern, array('{_locale}' => $locale));
 
-            if (is_callable($loggerClosure)) {
-                $loggerClosure(
-                    sprintf(
-                        '<comment>%s</comment> <info>[file+]</info> %s',
-                        date('H:i:s'),
-                        basename($target)
-                    )
-                );
-            }
+            $this->logger->info(
+                sprintf(
+                    '<comment>%s</comment> <info>[file+]</info> %s',
+                    date('H:i:s'),
+                    basename($target)
+                )
+            );
 
             $content = $this->translationController->renderJsTranslationContent($this->translationDomains, $locale);
 
-            if (true !== @mkdir(dirname($target), 0777, true)) {
-                throw new IOException(sprintf('Failed to create %s', $target));
+            $dirName = dirname($target);
+            if (!is_dir($dirName) && true !== @mkdir($dirName, 0777, true)) {
+                throw new IOException(sprintf('Failed to create %s', $dirName));
             }
 
             if (false === @file_put_contents($target, $content)) {
@@ -96,5 +99,15 @@ class JsTranslationDumper
         }
 
         return true;
+    }
+
+    /**
+     * Sets a logger
+     *
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }

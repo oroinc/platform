@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Psr\Log\LoggerInterface;
+
 abstract class AbstractAPIAdapter
 {
     /**
@@ -9,13 +11,13 @@ abstract class AbstractAPIAdapter
      */
     protected $apiKey;
 
-    /** @var  \Closure|null */
-    protected $progressCallback = null;
-
     /**
      * @var string endpoint URL
      */
     protected $endpoint;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     public function __construct($endpoint)
     {
@@ -48,7 +50,7 @@ abstract class AbstractAPIAdapter
      *
      * @return mixed
      */
-    abstract public function download($path, $package = 'all');
+    abstract public function download($path, $package = null);
 
     /**
      * Perform request
@@ -91,22 +93,12 @@ abstract class AbstractAPIAdapter
     }
 
     /**
-     * Notify progress status
+     * Sets a logger
+     *
+     * @param LoggerInterface $logger
      */
-    public function notifyProgress()
+    public function setLogger(LoggerInterface $logger)
     {
-        if (is_callable($this->progressCallback)) {
-            call_user_func($this->progressCallback, func_get_args());
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param \Closure $progressCallback
-     */
-    public function setProgressCallback(\Closure $progressCallback)
-    {
-        $this->progressCallback = $progressCallback;
+        $this->logger = $logger;
     }
 }

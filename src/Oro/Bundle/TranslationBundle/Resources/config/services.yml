@@ -69,6 +69,6 @@ services:
             - @oro_translation.controller
             - @router
             - %oro_translation.js_translation.domains%
-            - %kernel.root_dir
+            - %kernel.root_dir%
             - %kernel.default_locale%
 
