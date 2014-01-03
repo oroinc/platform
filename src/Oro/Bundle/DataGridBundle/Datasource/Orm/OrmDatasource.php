@@ -41,9 +41,9 @@ class OrmDatasource implements DatasourceInterface
             $converter = new YamlConverter();
             $this->qb  = $converter->parse($queryConfig, $this->em->createQueryBuilder());
 
-        } elseif (isset($config['entity']) and isset($config['method'])) {
+        } elseif (isset($config['entity']) and isset($config['repository_method'])) {
             $entity = $config['entity'];
-            $method = $config['method'];
+            $method = $config['repository_method'];
             $repository = $this->em->getRepository($entity);
             if (method_exists($repository, $method)) {
                 $this->qb = $repository->$method();
