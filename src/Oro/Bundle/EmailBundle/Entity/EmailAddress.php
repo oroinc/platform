@@ -166,6 +166,19 @@ abstract class EmailAddress
     }
 
     /**
+     * Sets a flag indicates whether this email address has an owner
+     *
+     * @param bool $hasOwner
+     * @return EmailAddress
+     */
+    protected function setHasOwner($hasOwner)
+    {
+        $this->hasOwner = $hasOwner;
+
+        return $this;
+    }
+
+    /**
      * Get email owner
      *
      * @return EmailOwnerInterface

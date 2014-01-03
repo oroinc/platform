@@ -41,7 +41,7 @@ class {{ className }} extends EmailAddress
             $this->{{ owner.fieldName }} = null;
         }
 {% endfor %}
-        $this->hasOwner = ($owner !== null);
+        $this->setHasOwner($owner !== null);
 
         return $this;
     }
