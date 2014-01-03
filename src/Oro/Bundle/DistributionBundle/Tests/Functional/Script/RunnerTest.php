@@ -285,6 +285,19 @@ class RunnerTest extends WebTestCase
     }
 
     /**
+     * @test
+     */
+    public function shouldRunClearCacheCommandWithoutErrors()
+    {
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(2))
+            ->method('info');
+        $runner = $this->createRunner(null, $logger);
+
+        $runner->clearDistApplicationCache();
+    }
+
+    /**
      * @return \PHPUnit_Framework_MockObject_MockObject|PackageInterface
      */
     protected function createPackageMock()
