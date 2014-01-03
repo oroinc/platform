@@ -29,15 +29,21 @@ services:
           - @oro_distribution.composer.installer
           - @oro_distribution.composer.io
           - @oro_distribution.script_runner
+          - @logger
           - %oro_distribution.composer_json%
+        tags:
+            - { name: monolog.logger, channel: oro_distribution }
 
     oro_distribution.script_runner:
         class: %oro_distribution.script_runner.class%
         public: false
         arguments:
             - @oro_distribution.composer.installation_manager
+            - @logger
             - %kernel.root_dir%
             - %kernel.environment%
+        tags:
+            - { name: monolog.logger, channel: oro_distribution }
 
     oro_distribution.composer.io:
         class: %oro_distribution.composer.io.class%
@@ -63,12 +69,10 @@ services:
         factory_method: getInstallationManager
 
     ### Menu
-
-#todo: uncomment this then package installer will be completed
-#    oro_distribution.listener.navigation_listener:
-#        class: %oro_distribution.listener.navigation_listener.class%
-#        arguments:
-#            - @security.context
-#            - %oro_distribution.entry_point%
-#        tags:
-#            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+    oro_distribution.listener.navigation_listener:
+        class: %oro_distribution.listener.navigation_listener.class%
+        arguments:
+            - @security.context
+            - %oro_distribution.entry_point%
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

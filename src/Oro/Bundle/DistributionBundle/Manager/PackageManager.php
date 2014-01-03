@@ -6,7 +6,7 @@ use Composer\DependencyResolver\DefaultPolicy;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Pool;
 use Composer\Installer;
-use Composer\IO\IOInterface;
+use Composer\IO\BufferIO;
 use Composer\Json\JsonFile;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
@@ -21,6 +21,7 @@ use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
 use Oro\Bundle\DistributionBundle\Exception\VerboseException;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
 use Oro\Bundle\DistributionBundle\Script\Runner;
+use Psr\Log\LoggerInterface;
 
 class PackageManager
 {
@@ -40,7 +41,7 @@ class PackageManager
     protected $scriptRunner;
 
     /**
-     * @var IOInterface
+     * @var BufferIO
      */
     protected $composerIO;
 
@@ -60,17 +61,24 @@ class PackageManager
     protected $pool;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @param Composer $composer
      * @param Installer $installer
-     * @param IOInterface $composerIO
+     * @param BufferIO $composerIO
      * @param Runner $scriptRunner
+     * @param LoggerInterface $logger
      * @param string $pathToComposerJson
      */
     public function __construct(
         Composer $composer,
         Installer $installer,
-        IOInterface $composerIO,
+        BufferIO $composerIO,
         Runner $scriptRunner,
+        LoggerInterface $logger,
         $pathToComposerJson
     ) {
         $this->composer = $composer;
@@ -78,6 +86,8 @@ class PackageManager
         $this->composerIO = $composerIO;
         $this->scriptRunner = $scriptRunner;
         $this->pathToComposerJson = $pathToComposerJson;
+
+        $this->logger = $logger;
     }
 
     /**
@@ -259,6 +269,7 @@ class PackageManager
      */
     public function install($packageName, $packageVersion = null)
     {
+        $this->logger->info(sprintf('%s (%s) installing begin', $packageName, $packageVersion));
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
@@ -280,6 +291,7 @@ class PackageManager
                     $justInstalledPackages
                 );
                 $this->scriptRunner->loadFixtures($justInstalledPackages);
+                $this->scriptRunner->clearDistApplicationCache();
             } else {
                 throw new VerboseException(
                     sprintf('%s can\'t be installed!', $packageName),
@@ -287,9 +299,14 @@ class PackageManager
                 );
             }
         } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            if ($e instanceof VerboseException) {
+                $this->logger->error($e->getVerboseMessage());
+            }
             $this->removeFromComposerJson([$packageName]);
             throw $e;
         }
+        $this->logger->info(sprintf('%s (%s) installed', $packageName, $packageVersion));
     }
 
     /**
@@ -329,10 +346,13 @@ class PackageManager
      */
     public function uninstall(array $packageNames)
     {
+        $this->logger->info('Uninstalling begin', $packageNames);
         array_map(
             function ($name) {
                 if (!$this->canBeDeleted($name)) {
-                    throw new \RuntimeException(sprintf('Package %s is not deletable', $name));
+                    $errorMessage = sprintf('Package %s is not deletable', $name);
+                    $this->logger->error($errorMessage);
+                    throw new \RuntimeException($errorMessage);
                 }
             },
             $packageNames
@@ -357,6 +377,8 @@ class PackageManager
         );
         $this->scriptRunner->removeCachedFiles();
         $this->scriptRunner->runPlatformUpdate();
+        $this->scriptRunner->clearDistApplicationCache();
+        $this->logger->info('Packages uninstalled', $packageNames);
     }
 
     /**
@@ -426,6 +448,7 @@ class PackageManager
      */
     public function update($packageName)
     {
+        $this->logger->info(sprintf('%s updating begin', $packageName));
         $previousInstalled = $this->getInstalled();
         $currentPackage = $this->findInstalledPackage($packageName);
         $this->updateComposerJsonFile($currentPackage, '*');
@@ -469,15 +492,20 @@ class PackageManager
                 $uninstalledPackages
             );
             $this->scriptRunner->runPlatformUpdate();
+            $this->scriptRunner->clearDistApplicationCache();
             $justInstalledPackage = $this->findInstalledPackage($packageName);
             $this->updateComposerJsonFile($justInstalledPackage, $justInstalledPackage->getPrettyVersion());
         } else {
             $this->updateComposerJsonFile($currentPackage, $currentPackage->getPrettyVersion());
+            $errorMessage = sprintf('%s can\'t be updated!', $packageName);
+            $this->logger->error($errorMessage);
+            $this->logger->error($this->composerIO->getOutput());
             throw new VerboseException(
-                sprintf('%s can\'t be updated!', $packageName),
+                $errorMessage,
                 $this->composerIO->getOutput()
             );
         }
+        $this->logger->info(sprintf('%s updated', $packageName));
     }
 
     /**
@@ -580,6 +608,7 @@ class PackageManager
      */
     protected function updateComposerJsonFile(PackageInterface $package, $version = null)
     {
+        $this->logger->info(sprintf('Updating composer.json %s : %s', $package->getPrettyName(), $version));
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
         $composerData['require'][$package->getName()] = $version ? : $package->getPrettyVersion();
@@ -593,6 +622,7 @@ class PackageManager
      */
     protected function removeFromComposerJson(array $packageNames)
     {
+        $this->logger->info('Removing from composer.json', $packageNames);
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
         foreach ($packageNames as $name) {

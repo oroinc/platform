@@ -4,7 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Script;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
-
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -24,18 +24,29 @@ class Runner
     protected $applicationRootDir;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var string
      */
     protected $environment;
 
     /**
      * @param InstallationManager $installationManager
+     * @param LoggerInterface $logger
      * @param string $applicationRootDir
      * @param string $environment
      */
-    public function __construct(InstallationManager $installationManager, $applicationRootDir, $environment)
-    {
+    public function __construct(
+        InstallationManager $installationManager,
+        LoggerInterface $logger,
+        $applicationRootDir,
+        $environment
+    ) {
         $this->installationManager = $installationManager;
+        $this->logger = $logger;
         $this->applicationRootDir = realpath($applicationRootDir);
         $this->environment = $environment;
     }
@@ -94,7 +105,7 @@ class Runner
         $phpPath = $this->getPhpExecutablePath();
 
         $command = sprintf(
-            '%s %s/console oro:platform:update --env=%s',
+            '"%s" "%s/console" oro:platform:update --env=%s',
             $phpPath,
             $this->applicationRootDir,
             $this->environment
@@ -139,7 +150,7 @@ class Runner
         }
 
         $commandPrefix = sprintf(
-            '%s %s/console oro:package:fixtures:load --env=%s',
+            '"%s" "%s/console" oro:package:fixtures:load --env=%s',
             $phpPath,
             $this->applicationRootDir,
             $this->environment
@@ -153,6 +164,23 @@ class Runner
 
         return $output;
 
+    }
+
+    /**
+     * @return string
+     */
+    public function clearDistApplicationCache()
+    {
+        $phpPath = $this->getPhpExecutablePath();
+
+        $command = sprintf(
+            '"%s" "%s/dist" cache:clear --no-warmup --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
+        return $this->runCommand($command);
     }
 
     /**
@@ -190,7 +218,7 @@ class Runner
             $phpPath = $this->getPhpExecutablePath();
 
             $command = sprintf(
-                '%s %s/console oro:platform:run-script "%s" --env=%s',
+                '"%s" "%s/console" oro:platform:run-script "%s" --env=%s',
                 $phpPath,
                 $this->applicationRootDir,
                 $path,
@@ -198,11 +226,17 @@ class Runner
             );
 
             return $this->runCommand($command);
+
+        } else {
+            $this->logger->info(sprintf('There is no %s file', $path));
         }
+
+        return null;
     }
 
     protected function runCommand($command)
     {
+        $this->logger->info(sprintf('Executing "%s"', $command));
         $process = new Process($command);
         $process->setWorkingDirectory(realpath($this->applicationRootDir . '/..')); // project root
         $process->setTimeout(600);
@@ -210,10 +244,15 @@ class Runner
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
+            $processFailedException = new ProcessFailedException($process);
+            $this->logger->error($processFailedException->getMessage());
+            throw $processFailedException;
         }
 
-        return $process->getOutput();
+        $output = $process->getOutput();
+        $this->logger->info($output);
+
+        return $output;
     }
 
     /**

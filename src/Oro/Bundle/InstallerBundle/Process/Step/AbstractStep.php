@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Process\Step;
 
+use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -55,13 +56,12 @@ abstract class AbstractStep extends ControllerStep
      */
     protected function runCommand($command, $params = array())
     {
+        $application = $this->getApplication();
         $output = $this->getOutput();
-        $params = array_merge(
-            array(
-                'command'    => $command,
-                '--no-debug' => true,
-            ),
-            $params
+        $commandExecutor = new CommandExecutor(
+            $application->getKernel()->getEnvironment(),
+            $output,
+            $application
         );
 
         $output->writeln('');
@@ -69,7 +69,13 @@ abstract class AbstractStep extends ControllerStep
 
         $mem  = (int) memory_get_usage() / (1024 * 1024);
         $time = time();
-        $code = $this->getApplication()->run(new ArrayInput($params), $output);
+
+        $failEx = null;
+        try {
+            $commandExecutor->runCommand($command, $params);
+        } catch (\RuntimeException $ex) {
+            $failEx = $ex;
+        }
 
         $output->writeln('');
         $output->writeln(
@@ -83,10 +89,8 @@ abstract class AbstractStep extends ControllerStep
         $output->writeln('');
 
         // check for any error
-        if ($code) {
-            throw new \RuntimeException(
-                sprintf('There was an error while running "%s" command. Exit code: %u.', $command, $code)
-            );
+        if ($failEx) {
+            throw $failEx;
         }
 
         return $this;
