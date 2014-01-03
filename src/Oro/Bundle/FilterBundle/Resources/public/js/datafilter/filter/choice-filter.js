@@ -191,7 +191,11 @@ function($, _, __, app, TextFilter) {
             $(e.currentTarget).parent().addClass('active');
             var parentDiv = $(e.currentTarget).parent().parent().parent();
             parentDiv.find('.name_input').val($(e.currentTarget).attr('data-value'));
-            parentDiv.find('button').html($(e.currentTarget).html() + '<span class="caret"></span>');
+            var choiceName = $(e.currentTarget).html();
+            if (!this.simple) {
+                choiceName += '<span class="caret"></span>';
+            }
+            parentDiv.find('.dropdown-toggle').html(choiceName);
             e.preventDefault();
         }
     });

@@ -12,20 +12,6 @@ function($, _, Backbone, app) {
      */
     return Backbone.View.extend({
         /**
-         * Filter container tag
-         *
-         * @property {String}
-         */
-        tagName: 'div',
-
-        /**
-         * Filter container class name
-         *
-         * @property {String}
-         */
-        className: 'btn-group filter-item oro-drop',
-
-        /**
          * Is filter can be disabled
          *
          * @property {Boolean}

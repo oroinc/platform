@@ -209,16 +209,13 @@ function($, _, __, AbstractFilter) {
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
-            this.$el.append(
-                this.template({
-                    label: this.label,
-                    showLabel: this.showLabel,
-                    criteriaHint: this._getCriteriaHint(),
-                    nullLink: this.nullLink,
-                    canDisable: !this.simple && this.canDisable
-                })
-            );
+            this.setElement(this.template({
+                label: this.label,
+                showLabel: this.showLabel,
+                criteriaHint: this._getCriteriaHint(),
+                nullLink: this.nullLink,
+                canDisable: !this.simple && this.canDisable
+            }));
 
             this._renderCriteria(this.$(this.criteriaSelector));
             this._clickOutsideCriteriaCallback = _.bind(function(e) {
