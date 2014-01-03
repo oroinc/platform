@@ -167,6 +167,23 @@ class Runner
     }
 
     /**
+     * @return string
+     */
+    public function clearDistApplicationCache()
+    {
+        $phpPath = $this->getPhpExecutablePath();
+
+        $command = sprintf(
+            '"%s" "%s/dist" cache:clear --no-warmup --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
+        return $this->runCommand($command);
+    }
+
+    /**
      * @param array $paths
      * @param string $commandPrefix
      * @param int $commandSize - windows shell-command is limited by 8kb
