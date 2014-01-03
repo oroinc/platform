@@ -9,6 +9,7 @@ parameters:
     oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
     oro_translation.adapter.class:                              Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
     oro_translation.js_dumper.class:                            Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
+    oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
 
 services:
     oro_translation.controller:
@@ -32,10 +33,14 @@ services:
             - @oro_translation.uploader.crowdin_adapter
             - @oro_translation.js_dumper
 
+    oro_translation.curl_request:
+        class: %oro_translation.curl_request.class%
+
     oro_translation.uploader.crowdin_adapter:
         class: %oro_translation.adapter.class%
         arguments:
             - %oro_translation.api.crowdin.endpoint%
+            - @oro_translation.curl_request
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.database_translation.metadata.cache.class%

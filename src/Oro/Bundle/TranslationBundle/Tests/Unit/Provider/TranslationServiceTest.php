@@ -2,25 +2,25 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\TranslationBundle\Provider\TranslationUploader;
+use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
 
-class TranslationUploaderTest extends \PHPUnit_Framework_TestCase
+class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $adapter;
 
-    /** @var TranslationUploader */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $dumper;
+
+    /** @var TranslationServiceProvider */
     protected $uploader;
 
     public function setUp()
     {
-        $this->adapter = $this->getMock(
-            'Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter',
-            array(),
-            array('some-api-key', 'http://service-url.tld/api/')
-        );
+        $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
+        $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
 
-        $this->uploader = new TranslationUploader($this->adapter);
+        $this->uploader = new TranslationServiceProvider($this->adapter, $this->dumper);
     }
 
     public function tearDown()
@@ -35,13 +35,6 @@ class TranslationUploaderTest extends \PHPUnit_Framework_TestCase
     public function testUpload()
     {
         $mode = 'add';
-        $callback = function ($logItem) {
-
-        };
-
-        $this->adapter->expects($this->once())
-            ->method('setProgressCallback')
-            ->with($callback);
 
         $this->adapter->expects($this->once())
             ->method('upload')
