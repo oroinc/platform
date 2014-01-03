@@ -1,7 +1,6 @@
 <?php
 namespace ConfigBundle\Tests\Provider;
 
-use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -11,6 +10,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 
@@ -27,7 +27,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             ->addExtensions($this->getExtensions())
             ->addTypeExtension(
                 new DataBlockExtension()
-            )->addType(new ParentScopeCheckbox())
+            )
             ->getFormFactory();
 
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -198,18 +198,20 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
 
     public function getExtensions()
     {
-        $subscriber    = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
+        $subscriber = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(array('__construct'))
             ->disableOriginalConstructor()->getMock();
 
-        $formType      = new FormType($subscriber);
-        $formFieldType = new FormFieldType();
+        $formType       = new FormType($subscriber);
+        $formFieldType  = new FormFieldType();
+        $useParentScope = new ParentScopeCheckbox();
 
         return array(
             new PreloadedExtension(
                 array(
-                    $formType->getName()      => $formType,
-                    $formFieldType->getName() => $formFieldType
+                    $formType->getName()       => $formType,
+                    $formFieldType->getName()  => $formFieldType,
+                    $useParentScope->getName() => $useParentScope
                 ),
                 array()
             ),
