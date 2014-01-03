@@ -39,8 +39,12 @@ class Runner
      * @param string $applicationRootDir
      * @param string $environment
      */
-    public function __construct(InstallationManager $installationManager, LoggerInterface $logger, $applicationRootDir, $environment)
-    {
+    public function __construct(
+        InstallationManager $installationManager,
+        LoggerInterface $logger,
+        $applicationRootDir,
+        $environment
+    ) {
         $this->installationManager = $installationManager;
         $this->logger = $logger;
         $this->applicationRootDir = realpath($applicationRootDir);
@@ -205,9 +209,8 @@ class Runner
             );
 
             return $this->runCommand($command);
-        }
-        else
-        {
+
+        } else {
             $this->logger->info(sprintf('There is no %s file', $path));
         }
     }
