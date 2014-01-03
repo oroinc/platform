@@ -6,11 +6,50 @@ Flotr.addType('funnel', {
         fillColor: null,
         fillOpacity: 0.5,
         fontColor: "#B2B2B2",
-        explode: 2,
-        extraHeight: true,
-        marginX: 50,
-        marginY: 50,
+        explode: 5,
+        extraHeight: 200,
+        marginX: 200,
+        marginY: 25,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
+    },
+
+    plot: function (options) {
+        var self = this;
+        var marginHeight = options.marginY ? options.height - options.marginY * 2 : options.height;
+        var marginWidth = options.marginX ? options.width - options.marginX : options.width;
+        var
+            extraHeight = options.extraHeight || 0,
+            data = options.data,
+            context = options.context,
+            summ = 0,
+            i = 0;
+
+        Flotr._.each(data, function (funnel) {
+            summ += funnel;
+        });
+
+        context.lineJoin = 'round';
+        context.translate(0.5, 0.5);
+        context.beginPath();
+        context.moveTo(options.marginX, options.marginY);
+
+        var segmentData = {
+            'prevStepWidth': marginWidth,
+            'prevStepWidthDelta': 0,
+            'prevStepHeight': (marginHeight + extraHeight),
+            'funnelSumm': options.marginY
+        };
+
+        Flotr._.each(data, function (funnel) {
+            var funnelSize = Math.ceil(funnel * marginHeight / summ);
+            segmentData = self.calculateSegment(options, funnelSize, i, marginWidth, segmentData, true);
+
+            if (options.explode > 0) {
+                segmentData = self.calculateSegment(options, options.explode, i, marginWidth, segmentData, false);
+            }
+
+            i++;
+        });
     },
 
     draw: function (options) {
@@ -24,82 +63,70 @@ Flotr.addType('funnel', {
         context.restore();
     },
 
-    plot: function (options) {
-        var marginHeight = options.marginY ? options.height - options.marginY * 2 : options.height;
-        var marginWidth = options.marginX ? options.width - options.marginX : options.width;
+    calculateSegment: function(options, funnel, iterator, marginWidth, segmentData, renderable) {
         var
-            extraHeight = options.extraHeight ? marginHeight/4 : 0,
-            data = options.data,
             context = options.context,
-            summ = 0,
-            labels = Object.keys(options.data);
+            prevStepWidth = segmentData.prevStepWidth,
+            prevStepWidthDelta = segmentData.prevStepWidthDelta,
+            prevStepHeight= segmentData.prevStepHeight,
+            funnelSumm = segmentData.funnelSumm;
 
-        Flotr._.each(data, function (funnel) {
-            summ += funnel;
-        });
+        context.lineWidth = options.lineWidth;
+        context.strokeStyle = options.colors[iterator];
+        context.fillStyle = Flotr.Color.parse(options.colors[iterator]).alpha(options.fillOpacity).toString() ;
+        var
+            self = this,
+            AD = Math.ceil(prevStepWidth / 2),
+            BC = Math.ceil((AD * (prevStepHeight - funnel)) / prevStepHeight);
 
-        var funnel_data = new Array();
-        Flotr._.each(data, function (funnel) {
-            funnel_data.push(Math.ceil(funnel * marginHeight / summ));
-        });
-        context.lineJoin = 'round';
-        context.translate(0.5, 0.5);
-        context.beginPath();
-        context.moveTo(options.marginX, options.marginY);
-
-        var prevStepWidth = marginWidth;
-        var prevStepHeight = marginHeight + extraHeight;
-        var funnelSumm = options.marginY;
-        var prevStepWidthDelta = 0;
-
-        Flotr._.each(funnel_data, function (funnel, iterator) {
-            context.lineWidth = options.lineWidth;
-            context.strokeStyle = options.colors[iterator];
-            context.fillStyle = Flotr.Color.parse(options.colors[iterator]).alpha(options.fillOpacity).toString() ;
-            var
-                AD = Math.ceil(prevStepWidth / 2),
-                AP = prevStepHeight,
-                funnelExplode = funnel - options. explode,
-                BC = Math.ceil((AD * (AP - funnelExplode)) / AP);
-
+        if (renderable) {
             context.lineTo(prevStepWidth + prevStepWidthDelta, funnelSumm);
-
-            context.lineTo(Math.round(marginWidth / 2 + BC), funnelSumm + funnelExplode);
-            context.lineTo(Math.round(marginWidth / 2 - BC) + options.marginX, funnelSumm + funnelExplode);
-
+            context.lineTo(Math.round(marginWidth / 2 + BC), funnelSumm + funnel);
+            context.lineTo(Math.round(marginWidth / 2 - BC) + options.marginX, funnelSumm + funnel);
             context.closePath();
             context.stroke();
             context.fill();
 
-            // label
-            var distX = 10,
-                distY = Math.round(funnelSumm + funnelExplode / 2);
+            self.renderLabel(
+                context,
+                options,
+                Object.keys(options.data)[iterator],
+                (Math.round(marginWidth / 2 - BC) + options.marginX),
+                Math.round(funnelSumm + funnel / 2)
+            );
+        }
+
+        funnelSumm += funnel;
+
+        context.beginPath();
+        context.moveTo(Math.ceil(marginWidth / 2 - BC) + options.marginX, funnelSumm);
+
+        return {
+            'prevStepWidth': (BC * 2),
+            'prevStepWidthDelta': (Math.ceil(marginWidth / 2 - BC)),
+            'prevStepHeight': (prevStepHeight - funnel),
+            'funnelSumm': funnelSumm
+        };
+    },
+
+    renderLabel: function(context, options, label, labelDistX, distY) {
+        var distX = 10,
             style = {
                 size : options.fontSize * 1.2,
                 color : options.fontColor,
                 weight : 1.5
             };
-            options.htmlText = true;
-            var textAlign     = distX < 0 ? 'right' : 'left',
-                textBaseline  = distY > 0 ? 'top' : 'bottom';
-            style.textAlign = textAlign;
-            style.textBaseline = textBaseline;
-            Flotr.drawText(context, labels[iterator] + ': ' + data[labels[iterator]], distX, distY - style.size - 5, style);
-            // label line
-            context.beginPath();
-            context.lineWidth = 1;
-            context.strokeStyle = options.fontColor;
-            context.moveTo(distX, distY);
-            context.lineTo(Math.round(marginWidth / 2 - BC) + options.marginX, distY);
-            context.stroke();
-            //end of label
+        options.htmlText = true;
+        style.textAlign = distX < 0 ? 'right' : 'left';
+        style.textBaseline = 'bottom';
+        Flotr.drawText(context, label + ': ' + options.data[label], distX, distY, style);
 
-            funnelSumm += funnel + options.explode;
-            context.beginPath();
-            context.moveTo(Math.ceil(marginWidth / 2 - BC) + options.marginX, funnelSumm);
-            prevStepWidth = BC * 2;
-            prevStepWidthDelta = Math.ceil(marginWidth / 2 - BC);
-            prevStepHeight = AP - funnel - options.explode;
-        });
+        // label line
+        context.beginPath();
+        context.lineWidth = 1;
+        context.strokeStyle = options.fontColor;
+        context.moveTo(distX, distY);
+        context.lineTo(labelDistX, distY);
+        context.stroke();
     }
 });
