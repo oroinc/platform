@@ -1,10 +1,11 @@
 {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
 
 {% set blockId = 'entity-transitions-container-' ~ random() %}
+{% set primaryWorkflowName = get_primary_workflow_name(entity_class) %}
 <div class="widget-content" id="{{ blockId }}">
     {# Show buttons for entity workflows #}
     <div class="btn-group">
-        {% for data in transitionsData if data.workflow.type == 'entity' %}
+        {% for data in transitionsData if data.workflow.type == 'entity' and data.workflow.name != primaryWorkflowName %}
             {# Show button for start or transit entity workflow #}
             {% set transitionData = {
                 'redirect-to-workflow': false,
@@ -53,7 +54,7 @@
     <div class="btn-group">
         {% for data in transitionsData if data.workflow.type == 'wizard' and data.workflowItem is not defined  %}
             {% set transitionData = {
-                'redirect-to-workflow': true,
+                'redirect-to-workflow': data.workflow.name == primaryWorkflowName ? false : true,
                 'enabled': data.isAllowed,
                 'transition-label': data.transition.label|trans,
                 'message': data.transition.message|trans,

@@ -1,5 +1,5 @@
 {% macro render_form_col(fields) %}
-    <fieldset class="span4 offset1">
+    <fieldset class="responsive-block">
         {% for field in fields %}
             {{ form_row(field) }}
         {% endfor %}
@@ -7,7 +7,7 @@
 {% endmacro %}
 
 {% macro render_view_attribute_col(workflowItem, viewAttributes) %}
-    <div class="span4 offset1">
+    <div class="responsive-block">
         {% for viewAttribute in viewAttributes %}
             {{ oro_workflow_render_view_attribute_row(workflowItem, viewAttribute) }}
         {% endfor %}
@@ -27,6 +27,10 @@
         }
 
         /** Wizard styles **/
+        .wizard {
+            line-height: 18px;
+        }
+
         .wizard a {
             padding: 5px 5px 5px 20px;
             margin-right: 0px;
@@ -77,19 +81,19 @@
     </style>
 
     <div class="step-form-header wizard" style="display: none;">
-            {% set isProcessed = false %}
-            {% for step in steps %}
-                <a href="{{ path('oro_workflow_widget_step_form', { workflowItemId: workflowItem.id, stepName: step.name }) }}"
-                   class="no-hash {% if not isProcessed %}processed{% endif %} {% if step.name == currentStep.name %}current{% endif %}">
-                    {% if step.name == displayStep.name %}
-                        <i class="icon icon-chevron-sign-right"></i>
-                    {% endif %}
-                    {{ step.label|trans }}
-                </a>
-                {% if step.name == currentStep.name %}
-                    {% set isProcessed = true %}
+        {% set isProcessed = false %}
+        {% for step in steps %}
+            <a href="{{ path('oro_workflow_widget_step_form', { workflowItemId: workflowItem.id, stepName: step.name }) }}"
+               class="no-hash {% if not isProcessed %}processed{% endif %} {% if step.name == currentStep.name %}current{% endif %}">
+                {% if step.name == displayStep.name %}
+                    <i class="icon icon-chevron-sign-right"></i>
                 {% endif %}
-            {% endfor %}
+                {{ step.label|trans }}
+            </a>
+            {% if step.name == currentStep.name %}
+                {% set isProcessed = true %}
+            {% endif %}
+        {% endfor %}
     </div>
 
     {% if saved %}

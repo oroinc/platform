@@ -12,6 +12,16 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
     protected $workflowRegistry;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $workflowManager;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $configProvider;
+
+    /**
      * @var WorkflowExtension
      */
     protected $extension;
@@ -21,19 +31,37 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new WorkflowExtension($this->workflowRegistry);
+        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->extension = new WorkflowExtension(
+            $this->workflowRegistry,
+            $this->workflowManager,
+            $this->configProvider
+        );
     }
 
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(1, $functions);
+        $this->assertCount(5, $functions);
+
+        $expectedFunctions = array(
+            'has_workflows',
+            'get_workflow',
+            'get_workflow_item_current_step',
+            'get_primary_workflow_name',
+            'get_primary_workflow_item'
+        );
 
         /** @var \Twig_SimpleFunction $function */
-        $function = current($functions);
-        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
-        $this->assertEquals('has_workflows', $function->getName());
-        $this->assertEquals(array($this->extension, 'hasWorkflows'), $function->getCallable());
+        foreach ($functions as $function) {
+            $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+            $this->assertContains($function->getName(), $expectedFunctions);
+        }
     }
 
     public function testGetName()
@@ -64,5 +92,128 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             array(null, false),
             array(array('test_workflow'), true)
         );
+    }
+
+    public function testGetWorkflow()
+    {
+        $workflowIdentifier = 'test';
+        $workflow = $this->assertWorkflow($workflowIdentifier);
+        $this->assertSame($workflow, $this->extension->getWorkflow($workflowIdentifier));
+    }
+
+    public function testGetWorkflowItemCurrentStep()
+    {
+        $stepName = 'testStep';
+        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflowItem->expects($this->once())
+            ->method('getCurrentStepName')
+            ->will($this->returnValue($stepName));
+        $workflow = $this->assertWorkflow($workflowItem);
+
+        $stepManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stepManager->expects($this->once())
+            ->method('getStep')
+            ->with($stepName);
+
+        $workflow->expects($this->once())
+            ->method('getStepManager')
+            ->will($this->returnValue($stepManager));
+
+        $this->extension->getWorkflowItemCurrentStep($workflowItem);
+    }
+
+    public function testGetPrimaryWorkflowNameNotConfigurable()
+    {
+        $className = '\stdClass';
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($className);
+        $this->assertNull($this->extension->getPrimaryWorkflowName($className));
+    }
+
+    public function testGetPrimaryWorkflowName()
+    {
+        $className = '\stdClass';
+        $workflowName = 'primaryWorkflow';
+
+        $this->assertCallToGetPrimaryWorkflowName($className, $workflowName);
+        $this->assertEquals($workflowName, $this->extension->getPrimaryWorkflowName($className));
+    }
+
+    public function testGetPrimaryWorkflowItemNoWorkflow()
+    {
+        $object = new \stdClass();
+        $this->assertNull($this->extension->getPrimaryWorkflowItem($object));
+    }
+
+    public function testGetPrimaryWorkflowItemExisting()
+    {
+        $object = new \stdClass();
+        $workflowName = 'primaryWorkflow';
+        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->assertCallToGetPrimaryWorkflowName(get_class($object), $workflowName);
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflowItemsByEntity')
+            ->with($object, $workflowName)
+            ->will($this->returnValue(array($workflowItem)));
+
+        $this->assertSame($workflowItem, $this->extension->getPrimaryWorkflowItem($object));
+    }
+
+    public function testGetPrimaryWorkflowItemNew()
+    {
+        $object = new \stdClass();
+        $workflowName = 'primaryWorkflow';
+        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->assertCallToGetPrimaryWorkflowName(get_class($object), $workflowName);
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflowItemsByEntity')
+            ->with($object, $workflowName);
+
+        $workflow = $this->assertWorkflow($workflowName);
+        $workflow->expects($this->once())
+            ->method('createWorkflowItem')
+            ->will($this->returnValue($workflowItem));
+
+        $this->assertSame($workflowItem, $this->extension->getPrimaryWorkflowItem($object));
+    }
+
+    protected function assertCallToGetPrimaryWorkflowName($className, $workflowName)
+    {
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
+            ->getMock();
+        $config->expects($this->once())
+            ->method('get')
+            ->with('primary')
+            ->will($this->returnValue($workflowName));
+
+        $this->configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($className)
+            ->will($this->returnValue(true));
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className)
+            ->will($this->returnValue($config));
+    }
+
+    protected function assertWorkflow($workflowIdentifier)
+    {
+        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->workflowManager->expects($this->once())
+            ->method('getWorkflow')
+            ->with($workflowIdentifier)
+            ->will($this->returnValue($workflow));
+        return $workflow;
     }
 }

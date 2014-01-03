@@ -1,0 +1,111 @@
+{% set workflowItem = get_primary_workflow_item(entity) %}
+{% if workflowItem %}
+    {% set workflow = get_workflow(workflowItem) %}
+
+    {% if workflow.enabled %}
+        {% set currentStep = get_workflow_item_current_step(workflowItem) %}
+
+        <style type="text/css">
+            /** Step form styles */
+            .step-form .box-type1 {
+                margin: 15px 0;
+                border-color: #d0d0d0;
+            }
+
+            .step-form .box-type1 .title {
+                font-weight: normal;
+                padding: 8px;
+                background-color: #f2f2f2;
+                border-bottom-color: #aaaaaa;
+            }
+
+            .primary-workflow .widget-title {
+                line-height: 28px !important;
+            }
+        </style>
+        {#<div class="responsive-section">#}
+            {#<div class="responsive-cell">#}
+                <div class="box-type1 primary-workflow">
+                    <div class="title">
+                        {% if currentStep %}
+                            {% set stepName %}
+                            <div class="status-enabled pull-left">
+                                <div class="badge badge-enabled status-enabled">
+                                    <i class="icon-status-enabled icon-circle"></i>{{ currentStep.label }}
+                                </div>
+                            </div>
+                            {% endset %}
+                        {% else %}
+                            {% set stepName %}
+                            <div class="status-enabled pull-left">
+                                <div class="badge badge-disabled status-disabled">
+                                    <i class="icon-status-disabled icon-circle"></i>{{ 'Not started'|trans }}
+                                </div>
+                            </div>
+                            {% endset %}
+                        {% endif %}
+                        <span class="widget-title workflow-name">{{ workflow.label }} {{ stepName }}</span>
+                        <div class="pull-right">
+                            {% if workflowItem.id %}
+                                {{ oro_widget_render({
+                                    'widgetType': 'buttons',
+                                    'url': path('oro_workflow_widget_buttons_wizard', {workflowItemId: workflowItem.id}),
+                                    'alias': 'primary_workflow_transitions'
+                                }) }}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="container-fluid step-form">
+                        {% if workflowItem.id %}
+                            {{ oro_widget_render({
+                                'widgetType': 'block',
+                                'url': path('oro_workflow_widget_step_form', {workflowItemId: workflowItem.id}),
+                                'loadingMaskEnabled': false,
+                                'alias': 'primary_workflow_step_form'
+                            }) }}
+
+                            <script type="text/javascript">
+                                require(['oro/workflow-step-form-handler'],
+                                function(stepFormHandler){
+                                    stepFormHandler('primary_workflow_step_form', 'primary_workflow_transitions');
+                                });
+                            </script>
+                        {% endif %}
+
+                        {% if workflow.type == 'wizard' and workflowItem.id %}
+                            <div class="pull-right">
+                                <a href="{{ path('oro_workflow_step_edit', {id: workflowItem.id}) }}">{{ 'Detailed view'|trans }}</a>
+                                |
+                                <a href="javascript: void(0);"
+                                   class="no-hash remove-button"
+                                   id="btn-remove-primary-workflow-item"
+                                   data-id="{{ workflowItem.id }}"
+                                   data-message="{{ 'Are you sure you want to delete this workflow instance?'|trans }}"
+                                   data-success-message="{{ '%workflow% instance deleted'|trans({'%workflow%': workflow.label}) }}"
+                                   data-url="{{ path('oro_api_workflow_delete', { workflowItemId: workflowItem.id }) }}"
+                                   title="{{ 'Delete "%workflow%" instance'|trans({'%workflow%': workflow.label}) }}"
+                                        >
+                                    <i class="icon-trash"></i>
+                                </a>
+
+                                <script type="text/javascript">
+                                   require(['jquery', 'oro/navigation'],
+                                   function($, Navigation) {
+                                       $('#btn-remove-primary-workflow-item').on('removesuccess', function(e) {
+                                           var navigation = Navigation.getInstance();
+                                           if (navigation) {
+                                               navigation.loadPage();
+                                           } else {
+                                               window.location.reload();
+                                           }
+                                       });
+                                   })
+                                </script>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {#</div>#}
+        {#</div>#}
+    {% endif %}
+{% endif %}

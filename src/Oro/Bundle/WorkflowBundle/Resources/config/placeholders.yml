@@ -4,6 +4,13 @@ placeholders:
         items:
             workflow_buttons_entity:
                 order: 100
+    view_content_before:
+        label: Entity primary workflow
+        items:
+            entity_primary_workflow:
+                order: 100
 items:
-   workflow_buttons_entity:
+    workflow_buttons_entity:
         template: OroWorkflowBundle:Widget:entityButtons.html.twig
+    entity_primary_workflow:
+        template: OroWorkflowBundle:Widget:entityPrimaryWorkflow.html.twig

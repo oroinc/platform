@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -263,11 +264,15 @@ class WidgetController extends Controller
     }
 
     /**
-     * @Route("/workflow_items/{entityClass}/{entityId}", name="oro_workflow_widget_workflow_items")
+     * @Route(
+     *      "/workflow_items/{entityClass}/{entityId}/{skipPrimary}",
+     *      name="oro_workflow_widget_workflow_items",
+     *      defaults={"skipPrimary" = 1}
+     * )
      * @Template
      * @AclAncestor("oro_workflow")
      */
-    public function workflowItemsAction($entityClass, $entityId)
+    public function workflowItemsAction($entityClass, $entityId, $skipPrimary = true)
     {
         $entity = $this->getEntityReference($entityClass, $entityId);
         $workflowType = $this->getRequest()->get('workflowType', Workflow::TYPE_WIZARD);
@@ -276,9 +281,20 @@ class WidgetController extends Controller
         $workflowManager = $this->get('oro_workflow.manager');
         $workflowItems = $workflowManager->getWorkflowItemsByEntity($entity, null, $workflowType);
 
+        /** @var ConfigProviderInterface $configProvider */
+        $configProvider = $this->get('oro_entity_config.provider.workflow');
+        $primaryWorkflowName = null;
+        if ($configProvider->hasConfig($entityClass)) {
+            $entityConfiguration = $configProvider->getConfig($entityClass);
+            $primaryWorkflowName = $entityConfiguration->get('primary');
+        }
+
         $workflowItemsData = array();
         /** @var WorkflowItem $workflowItem */
         foreach ($workflowItems as $workflowItem) {
+            if ($skipPrimary && $primaryWorkflowName === $workflowItem->getWorkflowName()) {
+                continue;
+            }
             $workflow = $workflowManager->getWorkflow($workflowItem);
             $workflowItemsData[] = array(
                 'workflow' => $workflowManager->getWorkflow($workflowItem),
