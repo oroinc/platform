@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'oro/translator', 'oro/datafilter/abstract-filter', 'oro/multiselect-decorator'],
-function(_, __, AbstractFilter, MultiselectDecorator) {
+define(['jquery', 'underscore', 'oro/translator', 'oro/datafilter/abstract-filter', 'oro/multiselect-decorator'],
+function ($, _, __, AbstractFilter, MultiselectDecorator) {
     'use strict';
 
     /**
@@ -16,17 +16,21 @@ function(_, __, AbstractFilter, MultiselectDecorator) {
          *
          * @property
          */
-        template: _.template(
-            '<div class="btn filter-select filter-criteria-selector">' +
-                '<% if (showLabel) { %><%= label %>: <% } %>' +
-                '<select>' +
-                    '<% _.each(options, function (option) { %>' +
-                        '<option value="<%= option.value %>"<% if (option.value == emptyValue.type) { %> selected="selected"<% } %>><%= option.label %></option>' +
-                    '<% }); %>' +
-                '</select>' +
-            '</div>' +
-            '<% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>'
-        ),
+        template: '',
+
+        /**
+         * Filter selector template
+         *
+         * @property
+         */
+        templateSelector: '#select-filter-template',
+
+        /**
+         * Filter simple selector template
+         *
+         * @property
+         */
+        simpleTemplateSelector: '#select-filter-simple-template',
 
         /**
          * Should default value be added to options list
@@ -116,7 +120,15 @@ function(_, __, AbstractFilter, MultiselectDecorator) {
          *
          * @param {Object} options
          */
-        initialize: function() {
+        initialize: function (options) {
+            options = _.pick(options || {}, 'simple', 'choices');
+            _.extend(this, options);
+
+            var templateSrc = $(this.simple ?
+                this.simpleTemplateSelector : this.templateSelector).text();
+
+            this.template = _.template(templateSrc);
+
             // init filter content options if it was not initialized so far
             if (_.isUndefined(this.choices)) {
                 this.choices = [];
@@ -142,14 +154,12 @@ function(_, __, AbstractFilter, MultiselectDecorator) {
          * @return {*}
          */
         render: function () {
-            var options =  this.choices.slice(0);
-            this.$el.empty();
-
+            var options = this.choices.slice(0);
             if (this.populateDefault) {
                 options.unshift({value: '', label: this.placeholder});
             }
 
-            this.$el.append(
+            this.setElement((
                 this.template({
                     label: this.label,
                     showLabel: this.showLabel,
@@ -159,7 +169,7 @@ function(_, __, AbstractFilter, MultiselectDecorator) {
                     canDisable: this.canDisable,
                     emptyValue: this.emptyValue
                 })
-            );
+            ));
 
             this._initializeSelectWidget();
 

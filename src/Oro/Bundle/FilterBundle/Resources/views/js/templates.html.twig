@@ -72,8 +72,37 @@
                 <% }); %>
             </ul>
         </div>
-        <span>of the following:</span>
+        <span>of the following: </span>
         <input type="text" name="value" value="">
         <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+    </div>
+</script>
+<script type="text/template" id="select-filter-template">
+    <div class="btn-group filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <select>
+                <% _.each(options, function (option) { %>
+                <option value="<%= option.value %>"<% if (option.value == emptyValue.type) { %> selected="selected"<% } %>>
+                    <%= option.label %>
+                </option>
+                <% }); %>
+            </select>
+        </div>
+        <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
+    </div>
+</script>
+<script type="text/template" id="select-filter-simple-template">
+    <div class="filter-item filter-item-simple">
+        <span>is </span>
+        <div class="filter-select filter-criteria-selector">
+            <select>
+                <% _.each(options, function (option) { %>
+                <option value="<%= option.value %>"<% if (option.value == emptyValue.type) { %> selected="selected"<% } %>>
+                <%= option.label %>
+                </option>
+                <% }); %>
+            </select>
+        </div>
     </div>
 </script>
