@@ -47,13 +47,82 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->exactly(4))
             ->method('execute')
+            ->will($this->returnValue('<?xml version="1.0" encoding="UTF-8"?><test>test</test>'));
+
+        $this->adapter->upload($files, $mode);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUploadError()
+    {
+        $mode = 'add';
+        $files = [
+            'some/path/to/file.yml' => 'api/path/test.yml',
+        ];
+
+        $this->adapter->setProjectId(1);
+
+        $this->request->expects($this->once())
+            ->method('setOptions');
+
+        $this->request->expects($this->once())
+            ->method('execute')
             ->will(
                 $this->returnValue(
-                    '<?xml version="1.0" encoding="UTF-8"?><test>test</test>'
+                    '<?xml version="1.0" encoding="UTF-8"?><error><message>error</message><code>0</code></error>'
                 )
             );
 
         $this->adapter->upload($files, $mode);
+    }
+
+    /**
+     * Test logging exception
+     */
+    public function testCreateDirError()
+    {
+        $dirs = ['some/path'];
+
+        $this->request->expects($this->once())
+            ->method('setOptions');
+
+        $this->request->expects($this->once())
+            ->method('execute')
+            ->will(
+                $this->returnValue(
+                    '<?xml version="1.0" encoding="UTF-8"?><error><message>error</message><code>13</code></error>'
+                )
+            );
+
+        $this->logger->expects($this->once())
+            ->method('info');
+
+        $this->adapter->createDirectories($dirs);
+    }
+
+    /**
+     * Test logging exception while uploading file
+     */
+    public function testUploadFiles()
+    {
+        $files = [
+            'some/path/to/file.yml' => 'api/path/test.yml',
+        ];
+
+        $this->request->expects($this->once())
+            ->method('execute')
+            ->will(
+                $this->returnValue(
+                    '<?xml version="1.0" encoding="UTF-8"?><error><message>error</message><code>13</code></error>'
+                )
+            );
+
+        $this->logger->expects($this->once())
+            ->method('error');
+
+        $this->adapter->uploadFiles($files, 'add');
     }
 
     /**
