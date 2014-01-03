@@ -41,6 +41,6 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('array'), $mode);
 
         $this->uploader->setAdapter($this->adapter);
-        $this->uploader->upload(__DIR__ . '/../Fixtures/Resources/lang-pack/', $mode, $callback);
+        $this->uploader->upload(__DIR__ . '/../Fixtures/Resources/lang-pack/', $mode);
     }
 }

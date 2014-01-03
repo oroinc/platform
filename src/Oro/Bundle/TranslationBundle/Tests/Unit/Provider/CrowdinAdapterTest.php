@@ -40,17 +40,40 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
             'some/path/to/file.yml' => 'api/path/test.yml',
         ];
 
-        $dirs = array('some', 'some/path', 'some/path/to');
-        $dirs = array_combine($dirs, $dirs);
+        $this->adapter->setProjectId(1);
+
+        $this->request->expects($this->exactly(4))
+            ->method('setOptions');
+
+        $this->request->expects($this->exactly(4))
+            ->method('execute')
+            ->will(
+                $this->returnValue(
+                    '<?xml version="1.0" encoding="UTF-8"?><test>test</test>'
+                )
+            );
+
+        $this->adapter->upload($files, $mode);
+    }
+
+    /**
+     * Test upload method
+     */
+    public function testDownload()
+    {
+        $locale = 'en';
+        $path =  './app/cache/dev/target.zip';
 
         $this->request->expects($this->once())
             ->method('setOptions');
 
         $this->request->expects($this->once())
-            ->method('execute');
+            ->method('execute')
+            ->will($this->returnValue(true));
 
-        $this->adapter->setProjectId(1);
-        $this->adapter->upload($files, $mode);
+        $res = $this->adapter->download($path, $locale);
+        $this->assertTrue($res);
+        unlink($path);
     }
 
     /**
@@ -59,66 +82,5 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
     public function testUploadEmpty()
     {
         $this->assertFalse($this->adapter->upload([]));
-    }
-
-    /**
-     * Test good scenario uploadFiles
-     */
-    public function testUploadFiles()
-    {
-        $this->markTestSkipped();
-        $adapter = $this->getMock(
-            'Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter',
-            array('request', 'addFile', 'notifyProgress'),
-            array('some-api-key', 'http://service-url.tld/api/')
-        );
-
-        $mode = 'add';
-        $files = array(
-            '/some/path/to/file.yml' => '/api/path/test.yml',
-        );
-
-        $adapter->expects($this->once())
-            ->method('addFile')
-            ->will($this->returnValue(true));
-
-        $adapter->expects($this->once())
-            ->method('notifyProgress')
-            ->will($this->returnValue(true));
-
-        $result = $adapter->uploadFiles($files, $mode);
-
-        $this->assertCount(1, $result['results']);
-    }
-
-    /**
-     * Test bad scenario for uploadFiles
-     *
-     * @throws \Exception
-     */
-    public function testExceptionUploadFiles()
-    {
-        $adapter = $this->getMock(
-            'Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter',
-            array('request', 'addFile', 'notifyProgress'),
-            array('some-api-key', 'http://service-url.tld/api/')
-        );
-
-        $mode = 'add';
-        $files = array(
-            '/some/path/to/file.yml' => '/api/path/test.yml',
-        );
-
-        $adapter->expects($this->once())
-            ->method('addFile')
-            ->will($this->throwException(new \Exception('some message')));
-
-        $adapter->expects($this->once())
-            ->method('notifyProgress')
-            ->will($this->returnValue(true));
-
-        $result = $adapter->uploadFiles($files, $mode);
-
-        $this->assertCount(1, $result['failed']);
     }
 }

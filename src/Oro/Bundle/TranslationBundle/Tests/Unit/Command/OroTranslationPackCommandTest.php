@@ -154,6 +154,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
 
         $projectId = 'someproject';
         $adapterMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
+        //$loggerMock = $this->getMock('Psr\Log\LoggerInterface');
 
         $adapterMock->expects($this->once())
             ->method('setProjectId')
@@ -163,13 +164,19 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
 
         $uploaderMock->expects($this->once())
             ->method('setAdapter')
-            ->with($adapterMock);
+            ->with($adapterMock)
+            ->will($this->returnSelf());
+
+        $uploaderMock->expects($this->once())
+            ->method('setLogger')
+            ->with($this->isInstanceOf('Psr\Log\LoggerInterface'))
+            ->will($this->returnSelf());
 
         $uploaderMock->expects($this->once())
             ->method('upload');
 
-        $kernel->getContainer()->set('oro_translation.service.crowdin_adapter', $adapterMock);
-        $kernel->getContainer()->set('oro_translation.service', $uploaderMock);
+        $kernel->getContainer()->set('oro_translation.uploader.crowdin_adapter', $adapterMock);
+        $kernel->getContainer()->set('oro_translation.service_provider', $uploaderMock);
 
         $app         = new Application($kernel);
         $commandMock = $this->getCommandMock();
