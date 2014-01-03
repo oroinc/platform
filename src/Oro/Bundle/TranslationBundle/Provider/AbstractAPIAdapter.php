@@ -2,24 +2,26 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Psr\Log\LoggerInterface;
+
 abstract class AbstractAPIAdapter
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $apiKey;
 
-    /** @var  \Closure|null */
-    protected $progressCallback = null;
-
-    /**
-     * @var string endpoint URL
-     */
+    /** @var string endpoint URL */
     protected $endpoint;
 
-    public function __construct($endpoint)
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /** @var ApiRequestInterface */
+    protected $apiRequest;
+
+    public function __construct($endpoint, ApiRequestInterface $apiRequest)
     {
         $this->endpoint  = $endpoint;
+        $this->apiRequest = $apiRequest;
     }
 
     /**
@@ -48,21 +50,22 @@ abstract class AbstractAPIAdapter
      *
      * @return mixed
      */
-    abstract public function download($path, $package = 'all');
+    abstract public function download($path, $package = null);
 
     /**
      * Perform request
      *
-     * @param        $uri
+     * @param string $uri
      * @param array  $data
      * @param string $method
      * @param array  $curlOptions
      *
-     * @throws \Exception
-     * @return \SimpleXMLElement
+     * @throws \RuntimeException
+     * @return mixed
      */
     protected function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
+
         $requestParams = [
                 CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
                 CURLOPT_RETURNTRANSFER => true,
@@ -73,40 +76,18 @@ abstract class AbstractAPIAdapter
             $requestParams[CURLOPT_POSTFIELDS] = $data;
         }
 
-        $ch = curl_init();
-        curl_setopt_array(
-            $ch,
-            $requestParams
-        );
+        $this->apiRequest->setOptions($requestParams);
 
-        $result = curl_exec($ch);
-        if (!$result) {
-            $errorCode = curl_errno($ch);
-            $error = curl_error($ch);
-            throw new \Exception($error, $errorCode);
-        }
-        curl_close($ch);
-
-        return $result;
+        return $this->apiRequest->execute();
     }
 
     /**
-     * Notify progress status
+     * Sets a logger
+     *
+     * @param LoggerInterface $logger
      */
-    public function notifyProgress()
+    public function setLogger(LoggerInterface $logger)
     {
-        if (is_callable($this->progressCallback)) {
-            call_user_func($this->progressCallback, func_get_args());
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param \Closure $progressCallback
-     */
-    public function setProgressCallback(\Closure $progressCallback)
-    {
-        $this->progressCallback = $progressCallback;
+        $this->logger = $logger;
     }
 }

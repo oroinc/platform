@@ -152,22 +152,14 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $kernel = new TestKernel();
         $kernel->boot();
 
-        $adapterMock = $this->getMock(
-            'Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter',
-            array(),
-            array('some-api-key', 'http://service-url.tld/api/')
-        );
-
         $projectId = 'someproject';
+        $adapterMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
+
         $adapterMock->expects($this->once())
             ->method('setProjectId')
             ->with($projectId);
 
-        $uploaderMock = $this->getMock(
-            'Oro\Bundle\TranslationBundle\Provider\TranslationUploader',
-            array(),
-            array($adapterMock)
-        );
+        $uploaderMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider');
 
         $uploaderMock->expects($this->once())
             ->method('setAdapter')
@@ -176,8 +168,8 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $uploaderMock->expects($this->once())
             ->method('upload');
 
-        $kernel->getContainer()->set('oro_translation.uploader.crowdin_adapter', $adapterMock);
-        $kernel->getContainer()->set('oro_translation.uploader', $uploaderMock);
+        $kernel->getContainer()->set('oro_translation.service.crowdin_adapter', $adapterMock);
+        $kernel->getContainer()->set('oro_translation.service', $uploaderMock);
 
         $app         = new Application($kernel);
         $commandMock = $this->getCommandMock();
@@ -232,5 +224,15 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             ->setMethods($methods);
 
         return $commandMock->getMock();
+    }
+
+    /**
+     * @param $class
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getNewMock($class)
+    {
+        return $this->getMock($class, [], [], '', false);
     }
 }

@@ -28,7 +28,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'js_translation' => array(
                         'domains' => array('jsmessages', 'validators'),
                         'debug' => '%kernel.debug%',
-                    )
+                    ),
+                    'api' => array(
+                        'crowdin' => array(
+                            'endpoint' => 'http://api.crowdin.net/api',
+                        ),
+                    ),
                 )
             ),
             array(
@@ -37,7 +42,12 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'js_translation' => array(
                         'domains' => array('jsmessages', 'validators'),
                         'debug' => '%kernel.debug%',
-                    )
+                    ),
+                    'api' => array(
+                        'crowdin' => array(
+                            'endpoint' => 'http://api.crowdin.net/api',
+                        ),
+                    ),
                 )
             ),
             array(
@@ -45,13 +55,23 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'js_translation' => array(
                         'domains' => array('validators'),
                         'debug' => true,
-                    )
+                    ),
+                    'api' => array(
+                        'crowdin' => array(
+                            'endpoint' => 'http://google',
+                        ),
+                    ),
                 ),
                 array(
                     'js_translation' => array(
                         'domains' => array('validators'),
                         'debug' => true,
-                    )
+                    ),
+                    'api' => array(
+                        'crowdin' => array(
+                            'endpoint' => 'http://google',
+                        ),
+                    ),
                 )
             ),
         );

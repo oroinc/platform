@@ -71,18 +71,20 @@ class CrowdinAdapter extends AbstractAPIAdapter
                 $i++;
                 $this->addDirectory($dir);
 
-                $this->notifyProgress(
-                    sprintf('%0.2f%%', $i * 100 / count($dirs)) .
-                    sprintf(' Directory <info>%s</info> created', $dir)
+                $this->logger->info(
+                    sprintf('%0.2f%% Directory <info>%s</info> created', $i * 100 / count($dirs), $dir)
                 );
             } catch (\Exception $e) {
                 if ($e->getCode() !== self::DIR_ALREADY_EXISTS) {
                     throw $e;
                 }
 
-                $this->notifyProgress(
-                    sprintf('%0.2f%%', $i * 100 / count($dirs)) .
-                    sprintf(' Directory <info>%s</info> already exists, skipping...', $dir)
+                $this->logger->info(
+                    sprintf(
+                        '%0.2f%% Directory <info>%s</info> already exists, skipping...',
+                        $i * 100 / count($dirs),
+                        $dir
+                    )
                 );
             }
         }
@@ -103,23 +105,27 @@ class CrowdinAdapter extends AbstractAPIAdapter
         $i       = 0;
 
         foreach ($files as $apiPath => $filePath) {
+            $i++;
+            $percent = $i * 100 / count($files);
+
             try {
                 $results[] = $this->addFile($apiPath, $filePath, $mode);
-                $message   = sprintf('File <info>%s</info> uploaded', $apiPath);
+
+                $this->logger->info(
+                    sprintf('%0.2f%% File <info>%s</info> uploaded', $percent, $apiPath)
+                );
             } catch (\Exception $e) {
                 $failed[$filePath] = $e->getMessage();
-                $message           = sprintf(
-                    'File <info>%s</info> upload failed: <error>%s</error>',
-                    $apiPath,
-                    $e->getMessage()
+
+                $this->logger->error(
+                    sprintf(
+                        '%0.2f%% File <info>%s</info> upload failed: <error>%s</error>',
+                        $percent,
+                        $apiPath,
+                        $e->getMessage()
+                    )
                 );
             }
-
-            $i++;
-            $this->notifyProgress(
-                sprintf('%0.2f%%', $i * 100 / count($files)),
-                $message
-            );
         }
 
         return array('results' => $results, 'failed' => $failed);
@@ -164,15 +170,18 @@ class CrowdinAdapter extends AbstractAPIAdapter
             }
         }
 
-        return $this->createDirectories($dirs)
+        return $this
+            ->createDirectories($dirs)
             ->uploadFiles($files, $mode);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function download($path, $package = 'all')
+    public function download($path, $package = null)
     {
+        $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
+
         $fileHandler = fopen($path, 'wb');
         $result = $this->request(
             sprintf('/project/%s/download/%s.zip', $this->projectId, $package),

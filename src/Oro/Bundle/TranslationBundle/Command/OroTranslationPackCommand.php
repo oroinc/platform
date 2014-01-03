@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\TranslationBundle\Provider\AbstractAPIAdapter;
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
@@ -34,7 +35,7 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                 array(
                     new InputArgument('project', InputArgument::REQUIRED, 'The project [e.g Oro, OroCRM etc]'),
                     new InputArgument(
-                        'default-locale',
+                        'locale',
                         InputArgument::OPTIONAL,
                         'The locale for creating language pack [en by default]',
                         'en'
@@ -158,20 +159,12 @@ EOF
      */
     protected function upload(InputInterface $input, OutputInterface $output)
     {
-        $projectName        = $input->getArgument('project');
+        $projectName      = $input->getArgument('project');
         $languagePackPath = $this->getLangPackDir($projectName);
 
-        /** @var TranslationServiceProvider $uploader */
-        $uploader = $this->getContainer()->get('oro_translation.uploader');
-        $uploader->setAdapter($this->getAdapterFromInput($input));
-
-        $uploader->upload(
-            $languagePackPath,
-            $input->getOption('upload-mode'),
-            function ($logItem) use ($output) {
-                $output->writeln(implode(', ', $logItem));
-            }
-        );
+        return $this
+            ->getTranslationService($input, $output)
+            ->upload($languagePackPath, $input->getOption('upload-mode'));
     }
 
     /**
@@ -180,28 +173,39 @@ EOF
      */
     protected function download(InputInterface $input, OutputInterface $output)
     {
-        $projectName        = $input->getArgument('project');
-        $languagePackPath   = rtrim($this->getLangPackDir($projectName), DIRECTORY_SEPARATOR) . '.zip';
+        $projectName = $input->getArgument('project');
+        $locale      = $input->getArgument('locale');
 
-        /** @var TranslationServiceProvider $apiService */
-        $apiService = $this->getContainer()
-            ->get('oro_translation.service_provider')
-            ->setAdapter($this->getAdapterFromInput($input));
+        $languagePackPath = rtrim($this->getLangPackDir($projectName), DIRECTORY_SEPARATOR) . '.zip';
 
-        $apiService->download(
-            $languagePackPath,
-            function ($logItem) use ($output) {
-                $output->writeln(implode(', ', $logItem));
-            }
-        );
+        $result = $this
+            ->getTranslationService($input, $output)
+            ->download($languagePackPath, $locale);
+
+        $output->writeln(sprintf("Download %s", $result ? 'successful' : 'failed'));
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return TranslationServiceProvider
+     */
+    protected function getTranslationService(InputInterface $input, OutputInterface $output)
+    {
+        return $this->getContainer()
+            ->get('oro_translation.service_provider')
+            ->setAdapter($this->getAdapterFromInput($input, $output))
+            ->setLogger(new OutputLogger($output));
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
      *
      * @return AbstractAPIAdapter
      */
-    protected function getAdapterFromInput(InputInterface $input)
+    protected function getAdapterFromInput(InputInterface $input, OutputInterface $output)
     {
         /** @var AbstractAPIAdapter $adapter */
         $adapter = $this->getContainer()->get(
@@ -225,7 +229,7 @@ EOF
     protected function dump(InputInterface $input, OutputInterface $output)
     {
         $projectNamespace = $input->getArgument('project');
-        $defaultLocale    = $input->getArgument('default-locale');
+        $defaultLocale    = $input->getArgument('locale');
 
         $output->writeln(sprintf('Dumping language pack for <info>%s</info>' . PHP_EOL, $projectNamespace));
 
