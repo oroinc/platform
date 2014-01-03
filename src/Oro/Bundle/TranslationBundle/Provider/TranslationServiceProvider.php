@@ -220,6 +220,14 @@ class TranslationServiceProvider
     }
 
     /**
+     * @return AbstractAPIAdapter
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
+    }
+
+    /**
      * Sets a logger
      *
      * @param LoggerInterface $logger

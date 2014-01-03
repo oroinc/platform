@@ -9,6 +9,9 @@ abstract class AbstractAPIAdapter
     /** @var string */
     protected $apiKey;
 
+    /** @var string */
+    protected $projectId;
+
     /** @var string endpoint URL */
     protected $endpoint;
 
@@ -30,6 +33,14 @@ abstract class AbstractAPIAdapter
     public function setApiKey($apiKey)
     {
         $this->apiKey = $apiKey;
+    }
+
+    /**
+     * @param string $projectId
+     */
+    public function setProjectId($projectId)
+    {
+        $this->projectId = $projectId;
     }
 
     /**

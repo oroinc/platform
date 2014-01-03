@@ -30,7 +30,7 @@ services:
     oro_translation.service_provider:
         class: %oro_translation.service_provider.class%
         arguments:
-            - @oro_translation.uploader.crowdin_adapter
+            - @oro_translation.uploader.default_adapter
             - @oro_translation.js_dumper
 
     oro_translation.curl_request:

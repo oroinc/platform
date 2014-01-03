@@ -8,11 +8,6 @@ class CrowdinAdapter extends AbstractAPIAdapter
     const DIR_ALREADY_EXISTS = 13;
 
     /**
-     * @var string
-     */
-    protected $projectId;
-
-    /**
      * Add or update file API method
      *
      * @param string $remotePath Path in remove API service
@@ -197,13 +192,5 @@ class CrowdinAdapter extends AbstractAPIAdapter
         fclose($fileHandler);
 
         return $result;
-    }
-
-    /**
-     * @param string $projectId
-     */
-    public function setProjectId($projectId)
-    {
-        $this->projectId = $projectId;
     }
 }
