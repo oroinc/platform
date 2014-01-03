@@ -19,10 +19,8 @@ class FormFieldType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'target_field'              => array(
-                    'type'    => 'text',
-                    'options' => array(),
-                ),
+                'target_field_options'      => array(),
+                'target_field_type'         => 'text',
                 'is_parent_scope_available' => true,
                 'cascade_validation'        => true,
             )
@@ -35,20 +33,10 @@ class FormFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $useParentOptions = array('required' => false, 'label' => 'Use default');
-
-        if ($options['target_field'] instanceof FieldNodeDefinition) {
-            $filedOptions = $options['target_field']->getOptions();
-            unset($filedOptions['block']);
-            unset($filedOptions['subblock']);
-            $options['target_field'] = array(
-                'type'    => $options['target_field']->getType(),
-                'options' => $filedOptions
-            );
-        }
         if ($options['is_parent_scope_available']) {
             $builder->add('use_parent_scope_value', 'checkbox', $useParentOptions);
         }
-        $builder->add('value', $options['target_field']['type'], $options['target_field']['options']);
+        $builder->add('value', $options['target_field_type'], $options['target_field_options']);
     }
 
     /**

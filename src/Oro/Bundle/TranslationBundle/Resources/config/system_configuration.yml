@@ -4,7 +4,7 @@ oro_system_configuration:
             type:  oro_translation_available_translations
             options:
                 label: 'Available translations'
-            is_parent_scope_available: false
+                is_parent_scope_available: false
 
     tree:
         system_configuration:

@@ -60,25 +60,8 @@ class FormFieldTypeTest extends TypeTestCase
             ),
             'target field options from array'           => array(
                 'options'         => array(
-                    'target_field' => array(
-                        'type'    => 'choice',
-                        'options' => array('label' => self::TEST_LABEL)
-                    )
-                ),
-                'expectedType'    => 'choice',
-                'expectedOptions' => array('label' => self::TEST_LABEL)
-            ),
-            'target field options from FieldDefinition' => array(
-                'options'         => array(
-                    'target_field' => new FieldNodeDefinition(
-                        'test_field_name',
-                        array(
-                            'type'    => 'choice',
-                            'options' => array(
-                                'label' => self::TEST_LABEL
-                            )
-                        )
-                    )
+                    'target_field_type'    => 'choice',
+                    'target_field_options' => array('label' => self::TEST_LABEL)
                 ),
                 'expectedType'    => 'choice',
                 'expectedOptions' => array('label' => self::TEST_LABEL)

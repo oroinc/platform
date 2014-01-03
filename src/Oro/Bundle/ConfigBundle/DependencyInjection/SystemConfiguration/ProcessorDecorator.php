@@ -144,7 +144,6 @@ class ProcessorDecorator
                     ->end()
                     ->scalarNode('acl_resource')->end()
                     ->integerNode('priority')->end()
-                    ->booleanNode('is_parent_scope_available')->defaultTrue()->end()
                 ->end()
             ->end();
 

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -117,6 +117,17 @@ class SystemConfigurationFormProvider extends Provider
             $fieldDefinition->getName()
         );
 
-        $form->add($name, 'oro_config_form_field_type', $fieldDefinition->toFormFieldOptions());
+        // take config field options form field definition
+        $configFieldOptions = array_intersect_key(
+            $fieldDefinition->getOptions(),
+            array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'is_parent_scope_available'])
+        );
+        // pass only options needed to "value" form type
+        $configFieldOptions['target_field_type']    = $fieldDefinition->getType();
+        $configFieldOptions['target_field_options'] = array_diff_key(
+            $fieldDefinition->getOptions(),
+            $configFieldOptions
+        );
+        $form->add($name, 'oro_config_form_field_type', $configFieldOptions);
     }
 }

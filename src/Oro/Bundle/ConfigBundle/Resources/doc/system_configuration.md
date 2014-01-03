@@ -38,7 +38,6 @@ Field declaration have required property `type`.
 `tooltip` - show additional info about field
 `acl_resource` - determines acl resource to check permissions to change config field value(optional)
 `priority` - sort order for displaying(optional)
-`is_parent_scope_available` - should "use default checkbox" be shown(optional, default: true)
 
 Also `options` available property here, it's just a proxy to form type definition
 
@@ -50,6 +49,7 @@ oro_system_configuration:
             type: text # can be any custom type
             options:
                label: 'Date format'
+               is_parent_scope_available: false # should "use default checkbox" be shown(optional, default: true)
                # here we can override any default option of the given form type
                # also here can be added field tooltips
             tooltip: 'Some additional information'
