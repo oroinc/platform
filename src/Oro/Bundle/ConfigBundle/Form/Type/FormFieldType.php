@@ -33,7 +33,7 @@ class FormFieldType extends AbstractType
         $useParentOptions = [];
         $useParentType    = 'oro_config_parent_scope_checkbox_type';
         if (!$options['is_parent_scope_available']) {
-            $useParentOptions = array_merge($useParentOptions, ['data' => false]);
+            $useParentOptions = ['data' => 0];
             $useParentType    = 'hidden';
         }
 
