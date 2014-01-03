@@ -170,10 +170,7 @@ abstract class EmailAddress
      *
      * @return EmailOwnerInterface
      */
-    public function getOwner()
-    {
-        return null;
-    }
+    abstract public function getOwner();
 
     /**
      * Set email owner
@@ -181,10 +178,7 @@ abstract class EmailAddress
      * @param EmailOwnerInterface|null $owner
      * @return EmailAddress
      */
-    public function setOwner(EmailOwnerInterface $owner = null)
-    {
-        return $this;
-    }
+    abstract public function setOwner(EmailOwnerInterface $owner = null);
 
     /**
      * Get a human-readable representation of this object.
