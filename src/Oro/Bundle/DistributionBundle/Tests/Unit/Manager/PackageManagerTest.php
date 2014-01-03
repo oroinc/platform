@@ -416,7 +416,14 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('info')
             ->with($this->stringContains('Removing from composer.json'));
 
-        $manager = $this->createPackageManager($composer, $composerInstaller, $bufferMock, null, $logger, $tempComposerJson);
+        $manager = $this->createPackageManager(
+            $composer,
+            $composerInstaller,
+            $bufferMock,
+            null,
+            $logger,
+            $tempComposerJson
+        );
 
         try {
             $manager->install($newPackage->getName());
