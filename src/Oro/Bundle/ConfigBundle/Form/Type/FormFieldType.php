@@ -6,8 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
-
 class FormFieldType extends AbstractType
 {
     /**
@@ -32,10 +30,14 @@ class FormFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $useParentOptions = array('required' => false, 'label' => 'Use default');
-        if ($options['is_parent_scope_available']) {
-            $builder->add('use_parent_scope_value', 'checkbox', $useParentOptions);
+        $useParentOptions = [];
+        $useParentType    = 'oro_config_parent_scope_checkbox_type';
+        if (!$options['is_parent_scope_available']) {
+            $useParentOptions = array_merge($useParentOptions, ['data' => false]);
+            $useParentType    = 'hidden';
         }
+
+        $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);
     }
 

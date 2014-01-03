@@ -14,7 +14,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_translation')
+        $rootNode = $treeBuilder->root('oro_translation')
             ->children()
                 ->arrayNode('js_translation')
                     ->addDefaultsIfNotSet()
@@ -44,6 +44,11 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
             ->end();
+
+        SettingsBuilder::append(
+            $rootNode,
+            ['languages' => ['value' => ['en_US', 'fr_FR', 'uk_UA'], 'type' => 'array']]
+        );
 
         return $treeBuilder;
     }

@@ -14,9 +14,13 @@
     {% if form.use_parent_scope_value is defined %}
         <div class="horizontal parent-scope-checkbox">
             <div class="oro-clearfix">
-                {{ form_widget(form.use_parent_scope_value) }}
-                {{ form_label(form.use_parent_scope_value) }}
+                {{ form_row(form.use_parent_scope_value) }}
             </div>
         </div>
     {% endif %}
+{% endblock %}
+
+{% block oro_config_parent_scope_checkbox_type_row %}
+    {{ form_widget(form) }}
+    {{ form_label(form) }}
 {% endblock %}

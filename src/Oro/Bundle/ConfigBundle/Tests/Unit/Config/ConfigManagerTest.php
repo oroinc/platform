@@ -17,6 +17,7 @@ use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
+use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
@@ -270,14 +271,16 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('__construct'))
             ->disableOriginalConstructor()->getMock();
 
-        $formType      = new FormType($subscriber);
-        $formFieldType = new FormFieldType();
+        $formType       = new FormType($subscriber);
+        $formFieldType  = new FormFieldType();
+        $useParentScope = new ParentScopeCheckbox();
 
         $extensions = array(
             new PreloadedExtension(
                 array(
-                    $formType->getName()      => $formType,
-                    $formFieldType->getName() => $formFieldType
+                    $formType->getName()       => $formType,
+                    $formFieldType->getName()  => $formFieldType,
+                    $useParentScope->getName() => $useParentScope
                 ),
                 array()
             ),

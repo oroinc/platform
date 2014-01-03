@@ -1,6 +1,7 @@
 <?php
 namespace ConfigBundle\Tests\Provider;
 
+use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -26,7 +27,7 @@ class SystemConfigurationFormProviderTest extends FormIntegrationTestCase
             ->addExtensions($this->getExtensions())
             ->addTypeExtension(
                 new DataBlockExtension()
-            )
+            )->addType(new ParentScopeCheckbox())
             ->getFormFactory();
 
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
