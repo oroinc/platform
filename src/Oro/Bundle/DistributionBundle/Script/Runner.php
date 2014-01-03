@@ -213,6 +213,8 @@ class Runner
         } else {
             $this->logger->info(sprintf('There is no %s file', $path));
         }
+
+        return null;
     }
 
     protected function runCommand($command)
