@@ -9,7 +9,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\DataGridBundle\Datasource\RepositoryInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -42,17 +41,18 @@ class OrmDatasource implements DatasourceInterface
             $converter = new YamlConverter();
             $this->qb  = $converter->parse($queryConfig, $this->em->createQueryBuilder());
 
-        } elseif (isset($config['entity'])) {
+        } elseif (isset($config['entity']) and isset($config['method'])) {
             $entity = $config['entity'];
+            $method = $config['method'];
             $repository = $this->em->getRepository($entity);
-            if ($repository instanceof DatagridRepositoryInterface) {
-                $this->qb = $repository->createDatagridQueryBuilder();
+            if (method_exists($repository, $method)) {
+                $this->qb = $repository->$method();
             } else {
-                $this->qb = $repository->createQueryBuilder('o');
+                throw new \Exception(sprintf('%s has no method %s', get_class($repository), $method));
             }
 
         } else {
-            throw new \Exception(get_class($this).' expects to be configured with query or entity');
+            throw new \Exception(get_class($this).' expects to be configured with query or repository method');
         }
 
         $grid->setDatasource(clone $this);
