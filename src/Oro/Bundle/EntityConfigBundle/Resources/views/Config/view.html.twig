@@ -1,19 +1,20 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% set gridName = 'entityfields-grid' %}
-{% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A') }}) %}
+{% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
 {% if resource_granted('oro_entityconfig_manage') %}
     {% set audit_entity_class = entity.classname|replace('\\', '_') %}
-    {% set audit_title = entity_config.get('label')|default(entity_name) %}
+    {% set audit_title = entity_config.get('label')|default(entity_name)|trans %}
     {% set audit_path = 'oro_entityconfig_audit' %}
 {% endif %}
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
-        {{ UI.button({'path' : path('oro_entityconfig_update', { id: entity.id }), 'iClass' : 'icon-edit ', 'title' : 'Edit user', 'label' : 'Edit'}) }}
-
-
+        {{ UI.editButton({
+            'path': path('oro_entityconfig_update', { id: entity.id }),
+            'title': 'Edit entity',
+            'label': 'Edit'
+        }) }}
         {% for button in button_config %}
             {{ UI.button({
                 'path'   : button.void is defined ? [ 'javascript:void(0);//', path(button.route, button.args|default({})) ]|join : path(button.route, button.args|default({})),
@@ -31,7 +32,7 @@
         'entity':      entity,
         'indexPath':   path('oro_entityconfig_index'),
         'indexLabel': 'Entities',
-        'entityTitle': entity_config.get('label')|default(entity_name),
+        'entityTitle': entity_config.get('label')|default(entity_name)|trans,
     }%}
 
     {{ parent() }}
@@ -54,45 +55,48 @@
         </script>
     {% endif %}
 
-    {% set id = 'entityconfig-view' %}
-    {% set unique_keys = [] %}
-    {% for key in unique_key.keys|default %}
-        {% set unique_keys = unique_keys|merge([UI.attibuteRow(key.name, key.key|join(', '))])%}
-    {% endfor %}
+    {% set entityInformationWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_entityconfig_widget_info', {id: entity.id}),
+            'title': 'Entity Information'|trans
+        }) }}
+    {% endset %}
 
-    {% set general_fields = [
-        UI.attibuteRow('Name', entity_name),
-        UI.renderAttribute('Icon', ['<div class="clearfix-oro"><p class="control-label"><i class="',entity_config.get('icon'),' hide-text"></i> (',entity_config.get('icon'),')</p></div>']|join),
-        UI.attibuteRow('Label', entity_config.get('label')),
-        UI.attibuteRow('Plural Label', entity_config.get('plural_label')),
-        UI.attibuteRow('Type', entity_extend.get('owner')),
-        UI.attibuteRow('Description', entity_config.get('description')),
-        UI.attibuteRow('Ownership Type', entity_ownership.get('owner_type')),
-        UI.attibuteRow('Module', module_name),
-    ]%}
+    {% set uniqueKeysWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_entityconfig_widget_unique_keys', {id: entity.id}),
+            'title': 'Unique Keys'|trans
+        }) }}
+    {% endset %}
 
-    {% set data = {
-        'dataBlocks': [
-            {
-                'title': 'General',
-                'class': 'active',
-                'subblocks': [
-                    {'title': 'General Information', 'data': general_fields},
-                    {'title': 'Unique Keys', 'data': unique_keys}
-                ]
-            },
-            {
-                'title': 'Fields',
-                'subblocks': [
-                    {
-                        'title': '',
-                        'useSpan': false,
-                        'data': [dataGrid.renderGrid(gridName, {entityId: entity.id}, { cssClass: 'inner-grid' })]
-                    }
-                ]
-            }
-        ]
-    }%}
+    {% set entityFieldsWidget %}
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_entityconfig_widget_entity_fields', {id: entity.id}),
+            'cssClass': 'inner-grid'
+        }) }}
+    {% endset %}
 
+    {% set dataBlocks = [
+        {
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [entityInformationWidget]},
+                {'data' : [uniqueKeysWidget]}
+            ]
+        },
+        {
+            'title': 'Fields'|trans,
+            'subblocks': [
+                {'data' : [entityFieldsWidget]},
+            ]
+        },
+    ] %}
+
+    {% set id = 'entityConfigView' %}
+    {% set data = { 'dataBlocks': dataBlocks } %}
     {{ parent() }}
 {% endblock content_data %}

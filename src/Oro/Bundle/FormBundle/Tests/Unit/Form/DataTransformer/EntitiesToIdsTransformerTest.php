@@ -127,11 +127,11 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
         $entitiesCodeAbc = $this->createMockEntityList('code', array('a', 'b', 'c'));
         return array(
             'default' => array(
-                'TestClass',
-                null,
-                null,
-                array(1, 2, 3, 4),
-                $entitiesId1234,
+                'className' => 'TestClass',
+                'property' => null,
+                'qb_callback' => null,
+                'value' => array(1, 2, 3, 4),
+                'expected' => $entitiesId1234,
                 'expectedCalls' => array(
                     'entityManager' => array(
                         array('getClassMetadata', array('TestClass'), array('self', 'getMockClassMetadata')),
@@ -158,11 +158,11 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
                 )
             ),
             'empty' => array(
-                'TestClass',
-                'id',
-                null,
-                array(),
-                array(),
+                'className' => 'TestClass',
+                'property' => 'id',
+                'qb_callback' => null,
+                'value' => array(),
+                'expected' => array(),
                 'expectedCalls' => array(
                     'entityManager' => array(),
                     'classMetadata' => array(),
@@ -172,11 +172,11 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
                 )
             ),
             'custom property' => array(
-                'TestClass',
-                'code',
-                null,
-                array('a', 'b', 'c'),
-                $entitiesCodeAbc,
+                'className' => 'TestClass',
+                'property' => 'code',
+                'qb_callback' => null,
+                'value' => array('a', 'b', 'c'),
+                'expected' => $entitiesCodeAbc,
                 'expectedCalls' => array(
                     'entityManager' => array(
                         array('getRepository', array('TestClass'), array('self', 'getMockRepository')),
@@ -200,15 +200,15 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
                 )
             ),
             'custom query builder callback' => array(
-                'TestClass',
-                null,
-                function ($repository, array $ids) use ($self) {
+                'className' => 'TestClass',
+                'property' => null,
+                'qb_callback' => function ($repository, array $ids) use ($self) {
                     $result = $repository->createQueryBuilder('o');
                     $result->where('o.id IN (:values)')->setParameter('values', $ids);
                     return $result;
                 },
-                array(1, 2, 3, 4),
-                $entitiesId1234,
+                'value' => array(1, 2, 3, 4),
+                'expected' => $entitiesId1234,
                 'expectedCalls' => array(
                     'entityManager' => array(
                         array('getClassMetadata', array('TestClass'), array('self', 'getMockClassMetadata')),
@@ -280,12 +280,12 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
         $entitiesId1234 = $this->createMockEntityList('id', array(1, 2, 3, 4));
         return array(
             'not array' => array(
-                'TestClass',
-                'id',
-                null,
-                '1,2,3,4,5',
-                'Symfony\Component\Form\Exception\UnexpectedTypeException',
-                'Expected argument of type "array", "string" given',
+                'className' => 'TestClass',
+                'property' => 'id',
+                'qb_callback' => null,
+                'value' => '1,2,3,4,5',
+                'exception' => 'Symfony\Component\Form\Exception\UnexpectedTypeException',
+                'exception_message' => 'Expected argument of type "array", "string" given',
                 'expectedCalls' => array(
                     'entityManager' => array(),
                     'classMetadata' => array(),
@@ -294,12 +294,12 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
                 )
             ),
             'entities count mismatch ids count' => array(
-                'TestClass',
-                'id',
-                null,
-                array(1, 2, 3, 4, 5),
-                'Symfony\Component\Form\Exception\TransformationFailedException',
-                'Could not find all entities for the given IDs',
+                'className' => 'TestClass',
+                'property' => 'id',
+                'qb_callback' => null,
+                'value' => array(1, 2, 3, 4, 5),
+                'exception' => 'Symfony\Component\Form\Exception\TransformationFailedException',
+                'exception_message' => 'Could not find all entities for the given IDs',
                 'expectedCalls' => array(
                     'entityManager' => array(
                         array('getRepository', array('TestClass'), array('self', 'getMockRepository')),
@@ -319,14 +319,14 @@ class EntitiesToIdsTransformerTest extends \PHPUnit_Framework_TestCase
                 )
             ),
             'invalid query builder callback' => array(
-                'TestClass',
-                'id',
-                function () {
+                'className' => 'TestClass',
+                'property' => 'id',
+                'qb_callback' => function () {
                     return new \stdClass();
                 },
-                array(1, 2, 3, 4),
-                'Symfony\Component\Form\Exception\UnexpectedTypeException',
-                'Expected argument of type "Doctrine\ORM\QueryBuilder", "stdClass" given',
+                'value' => array(1, 2, 3, 4),
+                'exception' => 'Symfony\Component\Form\Exception\UnexpectedTypeException',
+                'exception_message' => 'Expected argument of type "Doctrine\ORM\QueryBuilder", "stdClass" given',
                 'expectedCalls' => array(
                     'entityManager' => array(
                         array('getRepository', array('TestClass'), array('self', 'getMockRepository')),

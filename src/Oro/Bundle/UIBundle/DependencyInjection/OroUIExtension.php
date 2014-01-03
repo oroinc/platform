@@ -26,9 +26,11 @@ class OroUIExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
+        $container->setParameter('oro_ui.show_pin_button_on_start_page', $config['show_pin_button_on_start_page']);
         $container->setParameter('oro_ui.wrap_class', $config['wrap_class']);
 
         $this->placeholdersConfig($config, $container);
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 
     /**
@@ -48,10 +50,10 @@ class OroUIExtension extends Extension
             if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/placeholders.yml')) {
                 $placeholderData = Yaml::parse(realpath($file));
                 if (isset($placeholderData['placeholders'])) {
-                    $placeholders = array_merge_recursive($placeholders, $placeholderData['placeholders']);
+                    $placeholders = array_replace_recursive($placeholders, $placeholderData['placeholders']);
                 }
                 if (isset($placeholderData['items'])) {
-                    $items = array_merge_recursive($items, $placeholderData['items']);
+                    $items = array_replace_recursive($items, $placeholderData['items']);
                 }
             }
         }

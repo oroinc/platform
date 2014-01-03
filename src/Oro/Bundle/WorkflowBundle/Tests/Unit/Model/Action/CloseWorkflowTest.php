@@ -35,6 +35,7 @@ class CloseWorkflowTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($workflowItem->isClosed());
 
         $action = new CloseWorkflow();
+        $action->initialize(array());
         $action->execute($workflowItem);
         $this->assertTrue($workflowItem->isClosed());
     }

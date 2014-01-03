@@ -24,7 +24,7 @@ datagrid:
 
         columns:
             entityName:
-                label: oro.notification.datagrid.entity_name
+                label: oro.notification.emailnotification.entity_name.label
                 data_name: entityName
                 type: twig
                 template: OroNotificationBundle:EmailNotification:Datagrid/Property/entityName.html.twig
@@ -32,22 +32,22 @@ datagrid:
                 choices: @oro_notification.event_listener.email_notification_service->getEntityNameChoices
 
             eventName:
-                type: translateable
-                label: oro.notification.datagrid.event_name
+                label: oro.notification.emailnotification.event.label
+                type: translatable
                 choices: @oro_notification.event_listener.email_notification_service->getEventNameChoices
 
             templateName:
-                label: oro.notification.datagrid.template
+                label: oro.notification.emailnotification.template.label
 
             recipientUsersList:
+                label: oro.notification.datagrid.recipient.user
                 type: twig
                 template: OroNotificationBundle:EmailNotification:Datagrid/Property/recipientUsersList.html.twig
-                label: oro.notification.datagrid.recipient.user
                 frontend_type: html
 
             recipientGroupsList:
-                type: twig
                 label: oro.notification.datagrid.recipient.group
+                type: twig
                 template: OroNotificationBundle:EmailNotification:Datagrid/Property/recipientGroupsList.html.twig
                 choices: @oro_notification.event_listener.email_notification_service->getRecipientGroupsChoices
                 frontend_type: html

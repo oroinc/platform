@@ -1,0 +1,99 @@
+{% extends bap.layout %}
+{% oro_title_set({params : {"%name%": pageTitle|trans }}) %}
+
+{% macro renderCell(widgets, isEven) %}
+    {% if (not isEven and widgets|length) or (isEven and widgets|length > 1) %}
+        <div class="responsive-cell">
+            {% set index = 1 %}
+            {% for widget in widgets %}
+                {% if (isEven and index is even) or (not isEven and index is odd) %}
+                    {{
+                        oro_widget_render({
+                            'widgetType': 'block',
+                            'url': path(widget.route, widget.route_parameters)
+                        })
+                    }}
+                {% endif %}
+                {% set index = index + 1 %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+{% import _self as __ %}
+
+{% block content %}
+<div class="layout-content dashboard-contailer">
+    <div class="container-fluid page-title">
+        <div class="navigation clearfix navbar-extra navbar-extra-right">
+            <div class="row">
+                {% block title %}
+                <div class="span9">
+                    <div class="pull-left">
+                        <h1 class="oro-subtitle">{{ pageTitle|trans }}</h1>
+                    </div>
+                </div>
+                {% endblock title %}
+                {% block titleNavButtons %}
+                <div class="pull-right title-buttons-container">
+                    {% placeholder dashboard_navButtons_before %}
+                    {% block navButtons %}
+                        {% if dashboards|length > 1 %}
+                        <div class="dashboard-selector-container">
+                            <label for="dashboard_selector">{{ 'Dashboards'|trans }}:</label>
+                            <select id="dashboard_selector">
+                                {% for name,label in dashboards %}
+                                    <option value="{{ name }}"{% if name == dashboardName %} selected="selected"{% endif %}>{{ label|trans }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <script type="text/javascript">
+                            require(['jquery', 'routing', 'oro/navigation'],
+                            function($, routing, Navigation){
+                                $(function () {
+                                    $('#dashboard_selector').on('change', function (e) {
+                                        var url = routing.generate('oro_dashboard_index', {name: $(e.currentTarget).val()}) + '?change_dashboard=true',
+                                            navigation = Navigation.getInstance();
+                                        if (navigation) {
+                                            navigation.processRedirect({
+                                                fullRedirect: false,
+                                                location: url
+                                            });
+                                        } else {
+                                            location.href = url;
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
+                        {% endif %}
+                    {% endblock navButtons %}
+                    {% placeholder dashboard_navButtons_after %}
+                </div>
+                {% endblock titleNavButtons %}
+            </div>
+        </div>
+    </div>
+    {% block widgets_content %}
+        {% set contentClass = contentClass|default('dashboard-container') %}
+        <div class="scrollable-container">
+            <div class="responsive-section {{ contentClass }}">
+                <div class="clearfix">
+                {% block widgets %}
+                    {{ __.renderCell(widgets, false) }}
+                    {{ __.renderCell(widgets, true) }}
+                {% endblock widgets %}
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+            require(['jquery'],
+            function($){
+                $(function () {
+                    var $contentEl = $('.{{ contentClass }}');
+                    $contentEl.closest('.scrollable-container').css('background-color', $contentEl.css('background-color'));
+                });
+            });
+        </script>
+    {% endblock widgets_content %}
+</div>
+{% endblock content %}

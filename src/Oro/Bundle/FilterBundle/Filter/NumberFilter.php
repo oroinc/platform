@@ -25,12 +25,16 @@ class NumberFilter extends AbstractFilter
             return false;
         }
 
-        $operator = $this->getOperator($data['type']);
         $parameterName = $ds->generateParameterName($this->getName());
 
         $this->applyFilterToClause(
             $ds,
-            $ds->expr()->comparison($this->get(FilterUtility::DATA_NAME_KEY), $operator, $parameterName, true)
+            $this->buildComparisonExpr(
+                $ds,
+                $data['type'],
+                $this->get(FilterUtility::DATA_NAME_KEY),
+                $parameterName
+            )
         );
 
         $ds->setParameter($parameterName, $data['value']);
@@ -55,25 +59,32 @@ class NumberFilter extends AbstractFilter
     }
 
     /**
-     * Get operator string
+     * Build an expression used to filter data
      *
-     * @param int $type
-     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param int                              $comparisonType
+     * @param string                           $fieldName
+     * @param string                           $parameterName
      * @return string
      */
-    public function getOperator($type)
-    {
-        $type = (int)$type;
-
-        $operatorTypes = array(
-            NumberFilterType::TYPE_EQUAL         => '=',
-            NumberFilterType::TYPE_GREATER_EQUAL => '>=',
-            NumberFilterType::TYPE_GREATER_THAN  => '>',
-            NumberFilterType::TYPE_LESS_EQUAL    => '<=',
-            NumberFilterType::TYPE_LESS_THAN     => '<',
-        );
-
-        return isset($operatorTypes[$type]) ? $operatorTypes[$type] : '=';
+    protected function buildComparisonExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName,
+        $parameterName
+    ) {
+        switch ($comparisonType) {
+            case NumberFilterType::TYPE_GREATER_EQUAL:
+                return $ds->expr()->gte($fieldName, $parameterName, true);
+            case NumberFilterType::TYPE_GREATER_THAN:
+                return $ds->expr()->gt($fieldName, $parameterName, true);
+            case NumberFilterType::TYPE_LESS_EQUAL:
+                return $ds->expr()->lte($fieldName, $parameterName, true);
+            case NumberFilterType::TYPE_LESS_THAN:
+                return $ds->expr()->lt($fieldName, $parameterName, true);
+            default:
+                return $ds->expr()->eq($fieldName, $parameterName, true);
+        }
     }
 
     /**

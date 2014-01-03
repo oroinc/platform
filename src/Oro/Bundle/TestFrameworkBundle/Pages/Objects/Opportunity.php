@@ -194,9 +194,15 @@ class Opportunity extends AbstractEntity implements Entity
         return $this->closedate->value();
     }
 
+    public function checkStatus($status)
+    {
+        $this->assertElementPresent("//div[@class='status-enabled pull-left'][contains(., '{$status}')]");
+        return $this;
+    }
+
     public function edit()
     {
-        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Update opportunity']")->click();
+        $this->byXPath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit opportunity']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->init();

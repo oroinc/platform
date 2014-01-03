@@ -10,9 +10,30 @@ oro:
                 view: "View"
                 update: "Update"
                 delete: "Delete"
-            name: "Name"
-            email: "Email"
-            phone: "Phone"
             owner: "Owner Business Unit"
-            organization: "Organization"
-            created_at: "Created At"
+
+    organization:
+        entity_label:         Organization
+        entity_plural_label:  Organizations
+        entity_description:   Represent organization
+        id.label:        Id
+        precision.label: Precision
+        name.label:      Name
+        currency.label:  Currency
+        business_units.label: Bussines units
+
+        businessunit:
+            entity_label:        Business Unit
+            entity_plural_label: Business Units
+            entity_description:  Represent business unit
+            id.label:           Id
+            website.label:      Website
+            users.label:        Users
+            phone.label:        Phone
+            owner.label:        Owner
+            organization.label: Organization
+            name.label:         Name
+            fax.label:          Fax
+            email.label:        Email
+            created_at.label:   Created at
+            updated_at.label:   Updated at

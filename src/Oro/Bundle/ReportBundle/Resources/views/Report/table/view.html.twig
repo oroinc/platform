@@ -1,0 +1,48 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% oro_title_set({params : {"%report.name%": entity.name, "%report.group%": reportGroup} }) %}
+{% set pageTitle = entity.name %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_report_update') %}
+        {{ UI.editButton({
+            'path': path('oro_report_update', {'id': entity.id}),
+            'entity_label': 'oro.report.entity_label'|trans
+        }) }}
+    {% endif %}
+    {% if resource_granted('oro_report_delete') %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_api_delete_report', {'id': entity.id}),
+            'dataRedirect': path('oro_report_index'),
+            'aCss': 'no-hash remove-button',
+            'dataId': entity.id,
+            'id': 'btn-remove-report',
+            'entity_label': 'oro.report.entity_label'|trans
+        }) }}
+    {% endif %}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity': entity,
+        'indexPath': path('oro_report_index'),
+        'indexLabel': 'oro.report.entity_plural_label'|trans,
+        'entityTitle': entity.name
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% if gridName is defined %}
+        {{ dataGrid.renderGrid(gridName) }}
+    {% else %}
+        <div class="container-fluid">
+            <div class="grid-container">
+                <div class="no-data">
+                    <span>{{ 'Invalid report configuration'|trans }}</span>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock content_data %}

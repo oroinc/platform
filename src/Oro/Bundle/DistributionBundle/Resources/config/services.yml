@@ -1,5 +1,17 @@
 parameters:
-    oro_distribution.routing_loader.class:            Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
+    oro_distribution.routing_loader.class:                    Oro\Bundle\DistributionBundle\Routing\OroAutoLoader
+    oro_distribution.package_manager.class:                   Oro\Bundle\DistributionBundle\Manager\PackageManager
+    oro_distribution.script_runner.class:                     Oro\Bundle\DistributionBundle\Script\Runner
+    oro_distribution.composer.class:                          Composer\Composer
+    oro_distribution.composer.io.class:                       Composer\IO\BufferIO
+    oro_distribution.composer.installer.class:                Composer\Installer
+    oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
+    oro_distribution.composer_json:                           %kernel.root_dir%/../composer.json
+
+    oro_distribution.listener.navigation_listener.class:      Oro\Bundle\DistributionBundle\EventListener\NavigationListener
+    oro_distribution.entry_point:                             ~
+
+    oro_distribution.security.access_denied_listener.class:   Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
 
 services:
     oro_distribution.routing_loader:
@@ -9,3 +21,54 @@ services:
             - "@kernel"
         tags:
             - { name: routing.loader }
+
+    oro_distribution.package_manager:
+        class: %oro_distribution.package_manager.class%
+        arguments:
+          - @oro_distribution.composer
+          - @oro_distribution.composer.installer
+          - @oro_distribution.composer.io
+          - @oro_distribution.script_runner
+          - %oro_distribution.composer_json%
+
+    oro_distribution.script_runner:
+        class: %oro_distribution.script_runner.class%
+        public: false
+        arguments:
+            - @oro_distribution.composer.installation_manager
+            - %kernel.root_dir%
+            - %kernel.environment%
+
+    oro_distribution.composer.io:
+        class: %oro_distribution.composer.io.class%
+        public: false
+
+    oro_distribution.composer.installer:
+        class: %oro_distribution.composer.installer.class%
+        public: false
+        factory_class: Composer\Installer
+        factory_method: create
+        arguments: [@oro_distribution.composer.io, @oro_distribution.composer]
+
+    oro_distribution.composer:
+        class: %oro_distribution.composer.class%
+        factory_class: Composer\Factory
+        factory_method: create
+        arguments: [@oro_distribution.composer.io, %oro_distribution.composer_json%]
+
+    oro_distribution.composer.installation_manager:
+        class: %oro_distribution.composer.installation_manager.class%
+        public: false
+        factory_service: oro_distribution.composer
+        factory_method: getInstallationManager
+
+    ### Menu
+
+#todo: uncomment this then package installer will be completed
+#    oro_distribution.listener.navigation_listener:
+#        class: %oro_distribution.listener.navigation_listener.class%
+#        arguments:
+#            - @security.context
+#            - %oro_distribution.entry_point%
+#        tags:
+#            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

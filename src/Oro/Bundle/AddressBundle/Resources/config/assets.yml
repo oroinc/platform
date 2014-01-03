@@ -1,3 +1,4 @@
 css:
   'address':
+      - 'bundles/oroaddress/css/less/address.less'
       - 'bundles/oroaddress/css/address.css'

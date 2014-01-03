@@ -4,5 +4,54 @@
 "Edit address": "Edit address"
 "Create address": "Create address"
 "Remove address": "Remove address"
-oro.address.form.choose_country: "Choose a country..."
-oro.address.form.choose_state: "Choose a state..."
+
+oro:
+    address:
+        entity_label:        Address
+        entity_plural_label: Addresses
+        entity_description:  Represent address
+        id.label:           Id
+        label.label:        Label
+        street.label:       Street
+        street2.label:      Street 2
+        city.label:         City
+        postal_code.label:  Zip/postal code
+        organization.label: Organization
+        region_text.label:  State
+        name_prefix.label:  Name prefix
+        first_name.label:   First name
+        middle_name.label:  Middle name
+        last_name.label:    Last name
+        name_suffix.label:  Name suffix
+        created.label:      Created at
+        updated.label:      Updated at
+        country.label:      Country
+        region.label:       State
+
+        form:
+            choose_country: "Choose a country..."
+            choose_region: "Choose a state..."
+        region:
+            entity_label:         State
+            entity_plural_label:  States
+            entity_description:   Represent address region
+            name.label:           Name
+            country.label:        Country
+            combined_code.label:  Combined code
+            code.label:           Code
+        country:
+            entity_label:         Country
+            entity_plural_label:  Countries
+            entity_description:   Represent address country
+            regions.label:        States
+            name.label:           Name
+            iso3_code.label:      ISO3 code
+            iso2_code.label:      ISO2 code
+        addresstype:
+            entity_label:         Address Type
+            entity_plural_label:  Address Types
+            entity_description:   Represent address type
+            name.label:           Name
+            label.label:          Label
+        action:
+            read_dictionaries: "Read address dictionaries"

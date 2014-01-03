@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\SegmentationTreeBundle\Tests\Unit\Model;
 
-use Doctrine\Tests\OrmTestCase;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,8 +12,6 @@ use Oro\Bundle\SegmentationTreeBundle\Entity\AbstractSegment;
 
 /**
  * Tests on SegmentManager
- *
- *
  */
 class SegmentManagerTest extends \PHPUnit_Framework_TestCase
 {

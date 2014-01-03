@@ -1,0 +1,4 @@
+oro_dashboard:
+    resource:     "@OroDashboardBundle/Controller"
+    type:         annotation
+    prefix:       /dashboard

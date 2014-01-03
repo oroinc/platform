@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class CalendarEventApiType extends CalendarEventType
 {
@@ -20,16 +20,25 @@ class CalendarEventApiType extends CalendarEventType
                 'calendar',
                 'oro_entity_identifier',
                 array(
+                    'label'    => 'oro.calendar.entity_name',
                     'required' => true,
                     'class'    => 'OroCalendarBundle:Calendar',
                     'multiple' => false
                 )
             )
-            ->add('title', 'text', array('required' => true))
+            ->add(
+                'title',
+                'text',
+                array(
+                    'required' => true,
+                    'label' => 'oro.calendar.calendarevent.title.label'
+                )
+            )
             ->add(
                 'start',
                 'datetime',
                 array(
+                    'label'          => 'oro.calendar.calendarevent.start.label',
                     'required'       => true,
                     'with_seconds'   => true,
                     'widget'         => 'single_text',
@@ -41,6 +50,7 @@ class CalendarEventApiType extends CalendarEventType
                 'end',
                 'datetime',
                 array(
+                    'label'          => 'oro.calendar.calendarevent.end.label',
                     'required'       => true,
                     'with_seconds'   => true,
                     'widget'         => 'single_text',
@@ -48,8 +58,22 @@ class CalendarEventApiType extends CalendarEventType
                     'model_timezone' => 'UTC',
                 )
             )
-            ->add('allDay', 'checkbox', array('required' => false))
-            ->add('reminder', 'checkbox', array('required' => false));
+            ->add(
+                'allDay',
+                'checkbox',
+                array(
+                    'required' => false,
+                    'label' => 'oro.calendar.calendarevent.all_day.label'
+                )
+            )
+            ->add(
+                'reminder',
+                'checkbox',
+                array(
+                    'required' => false,
+                    'label' => 'oro.calendar.calendarevent.reminder.label'
+                )
+            );
 
         $builder->addEventSubscriber(new PatchSubscriber());
     }

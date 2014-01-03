@@ -12,3 +12,23 @@
 "Delete": "Delete"
 "Actions": "Actions"
 "Step information saved": "Step information saved"
+
+oro:
+    workflow:
+        workflowitem:
+            entity_label:        Workflow Item
+            entity_plural_label: Workflow Items
+            entity_description:  Represent workflow item
+
+            id.label:                 Id
+            workflow_name.label:      Workflow Name
+            current_step_name.label:  Current Step
+            transition_records.label: Transition records
+            serialized_data.label:    Serialized data
+            definition.label:         Definition
+            closed.label:             Closed
+            bind_entities.label:      Bind entities
+            created.label:            Start Date
+            updated.label:            Updated
+        action:
+            general: "Workflow manipulations"

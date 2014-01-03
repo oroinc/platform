@@ -54,7 +54,7 @@ class ControllersTest extends WebTestCase
         $form['oro_user_user_form[birthday]'] = $this->userData['birthday'];
         $form['oro_user_user_form[email]'] = $this->userData['email'];
         $form['oro_user_user_form[groups][1]'] = 2;
-        $form['oro_user_user_form[rolesCollection][1]'] = true;
+        $form['oro_user_user_form[roles][1]'] = true;
         $form['oro_user_user_form[owner]'] = 1;
 
         $this->client->followRedirects(true);
@@ -120,12 +120,12 @@ class ControllersTest extends WebTestCase
         $result['new'] = $this->clearResult($result['new']);
 
         foreach ($result['old'] as $auditRecord) {
-            $auditValue = explode(': ', $auditRecord, 2);
+            $auditValue = explode(':', $auditRecord, 2);
             $this->assertEmpty(trim($auditValue[1]));
         }
 
         foreach ($result['new'] as $auditRecord) {
-            $auditValue = explode(': ', $auditRecord, 2);
+            $auditValue = explode(':', $auditRecord, 2);
             $key = trim($auditValue[0]);
             $value = trim($auditValue[1]);
             if ($key == 'birthday') {

@@ -1,0 +1,180 @@
+.menu a:hover {
+    text-decoration: none;
+}
+
+.ajax-loading {
+    position: absolute;
+    display: none;
+}
+
+header {
+    padding: 0;
+}
+
+header div.navbar-inner {
+    height: 41px;
+}
+
+div.navbar-inner .help {
+    padding: 10px;
+}
+
+div.navbar-inner .help a {
+    color: #fff;
+    font-size: 16px;
+    text-decoration: none;
+
+}
+
+div.navbar-inner .help a:hover {
+    text-decoration: none;
+}
+
+.logo a {
+    font-weight: bold;
+}
+
+.wrapper {
+    width: 1127px;
+}
+
+.wrapper > .content {
+    border-width: 1px;
+}
+
+.content .title {
+    color: #444;
+    font-size: 17px;
+    line-height: 20px;
+    font-weight: 700;
+    padding: 15px 30px;
+    background-color: #fafafa
+}
+
+.content .body {
+    padding: 25px;
+}
+
+.content table {
+    border: 1px solid #dededf;
+    -webkit-border-radius: 7px;
+    border-radius: 7px;
+    border-collapse: separate;
+}
+
+.content .body table th {
+    background-color: #f6f6f6;
+}
+
+.content .body table tr,
+.content .body table td,
+.content .body table th {
+    border: none;
+}
+
+.content .body table td {
+    border-top: 1px solid #e1e1e1;
+}
+
+.content .body table colgroup col:first-child {
+    background-color: #f8f9fa;
+}
+
+#back-to-installed {
+    padding: 10px 0 0;
+    line-height: 40px;
+    font-size: 16px;
+}
+
+#back-to-installed .icon {
+    margin-right: 5px;
+}
+
+#install-new-package i {
+    height: 20px;
+}
+
+#install-new-package {
+    padding-left: 10px;
+}
+
+.ajax.update {
+    color: #60a53b
+}
+
+#alerts .alert {
+    padding: 14px;
+    font-size: 14px;
+    -webkit-box-shadow: 0px 1px 3px rgba(90, 90, 90, 0.8);
+    -moz-box-shadow: 0px 1px 3px rgba(90, 90, 90, 0.8);
+    box-shadow: 0px 1px 3px rgba(90, 90, 90, 0.8);
+}
+
+#alerts .alert .close {
+    position: static;
+    top: auto;
+    right: auto;
+    font-size: 24px;
+}
+
+#alerts .icon {
+    font-size: 20px;
+}
+
+#alerts .icon-success:before {
+    content: "\f00c"
+}
+
+#alerts .icon-error:before {
+    content: "\f06a"
+}
+
+.confirm-dialog.modal.fade.in {
+    top: 25%;
+    -webkit-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
+    box-shadow: 0px 0px 19px rgba(50, 50, 50, 0.75);
+}
+
+.confirm-dialog .modal-dialog .modal-content {
+    background-color: #fee0e0;
+    border-radius: 5px;
+    font-size: 14px;
+
+}
+
+.confirm-dialog .modal-dialog .modal-content .modal-header {
+    background-color: #fececc;
+    border: none;
+    border-radius: 5px 5px 0 0;
+}
+
+.confirm-dialog .modal-dialog .modal-content .modal-footer {
+    border: none;
+    box-shadow: none;
+    background-color: inherit;
+    text-align: center;
+}
+
+.confirm-dialog .modal-dialog .modal-content .modal-header .close {
+    font-size: 25px;
+}
+
+.confirm-dialog .modal-dialog .modal-content .modal-footer button {
+    margin: 0px 7px;
+    padding: 0 15px;
+    height: 35px;
+}
+
+.modal-backdrop, .modal-backdrop.fade.in {
+    opacity: 0.5;
+}
+
+.desktop-version #oroplatform-header .logo {
+    font-size: 0;
+}
+
+.desktop-version #oroplatform-header .logo a {
+    display: inline-block;
+    font-size: 17px;
+}

@@ -3,14 +3,17 @@ namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class ConfigReader extends Reader
+class ConfigReader implements ReaderInterface
 {
     /**
      * @var array
      */
     private $configData = array();
 
-    public function __construct(array $configData)
+    /**
+     * @param array $configData
+     */
+    public function setConfigData(array $configData)
     {
         $this->configData = $configData;
     }
@@ -18,7 +21,7 @@ class ConfigReader extends Reader
     /**
      * Get Route/Title information from bundle configs
      *
-     * @param  array                                                                        $routes
+     * @param  array $routes
      * @return array
      * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */

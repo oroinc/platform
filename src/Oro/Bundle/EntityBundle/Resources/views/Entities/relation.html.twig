@@ -95,7 +95,7 @@
                                             {% set field_name = 'field_' ~ field %}
                                         {% endif %}
                                     {
-                                        'label': '{{ entity_provider.getConfig(relation.get('target_entity'), field).get('label') }}',
+                                        'label': '{{ entity_provider.getConfig(relation.get('target_entity'), field).get('label')|trans }}',
                                         'value': model.get('{{ field_name }}')
                                     },
                                     {% endfor %}

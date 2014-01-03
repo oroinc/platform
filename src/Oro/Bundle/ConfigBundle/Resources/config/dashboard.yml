@@ -1,0 +1,10 @@
+oro_dashboard_config:
+    widgets:
+        quick_launchpad:
+            items:
+                settings:
+                    label:      Settings
+                    icon:       cogs
+                    route:      oro_config_configuration_system
+                    acl:        oro_config_system
+                    position:   50

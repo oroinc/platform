@@ -240,21 +240,29 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $tree->getUserBusinessUnitIds('user'));
         $this->assertNull($tree->getUserOrganizationId('user'));
         $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array(), $tree->getUserSubordinateBusinessUnitIds('user'));
+        $this->assertEquals(array(), $tree->getBusinessUnitsIdByUserOrganizations('user'));
 
         $tree->addUserBusinessUnit('user', 'bu1');
         $this->assertEquals(array('bu1'), $tree->getUserBusinessUnitIds('user'));
         $this->assertNull($tree->getUserOrganizationId('user'));
         $this->assertEquals(array(), $tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array('bu1'), $tree->getUserSubordinateBusinessUnitIds('user'));
+        $this->assertEquals(array(), $tree->getBusinessUnitsIdByUserOrganizations('user'));
 
         $tree->addUserBusinessUnit('user', 'bu2');
         $this->assertEquals(array('bu1', 'bu2'), $tree->getUserBusinessUnitIds('user'));
         $this->assertNull($tree->getUserOrganizationId('user'));
         $this->assertEquals(array('org2'), $tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array('bu1', 'bu2'), $tree->getUserSubordinateBusinessUnitIds('user'));
+        $this->assertEquals(array('bu2'), $tree->getBusinessUnitsIdByUserOrganizations('user'));
 
         $tree->addUserBusinessUnit('user', 'bu3');
         $this->assertEquals(array('bu1', 'bu2', 'bu3'), $tree->getUserBusinessUnitIds('user'));
         $this->assertNull($tree->getUserOrganizationId('user'));
         $this->assertEquals(array('org2', 'org3'), $tree->getUserOrganizationIds('user'));
+        $this->assertEquals(array('bu1', 'bu2', 'bu3'), $tree->getUserSubordinateBusinessUnitIds('user'));
+        $this->assertEquals(array('bu2', 'bu3'), $tree->getBusinessUnitsIdByUserOrganizations('user'));
     }
 
     public static function addBusinessUnitRelationProvider()

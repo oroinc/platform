@@ -3,15 +3,18 @@
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
 
 class ConfigType extends AbstractType
 {
@@ -21,11 +24,28 @@ class ConfigType extends AbstractType
     protected $configManager;
 
     /**
-     * @param ConfigManager $configManager
+     * @var Translator
      */
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
+    protected $translator;
+
+    /**
+     * @var OrmTranslationMetadataCache
+     */
+    protected $dbTranslationMetadataCache;
+
+    /**
+     * @param ConfigManager $configManager
+     * @param Translator    $translator
+     * @param OrmTranslationMetadataCache $dbTranslationMetadataCache
+     */
+    public function __construct(
+        ConfigManager $configManager,
+        Translator $translator,
+        OrmTranslationMetadataCache $dbTranslationMetadataCache
+    ) {
+        $this->configManager              = $configManager;
+        $this->translator                 = $translator;
+        $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
     }
 
     /**
@@ -75,7 +95,13 @@ class ConfigType extends AbstractType
 
         $builder->setData($data);
 
-        $builder->addEventSubscriber(new ConfigSubscriber($this->configManager));
+        $builder->addEventSubscriber(
+            new ConfigSubscriber(
+                $this->configManager,
+                $this->translator,
+                $this->dbTranslationMetadataCache
+            )
+        );
     }
 
     /**

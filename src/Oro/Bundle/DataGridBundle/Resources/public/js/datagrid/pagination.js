@@ -12,12 +12,6 @@ function($, _, Backbone) {
      */
     return Backbone.View.extend({
         /** @property */
-        tagName: 'div',
-
-        /** @property */
-        className: 'pagination pagination-centered',
-
-        /** @property */
         windowSize: 10,
 
         /** @property */
@@ -27,25 +21,7 @@ function($, _, Backbone) {
         hidden: false,
 
         /** @property */
-        template: _.template(
-            '<label class="dib">Page:</label>' +
-            '<ul class="icons-holder">' +
-                '<% _.each(handles, function (handle) { %>' +
-                    '<li <% if (handle.className) { %>class="<%= handle.className %>"<% } %>>' +
-                        '<a href="#" <% if (handle.title) {%> title="<%= handle.title %>"<% } %>>' +
-                            '<% if (handle.wrapClass) {%>' +
-                                '<i <% if (handle.wrapClass) { %>class="<%= handle.wrapClass %>"<% } %>>' +
-                                    '<%= handle.label %>' +
-                                '</i>' +
-                            '<% } else { %>' +
-                                '<%= handle.label %>' +
-                            '<% } %>' +
-                        '</a>' +
-                    '</li>' +
-                '<% }); %>' +
-            '</ul>' +
-            '<label class="dib">of <%= state.totalPages ? state.totalPages : 1 %> | <%= state.totalRecords %> records</label>'
-        ),
+        template: '#template-datagrid-toolbar-pagination',
 
         /** @property */
         events: {
@@ -86,6 +62,8 @@ function($, _, Backbone) {
 
             this.hidden = options.hide == true;
 
+            this.template = _.template($(options.template || this.template).html());
+
             Backbone.View.prototype.initialize.call(this, options);
         },
 
@@ -124,20 +102,25 @@ function($, _, Backbone) {
                 return;
             }
 
-            var label = $(e.target).text();
+            var label = $.trim($(e.target).text());
             var ffConfig = this.fastForwardHandleConfig;
 
             var collection = this.collection;
+            var state = collection.state;
 
             if (ffConfig) {
                 var prevLabel = _.has(ffConfig.prev, 'label') ? ffConfig.prev.label : undefined;
                 var nextLabel = _.has(ffConfig.next, 'label') ? ffConfig.next.label : undefined;
                 switch (label) {
                     case prevLabel:
-                        if (collection.hasPrevious()) collection.getPreviousPage();
+                        if (collection.hasPrevious()) {
+                            collection.getPreviousPage();
+                        }
                         return;
                     case nextLabel:
-                        if (collection.hasNext()) collection.getNextPage();
+                        if (collection.hasNext()) {
+                            collection.getNextPage();
+                        }
                         return;
                 }
             }

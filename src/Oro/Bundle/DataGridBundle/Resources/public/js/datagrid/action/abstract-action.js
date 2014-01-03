@@ -37,8 +37,14 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /** @property {Boolean} */
         confirmation: false,
 
+        /** @type oro.Modal */
+        confirmModal: undefined,
+
         /** @property {String} */
         frontend_type: null,
+
+        /** @property {String} */
+        frontend_handle: null,
 
         /** @property {Object} */
         frontend_options: null,
@@ -121,6 +127,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          */
         execute: function() {
             var eventName = this.getEventName();
+            mediator.off(eventName, this.executeConfiguredAction);
             mediator.once(eventName, this.executeConfiguredAction, this);
             this._confirmationExecutor(
                 _.bind(
@@ -135,9 +142,9 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         },
 
         executeConfiguredAction: function(action) {
-            if (action.frontend_type == 'ajax') {
+            if (action.frontend_handle == 'ajax') {
                 this._handleAjax(action);
-            } else if (action.frontend_type == 'redirect') {
+            } else if (action.frontend_handle == 'redirect') {
                 this._handleRedirect(action);
             } else {
                 this._handleWidget(action);
@@ -158,7 +165,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
             action.frontend_options.url = action.frontend_options.url || this.getLinkWithParameters();
             action.frontend_options.title = action.frontend_options.title || this.label;
-            require(['oro/' + action.frontend_type + '-widget'],
+            require(['oro/' + action.frontend_handle + '-widget'],
             function(WidgetType) {
                 var widget = new WidgetType(action.frontend_options);
                 widget.render();
@@ -255,11 +262,14 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          * @return {oro.Modal}
          */
         getConfirmDialog: function(callback) {
-            return new Modal({
-                title: this.messages.confirm_title,
-                content: this.messages.confirm_content,
-                okText: this.messages.confirm_ok
-            }).on('ok', callback);
+            if (!this.confirmModal) {
+                this.confirmModal = new Modal({
+                    title: this.messages.confirm_title,
+                    content: this.messages.confirm_content,
+                    okText: this.messages.confirm_ok
+                }).on('ok', callback);
+            }
+            return this.confirmModal;
         }
     });
 });

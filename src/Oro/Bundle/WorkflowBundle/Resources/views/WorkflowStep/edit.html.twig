@@ -1,16 +1,17 @@
 {% extends bap.layout %}
+{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as macros %}
 
 {% oro_title_set({
     params : {
-        '%section%': 'Workflows'|trans,
+        '%section%': 'oro.workflow.workflowitem.entity_plural_label'|trans,
         '%entity%': workflow.label,
         '%workflow_data%': currentStep.label
     }
 }) %}
 
 {% set breadcrumbs = [{
-    label: 'Workflows'|trans
+    label: 'oro.workflow.workflowitem.entity_plural_label'|trans
 }] %}
 
 {% block breadcrumb %}
@@ -201,13 +202,23 @@
             </div>
 
             <div class="span6 no-margin">
-                    {% block workflow_toolbox %}
-                        <div style="line-height: 200px;vertical-align: middle;text-align: center;">
-                            More exciting things are coming here soon...
-                        </div>
-                    {% endblock workflow_toolbox %}
+                {% block workflow_toolbox %}
+                    <div style="line-height: 200px;vertical-align: middle;text-align: center;">
+                        More exciting things are coming here soon...
+                    </div>
+                {% endblock workflow_toolbox %}
             </div>
         </div>
     {% endblock workflow_data %}
     </div>
+
+    {% block navigation_content_tags %}
+        {{ navigationMacro.navigationContentTags(workflowItem) }}
+        {% for attribute in workflow.attributeManager.managedEntityAttributes %}
+            {% set attributeName = attribute.name %}
+            {% if workflowItem.data[attributeName] is defined %}
+                {{ navigationMacro.navigationContentTags(workflowItem.data[attributeName]) }}
+            {% endif %}
+        {% endfor %}
+    {% endblock %}
 {% endblock content %}

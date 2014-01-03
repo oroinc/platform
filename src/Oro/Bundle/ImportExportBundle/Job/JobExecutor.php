@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -9,6 +11,7 @@ use Oro\Bundle\BatchBundle\Connector\ConnectorRegistry;
 use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
+use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -29,21 +32,34 @@ class JobExecutor
     /**
      * @var ConnectorRegistry
      */
-    protected $jobRegistry;
+    protected $batchJobRegistry;
 
     /**
      * @var ContextRegistry
      */
     protected $contextRegistry;
 
+    /**
+     * @var ManagerRegistry
+     */
+    protected $managerRegistry;
+
+    /**
+     * @var EntityManager
+     */
+    protected $batchJobManager;
+
     public function __construct(
-        EntityManager $entityManager,
         ConnectorRegistry $jobRegistry,
-        ContextRegistry $contextRegistry
+        BatchJobRepository $batchJobRepository,
+        ContextRegistry $contextRegistry,
+        ManagerRegistry $managerRegistry
     ) {
-        $this->entityManager = $entityManager;
-        $this->jobRegistry = $jobRegistry;
+        $this->batchJobRegistry = $jobRegistry;
+        $this->batchJobManager = $batchJobRepository->getJobManager();
         $this->contextRegistry = $contextRegistry;
+        $this->entityManager = $managerRegistry->getManager();
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -62,17 +78,61 @@ class JobExecutor
         $jobExecution = new JobExecution();
         $jobExecution->setJobInstance($jobInstance);
 
+        // persist batch entities
+        $this->batchJobManager->persist($jobInstance);
+        $this->batchJobManager->persist($jobExecution);
+
+        // do job
+        $jobResult = $this->doJob($jobInstance, $jobExecution);
+
+        // EntityManager can be closed when there was an exception in flush method called inside some jobs execution
+        // Can't be implemented right now due to OroEntityManager external dependencies
+        // on ExtendManager and FilterCollection
+        if (!$this->entityManager->isOpen()) {
+            $this->managerRegistry->resetManager();
+            $this->entityManager = $this->managerRegistry->getManager();
+        }
+
+        // flush batch entities
+        $this->batchJobManager->flush($jobInstance);
+        $this->batchJobManager->flush($jobExecution);
+
+        // set data to JobResult
+        $jobResult->setJobId($jobInstance->getId());
+        $jobResult->setJobCode($jobInstance->getCode());
+
+        // TODO: Find a way to work with multiple amount of job and step executions
+        // TODO: https://magecore.atlassian.net/browse/BAP-2600
+        /** @var JobExecution $jobExecution */
+        $jobExecution = $jobInstance->getJobExecutions()->first();
+        if ($jobExecution) {
+            $stepExecution = $jobExecution->getStepExecutions()->first();
+            if ($stepExecution) {
+                $context = $this->contextRegistry->getByStepExecution($stepExecution);
+                $jobResult->setContext($context);
+            }
+        }
+
+        return $jobResult;
+    }
+
+    /**
+     * @param JobExecution $jobExecution
+     * @param JobInstance $jobInstance
+     * @return JobResult
+     */
+    protected function doJob(JobInstance $jobInstance, JobExecution $jobExecution)
+    {
         $jobResult = new JobResult();
         $jobResult->setSuccessful(false);
 
         $this->entityManager->beginTransaction();
         try {
-            $job = $this->jobRegistry->getJob($jobInstance);
+            $job = $this->batchJobRegistry->getJob($jobInstance);
             if (!$job) {
-                throw new RuntimeException(sprintf('Can\'t find job "%s"', $jobName));
+                throw new RuntimeException(sprintf('Can\'t find job "%s"', $jobInstance->getAlias()));
             }
 
-            // TODO: Refactor whole logic of job execution to perform actions in transactions
             $job->execute($jobExecution);
 
             $failureExceptions = $this->collectFailureExceptions($jobExecution);
@@ -90,23 +150,6 @@ class JobExecutor
             $this->entityManager->rollback();
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
-        }
-
-        // save job instance
-        $this->entityManager->persist($jobInstance);
-        $this->entityManager->flush($jobInstance);
-
-        // set data to JobResult
-        $jobResult->setJobId($jobInstance->getId());
-        $jobResult->setJobCode($jobInstance->getCode());
-        /** @var JobExecution $jobExecution */
-        $jobExecution = $jobInstance->getJobExecutions()->first();
-        if ($jobExecution) {
-            $stepExecution = $jobExecution->getStepExecutions()->first();
-            if ($stepExecution) {
-                $context = $this->contextRegistry->getByStepExecution($stepExecution);
-                $jobResult->setContext($context);
-            }
         }
 
         return $jobResult;

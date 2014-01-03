@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Model;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Intl\Intl;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -424,5 +423,28 @@ class LocaleSettings
         }
 
         return LocaleConfiguration::DEFAULT_COUNTRY;
+    }
+
+    /**
+     * @param string $settingName
+     *
+     * @return mixed
+     */
+    public function get($settingName)
+    {
+        return $this->configManager->get($settingName);
+    }
+
+    /**
+     * @param array  $codes
+     * @param string $locale
+     *
+     * @return array
+     */
+    public function getLocalesByCodes(array $codes, $locale = 'en')
+    {
+        $localeLabels = Intl::getLocaleBundle()->getLocaleNames($locale);
+
+        return array_intersect_key($localeLabels, array_combine($codes, $codes));
     }
 }

@@ -1,5 +1,6 @@
 parameters:
     oro_email.email.entity.class:                 Oro\Bundle\EmailBundle\Entity\Email
+    oro_email.email_folder.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailFolder
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
@@ -13,6 +14,7 @@ parameters:
     oro_email.entity.cache.warmer.class:          Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer
     oro_email.entity.cache.clearer.class:         Oro\Bundle\EmailBundle\Cache\EntityCacheClearer
     oro_email.direct_mailer.class:                Oro\Bundle\EmailBundle\Mailer\DirectMailer
+    oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -37,9 +39,11 @@ parameters:
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesGridHelper
 
+    #Email Action for workflows
+    oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
+
 services:
     oro_email.entity.cache.warmer:
-        public: false
         class: %oro_email.entity.cache.warmer.class%
         arguments:
             - @oro_email.email.owner.provider.storage
@@ -50,7 +54,6 @@ services:
             - { name: kernel.cache_warmer, priority: 30 }
 
     oro_email.entity.cache.clearer:
-        public: false
         class: %oro_email.entity.cache.clearer.class%
         arguments:
             - %oro_email.entity.cache_dir%
@@ -212,3 +215,19 @@ services:
     oro_email.emailtemplate.datagrid_helper:
         class: %oro_email.emailtemplate.datagrid_helper.class%
         arguments: [%oro_config.entities%]
+
+    oro_email.mailer.processor:
+        class: %oro_email.mailer.processor.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_email.email.entity.builder=
+            - @oro_email.direct_mailer
+
+    oro_email.workflow.action.send_email:
+        class: %oro_email.workflow.action.send_email.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_email.mailer.processor
+            - @oro_locale.formatter.name
+        tags:
+            - { name: oro_workflow.action, alias: send_email }

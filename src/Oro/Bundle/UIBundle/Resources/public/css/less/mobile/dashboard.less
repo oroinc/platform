@@ -1,0 +1,51 @@
+.dashboard-contailer {
+  background-color: #f1f1f1;
+  min-height: 100%;
+  .responsive-section {
+    padding: 0;
+    .responsive-cell > div {
+      padding: 0;
+    }
+  }
+}
+.launchpad-widget-content {
+  & > div {
+    height: auto;
+    .box-shadow(none);
+    .border-radius(3px);
+  }
+  .image-wrap, .list-wrap {
+    float: none;
+    width: 100%;
+  }
+  .image-wrap {
+    .widget-image {
+      display: none !important;
+    }
+    p {
+      font-weight: bolder;
+      margin: 0px;
+      padding: 10px 15px 5px 15px;
+      text-align: left;
+    }
+  }
+  .list-wrap {
+    a {
+      border: none;
+    }
+    li {
+      line-height: 25px;
+    }
+  }
+}
+.box-type1 {
+  margin: 0 @contentPadding @contentPadding;
+  border: 1px solid #b6b6b6;
+  .border-radius(3px);
+  .title{
+    padding: @contentPadding;
+  }
+  .calendar-container {
+    padding: 0;
+  }
+}

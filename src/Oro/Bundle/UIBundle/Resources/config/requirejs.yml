@@ -27,6 +27,9 @@ config:
         'jstree/jquery.hotkeys':
             deps:
                 - 'jquery.jstree'
+        'flotr2':
+            deps:
+                - 'jquery'
         'bootstrap':
             deps:
                 - 'jquery'
@@ -74,6 +77,8 @@ config:
         'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
+        'flotr2': 'bundles/oroui/lib/flotr2/flotr2.amd.js'
+        'bean': 'bundles/oroui/lib/flotr2/bean.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
         'bootstrap-tooltip': 'bundles/oroui/lib/bootstrap/js/bootstrap-tooltip.js'
         'popover-extra-placements': 'bundles/oroui/lib/bootstrap/js/popover-extra-placements.js'
@@ -81,6 +86,7 @@ config:
         'backbone': 'bundles/oroui/lib/backbone.js'
         'backbone/bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'oro/app': 'bundles/oroui/js/app.js'
+        'oro/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oro/error': 'bundles/oroui/js/error.js'
         'oro/init-layout': 'bundles/oroui/js/init-layout.js'
         'oro/jquery-setup': 'bundles/oroui/js/jquery-setup.js'
@@ -90,9 +96,12 @@ config:
         'oro/mediator': 'bundles/oroui/js/mediator.js'
         'oro/messenger': 'bundles/oroui/js/messenger.js'
         'oro/modal': 'bundles/oroui/js/modal.js'
-        'oro/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
+        'oro/scrollspy': 'bundles/oroui/js/scrollspy.js'
         'oro/tools': 'bundles/oroui/js/tools.js'
         'oro/widget-manager': 'bundles/oroui/js/widget-manager.js'
         'oro/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
         'oro/buttons-widget': 'bundles/oroui/js/widget/buttons-widget.js'
+        'oro/mobile/layout': 'bundles/oroui/js/mobile/layout.js'
+        'oro/mobile/page-header': 'bundles/oroui/js/mobile/page-header.js'
+        'oro/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'

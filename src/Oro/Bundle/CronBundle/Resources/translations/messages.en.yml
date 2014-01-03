@@ -13,8 +13,7 @@ oro:
             output:       Output
             error:        Error output
             statistics:   Statistics
-        no_jobs:          There are no jobs
-        na:               N/A
+            view:         View
         sidebar:
             status:       Daemon status
             pid:          Daemon PID
@@ -22,7 +21,6 @@ oro:
             not_running:  Not running
             run:          Run daemon
             stop:         Stop daemon
-            refresh:      Refresh list
             check:        Check status
         view:
             original:     Original Job
@@ -36,3 +34,5 @@ oro:
             stop:
                 fail:     Failed to stop daemon
                 success:  Daemon stopped
+        action:
+            jobs_management: Jobs management

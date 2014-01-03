@@ -4,13 +4,16 @@
     parameters:
         name: datagrid name
         params: additional parameters for url
+        renderParams: parameters for grid UI
 #}
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
-    {% set metaData = oro_datagrid_metadata(name, params) %}
+    {% set datagrid = oro_datagrid_build(name, params) %}
+    {% set metaData = oro_datagrid_metadata(datagrid, params) %}
+    {% set data     = oro_datagrid_data(datagrid) %}
 
-    <div id="grid-{{ name }}" data-type="datagrid" data-data="{{ oro_datagrid_data(name, params)|escape }}"
+    <div id="grid-{{ name }}" data-type="datagrid" data-data="{{ data|json_encode|raw|escape }}"
          {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
-         data-metadata="{{ metaData|json_encode }}"></div>
+         data-metadata="{{ metaData|json_encode|raw|escape }}"></div>
     <script type="text/javascript">
         require(['jquery', 'oro/datagrid-builder'].concat({{ metaData.requireJSModules|json_encode|raw }}),
         function ($, datagridBuilder) {

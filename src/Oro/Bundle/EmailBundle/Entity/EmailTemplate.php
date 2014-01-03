@@ -5,6 +5,8 @@ namespace Oro\Bundle\EmailBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use JMS\Serializer\Annotation as JMS;
+
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 
@@ -25,13 +27,13 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
  * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Email Template", "plural_label"="Email Templates"},
  *      "security"={
  *          "type"="ACL",
  *          "group_name"=""
  *      }
  *  }
  * )
+ * @JMS\ExclusionPolicy("ALL")
  */
 class EmailTemplate implements EmailTemplateInterface, Translatable
 {
@@ -41,6 +43,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @JMS\Type("integer")
+     * @JMS\Expose
      */
     protected $id;
 
@@ -48,6 +52,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @var boolean
      *
      * @ORM\Column(name="isSystem", type="boolean")
+     * @JMS\Type("boolean")
+     * @JMS\Expose
      */
     protected $isSystem;
 
@@ -55,6 +61,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @var boolean
      *
      * @ORM\Column(name="isEditable", type="boolean")
+     * @JMS\Type("boolean")
+     * @JMS\Expose
      */
     protected $isEditable;
 
@@ -62,6 +70,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $name;
 
@@ -69,6 +79,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @var integer
      *
      * @ORM\Column(name="parent", type="integer", nullable=true)
+     * @JMS\Type("integer")
+     * @JMS\Expose
      */
     protected $parent;
 
@@ -77,6 +89,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      *
      * @ORM\Column(name="subject", type="string", length=255, nullable=true)
      * @Gedmo\Translatable
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $subject;
 
@@ -85,6 +99,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      *
      * @ORM\Column(name="content", type="text", nullable=true)
      * @Gedmo\Translatable
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $content;
 
@@ -92,6 +108,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @var string
      *
      * @ORM\Column(name="entityName", type="string", length=255, nullable=true)
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $entityName;
 
@@ -100,8 +118,11 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      *  - html
      *  - text
      *
-     * @ORM\Column(name="type", type="string", length=20)
      * @var string
+     *
+     * @ORM\Column(name="type", type="string", length=20)
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $type;
 

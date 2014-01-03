@@ -3,19 +3,28 @@ oro:
         controller:
             emailnotification:
                 saved.message: "Email notification rule saved"
+
         event:
-            entity_post_update: "Entity update"
+            entity_post_update:  "Entity update"
             entity_post_persist: "Entity create"
-            entity_post_remove: "Entity remove"
+            entity_post_remove:  "Entity remove"
+
         datagrid:
             action:
                 update: "Update"
                 delete: "Delete"
-            template: "Template"
-            event_name: "Event name"
-            entity_name: "Entity name"
             recipient:
                 user: "Recipient users"
                 group: "Recipient groups"
                 custom_email: "Recipient email"
                 owner: "Recipient entity owner"
+
+        emailnotification:
+            entity_label:        Notification
+            entity_plural_label: Notifications
+            entity_description:  Represent email notification
+            id.label:             Id
+            entity_name.label:    Entity name
+            event.label:          Event name
+            template.label:       Template
+            recipient_list.label: Recipient list

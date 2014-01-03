@@ -12,6 +12,8 @@ parameters:
     oro_dataaudit.event_listener.dataaudit_grid_listener.class: Oro\Bundle\DataAuditBundle\EventListener\AuditGridListener
     oro_dataaudit.event_listener.dataaudit_history_grid_listener.class: Oro\Bundle\DataAuditBundle\EventListener\AuditHistoryGridListener
 
+    oro_dataaudit.twig.extension.auditable.class:   Oro\Bundle\DataAuditBundle\Twig\AuditableExtension
+
 services:
     oro_dataaudit.loggable.loggable_manager:
         class:                                      %oro_dataaudit.loggable.loggable_manager.class%
@@ -55,3 +57,10 @@ services:
             - [objectClass, objectId]
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.audit-history-grid, method: onBuildAfter }
+
+    oro_dataaudit.twig.extension.auditable:
+        class: %oro_dataaudit.twig.extension.auditable.class%
+        arguments:
+            - @oro_entity_config.provider.dataaudit
+        tags:
+            - { name: twig.extension }

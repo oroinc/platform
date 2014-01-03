@@ -1,0 +1,19 @@
+oro_menu_config:
+    items:
+        channels_list:
+            label: oro.integration.channel.entity_plural_label
+            route: oro_integration_channel_index
+            extras:
+                routes: 'oro_integration_channel_*'
+
+    tree:
+        application_menu:
+            children:
+                system_tab:
+                    children:
+                        channels_list: ~
+
+oro_titles:
+    oro_integration_channel_index:  ~
+    oro_integration_channel_update: %%channel.name%%
+    oro_integration_channel_create: Create Channel

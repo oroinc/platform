@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Oro\Bundle\UserBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class RoleApiType extends AclRoleType
 {
@@ -23,7 +23,7 @@ class RoleApiType extends AclRoleType
             'text',
             array(
                 'required' => true,
-                'label' => 'Role'
+                'label' => 'oro.user.role.label.label'
             )
         );
 

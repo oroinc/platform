@@ -3,7 +3,6 @@ parameters:
     oro_address.address.type.entity.class: Oro\Bundle\AddressBundle\Entity\AddressType
 
     oro_address.address.manager.class: Oro\Bundle\AddressBundle\Entity\Manager\AddressManager
-    oro_address.address.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_address.provider.address.class: Oro\Bundle\AddressBundle\Provider\AddressProvider
 
@@ -19,10 +18,5 @@ services:
         tags:
             - { name: oro_address.storage }
 
-    oro_address.address.manager.api:
-        class: %oro_address.address.manager.api.class%
-        arguments:
-            - %oro_address.address.entity.class%
-            - @doctrine.orm.entity_manager
 
 

@@ -1,13 +1,17 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 {% oro_title_set({params : {
-    "%entityName%": entity_config.get('label')|default('N/A'),
+    "%entityName%": entity_config.get('label')|default('N/A')|trans,
     "%recordName%": 'Item #'~entity.id|default('N/A') },
 }) %}
 
 {% block navButtons %}
     {% if resource_granted('EDIT', 'entity:'~entity_class) %}
-        {{ UI.button({'path' : path('oro_entity_update', { 'entity_id': parent, id: entity.id }), 'iClass' : 'icon-edit ', 'title' : 'Edit user', 'label' : 'Edit'}) }}
+        {{ UI.editButton({
+            'path': path('oro_entity_update', { 'entity_id': parent, id: entity.id }),
+            'entity_label': entity_config.get('label')|default('N/A')|trans
+        }) }}
     {% endif %}
 {% endblock navButtons %}
 
@@ -40,32 +44,12 @@
 {% endmacro %}
 
 {% block content_data %}
-    {% set general_fields = [ ] %}
-    {% for key, value in entity_fields|default %}
-        {% if value is iterable %}
-            {% set data = '' %}
-            {% for item in value.values %}
-                {% if item.link is defined and item.link != false  %}
-                    {% set data = data ~ '<a href="' ~ item.link ~ '">' ~ item.title ~ '</a>' %}
-                {% else %}
-                    {% set data = data ~ item.title %}
-                {% endif %}
-                {% if not loop.last %}
-                    {% set data = data ~ ', ' %}
-                {% endif %}
-            {% endfor %}
-            {% set value = data %}
-        {% endif %}
-
-        {% set general_fields = general_fields|merge([_self.attibuteRow(key|capitalize, value)])%}
-    {% endfor %}
-
     {% set data = { 'dataBlocks': [{
         'title': 'General',
         'class': 'active',
         'subblocks': [{
             'title': 'General Information',
-            'data':  general_fields
+            'data':  [entityConfig.renderDynamicFields(entity, entity_class)]
         }]
     }] } %}
 

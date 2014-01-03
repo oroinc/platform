@@ -5,6 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
 class BuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -76,6 +78,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     public function testBuild($config, $resultFQCN, $raisedEvents, $extensionsCount, $extensionsMocks = [])
     {
         $builder = $this->getBuilderMock(['buildDataSource']);
+        $parameters = array('key' => 'value');
 
         foreach ($extensionsMocks as $extension) {
             $builder->registerExtension($extension);
@@ -84,11 +87,19 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         foreach ($raisedEvents as $at => $eventDetails) {
             list($name, $eventType) = $eventDetails;
             $this->eventDispatcher->expects($this->at($at))->method('dispatch')
-                ->with($this->equalTo($name), $this->isInstanceOf($eventType));
+                ->with($this->equalTo($name), $this->isInstanceOf($eventType))
+                ->will(
+                    $this->returnCallback(
+                        function ($eventName, $event) use ($parameters) {
+                            /** @var $event BuildBefore|BuildAfter */
+                            \PHPUnit_Framework_TestCase::assertEquals($parameters, $event->getParameters());
+                        }
+                    )
+                );
         }
 
         /** @var DatagridInterface $result */
-        $result = $builder->build($config);
+        $result = $builder->build($config, $parameters);
         $this->assertInstanceOf($resultFQCN, $result);
 
         $this->assertInstanceOf(self::DEFAULT_ACCEPTOR_CLASS, $result->getAcceptor());

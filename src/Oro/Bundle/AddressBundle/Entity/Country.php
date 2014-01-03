@@ -4,10 +4,13 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
 
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+use JMS\Serializer\Annotation as JMS;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Country
@@ -17,6 +20,8 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  * })
  * @ORM\Entity
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\CountryTranslation")
+ * @Config()
+ * @JMS\ExclusionPolicy("ALL")
  */
 class Country implements Translatable
 {
@@ -25,7 +30,9 @@ class Country implements Translatable
      *
      * @ORM\Id
      * @ORM\Column(name="iso2_code", type="string", length=2)
-     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     * @JMS\SerializedName("iso2code")
+     * @JMS\Expose
      */
     protected $iso2Code;
 
@@ -33,7 +40,9 @@ class Country implements Translatable
      * @var string
      *
      * @ORM\Column(name="iso3_code", type="string", length=3)
-     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     * @JMS\SerializedName("iso3code")
+     * @JMS\Expose
      */
     protected $iso3Code;
 
@@ -41,8 +50,9 @@ class Country implements Translatable
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
-     * @Soap\ComplexType("string", nillable=true)
      * @Gedmo\Translatable
+     * @JMS\Type("string")
+     * @JMS\Expose
      */
     protected $name;
 

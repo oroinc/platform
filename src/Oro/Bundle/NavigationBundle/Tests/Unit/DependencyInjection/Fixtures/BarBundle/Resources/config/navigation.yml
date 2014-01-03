@@ -1,0 +1,7 @@
+oro_menu_config:
+    tree:
+        application_menu:
+            type: application_menu
+
+        shortcuts:
+            type: shortcuts

@@ -58,6 +58,26 @@ class BusinessUnitRepository extends EntityRepository
     }
 
     /**
+     * Get business units ids
+     *
+     * @return array
+     */
+    public function getBusinessUnitIds()
+    {
+        $result = [];
+        $businessUnits = $this->createQueryBuilder('businessUnit')
+            ->select('businessUnit.id')
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach ($businessUnits as $buId) {
+            $result[] = $buId['id'];
+        }
+
+        return $result;
+    }
+
+    /**
      * @param array $businessUnits
      * @return mixed
      */

@@ -8,6 +8,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 
 class EmailNotificationType extends AbstractType
@@ -28,10 +30,11 @@ class EmailNotificationType extends AbstractType
     protected $subscriber;
 
     /**
-     * @param array $entitiesConfig
+     * @param array                       $entitiesConfig
      * @param BuildTemplateFormSubscriber $subscriber
+     * @param ConfigProvider              $configManager
      */
-    public function __construct($entitiesConfig, BuildTemplateFormSubscriber $subscriber)
+    public function __construct($entitiesConfig, BuildTemplateFormSubscriber $subscriber, ConfigProvider $configManager)
     {
         $this->subscriber = $subscriber;
         $this->entityNameChoices = array_map(
@@ -44,14 +47,10 @@ class EmailNotificationType extends AbstractType
         $this->entitiesData = $entitiesConfig;
         array_walk(
             $this->entitiesData,
-            function (&$value, $key) {
-                $reflection = new \ReflectionClass($key);
-                $interfaces = $reflection->getInterfaceNames();
-
-                /**
-                 * @TODO change interface name when entityConfigBundle will provide responsibility of owner interface
-                 */
-                $value = array_search('Oro\\Bundle\\TagBundle\\Entity\\ContainAuthorInterface', $interfaces) !== false;
+            function (&$value, $class) use ($configManager) {
+                $ownerType = $configManager->hasConfig($class) ?
+                    $configManager->getConfig($class)->get('owner_type') : null;
+                $value = !empty($ownerType) && $ownerType != OwnershipType::OWNER_TYPE_NONE;
             }
         );
     }
@@ -67,9 +66,9 @@ class EmailNotificationType extends AbstractType
             'entityName',
             'choice',
             array(
+                'label'              => 'oro.notification.emailnotification.entity_name.label',
                 'choices'            => $this->entityNameChoices,
                 'multiple'           => false,
-                'translation_domain' => 'config',
                 'empty_value'        => '',
                 'empty_data'         => null,
                 'required'           => true,
@@ -83,6 +82,7 @@ class EmailNotificationType extends AbstractType
             'event',
             'entity',
             array(
+                'label'         => 'oro.notification.emailnotification.event.label',
                 'class'         => 'OroNotificationBundle:Event',
                 'property'      => 'name',
                 'query_builder' => function (EntityRepository $er) {
@@ -99,6 +99,7 @@ class EmailNotificationType extends AbstractType
             'template',
             'oro_email_template_list',
             array(
+                'label'    => 'oro.notification.emailnotification.template.label',
                 'required' => true
             )
         );
@@ -107,6 +108,7 @@ class EmailNotificationType extends AbstractType
             'recipientList',
             'oro_notification_recipient_list',
             array(
+                'label'    => 'oro.notification.emailnotification.recipient_list.label',
                 'required' => true,
             )
         );

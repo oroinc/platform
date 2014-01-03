@@ -135,4 +135,32 @@ class SecurityFacade
 
         return $isGranted;
     }
+
+    /**
+     * Gets id of currently logged in user.
+     *
+     * @return int 0 if there is not currently logged in user; otherwise, a number greater than zero
+     */
+    public function getLoggedUserId()
+    {
+        if (null === $token = $this->securityContext->getToken()) {
+            return 0;
+        }
+
+        if (!is_object($user = $token->getUser())) {
+            return 0;
+        }
+
+        return $user->getId();
+    }
+
+    /**
+     * Checks whether any user is currently logged in or not
+     *
+     * @return bool
+     */
+    public function hasLoggedUser()
+    {
+        return ($this->getLoggedUserId() !== 0);
+    }
 }

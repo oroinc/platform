@@ -3,6 +3,8 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTransformer;
@@ -26,7 +28,6 @@ class BusinessUnitTreeSelectType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        parent::buildForm($builder, $options);
         $builder->addModelTransformer($this->transformer);
     }
 
@@ -37,7 +38,8 @@ class BusinessUnitTreeSelectType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'configs' => array()
+                'configs' => array(),
+                'business_unit_ids' => array(),
             )
         );
     }
@@ -48,5 +50,13 @@ class BusinessUnitTreeSelectType extends AbstractType
     public function getName()
     {
         return 'oro_business_unit_tree_select';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['business_unit_ids'] = $options['business_unit_ids'];
     }
 }

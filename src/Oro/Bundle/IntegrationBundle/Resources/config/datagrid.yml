@@ -1,0 +1,58 @@
+datagrid:
+    channels-grid:
+        source:
+            type: orm
+            acl_resource: oro_integration_channel_index
+            query:
+                select:
+                    - c.id
+                    - c.name
+                    - c.type
+                from:
+                    - { table: %oro_integration.channel.entity.class%, alias: c }
+        columns:
+            name:
+                label: oro.integration.channel.name.label
+            type:
+                label: oro.integration.channel.type.label
+                frontend_type:  select
+                choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
+        properties:
+            id: ~
+            update_link:
+                type:    url
+                route:   oro_integration_channel_update
+                params:  [ id ]
+            delete_link:
+                type:    url
+                route:   oro_api_delete_channel
+                params:  [ id ]
+        sorters:
+            columns:
+                name: { data_name: c.name }
+                type: { data_name: c.type }
+        filters:
+            columns:
+                name: { data_name: c.name, type: string }
+                type:
+                    data_name: c.type
+                    type: choice
+                    options:
+                        field_options:
+                            choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
+        actions:
+            update:
+                type:         navigate
+                link:         update_link
+                acl_resource: oro_integration_channel_update
+                icon:         edit
+                label:        oro.integration.datagrid.action.update
+                rowAction:    true
+            delete:
+                type:         delete
+                link:         delete_link
+                acl_resource: oro_integration_channel_delete
+                icon:         trash
+                label:        oro.integration.datagrid.action.delete
+        options:
+            entityHint: channel

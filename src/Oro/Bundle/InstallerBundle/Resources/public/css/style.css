@@ -147,9 +147,6 @@ button {
     width: 0;
     height: 0;
     position: absolute;
-    filter: alpha(opacity=0);
-    -moz-opacity: 0;
-    -khtml-opacity: 0;
     opacity: 0
 }
 

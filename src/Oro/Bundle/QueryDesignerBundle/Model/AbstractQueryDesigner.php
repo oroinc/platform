@@ -19,14 +19,14 @@ abstract class AbstractQueryDesigner
     abstract public function setEntity($entity);
 
     /**
-     * Get this report definition in YAML format
+     * Get this report definition in JSON format
      *
      * @return string
      */
     abstract public function getDefinition();
 
     /**
-     * Set this report definition in YAML format
+     * Set this report definition in JSON format
      *
      * @param string $definition
      */

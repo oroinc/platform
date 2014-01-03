@@ -178,7 +178,7 @@ class TagManager
 
             /** @var Tagging $tagging */
             foreach ($taggingCollection as $tagging) {
-                if ($this->getUser()->getId() == $tagging->getCreatedBy()->getId()) {
+                if ($this->getUser()->getId() == $tagging->getOwner()->getId()) {
                     $entry['owner'] = true;
                 }
             }
@@ -195,8 +195,9 @@ class TagManager
      * Saves tags for the given taggable resource
      *
      * @param Taggable $resource Taggable resource
+     * @param  bool $flush Whether to flush the changes (default true)
      */
-    public function saveTagging(Taggable $resource)
+    public function saveTagging(Taggable $resource, $flush = true)
     {
         $oldTags = $this->getTagging($resource, $this->getUser()->getId());
         $newTags = $resource->getTags();
@@ -263,7 +264,7 @@ class TagManager
                 $this->em->persist($tagging);
             }
 
-            if (!$tagsToAdd->isEmpty()) {
+            if (!$tagsToAdd->isEmpty() && $flush) {
                 $this->em->flush();
             }
         }
