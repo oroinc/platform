@@ -36,6 +36,7 @@ security:
                 login_path:                     oro_distribution_security_login
                 default_target_path:            oro_distribution_package_listinstalled
                 always_use_default_target_path: true
+                csrf_provider:                  form.csrf_provider
             remember_me:
                 key:                        %secret%
                 name:                       BAPRM_DIST

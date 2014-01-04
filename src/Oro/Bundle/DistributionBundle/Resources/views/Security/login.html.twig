@@ -37,5 +37,6 @@
                 <button type="submit" class="btn btn-large  btn-primary pull-right" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
             </div>
         </fieldset>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token("authenticate") }}" />
     </form>
 {% endblock body %}
