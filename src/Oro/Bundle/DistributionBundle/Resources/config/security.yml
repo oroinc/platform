@@ -32,10 +32,15 @@ security:
             pattern:                          ^/
             provider:                         oro_user
             form_login:
-              check_path:                     oro_distribution_security_login_check
-              login_path:                     oro_distribution_security_login
-              default_target_path:            oro_distribution_package_listinstalled
-              always_use_default_target_path: true
+                check_path:                     oro_distribution_security_login_check
+                login_path:                     oro_distribution_security_login
+                default_target_path:            oro_distribution_package_listinstalled
+                always_use_default_target_path: true
+                csrf_provider:                  form.csrf_provider
+            remember_me:
+                key:                        %secret%
+                name:                       BAPRM_DIST
+                lifetime:                   1209600   # stay logged for two weeks
             anonymous:                        ~
             logout:
               path:   /logout
