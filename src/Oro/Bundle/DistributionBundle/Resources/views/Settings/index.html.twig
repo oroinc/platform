@@ -1,0 +1,10 @@
+{% extends 'OroDistributionBundle::base_inner.html.twig' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block menu %}
+    <a id="back-to-installed" href="{{ path('oro_distribution_package_listinstalled') }}">
+        <i class="icon icon-reply"></i>
+        Back to Installed Packages
+    </a>
+{% endblock %}
