@@ -1,7 +1,7 @@
 /* jshint browser:true */
 /* global define, require */
-define(['jquery', 'underscore', 'oro/tools', 'oro/mediator', 'oro/datafilter/collection-filters-manager'],
-function($, _, tools,  mediator, FiltersManager) {
+define(['jquery', 'underscore', 'oro/tools', 'oro/mediator', 'oro/datafilter/collection-filters-manager', 'oro/datafilter-wrapper'],
+function($, _, tools,  mediator, FiltersManager, filterWrapper) {
     'use strict';
 
     var initialized = false,
@@ -58,7 +58,12 @@ function($, _, tools,  mediator, FiltersManager) {
                         if (options.type == 'selectrow') {
                             options.collection = collection
                         }
-                        filters[options.name] = new (modules[options.type].extend(options));
+                        var Filter = modules[options.type].extend(options);
+                        var filter = new Filter();
+                        if (filter.wrappable) {
+                            _.extend(filter, filterWrapper);
+                        }
+                        filters[options.name] = filter;
                     }
                 });
                 return {filters: filters};

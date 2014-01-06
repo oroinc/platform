@@ -26,13 +26,6 @@ function ($, _, __, AbstractFilter, MultiselectDecorator) {
         templateSelector: '#select-filter-template',
 
         /**
-         * Filter simple selector template
-         *
-         * @property
-         */
-        simpleTemplateSelector: '#select-filter-simple-template',
-
-        /**
          * Should default value be added to options list
          *
          * @property
@@ -121,12 +114,10 @@ function ($, _, __, AbstractFilter, MultiselectDecorator) {
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'simple', 'choices');
+            options = _.pick(options || {}, 'templateSelector', 'choices');
             _.extend(this, options);
 
-            var templateSrc = $(this.simple ?
-                this.simpleTemplateSelector : this.templateSelector).text();
-
+            var templateSrc = $(this.templateSelector).text();
             this.template = _.template(templateSrc);
 
             // init filter content options if it was not initialized so far

@@ -15,14 +15,7 @@ function($, _, __, AbstractFilter) {
      * @extends oro.datafilter.AbstractFilter
      */
     return AbstractFilter.extend({
-        /** @property */
-        wrapperTemplate: '',
-
-        /** @property */
-        wrapperTemplateSelector: '#text-filter-template',
-
-        /** @property */
-        wrapperSimpleTemplateSelector: '#text-filter-simple-template',
+        wrappable: true,
 
         /**
          * Template for filter criteria
@@ -36,19 +29,7 @@ function($, _, __, AbstractFilter) {
          *
          * @property
          */
-        templateSelector: '#text-filter-popup-criteria-template',
-
-        /**
-         * Simple template selector for filter criteria
-         *
-         * @property
-         */
-        simpleTemplateSelector: '#text-filter-popup-criteria-simple-template',
-
-        /**
-         * @property {Boolean}
-         */
-        popupCriteriaShowed: false,
+        templateSelector: '#text-filter-template',
 
         /**
          * Selector to element of criteria hint
@@ -96,15 +77,10 @@ function($, _, __, AbstractFilter) {
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'simple');
+            options = _.pick(options || {}, 'templateSelector');
             _.extend(this, options);
 
-            var wrapperTemplateSrc = $(this.simple ?
-                this.wrapperSimpleTemplateSelector : this.wrapperTemplateSelector).text();
-            var templateSrc = $(this.simple ?
-                this.simpleTemplateSelector : this.templateSelector).text();
-
-            this.wrapperTemplate = _.template(wrapperTemplateSrc);
+            var templateSrc = $(this.templateSelector).text();
             this.template = _.template(templateSrc);
 
             // init empty value object if it was not initialized so far
@@ -215,22 +191,7 @@ function($, _, __, AbstractFilter) {
         },
 
         _wrap: function ($filter) {
-            this.setElement(this.wrapperTemplate({
-                label: this.label,
-                showLabel: this.showLabel,
-                criteriaHint: this._getCriteriaHint(),
-                nullLink: this.nullLink,
-                canDisable: !this.simple && this.canDisable
-            }));
-
-            this.$(this.criteriaSelector).append($filter);
-
-            this._clickOutsideCriteriaCallback = _.bind(function(e) {
-                if (this.popupCriteriaShowed) {
-                    this._onClickOutsideCriteria(e);
-                }
-            }, this);
-            $('body').on('click', this._clickOutsideCriteriaCallback);
+            this.$el.append($filter);
         },
 
         /**

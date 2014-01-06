@@ -24,4 +24,5 @@ config:
         'oro/datafilter/filters-manager': 'bundles/orofilter/js/datafilter/filters-manager.js'
         'oro/datafilter/collection-filters-manager': 'bundles/orofilter/js/datafilter/collection-filters-manager.js'
         'oro/datafilter-builder': 'bundles/orofilter/js/datafilter-builder.js'
+        'oro/datafilter-wrapper': 'bundles/orofilter/js/datafilter-wrapper.js'
         'oro/multiselect-decorator': 'bundles/orofilter/js/multiselect-decorator.js'

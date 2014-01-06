@@ -16,14 +16,7 @@ function($, _, __, app, TextFilter) {
          *
          * @property
          */
-        popupCriteriaTemplateSelector: '#choice-filter-popup-criteria-template',
-
-        /**
-         * Simple template selector for filter criteria
-         *
-         * @property
-         */
-        simplePopupCriteriaTemplateSelector: '#choice-filter-popup-criteria-simple-template',
+        templateSelector: '#choice-filter-template',
 
         /**
          * Selectors for filter criteria elements
@@ -191,9 +184,7 @@ function($, _, __, app, TextFilter) {
             var parentDiv = $(e.currentTarget).parent().parent().parent();
             parentDiv.find('.name_input').val($(e.currentTarget).attr('data-value'));
             var choiceName = $(e.currentTarget).html();
-            if (!this.simple) {
-                choiceName += '<span class="caret"></span>';
-            }
+            choiceName += '<span class="caret"></span>';
             parentDiv.find('.dropdown-toggle').html(choiceName);
             e.preventDefault();
         }

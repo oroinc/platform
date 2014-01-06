@@ -1,4 +1,4 @@
-<script type="text/template" id="text-filter-template">
+<script type="text/template" id="filter-wrapper-template">
     <div class="btn-group filter-item oro-drop">
         <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">
             <% if (showLabel) { %><%= label %>: <% } %>
@@ -13,12 +13,7 @@
         <div class="filter-criteria dropdown-menu" />
     </div>
 </script>
-<script type="text/template" id="text-filter-simple-template">
-    <div class="filter-item filter-item-simple">
-        <div class="filter-criteria" />
-    </div>
-</script>
-<script type="text/template" id="text-filter-popup-criteria-template">
+<script type="text/template" id="text-filter-template">
     <div>
         <div>
             <input type="text" name="value" value=""/>
@@ -30,14 +25,14 @@
         </div>
     </div>
 </script>
-<script type="text/template" id="text-filter-popup-criteria-simple-template">
+<script type="text/template" id="text-filter-simple-template">
     <div>
         <div>
             <input type="text" name="value" value=""/>
         </div>
     </div>
 </script>
-<script type="text/template" id="choice-filter-popup-criteria-template">
+<script type="text/template" id="choice-filter-template">
     <div class="choicefilter">
         <div class="input-prepend">
             <div class="btn-group">
@@ -58,7 +53,7 @@
         <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
     </div>
 </script>
-<script type="text/template" id="choice-filter-popup-criteria-simple-template">
+<script type="text/template" id="choice-filter-simple-template">
     <div class="choicefilter">
         <div class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">

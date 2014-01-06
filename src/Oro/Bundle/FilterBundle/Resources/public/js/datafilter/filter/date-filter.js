@@ -16,7 +16,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
          *
          * @property {function(Object, ?Object=): String}
          */
-        popupCriteriaTemplate: _.template(
+        template: _.template(
             '<div>' +
                 '<div class="horizontal clearfix">' +
                     '<select name="<%= name %>" class="filter-select-oro">' +
