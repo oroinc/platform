@@ -4,8 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 class CrowdinAdapter extends AbstractAPIAdapter
 {
-    /** Crowdin folder exists */
     const DIR_ALREADY_EXISTS = 13;
+    const FILE_NOT_FOUND     = 8;
 
     /**
      * @var string
@@ -115,16 +115,20 @@ class CrowdinAdapter extends AbstractAPIAdapter
                     sprintf('%0.2f%% File <info>%s</info> uploaded', $percent, $apiPath)
                 );
             } catch (\Exception $e) {
-                $failed[$filePath] = $e->getMessage();
-
-                $this->logger->error(
-                    sprintf(
-                        '%0.2f%% File <info>%s</info> upload failed: <error>%s</error>',
-                        $percent,
-                        $apiPath,
-                        $e->getMessage()
-                    )
-                );
+                if ($e->getCode() == self::FILE_NOT_FOUND && $mode == 'update') {
+                    // add this file
+                    $this->addFile($apiPath, $filePath, 'add');
+                } else {
+                    $failed[$filePath] = $e->getMessage();
+                    $this->logger->error(
+                        sprintf(
+                            '%0.2f%% File <info>%s</info> upload failed: <error>%s</error>',
+                            $percent,
+                            $apiPath,
+                            $e->getMessage()
+                        )
+                    );
+                }
             }
         }
 

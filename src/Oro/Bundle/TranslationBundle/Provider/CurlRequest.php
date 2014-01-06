@@ -47,6 +47,16 @@ class CurlRequest implements ApiRequestInterface
     }
 
     /**
+     * Reset options that may still be in place after previous calls
+     * as curl_reset available only in php5.5, just re-init curl handler
+     */
+    public function reset()
+    {
+        $this->close();
+        $this->handler = curl_init();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function close()

@@ -27,4 +27,9 @@ interface ApiRequestInterface
      * @return void
      */
     public function close();
+
+    /**
+     * @return mixed
+     */
+    public function reset();
 }

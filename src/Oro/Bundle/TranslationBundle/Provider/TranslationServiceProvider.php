@@ -31,18 +31,26 @@ class TranslationServiceProvider
     }
 
     /**
+     * Loop through the generated files in $dir and merge them with downloaded in $targetDir
+     * merge generated files over downloaded and upload result back to remote
+     *
      * @param string $dir
+     *
+     * @return mixed
      */
-    protected function update($dir)
+    public function update($dir)
     {
         $pathToSave = './app/cache/remote-trans/update.zip';
         $targetDir = dirname($pathToSave);
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
+        $targetDir = $targetDir . DIRECTORY_SEPARATOR . 'en' . DIRECTORY_SEPARATOR;
 
         $isDownloaded = $this->download($pathToSave, 'en', false);
-        $targetDir = $targetDir . DIRECTORY_SEPARATOR . 'en' . DIRECTORY_SEPARATOR;
+        if (!$isDownloaded) {
+            return false;
+        }
 
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
         foreach ($finder->files() as $fileInfo) {
@@ -51,11 +59,12 @@ class TranslationServiceProvider
 
             if (file_exists($remoteFile)) {
                 $remoteContents = file($remoteFile);
+                array_shift($remoteContents); // remove dashes from the beginning of file
             } else {
                 $remoteContents = [];
             }
 
-            $content = array_merge($remoteContents, $localContents);
+            $content = array_unique(array_merge($remoteContents, $localContents));
             $content = implode('', $content);
 
             $remoteDir = dirname($remoteFile);
@@ -64,34 +73,19 @@ class TranslationServiceProvider
             }
             file_put_contents($remoteFile, $content);
         }
+
+        return $this->upload($targetDir, 'update');
     }
 
     /**
      * Upload translations
      *
      * @param string $dir
-     * @param string $mode add or update
+     * @param string $mode
      *
      * @return mixed
      */
     public function upload($dir, $mode = 'add')
-    {
-        if ($mode == 'update') {
-            $this->update($dir);
-        }
-
-        return $this->doUpload($dir, $mode);
-    }
-
-    /**
-     * Upload translations
-     *
-     * @param string $dir
-     * @param string $mode add or update
-     *
-     * @return mixed
-     */
-    protected function doUpload($dir, $mode = 'add')
     {
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
 
@@ -124,6 +118,12 @@ class TranslationServiceProvider
             is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
         );
 
+        // TODO: consider move this in crowdin adapter or remove
+        if ($locale == 'en') {
+            // check and fix exported file names, replace $locale_XX locale in file names to $locale
+            $this->renameFiles('.en_US.', '.en.', $targetDir);
+        }
+
         if ($isExtracted) {
             unlink($pathToSave);
         }
@@ -133,6 +133,21 @@ class TranslationServiceProvider
         }
 
         return $isExtracted && $isDownloaded;
+    }
+
+    /**
+     * @param string $find      find string in file name
+     * @param string $replace   replacement
+     * @param string $dir       where to search
+     */
+    protected function renameFiles($find, $replace, $dir)
+    {
+        $finder = Finder::create()->files()->name('*.yml')->in($dir);
+
+        /** $file \SplFileInfo */
+        foreach ($finder->files() as $file) {
+            rename($file, str_replace($find, $replace, $file));
+        }
     }
 
     /**
