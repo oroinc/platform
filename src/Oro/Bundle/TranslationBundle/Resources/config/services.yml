@@ -7,7 +7,9 @@ parameters:
     oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
     oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
-    oro_translation.adapter.class:                              Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
+    oro_translation.statistic_provider.class:                   Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider
+    oro_translation.crowdin.adapter.class:                      Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
+    oro_translation.oro_translation.adapter.class:              Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter
     oro_translation.js_dumper.class:                            Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
     oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
 
@@ -33,14 +35,27 @@ services:
             - @oro_translation.uploader.default_adapter
             - @oro_translation.js_dumper
 
+    oro_translation.statistic_provider:
+        class: %oro_translation.statistic_provider.class%
+        arguments:
+            - @oro_translation.cache
+            - @oro_translation.oro_translation_adapter
+
     oro_translation.curl_request:
         class: %oro_translation.curl_request.class%
 
     oro_translation.uploader.crowdin_adapter:
-        class: %oro_translation.adapter.class%
+        class: %oro_translation.crowdin.adapter.class%
         arguments:
             - %oro_translation.api.crowdin.endpoint%
             - @oro_translation.curl_request
+
+    oro_translation.oro_translation_adapter:
+        class: %oro_translation.oro_translation.adapter.class%
+        arguments:
+            - @oro_translation.curl_request
+            - %oro_translation.api.oro_service.endpoint%
+            - %oro_translation.api.oro_service.key%
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.database_translation.metadata.cache.class%
@@ -59,6 +74,11 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: translation.loader, alias: oro_database_translation }
+
+    oro_translation.cache:
+          parent: oro.cache.abstract
+          calls:
+              - [setNamespace, ['oro_translation.cache']]
 
     oro_translation.listener.request:
         class: %oro_translation.listener.request.class%

@@ -11,6 +11,9 @@ class AvailableTranslationsConfigurationType extends AbstractType
 {
     const NAME = 'oro_translation_available_translations';
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer(new ObjectToJsonTransformer());
@@ -21,7 +24,7 @@ class AvailableTranslationsConfigurationType extends AbstractType
      */
     public function getParent()
     {
-        return 'text';
+        return 'hidden';
     }
 
     /**

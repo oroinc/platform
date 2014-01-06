@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
+
 class ServiceController extends BaseController
 {
     /**
@@ -15,8 +17,12 @@ class ServiceController extends BaseController
      */
     public function availableTranslationsAction()
     {
-        $tranlationService = $this->get('oro_translation.service_provider');
+        $statisticProvider = $this->get('oro_translation.statistic_provider');
+        $configValues      = $this->get('oro_config.global')->get(TranslationStatusInterface::CONFIG_KEY);
 
-        return [];
+        return [
+            'statistic' => $statisticProvider->get(),
+            'config'    => (array)$configValues
+        ];
     }
 }

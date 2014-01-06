@@ -38,7 +38,7 @@ oro_system_configuration:
                 required: true
 
         oro_locale.language:
-            type: oro_locale
+            type: oro_language
             priority: 40
             options:
                 label: 'Default Language'
