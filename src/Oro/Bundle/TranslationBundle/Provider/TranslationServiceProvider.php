@@ -33,6 +33,8 @@ class TranslationServiceProvider
     public function update($dir)
     {
 
+
+        $this->upload($dir, 'update');
     }
 
     /**
