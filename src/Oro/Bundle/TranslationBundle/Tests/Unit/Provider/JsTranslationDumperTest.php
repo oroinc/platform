@@ -67,35 +67,4 @@ class JsTranslationDumperTest extends \PHPUnit_Framework_TestCase
 
         $this->dumper->dumpTranslations();
     }
-
-    /**
-     * @expectedException IOException
-     */
-    public function testDumpTranslationsIOExceptionException()
-    {
-        $routeMock = $this->getMockBuilder('Symfony\Component\Routing\Route')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $routeMock->expects($this->once())
-            ->method('getPath')
-            ->will($this->returnValue('-not-valid-path-'));
-
-        $routeCollectionMock = $this->getMock('Symfony\Component\Routing\RouteCollection');
-        $routeCollectionMock->expects($this->once())
-            ->method('get')
-            ->will($this->returnValue($routeMock));
-
-        $this->routerMock->expects($this->once())
-            ->method('getRouteCollection')
-            ->will($this->returnValue($routeCollectionMock));
-
-        $this->logger->expects($this->once())
-            ->method('info');
-
-        $this->translationControllerMock->expects($this->once())
-            ->method('renderJsTranslationContent')
-            ->will($this->returnValue('test'));
-
-        $this->dumper->dumpTranslations();
-    }
 }
