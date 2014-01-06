@@ -16,9 +16,12 @@ class OroInstall extends Page
 
     public function beginInstallation()
     {
-        $this->test->moveto($this->byXpath("//button['Begin Installation'=normalize-space(.)]"));
-        $this->test->byXpath("//button['Begin Installation'=normalize-space(.)]")->click();
-        $this->waitPageToLoad();
+        if ($this->isElementPresent("//button['Begin Installation'=normalize-space(.)]") &&
+            $this->byXpath("//button['Begin Installation'=normalize-space(.)]")->displayed())
+        {
+            $this->test->moveto($this->byXpath("//button['Begin Installation'=normalize-space(.)]"));
+            $this->test->byXpath("//button['Begin Installation'=normalize-space(.)]")->click();
+        }
         $this->assertTitle('Oro Application installation');
         return new OroRequirements($this->test);
     }

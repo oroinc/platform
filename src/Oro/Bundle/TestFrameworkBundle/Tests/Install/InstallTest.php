@@ -21,6 +21,11 @@ class InstallTest extends Selenium2TestCase
         $this->setSeleniumServerRequestsTimeout(MAX_EXECUTION_TIME);
     }
 
+    public function tearDown()
+    {
+        $this->cookie()->clear();
+    }
+
     public function testInstallation()
     {
         /** @var OroInstall $installer */
