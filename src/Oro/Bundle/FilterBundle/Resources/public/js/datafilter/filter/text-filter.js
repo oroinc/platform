@@ -16,34 +16,34 @@ function($, _, __, AbstractFilter) {
      */
     return AbstractFilter.extend({
         /** @property */
-        template: '',
+        wrapperTemplate: '',
+
+        /** @property */
+        wrapperTemplateSelector: '#text-filter-template',
+
+        /** @property */
+        wrapperSimpleTemplateSelector: '#text-filter-simple-template',
 
         /**
          * Template for filter criteria
          *
          * @property
          */
-        popupCriteriaTemplate: '',
-
-        /** @property */
-        templateSelector: '#text-filter-template',
-
-        /** @property */
-        simpleTemplateSelector: '#text-filter-simple-template',
+        template: '',
 
         /**
          * Template selector for filter criteria
          *
          * @property
          */
-        popupCriteriaTemplateSelector: '#text-filter-popup-criteria-template',
+        templateSelector: '#text-filter-popup-criteria-template',
 
         /**
          * Simple template selector for filter criteria
          *
          * @property
          */
-        simplePopupCriteriaTemplateSelector: '#text-filter-popup-criteria-simple-template',
+        simpleTemplateSelector: '#text-filter-popup-criteria-simple-template',
 
         /**
          * @property {Boolean}
@@ -99,13 +99,13 @@ function($, _, __, AbstractFilter) {
             options = _.pick(options || {}, 'simple');
             _.extend(this, options);
 
+            var wrapperTemplateSrc = $(this.simple ?
+                this.wrapperSimpleTemplateSelector : this.wrapperTemplateSelector).text();
             var templateSrc = $(this.simple ?
                 this.simpleTemplateSelector : this.templateSelector).text();
-            var popupCriteriaTemplateSrc = $(this.simple ?
-                this.simplePopupCriteriaTemplateSelector : this.popupCriteriaTemplateSelector).text();
 
+            this.wrapperTemplate = _.template(wrapperTemplateSrc);
             this.template = _.template(templateSrc);
-            this.popupCriteriaTemplate = _.template(popupCriteriaTemplateSrc);
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -209,7 +209,13 @@ function($, _, __, AbstractFilter) {
          * @return {*}
          */
         render: function () {
-            this.setElement(this.template({
+            var $filter = $(this.template());
+            this._wrap($filter);
+            return this;
+        },
+
+        _wrap: function ($filter) {
+            this.setElement(this.wrapperTemplate({
                 label: this.label,
                 showLabel: this.showLabel,
                 criteriaHint: this._getCriteriaHint(),
@@ -217,27 +223,14 @@ function($, _, __, AbstractFilter) {
                 canDisable: !this.simple && this.canDisable
             }));
 
-            this._renderCriteria(this.$(this.criteriaSelector));
+            this.$(this.criteriaSelector).append($filter);
+
             this._clickOutsideCriteriaCallback = _.bind(function(e) {
                 if (this.popupCriteriaShowed) {
                     this._onClickOutsideCriteria(e);
                 }
             }, this);
             $('body').on('click', this._clickOutsideCriteriaCallback);
-
-            return this;
-        },
-
-        /**
-         * Render filter criteria popup
-         *
-         * @param {Object} el
-         * @protected
-         * @return {*}
-         */
-        _renderCriteria: function(el) {
-            $(el).append(this.popupCriteriaTemplate());
-            return this;
         },
 
         /**

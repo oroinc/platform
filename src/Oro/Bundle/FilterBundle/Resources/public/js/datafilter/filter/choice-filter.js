@@ -84,7 +84,7 @@ function($, _, __, app, TextFilter) {
         /**
          * @inheritDoc
          */
-        _renderCriteria: function(el) {
+        render: function () {
             var selectedChoice = this.emptyValue.type;
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
@@ -93,14 +93,13 @@ function($, _, __, app, TextFilter) {
                     });
                 selectedChoiceLabel = foundChoice.label;
             }
-            $(el).append(
-                this.popupCriteriaTemplate({
-                    name: this.name,
-                    choices: this.choices,
-                    selectedChoice: selectedChoice,
-                    selectedChoiceLabel: selectedChoiceLabel
-                })
-            );
+            var $filter = $(this.template({
+                name: this.name,
+                choices: this.choices,
+                selectedChoice: selectedChoice,
+                selectedChoiceLabel: selectedChoiceLabel
+            }));
+            this._wrap($filter);
             return this;
         },
 

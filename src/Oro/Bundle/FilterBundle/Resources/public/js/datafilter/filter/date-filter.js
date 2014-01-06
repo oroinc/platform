@@ -144,17 +144,16 @@ function($, _, __, ChoiceFilter, localeSettings) {
         /**
          * @inheritDoc
          */
-        _renderCriteria: function(el) {
-            $(el).append(
-                this.popupCriteriaTemplate({
-                    name: this.name,
-                    choices: this.choices,
-                    selectedChoice: this.emptyValue.type,
-                    inputClass: this.inputClass
-                })
-            );
+        render: function () {
+            var $filter = $(this.template({
+                name: this.name,
+                choices: this.choices,
+                selectedChoice: this.emptyValue.type,
+                inputClass: this.inputClass
+            }));
+            this._wrap($filter);
 
-            $(el).find('select:first').bind('change', _.bind(this.changeFilterType, this));
+            $filter.find('select:first').bind('change', _.bind(this.changeFilterType, this));
 
             _.each(this.criteriaValueSelectors.value, function(actualSelector, name) {
                 this.dateWidgets[name] = this._initializeDateWidget(actualSelector);
