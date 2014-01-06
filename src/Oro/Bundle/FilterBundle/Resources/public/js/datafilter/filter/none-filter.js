@@ -14,36 +14,23 @@ function($, _, __, AbstractFilter) {
      * @extends oro.datafilter.AbstractFilter
      */
     return AbstractFilter.extend({
-        /**
-         * Filter template
-         *
-         * @property
-         */
-        template: _.template(
-            '<button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">' +
-                '<% if (showLabel) { %><%= label %>: <% } %>' +
-                '<strong class="filter-criteria-hint"><%= criteriaHint %></strong>' +
-                '<span class="caret"></span>' +
-            '</button>' +
-            '<% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>' +
-            '<div class="filter-criteria dropdown-menu" />'
-        ),
+        wrappable: true,
+
+        wrapperTemplateSelector: '#none-wrapper-template',
 
         /**
          * Template for filter criteria
          *
          * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div>' +
-                '<%= popupHint %>' +
-            '</div>'
-        ),
+        template: '',
 
         /**
-         * @property {Boolean}
+         * Template selector for filter criteria
+         *
+         * @property
          */
-        popupCriteriaShowed: false,
+        templateSelector: '#none-filter-template',
 
         /**
          * Selector to element of criteria hint
@@ -82,11 +69,13 @@ function($, _, __, AbstractFilter) {
          *
          * @param {Object} options
          */
-        initialize: function(options) {
-            options = options || {};
-            if (_.has(options, 'popupHint')) {
-                this.popupHint = options.popupHint;
-            }
+        initialize: function (options) {
+            options = _.pick(options || {}, 'templateSelector', 'popupHint');
+            _.extend(this, options);
+
+            var templateSrc = $(this.templateSelector).text();
+            this.template = _.template(templateSrc);
+
             this.label = 'None';
             AbstractFilter.prototype.initialize.apply(this, arguments);
         },

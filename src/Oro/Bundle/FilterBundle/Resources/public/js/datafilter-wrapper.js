@@ -3,26 +3,24 @@
 define(['jquery', 'underscore'], function($, _) {
     'use strict';
 
-    var wrapperTemplate = '';
-
-    var wrapperTemplateSelector = '#filter-wrapper-template';
-
-    var getWrapperTemplate = function () {
-        if (!wrapperTemplate) {
-            var wrapperTemplateSrc = $(wrapperTemplateSelector).text();
-            wrapperTemplate = _.template(wrapperTemplateSrc);
-        }
-        return wrapperTemplate;
-    };
-
     return {
+        wrapperTemplate: '',
+
         /**
          * @property {Boolean}
          */
         popupCriteriaShowed: false,
 
+        _getWrapperTemplate: function () {
+            if (!this.wrapperTemplate) {
+                var wrapperTemplateSrc = $(this.wrapperTemplateSelector).text();
+                this.wrapperTemplate = _.template(wrapperTemplateSrc);
+            }
+            return this.wrapperTemplate;
+        },
+
         _wrap: function ($filter) {
-            this.setElement(getWrapperTemplate()({
+            this.setElement(this._getWrapperTemplate()({
                 label: this.label,
                 showLabel: this.showLabel,
                 criteriaHint: this._getCriteriaHint(),

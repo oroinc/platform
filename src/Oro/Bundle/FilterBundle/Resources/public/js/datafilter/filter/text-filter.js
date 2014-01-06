@@ -17,6 +17,8 @@ function($, _, __, AbstractFilter) {
     return AbstractFilter.extend({
         wrappable: true,
 
+        wrapperTemplateSelector: '#filter-wrapper-template',
+
         /**
          * Template for filter criteria
          *

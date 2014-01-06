@@ -13,6 +13,20 @@
         <div class="filter-criteria dropdown-menu" />
     </div>
 </script>
+<script type="text/template" id="none-wrapper-template">
+    <div>
+        <%= popupHint %>
+    </div>
+</script>
+<script type="text/template" id="none-filter-template">
+    <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">
+        <% if (showLabel) { %><%= label %>: <% } %>
+        <strong class="filter-criteria-hint"><%= criteriaHint %></strong>
+        <span class="caret"></span>
+    </button>
+    <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
+    <div class="filter-criteria dropdown-menu" />
+</script>
 <script type="text/template" id="text-filter-template">
     <div>
         <div>
@@ -74,6 +88,27 @@
         </div>
     </div>
 </script>
+<script type="text/template" id="date-filter-template">
+    <div>
+        <div class="horizontal clearfix">
+            <select name="<%= name %>" class="filter-select-oro">
+                <% _.each(choices, function (option) { %>
+                    <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div>
+            <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
+            <span class="filter-separator">-</span>
+            <input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">
+        </div>
+        <div class="oro-action">
+            <div class="btn-group">
+                <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+            </div>
+        </div>
+    </div>
+</script>
 <script type="text/template" id="select-filter-template">
     <div class="btn-group filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector">
@@ -102,4 +137,13 @@
             </select>
         </div>
     </div>
+</script>
+<script type="text/template" id="multiselect-filter-template">
+    <div class="btn filter-select filter-criteria-selector">
+        <% if (showLabel) { %><%= label %>: <% } %>
+        <select multiple>
+            <% _.each(options, function (option) { %><option value="<%= option.value %>"><%= option.label %></option><% }); %>
+            </select>
+        </div>
+    <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
 </script>
