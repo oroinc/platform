@@ -7,7 +7,7 @@ Flotr.addType('funnel', {
         fillOpacity: 0.5,
         fontColor: "#B2B2B2",
         explode: 5,
-        extraHeight: 200,
+        extraHeight: 150,
         marginX: 200,
         marginY: 25,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
@@ -68,16 +68,53 @@ Flotr.addType('funnel', {
             y      = mouse.relY;
 
             for (var i in self.stack) {
+                var belongSide = true;
+                /**
+                 *  left rectangle side case
+                 *
+                 *  (x1 - x0) * (y2 - y1) - (x2 - x1) * (y1 - y0)
+                 *  (x2 - x0) * (y3 - y2) - (x3 - x2) * (y2 - y0)
+                 *  (x3 - x0) * (y1 - y3) - (x1 - x3) * (y3 - y0)
+                 */
+
+                if (
+                    x >= self.stack[i].x1 && x <= self.stack[i].x4 &&
+                    y >= self.stack[i].y1 && y <= self.stack[i].y4
+                ){
+                    var
+                        s1 = (self.stack[i].x1 - x) * (self.stack[i].y4 - self.stack[i].y1) - (self.stack[i].x1 - self.stack[i].x1) * (self.stack[i].y1 - y),
+                        s2 = (self.stack[i].x1 - x) * (self.stack[i].y4 - self.stack[i].y4) - (self.stack[i].x4 - self.stack[i].x1) * (self.stack[i].y4 - y),
+                        s3 = (self.stack[i].x4 - x) * (self.stack[i].y1 - self.stack[i].y4) - (self.stack[i].x1 - self.stack[i].x4) * (self.stack[i].y4 - y);
+                    if (s1 == 0 || s2 == 0 || s3 == 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
+                        belongSide = false;
+                    }
+                }
+
+                // right rectangle side case
+                if (
+                    x >= self.stack[i].x3 && x <= self.stack[i].x2 &&
+                    y >= self.stack[i].y2 && y <= self.stack[i].y3
+                ){
+                    var
+                        s1 = (self.stack[i].x3 - x) * (self.stack[i].y2 - self.stack[i].y3) - (self.stack[i].x2 - self.stack[i].x3) * (self.stack[i].y3 - y),
+                        s2 = (self.stack[i].x2 - x) * (self.stack[i].y3 - self.stack[i].y2) - (self.stack[i].x2 - self.stack[i].x2) * (self.stack[i].y2 - y),
+                        s3 = (self.stack[i].x2 - x) * (self.stack[i].y3 - self.stack[i].y3) - (self.stack[i].x3 - self.stack[i].x2) * (self.stack[i].y3 - y);
+                    if (s1 == 0 || s2 == 0 || s3 == 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
+                        belongSide = false;
+                    }
+                }
+
+                // full rectangle case
                 if (
                     y >= self.stack[i].y1
                     && y <= self.stack[i].y3
                     && x >= self.stack[i].x1
                     && x <= self.stack[i].x2
+                    && belongSide != false
                 ) {
                     if (self.stacked === i) {
                         return;
                     }
-
                     self.stacked = i;
                     self.clearHit(options);
                     self.drawHit(options, i);
