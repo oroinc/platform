@@ -16,24 +16,17 @@ class EntityCacheClearer implements CacheClearerInterface
     /**
      * @var string
      */
-    private $entityCacheNamespace;
-
-    /**
-     * @var string
-     */
     private $entityProxyNameTemplate;
 
     /**
      * Constructor.
      *
      * @param string $entityCacheDir
-     * @param string $entityCacheNamespace
      * @param string $entityProxyNameTemplate
      */
-    public function __construct($entityCacheDir, $entityCacheNamespace, $entityProxyNameTemplate)
+    public function __construct($entityCacheDir, $entityProxyNameTemplate)
     {
         $this->entityCacheDir = $entityCacheDir;
-        $this->entityCacheNamespace = $entityCacheNamespace;
         $this->entityProxyNameTemplate = $entityProxyNameTemplate;
     }
 
@@ -43,22 +36,7 @@ class EntityCacheClearer implements CacheClearerInterface
     public function clear($cacheDir)
     {
         $fs = $this->createFilesystem();
-
-        $entityCacheDir = sprintf('%s/%s', $this->entityCacheDir, str_replace('\\', '/', $this->entityCacheNamespace));
-
-        // Temporary fix till EmailAddress will be moved to the cache folder
-        // $this->clearEmailAddressCache($entityCacheDir, $fs);
-    }
-
-    /**
-     * Clear cache file
-     */
-    public function forceClear()
-    {
-        $this->clearEmailAddressCache(
-            sprintf('%s/%s', $this->entityCacheDir, str_replace('\\', '/', $this->entityCacheNamespace)),
-            $this->createFilesystem()
-        );
+        $this->removeEmailAddressProxy($fs);
     }
 
     /**
@@ -72,14 +50,17 @@ class EntityCacheClearer implements CacheClearerInterface
     }
 
     /**
-     * Clear a proxy class for EmailAddress entity and save it in cache
+     * Removes a proxy class for EmailAddress entity
      *
-     * @param string $entityCacheDir
      * @param Filesystem $fs
      */
-    protected function clearEmailAddressCache($entityCacheDir, Filesystem $fs)
+    protected function removeEmailAddressProxy(Filesystem $fs)
     {
         $className = sprintf($this->entityProxyNameTemplate, 'EmailAddress');
-        $fs->remove(sprintf('%s/%s.php', $entityCacheDir, $className));
+
+        // remove a proxy class
+        $fs->remove(sprintf('%s%s%s.php', $this->entityCacheDir, DIRECTORY_SEPARATOR, $className));
+        // remove ORM mappings for a proxy class
+        $fs->remove(sprintf('%s%s%s.orm.yml', $this->entityCacheDir, DIRECTORY_SEPARATOR, $className));
     }
 }

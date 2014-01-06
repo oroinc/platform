@@ -3,27 +3,14 @@
 namespace {{ namespace }};
 
 use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
-use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="oro_email_address",
- *      uniqueConstraints={@ORM\UniqueConstraint(name="oro_email_address_uq", columns={"email"})},
- *      indexes={@ORM\Index(name="oro_email_address_idx", columns={"email"})})
- * @ORM\HasLifecycleCallbacks
- */
 class {{ className }} extends EmailAddress
 {
 {% for owner in owners %}
     /**
      * @var EmailOwnerInterface
-     * @ORM\ManyToOne(targetEntity="{{ owner.targetEntity }}")
-     * @ORM\JoinColumn(name="{{ owner.columnName }}", referencedColumnName="id")
-     * @Exclude
      */
     private ${{ owner.fieldName }};
 {% endfor %}
@@ -54,29 +41,26 @@ class {{ className }} extends EmailAddress
             $this->{{ owner.fieldName }} = null;
         }
 {% endfor %}
-        $this->hasOwner = ($owner !== null);
+        $this->setHasOwner($owner !== null);
 
         return $this;
     }
 
     /**
      * Pre persist event listener
-     *
-     * @ORM\PrePersist
      */
     public function beforeSave()
     {
-        $this->created = EmailUtil::currentUTCDateTime();
-        $this->updated = EmailUtil::currentUTCDateTime();
+        $date = EmailUtil::currentUTCDateTime();
+        $this->setCreatedAt($date);
+        $this->setUpdatedAt($date);
     }
 
     /**
      * Pre update event listener
-     *
-     * @ORM\PreUpdate
      */
     public function beforeUpdate()
     {
-        $this->updated = EmailUtil::currentUTCDateTime();
+        $this->setUpdatedAt(EmailUtil::currentUTCDateTime());
     }
 }
