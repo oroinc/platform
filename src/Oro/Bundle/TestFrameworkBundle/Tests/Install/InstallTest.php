@@ -18,6 +18,7 @@ class InstallTest extends Selenium2TestCase
         $this->setPort(intval(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT));
         $this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
         $this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL);
+        $this->setSeleniumServerRequestsTimeout(MAX_EXECUTION_TIME);
     }
 
     public function testRequirements()
