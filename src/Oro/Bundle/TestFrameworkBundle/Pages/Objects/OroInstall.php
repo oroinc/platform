@@ -18,6 +18,7 @@ class OroInstall extends Page
     {
         $this->test->moveto($this->byXpath("//button['Begin Installation'=normalize-space(.)]"));
         $this->test->byXpath("//button['Begin Installation'=normalize-space(.)]")->click();
+        $this->waitPageToLoad();
         $this->assertTitle('Oro Application installation');
         return new OroRequirements($this->test);
     }
