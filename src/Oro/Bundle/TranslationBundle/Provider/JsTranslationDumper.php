@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -57,6 +58,8 @@ class JsTranslationDumper
         $this->kernelRootDir         = $kernelRootDir;
         $this->defaultLocale         = $defaultLocale;
         $this->jsTranslationRoute    = $jsTranslationRoute;
+
+        $this->setLogger(new NullLogger());
     }
 
     /**

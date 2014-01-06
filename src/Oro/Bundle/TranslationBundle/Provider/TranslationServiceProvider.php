@@ -30,6 +30,13 @@ class TranslationServiceProvider
         $this->setLogger(new NullLogger());
     }
 
+    public function update($dir)
+    {
+
+
+        $this->upload($dir, 'update');
+    }
+
     /**
      * Upload translations
      *
@@ -78,17 +85,6 @@ class TranslationServiceProvider
         }
 
         return $isExtracted && $isDownloaded;
-    }
-
-    /**
-     * We need to keep existing translation strings at remote end,
-     * so first we have to download pack and merge with local
-     *
-     * @param string   $dir
-     */
-    public function update($dir)
-    {
-
     }
 
     /**

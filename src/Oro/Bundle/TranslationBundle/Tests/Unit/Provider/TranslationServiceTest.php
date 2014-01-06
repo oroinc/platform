@@ -13,20 +13,19 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     protected $dumper;
 
     /** @var TranslationServiceProvider */
-    protected $uploader;
+    protected $service;
 
     public function setUp()
     {
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
         $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
 
-        $this->uploader = new TranslationServiceProvider($this->adapter, $this->dumper);
+        $this->service = new TranslationServiceProvider($this->adapter, $this->dumper);
     }
 
     public function tearDown()
     {
-        unset($this->adapter);
-        unset($this->uploader);
+        unset($this->adapter, $this->dumper, $this->service);
     }
 
     /**
@@ -40,7 +39,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->method('upload')
             ->with($this->isType('array'), $mode);
 
-        $this->uploader->setAdapter($this->adapter);
-        $this->uploader->upload(__DIR__ . '/../Fixtures/Resources/lang-pack/', $mode, $callback);
+        $this->service->setAdapter($this->adapter);
+        $this->service->upload(__DIR__ . '/../Fixtures/Resources/lang-pack/', $mode);
     }
 }

@@ -76,7 +76,6 @@ abstract class AbstractAPIAdapter
      */
     protected function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
-
         $requestParams = [
                 CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
                 CURLOPT_RETURNTRANSFER => true,
