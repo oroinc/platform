@@ -30,11 +30,40 @@ class TranslationServiceProvider
         $this->setLogger(new NullLogger());
     }
 
-    public function update($dir)
+    /**
+     * @param string $dir
+     */
+    protected function update($dir)
     {
+        $pathToSave = './app/cache/remote-trans/update.zip';
+        $targetDir = dirname($pathToSave);
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
 
+        $isDownloaded = $this->download($pathToSave, 'en', false);
+        $targetDir = $targetDir . DIRECTORY_SEPARATOR . 'en' . DIRECTORY_SEPARATOR;
 
-        $this->upload($dir, 'update');
+        $finder = Finder::create()->files()->name('*.yml')->in($dir);
+        foreach ($finder->files() as $fileInfo) {
+            $localContents = file($fileInfo);
+            $remoteFile = $targetDir . $fileInfo->getRelativePathname();
+
+            if (file_exists($remoteFile)) {
+                $remoteContents = file($remoteFile);
+            } else {
+                $remoteContents = [];
+            }
+
+            $content = array_merge($remoteContents, $localContents);
+            $content = implode('', $content);
+
+            $remoteDir = dirname($remoteFile);
+            if (!is_dir($remoteDir)) {
+                mkdir($remoteDir, 0777, true);
+            }
+            file_put_contents($remoteFile, $content);
+        }
     }
 
     /**
@@ -46,6 +75,23 @@ class TranslationServiceProvider
      * @return mixed
      */
     public function upload($dir, $mode = 'add')
+    {
+        if ($mode == 'update') {
+            $this->update($dir);
+        }
+
+        return $this->doUpload($dir, $mode);
+    }
+
+    /**
+     * Upload translations
+     *
+     * @param string $dir
+     * @param string $mode add or update
+     *
+     * @return mixed
+     */
+    protected function doUpload($dir, $mode = 'add')
     {
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
 
@@ -63,10 +109,11 @@ class TranslationServiceProvider
     /**
      * @param string      $pathToSave path to save translations
      * @param null|string $locale
+     * @param bool        $toApply whether apply download packs or not
      *
      * @return bool
      */
-    public function download($pathToSave, $locale = null)
+    public function download($pathToSave, $locale = null, $toApply = true)
     {
         $targetDir = dirname($pathToSave);
         $this->cleanup($targetDir);
@@ -79,9 +126,10 @@ class TranslationServiceProvider
 
         if ($isExtracted) {
             unlink($pathToSave);
-            $appliedLocales = $this->apply('./app/Resources/', $targetDir, $locale);
-            $this->cleanup($targetDir);
-            $this->jsTranslationDumper->dumpTranslations($appliedLocales);
+        }
+
+        if ($toApply) {
+            $this->apply('./app/Resources/', $targetDir);
         }
 
         return $isExtracted && $isDownloaded;
@@ -151,11 +199,10 @@ class TranslationServiceProvider
      *
      * @param string $targetDir
      * @param string $sourceDir
-     * @param string $locale
      *
      * @return array
      */
-    protected function apply($targetDir, $sourceDir, $locale)
+    protected function apply($targetDir, $sourceDir)
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($sourceDir, \FilesystemIterator::SKIP_DOTS),
@@ -198,6 +245,11 @@ class TranslationServiceProvider
                     )
                 );
             }
+        }
+
+        if ($appliedLocales) {
+            $this->cleanup($targetDir);
+            $this->jsTranslationDumper->dumpTranslations($appliedLocales);
         }
 
         return $appliedLocales;
