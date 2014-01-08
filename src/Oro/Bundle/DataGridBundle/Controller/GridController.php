@@ -10,11 +10,16 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 
 class GridController extends Controller
 {
     /**
-     * @Route("/{gridName}", name="oro_datagrid_index")
+     * @Route(
+     *      "/{gridName}",
+     *      name="oro_datagrid_index",
+     *      requirements={"gridName"="[\w-]+"}
+     * )
      *
      * @param string $gridName
      *
@@ -29,7 +34,46 @@ class GridController extends Controller
     }
 
     /**
-     * @Route("/{gridName}/massAction/{actionName}", name="oro_datagrid_mass_action")
+     * @Route(
+     *      "/{gridName}/extraAction/{actionName}",
+     *      name="oro_datagrid_extra_action",
+     *      requirements={"gridName"="[\w-]+", "actionName"="[\w-]+"}
+     * )
+     *
+     * @param string $gridName
+     * @param string $actionName
+     *
+     * @return Response
+     * @throws \LogicException
+     */
+    public function extraActionAction($gridName, $actionName)
+    {
+        $request = $this->getRequest();
+
+        if ($actionName === 'export') {
+            $format = $request->query->get('format');
+            /** @var ExportHandler $handler */
+            $handler = $this->get('oro_importexport.handler.export');
+
+            return $handler->handleExport(
+                'datagrid_export_to_' . $format,
+                'oro_datagrid',
+                $format,
+                'datagrid_' . $gridName,
+                ['gridName' => $gridName]
+            );
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unsupported action: %s.', $actionName));
+    }
+
+    /**
+     * @Route(
+     *      "/{gridName}/massAction/{actionName}",
+     *      name="oro_datagrid_mass_action",
+     *      requirements={"gridName"="[\w-]+", "actionName"="[\w-]+"}
+     * )
+     *
      * @param string $gridName
      * @param string $actionName
      *
