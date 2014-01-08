@@ -238,7 +238,7 @@ Flotr.addType('funnel', {
     },
 
     renderLabel: function(context, options, label, distY) {
-        var distX = (options.width) / 2,
+        var distX = (options.width - options.marginX) / 2,
             style = {
                 size : options.fontSize * 1.2,
                 color : options.fontColor,
@@ -264,7 +264,7 @@ Flotr.addType('funnel', {
             divStyle =
                 'position:absolute;' +
                 style.textBaseline + ':' + (distY - style.size)  + 'px;' +
-                style.textAlign + ':' + (distX + options.width/3 + 10) + 'px;';
+                style.textAlign + ':' + (distX + (options.marginX + options.width)/3 + 10) + 'px;';
 
         html.push('<div style="', divStyle, '" class="flotr-grid-label">', label + ': ' + formattedValue, '</div>');
 
@@ -277,7 +277,7 @@ Flotr.addType('funnel', {
         context.lineWidth = 1;
         context.strokeStyle = options.fontColor;
         context.moveTo(distX, distY);
-        context.lineTo(distX + options.width/3, distY);
+        context.lineTo(distX + (options.marginX + options.width)/3, distY);
         context.stroke();
     }
 });
