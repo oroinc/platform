@@ -4,11 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinitionEntity;
-use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
-class ConfigurationWorkflowDefinitionBuilder
+class WorkflowDefinitionConfigurationBuilder
 {
     /**
      * @param array $configurationData

@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\WorkflowBundle\Configuration\ConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\CorrectConfiguration\CorrectConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\EmptyConfiguration\EmptyConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectConfiguration\IncorrectConfigurationBundle;
@@ -20,7 +20,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowDefinitionsIncorrectConfiguration()
     {
         $bundles = array(new IncorrectConfigurationBundle());
-        $configurationProvider = new ConfigurationProvider(
+        $configurationProvider = new WorkflowConfigurationProvider(
             $bundles,
             new WorkflowListConfiguration(new WorkflowConfiguration())
         );
@@ -33,7 +33,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowDefinitionsDuplicateConfiguration()
     {
         $bundles = array(new CorrectConfigurationBundle(), new DuplicateConfigurationBundle());
-        $configurationProvider = new ConfigurationProvider(
+        $configurationProvider = new WorkflowConfigurationProvider(
             $bundles,
             new WorkflowListConfiguration(new WorkflowConfiguration())
         );
@@ -43,7 +43,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowDefinitions()
     {
         $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
-        $configurationProvider = new ConfigurationProvider(
+        $configurationProvider = new WorkflowConfigurationProvider(
             $bundles,
             new WorkflowListConfiguration(new WorkflowConfiguration())
         );

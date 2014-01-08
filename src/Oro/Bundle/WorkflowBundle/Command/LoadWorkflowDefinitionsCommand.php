@@ -7,8 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
-use Oro\Bundle\WorkflowBundle\Configuration\ConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Configuration\ConfigurationWorkflowDefinitionBuilder;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
@@ -56,9 +56,9 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 
         $output->writeln('Loading workflow definitions ...');
 
-        /** @var ConfigurationProvider $configurationProvider */
-        $configurationProvider = $this->getContainer()->get('oro_workflow.configuration.config_provider');
-        /** @var ConfigurationWorkflowDefinitionBuilder $configurationBuilder */
+        /** @var WorkflowConfigurationProvider $configurationProvider */
+        $configurationProvider = $this->getContainer()->get('oro_workflow.configuration.provider.workflow_config');
+        /** @var WorkflowDefinitionConfigurationBuilder $configurationBuilder */
         $configurationBuilder = $this->getContainer()->get('oro_workflow.configuration.builder.workflow_definition');
         /** @var EntityManager $manager */
         $manager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
