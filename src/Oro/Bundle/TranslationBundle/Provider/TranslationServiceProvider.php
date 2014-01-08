@@ -110,7 +110,11 @@ class TranslationServiceProvider
     public function download($pathToSave, $locale = null, $toApply = true)
     {
         $targetDir = dirname($pathToSave);
-        $this->cleanup($targetDir);
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        } else {
+            $this->cleanup($targetDir);
+        }
 
         $isDownloaded = $this->adapter->download($pathToSave, $locale);
         $isExtracted  = $this->unzip(
@@ -263,7 +267,7 @@ class TranslationServiceProvider
         }
 
         if ($appliedLocales) {
-            $this->cleanup($targetDir);
+            $this->cleanup($sourceDir);
             $this->jsTranslationDumper->dumpTranslations($appliedLocales);
         }
 
