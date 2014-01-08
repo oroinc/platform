@@ -6,7 +6,7 @@ use Composer\DependencyResolver\DefaultPolicy;
 use Composer\DependencyResolver\Operation\UninstallOperation;
 use Composer\DependencyResolver\Pool;
 use Composer\Installer;
-use Composer\IO\IOInterface;
+use Composer\IO\BufferIO;
 use Composer\Json\JsonFile;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
@@ -41,7 +41,7 @@ class PackageManager
     protected $scriptRunner;
 
     /**
-     * @var IOInterface
+     * @var BufferIO
      */
     protected $composerIO;
 
@@ -68,7 +68,7 @@ class PackageManager
     /**
      * @param Composer $composer
      * @param Installer $installer
-     * @param IOInterface $composerIO
+     * @param BufferIO $composerIO
      * @param Runner $scriptRunner
      * @param LoggerInterface $logger
      * @param string $pathToComposerJson
@@ -76,7 +76,7 @@ class PackageManager
     public function __construct(
         Composer $composer,
         Installer $installer,
-        IOInterface $composerIO,
+        BufferIO $composerIO,
         Runner $scriptRunner,
         LoggerInterface $logger,
         $pathToComposerJson
@@ -291,6 +291,7 @@ class PackageManager
                     $justInstalledPackages
                 );
                 $this->scriptRunner->loadFixtures($justInstalledPackages);
+                $this->scriptRunner->clearDistApplicationCache();
             } else {
                 throw new VerboseException(
                     sprintf('%s can\'t be installed!', $packageName),
@@ -299,6 +300,9 @@ class PackageManager
             }
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
+            if ($e instanceof VerboseException) {
+                $this->logger->error($e->getVerboseMessage());
+            }
             $this->removeFromComposerJson([$packageName]);
             throw $e;
         }
@@ -373,6 +377,7 @@ class PackageManager
         );
         $this->scriptRunner->removeCachedFiles();
         $this->scriptRunner->runPlatformUpdate();
+        $this->scriptRunner->clearDistApplicationCache();
         $this->logger->info('Packages uninstalled', $packageNames);
     }
 
@@ -487,6 +492,7 @@ class PackageManager
                 $uninstalledPackages
             );
             $this->scriptRunner->runPlatformUpdate();
+            $this->scriptRunner->clearDistApplicationCache();
             $justInstalledPackage = $this->findInstalledPackage($packageName);
             $this->updateComposerJsonFile($justInstalledPackage, $justInstalledPackage->getPrettyVersion());
         } else {

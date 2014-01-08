@@ -28,6 +28,9 @@
         #pin-button-div {
             display: none !important;
         }
+        .page-title h1 {
+            min-height: initial;
+        }
 
         /** Step form styles */
         .step-form .box-type1 {
@@ -80,6 +83,7 @@
             position: relative;
             text-align: left;
             border-color: #d0d0d0;
+            overflow: visible;
         }
 
         .workflow-data .box-type1 .title .widget-title {
@@ -101,46 +105,48 @@
     </style>
 
     {% block workflow_header %}
-    <div class="navigation clearfix navbar-extra navbar-extra-right" style="border-bottom: 1px solid #c8c8c8">
-        <div class="row">
-            <div class="pull-right">
-                <div class="pull-left">
-                    {% block workflow_transitions %}
-                        {{ oro_widget_render({
+    <div class="container-fluid page-title" style="border-bottom: 1px solid #c8c8c8">
+        <div class="navigation clearfix navbar-extra navbar-extra-right">
+            <div class="row">
+                <div class="span9">
+                    <div class="customer-info customer-simple well-small">
+                        <div class="customer-content pull-left">
+                            <div class="clearfix">
+                                {% block workflow_title %}
+                                    <div class="pull-left">
+                                        <div class="sub-title">
+                                            {%- if titleParts.indexPath is defined -%}
+                                                <a href="{{ titleParts.indexPath }}">{{ titleParts.indexLabel }}</a>
+                                            {%- else -%}
+                                                {{ titleParts.indexLabel }}
+                                            {%- endif -%}
+                                        </div>
+                                        <span class="separator">/</span>
+                                        {% if titleParts.additional is defined %}
+                                            {% for titlePart in titleParts.additional %}
+                                                <div class="sub-title"><a href="{{ titlePart.indexPath }}">{{ titlePart.indexLabel }}</a></div>
+                                                <span class="separator">/</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <h1 class="user-name">{{ titleParts.entityTitle }}</h1>
+                                    </div>
+                                {% endblock workflow_title %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-right title-buttons-container">
+                    <div class="pull-left">
+                        {% block workflow_transitions %}
+                            {{ oro_widget_render({
                             'widgetType': 'buttons',
                             'url': path('oro_workflow_widget_buttons_wizard', {workflowItemId: workflowItem.id}),
                             'alias': 'workflow_transitions'
-                        }) }}
-                    {% endblock workflow_transitions %}
+                            }) }}
+                        {% endblock workflow_transitions %}
 
-                    {% block workflow_actions %}
-                    {% endblock workflow_actions %}
-                </div>
-            </div>
-            <div class="span9">
-                <div class="customer-info customer-simple well-small">
-                    <div class="customer-content pull-left">
-                        <div class="clearfix">
-                            {% block workflow_title %}
-                                <div class="pull-left">
-                                    <div class="sub-title">
-                                        {%- if titleParts.indexPath is defined -%}
-                                            <a href="{{ titleParts.indexPath }}">{{ titleParts.indexLabel }}</a>
-                                        {%- else -%}
-                                            {{ titleParts.indexLabel }}
-                                        {%- endif -%}
-                                    </div>
-                                    <span class="separator">/</span>
-                                    {% if titleParts.additional is defined %}
-                                        {% for titlePart in titleParts.additional %}
-                                            <div class="sub-title"><a href="{{ titlePart.indexPath }}">{{ titlePart.indexLabel }}</a></div>
-                                            <span class="separator">/</span>
-                                        {% endfor %}
-                                    {% endif %}
-                                    <h1 class="user-name">{{ titleParts.entityTitle }}</h1>
-                                </div>
-                            {% endblock workflow_title %}
-                        </div>
+                        {% block workflow_actions %}
+                        {% endblock workflow_actions %}
                     </div>
                 </div>
             </div>
