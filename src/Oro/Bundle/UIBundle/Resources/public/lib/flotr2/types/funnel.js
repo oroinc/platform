@@ -63,7 +63,7 @@ Flotr.addType('funnel', {
 
         Flotr._.each(data, function (funnel) {
             var funnelSize = marginHeight / summ * funnel;
-            if (options.explode > 0 && Object.keys(data).length > i+1) {
+            if (options.explode > 0 /*&& Object.keys(data).length > i+1*/) {
                 funnelSize -= options.explode;
             }
 
@@ -219,6 +219,7 @@ Flotr.addType('funnel', {
 
             this.stack[iterator].y3 =
             this.stack[iterator].y4 = (funnelSumm + funnel);
+            console.log(funnel);
 
             context.lineTo(this.stack[iterator].x2, this.stack[iterator].y2);   // lineTo x2y2
             context.lineTo(this.stack[iterator].x3, this.stack[iterator].y3);   // lineTo x3y3
