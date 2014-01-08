@@ -42,7 +42,12 @@ class WorkflowSelectorType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array('entity_class' => null));
+        $resolver->setDefaults(
+            array(
+                'entity_class' => null,
+                'config_id'    => null, // can be extracted from parent form
+            )
+        );
 
         $resolver->setNormalizers(
             array(
@@ -52,9 +57,11 @@ class WorkflowSelectorType extends AbstractType
                     }
 
                     $entityClass = $options['entity_class'];
-                    $configId = $options['config_id'];
-                    if (!$entityClass && $configId && $configId instanceof ConfigIdInterface) {
-                        $entityClass = $configId->getClassName();
+                    if (!$entityClass && $options->has('config_id')) {
+                        $configId = $options['config_id'];
+                        if ($configId && $configId instanceof ConfigIdInterface) {
+                            $entityClass = $configId->getClassName();
+                        }
                     }
 
                     $choices = array();
