@@ -9,7 +9,8 @@ Flotr.addType('funnel', {
         explode: 5,
         marginX: 250,
         marginY: 0,
-        colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
+        colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
+        formatter: ''
     },
 
     stack: [],
@@ -243,10 +244,10 @@ Flotr.addType('funnel', {
                 color : options.fontColor,
                 weight : 1.5
             };
-        options.htmlText = true;
-        style.textAlign = 'left';
+        options.htmlText   = true;
+        style.textAlign    = 'left';
         style.textBaseline = 'top';
-        style.wordWrap = 'break-word';
+        style.wordWrap     = 'break-word';
 
         /*Flotr.drawText(
             context,
@@ -256,18 +257,20 @@ Flotr.addType('funnel', {
             style
         );*/
 
-        var html = [];
-        var divStyle =
-            'position:absolute;' +
-            style.textBaseline + ':' + (distY - style.size)  + 'px;' +
-            style.textAlign + ':' + (distX + options.width/3 + 10) + 'px;';
+        var html = [],
+            formattedValue = (options.formatter)
+                ? options.formatter(options.data[label])
+                : options.data[label],
+            divStyle =
+                'position:absolute;' +
+                style.textBaseline + ':' + (distY - style.size)  + 'px;' +
+                style.textAlign + ':' + (distX + options.width/3 + 10) + 'px;';
 
-        html.push('<div style="', divStyle, '" class="flotr-grid-label">', label + ': ' + options.data[label], '</div>');
+        html.push('<div style="', divStyle, '" class="flotr-grid-label">', label + ': ' + formattedValue, '</div>');
 
         var div = Flotr.DOM.node('<div style="color:#454545" class="flotr-labels"></div>');
         Flotr.DOM.insert(div, html.join(''));
         Flotr.DOM.insert(options.element, div);
-
 
         // label line
         context.beginPath();
