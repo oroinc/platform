@@ -226,7 +226,7 @@ Flotr.addType('funnel', {
             context.stroke();
             context.fill();
 
-            self.renderLabel(context, options, Object.keys(options.data)[iterator], Math.round(funnelSumm + funnel/2));
+            self.renderLabel(context, options, Object.keys(options.data)[iterator], Math.round(funnelSumm + funnel/2), iterator);
         }
 
         funnelSumm += funnel;
@@ -246,8 +246,12 @@ Flotr.addType('funnel', {
         };
     },
 
-    renderLabel: function(context, options, label, distY) {
+    renderLabel: function(context, options, label, startY, iterator) {
         var distX = (options.width - options.marginX) / 2,
+            count = Object.keys(options.data).length,
+            distY = (iterator == 0)
+                ? options.marginY
+                : (options.height - options.marginY) / (count + 2) * iterator,
             style = {
                 size : options.fontSize * 1.2,
                 color : options.fontColor,
@@ -285,7 +289,7 @@ Flotr.addType('funnel', {
         context.beginPath();
         context.lineWidth = 1;
         context.strokeStyle = options.fontColor;
-        context.moveTo(distX, distY);
+        context.moveTo(distX, startY);
         context.lineTo(distX + (options.marginX + options.width)/3, distY);
         context.stroke();
     }
