@@ -10,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 
 class GridController extends Controller
 {
@@ -26,6 +27,35 @@ class GridController extends Controller
         $result = $grid->getData();
 
         return new JsonResponse($result->toArray());
+    }
+
+    /**
+     * @Route("/{gridName}/extraAction/{actionName}", name="oro_datagrid_extra_action")
+     * @param string $gridName
+     * @param string $actionName
+     *
+     * @return Response
+     * @throws \LogicException
+     */
+    public function extraActionAction($gridName, $actionName)
+    {
+        $request = $this->getRequest();
+
+        if ($actionName === 'export') {
+            $format = $request->query->get('format');
+            /** @var ExportHandler $handler */
+            $handler = $this->get('oro_importexport.handler.export');
+
+            return $handler->handleExport(
+                'datagrid_export_to_' . $format,
+                'oro_datagrid',
+                $format,
+                'oro_datagrid_' . $gridName,
+                ['gridName' => $gridName]
+            );
+        }
+
+        throw new \InvalidArgumentException(sprintf('Unsupported action: %s.', $actionName));
     }
 
     /**

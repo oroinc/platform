@@ -341,6 +341,19 @@ function(_, Backbone, BackbonePageableCollection, app) {
         },
 
         /**
+         * Returns an array contains the current state of a grid
+         *
+         * @returns {Array}
+         */
+        getFetchData: function () {
+            var state = this._checkState(this.state);
+            var data = {};
+            data = this.processQueryParams(data, state);
+            data = this.processFiltersParams(data, state);
+            return data;
+        },
+
+        /**
          * Fetch collection data
          */
         fetch: function (options) {

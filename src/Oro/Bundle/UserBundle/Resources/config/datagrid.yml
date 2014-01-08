@@ -3,6 +3,8 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
+            toolbarOptions:
+                addExportAction: true
         source:
             acl_resource: oro_user_user_view
             type: orm

@@ -27,6 +27,9 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
         actionsPanel: ActionsPanel,
 
         /** @property */
+        extraActionsPanel: ActionsPanel,
+
+        /** @property */
         massActionsPanel: ActionsPanel,
 
         /**
@@ -56,6 +59,11 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
                 this.actionsPanel.setActions(options.actions);
             }
 
+            this.extraActionsPanel = new this.extraActionsPanel();
+            if (options.extraActions) {
+                this.extraActionsPanel.setActions(options.extraActions);
+            }
+
             if (options.enable == false) {
                 this.disable();
             }
@@ -82,6 +90,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
             this.pagination.enable();
             this.pageSize.enable();
             this.actionsPanel.enable();
+            this.extraActionsPanel.enable();
             this.massActionsPanel.enable();
             return this;
         },
@@ -95,6 +104,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
             this.pagination.disable();
             this.pageSize.disable();
             this.actionsPanel.disable();
+            this.extraActionsPanel.disable();
             this.massActionsPanel.disable();
             return this;
         },
@@ -120,6 +130,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
             this.$('.pagination').replaceWith($pagination);
             this.$('.page-size').append(this.pageSize.render().$el);
             this.$('.actions-panel').append(this.actionsPanel.render().$el);
+            this.$('.extra-actions-panel').append(this.extraActionsPanel.render().$el);
             this.$('.mass-actions-panel').append(this.massActionsPanel.render().$el);
 
             return this;
