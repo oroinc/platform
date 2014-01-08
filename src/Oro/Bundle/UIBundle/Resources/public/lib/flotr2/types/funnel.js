@@ -20,7 +20,7 @@ Flotr.addType('funnel', {
         var
             self = this,
             marginWidth = options.marginX ? options.width - options.marginX : options.width,
-            marginHeight = options.marginY ? options.height - options.marginY : options.height,
+            marginHeight = options.marginY ? options.height - options.marginY * 2 : options.height,
             extraHeight = options.extraHeight || 0,
             data = options.data,
             context = options.context,
