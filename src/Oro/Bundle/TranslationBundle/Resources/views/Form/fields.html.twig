@@ -12,16 +12,22 @@
     <div class="available-translation-widget-container">
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path('oro_translation_available_translations')
+            'url': path('oro_translation_available_translations'),
+            'alias': 'oro_translation_available_translations'
         }) }}
     </div>
     <script type="text/javascript">
-        require(['jquery'], function($) {
+        require(['jquery', 'oro/translation/translation/config-action', 'oro/widget-manager'],
+        function ($, ActionPerformer, widgetManager) {
             $('.available-translation-widget-container')
                 .parents('.controls.control-subgroup')
                 .removeClass('controls')
                 .removeClass('control-subgroup')
             ;
+
+            widgetManager.getWidgetInstanceByAlias('oro_translation_available_translations', function (widget) {
+                new ActionPerformer({el: {{ ('#' ~ form.vars.id)|json_encode|raw }}});
+            });
         });
     </script>
 {% endblock %}

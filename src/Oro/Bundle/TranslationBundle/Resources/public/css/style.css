@@ -1,6 +1,23 @@
 .available-translation-widget-container {
     position: relative;
+    max-height: 300px;
+    overflow-y: auto;
 }
+
 .available-translation-widget-container .no-statistic {
     text-align: center;
+}
+
+.available-translation-widget-container .progress {
+    margin: 0;
+}
+
+.available-translation-widget-container .translation-status b {
+    text-align: center;
+    display: block;
+    margin-top: -19px;
+}
+
+.available-translation-widget-container .btn {
+    width: 90px;
 }

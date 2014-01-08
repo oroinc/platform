@@ -45,11 +45,16 @@ class OroTranslationAdapter
      *
      * @param array $packages
      *
-     * @return array
+     * @return array [
+     *     ['code' => 'en', 'translationStatus' => 30]
+     * ]
      */
     public function fetchStatistic(array $packages = [])
     {
-        $data = [];
+        $data = [
+            ['code' => 'en', 'translationStatus' => 100],
+            ['code' => 'ru', 'translationStatus' => 20]
+        ];
 
         return $data;
     }

@@ -1,5 +1,10 @@
 <div class="widget-content">
     <table class="table table-hover table-bordered">
+        <colgroup>
+            <col width="150">
+            <col>
+            <col width="100">
+        </colgroup>
         <thead>
             <tr>
                 <th>{% trans %}Language{% endtrans %}</th>
@@ -8,9 +13,40 @@
             </tr>
         </thead>
         {% for language in statistic %}
+            <tr>
+                <td>
+                    {% if locale[language.code] is defined %}
+                        {{ locale[language.code]|trans }}
+                    {% else %}
+                        {{ language.code|trans }}
+                    {% endif %}
+                </td>
+                <td class="translation-status">
+                    <div class="progress">
+                        <div class="bar bar-success" style="width: {{ language.translationStatus }}%;"></div>
+                    </div>
+                    <b>{{ (language.translationStatus / 100)|oro_format_percent }}</b>
+                </td>
+                <td>
+                    {%
+                        set status = config[language.code] is defined
+                            ? config[language.code]
+                            : constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW')
+                    %}
+                    {% if status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
+                        <button class="btn btn-mini" data-lang="{{ language.code }}" data-action="download">{{ 'Download'|trans }}</button>
+                    {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_DOWNLOADED') %}
+                        <button class="btn btn-mini" data-lang="{{ language.code }}" data-action="enable">{{ 'Enable'|trans }}</button>
+                    {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_ENABLED') %}
+                        <button class="btn btn-mini" data-lang="{{ language.code }}" data-action="disable">{{ 'Disable'|trans }}</button>
+                    {% endif %}
+                </td>
+            </tr>
         {% else %}
             <tr>
-                {% trans %}<td colspan="3" class="no-statistic">Sorry, but translation statistic is not available.</td>{% endtrans %}
+                <td colspan="3" class="no-statistic">
+                    {% trans %}Sorry, but translation statistic is not available.{% endtrans %}
+                </td>
             </tr>
         {% endfor %}
     </table>
