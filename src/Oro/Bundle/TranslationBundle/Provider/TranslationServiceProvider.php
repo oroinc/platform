@@ -178,6 +178,14 @@ class TranslationServiceProvider
             \ZipArchive::ER_SEEK   => 'Seek error.',
         ];
 
+        // try to check possible error messages in file
+        if ($res == \ZipArchive::ER_NOZIP) {
+            $result = $this->adapter->parseResponse(file_get_contents($file));
+            if ($result->getName() == 'error') {
+                throw new \RuntimeException($result->message, (int)$result->code);
+            }
+        }
+
         if ($res !== true) {
             throw new \RuntimeException($zipErrors[$res], $res);
         }

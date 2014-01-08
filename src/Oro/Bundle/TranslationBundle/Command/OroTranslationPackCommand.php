@@ -208,11 +208,10 @@ EOF
 
     /**
      * @param InputInterface  $input
-     * @param OutputInterface $output
      *
      * @return AbstractAPIAdapter
      */
-    protected function getAdapterFromInput(InputInterface $input, OutputInterface $output)
+    protected function getAdapterFromInput(InputInterface $input)
     {
         /** @var AbstractAPIAdapter $adapter */
         $adapter = $this->getContainer()->get(
