@@ -49,8 +49,17 @@ Flotr.addType('funnel', {
             'funnelSumm': options.marginY
         };
 
+        console.log(summ);
+
         Flotr._.each(data, function (funnel) {
             var funnelSize = Math.round(marginHeight / summ * funnel);
+            if (funnelSize == 0) {
+                funnelSize = marginHeight / 100 * 2; // 2% of full height
+                summ += summ / 100 * 2;
+            }
+
+            console.log(funnel + '**' + funnelSize);
+
             if (options.explode > 0 && Object.keys(data).length > i+1) {
                 funnelSize -= options.explode;
             }
