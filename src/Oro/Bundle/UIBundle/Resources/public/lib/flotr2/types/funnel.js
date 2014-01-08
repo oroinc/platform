@@ -32,6 +32,18 @@ Flotr.addType('funnel', {
             summ += funnel;
         });
 
+        Flotr._.each(data, function (funnel, iterator) {
+            if (funnel == 0) {
+                data[iterator] = summ / 100 * 2;
+                self.shiftLabels = true;
+            }
+        });
+
+        summ = 0;
+        Flotr._.each(data, function (funnel) {
+            summ += funnel;
+        });
+
         context.lineJoin = 'round';
 
         context.translate(0.5, 0.5);
@@ -49,19 +61,8 @@ Flotr.addType('funnel', {
             'funnelSumm': options.marginY
         };
 
-        var funnel_data = [];
         Flotr._.each(data, function (funnel) {
             var funnelSize = marginHeight / summ * funnel;
-            if (funnelSize == 0) {
-                funnelSize = marginHeight / 100 * 2; // 2% of full height
-                summ += summ / 100 * 2;
-                self.shiftLabels = true;
-            }
-
-            funnel_data.push(funnelSize);
-        });
-
-        Flotr._.each(funnel_data, function (funnelSize) {
             if (options.explode > 0 && Object.keys(data).length > i+1) {
                 funnelSize -= options.explode;
             }
