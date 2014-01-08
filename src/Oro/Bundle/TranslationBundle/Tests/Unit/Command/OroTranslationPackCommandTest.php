@@ -149,12 +149,26 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
 
     public function testUpload()
     {
+        $this->runUploadDownloadTest('upload');
+    }
+
+    public function testUpdate()
+    {
+        $this->runUploadDownloadTest('upload', array('-m' => 'update'));
+    }
+
+    public function testDownload()
+    {
+        $this->runUploadDownloadTest('download');
+    }
+
+    public function runUploadDownloadTest($commandName, $args = [])
+    {
         $kernel = new TestKernel();
         $kernel->boot();
 
         $projectId = 'someproject';
         $adapterMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
-        //$loggerMock = $this->getMock('Psr\Log\LoggerInterface');
 
         $adapterMock->expects($this->once())
             ->method('setProjectId')
@@ -172,8 +186,13 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Psr\Log\LoggerInterface'))
             ->will($this->returnSelf());
 
-        $uploaderMock->expects($this->once())
-            ->method('upload');
+        if (isset($args['-m']) && $args['-m'] == 'update') {
+            $uploaderMock->expects($this->once())
+                ->method('update');
+        } else {
+            $uploaderMock->expects($this->once())
+                ->method($commandName);
+        }
 
         $kernel->getContainer()->set('oro_translation.uploader.crowdin_adapter', $adapterMock);
         $kernel->getContainer()->set('oro_translation.service_provider', $uploaderMock);
@@ -186,9 +205,31 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $command->setApplication($app);
 
         $tester = new CommandTester($command);
-        $input  = array('command' => $command->getName(), '--upload' => true, 'project' => $projectId);
+        $input  = array('command' => $command->getName(), '--'.$commandName => true, 'project' => $projectId);
+        if (!empty($args)) {
+            $input = array_merge($input, $args);
+        }
 
         $tester->execute($input);
+    }
+
+    public function testExecuteWithoutMode()
+    {
+        $kernel = new TestKernel();
+        $kernel->boot();
+
+        $app         = new Application($kernel);
+        $commandMock = $this->getCommandMock();
+        $app->add($commandMock);
+
+        $command = $app->find('oro:translation:pack');
+        $command->setApplication($app);
+
+        $tester = new CommandTester($command);
+        $input  = array('command' => $command->getName(), 'project' => 'test123');
+
+        $return = $tester->execute($input);
+        $this->assertEquals(1, $return);
     }
 
     /**
