@@ -30,18 +30,58 @@ class TranslationServiceProvider
         $this->setLogger(new NullLogger());
     }
 
+    /**
+     * Loop through the generated files in $dir and merge them with downloaded in $targetDir
+     * merge generated files over downloaded and upload result back to remote
+     *
+     * @param string $dir
+     *
+     * @return mixed
+     */
     public function update($dir)
     {
+        $pathToSave = './app/cache/remote-trans/update.zip';
+        $targetDir = dirname($pathToSave);
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+        $targetDir = $targetDir . DIRECTORY_SEPARATOR . 'en' . DIRECTORY_SEPARATOR;
 
+        $isDownloaded = $this->download($pathToSave, 'en', false);
+        if (!$isDownloaded) {
+            return false;
+        }
 
-        $this->upload($dir, 'update');
+        $finder = Finder::create()->files()->name('*.yml')->in($dir);
+        foreach ($finder->files() as $fileInfo) {
+            $localContents = file($fileInfo);
+            $remoteFile = $targetDir . $fileInfo->getRelativePathname();
+
+            if (file_exists($remoteFile)) {
+                $remoteContents = file($remoteFile);
+                array_shift($remoteContents); // remove dashes from the beginning of file
+            } else {
+                $remoteContents = [];
+            }
+
+            $content = array_unique(array_merge($remoteContents, $localContents));
+            $content = implode('', $content);
+
+            $remoteDir = dirname($remoteFile);
+            if (!is_dir($remoteDir)) {
+                mkdir($remoteDir, 0777, true);
+            }
+            file_put_contents($remoteFile, $content);
+        }
+
+        return $this->upload($targetDir, 'update');
     }
 
     /**
      * Upload translations
      *
      * @param string $dir
-     * @param string $mode add or update
+     * @param string $mode
      *
      * @return mixed
      */
@@ -63,10 +103,11 @@ class TranslationServiceProvider
     /**
      * @param string      $pathToSave path to save translations
      * @param null|string $locale
+     * @param bool        $toApply whether apply download packs or not
      *
      * @return bool
      */
-    public function download($pathToSave, $locale = null)
+    public function download($pathToSave, $locale = null, $toApply = true)
     {
         $targetDir = dirname($pathToSave);
         $this->cleanup($targetDir);
@@ -77,14 +118,36 @@ class TranslationServiceProvider
             is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
         );
 
+        // TODO: consider move this in crowdin adapter or remove
+        if ($locale == 'en') {
+            // check and fix exported file names, replace $locale_XX locale in file names to $locale
+            $this->renameFiles('.en_US.', '.en.', $targetDir);
+        }
+
         if ($isExtracted) {
             unlink($pathToSave);
-            $appliedLocales = $this->apply('./app/Resources/', $targetDir, $locale);
-            $this->cleanup($targetDir);
-            $this->jsTranslationDumper->dumpTranslations($appliedLocales);
+        }
+
+        if ($toApply) {
+            $this->apply('./app/Resources/', $targetDir);
         }
 
         return $isExtracted && $isDownloaded;
+    }
+
+    /**
+     * @param string $find      find string in file name
+     * @param string $replace   replacement
+     * @param string $dir       where to search
+     */
+    protected function renameFiles($find, $replace, $dir)
+    {
+        $finder = Finder::create()->files()->name('*.yml')->in($dir);
+
+        /** $file \SplFileInfo */
+        foreach ($finder->files() as $file) {
+            rename($file, str_replace($find, $replace, $file));
+        }
     }
 
     /**
@@ -151,11 +214,10 @@ class TranslationServiceProvider
      *
      * @param string $targetDir
      * @param string $sourceDir
-     * @param string $locale
      *
      * @return array
      */
-    protected function apply($targetDir, $sourceDir, $locale)
+    protected function apply($targetDir, $sourceDir)
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($sourceDir, \FilesystemIterator::SKIP_DOTS),
@@ -198,6 +260,11 @@ class TranslationServiceProvider
                     )
                 );
             }
+        }
+
+        if ($appliedLocales) {
+            $this->cleanup($targetDir);
+            $this->jsTranslationDumper->dumpTranslations($appliedLocales);
         }
 
         return $appliedLocales;

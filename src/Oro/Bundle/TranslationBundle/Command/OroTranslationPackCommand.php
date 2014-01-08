@@ -113,6 +113,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+
         // check presence of action
         $modeOption = false;
         foreach (['dump', 'upload', 'download'] as $option) {
@@ -153,9 +155,14 @@ EOF
         $projectName      = $input->getArgument('project');
         $languagePackPath = $this->getLangPackDir($projectName);
 
-        return $this
-            ->getTranslationService($input, $output)
-            ->upload($languagePackPath, $input->getOption('upload-mode'));
+        $translationService = $this->getTranslationService($input, $output);
+        $mode = $input->getOption('upload-mode');
+
+        if ($mode == 'update') {
+            $translationService->update($languagePackPath);
+        } else {
+            $translationService->upload($languagePackPath);
+        }
     }
 
     /**

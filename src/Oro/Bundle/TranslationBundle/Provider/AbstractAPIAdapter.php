@@ -86,6 +86,7 @@ abstract class AbstractAPIAdapter
             $requestParams[CURLOPT_POSTFIELDS] = $data;
         }
 
+        $this->apiRequest->reset();
         $this->apiRequest->setOptions($requestParams);
 
         return $this->apiRequest->execute();
