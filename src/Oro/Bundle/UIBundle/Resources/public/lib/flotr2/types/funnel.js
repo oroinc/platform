@@ -7,20 +7,19 @@ Flotr.addType('funnel', {
         fillOpacity: 0.5,
         fontColor: "#B2B2B2",
         explode: 5,
-        extraHeight: 150,
-        marginX: 200,
-        marginY: 25,
-        colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
+        marginX: 250,
+        marginY: 0,
+        colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377']
     },
 
     stack: [],
     stacked: false,
 
     plot: function (options) {
-        var self = this;
-        var marginHeight = options.marginY ? options.height - options.marginY * 2 : options.height;
-        var marginWidth = options.marginX ? options.width - options.marginX : options.width;
         var
+            self = this,
+            marginWidth = options.marginX ? options.width - options.marginX : options.width,
+            marginHeight = options.marginY ? options.height - options.marginY : options.height,
             extraHeight = options.extraHeight || 0,
             data = options.data,
             context = options.context,
@@ -32,29 +31,33 @@ Flotr.addType('funnel', {
         });
 
         context.lineJoin = 'round';
+
         context.translate(0.5, 0.5);
         context.beginPath();
-        context.moveTo(options.marginX, options.marginY);
+        //context.moveTo(options.marginX, options.marginY);
+        context.moveTo(0, 0);
 
         self.stack[0] = {};
-        self.stack[0].x1 = options.marginX;
-        self.stack[0].y1 = options.marginY;
+        self.stack[0].x1 = 0; //options.marginX;
+        self.stack[0].y1 = 0; //options.marginY;
 
         var segmentData = {
             'prevStepWidth': marginWidth,
             'prevStepWidthDelta': 0,
-            'prevStepHeight': (marginHeight + extraHeight),
+            'prevStepHeight': marginHeight + extraHeight,
             'funnelSumm': options.marginY
         };
 
         Flotr._.each(data, function (funnel) {
-            var funnelSize = Math.ceil(funnel * marginHeight / summ);
-            segmentData = self.calculateSegment(options, funnelSize, i, marginWidth, segmentData, true);
-
-            if (options.explode > 0) {
-                segmentData = self.calculateSegment(options, options.explode, i, marginWidth, segmentData, false);
+            var funnelSize = Math.round(marginHeight / summ * funnel);
+            if (options.explode > 0 && Object.keys(data).length > i+1) {
+                funnelSize -= options.explode;
             }
 
+            segmentData = self.calculateSegment(options, funnelSize, i, marginWidth, segmentData, true);
+            if (options.explode > 0 && Object.keys(data).length != i+1) {
+                segmentData = self.calculateSegment(options, options.explode, i, marginWidth, segmentData, false);
+            }
             i++;
         });
     },
@@ -118,7 +121,7 @@ Flotr.addType('funnel', {
                     self.stacked = i;
                     self.clearHit(options);
                     self.drawHit(options, i);
-                    self.drawTooltip('Test', x+10 , y);
+                    //self.drawTooltip('Test', x+10 , y);
                     return;
                 }
             }
@@ -132,25 +135,18 @@ Flotr.addType('funnel', {
     },
 
     drawHit: function (options, i) {
-        var
-            self = this,
-            context = options.context;
-
+        var self = this, context = options.context;
         context.save();
-
         context.lineJoin    = 'round';
         context.strokeStyle = '#FF3F19';
         context.lineWidth   = options.lineWidth;
-
         context.beginPath();
-
-        context.moveTo(self.stack[i].x1 + options.lineWidth, self.stack[i].y1);
-        context.lineTo(self.stack[i].x2 + options.lineWidth, self.stack[i].y2);
-        context.lineTo(self.stack[i].x3 + options.lineWidth, self.stack[i].y3);
-        context.lineTo(self.stack[i].x4 + options.lineWidth, self.stack[i].y4);
+        context.moveTo(self.stack[i].x1 + options.lineWidth * 2, self.stack[i].y1);
+        context.lineTo(self.stack[i].x2 + options.lineWidth * 2, self.stack[i].y2);
+        context.lineTo(self.stack[i].x3 + options.lineWidth * 2, self.stack[i].y3);
+        context.lineTo(self.stack[i].x4 + options.lineWidth * 2, self.stack[i].y4);
         context.closePath();
         context.stroke();
-
         context.restore();
     },
 
@@ -162,10 +158,10 @@ Flotr.addType('funnel', {
         context.save();
         for (var i in self.stack) {
             context.clearRect(
-                self.stack[i].x1,
+                self.stack[i].x1 - options.lineWidth * 2,
                 self.stack[i].y1 - options.lineWidth,
-                self.stack[i].x2 + options.lineWidth - self.stack[i].x1 + options.lineWidth,
-                self.stack[i].y4 + options.lineWidth - self.stack[i].y1 + options.lineWidth
+                self.stack[i].x2 - self.stack[i].x1 + options.lineWidth * 5,
+                self.stack[i].y4 - self.stack[i].y1 + options.lineWidth * 5
             );
         }
         context.restore();
@@ -185,10 +181,10 @@ Flotr.addType('funnel', {
     calculateSegment: function(options, funnel, iterator, marginWidth, segmentData, renderable) {
         var
             context = options.context,
-            prevStepWidth = segmentData.prevStepWidth,
+            prevStepWidth      = segmentData.prevStepWidth,
             prevStepWidthDelta = segmentData.prevStepWidthDelta,
-            prevStepHeight= segmentData.prevStepHeight,
-            funnelSumm = segmentData.funnelSumm;
+            prevStepHeight     = segmentData.prevStepHeight,
+            funnelSumm         = segmentData.funnelSumm;
 
         context.lineWidth = options.lineWidth;
         context.strokeStyle = options.colors[iterator];
@@ -201,62 +197,84 @@ Flotr.addType('funnel', {
         if (renderable) {
             this.stack[iterator].x2 = prevStepWidth + prevStepWidthDelta;
             this.stack[iterator].y2 = funnelSumm;
-            this.stack[iterator].x3 = Math.round(marginWidth / 2 + BC);
-            this.stack[iterator].y3 = funnelSumm + funnel;
-            this.stack[iterator].x4 = Math.round(marginWidth / 2 - BC) + options.marginX;
-            this.stack[iterator].y4 = funnelSumm + funnel;
 
-            context.lineTo(prevStepWidth + prevStepWidthDelta, funnelSumm);
-            context.lineTo(Math.round(marginWidth / 2 + BC), funnelSumm + funnel);
-            context.lineTo(Math.round(marginWidth / 2 - BC) + options.marginX, funnelSumm + funnel);
+            var x3 = Math.round(marginWidth / 2 + BC);
+            var x4 = Math.round(marginWidth / 2 - BC);
+            this.stack[iterator].x3 = (x3 <= marginWidth / 2) ? marginWidth / 2 : x3;
+            this.stack[iterator].x4 = (x4 >= marginWidth / 2) ? marginWidth / 2 : x4;
+
+            this.stack[iterator].y3 =
+            this.stack[iterator].y4 = (funnelSumm + funnel);
+
+            context.lineTo(this.stack[iterator].x2, this.stack[iterator].y2);   // lineTo x2y2
+            context.lineTo(this.stack[iterator].x3, this.stack[iterator].y3); // lineTo x3y3
+            if (this.stack[iterator].x3 != this.stack[iterator].x4) {
+                context.lineTo(this.stack[iterator].x4, this.stack[iterator].y4); // lineTo x4y4
+            }
+
             context.closePath();
             context.stroke();
             context.fill();
 
-            self.renderLabel(
-                context,
-                options,
-                Object.keys(options.data)[iterator],
-                (Math.round(options.width / 2)),
-                Math.round(funnelSumm + funnel / 2)
-            );
+            self.renderLabel(context, options, Object.keys(options.data)[iterator], Math.round(funnelSumm + funnel/2));
         }
 
         funnelSumm += funnel;
 
         context.beginPath();
-        context.moveTo(Math.ceil(marginWidth / 2 - BC) + options.marginX, funnelSumm);
+        context.moveTo(Math.ceil(marginWidth / 2 - BC), funnelSumm);
 
         self.stack[iterator + 1] = {};
-        self.stack[iterator + 1].x1 = Math.ceil(marginWidth / 2 - BC) + options.marginX;
+        self.stack[iterator + 1].x1 = Math.ceil(marginWidth / 2 - BC);
         self.stack[iterator + 1].y1 = funnelSumm;
 
         return {
-            'prevStepWidth': (BC * 2),
-            'prevStepWidthDelta': (Math.ceil(marginWidth / 2 - BC)),
-            'prevStepHeight': (prevStepHeight - funnel),
-            'funnelSumm': funnelSumm
+            'prevStepWidth'     : BC * 2,
+            'prevStepWidthDelta': marginWidth / 2 - BC,
+            'prevStepHeight'    : prevStepHeight - funnel,
+            'funnelSumm'        : funnelSumm
         };
     },
 
-    renderLabel: function(context, options, label, labelDistX, distY) {
-        var distX = 0,
+    renderLabel: function(context, options, label, distY) {
+        var distX = (options.width) / 2,
             style = {
                 size : options.fontSize * 1.2,
                 color : options.fontColor,
                 weight : 1.5
             };
         options.htmlText = true;
-        style.textAlign = distX < 0 ? 'right' : 'left';
-        style.textBaseline = 'bottom';
-        Flotr.drawText(context, label + ': ' + options.data[label], distX, distY, style);
+        style.textAlign = 'left';
+        style.textBaseline = 'top';
+        style.wordWrap = 'break-word';
+
+        /*Flotr.drawText(
+            context,
+            label +' '+ label +' '+ label + ': ' + options.data[label],
+            distX + options.width/3 + 5,
+            distY + Math.round(style.size / 2),
+            style
+        );*/
+
+        var html = [];
+        var divStyle =
+            'position:absolute;' +
+            style.textBaseline + ':' + (distY - style.size)  + 'px;' +
+            style.textAlign + ':' + (distX + options.width/3 + 10) + 'px;';
+
+        html.push('<div style="', divStyle, '" class="flotr-grid-label">', label + ': ' + options.data[label], '</div>');
+
+        var div = Flotr.DOM.node('<div style="color:#454545" class="flotr-labels"></div>');
+        Flotr.DOM.insert(div, html.join(''));
+        Flotr.DOM.insert(options.element, div);
+
 
         // label line
         context.beginPath();
         context.lineWidth = 1;
         context.strokeStyle = options.fontColor;
         context.moveTo(distX, distY);
-        context.lineTo(labelDistX, distY);
+        context.lineTo(distX + options.width/3, distY);
         context.stroke();
     }
 });
