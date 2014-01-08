@@ -167,6 +167,8 @@ class ConfigManager
 
         $this->om->persist($config);
         $this->om->flush();
+
+        $this->reload();
     }
 
     /**
@@ -237,6 +239,17 @@ class ConfigManager
         $this->storedSettings[$entity][$entityId] = $config;
 
         return true;
+    }
+
+    /**
+     * Reload settings data
+     */
+    public function reload()
+    {
+        $entity   = $this->getScopedEntityName();
+        $entityId = $this->getScopeId();
+        unset($this->storedSettings[$entity][$entityId]);
+        $this->loadStoredSettings($entity, $entityId);
     }
 
     /**
