@@ -40,8 +40,8 @@ class TranslationServiceProvider
      */
     public function update($dir)
     {
-        $pathToSave = './app/cache/remote-trans/update.zip';
-        $targetDir = dirname($pathToSave);
+        $pathToSave = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' . DIRECTORY_SEPARATOR . 'update.zip';
+        $targetDir  = dirname($pathToSave);
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
@@ -55,7 +55,7 @@ class TranslationServiceProvider
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
         foreach ($finder->files() as $fileInfo) {
             $localContents = file($fileInfo);
-            $remoteFile = $targetDir . $fileInfo->getRelativePathname();
+            $remoteFile    = $targetDir . $fileInfo->getRelativePathname();
 
             if (file_exists($remoteFile)) {
                 $remoteContents = file($remoteFile);
@@ -74,7 +74,10 @@ class TranslationServiceProvider
             file_put_contents($remoteFile, $content);
         }
 
-        return $this->upload($targetDir, 'update');
+        $result =  $this->upload($targetDir, 'update');
+        $this->cleanup($targetDir);
+
+        return $result;
     }
 
     /**
