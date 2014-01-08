@@ -82,6 +82,14 @@ class BaseCart
     }
 
     /**
+     * @param float $grandTotal
+     */
+    public function setGrandTotal($grandTotal)
+    {
+        $this->grandTotal = $grandTotal;
+    }
+
+    /**
      * @param \DateTime $createdAt
      * @return $this
      */
