@@ -50,7 +50,7 @@ class DatagridExportConnector extends EntityReader
                     )
                 );
             }
-        } elseif (!$this->sourceIterator) {
+        } else {
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export connector must contain "gridName".'
             );

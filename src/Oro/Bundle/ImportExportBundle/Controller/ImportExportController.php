@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
-use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
-use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -20,6 +18,8 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 
 class ImportExportController extends Controller
 {

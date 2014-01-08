@@ -15,7 +15,11 @@ use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 class GridController extends Controller
 {
     /**
-     * @Route("/{gridName}", name="oro_datagrid_index")
+     * @Route(
+     *      "/{gridName}",
+     *      name="oro_datagrid_index",
+     *      requirements={"gridName"="[\w-]+"}
+     * )
      *
      * @param string $gridName
      *
@@ -30,7 +34,12 @@ class GridController extends Controller
     }
 
     /**
-     * @Route("/{gridName}/extraAction/{actionName}", name="oro_datagrid_extra_action")
+     * @Route(
+     *      "/{gridName}/extraAction/{actionName}",
+     *      name="oro_datagrid_extra_action",
+     *      requirements={"gridName"="[\w-]+", "actionName"="[\w-]+"}
+     * )
+     *
      * @param string $gridName
      * @param string $actionName
      *
@@ -50,7 +59,7 @@ class GridController extends Controller
                 'datagrid_export_to_' . $format,
                 'oro_datagrid',
                 $format,
-                'oro_datagrid_' . $gridName,
+                'datagrid_' . $gridName,
                 ['gridName' => $gridName]
             );
         }
@@ -59,7 +68,12 @@ class GridController extends Controller
     }
 
     /**
-     * @Route("/{gridName}/massAction/{actionName}", name="oro_datagrid_mass_action")
+     * @Route(
+     *      "/{gridName}/massAction/{actionName}",
+     *      name="oro_datagrid_mass_action",
+     *      requirements={"gridName"="[\w-]+", "actionName"="[\w-]+"}
+     * )
+     *
      * @param string $gridName
      * @param string $actionName
      *
