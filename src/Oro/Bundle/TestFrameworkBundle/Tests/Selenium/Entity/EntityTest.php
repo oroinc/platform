@@ -27,7 +27,7 @@ class EntityTest extends Selenium2TestCase
      */
     public function testCreateEntity()
     {
-        $entityname = 'Entity'.mt_rand();
+        $entityName = 'Entity'.mt_rand();
 
         $login = new Login($this);
         $login->setUsername(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
@@ -36,9 +36,9 @@ class EntityTest extends Selenium2TestCase
             ->openConfigEntities()
             ->add()
             ->assertTitle('New Entity - Entities - System')
-            ->setName($entityname)
-            ->setLabel($entityname)
-            ->setPluralLabel($entityname)
+            ->setName($entityName)
+            ->setLabel($entityName)
+            ->setPluralLabel($entityName)
             ->save()
             ->assertMessage('Entity saved')
             ->createField()
@@ -50,31 +50,29 @@ class EntityTest extends Selenium2TestCase
             ->updateSchema()
             ->close();
 
-        return $entityname;
+        return $entityName;
     }
 
     /**
      * @depends testCreateEntity
-     * @param $entityname
+     * @param $entityName
      * @return string
      */
-    public function testUpdateEntity($entityname)
+    public function testUpdateEntity($entityName)
     {
-        $this->markTestIncomplete('Need to rewrite this test to use filter by Name. BAP-2605');
-
-        $newentityname = 'Update' . $entityname;
+        $newEntityName = 'Update' . $entityName;
         $login = new Login($this);
         $login->setUsername(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->setPassword(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS)
             ->submit()
             ->openConfigEntities()
-            ->filterBy('Label', $entityname)
-            ->open(array($entityname))
+            //->filterBy('Label', $entityName)
+            ->open(array($entityName))
             ->edit()
-            ->setLabel($newentityname)
+            ->setLabel($newEntityName)
             ->save()
             ->assertMessage('Entity saved')
-            ->assertTitle($newentityname .' - Entities - System')
+            ->assertTitle($newEntityName .' - Entities - System')
             ->createField()
             ->setFieldName('Test_field2')
             ->setType('Integer')
@@ -83,7 +81,7 @@ class EntityTest extends Selenium2TestCase
             ->assertMessage('Field saved')
             ->updateSchema();
 
-        return $newentityname;
+        return $newEntityName;
     }
 
     /**
@@ -109,24 +107,23 @@ class EntityTest extends Selenium2TestCase
 
     /**
      * @depends testUpdateEntity
-     * @param $entityname
+     * @param $entityName
      */
-    public function testDeleteEntity($entityname)
+    public function testDeleteEntity($entityName)
     {
-        $this->markTestIncomplete('Need to rewrite this test to use filter by Name. BAP-2605');
-
         $login = new Login($this);
-        $login->setUsername(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
+        $entityExist = $login->setUsername(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->setPassword(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS)
             ->submit()
             ->openConfigEntities()
-            ->filterBy('Label', $entityname)
+            //->filterBy('Label', $entityName)
             ->delete()
             ->assertMessage('Item was removed')
-            ->open(array($entityname))
+            ->open(array($entityName))
             ->updateSchema()
             ->close()
-            ->filterBy('Label', $entityname)
-            ->assertNoDataMessage('No entity was found to match your search.');
+            ->entityExists(array($entityName));
+
+        $this->assertFalse($entityExist);
     }
 }

@@ -9,10 +9,15 @@ class EmailAddress extends OriginalEmailAddress
 {
     protected $owner;
 
-    public function __construct($date = null)
+    public function __construct($id = null, $date = null)
     {
-        $this->created = $date;
-        $this->updated = $date;
+        if ($id !== null) {
+            $this->setId($id);
+        }
+        if ($date !== null) {
+            $this->setCreatedAt($date);
+            $this->setUpdatedAt($date);
+        }
     }
 
     public function getOwner()
