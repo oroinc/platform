@@ -11,6 +11,7 @@ Flotr.addType('funnel', {
         marginX: 200,
         marginY: 25,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
+        formatter: ''
     },
 
     stack: [],
@@ -249,7 +250,12 @@ Flotr.addType('funnel', {
         options.htmlText = true;
         style.textAlign = distX < 0 ? 'right' : 'left';
         style.textBaseline = 'bottom';
-        Flotr.drawText(context, label + ': ' + options.data[label], distX, distY, style);
+        if (options.formatter) {
+            var formattedValue = options.formatter(options.data[label]);
+        } else {
+            var formattedValue = options.data[label];
+        }
+        Flotr.drawText(context, label + ': ' + formattedValue, distX, distY, style);
 
         // label line
         context.beginPath();
