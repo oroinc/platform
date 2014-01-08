@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\PrepareAttributePath;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
@@ -77,6 +78,9 @@ class WorkflowAssembler extends AbstractAssembler
         );
 
         $attributes = $this->assembleAttributes($configuration);
+        $this->preparePasses($attributes);
+        $configuration = $this->passConfiguration($configuration, $attributes);
+
         $steps = $this->assembleSteps($configuration, $attributes);
         $transitions = $this->assembleTransitions($configuration, $steps, $attributes);
 
@@ -94,6 +98,15 @@ class WorkflowAssembler extends AbstractAssembler
         $this->validateWorkflow($workflow);
 
         return $workflow;
+    }
+
+    protected function preparePasses($attributes)
+    {
+        foreach ($this->configurationPasses as $pass) {
+            if ($pass instanceof AttributesAwareInterface) {
+                $pass->setAttributes($attributes);
+            }
+        }
     }
 
     /**

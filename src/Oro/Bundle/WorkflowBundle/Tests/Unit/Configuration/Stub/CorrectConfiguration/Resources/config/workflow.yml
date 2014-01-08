@@ -29,6 +29,10 @@ workflows:
                 type: object
                 options:
                     class: DateTime
+            second_attribute:
+                label: 'Second Attribute'
+                type: string
+                property_path: first_attribute.test
         transitions:
             first_transition:
                 label: 'First Transition'

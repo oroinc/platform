@@ -40,6 +40,7 @@ class AttributeAssembler extends AbstractAssembler
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
+        $attribute->setPropertyPath($options['property_path']);
         $attribute->setOptions($this->getOption($options, 'options', array()));
 
         $this->validateAttribute($attribute);
@@ -79,6 +80,9 @@ class AttributeAssembler extends AbstractAssembler
             $managedEntity = $attribute->getOption('managed_entity');
             $multiple = $attribute->getOption('multiple');
             $bind = $attribute->getOption('bind');
+            if ($managedEntity && $attribute->getPropertyPath()) {
+
+            }
             if ($managedEntity && !$multiple && !$bind) {
                 throw new AssemblerException(
                     sprintf(
