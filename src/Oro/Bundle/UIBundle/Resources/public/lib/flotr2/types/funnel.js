@@ -15,6 +15,7 @@ Flotr.addType('funnel', {
 
     stack: [],
     stacked: false,
+    shiftLabels: false,
 
     plot: function (options) {
         var
@@ -35,11 +36,10 @@ Flotr.addType('funnel', {
 
         context.translate(0.5, 0.5);
         context.beginPath();
-        //context.moveTo(options.marginX, options.marginY);
         context.moveTo(0, options.marginY);
 
         self.stack[0] = {};
-        self.stack[0].x1 = 0; //options.marginX;
+        self.stack[0].x1 = 0;
         self.stack[0].y1 = options.marginY;
 
         var segmentData = {
@@ -49,17 +49,19 @@ Flotr.addType('funnel', {
             'funnelSumm': options.marginY
         };
 
-        console.log(summ);
-
+        var funnel_data = [];
         Flotr._.each(data, function (funnel) {
-            var funnelSize = Math.round(marginHeight / summ * funnel);
+            var funnelSize = marginHeight / summ * funnel;
             if (funnelSize == 0) {
                 funnelSize = marginHeight / 100 * 2; // 2% of full height
                 summ += summ / 100 * 2;
+                self.shiftLabels = true;
             }
 
-            console.log(funnel + '**' + funnelSize);
+            funnel_data.push(funnelSize);
+        });
 
+        Flotr._.each(funnel_data, function (funnelSize) {
             if (options.explode > 0 && Object.keys(data).length > i+1) {
                 funnelSize -= options.explode;
             }
@@ -83,7 +85,8 @@ Flotr.addType('funnel', {
             for (var i in self.stack) {
                 var belongSide = true;
                 /**
-                 *  left rectangle side case
+                 *  left/right rectangle side case
+                 *  detect mouse is in figure
                  *
                  *  (x1 - x0) * (y2 - y1) - (x2 - x1) * (y1 - y0)
                  *  (x2 - x0) * (y3 - y2) - (x3 - x2) * (y2 - y0)
@@ -217,7 +220,7 @@ Flotr.addType('funnel', {
             this.stack[iterator].y4 = (funnelSumm + funnel);
 
             context.lineTo(this.stack[iterator].x2, this.stack[iterator].y2);   // lineTo x2y2
-            context.lineTo(this.stack[iterator].x3, this.stack[iterator].y3); // lineTo x3y3
+            context.lineTo(this.stack[iterator].x3, this.stack[iterator].y3);   // lineTo x3y3
             if (this.stack[iterator].x3 != this.stack[iterator].x4) {
                 context.lineTo(this.stack[iterator].x4, this.stack[iterator].y4); // lineTo x4y4
             }
@@ -226,7 +229,7 @@ Flotr.addType('funnel', {
             context.stroke();
             context.fill();
 
-            self.renderLabel(context, options, Object.keys(options.data)[iterator], Math.round(funnelSumm + funnel/2), iterator);
+            self.renderLabel(context, options, Object.keys(options.data)[iterator], funnelSumm, iterator);
         }
 
         funnelSumm += funnel;
@@ -251,7 +254,9 @@ Flotr.addType('funnel', {
             count = Object.keys(options.data).length,
             distY = (iterator == 0)
                 ? options.marginY
-                : (options.height - options.marginY * 2) / (count + 1) * iterator,
+                : this.shiftLabels
+                    ? (options.height - options.marginY * 2) / (count + 1) * iterator
+                    : startY,
             style = {
                 size : options.fontSize * 1.2,
                 color : options.fontColor,
@@ -261,14 +266,6 @@ Flotr.addType('funnel', {
         style.textAlign    = 'left';
         style.textBaseline = 'top';
         style.wordWrap     = 'break-word';
-
-        /*Flotr.drawText(
-            context,
-            label +' '+ label +' '+ label + ': ' + options.data[label],
-            distX + options.width/3 + 5,
-            distY + Math.round(style.size / 2),
-            style
-        );*/
 
         var html = [],
             formattedValue = (options.formatter)
