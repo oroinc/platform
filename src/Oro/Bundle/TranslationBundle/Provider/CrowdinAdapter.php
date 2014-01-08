@@ -149,22 +149,6 @@ class CrowdinAdapter extends AbstractAPIAdapter
     }
 
     /**
-     * @param $response
-     *
-     * @return \SimpleXMLElement
-     * @throws \Exception
-     */
-    public function parseResponse($response)
-    {
-        $result = new \SimpleXMLElement($response);
-        if ($result->getName() == 'error') {
-            throw new \Exception($result->message, (int)$result->code);
-        }
-
-        return $result;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function upload($files, $mode = 'add')
