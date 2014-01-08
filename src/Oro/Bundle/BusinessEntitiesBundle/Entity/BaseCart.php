@@ -116,4 +116,42 @@ class BaseCart
     {
         return $this->updatedAt;
     }
+
+    /**
+     * @param float $subTotal
+     *
+     * @return $this
+     */
+    public function setSubTotal($subTotal)
+    {
+        $this->subTotal = $subTotal;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getSubTotal()
+    {
+        return $this->subTotal;
+    }
+
+    /**
+     * @param float $taxAmount
+     *
+     * @return $this
+     */
+    public function setTaxAmount($taxAmount)
+    {
+        $this->taxAmount = $taxAmount;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTaxAmount()
+    {
+        return $this->taxAmount;
+    }
 }
