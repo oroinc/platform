@@ -191,9 +191,8 @@ EOF
      */
     protected function getTranslationService(InputInterface $input, OutputInterface $output)
     {
-        $service = $this->getContainer()
-            ->get('oro_translation.service_provider')
-            ->setLogger(new OutputLogger($output));
+        $service = $this->getContainer()->get('oro_translation.service_provider');
+        $service->setLogger(new OutputLogger($output));
 
         // set non default adapter if comes from input
         if ($adapter = $this->getAdapterFromInput($input)) {

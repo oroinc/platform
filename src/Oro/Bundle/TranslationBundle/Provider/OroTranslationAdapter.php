@@ -22,8 +22,8 @@ class OroTranslationAdapter
     public function __construct(ApiRequestInterface $apiRequest, $endpoint, $apiKey = null)
     {
         $this->apiRequest = $apiRequest;
-        $this->endpoint   = $endpoint;
-        $this->apiKey     = $apiKey;
+        $this->setEndpoint($endpoint);
+        $this->setApiKey($apiKey);
         $this->setLogger(new NullLogger());
     }
 
@@ -60,6 +60,14 @@ class OroTranslationAdapter
     public function setApiKey($apiKey)
     {
         $this->apiKey = $apiKey;
+    }
+
+    /**
+     * @param $endpoint
+     */
+    public function setEndpoint($endpoint)
+    {
+        $this->endpoint = $endpoint;
     }
 
     /**

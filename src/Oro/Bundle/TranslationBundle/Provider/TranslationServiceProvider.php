@@ -182,7 +182,7 @@ class TranslationServiceProvider
         ];
 
         // try to check possible error messages in file
-        if ($res == \ZipArchive::ER_NOZIP) {
+        if ($res === \ZipArchive::ER_NOZIP) {
             $result = $this->adapter->parseResponse(file_get_contents($file));
             if ($result->getName() == 'error') {
                 throw new \RuntimeException($result->message, (int)$result->code);
@@ -287,14 +287,10 @@ class TranslationServiceProvider
 
     /**
      * @param AbstractAPIAdapter $adapter
-     *
-     * @return $this
      */
     public function setAdapter(AbstractAPIAdapter $adapter)
     {
         $this->adapter = $adapter;
-
-        return $this;
     }
 
     /**
@@ -309,8 +305,6 @@ class TranslationServiceProvider
      * Sets a logger
      *
      * @param LoggerInterface $logger
-     *
-     * @return $this
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -318,7 +312,5 @@ class TranslationServiceProvider
 
         $this->adapter->setLogger($this->logger);
         $this->jsTranslationDumper->setLogger($this->logger);
-
-        return $this;
     }
 }
