@@ -121,7 +121,7 @@ EOF
         // check presence of action
         $modeOption = false;
         foreach (['dump', 'upload', 'download'] as $option) {
-            $modeOption = $modeOption || $input->getOption($option) !== true;
+            $modeOption = $modeOption || $input->getOption($option) === true;
         }
 
         if (!$modeOption) {
