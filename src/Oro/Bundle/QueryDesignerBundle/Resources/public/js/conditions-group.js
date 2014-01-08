@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'backbone', 'jquery-ui', 'ororeport/js/dropdown-select'], function ($, _, Backbone) {
+define(['jquery', 'underscore', 'backbone', 'jquery-ui', 'oroui/js/dropdown-select'], function ($, _, Backbone) {
     'use strict';
 
     /**
