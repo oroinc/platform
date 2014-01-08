@@ -173,11 +173,9 @@ class PageGrid extends Page
     public function deleteEntity($entityData = array())
     {
         $entity = $this->getEntity($entityData, $name = 'Delete');
-        $entity->element($this->using('xpath')
-            ->value("td[@class = 'action-cell']//a[contains(., '...')]"))
+        $entity->element($this->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]"))
             ->click();
-        $entity->element($this->using('xpath')
-            ->value("td[@class = 'action-cell']//a[contains(., '{$name}')]"))
+        $entity->element($this->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '{$name}')]"))
             ->click();
         $this->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
 
