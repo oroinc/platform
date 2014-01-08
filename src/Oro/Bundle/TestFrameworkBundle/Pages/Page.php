@@ -72,7 +72,9 @@ class Page
     {
         $this->test->waitUntil(
             function ($testCase) {
-                $status = $testCase->execute(array('script' => "return 'complete' == document['readyState']", 'args' => array()));
+                $status = $testCase->execute(
+                    array('script' => "return 'complete' == document['readyState']", 'args' => array())
+                );
                 if ($status) {
                     return true;
                 } else {
@@ -84,7 +86,14 @@ class Page
 
         $this->test->waitUntil(
             function ($testCase) {
-                $status = $testCase->execute(array('script' => "return !!document['page-rendered']", 'args' => array()));
+                $status = $testCase->execute(
+                    array(
+                        'script' =>
+                            "return typeof(document['page-rendered'])=='undefined' || !!document['page-rendered']",
+                        'args' =>
+                            array()
+                    )
+                );
                 if ($status) {
                     return true;
                 } else {
@@ -104,7 +113,12 @@ class Page
     {
         $this->test->waitUntil(
             function ($testCase) {
-                $status = $testCase->execute(array('script' => 'return !jQuery.isActive()', 'args' => array()));
+                $status = $testCase->execute(
+                    array(
+                        'script' => "return typeof(jQuery.isActive) == 'undefined' || !jQuery.isActive()",
+                        'args' => array()
+                    )
+                );
                 if ($status) {
                     return true;
                 } else {
@@ -188,7 +202,9 @@ class Page
             $this->isElementPresent("//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]"),
             'Flash message is missing'
         );
-        $actualResult = $this->byXPath("//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]/div")->text();
+        $actualResult = $this->byXPath(
+            "//div[contains(@class,'alert') and not(contains(@class, 'alert-empty'))]/div"
+        )->text();
 
         PHPUnit_Framework_Assert::assertEquals($messageText, trim($actualResult), $message);
         return $this;
