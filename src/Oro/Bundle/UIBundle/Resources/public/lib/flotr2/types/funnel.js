@@ -7,7 +7,7 @@ Flotr.addType('funnel', {
         fillOpacity: 0.5,
         fontColor: "#B2B2B2",
         explode: 5,
-        marginX: 250,
+        marginX: 350,
         marginY: 20,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
         formatter: ''
@@ -251,7 +251,7 @@ Flotr.addType('funnel', {
             count = Object.keys(options.data).length,
             distY = (iterator == 0)
                 ? options.marginY
-                : (options.height - options.marginY) / (count + 2) * iterator,
+                : (options.height - options.marginY * 2) / (count + 1) * iterator,
             style = {
                 size : options.fontSize * 1.2,
                 color : options.fontColor,
@@ -289,7 +289,7 @@ Flotr.addType('funnel', {
         context.beginPath();
         context.lineWidth = 1;
         context.strokeStyle = options.fontColor;
-        context.moveTo(distX, startY);
+        context.moveTo(this.stack[iterator].x2, this.stack[iterator].y2);
         context.lineTo(distX + (options.marginX + options.width)/3, distY);
         context.stroke();
     }
