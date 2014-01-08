@@ -131,7 +131,12 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
     public function testDownload()
     {
         $locale = 'en';
-        $path =  './app/cache/dev/target.zip';
+        $path =  sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' .
+            DIRECTORY_SEPARATOR . 'target.zip';
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
 
         $this->request->expects($this->once())
             ->method('setOptions');
