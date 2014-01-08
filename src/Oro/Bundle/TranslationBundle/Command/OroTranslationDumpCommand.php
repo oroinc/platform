@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+
 class OroTranslationDumpCommand extends ContainerAwareCommand
 {
     /**
@@ -42,12 +44,9 @@ class OroTranslationDumpCommand extends ContainerAwareCommand
             $locales[] = $this->getContainer()->getParameter('kernel.default_locale');
         }
 
-        $jsDumper = $this->getContainer()->get('oro_translation.js_dumper');
-        $jsDumper->dumpTranslations(
-            $locales,
-            function ($string) use ($output) {
-                $output->writeln($string);
-            }
-        );
+        $this->getContainer()
+            ->get('oro_translation.js_dumper')
+            ->setLogger(new OutputLogger($output))
+            ->dumpTranslations($locales);
     }
 }

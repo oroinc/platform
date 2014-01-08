@@ -137,11 +137,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     {
         $result = parent::request($uri, $data, $method, $curlOptions);
         if (!isset($curlOptions[CURLOPT_FILE])) {
-            $result = new \SimpleXMLElement($result);
-            if ($result->getName() == 'error') {
-                $message = $result->message;
-                throw new \Exception($message, (int)$result->code);
-            }
+            $result = $this->parseResponse($result);
         }
 
         return $result;

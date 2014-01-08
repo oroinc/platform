@@ -40,8 +40,8 @@ class TranslationServiceProvider
      */
     public function update($dir)
     {
-        $pathToSave = './app/cache/remote-trans/update.zip';
-        $targetDir = dirname($pathToSave);
+        $pathToSave = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' . DIRECTORY_SEPARATOR . 'update.zip';
+        $targetDir  = dirname($pathToSave);
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
@@ -55,7 +55,7 @@ class TranslationServiceProvider
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
         foreach ($finder->files() as $fileInfo) {
             $localContents = file($fileInfo);
-            $remoteFile = $targetDir . $fileInfo->getRelativePathname();
+            $remoteFile    = $targetDir . $fileInfo->getRelativePathname();
 
             if (file_exists($remoteFile)) {
                 $remoteContents = file($remoteFile);
@@ -74,7 +74,10 @@ class TranslationServiceProvider
             file_put_contents($remoteFile, $content);
         }
 
-        return $this->upload($targetDir, 'update');
+        $result =  $this->upload($targetDir, 'update');
+        $this->cleanup($targetDir);
+
+        return $result;
     }
 
     /**
@@ -110,7 +113,11 @@ class TranslationServiceProvider
     public function download($pathToSave, $locale = null, $toApply = true)
     {
         $targetDir = dirname($pathToSave);
-        $this->cleanup($targetDir);
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        } else {
+            $this->cleanup($targetDir);
+        }
 
         $isDownloaded = $this->adapter->download($pathToSave, $locale);
         $isExtracted  = $this->unzip(
@@ -173,6 +180,14 @@ class TranslationServiceProvider
             \ZipArchive::ER_READ   => 'Read error.',
             \ZipArchive::ER_SEEK   => 'Seek error.',
         ];
+
+        // try to check possible error messages in file
+        if ($res == \ZipArchive::ER_NOZIP) {
+            $result = $this->adapter->parseResponse(file_get_contents($file));
+            if ($result->getName() == 'error') {
+                throw new \RuntimeException($result->message, (int)$result->code);
+            }
+        }
 
         if ($res !== true) {
             throw new \RuntimeException($zipErrors[$res], $res);
@@ -263,7 +278,7 @@ class TranslationServiceProvider
         }
 
         if ($appliedLocales) {
-            $this->cleanup($targetDir);
+            $this->cleanup($sourceDir);
             $this->jsTranslationDumper->dumpTranslations($appliedLocales);
         }
 
