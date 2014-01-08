@@ -19,7 +19,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     /**
      * Count of records that will be loaded on each page during iterations
      * This is just recommended buffer size because the real size can be differed
-     * in case when MaxResults of source query is less than this requested size
+     * in case when MaxResults of source query is specified
      *
      * @var int
      */
