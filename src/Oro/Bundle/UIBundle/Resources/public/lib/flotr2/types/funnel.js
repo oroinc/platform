@@ -8,7 +8,7 @@ Flotr.addType('funnel', {
         fontColor: "#B2B2B2",
         explode: 5,
         marginX: 250,
-        marginY: 0,
+        marginY: 20,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
         formatter: ''
     },
@@ -36,11 +36,11 @@ Flotr.addType('funnel', {
         context.translate(0.5, 0.5);
         context.beginPath();
         //context.moveTo(options.marginX, options.marginY);
-        context.moveTo(0, 0);
+        context.moveTo(0, options.marginY);
 
         self.stack[0] = {};
         self.stack[0].x1 = 0; //options.marginX;
-        self.stack[0].y1 = 0; //options.marginY;
+        self.stack[0].y1 = options.marginY;
 
         var segmentData = {
             'prevStepWidth': marginWidth,
