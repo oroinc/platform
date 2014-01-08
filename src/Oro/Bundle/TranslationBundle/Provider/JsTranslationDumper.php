@@ -108,9 +108,13 @@ class JsTranslationDumper
      * Sets a logger
      *
      * @param LoggerInterface $logger
+     *
+     * @return $this
      */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+
+        return $this;
     }
 }
