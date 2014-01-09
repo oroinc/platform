@@ -1,6 +1,5 @@
 parameters:
     oro_workflow.configuration_pass.replace_property_path.class: Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ReplacePropertyPath
-    oro_workflow.configuration_pass.prepare_attribute_path.class: Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\PrepareAttributePath
 
     oro_workflow.condition_assembler.class: Oro\Bundle\WorkflowBundle\Model\Condition\ConditionAssembler
     oro_workflow.action_assembler.class: Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler
@@ -15,9 +14,6 @@ services:
         class: %oro_workflow.configuration_pass.replace_property_path.class%
         arguments:
             - "data"
-
-    oro_workflow.configuration_pass.prepare_attribute_path:
-        class: %oro_workflow.configuration_pass.prepare_attribute_path.class%
 
     oro_workflow.condition_assembler:
         class: %oro_workflow.condition_assembler.class%
@@ -59,8 +55,6 @@ services:
             - @oro_workflow.attribute_assembler
             - @oro_workflow.step_assembler
             - @oro_workflow.transition_assembler
-        calls:
-            - [addConfigurationPass, [@oro_workflow.configuration_pass.prepare_attribute_path]]
 
     oro_workflow.form_options_assembler:
         class: %oro_workflow.form_options_assembler.class%

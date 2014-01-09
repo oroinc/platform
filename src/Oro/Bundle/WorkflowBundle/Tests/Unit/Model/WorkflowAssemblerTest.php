@@ -240,16 +240,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $transitions = new ArrayCollection($transitions);
 
         // mocks
-        $passMock = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\PrepareAttributePath')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $passMock->expects($this->once())
-            ->method('setAttributes')
-            ->with($attributes)
-            ->will($this->returnSelf());
-        $passMock->expects($this->once())
-            ->method('passConfiguration')
-            ->will($this->returnArgument(0));
         $container = $this->createContainerMock($workflow);
         $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
         $attributeAssembler = $this->createAttributeAssemblerMock($configuration, $attributes);
@@ -271,7 +261,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $stepAssembler,
             $transitionAssembler
         );
-        $workflowAssembler->addConfigurationPass($passMock);
         $actualWorkflow = $workflowAssembler->assemble($workflowDefinition);
 
         $this->assertEquals($workflow, $actualWorkflow);

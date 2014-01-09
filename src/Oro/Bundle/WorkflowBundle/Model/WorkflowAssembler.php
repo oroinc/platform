@@ -78,8 +78,6 @@ class WorkflowAssembler extends AbstractAssembler
         );
 
         $attributes = $this->assembleAttributes($configuration);
-        $this->preparePasses($attributes);
-        $configuration = $this->passConfiguration($configuration);
 
         $steps = $this->assembleSteps($configuration, $attributes);
         $transitions = $this->assembleTransitions($configuration, $steps, $attributes);
@@ -98,15 +96,6 @@ class WorkflowAssembler extends AbstractAssembler
         $this->validateWorkflow($workflow);
 
         return $workflow;
-    }
-
-    protected function preparePasses($attributes)
-    {
-        foreach ($this->configurationPasses as $pass) {
-            if ($pass instanceof AttributesAwareInterface) {
-                $pass->setAttributes($attributes);
-            }
-        }
     }
 
     /**
