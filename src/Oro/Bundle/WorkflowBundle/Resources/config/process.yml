@@ -1,0 +1,18 @@
+definitions:
+    test_definition:
+        label: 'Test Definition'
+        enabled: true
+        entity: Oro\Bundle\UserBundle\Entity\User
+        order: 20
+        execution_required: true
+        actions_configuration:
+            - @assign_value: [$entity.field, 'value']
+
+triggers:
+    test_definition:
+        -
+            event: update
+            field: some_field
+            time_shift: 123456 or P6YT5M
+        -
+            event: create
