@@ -12,66 +12,97 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testConfigTree($options, $expects)
     {
-        $processor = new Processor();
+        $processor     = new Processor();
         $configuration = new Configuration(array());
-        $result = $processor->processConfiguration($configuration, array($options));
+        $result        = $processor->processConfiguration($configuration, array($options));
 
         $this->assertEquals($expects, $result);
     }
 
     public function dataProviderConfigTree()
     {
+        $settings = array(
+            'available_translations' => array(
+                'value' => null,
+                'scope' => 'app'
+            ),
+            'resolved'               => true
+        );
+
         return array(
             array(
                 array(),
                 array(
-                    'js_translation' => array(
+                    'js_translation'      => array(
                         'domains' => array('jsmessages', 'validators'),
-                        'debug' => '%kernel.debug%',
+                        'debug'   => '%kernel.debug%',
                     ),
-                    'api' => array(
-                        'crowdin' => array(
+                    'api'                 => array(
+                        'crowdin'     => array(
                             'endpoint' => 'http://api.crowdin.net/api',
                         ),
+                        'oro_service' => array(
+                            'endpoint' => 'http://proxy.dev/api',
+                            'key'      => ''
+                        )
                     ),
+                    'default_api_adapter' => 'crowdin',
+                    'settings'            => $settings
                 )
             ),
             array(
                 array('js_translation' => array()),
                 array(
-                    'js_translation' => array(
+                    'js_translation'      => array(
                         'domains' => array('jsmessages', 'validators'),
-                        'debug' => '%kernel.debug%',
+                        'debug'   => '%kernel.debug%',
                     ),
-                    'api' => array(
-                        'crowdin' => array(
+                    'api'                 => array(
+                        'crowdin'     => array(
                             'endpoint' => 'http://api.crowdin.net/api',
                         ),
+                        'oro_service' => array(
+                            'endpoint' => 'http://proxy.dev/api',
+                            'key'      => ''
+                        )
                     ),
+                    'default_api_adapter' => 'crowdin',
+                    'settings'            => $settings
                 )
             ),
             array(
                 array(
-                    'js_translation' => array(
+                    'js_translation'      => array(
                         'domains' => array('validators'),
-                        'debug' => true,
+                        'debug'   => true,
                     ),
-                    'api' => array(
-                        'crowdin' => array(
+                    'api'                 => array(
+                        'crowdin'     => array(
                             'endpoint' => 'http://google',
                         ),
+                        'oro_service' => array(
+                            'endpoint' => 'http://test.dev/api',
+                            'key'      => 'testKey'
+                        )
                     ),
+                    'default_api_adapter' => 'crowdin',
                 ),
                 array(
-                    'js_translation' => array(
+                    'js_translation'      => array(
                         'domains' => array('validators'),
-                        'debug' => true,
+                        'debug'   => true,
                     ),
-                    'api' => array(
-                        'crowdin' => array(
+                    'api'                 => array(
+                        'crowdin'     => array(
                             'endpoint' => 'http://google',
                         ),
+                        'oro_service' => array(
+                            'endpoint' => 'http://test.dev/api',
+                            'key'      => 'testKey'
+                        )
                     ),
+                    'default_api_adapter' => 'crowdin',
+                    'settings'            => $settings
                 )
             ),
         );

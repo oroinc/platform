@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-use Oro\Bundle\FormBundle\Form\DataTransformer\ObjectToJsonTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
 
 class AvailableTranslationsConfigurationType extends AbstractType
 {
@@ -16,7 +16,7 @@ class AvailableTranslationsConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addModelTransformer(new ObjectToJsonTransformer());
+        $builder->addModelTransformer(new ArrayToJsonTransformer());
     }
 
     /**
