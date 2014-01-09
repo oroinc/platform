@@ -6,15 +6,30 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use OroEmail\Cache\OroEmailBundle\Entity\EmailAddressProxy;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\Email;
 
-class LoadEmails extends AbstractFixture implements OrderedFixtureInterface
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+class LoadEmails extends AbstractFixture implements ContainerAwareInterface, OrderedFixtureInterface
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -26,7 +41,9 @@ class LoadEmails extends AbstractFixture implements OrderedFixtureInterface
             throw new \RuntimeException('Fixture with OroEmailBundle:EmailFolder should be loaded first.');
         }
 
-        $fromEmail = new EmailAddressProxy();
+        /** @var EmailAddressManager $emailAddressManager */
+        $emailAddressManager = $this->container->get('oro_email.email.address.manager');
+        $fromEmail = $emailAddressManager->newEmailAddress();
         $fromEmail->setEmail(uniqid().'@gmail.com');
 
         $attachmentContent = new EmailAttachmentContent();

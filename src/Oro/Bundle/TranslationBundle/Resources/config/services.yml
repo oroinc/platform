@@ -6,6 +6,11 @@ parameters:
     oro_translation.database_translation.metadata.cache.class:  Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache
     oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
+    oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
+    oro_translation.adapter.class:                              Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter
+    oro_translation.js_dumper.class:                            Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
+    oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
+
 services:
     oro_translation.controller:
         class: %oro_translation.controller.class%
@@ -21,6 +26,21 @@ services:
             - @service_container
         tags:
             - { name: translation.extractor, alias: oro_translation_php_extractor }
+
+    oro_translation.service_provider:
+        class: %oro_translation.service_provider.class%
+        arguments:
+            - @oro_translation.uploader.crowdin_adapter
+            - @oro_translation.js_dumper
+
+    oro_translation.curl_request:
+        class: %oro_translation.curl_request.class%
+
+    oro_translation.uploader.crowdin_adapter:
+        class: %oro_translation.adapter.class%
+        arguments:
+            - %oro_translation.api.crowdin.endpoint%
+            - @oro_translation.curl_request
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.database_translation.metadata.cache.class%
@@ -47,3 +67,13 @@ services:
             - @oro_translation.database_translation.metadata.cache
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
+
+    oro_translation.js_dumper:
+        class: %oro_translation.js_dumper.class%
+        arguments:
+            - @oro_translation.controller
+            - @router
+            - %oro_translation.js_translation.domains%
+            - %kernel.root_dir%
+            - %kernel.default_locale%
+
