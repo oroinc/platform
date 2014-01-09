@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\ConfigBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Table(
@@ -112,7 +111,7 @@ class Config
     /**
      * Returns array of entity settings
      *
-     * @return array Entity related settings
+     * @return ArrayCollection|ConfigValue[]
      */
     public function getValues()
     {
@@ -121,6 +120,7 @@ class Config
 
     /**
      * @param $values
+     *
      * @return $this
      */
     public function setValues($values)
@@ -130,21 +130,30 @@ class Config
         return $this;
     }
 
-    public function getOrCreateValue($section, $key)
+    /**
+     * Return value object related to this config found by given criteria, or creates new one otherwise
+     *
+     * @param string $section
+     * @param string $name
+     *
+     * @return ConfigValue
+     */
+    public function getOrCreateValue($section, $name)
     {
-        $value = $this->getValues()->filter(
-            function (ConfigValue $item) use ($key, $section) {
-                return $item->getName() == $key && $item->getSection() == $section;
+        $values = $this->getValues()->filter(
+            function (ConfigValue $item) use ($name, $section) {
+                return $item->getName() == $name && $item->getSection() == $section;
             }
         );
 
-        if ($value->first() === false) {
+        /** @var ArrayCollection $values */
+        if ($values->first() === false) {
             $value = new ConfigValue();
-            $value->setConfig($this)
-                ->setName($key)
-                ->setSection($section);
+            $value->setConfig($this);
+            $value->setName($name);
+            $value->setSection($section);
         } else {
-            $value = $value->first();
+            $value = $values->first();
         }
 
         return $value;

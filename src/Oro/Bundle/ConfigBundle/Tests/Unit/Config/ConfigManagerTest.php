@@ -88,7 +88,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repository->expects($this->once())
             ->method('loadSettings')
-            ->with('app', 0, null)
+            ->with('app', 0)
             ->will($this->returnValue($loadedSettings));
 
         $this->om
@@ -172,7 +172,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
-            array('getChanged'),
+            array('calculateChangeSet', 'reload'),
             array($this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
@@ -181,9 +181,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $object->expects($this->once())
-            ->method('getChanged')
+            ->method('calculateChangeSet')
             ->with($this->equalTo($settings))
             ->will($this->returnValue($changes));
+
+        $object->expects($this->once())
+            ->method('reload');
 
         $configMock = $this->getMock('Oro\Bundle\ConfigBundle\Entity\Config');
         $configMock->expects($this->once())
@@ -252,7 +255,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with('oro_user.level')
             ->will($this->returnValue($currentValue));
 
-        $object->getChanged($settings);
+        $object->calculateChangeSet($settings);
     }
 
     /**

@@ -4,8 +4,6 @@ namespace Oro\Bundle\ConfigBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use JMS\Serializer\Annotation\Exclude;
-
 /**
  * ConfigValue
  *
@@ -100,7 +98,7 @@ class ConfigValue
      *
      * @param string $config
      *
-     * @return Config
+     * @return $this
      */
     public function setConfig($config)
     {

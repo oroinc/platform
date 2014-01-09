@@ -5,42 +5,35 @@ namespace Oro\Bundle\ConfigBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
+use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 
 /**
  * Class ConfigRepository
+ *
  * @package Oro\Bundle\ConfigBundle
  */
 class ConfigRepository extends EntityRepository
 {
     /**
-     * @param string $entity
-     * @param string $entityId
-     * @param string $section
+     * Load settings from database for given
+     *
+     * @param string $scopeEntityName
+     * @param string $scopeEntityIdentifier
+     *
      * @return array
      */
-    public function loadSettings($entity, $entityId, $section)
+    public function loadSettings($scopeEntityName, $scopeEntityIdentifier)
     {
-        $criteria = array(
-            'scopedEntity' => $entity,
-            'recordId'     => $entityId,
-        );
+        $scope = $this->getByEntity($scopeEntityName, $scopeEntityIdentifier);
 
-        if (!is_null($section)) {
-            $criteria['section'] = $section;
-        }
-
-        $scope = $this->findOneBy($criteria);
-        if (!$scope) {
-            return array();
-        }
-
-        $settings = array();
+        $settings = [];
+        /** @var ConfigValue $value */
         foreach ($scope->getValues() as $value) {
-            $settings[$value->getSection()][$value->getName()] = array(
-                'value' => $value->getValue(),
-                'scope' => $scope->getEntity() ?: 'app',
+            $settings[$value->getSection()][$value->getName()] = [
+                'value'                  => $value->getValue(),
+                'scope'                  => $scope->getEntity(),
                 'use_parent_scope_value' => false
-            );
+            ];
         }
 
         return $settings;
@@ -49,11 +42,12 @@ class ConfigRepository extends EntityRepository
     /**
      * @param $entityName
      * @param $scopeId
+     *
      * @return Config
      */
     public function getByEntity($entityName, $scopeId)
     {
-        $config = $this->findOneBy(array('scopedEntity' => $entityName, 'recordId' => $scopeId));
+        $config = $this->findOneBy(['scopedEntity' => $entityName, 'recordId' => $scopeId]);
 
         if (!$config) {
             $config = new Config();
