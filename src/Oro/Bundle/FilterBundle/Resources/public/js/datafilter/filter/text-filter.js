@@ -215,9 +215,6 @@ function($, _, __, AbstractFilter) {
          * @protected
          */
         _showCriteria: function() {
-            if (this.simple) {
-                return;
-            }
             this.$(this.criteriaSelector).show();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -232,9 +229,6 @@ function($, _, __, AbstractFilter) {
          * @protected
          */
         _hideCriteria: function() {
-            if (this.simple) {
-                return;
-            }
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {
