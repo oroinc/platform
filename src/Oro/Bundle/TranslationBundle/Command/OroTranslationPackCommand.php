@@ -321,6 +321,16 @@ EOF
         if (is_dir($bundleViewsPath)) {
             $extractor = $container->get('translation.extractor');
             $extractor->extract($bundleViewsPath, $extractedCatalogue);
+
+            // fix extracted strings with hashes
+            $messages = $extractedCatalogue->all('messages');
+            $fixedMessages = [];
+            foreach ($messages as $key => $message) {
+                $key = str_replace('#', '"#"', $key);
+                $fixedMessages[$key] = $message;
+            }
+            $extractedCatalogue = new MessageCatalogue($defaultLocale);
+            $extractedCatalogue->add($fixedMessages);
         }
         if (is_dir($bundleTransPath)) {
             $loader->loadMessages($bundleTransPath, $currentCatalogue);
