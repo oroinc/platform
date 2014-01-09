@@ -58,7 +58,7 @@ class Configuration implements ConfigurationInterface
 
         SettingsBuilder::append(
             $rootNode,
-            ['available_translations' => ['value' => null]]
+            ['available_translations' => ['type' => 'array']]
         );
 
         return $treeBuilder;

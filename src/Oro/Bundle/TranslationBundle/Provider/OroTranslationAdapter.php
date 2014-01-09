@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use FOS\Rest\Util\Codes;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
 
 class OroTranslationAdapter
 {
+    const URL_STATISTIC = '/statistic';
+
     /** @var string */
     protected $apiKey;
 
@@ -45,18 +48,40 @@ class OroTranslationAdapter
      *
      * @param array $packages
      *
+     * @throws \RuntimeException
      * @return array [
      *     ['code' => 'en', 'translationStatus' => 30]
      * ]
      */
     public function fetchStatistic(array $packages = [])
     {
-        $data = [
-            ['code' => 'en', 'translationStatus' => 100],
-            ['code' => 'ru', 'translationStatus' => 20]
-        ];
+        $response = $this->request(
+            self::URL_STATISTIC,
+            ['packages' => implode(',', $packages)]
+        );
 
-        return $data;
+        $responseCode = $this->apiRequest->getResponseCode();
+        if ($responseCode === Codes::HTTP_OK) {
+            $result = json_decode($response, true);
+            $result = $result ? $result : [];
+
+            $filtered = array_filter(
+                $result,
+                function ($item) {
+                    return isset($item['code']) && isset($item['translationStatus']);
+                }
+            );
+
+            if (empty($filtered) || empty($result)) {
+                $this->logger->critical('Bad data received' . PHP_EOL . var_export($result, true));
+                throw new \RuntimeException('Bad data received');
+            }
+
+            return $result;
+        } else {
+            $this->logger->critical('Service unavailable. Status received: ' . $responseCode);
+            throw new \RuntimeException('Service unavailable');
+        }
     }
 
     /**
@@ -89,15 +114,18 @@ class OroTranslationAdapter
      * Perform request
      *
      * @param string $uri
+     * @param array  $urlParams
      * @param array  $curlOptions
      *
-     * @throws \RuntimeException
      * @return mixed
      */
-    protected function request($uri, $curlOptions = [])
+    protected function request($uri, $urlParams = [], $curlOptions = [])
     {
+        $urlParams['key'] = $this->apiKey;
+        $urlParams        = '?' . http_build_query($urlParams, '', '&');
+
         $requestParams = [
-                CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,
+                CURLOPT_URL            => $this->endpoint . $uri . $urlParams,
                 CURLOPT_RETURNTRANSFER => true,
             ] + $curlOptions;
         $this->apiRequest->setOptions($requestParams);

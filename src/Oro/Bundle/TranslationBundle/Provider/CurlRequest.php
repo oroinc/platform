@@ -47,6 +47,14 @@ class CurlRequest implements ApiRequestInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getResponseCode()
+    {
+        return curl_getinfo($this->handler, CURLINFO_HTTP_CODE);
+    }
+
+    /**
      * Reset options that may still be in place after previous calls
      * as curl_reset available only in php5.5, just re-init curl handler
      */

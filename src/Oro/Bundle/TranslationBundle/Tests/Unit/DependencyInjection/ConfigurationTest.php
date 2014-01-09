@@ -23,7 +23,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         $settings = array(
             'available_translations' => array(
-                'value' => null,
+                'value' => [],
                 'scope' => 'app'
             ),
             'resolved'               => true

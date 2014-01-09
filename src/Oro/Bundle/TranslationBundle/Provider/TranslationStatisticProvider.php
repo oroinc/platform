@@ -4,6 +4,10 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
 
+use Composer\Package\PackageInterface;
+
+use Oro\Bundle\DistributionBundle\Manager\PackageManager;
+
 class TranslationStatisticProvider
 {
     const CACHE_KEY = 'translation_statistic';
@@ -15,10 +19,18 @@ class TranslationStatisticProvider
     /** @var OroTranslationAdapter */
     protected $adapter;
 
-    public function __construct(Cache $cache, OroTranslationAdapter $adapter)
+    /** @var PackageManager */
+    protected $pm;
+
+    /** @var array */
+    protected $bundles;
+
+    public function __construct(Cache $cache, OroTranslationAdapter $adapter, PackageManager $pm, array $bundles)
     {
         $this->cache   = $cache;
         $this->adapter = $adapter;
+        $this->pm      = $pm;
+        $this->bundles = $bundles;
     }
 
     /**
@@ -28,7 +40,7 @@ class TranslationStatisticProvider
      */
     public function get()
     {
-        $data = $this->cache->fetch(static::CACHE_KEY);
+        $data = false; //@TODO remove debug $this->cache->fetch(static::CACHE_KEY);
 
         if (false === $data) {
             $data = $this->fetch();
@@ -47,8 +59,22 @@ class TranslationStatisticProvider
     protected function fetch()
     {
         try {
-            // @TODO collect packages
-            $data = $this->adapter->fetchStatistic();
+            // collect installed packages through PackageManger
+            $packages = $this->pm->getInstalled();
+            $packages = array_map(
+                function (PackageInterface $package) {
+                    return $package->getName();
+                },
+                $packages
+            );
+
+            // collect bundle namespaces
+            foreach ($this->bundles as $bundle) {
+                $namespaceParts = explode('\\', $bundle);
+                $packages[]     = reset($namespaceParts);
+            }
+
+            $data = $this->adapter->fetchStatistic(array_unique($packages));
         } catch (\Exception $e) {
             $data = [];
         }

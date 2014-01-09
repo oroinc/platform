@@ -34,12 +34,15 @@ services:
         arguments:
             - @oro_translation.uploader.default_adapter
             - @oro_translation.js_dumper
+            - %kernel.root_dir%
 
     oro_translation.statistic_provider:
         class: %oro_translation.statistic_provider.class%
         arguments:
             - @oro_translation.cache
             - @oro_translation.oro_translation_adapter
+            - @oro_distribution.package_manager
+            - %kernel.bundles%
 
     oro_translation.curl_request:
         class: %oro_translation.curl_request.class%

@@ -18,14 +18,19 @@ class TranslationServiceProvider
     /** @var NullLogger */
     protected $logger;
 
+    /** @var string */
+    protected $rootDir;
+
     /**
      * @param AbstractAPIAdapter  $adapter
      * @param JsTranslationDumper $jsTranslationDumper
+     * @param string              $rootFolder
      */
-    public function __construct(AbstractAPIAdapter $adapter, JsTranslationDumper $jsTranslationDumper)
+    public function __construct(AbstractAPIAdapter $adapter, JsTranslationDumper $jsTranslationDumper, $rootDir)
     {
-        $this->adapter = $adapter;
+        $this->adapter             = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
+        $this->rootDir             = $rootDir;
 
         $this->setLogger(new NullLogger());
     }
@@ -74,7 +79,7 @@ class TranslationServiceProvider
             file_put_contents($remoteFile, $content);
         }
 
-        $result =  $this->upload($targetDir, 'update');
+        $result = $this->upload($targetDir, 'update');
         $this->cleanup($targetDir);
 
         return $result;
@@ -96,8 +101,8 @@ class TranslationServiceProvider
         $files = array();
         foreach ($finder->files() as $file) {
             // crowdin understand only "/" as directory separator :)
-            $apiPath = str_replace(array($dir, DIRECTORY_SEPARATOR), array('', '/'), (string)$file);
-            $files[ $apiPath ] = (string)$file;
+            $apiPath         = str_replace(array($dir, DIRECTORY_SEPARATOR), array('', '/'), (string)$file);
+            $files[$apiPath] = (string)$file;
         }
 
         return $this->adapter->upload($files, $mode);
@@ -106,7 +111,7 @@ class TranslationServiceProvider
     /**
      * @param string      $pathToSave path to save translations
      * @param null|string $locale
-     * @param bool        $toApply whether apply download packs or not
+     * @param bool        $toApply    whether apply download packs or not
      *
      * @return bool
      */
@@ -136,16 +141,16 @@ class TranslationServiceProvider
         }
 
         if ($toApply) {
-            $this->apply('./app/Resources/', $targetDir);
+            $this->apply($this->rootDir . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR, $targetDir);
         }
 
         return $isExtracted && $isDownloaded;
     }
 
     /**
-     * @param string $find      find string in file name
-     * @param string $replace   replacement
-     * @param string $dir       where to search
+     * @param string $find    find string in file name
+     * @param string $replace replacement
+     * @param string $dir     where to search
      */
     protected function renameFiles($find, $replace, $dir)
     {
@@ -198,7 +203,7 @@ class TranslationServiceProvider
             throw new \RuntimeException(sprintf('Pack %s can\'t be extracted', $file));
         }
 
-        $isClosed    = $zip->close();
+        $isClosed = $zip->close();
         if (!$isClosed) {
             throw new \RuntimeException(sprintf('Pack %s can\'t be closed', $file));
         }
@@ -246,12 +251,12 @@ class TranslationServiceProvider
             }
 
             $target = $targetDir . preg_replace(
-                '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
-                '',
-                $fileInfo->getPathname()
-            );
+                    '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
+                    '',
+                    $fileInfo->getPathname()
+                );
 
-            $locale = str_replace(
+            $locale                  = str_replace(
                 '-',
                 '_',
                 preg_replace(
