@@ -26,5 +26,6 @@ class ReportDatagridConfigurationBuilder extends DatagridConfigurationBuilder
         parent::__construct($gridName, $report, $functionProvider, $doctrine);
 
         $this->config->offsetSetByPath('[source][acl_resource]', 'oro_report_view');
+        $this->config->offsetSetByPath('[options][toolbarOptions][addExportAction]', true);
     }
 }

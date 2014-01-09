@@ -60,7 +60,7 @@ class GridController extends Controller
                 'oro_datagrid',
                 $format,
                 'datagrid_' . $gridName,
-                ['gridName' => $gridName]
+                ['gridName' => $gridName, 'localized' => true]
             );
         }
 

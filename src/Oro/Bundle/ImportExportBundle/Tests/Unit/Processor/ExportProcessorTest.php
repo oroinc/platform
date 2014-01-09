@@ -11,9 +11,22 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $processor;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $context;
+
     protected function setUp()
     {
+        $this->context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
+            ->setMethods(array('getOption'))
+            ->getMockForAbstractClass();
+        $this->context->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue([]));
+
         $this->processor = new ExportProcessor();
+        $this->processor->setImportExportContext($this->context);
     }
 
     /**
@@ -69,16 +82,13 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSetImportExportContextWithoutQueryBuilder()
     {
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())->method('getOption')
+        $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue(null));
 
         $dataConverter = $this->getMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
-
-        $this->processor->setImportExportContext($context);
     }
 
     public function testSetImportExportContextWithQueryBuilderIgnored()
@@ -87,16 +97,13 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())->method('getOption')
+        $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue($queryBuilder));
 
         $dataConverter = $this->getMock('Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface');
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
-
-        $this->processor->setImportExportContext($context);
     }
 
     public function testSetImportExportContextWithQueryBuilder()
@@ -105,8 +112,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())->method('getOption')
+        $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue($queryBuilder));
 
         $dataConverter = $this->getMock(
@@ -117,8 +123,6 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryBuilder));
 
         $this->processor->setDataConverter($dataConverter);
-
-        $this->processor->setImportExportContext($context);
     }
 
     // @codingStandardsIgnoreStart
@@ -129,8 +133,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testSetImportExportContextFailsWithInvalidQueryBuilder()
     {
-        $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-        $context->expects($this->once())->method('getOption')
+        $this->context->expects($this->once())->method('getOption')
             ->will($this->returnValue(new \stdClass()));
 
         $dataConverter = $this->getMock(
@@ -139,7 +142,5 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
-
-        $this->processor->setImportExportContext($context);
     }
 }
