@@ -117,7 +117,7 @@ class EntityTest extends Selenium2TestCase
             ->submit()
             ->openConfigEntities()
             //->filterBy('Label', $entityName)
-            ->deleteEntity(array($entityName))
+            ->deleteEntity(array($entityName), 'Remove')
             ->assertMessage('Item was removed')
             ->open(array($entityName))
             ->updateSchema()

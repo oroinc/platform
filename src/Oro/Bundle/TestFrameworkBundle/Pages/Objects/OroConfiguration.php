@@ -24,10 +24,12 @@ class OroConfiguration extends Page
         $this->test->byXpath("//button[@class = 'primary button next']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Database initialization - Oro Application installation');
-        //waiting
+        $s = microtime(true);
         do {
             sleep(5);
             $this->waitPageToLoad();
+            $e = microtime(true);
+            $this->test->assertTrue(($e-$s) <= MAX_EXECUTION_TIME);
         } while ($this->isElementPresent("//a[@class = 'button next primary disabled']"));
 
         $this->test->moveto($this->byXpath("//a[@class = 'button next primary']"));
