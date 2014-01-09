@@ -18,7 +18,7 @@ class ConfigRepository extends EntityRepository
      * Load settings from database for given
      *
      * @param string $scopeEntityName
-     * @param string $scopeEntityIdentifier
+     * @param mixed $scopeEntityIdentifier
      *
      * @return array
      */
@@ -40,19 +40,19 @@ class ConfigRepository extends EntityRepository
     }
 
     /**
-     * @param $entityName
-     * @param $scopeId
+     * @param string $scopeEntityName
+     * @param mixed  $scopeEntityIdentifier
      *
      * @return Config
      */
-    public function getByEntity($entityName, $scopeId)
+    public function getByEntity($scopeEntityName, $scopeEntityIdentifier)
     {
-        $config = $this->findOneBy(['scopedEntity' => $entityName, 'recordId' => $scopeId]);
+        $config = $this->findOneBy(['scopedEntity' => $scopeEntityName, 'recordId' => $scopeEntityIdentifier]);
 
         if (!$config) {
             $config = new Config();
-            $config->setEntity($entityName)
-                ->setRecordId($scopeId);
+            $config->setEntity($scopeEntityName)
+                ->setRecordId($scopeEntityIdentifier);
         }
 
         return $config;

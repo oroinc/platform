@@ -3,9 +3,9 @@ oro_system_configuration:
         oro_translation.available_translations:
             type:  oro_translation_available_translations
             options:
-                label: 'Available translations'
-                required: false
-                is_parent_scope_available: false
+                label:      'Available translations'
+                required:   false
+                resettable: false
 
     tree:
         system_configuration:

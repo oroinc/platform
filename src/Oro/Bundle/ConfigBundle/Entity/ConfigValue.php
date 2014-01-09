@@ -16,10 +16,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ConfigValue
 {
-    const FIELD_SCALAR_TYPE     = 'text';
-    const FIELD_LIST_TYPE       = 'list';
-    const FIELD_SERIALIZED_TYPE = 'serialized';
-    const DELIMITER             = ',';
+    const FIELD_SCALAR_TYPE = 'scalar';
+    const FIELD_OBJECT_TYPE = 'object';
+    const FIELD_ARRAY_TYPE  = 'array';
 
     /**
      * @var integer
@@ -53,9 +52,21 @@ class ConfigValue
 
     /**
      * @var string
-     * @ORM\Column(type="text", nullable=true)
+     * @ORM\Column(name="text_value", type="text", nullable=true)
      */
-    protected $value;
+    protected $textValue;
+
+    /**
+     * @var string
+     * @ORM\Column(name="object_value", type="object", nullable=true)
+     */
+    protected $objectValue;
+
+    /**
+     * @var string
+     * @ORM\Column(name="array_value", type="array", nullable=true)
+     */
+    protected $arrayValue;
 
     /**
      * @var string
@@ -118,23 +129,45 @@ class ConfigValue
     }
 
     /**
-     * @param string $value
+     * @param mixed $value
      *
      * @return $this
      */
     public function setValue($value)
     {
-        $this->value = $value;
+        $this->clearValue();
+        switch (true) {
+            case is_object($value):
+                $this->objectValue = $value;
+                $this->type        = self::FIELD_OBJECT_TYPE;
+                break;
+            case is_array($value):
+                $this->arrayValue = $value;
+                $this->type       = self::FIELD_ARRAY_TYPE;
+                break;
+            default:
+                $this->textValue = $value;
+                $this->type      = self::FIELD_SCALAR_TYPE;
+        }
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return mixed
      */
     public function getValue()
     {
-        return $this->value;
+        switch ($this->type) {
+            case self::FIELD_ARRAY_TYPE:
+                return $this->arrayValue;
+                break;
+            case self::FIELD_OBJECT_TYPE:
+                return $this->objectValue;
+                break;
+            default:
+                return $this->textValue;
+        }
     }
 
     /**
@@ -182,49 +215,16 @@ class ConfigValue
      */
     public function __toString()
     {
-        return (string) $this->getValue();
+        return (string)$this->getValue();
     }
 
     /**
-     * @ORM\PostLoad
+     * Clear all value types
+     *
+     * @return void
      */
-    public function doOnPostLoad()
+    protected function clearValue()
     {
-        switch ($this->type) {
-            case self::FIELD_SERIALIZED_TYPE:
-                $this->value = unserialize($this->value);
-                break;
-            case self::FIELD_LIST_TYPE:
-                $this->value = explode(ConfigValue::DELIMITER, $this->value);
-                break;
-        }
-    }
-
-    /**
-     * @ORM\PrePersist
-     */
-    public function doOnPrePersist()
-    {
-        switch ($this->type) {
-            case is_object($this->value):
-                $this->value = serialize($this->value);
-                $this->type = self::FIELD_SERIALIZED_TYPE;
-                break;
-            case is_array($this->value):
-                $this->value = join(ConfigValue::DELIMITER, $this->value);
-                $this->type = self::FIELD_LIST_TYPE;
-                break;
-            default:
-                $this->type = self::FIELD_SCALAR_TYPE;
-                break;
-        }
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function doOnPreUpdate()
-    {
-        $this->doOnPrePersist();
+        $this->objectValue = $this->arrayValue = $this->textValue = null;
     }
 }

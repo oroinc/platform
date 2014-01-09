@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ConfigurationController extends Controller
 {
@@ -46,6 +47,13 @@ class ConfigurationController extends Controller
                 $tagableData = ['name' => 'system_configuration', 'params' => [$activeGroup, $activeSubGroup]];
                 $sender      = $this->get('oro_navigation.content.topic_sender');
                 $sender->send($sender->getGenerator()->generate($tagableData));
+
+                return new RedirectResponse(
+                    $this->get('router')->generate(
+                        'oro_config_configuration_system',
+                        ['activeGroup' => $activeGroup, 'activeSubGroup' => $activeSubGroup]
+                    )
+                );
             }
         }
 
