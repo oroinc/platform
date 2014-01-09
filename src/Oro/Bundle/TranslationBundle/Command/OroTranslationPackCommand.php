@@ -252,7 +252,7 @@ EOF
                     $this->createDirectory($bundleLanguagePackPath);
                 }
 
-                $operation = $this->getMergedTranslations($defaultLocale, $bundle);
+                $messageCatalog = $this->getMergedTranslations($defaultLocale, $bundle);
                 $output->writeln(
                     sprintf(
                         'Writing files for <info>%s</info>',
@@ -260,7 +260,7 @@ EOF
                     )
                 );
                 $writer->writeTranslations(
-                    $operation->getResult(),
+                    $messageCatalog,
                     $input->getOption('output-format'),
                     array('path' => $bundleLanguagePackPath)
                 );
@@ -306,7 +306,7 @@ EOF
      * @param string          $defaultLocale
      * @param BundleInterface $bundle
      *
-     * @return MergeOperation
+     * @return MessageCatalogue
      */
     protected function getMergedTranslations($defaultLocale, BundleInterface $bundle)
     {
@@ -325,8 +325,20 @@ EOF
         if (is_dir($bundleTransPath)) {
             $loader->loadMessages($bundleTransPath, $currentCatalogue);
         }
-        $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
 
-        return $operation;
+        $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
+        $messageCatalogue = $operation->getResult();
+
+        // fix extracted strings with hashes
+        $messages = $messageCatalogue->all('messages');
+        $fixedMessages = [];
+        foreach ($messages as $key => $message) {
+            $key = str_replace('#', '"#"', $key);
+            $fixedMessages[$key] = $message;
+        }
+        $messageCatalogue = new MessageCatalogue($defaultLocale);
+        $messageCatalogue->add($fixedMessages);
+
+        return $messageCatalogue;
     }
 }
