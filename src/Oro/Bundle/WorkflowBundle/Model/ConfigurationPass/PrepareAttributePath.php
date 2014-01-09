@@ -32,9 +32,9 @@ class PrepareAttributePath implements ConfigurationPassInterface, AttributesAwar
     {
         foreach ($configuration as $key => $value) {
             if (is_array($value)) {
-                $data[$key] = $this->passConfiguration($value);
+                $configuration[$key] = $this->passConfiguration($value);
             } elseif ($this->isStringPropertyPath($value)) {
-                $data[$key] = $this->replaceAttribute($value);
+                $configuration[$key] = $this->replaceAttribute($value);
             }
         }
 

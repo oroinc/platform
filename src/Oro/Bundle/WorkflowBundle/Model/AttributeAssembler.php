@@ -81,7 +81,12 @@ class AttributeAssembler extends AbstractAssembler
             $multiple = $attribute->getOption('multiple');
             $bind = $attribute->getOption('bind');
             if ($managedEntity && $attribute->getPropertyPath()) {
-
+                throw new AssemblerException(
+                    sprintf(
+                        'Property path can not be set for managed entity in attribute "%s"',
+                        $attribute->getName()
+                    )
+                );
             }
             if ($managedEntity && !$multiple && !$bind) {
                 throw new AssemblerException(

@@ -22,6 +22,10 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
         $assembler->assemble($configuration);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function invalidOptionsDataProvider()
     {
         return array(
@@ -123,6 +127,19 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                 'Options "multiple" and "bind" for managed entity in attribute "name" ' .
                     'cannot be both false simultaneously'
             ),
+            'property_path for managed entity' => array(
+                array(
+                    'name' => array(
+                        'label' => 'Label', 'type' => 'entity',
+                        'options' => array(
+                            'class' => 'DateTime', 'managed_entity' => true
+                        ),
+                        'property_path' => 'test'
+                    )
+                ),
+                'Oro\Bundle\WorkflowBundle\Exception\AssemblerException',
+                'Property path can not be set for managed entity in attribute "name"'
+            )
         );
     }
 
@@ -143,6 +160,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function configurationDataProvider()
@@ -221,14 +239,15 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                     'attribute_one' => array(
                         'label' => 'label', 'type' => 'entity',
                         'options' => array('class' => 'stdClass', 'multiple' => true, 'bind' => false),
-                        'property_path' => null
+                        'property_path' => 'test'
                     )
                 ),
                 $this->getAttribute(
                     'attribute_one',
                     'label',
                     'entity',
-                    array('class' => 'stdClass', 'multiple' => true, 'bind' => false)
+                    array('class' => 'stdClass', 'multiple' => true, 'bind' => false),
+                    'test'
                 )
             ),
             'entity_multiple_and_bind' => array(
@@ -254,15 +273,17 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      * @param string $label
      * @param string $type
      * @param array $options
+     * @param string $propertyPath
      * @return Attribute
      */
-    protected function getAttribute($name, $label, $type, array $options = array())
+    protected function getAttribute($name, $label, $type, array $options = array(), $propertyPath = null)
     {
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($label);
         $attribute->setType($type);
         $attribute->setOptions($options);
+        $attribute->setPropertyPath($propertyPath);
         return $attribute;
     }
 }

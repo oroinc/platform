@@ -79,7 +79,7 @@ class WorkflowAssembler extends AbstractAssembler
 
         $attributes = $this->assembleAttributes($configuration);
         $this->preparePasses($attributes);
-        $configuration = $this->passConfiguration($configuration, $attributes);
+        $configuration = $this->passConfiguration($configuration);
 
         $steps = $this->assembleSteps($configuration, $attributes);
         $transitions = $this->assembleTransitions($configuration, $steps, $attributes);
