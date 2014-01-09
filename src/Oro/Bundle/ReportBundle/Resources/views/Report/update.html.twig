@@ -47,6 +47,66 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
+    {#<div class="container-fluid">
+        <div class="row-fluid">
+            <div class="span3 filter-criteria">
+                <h4>Filter Criteria</h4>
+                <ul class="criteria-list" id="filter-criteria-list">
+                    <li class="option" data-criteria="compare-fields">
+                        Compare Fields
+                    </li>
+                    <li class="option" data-criteria="conditions-group">
+                        Conditions Group
+                    </li>
+                </ul>
+            </div>
+            <div class="span9" id="segmentation-conditions">
+                <ul class="conditions-group">
+                    <li class="condition" data-criteria="compare-fields">
+                        <a class="close" data-dismiss="alert" href="#">×</a>
+                        <div class="field-filter">
+                            <a href="#">Contacts email</a> field value <a href="#">contains</a> <a href="#">all</a> of the following:<br />
+                            <input type="text" value="@gmail.com, @hotmail.com, @yahoo.com">
+                        </div>
+                    </li>
+                    <li class="condition" data-criteria="conditions-group" data-operation="and">
+                        <a class="close" data-dismiss="alert" href="#">×</a>
+                        <ul class="conditions-group">
+                            <li class="condition" data-criteria="compare-fields">
+                                <a class="close" data-dismiss="alert" href="#">×</a>
+                                <div class="field-filter">
+                                    <a href="#">Title</a> field value <a href="#">includes</a> <a href="#">any</a> of the following:<br />
+                                    <input type="text" value="VP of Engineering, Marketing Director">
+                                </div>
+                            </li>
+                            <li class="condition" data-criteria="compare-fields" data-operation="or">
+                                <a class="close" data-dismiss="alert" href="#">×</a>
+                                <div class="field-filter">
+                                    <a href="#">Contact name</a> field value <a href="#">starts with</a>:<br />
+                                    <input type="text" value="Tiffany">
+                                </div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="condition" data-criteria="compare-fields" data-operation="and">
+                        <a class="close" data-dismiss="alert" href="#">×</a>
+                        <div class="field-filter">
+                            <a href="#">Contact country</a> field value <a href="#">is</a> <a href="#">United States</a>
+                        </div>
+                    </li>
+                </ul>
+                <script type="text/javascript">
+                    require(['oroquerydesigner/js/conditions-group'], function (ConditionsGroup) {
+                        new ConditionsGroup({
+                            conditionsGroupSelector: '#segmentation-conditions',
+                            criteriaListSelector: '#filter-criteria-list'
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>#}
+
     {% set id = 'report-profile' %}
     {% set ownerDataBlock = {
         'dataBlocks': [{

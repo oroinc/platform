@@ -1,3 +1,4 @@
 css:
     'report':
+        - 'bundles/ororeport/css/less/report.less'
         - 'bundles/ororeport/css/report.css'
