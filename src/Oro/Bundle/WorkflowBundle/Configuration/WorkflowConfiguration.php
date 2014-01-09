@@ -20,8 +20,6 @@ class WorkflowConfiguration implements ConfigurationInterface
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
 
     /**
-     * Processes and validates configuration
-     *
      * @param array $configs
      * @return array
      */

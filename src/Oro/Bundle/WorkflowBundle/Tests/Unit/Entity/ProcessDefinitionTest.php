@@ -43,9 +43,10 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
     public function setGetDataProvider()
     {
         return array(
-            'name'    => array('name', 'test'),
+            'name' => array('name', 'test'),
+            'label' => array('label', 'Test Definition'),
             'enabled' => array('enabled', false, true),
-            'configuration' => array('configuration', serialize(array('my' => 'configuration'))),
+            'actionsConfiguration' => array('actionsConfiguration', array('my' => 'configuration')),
             'relatedEntity' => array('relatedEntity', 'My\Entity'),
             'executionOrder' => array('executionOrder', 42, 0),
             'executionRequired' => array('executionRequired', true, false),

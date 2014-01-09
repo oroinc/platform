@@ -19,18 +19,18 @@ class ProcessDefinition
     protected $name;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="label", type="string", length=255)
+     */
+    protected $label;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="enabled", type="boolean")
      */
     protected $enabled = true;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="configuration", type="text")
-     */
-    protected $configuration;
 
     /**
      * @var string
@@ -52,6 +52,13 @@ class ProcessDefinition
      * @ORM\Column(name="execution_required", type="boolean")
      */
     protected $executionRequired = false;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="actions_configuration", type="array")
+     */
+    protected $actionsConfiguration;
 
     /**
      * @var \DateTime
@@ -87,6 +94,25 @@ class ProcessDefinition
     }
 
     /**
+     * @param string $label
+     * @return ProcessDefinition
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
      * @param boolean $enabled
      * @return ProcessDefinition
      */
@@ -103,25 +129,6 @@ class ProcessDefinition
     public function isEnabled()
     {
         return $this->enabled;
-    }
-
-    /**
-     * @param string $configuration
-     * @return ProcessDefinition
-     */
-    public function setConfiguration($configuration)
-    {
-        $this->configuration = $configuration;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getConfiguration()
-    {
-        return $this->configuration;
     }
 
     /**
@@ -179,6 +186,25 @@ class ProcessDefinition
     public function isExecutionRequired()
     {
         return $this->executionRequired;
+    }
+
+    /**
+     * @param array $configuration
+     * @return ProcessDefinition
+     */
+    public function setActionsConfiguration($configuration)
+    {
+        $this->actionsConfiguration = $configuration;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActionsConfiguration()
+    {
+        return $this->actionsConfiguration;
     }
 
     /**

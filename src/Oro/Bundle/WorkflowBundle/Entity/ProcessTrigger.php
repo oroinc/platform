@@ -10,6 +10,10 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ProcessTrigger
 {
+    const EVENT_CREATE = 'create';
+    const EVENT_UPDATE = 'update';
+    const EVENT_DELETE = 'delete';
+
     /**
      * @var integer
      *
@@ -130,6 +134,33 @@ class ProcessTrigger
     }
 
     /**
+     * @param \DateInterval $timeShiftInterval
+     * @return ProcessTrigger
+     */
+    public function setTimeShiftInterval($timeShiftInterval)
+    {
+        if (null !== $timeShiftInterval) {
+            $this->timeShift = self::convertDateIntervalToSeconds($timeShiftInterval);
+        } else {
+            $this->timeShift = null;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return \DateInterval
+     */
+    public function getTimeShiftInterval()
+    {
+        if (null === $this->timeShift) {
+            return null;
+        }
+
+        return self::convertSecondsToDateInterval($this->timeShift);
+    }
+
+    /**
      * @param ProcessDefinition $definition
      * @return ProcessTrigger
      */
@@ -201,5 +232,27 @@ class ProcessTrigger
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param \DateInterval $interval
+     * @return int
+     */
+    public static function convertDateIntervalToSeconds(\DateInterval $interval)
+    {
+        $date = new \DateTime('now');
+        $basicTimestamp = $date->getTimestamp();
+        $shiftedTimestamp = $date->add($interval)->getTimestamp();
+
+        return $shiftedTimestamp - $basicTimestamp;
+    }
+
+    /**
+     * @param int $seconds
+     * @return \DateInterval
+     */
+    public static function convertSecondsToDateInterval($seconds)
+    {
+        return new \DateInterval(sprintf('PT%dS', $seconds));
     }
 }
