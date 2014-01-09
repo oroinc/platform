@@ -49,7 +49,7 @@ oro_system_configuration:
             type: text # can be any custom type
             options:
                label: 'Date format'
-               is_parent_scope_available: false # should "use default checkbox" be shown(optional, default: true)
+               resettable: false  # should "use default checkbox" be shown(optional, default: true)
                # here we can override any default option of the given form type
                # also here can be added field tooltips
             tooltip: 'Some additional information'

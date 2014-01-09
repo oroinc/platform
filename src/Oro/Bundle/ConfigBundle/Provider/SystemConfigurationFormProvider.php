@@ -120,7 +120,7 @@ class SystemConfigurationFormProvider extends Provider
         // take config field options form field definition
         $configFieldOptions = array_intersect_key(
             $fieldDefinition->getOptions(),
-            array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'is_parent_scope_available'])
+            array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'resettable'])
         );
         // pass only options needed to "value" form type
         $configFieldOptions['target_field_type']    = $fieldDefinition->getType();
