@@ -20,7 +20,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
         $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
 
-        $this->service = new TranslationServiceProvider($this->adapter, $this->dumper);
+        $this->service = new TranslationServiceProvider($this->adapter, $this->dumper, 'someTestRootDir');
     }
 
     public function tearDown()
