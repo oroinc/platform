@@ -313,24 +313,56 @@ class NumberFormatter
         array $textAttributes = array(),
         array $symbols = array()
     ) {
-        $formatter = new IntlNumberFormatter(
-            $locale ? : $this->localeSettings->getLocale(),
-            $this->parseStyle($style)
-        );
+        $locale = $locale ? : $this->localeSettings->getLocale();
+        $style = $this->parseStyle($style);
+        $attributes = $this->parseAttributes($attributes);
+        $textAttributes = $this->parseAttributes($textAttributes);
+        $symbols = $this->parseAttributes($symbols);
 
-        foreach ($this->parseAttributes($attributes) as $attribute => $value) {
+        $formatter = new IntlNumberFormatter($locale, $style);
+
+        foreach ($attributes as $attribute => $value) {
             $formatter->setAttribute($attribute, $value);
         }
 
-        foreach ($this->parseAttributes($textAttributes) as $attribute => $value) {
+        foreach ($textAttributes as $attribute => $value) {
             $formatter->setTextAttribute($attribute, $value);
         }
 
-        foreach ($this->parseAttributes($symbols) as $symbol => $value) {
+        foreach ($symbols as $symbol => $value) {
             $formatter->setSymbol($symbol, $value);
         }
 
+        $this->adjustFormatter($formatter, $locale, $style, $attributes, $textAttributes, $symbols);
+
         return $formatter;
+    }
+
+
+    protected function adjustFormatter(
+        IntlNumberFormatter $formatter,
+        $locale,
+        $style,
+        array $attributes = array(),
+        array $textAttributes = array(),
+        array $symbols = array()
+    ) {
+        // need to manually set percent fraction same to decimal
+        if ($style === \NumberFormatter::PERCENT) {
+            $overriddenDecimalAttributes = array(
+                \NumberFormatter::FRACTION_DIGITS,
+                \NumberFormatter::MIN_FRACTION_DIGITS,
+                \NumberFormatter::MAX_FRACTION_DIGITS,
+            );
+
+            $decimalFormatter = $this->getFormatter($locale, \NumberFormatter::DECIMAL);
+
+            foreach ($overriddenDecimalAttributes as $decimalAttribute) {
+                if (!array_key_exists($decimalAttribute, $attributes)) {
+                    $formatter->setAttribute($decimalAttribute, $decimalFormatter->getAttribute($decimalAttribute));
+                }
+            }
+        }
     }
 
     /**
