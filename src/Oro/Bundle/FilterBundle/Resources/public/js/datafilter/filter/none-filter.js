@@ -144,42 +144,15 @@ function($, _, __, AbstractFilter) {
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
-            this.$el.append(
-                this.wrapperTemplate({
-                    label: this.label,
-                    showLabel: this.showLabel,
-                    criteriaHint:  this._getCriteriaHint(),
-                    nullLink: this.nullLink,
-                    canDisable: this.canDisable
-                })
-            );
-
-            this._renderCriteria(this.$(this.criteriaSelector));
-            this._clickOutsideCriteriaCallback = _.bind(function(e) {
-                if (this.popupCriteriaShowed) {
-                    this._onClickOutsideCriteria(e);
-                }
-            }, this);
-            $('body').on('click', this._clickOutsideCriteriaCallback);
-
+            var $filter = $(this.template({
+                popupHint: this._getPopupHint()
+            }));
+            this._wrap($filter);
             return this;
         },
 
-        /**
-         * Render filter criteria popup
-         *
-         * @param {Object} el
-         * @protected
-         * @return {*}
-         */
-        _renderCriteria: function(el) {
-            $(el).append(
-                this.template({
-                    popupHint: this._getPopupHint()
-                })
-            );
-            return this;
+        _wrap: function ($filter) {
+            this.$el.append($filter);
         },
 
         /**

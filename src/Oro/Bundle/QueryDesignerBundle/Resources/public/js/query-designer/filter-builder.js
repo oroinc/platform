@@ -1,11 +1,10 @@
 /* jshint browser:true */
 /* global define, require */
-define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'oro/query-designer/filter-manager'],
-function($, _, __, tools, mediator, FilterManager) {
+define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'oro/query-designer/filter-manager', 'oro/datafilter-wrapper'],
+function($, _, __, tools, mediator, FilterManager, filterWrapper) {
     'use strict';
 
-    var
-        initialized = false,
+    var initialized = false,
         filterModuleName = 'oro/datafilter/{{type}}-filter',
         filterTypes = {
             string:      'choice',
@@ -64,7 +63,12 @@ function($, _, __, tools, mediator, FilterManager) {
                     options.showLabel = false;
                     options.canDisable = false;
                     options.placeholder = __('Choose a condition');
-                    filters[options.type] = new (modules[options.type].extend(options));
+                    var Filter = modules[options.type].extend(options);
+                    var filter = new Filter();
+                    if (filter.wrappable) {
+                        _.extend(filter, filterWrapper);
+                    }
+                    filters[options.type] = filter;
                 });
                 return {filters: filters};
             }

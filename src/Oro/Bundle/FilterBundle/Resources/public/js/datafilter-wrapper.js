@@ -4,8 +4,6 @@ define(['jquery', 'underscore'], function($, _) {
     'use strict';
 
     return {
-        wrapperTemplate: '',
-
         /**
          * @property {Boolean}
          */
