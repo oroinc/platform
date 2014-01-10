@@ -102,34 +102,16 @@ class Runner
      */
     public function runPlatformUpdate()
     {
-        $phpPath = $this->getPhpExecutablePath();
-
-        $command = sprintf(
-            '"%s" "%s/console" oro:platform:update --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $this->environment
-        );
-
-        return $this->runCommand($command);
+        return $this->runCommand('oro:platform:update');
     }
 
     /**
      * @return string
      * @throws ProcessFailedException
      */
-    public function clearAppCache()
+    public function clearApplicationCache()
     {
-        $phpPath = $this->getPhpExecutablePath();
-
-        $command = sprintf(
-            '"%s" "%s/console" cache:clear --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $this->environment
-        );
-
-        return $this->runCommand($command);
+        return $this->runCommand('cache:clear');
     }
 
     /**
@@ -138,16 +120,7 @@ class Runner
      */
     public function updateDBSchema()
     {
-        $phpPath = $this->getPhpExecutablePath();
-
-        $command = sprintf(
-            '"%s" "%s/console" doctrine:schema:update --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $this->environment
-        );
-
-        return $this->runCommand($command);
+        return $this->runCommand('doctrine:schema:update --force');
     }
 
     /**
@@ -167,6 +140,7 @@ class Runner
         foreach ($finder as $file) {
             /** @var SplFileInfo $file */
             if (is_file($file->getPathname())) {
+                $this->logger->info(sprintf('Removing %s', $file->getPathname()));
                 unlink($file->getPathname());
             }
         }
@@ -181,6 +155,7 @@ class Runner
     {
         return $this->executeBatchCommand($packages, 'oro:package:fixtures:load');
     }
+
     /**
      * @param PackageInterface[] $packages
      *
@@ -196,40 +171,7 @@ class Runner
      */
     public function clearDistApplicationCache()
     {
-        $phpPath = $this->getPhpExecutablePath();
-
-        $command = sprintf(
-            '"%s" "%s/dist" cache:clear --no-warmup --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $this->environment
-        );
-
-        return $this->runCommand($command);
-    }
-
-    /**
-     * @param array $paths
-     * @param string $commandPrefix
-     * @param int $commandSize - windows shell-command is limited by 8kb
-     *
-     * @return array of commands to be executed
-     */
-    protected function makeCommands(array $paths, $commandPrefix, $commandSize = 8000)
-    {
-        $commands = [];
-        $commandIndex = 0;
-
-        $commands[$commandIndex] = $commandPrefix;
-        foreach ($paths as $path) {
-            if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
-                $commands[$commandIndex] .=  ' ' . $path ;
-            } else {
-                $commands[++$commandIndex] = $commandPrefix . ' ' . $path ;
-            }
-        }
-
-        return $commands;
+        return $this->runCommand('cache:clear --no-warmup', 'dist');
     }
 
     /**
@@ -240,18 +182,9 @@ class Runner
     protected function run($path)
     {
         if (file_exists($path)) {
-            $phpPath = $this->getPhpExecutablePath();
-
-            $command = sprintf(
-                '"%s" "%s/console" oro:platform:run-script "%s" --env=%s',
-                $phpPath,
-                $this->applicationRootDir,
-                $path,
-                $this->environment
-            );
+            $command = sprintf('oro:platform:run-script "%s"', $path);
 
             return $this->runCommand($command);
-
         } else {
             $this->logger->info(sprintf('There is no %s file', $path));
         }
@@ -259,9 +192,28 @@ class Runner
         return null;
     }
 
-    protected function runCommand($command)
+    /**
+     * @param string $command - e.g. clear:cache --no-warmup
+     * @param string $application - console or dist
+     *
+     * @return string
+     * @throws ProcessFailedException
+     */
+    protected function runCommand($command, $application = 'console')
     {
+        $phpPath = $this->getPhpExecutablePath();
+
+        $command = sprintf(
+            '"%s" "%s/%s" %s --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $application,
+            $command,
+            $this->environment
+        );
+
         $this->logger->info(sprintf('Executing "%s"', $command));
+
         $process = new Process($command);
         $process->setWorkingDirectory(realpath($this->applicationRootDir . '/..')); // project root
         $process->setTimeout(600);
@@ -279,6 +231,7 @@ class Runner
 
         return $output;
     }
+
 
     /**
      * @param PackageInterface $package
@@ -356,21 +309,12 @@ class Runner
      */
     protected function executeBatchCommand(array $packages, $command)
     {
-        $phpPath = $this->getPhpExecutablePath();
         $paths = [];
         foreach ($packages as $package) {
             $paths[] = $this->installationManager->getInstallPath($package);
         }
 
-        $commandPrefix = sprintf(
-            '"%s" "%s/console" %s --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $command,
-            $this->environment
-        );
-
-        $commands = $this->makeCommands($paths, $commandPrefix);
+        $commands = $this->makeCommands($paths, $command);
         $output = '';
         foreach ($commands as $command) {
             $output .= $this->runCommand($command);
@@ -378,4 +322,29 @@ class Runner
 
         return $output;
     }
+
+    /**
+     * @param array $paths
+     * @param string $commandPrefix
+     * @param int $commandSize - windows shell-command is limited by 8kb
+     *
+     * @return array of commands to be executed
+     */
+    protected function makeCommands(array $paths, $commandPrefix, $commandSize = 8000)
+    {
+        $commands = [];
+        $commandIndex = 0;
+
+        $commands[$commandIndex] = $commandPrefix;
+        foreach ($paths as $path) {
+            if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
+                $commands[$commandIndex] .= ' ' . $path;
+            } else {
+                $commands[++$commandIndex] = $commandPrefix . ' ' . $path;
+            }
+        }
+
+        return $commands;
+    }
+
 }
