@@ -29,7 +29,21 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('api')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->arrayNode('crowdin')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->scalarNode('endpoint')
+                                    ->defaultValue('http://api.crowdin.net/api')
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
+
         return $treeBuilder;
     }
 }
