@@ -1,7 +1,7 @@
 /* jshint browser:true */
 /* global define, require */
-define(['jquery', 'underscore', 'oro/tools', 'oro/mediator', 'oro/datafilter/collection-filters-manager', 'oro/datafilter-wrapper'],
-function($, _, tools,  mediator, FiltersManager, filterWrapper) {
+define(['jquery', 'underscore', 'oro/tools', 'oro/mediator', 'oro/datafilter/collection-filters-manager'],
+function($, _, tools,  mediator, FiltersManager) {
     'use strict';
 
     var initialized = false,
@@ -59,11 +59,7 @@ function($, _, tools,  mediator, FiltersManager, filterWrapper) {
                             options.collection = collection
                         }
                         var Filter = modules[options.type].extend(options);
-                        var filter = new Filter();
-                        if (filter.wrappable) {
-                            _.extend(filter, filterWrapper);
-                        }
-                        filters[options.name] = filter;
+                        filters[options.name] = new Filter();
                     }
                 });
                 return {filters: filters};
