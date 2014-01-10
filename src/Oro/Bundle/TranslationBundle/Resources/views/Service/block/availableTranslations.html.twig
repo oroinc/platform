@@ -46,15 +46,19 @@
                 </td>
                 <td>
                     {% if status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
-                        <button class="btn btn-mini" data-lang="{{ language.code }}"
-                                data-action="download"
-                                data-translation-status="{{ language.translationStatus }}">
-                            {{ 'Download'|trans }}
-                        </button>
+                        {{ _self.renderButton(language.code, 'download', 'Download', language.translationStatus) }}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_DOWNLOADED') %}
-                        <button class="btn btn-mini" data-lang="{{ language.code }}" data-action="enable">{{ 'Enable'|trans }}</button>
+                        {{ _self.renderButton(language.code, 'enable', 'Enable') }}
+
+                        {% if language.translationStatus != installedStatus %}
+                            {{ _self.renderButton(language.code, 'update', 'Update', language.translationStatus) }}
+                        {% endif %}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_ENABLED') %}
-                        <button class="btn btn-mini" data-lang="{{ language.code }}" data-action="disable">{{ 'Disable'|trans }}</button>
+                        {{ _self.renderButton(language.code, 'disable', 'Disable') }}
+
+                        {% if language.translationStatus != installedStatus %}
+                            {{ _self.renderButton(language.code, 'update', 'Update', language.translationStatus) }}
+                        {% endif %}
                     {% endif %}
                 </td>
             </tr>
@@ -68,3 +72,17 @@
     </table>
 </div>
 
+{#
+    Renders action button
+        langCode - code of the row language
+        action   - enable | disable | download | update
+        label    - any label you want
+        translationStatus - translation coverage percent
+#}
+{% macro renderButton(langCode, action, label, translationStatus = 0) %}
+    <button class="btn btn-mini" data-lang="{{ langCode }}"
+            data-action="{{ action }}"
+            data-translation-status="{{ translationStatus }}">
+        {{ label|trans }}
+    </button>
+{% endmacro %}

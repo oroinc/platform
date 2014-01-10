@@ -39,6 +39,10 @@
     width: 90px;
 }
 
+.available-translation-widget-container .btn + .btn {
+    margin-top: 10px;
+}
+
 .available-translation-widget-note {
     font-size: 11px;
     color: #666;

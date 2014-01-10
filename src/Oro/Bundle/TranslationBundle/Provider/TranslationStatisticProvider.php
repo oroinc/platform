@@ -40,7 +40,7 @@ class TranslationStatisticProvider
      */
     public function get()
     {
-        $data = $this->cache->fetch(static::CACHE_KEY);
+        $data = false; //$this->cache->fetch(static::CACHE_KEY);
 
         if (false === $data) {
             $data = $this->fetch();

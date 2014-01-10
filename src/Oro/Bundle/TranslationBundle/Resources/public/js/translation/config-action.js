@@ -54,7 +54,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
 
             if (_.isUndefined(action)) {
                 throw new TypeError('Attribute "data-action" should be set for action button');
-            } else if (_.indexOf(['enable', 'disable', 'download'], action) === -1) {
+            } else if (_.indexOf(['enable', 'disable', 'download', 'update'], action) === -1) {
                 throw new TypeError('Unknown action');
             }
 
@@ -77,7 +77,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
          * @param {Object} actionMediator
          */
         performAction: function (actionMediator) {
-            if (actionMediator.action == 'download') {
+            if (actionMediator.action == 'download' || actionMediator.action == 'update') {
                 var navigation = Navigation.getInstance();
                 if (navigation) {
                     navigation.loadingMask.show();
@@ -88,19 +88,23 @@ function (Backbone, _, routing, __, Navigation, messenger) {
                     translationStatus: actionMediator.translationStatus
                 });
                 $.post(url, _.bind(function () {
+                        this.markAsUpToDate(actionMediator);
                         this.postAction(actionMediator);
                     }, this))
-                    .always(_.bind(function (respose, status) {
+                    .always(_.bind(function (response, status) {
                         var message;
 
                         if (navigation) {
                             navigation.loadingMask.hide();
                         }
                         if (status !== 'success') {
-                            message = _.isUndefined(respose.message) ? __('unknown') : __(respose.message);
+                            response = response.responseJSON || {};
+                            message = _.isUndefined(response.message) ? __('unknown') : __(response.message);
                             message = __('Could not download translations, error: ') + message;
                         } else {
-                            message = __('Download finished.');
+                            message = actionMediator.action == 'download'
+                                ? __('Download finished.')
+                                : __('Update finished.');
                         }
 
                         messenger.notificationFlashMessage(status !== 'success' ? 'error' : 'success', message);
@@ -135,6 +139,19 @@ function (Backbone, _, routing, __, Navigation, messenger) {
             actionMediator.el.replaceWith($newButton);
 
             this.$el.val(JSON.stringify(config));
+        },
+
+        /**
+         * Mark given row as up to date
+         */
+        markAsUpToDate: function(actionMediator) {
+            var tableLine = actionMediator.el.parents('tr');
+
+            if (actionMediator.action == 'update') {
+                // remove update button
+                actionMediator.el.remove();
+            }
+            tableLine.find('.translation-status').html($('<span class="status-up-to-date">' + __('Up to date') + '</span>'));
         }
     });
 });
