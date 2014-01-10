@@ -174,16 +174,11 @@ EOF
         $projectName = $input->getArgument('project');
         $locale      = $input->getArgument('locale');
 
+        $projects = explode(',', $projectName);
         $languagePackPath = rtrim(
-                $this->getLangPackDir(str_replace(',', '_', $projectName)),
+                $this->getLangPackDir(implode('_', $projects)),
                 DIRECTORY_SEPARATOR
             ) . '.zip';
-
-        if (strpos($projectName, ',') !== false) {
-            $projects = explode(',', $projectName);
-        } else {
-            $projects = [$projectName];
-        }
 
         $result = $this
             ->getTranslationService($input, $output)
