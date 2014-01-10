@@ -107,13 +107,7 @@ class StepAssembler extends AbstractAssembler
                 $attributeName = $viewAttribute['attribute'];
                 $this->assertAttributeExists($attributeName, $stepName);
                 if (!isset($viewAttribute['path'])) {
-                    $attributeProperty = $viewAttribute['attribute'];
-                    if (array_key_exists($attributeProperty, $this->attributes)
-                        && $this->attributes[$attributeName]->getPropertyPath()
-                    ) {
-                        $attributeProperty = $this->attributes[$attributeName]->getPropertyPath();
-                    }
-                    $viewAttribute['path'] = '$' . $attributeProperty;
+                    $viewAttribute['path'] = '$' . $viewAttribute['attribute'];
                 }
                 if (!isset($viewAttribute['label'])) {
                     $viewAttribute['label'] = $this->attributes[$viewAttribute['attribute']]->getLabel();

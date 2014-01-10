@@ -139,14 +139,12 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                         'view_attributes' => array(
                             array('attribute' => 'attribute_one'),
                             array('path' => '$attribute_one.foo', 'label' => 'Custom Label'),
-                            array('attribute' => 'attribute_three'),
                         )
                     )
                 ),
                 array(
                     $this->createAttribute('attribute_one')->setLabel('Attribute One'),
                     $this->createAttribute('attribute_two'),
-                    $this->createAttribute('attribute_three')->setLabel('Attribute Three')->setPropertyPath('test'),
                 ),
                 $this->createStep('step_two')
                     ->setLabel('label')
@@ -170,11 +168,6 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                                 'label' => 'Attribute One'
                             ),
                             array('path' => new PropertyPath('data.attribute_one.foo'), 'label' => 'Custom Label'),
-                            array(
-                                'attribute' => 'attribute_three',
-                                'path' => new PropertyPath('data.test'),
-                                'label' => 'Attribute Three'
-                            ),
                         )
                     )
             ),
