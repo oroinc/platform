@@ -955,4 +955,33 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
     }
+
+    public function testGetAttributesMapping()
+    {
+        $attributeOne = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+            ->getMock();
+        $attributeOne->expects($this->once())
+            ->method('getPropertyPath');
+        $attributeOne->expects($this->never())
+            ->method('getName');
+        $attributeTwo = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+            ->getMock();
+        $attributeTwo->expects($this->atLeastOnce())
+            ->method('getPropertyPath')
+            ->will($this->returnValue('path'));
+        $attributeTwo->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('name'));
+
+        $attributes = array($attributeOne, $attributeTwo);
+        $attributeManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $attributeManager->expects($this->once())
+            ->method('getAttributes')
+            ->will($this->returnValue($attributes));
+        $workflow = new Workflow(null, $attributeManager, null);
+        $expected = array('name' => 'path');
+        $this->assertEquals($expected, $workflow->getAttributesMapping());
+    }
 }
