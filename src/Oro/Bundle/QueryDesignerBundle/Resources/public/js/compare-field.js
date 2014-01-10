@@ -83,7 +83,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
 
                 that.element.find('.active-filter').empty().append(filter.$el);
 
-                console.log(filter);
+//                console.log(filter);
             });
         },
 
@@ -176,26 +176,26 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                 var filter = new (Filter.extend(filterOptions));
 
                 if (filter.templateSelector === '#text-filter-template') {
-                    filter.templateSelector = '#text-filter-simple-template';
+                    filter.templateSelector = '#text-filter-embedded-template';
                     filter.template = _.template($(filter.templateSelector).text());
                 }
 
                 if (filter.templateSelector === '#choice-filter-template') {
-                    filter.templateSelector = '#choice-filter-simple-template';
+                    filter.templateSelector = '#choice-filter-embedded-template';
                     filter.template = _.template($(filter.templateSelector).text());
                 }
 
                 if (filter.templateSelector === '#date-filter-template') {
-                    filter.templateSelector = '#date-filter-simple-template';
+                    filter.templateSelector = '#date-filter-embedded-template';
                     filter.template = _.template($(filter.templateSelector).text());
                 }
 
                 if (filter.templateSelector === '#select-filter-template') {
-                    filter.templateSelector = '#select-filter-simple-template';
+                    filter.templateSelector = '#select-filter-embedded-template';
                     filter.template = _.template($(filter.templateSelector).text());
                 }
 
-                console.log(filter.templateSelector);
+//                console.log(filter.templateSelector);
 
                 cb(filter);
             });

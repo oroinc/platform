@@ -16,22 +16,23 @@ function($, _, __, AbstractFilter) {
     return AbstractFilter.extend({
         wrappable: true,
 
-        template: _.template('<div><%= popupHint %></div>'),
+        wrapperTemplate: '',
+
+        wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
          * Template for filter criteria
          *
          * @property
          */
-        wrapperTemplate: _.template('\
-            <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">\
-                <% if (showLabel) { %><%= label %>: <% } %>\
-                <strong class="filter-criteria-hint"><%= criteriaHint %></strong>\
-                <span class="caret"></span>\
-            </button>\
-            <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>\
-            <div class="filter-criteria dropdown-menu" />\
-        '),
+        template: '',
+
+        /**
+         * Template selector for filter criteria
+         *
+         * @property
+         */
+        templateSelector: '#none-filter-template',
 
         /**
          * Selector to element of criteria hint
@@ -71,8 +72,10 @@ function($, _, __, AbstractFilter) {
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'popupHint');
+            options = _.pick(options || {}, 'popupHint', 'templateSelector');
             _.extend(this, options);
+
+            this.template = _.template($(this.templateSelector).text());
 
             this.label = 'None';
             AbstractFilter.prototype.initialize.apply(this, arguments);
