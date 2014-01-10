@@ -7,12 +7,13 @@ interface TranslationStatusInterface
     /**
      * Setting key for config manager
      */
-    const CONFIG_KEY = 'oro_translation.available_translations';
+    const CONFIG_KEY      = 'oro_translation.available_translations';
+    const META_CONFIG_KEY = 'oro_translation.installed_translation_meta';
 
     /**
      * Translation pack was not downloaded yet
      */
-    const STATUS_NEW        = 1;
+    const STATUS_NEW = 1;
 
     /**
      * Translation pack downloaded, but did not enabled for usage.
@@ -22,5 +23,5 @@ interface TranslationStatusInterface
     /**
      * Translation pack downloaded and available for usage
      */
-    const STATUS_ENABLED    = 3;
+    const STATUS_ENABLED = 3;
 }

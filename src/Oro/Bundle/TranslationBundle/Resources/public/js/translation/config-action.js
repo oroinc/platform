@@ -48,8 +48,9 @@ function (Backbone, _, routing, __, Navigation, messenger) {
 
             var $el = $(e.currentTarget),
                 action = $el.data('action'),
-                code = $el.data('lang')
-                ;
+                code = $el.data('lang'),
+                translationStatus = $el.data('translationStatus') || 0
+            ;
 
             if (_.isUndefined(action)) {
                 throw new TypeError('Attribute "data-action" should be set for action button');
@@ -64,7 +65,8 @@ function (Backbone, _, routing, __, Navigation, messenger) {
             var actionMediator = {
                 el: $el,
                 action: action,
-                code: code
+                code: code,
+                translationStatus: translationStatus
             };
             this.performAction(actionMediator);
         },
@@ -81,7 +83,11 @@ function (Backbone, _, routing, __, Navigation, messenger) {
                     navigation.loadingMask.show();
                 }
 
-                $.post(routing.generate(this.route, {code: actionMediator.code}), _.bind(function () {
+                var url = routing.generate(this.route, {
+                    code: actionMediator.code,
+                    translationStatus: actionMediator.translationStatus
+                });
+                $.post(url, _.bind(function () {
                         this.postAction(actionMediator);
                     }, this))
                     .always(_.bind(function (respose, status) {

@@ -63,7 +63,7 @@ class OroTranslationAdapter
         $responseCode = $this->apiRequest->getResponseCode();
         if ($responseCode === Codes::HTTP_OK) {
             $result = json_decode($response, true);
-            $result = $result ? $result : [];
+            $result = is_array($result) ? $result : [];
 
             $filtered = array_filter(
                 $result,

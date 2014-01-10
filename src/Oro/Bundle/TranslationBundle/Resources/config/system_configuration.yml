@@ -13,8 +13,8 @@ oro_system_configuration:
                 children:
                     general_setup:
                         children:
-                            localization:
+                            language_settings:
                                 children:
-                                    language_settings:
+                                    language_general:
                                         children:
                                             - oro_translation.available_translations
