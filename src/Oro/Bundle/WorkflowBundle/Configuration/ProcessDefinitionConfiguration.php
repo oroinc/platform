@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class ProcessDefinitionConfiguration implements ConfigurationInterface
 {
@@ -25,7 +26,18 @@ class ProcessDefinitionConfiguration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('configuration');
-        $rootNode
+        $this->addDefinitionNodes($rootNode);
+
+        return $treeBuilder;
+    }
+
+    /**
+     * @param ArrayNodeDefinition $nodeDefinition
+     * @return ArrayNodeDefinition
+     */
+    public function addDefinitionNodes(ArrayNodeDefinition $nodeDefinition)
+    {
+        $nodeDefinition
             ->children()
                 ->scalarNode('name')
                     ->cannotBeEmpty()
@@ -53,6 +65,6 @@ class ProcessDefinitionConfiguration implements ConfigurationInterface
                 ->end()
             ->end();
 
-        return $treeBuilder;
+        return $nodeDefinition;
     }
 }
