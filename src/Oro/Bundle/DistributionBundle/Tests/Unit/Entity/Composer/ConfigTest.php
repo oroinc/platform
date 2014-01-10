@@ -3,12 +3,11 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity\Composer;
 
 
-use MyProject\Proxies\__CG__\stdClass;
 use Oro\Bundle\DistributionBundle\Entity\Composer\Config;
 use Oro\Bundle\DistributionBundle\Entity\Composer\Repository;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 
-class RepositoryTest extends \PHPUnit_Framework_TestCase
+class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     use MockHelperTrait;
 
