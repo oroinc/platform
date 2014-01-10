@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages\Objects;
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractEntity;
 use Oro\Bundle\TestFrameworkBundle\Pages\Entity;
 use Oro\Bundle\TestFrameworkBundle\Pages\Page;
+use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 
 class OroAdministration extends Page
 {
@@ -30,9 +31,12 @@ class OroAdministration extends Page
         $this->waitPageToLoad();
         $this->assertTitle('Installation - Oro Application installation');
         //waiting
+        $s = microtime(true);
         do {
             sleep(5);
             $this->waitPageToLoad();
+            $e = microtime(true);
+            $this->test->assertTrue(($e-$s) <= MAX_EXECUTION_TIME);
         } while ($this->isElementPresent("//a[@class = 'button next primary disabled']"));
 
         $this->test->moveto($this->byXpath("//a[@class = 'button next primary']"));

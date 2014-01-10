@@ -16,6 +16,9 @@
             'alias': 'oro_translation_available_translations'
         }) }}
     </div>
+    <p class="available-translation-widget-note">
+        <sup>&nbsp;1&nbsp;</sup>{% trans %}Translation coverage indicator relates to translation package volume. Some bundles may still not be translated.{% endtrans %}
+    </p>
     <script type="text/javascript">
         require(['jquery', 'oro/translation/translation/config-action', 'oro/widget-manager'],
         function ($, ActionPerformer, widgetManager) {
@@ -23,6 +26,9 @@
                 .parents('.controls.control-subgroup')
                 .removeClass('controls')
                 .removeClass('control-subgroup')
+                .end()
+                .parents('.control-group')
+                .addClass('available-translation-widget-control-group')
             ;
 
             widgetManager.getWidgetInstanceByAlias('oro_translation_available_translations', function (widget) {
