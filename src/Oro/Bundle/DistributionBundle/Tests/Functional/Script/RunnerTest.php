@@ -184,7 +184,9 @@ class RunnerTest extends WebTestCase
             'Simple migration 2 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_2.php',
             'update 2'
-        ) . PHP_EOL . $this->formatExpectedResult(
+        );
+        $expectedRunnerOutput .= PHP_EOL;
+        $expectedRunnerOutput .= $this->formatExpectedResult(
             'Simple migration 3 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_3.php',
             'update 3'
@@ -205,7 +207,9 @@ class RunnerTest extends WebTestCase
             'Complex migration 0_1_9_1 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_0.1.9.1.php',
             'update 0.1.9.1'
-        ) . PHP_EOL . $this->formatExpectedResult(
+        );
+        $expectedRunnerOutput .= PHP_EOL;
+        $expectedRunnerOutput .= $this->formatExpectedResult(
             'Complex migration 0_1_10 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_0.1.10.php',
             'update 0.1.10'
@@ -248,7 +252,7 @@ class RunnerTest extends WebTestCase
         $this->assertFileNotExists($containerFileName);
     }
 
-    public function testShouldRunClearCacheCommandWithoutErrors()
+    public function testShouldRunClearCacheCommandForDistApplicationWithoutErrors()
     {
         $logger = $this->createLoggerMock();
         $logger->expects($this->exactly(2))
@@ -256,6 +260,16 @@ class RunnerTest extends WebTestCase
         $runner = $this->createRunner(null, $logger);
 
         $runner->clearDistApplicationCache();
+    }
+
+    public function testShouldRunClearCacheCommandWithoutErrors()
+    {
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(2))
+            ->method('info');
+        $runner = $this->createRunner(null, $logger);
+
+        $runner->clearApplicationCache();
     }
 
     /**

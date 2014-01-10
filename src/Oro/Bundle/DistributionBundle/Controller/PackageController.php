@@ -127,7 +127,10 @@ class PackageController extends Controller
         $params = $this->getRequest()->get('params');
         $packageName = $this->getParamValue($params, 'packageName', null);
         $packageVersion = $this->getParamValue($params, 'version', null);
+        $loadDemoData = $this->getParamValue($params, 'loadDemoData', null);
         $forceDependenciesInstalling = $this->getParamValue($params, 'force', false);
+
+        $isConfirmationRequired = ($loadDemoData === null);
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
@@ -145,26 +148,32 @@ class PackageController extends Controller
             return $response;
         }
 
+
         try {
-            if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName)) {
+            if ($isConfirmationRequired) {
                 $params['force'] = true;
                 $responseContent = [
                     'code' => self::CODE_CONFIRM,
-                    'requirements' => array_map(
+                    'params' => $params
+                ];
+
+                if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName)) {
+
+                    $responseContent['requirements'] = array_map(
                         function (PackageRequirement $pr) {
                             return $pr->toArray();
                         },
                         $requirements
-                    ),
-                    'params' => $params
-                ];
+                    );
+                }
+
                 $response->setContent(json_encode($responseContent));
 
                 return $response;
+
             }
 
-            $manager->install($packageName, $packageVersion);
-
+            $manager->install($packageName, $packageVersion, (bool)$loadDemoData);
 
         } catch (\Exception $e) {
             $message = $e instanceof VerboseException ?
