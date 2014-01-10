@@ -339,7 +339,7 @@ class NumberFormatter
     }
 
     /**
-     * @param \NumberFormatter $formatter
+     * @param IntlNumberFormatter $formatter
      * @param string $locale
      * @param int $style
      * @param array $attributes
