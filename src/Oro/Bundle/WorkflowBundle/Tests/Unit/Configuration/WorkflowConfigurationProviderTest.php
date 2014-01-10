@@ -15,15 +15,27 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var WorkflowListConfiguration
+     */
+    protected $configuration;
+
+    protected function setUp()
+    {
+        $this->configuration = new WorkflowListConfiguration(new WorkflowConfiguration());
+    }
+
+    protected function tearDown()
+    {
+        unset($this->configuration);
+    }
+
+    /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      */
     public function testGetWorkflowDefinitionsIncorrectConfiguration()
     {
         $bundles = array(new IncorrectConfigurationBundle());
-        $configurationProvider = new WorkflowConfigurationProvider(
-            $bundles,
-            new WorkflowListConfiguration(new WorkflowConfiguration())
-        );
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
         $configurationProvider->getWorkflowDefinitionConfiguration();
     }
 
@@ -33,24 +45,61 @@ class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowDefinitionsDuplicateConfiguration()
     {
         $bundles = array(new CorrectConfigurationBundle(), new DuplicateConfigurationBundle());
-        $configurationProvider = new WorkflowConfigurationProvider(
-            $bundles,
-            new WorkflowListConfiguration(new WorkflowConfiguration())
-        );
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
         $configurationProvider->getWorkflowDefinitionConfiguration();
     }
 
     public function testGetWorkflowDefinitions()
     {
         $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
-        $configurationProvider = new WorkflowConfigurationProvider(
-            $bundles,
-            new WorkflowListConfiguration(new WorkflowConfiguration())
-        );
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
 
         $this->assertEquals(
             $this->getExpectedWokflowConfiguration('CorrectConfiguration'),
             $configurationProvider->getWorkflowDefinitionConfiguration()
+        );
+    }
+
+    public function testGetWorkflowDefinitionsFilterByDirectory()
+    {
+        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $this->assertEquals(
+            $this->getExpectedWokflowConfiguration('CorrectConfiguration'),
+            $configurationProvider->getWorkflowDefinitionConfiguration(
+                array(__DIR__ . '/Stub/CorrectConfiguration')
+            )
+        );
+
+        $this->assertEmpty(
+            $configurationProvider->getWorkflowDefinitionConfiguration(
+                array(__DIR__ . '/Stub/EmptyConfiguration')
+            )
+        );
+    }
+
+    public function testGetWorkflowDefinitionsFilterByWorkflow()
+    {
+        $bundles = array(new CorrectConfigurationBundle(), new EmptyConfigurationBundle());
+        $configurationProvider = new WorkflowConfigurationProvider($bundles, $this->configuration);
+
+        $expectedWorkflows = $this->getExpectedWokflowConfiguration('CorrectConfiguration');
+        unset($expectedWorkflows['second_workflow']);
+
+        $this->assertEquals(
+            $expectedWorkflows,
+            $configurationProvider->getWorkflowDefinitionConfiguration(
+                null,
+                array('first_workflow')
+            )
+        );
+
+        $this->assertEmpty(
+            $configurationProvider->getWorkflowDefinitionConfiguration(
+                null,
+                array('not_existing_workflow')
+            )
         );
     }
 

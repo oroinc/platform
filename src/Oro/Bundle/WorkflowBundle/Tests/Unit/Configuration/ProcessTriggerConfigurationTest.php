@@ -96,12 +96,27 @@ class ProcessTriggerConfigurationTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
      * @expectedExceptionMessage Invalid configuration for path "configuration": Field is only allowed for update event
      */
-    public function testProcessInvalidFieldValue()
+    public function testProcessInvalidField()
     {
         $this->configuration->processConfiguration(
             array(
                 'event' => ProcessTrigger::EVENT_CREATE,
                 'field' => 'status',
+            )
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage The value "not_existing_event" is not allowed for path "configuration.event". Permissible values: "create", "update", "delete"
+     */
+    //@codingStandardsIgnoreEnd
+    public function testProcessInvalidEvent()
+    {
+        $this->configuration->processConfiguration(
+            array(
+                'event' => 'not_existing_event',
             )
         );
     }

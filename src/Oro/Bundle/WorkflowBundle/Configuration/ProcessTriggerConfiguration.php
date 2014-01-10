@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 class ProcessTriggerConfiguration implements ConfigurationInterface
 {
@@ -28,7 +29,14 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
     {
         $nodeDefinition
             ->children()
-                ->scalarNode('event')
+                ->enumNode('event')
+                    ->values(
+                        array(
+                            ProcessTrigger::EVENT_CREATE,
+                            ProcessTrigger::EVENT_UPDATE,
+                            ProcessTrigger::EVENT_DELETE
+                        )
+                    )
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
