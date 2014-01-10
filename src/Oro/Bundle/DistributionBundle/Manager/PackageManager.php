@@ -263,13 +263,21 @@ class PackageManager
     /**
      * @param string $packageName
      * @param string $packageVersion
+     * @param bool $loadDemoData
      *
      * @throws VerboseException
      * @throws \Exception
      */
-    public function install($packageName, $packageVersion = null)
+    public function install($packageName, $packageVersion = null, $loadDemoData = false)
     {
-        $this->logger->info(sprintf('%s (%s) installing begin', $packageName, $packageVersion));
+        $this->logger->info(
+            sprintf(
+                '%s (%s) installing begin (%s)',
+                $packageName,
+                $packageVersion,
+                $loadDemoData ? 'with demo data' : 'without demo data'
+            )
+        );
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
@@ -283,6 +291,7 @@ class PackageManager
                         return !in_array($package->getName(), $previousInstalled);
                     }
                 );
+                $this->scriptRunner->clearAppCache();
                 $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
@@ -290,7 +299,11 @@ class PackageManager
                     },
                     $justInstalledPackages
                 );
+                $this->scriptRunner->updateDBSchema();
                 $this->scriptRunner->loadFixtures($justInstalledPackages);
+                if ($loadDemoData) {
+                    $this->scriptRunner->loadDemoData($justInstalledPackages);
+                }
                 $this->scriptRunner->clearDistApplicationCache();
             } else {
                 throw new VerboseException(

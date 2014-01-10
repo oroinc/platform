@@ -115,6 +115,42 @@ class Runner
     }
 
     /**
+     * @return string
+     * @throws ProcessFailedException
+     */
+    public function clearAppCache()
+    {
+        $phpPath = $this->getPhpExecutablePath();
+
+        $command = sprintf(
+            '"%s" "%s/console" cache:clear --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
+        return $this->runCommand($command);
+    }
+
+    /**
+     * @return string
+     * @throws ProcessFailedException
+     */
+    public function updateDBSchema()
+    {
+        $phpPath = $this->getPhpExecutablePath();
+
+        $command = sprintf(
+            '"%s" "%s/console" doctrine:schema:update --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $this->environment
+        );
+
+        return $this->runCommand($command);
+    }
+
+    /**
      * Needed to be executed after package has been uninstalled so that main application (app/console) could be built
      */
     public function removeCachedFiles()
@@ -143,27 +179,16 @@ class Runner
      */
     public function loadFixtures(array $packages)
     {
-        $phpPath = $this->getPhpExecutablePath();
-        $paths = [];
-        foreach ($packages as $package) {
-            $paths[] = $this->installationManager->getInstallPath($package);
-        }
-
-        $commandPrefix = sprintf(
-            '"%s" "%s/console" oro:package:fixtures:load --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $this->environment
-        );
-
-        $commands = $this->makeCommands($paths, $commandPrefix);
-        $output = '';
-        foreach ($commands as $command) {
-            $output .= $this->runCommand($command);
-        }
-
-        return $output;
-
+        return $this->executeBatchCommand($packages, 'oro:package:fixtures:load');
+    }
+    /**
+     * @param PackageInterface[] $packages
+     *
+     * @return string
+     */
+    public function loadDemoData(array $packages)
+    {
+        return $this->executeBatchCommand($packages, 'oro:package:demo:load');
     }
 
     /**
@@ -321,5 +346,36 @@ class Runner
         }
 
         throw new \RuntimeException('PHP cannot be found');
+    }
+
+    /**
+     * @param PackageInterface[] $packages
+     * @param string $command
+     *
+     * @return string
+     */
+    protected function executeBatchCommand(array $packages, $command)
+    {
+        $phpPath = $this->getPhpExecutablePath();
+        $paths = [];
+        foreach ($packages as $package) {
+            $paths[] = $this->installationManager->getInstallPath($package);
+        }
+
+        $commandPrefix = sprintf(
+            '"%s" "%s/console" %s --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $command,
+            $this->environment
+        );
+
+        $commands = $this->makeCommands($paths, $commandPrefix);
+        $output = '';
+        foreach ($commands as $command) {
+            $output .= $this->runCommand($command);
+        }
+
+        return $output;
     }
 }

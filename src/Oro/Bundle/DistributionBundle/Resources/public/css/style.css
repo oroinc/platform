@@ -229,3 +229,17 @@ table.table {
     font-size: 17px;
 }
 
+#load-demo-data {
+    display: none;
+}
+#load-demo-data + span {
+    font-size: 15px;
+}
+#load-demo-data + span:before {
+    font-family: 'FontAwesome';
+    padding-right: 2px;
+    content: "\f096";
+}
+#load-demo-data:checked + span:before {
+    content: "\f046";
+}
