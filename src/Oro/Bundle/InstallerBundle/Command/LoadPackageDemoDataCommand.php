@@ -47,6 +47,8 @@ class LoadPackageDemoDataCommand extends ContainerAwareCommand
             $output->writeln('');
             $output->writeln('<error>No valid paths specified</error>');
             return 1;
+        }
+
 
         // a function which allows filter fixtures by the given packages
         $filterByPackage = function ($path) use ($packageDirectories) {
