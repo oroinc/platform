@@ -40,10 +40,7 @@ class ProcessTriggerListConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('configuration');
         $rootNode->useAttributeAsKey('name');
-        $nodeBuilder = $rootNode
-            ->prototype('array')
-                ->prototype('array');
-        $this->triggerConfiguration->addTriggerNodes($nodeBuilder);
+        $this->triggerConfiguration->addTriggerNodes($rootNode->prototype('array')->prototype('array'));
 
         return $treeBuilder;
     }
