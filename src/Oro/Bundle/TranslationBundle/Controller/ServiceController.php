@@ -70,15 +70,8 @@ class ServiceController extends BaseController
         $service      = $this->get('oro_translation.service_provider');
         $service->setAdapter($proxyAdapter);
 
-        // TODO: consider if we need this info for proxy adapter
-        $proxyAdapter->setApiKey('e906a809346a58caeb6e5355dcabd2dc');
-        $proxyAdapter->setProjectId('test-orocrm-project');
-
-        $path   = $this->container->getParameter('kernel.root_dir')
-            . DIRECTORY_SEPARATOR . 'Resources'
-            . DIRECTORY_SEPARATOR . 'language-pack'
-            . DIRECTORY_SEPARATOR . 'OroCRM'
-            . DIRECTORY_SEPARATOR . 'OroCRM.zip';
+        $path   = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('download_') .
+            DIRECTORY_SEPARATOR . $code . '.zip';
 
         try {
             $result = $service->download($path, $projects, $code);
