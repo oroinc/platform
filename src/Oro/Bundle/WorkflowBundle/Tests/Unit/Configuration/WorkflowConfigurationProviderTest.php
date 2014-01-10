@@ -12,7 +12,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfigurati
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
+class WorkflowConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException

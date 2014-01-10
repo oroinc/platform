@@ -6,24 +6,12 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-class WorkflowConfigurationProvider
+class WorkflowConfigurationProvider extends AbstractConfigurationProvider
 {
-    const NODE_WORKFLOWS = 'workflows';
-
-    /**
-     * @var string
-     */
-    protected $configDirectory = '/Resources/config/';
-
     /**
      * @var string
      */
     protected $configFilePattern = 'workflow.yml';
-
-    /**
-     * @var array
-     */
-    protected $kernelBundles = array();
 
     /**
      * @var WorkflowListConfiguration
@@ -36,27 +24,30 @@ class WorkflowConfigurationProvider
      */
     public function __construct(array $kernelBundles, WorkflowListConfiguration $configuration)
     {
-        $this->kernelBundles = $kernelBundles;
+        parent::__construct($kernelBundles);
+
         $this->configuration = $configuration;
     }
 
     /**
-     * @param callable|null $filter
+     * @param array|null $usedDirectories
+     * @param array|null $usedWorkflows
      * @return array
      * @throws InvalidConfigurationException
      */
-    public function getWorkflowDefinitionConfiguration(\Closure $filter = null)
-    {
-        $configDirectories = $this->getConfigDirectories();
+    public function getWorkflowDefinitionConfiguration(
+        array $usedDirectories = null,
+        array $usedWorkflows = null
+    ) {
+        $this->setUsedDirectories($usedDirectories);
 
-        $finder = new Finder();
-        $finder->in($configDirectories)->name($this->configFilePattern);
+        $finder = $this->getConfigFinder();
 
         $configuration = array();
         /** @var $file \SplFileInfo */
         foreach ($finder as $file) {
             $realPathName = $file->getRealPath();
-            if ($filter !== null && !$filter($realPathName)) {
+            if (!$this->isFileAllowed($realPathName)) {
                 continue;
             }
 
@@ -74,6 +65,11 @@ class WorkflowConfigurationProvider
             }
 
             foreach ($finalizedData as $workflowName => $workflowConfiguration) {
+                // skip not used workflows
+                if (null !== $usedWorkflows && !in_array($workflowName, $usedWorkflows)) {
+                    continue;
+                }
+
                 if (isset($configuration[$workflowName])) {
                     throw new InvalidConfigurationException(
                         sprintf('Duplicated workflow name "%s" in %s', $workflowName, $realPathName)
@@ -88,21 +84,10 @@ class WorkflowConfigurationProvider
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    protected function getConfigDirectories()
+    protected function getConfigFilePattern()
     {
-        $configDirectory = str_replace('/', DIRECTORY_SEPARATOR, $this->configDirectory);
-        $configDirectories = array();
-
-        foreach ($this->kernelBundles as $bundle) {
-            $reflection = new \ReflectionClass($bundle);
-            $bundleConfigDirectory = dirname($reflection->getFilename()) . $configDirectory;
-            if (is_dir($bundleConfigDirectory) && is_readable($bundleConfigDirectory)) {
-                $configDirectories[] = realpath($bundleConfigDirectory);
-            }
-        }
-
-        return $configDirectories;
+        return $this->configFilePattern;
     }
 }
