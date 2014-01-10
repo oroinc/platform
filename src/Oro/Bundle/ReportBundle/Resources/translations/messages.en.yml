@@ -61,8 +61,8 @@ oro:
             label.label:         Label
 
 "New Report": New Report
-"Manage Reports": Manage Reports
-"Manage Reports - Reports": Manage Reports - Reports
+"Manage Custom Reports": Manage Custom Reports
+"Manage Custom Reports - Reports": Manage Custom Reports - Reports
 "Create Report - Reports": Create Report - Reports
 "%report.name% - Edit - Reports": %report.name% - Edit - Reports
 "%report.name% - Reports": %report.name% - Reports
