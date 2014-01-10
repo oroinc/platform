@@ -333,19 +333,22 @@ class NumberFormatter
             $formatter->setSymbol($symbol, $value);
         }
 
-        $this->adjustFormatter($formatter, $locale, $style, $attributes, $textAttributes, $symbols);
+        $this->adjustFormatter($formatter, $locale, $style, $attributes);
 
         return $formatter;
     }
 
-
+    /**
+     * @param \NumberFormatter $formatter
+     * @param string $locale
+     * @param int $style
+     * @param array $attributes
+     */
     protected function adjustFormatter(
         IntlNumberFormatter $formatter,
         $locale,
         $style,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array()
+        array $attributes = array()
     ) {
         // need to manually set percent fraction same to decimal
         if ($style === \NumberFormatter::PERCENT) {
