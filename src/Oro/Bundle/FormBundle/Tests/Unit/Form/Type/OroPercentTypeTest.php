@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\OroPercentType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
-use Oro\Bundle\FormBundle\Form\Type\OroMoneyType;
+use Oro\Bundle\FormBundle\Form\Type\OroPercentType;
 
 class OroPercentTypeTest extends FormIntegrationTestCase
 {
@@ -15,7 +14,7 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     protected $locale;
 
     /**
-     * @var OroMoneyType
+     * @var OroPercentType
      */
     protected $formType;
 
