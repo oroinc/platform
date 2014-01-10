@@ -1,24 +1,5 @@
 {% extends 'OroDistributionBundle::base_inner.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
-    <script type="text/javascript">
-        $(function () {
-            holder = $('ul.repos');
-            holder.data('index', holder.find(':input').length);
-
-            $('#add_repo_link').on('click', function (e) {
-                var index = holder.data('index');
-                var newForm = holder.data('prototype').replace(/__name__/g, index);
-
-                holder.data('index', index + 1);
-                holder.append(newForm);
-                $(newForm).find('.delete-action').remove();
-            });
-        });
-    </script>
-{% endblock %}
-
 {% block title %}Composer Settings{% endblock %}
 
 {% block menu %}
@@ -29,17 +10,13 @@
 {% endblock %}
 
 {% block body %}
-    {{ form_start(form) }}
-        {{ form_row(form.oauth) }}
+    {% if saved %}
+        <div class="alert fade in alert-success">
+            <i class="icon icon-success"></i>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            The settings were saved.
+        </div>
+    {% endif %}
 
-        <h3>Repositories</h3>
-        <ul class="repos" data-prototype="{% filter escape %}{% include 'OroDistributionBundle:Settings:repo_prototype.html.twig' with { 'repo': form.repositories.vars.prototype } %}{% endfilter %}">
-            {% for repo in form.repositories %}
-                {% include 'OroDistributionBundle:Settings:repo_prototype.html.twig' with { 'repo': repo } %}
-            {% endfor %}
-
-        </ul>
-        <a href="#" id="add_repo_link">Add a repository</a>
-    {{ form_end(form) }}
-
+    {% include 'OroDistributionBundle:Settings:settings_form.html.twig' with { 'form': form } %}
 {% endblock %}

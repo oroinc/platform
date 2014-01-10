@@ -15,7 +15,8 @@ class RepositoryType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('url', 'text');
+            ->add('type', 'choice', ['choices' => ['composer' => 'composer', 'vcs' => 'vcs', 'pear' => 'pear']])
+            ->add('url', 'text', ['required' => true]);
     }
 
     /**
@@ -33,7 +34,7 @@ class RepositoryType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\DistributionBundle\Entity\Composer\Repository'
+                'data_class' => 'Oro\Bundle\DistributionBundle\Entity\Composer\Repository',
             ]
         );
     }

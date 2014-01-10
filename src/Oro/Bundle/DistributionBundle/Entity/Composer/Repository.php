@@ -2,11 +2,19 @@
 
 namespace Oro\Bundle\DistributionBundle\Entity\Composer;
 
+use Symfony\Component\Validator\Constraints as Assert;
 
 class Repository {
 
-    protected $type = 'vcs';
+    /**
+     * @Assert\Choice(choices = {"composer", "vcs", "pear"}, message = "Choose a valid type.")
+     * @var string
+     */
+    protected $type = 'composer';
 
+    /**
+     * @Assert\NotBlank()
+     */
     protected $url;
 
     /**
@@ -15,6 +23,14 @@ class Repository {
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 
     /**
