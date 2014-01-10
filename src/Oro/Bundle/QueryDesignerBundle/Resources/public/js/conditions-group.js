@@ -18,7 +18,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
             conditionsGroup: {
                 items: '>.condition[data-criteria]',
                 cursorAt: "10 10",
-                cancel: 'a, input, .btn'
+                cancel: 'a, input, .btn, select'
             },
             conditionsGroupSelector: '#segmentation-conditions',
             criteriaList: {},
