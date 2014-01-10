@@ -13,7 +13,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageType;
 use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
-use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
 class ServiceController extends BaseController
 {

@@ -114,6 +114,7 @@ class TranslationServiceProvider
      * @param null|string $locale
      * @param bool        $toApply    whether apply download packs or not
      *
+     * @throws \RuntimeException
      * @return bool
      */
     public function download($pathToSave, array $projects, $locale = null, $toApply = true)
@@ -126,10 +127,19 @@ class TranslationServiceProvider
         }
 
         $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
-        $isExtracted  = $this->unzip(
-            $pathToSave,
-            is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
-        );
+        try {
+            $isExtracted  = $this->unzip(
+                $pathToSave,
+                is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
+            );
+        } catch (\RuntimeException $e) {
+            // try to check possible error messages in file
+            if ($e->getCode() === \ZipArchive::ER_NOZIP) {
+                $this->adapter->parseResponse(file_get_contents($pathToSave));
+            }
+
+            throw $e;
+        }
 
         // TODO: consider move this in crowdin adapter or remove
         if ($locale == 'en') {
@@ -186,14 +196,6 @@ class TranslationServiceProvider
             \ZipArchive::ER_READ   => 'Read error.',
             \ZipArchive::ER_SEEK   => 'Seek error.',
         ];
-
-        // try to check possible error messages in file
-        if ($res === \ZipArchive::ER_NOZIP) {
-            $result = $this->adapter->parseResponse(file_get_contents($file));
-            if ($result->getName() == 'error') {
-                throw new \RuntimeException($result->message, (int)$result->code);
-            }
-        }
 
         if ($res !== true) {
             throw new \RuntimeException($zipErrors[$res], $res);
@@ -321,9 +323,9 @@ class TranslationServiceProvider
     }
 
     /**
-     * @param AbstractAPIAdapter $adapter
+     * @param APIAdapterInterface $adapter
      */
-    public function setAdapter(AbstractAPIAdapter $adapter)
+    public function setAdapter(APIAdapterInterface $adapter)
     {
         $this->adapter = $adapter;
     }

@@ -141,4 +141,21 @@ class OroTranslationAdapter implements APIAdapterInterface
 
         return $this->apiRequest->execute();
     }
+
+    /**
+     * @param $response
+     *
+     * @return \stdClass
+     * @throws \RuntimeException
+     */
+    public function parseResponse($response)
+    {
+        $result = json_decode($response);
+        if (isset($result->error)) {
+            $code = isset($result->code) ? (int)$result->code : 0;
+            throw new \RuntimeException($result->error, $code);
+        }
+
+        return $result;
+    }
 }
