@@ -2,43 +2,38 @@
 
 namespace Oro\Bundle\NavigationBundle\Title;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Extractor\ExtractorInterface;
 
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+
 class TranslationExtractor implements ExtractorInterface
 {
-    /**
-     * @var \Oro\Bundle\NavigationBundle\Provider\TitleService
-     */
+    /** @var TitleServiceInterface */
     private $titleService;
 
-    /**
-     * @var \Symfony\Component\Routing\Router
-     */
+    /** @var Router */
     private $router;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $prefix;
 
     /**
-     * @param \Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface $titleService
-     * @param \Symfony\Component\Routing\Router $router
+     * @param TitleServiceInterface $titleService
+     * @param Router                $router
      */
     public function __construct(TitleServiceInterface $titleService, Router $router)
     {
         $this->titleService = $titleService;
-        $this->router = $router;
+        $this->router       = $router;
     }
 
     /**
      * Extract titles for translation
      *
-     * @param string                                          $directory
-     * @param \Symfony\Component\Translation\MessageCatalogue $catalogue
+     * @param string           $directory
+     * @param MessageCatalogue $catalogue
      *
      * @return MessageCatalogue
      */
@@ -49,8 +44,8 @@ class TranslationExtractor implements ExtractorInterface
         $titles = $this->titleService->getStoredTitlesRepository()->getTitles($routes);
 
         foreach ($titles as $titleRecord) {
-            $message = $titleRecord['title'];
-            $catalogue->set($message, $this->prefix . $message);
+            $catalogue->set($titleRecord['shortTitle'], $this->prefix . $titleRecord['shortTitle']);
+            $catalogue->set($titleRecord['title'], $this->prefix . $titleRecord['title']);
         }
 
         return $catalogue;
@@ -60,7 +55,8 @@ class TranslationExtractor implements ExtractorInterface
      * Get routes by bundle dir
      *
      * @param string $dir
-     * @return array|\Symfony\Component\Routing\Route
+     *
+     * @return array|Router
      */
     public function getRoutesByBundleDir($dir)
     {
@@ -79,6 +75,11 @@ class TranslationExtractor implements ExtractorInterface
         return $resultRoutes;
     }
 
+    /**
+     * @param string $string
+     *
+     * @return bool|string
+     */
     public function getBundleNameFromString($string)
     {
         $bundleName = false;
