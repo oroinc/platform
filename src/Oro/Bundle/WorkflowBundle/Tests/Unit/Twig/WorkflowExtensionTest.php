@@ -47,10 +47,11 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(5, $functions);
+        $this->assertCount(6, $functions);
 
         $expectedFunctions = array(
             'has_workflows',
+            'has_workflow_items',
             'get_workflow',
             'get_workflow_item_current_step',
             'get_primary_workflow_name',
@@ -184,6 +185,44 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($workflowItem));
 
         $this->assertSame($workflowItem, $this->extension->getPrimaryWorkflowItem($object));
+    }
+
+    /**
+     * @dataProvider trueFalseDataProvider
+     */
+    public function testHasWorkflowItemsWithPrimary($result)
+    {
+        $entity = new \stdClass();
+        $this->workflowManager->expects($this->once())
+            ->method('checkWorkflowItemsByEntity')
+            ->with($entity)
+            ->will($this->returnValue($result));
+        $this->assertEquals($result, $this->extension->hasWorkflowItems($entity));
+    }
+
+    public function trueFalseDataProvider()
+    {
+        return array(
+            array(true),
+            array(false)
+        );
+    }
+
+    /**
+     * @dataProvider trueFalseDataProvider
+     */
+    public function testHasWorkflowItemsWithoutPrimary($result)
+    {
+        $entity = new \stdClass();
+        $workflowName = 'primary';
+        $this->assertCallToGetPrimaryWorkflowName(get_class($entity), $workflowName);
+
+        $this->workflowManager->expects($this->once())
+            ->method('checkWorkflowItemsByEntity')
+            ->with($entity, $workflowName)
+            ->will($this->returnValue($result));
+
+        $this->assertEquals($result, $this->extension->hasWorkflowItems($entity, true));
     }
 
     protected function assertCallToGetPrimaryWorkflowName($className, $workflowName)

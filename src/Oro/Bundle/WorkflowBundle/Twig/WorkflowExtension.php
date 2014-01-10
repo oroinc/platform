@@ -46,6 +46,7 @@ class WorkflowExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('has_workflows', array($this, 'hasWorkflows')),
+            new \Twig_SimpleFunction('has_workflow_items', array($this, 'hasWorkflowItems')),
             new \Twig_SimpleFunction('get_workflow', array($this, 'getWorkflow')),
             new \Twig_SimpleFunction('get_workflow_item_current_step', array($this, 'getWorkflowItemCurrentStep')),
             new \Twig_SimpleFunction('get_primary_workflow_name', array($this, 'getPrimaryWorkflowName')),
@@ -62,6 +63,22 @@ class WorkflowExtension extends \Twig_Extension
     public function hasWorkflows($entityClass)
     {
         return count($this->workflowRegistry->getWorkflowsByEntityClass($entityClass)) > 0;
+    }
+
+    /**
+     * Check for started workflow instances.
+     *
+     * @param object $entity
+     * @param bool $skipPrimary
+     * @return bool
+     */
+    public function hasWorkflowItems($entity, $skipPrimary = true)
+    {
+        $skippedWorkflowName = null;
+        if ($skipPrimary) {
+            $skippedWorkflowName = $this->getPrimaryWorkflowName(ClassUtils::getRealClass($entity));
+        }
+        return $this->workflowManager->checkWorkflowItemsByEntity($entity, $skippedWorkflowName);
     }
 
     /**
