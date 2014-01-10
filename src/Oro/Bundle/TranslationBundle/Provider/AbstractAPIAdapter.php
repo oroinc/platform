@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Psr\Log\LoggerInterface;
 
-abstract class AbstractAPIAdapter
+abstract class AbstractAPIAdapter implements APIAdapterInterface
 {
     /** @var string */
     protected $apiKey;
@@ -54,16 +54,6 @@ abstract class AbstractAPIAdapter
     abstract public function upload($files, $mode = 'add');
 
     /**
-     * Download translations
-     *
-     * @param string $path save downloaded file to this path
-     * @param string $package
-     *
-     * @return mixed
-     */
-    abstract public function download($path, $package = null);
-
-    /**
      * Perform request
      *
      * @param string $uri
@@ -74,7 +64,7 @@ abstract class AbstractAPIAdapter
      * @throws \RuntimeException
      * @return mixed
      */
-    protected function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
+    public function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
         $requestParams = [
                 CURLOPT_URL            => $this->endpoint . $uri . '?key=' . $this->apiKey,

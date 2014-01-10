@@ -110,12 +110,13 @@ class TranslationServiceProvider
 
     /**
      * @param string      $pathToSave path to save translations
+     * @param array       $projects   project names
      * @param null|string $locale
      * @param bool        $toApply    whether apply download packs or not
      *
      * @return bool
      */
-    public function download($pathToSave, $locale = null, $toApply = true)
+    public function download($pathToSave, array $projects, $locale = null, $toApply = true)
     {
         $targetDir = dirname($pathToSave);
         if (!is_dir($targetDir)) {
@@ -124,7 +125,7 @@ class TranslationServiceProvider
             $this->cleanup($targetDir);
         }
 
-        $isDownloaded = $this->adapter->download($pathToSave, $locale);
+        $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
         $isExtracted  = $this->unzip(
             $pathToSave,
             is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
@@ -273,11 +274,40 @@ class TranslationServiceProvider
 
             if ($fileInfo->isFile()) {
                 rename($fileInfo->getPathname(), $target);
+
+                $contents = file($target);
+                // remove first dashes line
+                if (isset($contents[0]) && trim($contents[0]) == '---') {
+                    array_shift($contents);
+                }
+
+                // fix downloaded translations
+                foreach ($contents as $i => $line) {
+                    $line = explode(':', $line);
+
+                    if (!isset($line[0]) || count($line) != 2) {
+                        continue;
+                    }
+
+                    $key = $line[0];
+                    if (in_array($key[0], ['"', "'"])) {
+                        $lineQuote = $key[0];
+                    } else {
+                        $lineQuote = '';
+                    }
+
+                    $key = trim($key, '"\'');
+                    if (strpos($key, '"') !== false) {
+                        $key = "'" . $key . "'";
+                    } else {
+                        $key = $lineQuote . $key . $lineQuote;
+                    }
+                    $contents[$i] = $key . ':' . $line[1];
+                }
+
                 file_put_contents(
                     $target,
-                    trim(
-                        str_replace('---', '', file_get_contents($target))
-                    )
+                    trim(implode('', $contents))
                 );
             }
         }

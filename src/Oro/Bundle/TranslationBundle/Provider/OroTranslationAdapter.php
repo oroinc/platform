@@ -3,12 +3,13 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use FOS\Rest\Util\Codes;
+
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
 
-class OroTranslationAdapter
+class OroTranslationAdapter implements APIAdapterInterface
 {
-    const URL_STATISTIC = '/statistic';
+    const URL_STATS = '/stats';
 
     /** @var string */
     protected $apiKey;
@@ -31,16 +32,30 @@ class OroTranslationAdapter
     }
 
     /**
-     * Download translations
-     *
-     * @param string $path save downloaded file to this path
-     * @param string $package
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function download($path, $package = null)
+    public function download($path, array $projects, $package = null)
     {
-        // TODO: Implement download() method.
+        $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
+
+        $fileHandler = fopen($path, 'wb');
+        $result = $this->request(
+            '/download',
+            [
+                'packages' => implode(',', $projects),
+                'lang'     => $package,
+            ],
+            'GET',
+            [
+                CURLOPT_FILE           => $fileHandler,
+                CURLOPT_RETURNTRANSFER => false,
+                CURLOPT_HEADER         => false,
+            ]
+        );
+
+        fclose($fileHandler);
+
+        return $result;
     }
 
     /**
@@ -56,7 +71,7 @@ class OroTranslationAdapter
     public function fetchStatistic(array $packages = [])
     {
         $response = $this->request(
-            self::URL_STATISTIC,
+            self::URL_STATS,
             ['packages' => implode(',', $packages)]
         );
 
@@ -111,21 +126,15 @@ class OroTranslationAdapter
     }
 
     /**
-     * Perform request
-     *
-     * @param string $uri
-     * @param array  $urlParams
-     * @param array  $curlOptions
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    protected function request($uri, $urlParams = [], $curlOptions = [])
+    public function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
-        $urlParams['key'] = $this->apiKey;
-        $urlParams        = '?' . http_build_query($urlParams, '', '&');
+        $data['key'] = $this->apiKey;
+        $data        = '?' . http_build_query($data, '', '&');
 
         $requestParams = [
-                CURLOPT_URL            => $this->endpoint . $uri . $urlParams,
+                CURLOPT_URL            => $this->endpoint . $uri . $data,
                 CURLOPT_RETURNTRANSFER => true,
             ] + $curlOptions;
         $this->apiRequest->setOptions($requestParams);

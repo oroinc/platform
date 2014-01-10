@@ -12,6 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\TranslationBundle\Translation\TranslationStatusInterface;
+use Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider;
 
 class ServiceController extends BaseController
 {
@@ -54,19 +55,24 @@ class ServiceController extends BaseController
     {
         $status = Codes::HTTP_OK;
         $data   = [];
-        try {
-            // @TODO BEGIN: should be processed by proxy
-            $service = $this->get('oro_translation.service_provider');
-            $service->getAdapter()->setApiKey('e906a809346a58caeb6e5355dcabd2dc');
-            $service->getAdapter()->setProjectId('test-orocrm-project');
 
-            $path   = $this->container->getParameter('kernel.root_dir')
-                . DIRECTORY_SEPARATOR . 'Resources'
-                . DIRECTORY_SEPARATOR . 'language-pack'
-                . DIRECTORY_SEPARATOR . 'OroCRM'
-                . DIRECTORY_SEPARATOR . 'OroCRM.zip';
-            $result = $service->download($path, $code);
-            // @TODO END: should be processed by proxy
+        $projects     = $this->get('oro_translation.statistic_provider')->getInstalledPackages();
+        $proxyAdapter = $this->get('oro_translation.oro_translation_adapter');
+        $service      = $this->get('oro_translation.service_provider');
+        $service->setAdapter($proxyAdapter);
+
+        // TODO: consider if we need this info for proxy adapter
+        $proxyAdapter->setApiKey('e906a809346a58caeb6e5355dcabd2dc');
+        $proxyAdapter->setProjectId('test-orocrm-project');
+
+        $path   = $this->container->getParameter('kernel.root_dir')
+            . DIRECTORY_SEPARATOR . 'Resources'
+            . DIRECTORY_SEPARATOR . 'language-pack'
+            . DIRECTORY_SEPARATOR . 'OroCRM'
+            . DIRECTORY_SEPARATOR . 'OroCRM.zip';
+
+        try {
+            $result = $service->download($path, $projects, $code);
 
             if ($result) {
                 $cm          = $this->get('oro_config.global');

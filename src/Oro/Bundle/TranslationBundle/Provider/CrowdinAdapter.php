@@ -133,7 +133,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    protected function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
+    public function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
         $result = parent::request($uri, $data, $method, $curlOptions);
         if (!isset($curlOptions[CURLOPT_FILE])) {
@@ -173,7 +173,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    public function download($path, $package = null)
+    public function download($path, array $projects, $package = null)
     {
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
 

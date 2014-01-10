@@ -59,26 +59,38 @@ class TranslationStatisticProvider
     protected function fetch()
     {
         try {
-            // collect installed packages through PackageManger
-            $packages = $this->pm->getInstalled();
-            $packages = array_map(
-                function (PackageInterface $package) {
-                    return $package->getName();
-                },
-                $packages
+            $data = $this->adapter->fetchStatistic(
+                $this->getInstalledPackages()
             );
-
-            // collect bundle namespaces
-            foreach ($this->bundles as $bundle) {
-                $namespaceParts = explode('\\', $bundle);
-                $packages[]     = reset($namespaceParts);
-            }
-
-            $data = $this->adapter->fetchStatistic(array_unique($packages));
         } catch (\Exception $e) {
             $data = [];
         }
 
         return $data;
+    }
+
+    /**
+     * Collect installed packages through PackageManger
+     * and add bundle namespaces to them
+     *
+     * @return array
+     */
+    public function getInstalledPackages()
+    {
+        $packages = $this->pm->getInstalled();
+        $packages = array_map(
+            function (PackageInterface $package) {
+                return $package->getName();
+            },
+            $packages
+        );
+
+        // collect bundle namespaces
+        foreach ($this->bundles as $bundle) {
+            $namespaceParts = explode('\\', $bundle);
+            $packages[]     = reset($namespaceParts);
+        }
+
+        return array_unique($packages);
     }
 }
