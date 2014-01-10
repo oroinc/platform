@@ -35,6 +35,7 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             $this->getApplication()
         );
         $commandExecutor
+            ->runCommand('cache:clear')
             ->runCommand('oro:entity-config:update')
             ->runCommand('oro:entity-extend:update')
             ->runCommand('oro:navigation:init')
