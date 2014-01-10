@@ -65,6 +65,7 @@ class EntityFieldChoiceType extends AbstractType
 
         $defaultConfigs = array(
             'is_translate_option'     => false,
+            'is_group_collapsible'    => true,
             'placeholder'             => 'oro.entity.form.choose_entity_field',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection%s.html.twig',

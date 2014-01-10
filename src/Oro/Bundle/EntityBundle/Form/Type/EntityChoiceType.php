@@ -44,6 +44,7 @@ class EntityChoiceType extends AbstractType
                 'show_plural' => true,
                 'configs'     => array(
                     'is_translate_option'     => false,
+                    'is_group_collapsible'    => true,
                     'placeholder'             => 'oro.entity.form.choose_entity',
                     'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
                     'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
