@@ -4,10 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinitionEntity;
-use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
-class WorkflowDefinitionConfigurationBuilder
+class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
 {
     /**
      * @param array $configurationData
@@ -88,33 +87,5 @@ class WorkflowDefinitionConfigurationBuilder
         }
 
         return $managedEntityClasses;
-    }
-
-    /**
-     * @param array $configuration
-     * @param array $requiredOptions
-     * @throws MissedRequiredOptionException
-     */
-    protected function assertConfigurationOptions(array $configuration, array $requiredOptions)
-    {
-        foreach ($requiredOptions as $optionName) {
-            if (!isset($configuration[$optionName])) {
-                throw new MissedRequiredOptionException(sprintf('Configuration option "%s" is required', $optionName));
-            }
-        }
-    }
-
-    /**
-     * @param array $options
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getConfigurationOption(array $options, $key, $default)
-    {
-        if (isset($options[$key])) {
-            return $options[$key];
-        }
-        return $default;
     }
 }

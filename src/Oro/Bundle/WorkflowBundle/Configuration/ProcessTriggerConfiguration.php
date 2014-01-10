@@ -30,13 +30,7 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
         $nodeDefinition
             ->children()
                 ->enumNode('event')
-                    ->values(
-                        array(
-                            ProcessTrigger::EVENT_CREATE,
-                            ProcessTrigger::EVENT_UPDATE,
-                            ProcessTrigger::EVENT_DELETE
-                        )
-                    )
+                    ->values(ProcessTrigger::getAllowedEvents())
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()

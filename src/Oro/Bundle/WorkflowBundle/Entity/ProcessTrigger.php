@@ -255,4 +255,12 @@ class ProcessTrigger
     {
         return new \DateInterval(sprintf('PT%dS', $seconds));
     }
+
+    /**
+     * @return array
+     */
+    public static function getAllowedEvents()
+    {
+        return array(self::EVENT_CREATE, self::EVENT_UPDATE, self::EVENT_DELETE);
+    }
 }

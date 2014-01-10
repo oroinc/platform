@@ -22,7 +22,7 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:workflow:definitions:load')
-            ->setDescription('Load workflow definitions from specified directories to your database.')
+            ->setDescription('Load workflow definitions from configuration files to the database.')
             ->addOption(
                 'directories',
                 null,
@@ -48,13 +48,10 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
         $usedWorkflows = $input->getOption('workflows');
         $usedWorkflows = $usedWorkflows ?: null;
 
-        /** @var WorkflowConfigurationProvider $configurationProvider */
-        $configurationProvider = $this->getContainer()->get('oro_workflow.configuration.provider.workflow_config');
-        /** @var WorkflowDefinitionConfigurationBuilder $configurationBuilder */
-        $configurationBuilder = $this->getContainer()->get('oro_workflow.configuration.builder.workflow_definition');
-        /** @var EntityManager $manager */
-        $manager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
+        $container = $this->getContainer();
 
+        /** @var WorkflowConfigurationProvider $configurationProvider */
+        $configurationProvider = $container->get('oro_workflow.configuration.provider.workflow_config');
         $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration(
             $usedDirectories,
             $usedWorkflows
@@ -63,6 +60,11 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
         if ($workflowConfiguration) {
             $output->writeln('Loading workflow definitions...');
 
+            /** @var EntityManager $manager */
+            $manager = $container->get('doctrine.orm.default_entity_manager');
+
+            /** @var WorkflowDefinitionConfigurationBuilder $configurationBuilder */
+            $configurationBuilder = $container->get('oro_workflow.configuration.builder.workflow_definition');
             $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
             /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
@@ -80,10 +82,10 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                     $manager->persist($workflowDefinition);
                 }
             }
+
+            $manager->flush();
         } else {
             $output->writeln('No workflow definitions found.');
         }
-
-        $manager->flush();
     }
 }

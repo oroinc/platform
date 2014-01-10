@@ -3,11 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class ConfigurationWorkflowDefinitionBuilderTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param WorkflowDefinition $definition
