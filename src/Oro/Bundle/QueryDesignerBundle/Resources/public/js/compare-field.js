@@ -27,27 +27,21 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                 <option value="" data-label=""></option>\
                 <optgroup label="Fields">\
                     <option value="name" data-type="string" data-label="Account name">Account name</option>\
-                    <option value="billingAddress" data-type="ref-one" data-label="Billing Address">Billing Address</option>\
-                    <option value="contacts" data-type="ref-many" data-label="Contacts">Contacts</option>\
                     <option value="createdAt" data-type="datetime" data-label="Created">Created</option>\
-                    <option value="defaultContact" data-type="ref-one" data-label="Default contact">Default contact</option>\
                     <option value="extend_description" data-type="text" data-label="Description">Description</option>\
                     <option value="extend_email" data-type="string" data-label="Email">Email</option>\
                     <option value="extend_employees" data-type="integer" data-label="Employees">Employees</option>\
                     <option value="extend_fax" data-type="string" data-label="Fax">Fax</option>\
                     <option value="id" data-type="integer" data-label="Id" data-identifier="true">Id</option>\
-                    <option value="owner" data-type="ref-one" data-label="Owner">Owner</option>\
                     <option value="extend_ownership" data-type="string" data-label="Ownership">Ownership</option>\
                     <option value="extend_phone" data-type="string" data-label="Phone">Phone</option>\
                     <option value="extend_rating" data-type="string" data-label="Rating">Rating</option>\
-                    <option value="shippingAddress" data-type="ref-one" data-label="Shipping Address">Shipping Address</option>\
                     <option value="extend_ticker_symbol" data-type="string" data-label="Ticker Symbol">Ticker Symbol</option>\
                     <option value="updatedAt" data-type="datetime" data-label="Updated">Updated</option>\
                     <option value="extend_website" data-type="string" data-label="Website">Website</option>\
                 </optgroup>\
                 <optgroup label="Billing Address">\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::city" data-type="string" data-label="City">City</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::country" data-type="ref-one" data-label="Country">Country</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::created" data-type="datetime" data-label="Created at">Created at</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::firstName" data-type="string" data-label="First name">First name</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::id" data-type="integer" data-label="Id" data-identifier="true">Id</option>\
@@ -58,7 +52,6 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::nameSuffix" data-type="string" data-label="Name suffix">Name suffix</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::organization" data-type="string" data-label="Organization">Organization</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::regionText" data-type="string" data-label="State">State</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::region" data-type="ref-one" data-label="State">State</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::street" data-type="string" data-label="Street">Street</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::street2" data-type="string" data-label="Street 2">Street 2</option>\
                     <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::updated" data-type="datetime" data-label="Updated at">Updated at</option>\
@@ -69,7 +62,6 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             ');
 
             self.element.append(self.template());
-
 
             var $select = self.element.find('select');
             $select.change(function () {
@@ -182,6 +174,28 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
 
             requirejs([filterModuleName], function (Filter) {
                 var filter = new (Filter.extend(filterOptions));
+
+                if (filter.templateSelector === '#text-filter-template') {
+                    filter.templateSelector = '#text-filter-simple-template';
+                    filter.template = _.template($(filter.templateSelector).text());
+                }
+
+                if (filter.templateSelector === '#choice-filter-template') {
+                    filter.templateSelector = '#choice-filter-simple-template';
+                    filter.template = _.template($(filter.templateSelector).text());
+                }
+
+                if (filter.templateSelector === '#date-filter-template') {
+                    filter.templateSelector = '#date-filter-simple-template';
+                    filter.template = _.template($(filter.templateSelector).text());
+                }
+
+                if (filter.templateSelector === '#select-filter-template') {
+                    filter.templateSelector = '#select-filter-simple-template';
+                    filter.template = _.template($(filter.templateSelector).text());
+                }
+
+                console.log(filter.templateSelector);
 
                 cb(filter);
             });
