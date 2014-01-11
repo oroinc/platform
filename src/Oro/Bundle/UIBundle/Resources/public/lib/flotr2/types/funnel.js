@@ -7,16 +7,27 @@ Flotr.addType('funnel', {
         fillOpacity: 0.5,
         fontColor: "#B2B2B2",
         explode: 5,
-        marginX: 350,
+        marginX: 450,
         marginY: 20,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
-        formatter: ''
+        formatter: '',
+        nozzleSteps: []
     },
 
     stack: [],
     stacked: false,
     shiftLabels: false,
     originData: [],
+
+    in_array: function(what, where) {
+        for(var i=0; i<where.length; i++) {
+            if(what == where[i]) {
+                return true;
+            }
+        }
+
+        return false;
+    },
 
     plot: function (options) {
         var
@@ -30,11 +41,19 @@ Flotr.addType('funnel', {
             reSumm = 0,
             i = 0;
 
-        Flotr._.each(data, function (funnel) { summ += funnel; });
+        Flotr._.each(data, function (funnel, label) {
+            if (!self.in_array(label, options.nozzleSteps)) {
+                summ += funnel;
+            }
+        });
         Flotr._.each(data, function (funnel, iterator) {
             if (funnel == 0) {
                 reSumm += summ / 100 * 2;
                 data[iterator] = summ / 100 * 2;
+                self.shiftLabels = true;
+            } else if (self.in_array(iterator, options.nozzleSteps)) {
+                reSumm += summ / 100 * 10;
+                data[iterator] = summ / 100 * 10;
                 self.shiftLabels = true;
             } else {
                 reSumm += funnel;
@@ -58,15 +77,20 @@ Flotr.addType('funnel', {
             'funnelSumm': options.marginY
         };
 
-        Flotr._.each(data, function (funnel) {
+        Flotr._.each(data, function (funnel, iterator) {
+            if (self.in_array(iterator, options.nozzleSteps)) {
+                var isNozzleStep = true;
+            } else {
+                var isNozzleStep = false;
+            }
             var funnelSize = marginHeight / summ * funnel;
             if (options.explode > 0 /*&& Object.keys(data).length > i+1*/) {
                 funnelSize -= options.explode;
             }
 
-            segmentData = self.calculateSegment(options, funnelSize, i, marginWidth, segmentData, true);
+            segmentData = self.calculateSegment(options, funnelSize, i, marginWidth, segmentData, true, isNozzleStep);
             if (options.explode > 0 && Object.keys(data).length != i+1) {
-                segmentData = self.calculateSegment(options, options.explode, i, marginWidth, segmentData, false);
+                segmentData = self.calculateSegment(options, options.explode, i, marginWidth, segmentData, false, isNozzleStep);
             }
             i++;
         });
@@ -183,12 +207,13 @@ Flotr.addType('funnel', {
         context.lineWidth = options.lineWidth;
 
         this.originData = _.clone(options.data);
+
         this.plot(options);
 
         context.restore();
     },
 
-    calculateSegment: function(options, funnel, iterator, marginWidth, segmentData, renderable) {
+    calculateSegment: function(options, funnel, iterator, marginWidth, segmentData, renderable, isNozzleStep) {
         var
             context = options.context,
             prevStepWidth      = segmentData.prevStepWidth,
@@ -234,8 +259,14 @@ Flotr.addType('funnel', {
             this.stack[iterator].x2 = prevStepWidth + prevStepWidthDelta;
             this.stack[iterator].y2 = funnelSumm;
 
-            var x3 = Math.round(marginWidth / 2 + BC);
-            var x4 = Math.round(marginWidth / 2 - BC);
+            if (isNozzleStep) {
+                x3 = this.stack[iterator].x2;
+                x4 = Math.ceil(marginWidth / 2 - AD);
+            } else {
+                var x3 = Math.round(marginWidth / 2 + BC);
+                var x4 = Math.round(marginWidth / 2 - BC);
+            }
+
             this.stack[iterator].x3 = (x3 <= marginWidth / 2) ? marginWidth / 2 : x3;
             this.stack[iterator].x4 = (x4 >= marginWidth / 2) ? marginWidth / 2 : x4;
 
@@ -258,15 +289,20 @@ Flotr.addType('funnel', {
         funnelSumm += funnel;
 
         context.beginPath();
-        context.moveTo(Math.ceil(marginWidth / 2 - BC), funnelSumm);
+        if (isNozzleStep) {
+            var nextX = Math.ceil(marginWidth / 2 - AD);
+        } else {
+            var nextX = Math.ceil(marginWidth / 2 - BC);
+        }
+        context.moveTo(nextX, funnelSumm);
 
         self.stack[iterator + 1] = {};
-        self.stack[iterator + 1].x1 = Math.ceil(marginWidth / 2 - BC);
+        self.stack[iterator + 1].x1 = nextX;
         self.stack[iterator + 1].y1 = funnelSumm;
 
         return {
-            'prevStepWidth'     : BC * 2,
-            'prevStepWidthDelta': marginWidth / 2 - BC,
+            'prevStepWidth'     : isNozzleStep ? AD * 2 : BC * 2,
+            'prevStepWidthDelta': isNozzleStep ? marginWidth / 2 - AD: marginWidth / 2 - BC,
             'prevStepHeight'    : prevStepHeight - funnel,
             'funnelSumm'        : funnelSumm
         };
