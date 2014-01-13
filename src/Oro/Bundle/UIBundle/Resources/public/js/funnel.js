@@ -19,21 +19,10 @@ Flotr.addType('funnel', {
             return label + ': ' + value;
         }
     },
-
     stack: [],
     stacked: false,
     shiftLabels: false,
     originData: [],
-
-    in_array: function(what, where) {
-        for(var i=0; i<where.length; i++) {
-            if(what == where[i]) {
-                return true;
-            }
-        }
-
-        return false;
-    },
 
     plot: function (options) {
         var
@@ -48,16 +37,17 @@ Flotr.addType('funnel', {
             i = 0;
 
         Flotr._.each(data, function (funnel, label) {
-            if (!self.in_array(label, options.nozzleSteps)) {
+            if (options.nozzleSteps.indexOf(label) === -1) {
                 summ += funnel;
             }
         });
+
         Flotr._.each(data, function (funnel, iterator) {
-            if (funnel == 0 && !self.in_array(iterator, options.nozzleSteps)) {
+            if (funnel == 0 && options.nozzleSteps.indexOf(iterator) === -1) {
                 reSumm += summ / 100 * 2;
                 data[iterator] = summ / 100 * 2;
                 self.shiftLabels = true;
-            } else if (self.in_array(iterator, options.nozzleSteps)) {
+            } else if (options.nozzleSteps.indexOf(iterator) !== -1) {
                 reSumm += summ / 100 * 10;
                 data[iterator] = summ / 100 * 10;
                 self.shiftLabels = true;
@@ -72,7 +62,7 @@ Flotr.addType('funnel', {
         context.beginPath();
         context.moveTo(options.leftMargin || 0, options.marginY);
 
-        self.stack[0] = {};
+        self.stack[0]    = {};
         self.stack[0].x1 = options.leftMargin || 0;
         self.stack[0].y1 = options.marginY;
 
@@ -83,20 +73,15 @@ Flotr.addType('funnel', {
             'funnelSumm': options.marginY
         };
 
-        Flotr._.each(data, function (funnel, iterator) {
-            if (self.in_array(iterator, options.nozzleSteps)) {
-                var isNozzleStep = true;
-            } else {
-                var isNozzleStep = false;
-            }
+        Flotr._.each(data, function (funnel) {
             var funnelSize = marginHeight / summ * funnel;
-            if (options.explode > 0 /*&& Object.keys(data).length > i+1*/) {
+            if (options.explode > 0) {
                 funnelSize -= options.explode;
             }
 
-            segmentData = self.calculateSegment(options, funnelSize, i, marginWidth, segmentData, true, isNozzleStep);
+            segmentData = self.calculateSegment(options, funnelSize, i, marginWidth, segmentData, true);
             if (options.explode > 0 && Object.keys(data).length != i+1) {
-                segmentData = self.calculateSegment(options, options.explode, i, marginWidth, segmentData, false, isNozzleStep);
+                segmentData = self.calculateSegment(options, options.explode, i, marginWidth, segmentData, false);
             }
             i++;
         });
@@ -111,7 +96,10 @@ Flotr.addType('funnel', {
             y      = mouse.relY;
 
             for (var i in self.stack) {
-                var belongSide = true;
+                var
+                    belongSide = true,
+                    seg        = self.stack[i]; //Current funnel's segment
+
                 /**
                  *  left/right rectangle side case
                  *  detect mouse is in figure
@@ -121,55 +109,41 @@ Flotr.addType('funnel', {
                  *  (x3 - x0) * (y1 - y3) - (x1 - x3) * (y3 - y0)
                  */
 
-                if (
-                    x >= self.stack[i].x1 && x <= self.stack[i].x4 &&
-                    y >= self.stack[i].y1 && y <= self.stack[i].y4
-                ){
+                if (x >= seg.x1 && x <= seg.x4 && y >= seg.y1 && y <= seg.y4) {
                     var
-                        s1 = (self.stack[i].x1 - x) * (self.stack[i].y4 - self.stack[i].y1) - (self.stack[i].x1 - self.stack[i].x1) * (self.stack[i].y1 - y),
-                        s2 = (self.stack[i].x1 - x) * (self.stack[i].y4 - self.stack[i].y4) - (self.stack[i].x4 - self.stack[i].x1) * (self.stack[i].y4 - y),
-                        s3 = (self.stack[i].x4 - x) * (self.stack[i].y1 - self.stack[i].y4) - (self.stack[i].x1 - self.stack[i].x4) * (self.stack[i].y4 - y);
+                        s1 = (seg.x1 - x) * (seg.y4 - seg.y1) - (seg.x1 - seg.x1) * (seg.y1 - y),
+                        s2 = (seg.x1 - x) * (seg.y4 - seg.y4) - (seg.x4 - seg.x1) * (seg.y4 - y),
+                        s3 = (seg.x4 - x) * (seg.y1 - seg.y4) - (seg.x1 - seg.x4) * (seg.y4 - y);
                     if (s1 == 0 || s2 == 0 || s3 == 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
                         belongSide = false;
                     }
                 }
 
                 // right rectangle side case
-                if (
-                    x >= self.stack[i].x3 && x <= self.stack[i].x2 &&
-                    y >= self.stack[i].y2 && y <= self.stack[i].y3
-                ){
+                if (x >= seg.x3 && x <= seg.x2 && y >= seg.y2 && y <= seg.y3) {
                     var
-                        s1 = (self.stack[i].x3 - x) * (self.stack[i].y2 - self.stack[i].y3) - (self.stack[i].x2 - self.stack[i].x3) * (self.stack[i].y3 - y),
-                        s2 = (self.stack[i].x2 - x) * (self.stack[i].y3 - self.stack[i].y2) - (self.stack[i].x2 - self.stack[i].x2) * (self.stack[i].y2 - y),
-                        s3 = (self.stack[i].x2 - x) * (self.stack[i].y3 - self.stack[i].y3) - (self.stack[i].x3 - self.stack[i].x2) * (self.stack[i].y3 - y);
+                        s1 = (seg.x3 - x) * (seg.y2 - seg.y3) - (seg.x2 - seg.x3) * (seg.y3 - y),
+                        s2 = (seg.x2 - x) * (seg.y3 - seg.y2) - (seg.x2 - seg.x2) * (seg.y2 - y),
+                        s3 = (seg.x2 - x) * (seg.y3 - seg.y3) - (seg.x3 - seg.x2) * (seg.y3 - y);
                     if (s1 == 0 || s2 == 0 || s3 == 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
                         belongSide = false;
                     }
                 }
 
                 // full rectangle case
-                if (
-                    y >= self.stack[i].y1 && y <= self.stack[i].y3
-                    && x >= self.stack[i].x1 && x <= self.stack[i].x2
-                    && belongSide != false
-                ) {
+                if (y >= seg.y1 && y <= seg.y3 && x >= seg.x1 && x <= seg.x2 && belongSide != false) {
                     if (self.stacked === i) return;
 
                     self.stacked = i;
                     self.clearHit(options);
                     self.drawHit(options, i);
 
-                    //self.drawTooltip('Test', x+10 , y);
                     return;
                 }
             }
 
             self.stacked = false;
             self.clearHit(options);
-    },
-
-    drawTooltip: function (content, x, y, options){
     },
 
     drawHit: function (options, i) {
@@ -219,17 +193,23 @@ Flotr.addType('funnel', {
         context.restore();
     },
 
-    calculateSegment: function(options, funnel, iterator, marginWidth, segmentData, renderable, isNozzleStep) {
+    calculateSegment: function(options, funnel, iterator, marginWidth, segmentData, renderable) {
         var
             context = options.context,
             prevStepWidth      = segmentData.prevStepWidth,
             prevStepWidthDelta = segmentData.prevStepWidthDelta,
             prevStepHeight     = segmentData.prevStepHeight,
-            funnelSumm         = segmentData.funnelSumm;
+            funnelSumm         = segmentData.funnelSumm,
+            isNozzleStep       = true,
+            label              = Object.keys(options.data)[iterator];
 
-        context.lineWidth = options.lineWidth;
+        if (options.nozzleSteps.indexOf(label) === -1) {
+            isNozzleStep = false;
+        }
+
+        context.lineWidth   = options.lineWidth;
         context.strokeStyle = options.colors[iterator];
-        context.fillStyle = Flotr.Color.parse(options.colors[iterator]).alpha(options.fillOpacity).toString();
+        context.fillStyle   = Flotr.Color.parse(options.colors[iterator]).alpha(options.fillOpacity).toString();
 
         /**
          * Each segment calculate
@@ -265,12 +245,12 @@ Flotr.addType('funnel', {
             this.stack[iterator].x2 = prevStepWidth + prevStepWidthDelta + (options.leftMargin || 0);
             this.stack[iterator].y2 = funnelSumm;
 
+            var x3 = Math.round(marginWidth / 2 + BC) + (options.leftMargin || 0);
+            var x4 = Math.round(marginWidth / 2 - BC) + (options.leftMargin || 0);
+
             if (isNozzleStep) {
-                var x3 = this.stack[iterator].x2;
-                var x4 = Math.ceil(marginWidth / 2 - AD) + (options.leftMargin || 0);
-            } else {
-                var x3 = Math.round(marginWidth / 2 + BC) + (options.leftMargin || 0);
-                var x4 = Math.round(marginWidth / 2 - BC) + (options.leftMargin || 0);
+                x3 = this.stack[iterator].x2;
+                x4 = Math.ceil(marginWidth / 2 - AD) + (options.leftMargin || 0);
             }
 
             this.stack[iterator].x3 = x3;
@@ -289,17 +269,18 @@ Flotr.addType('funnel', {
             context.stroke();
             context.fill();
 
-            self.renderLabel(context, options, Object.keys(options.data)[iterator], funnelSumm, iterator, isNozzleStep);
+            self.renderLabel(context, options, label, funnelSumm, iterator, isNozzleStep);
         }
 
         funnelSumm += funnel;
 
         context.beginPath();
+
+        var nextX = Math.ceil(marginWidth / 2 - BC) + (options.leftMargin || 0);
         if (isNozzleStep) {
-            var nextX = Math.ceil(marginWidth / 2 - AD) + (options.leftMargin || 0);
-        } else {
-            var nextX = Math.ceil(marginWidth / 2 - BC) + (options.leftMargin || 0);
+            nextX = Math.ceil(marginWidth / 2 - AD) + (options.leftMargin || 0);
         }
+
         context.moveTo(nextX , funnelSumm);
 
         self.stack[iterator + 1] = {};
