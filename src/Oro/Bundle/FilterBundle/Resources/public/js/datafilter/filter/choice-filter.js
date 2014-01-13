@@ -12,31 +12,11 @@ function($, _, __, app, TextFilter) {
      */
     return TextFilter.extend({
         /**
-         * Template for filter criteria
+         * Template selector for filter criteria
          *
-         * @property {function(Object, ?Object=): String}
+         * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div class="choicefilter">' +
-                '<div class="input-prepend">' +
-                    '<div class="btn-group">' +
-                        '<button class="btn dropdown-toggle" data-toggle="dropdown">' +
-                            '<%= selectedChoiceLabel %>' +
-                            '<span class="caret"></span>' +
-                        '</button>' +
-                        '<ul class="dropdown-menu">' +
-                            '<% _.each(choices, function (option) { %>' +
-                                '<li<% if (selectedChoice == option.value) { %> class="active"<% } %>><a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a></li>' +
-                            '<% }); %>' +
-                        '</ul>' +
-                        '<input type="text" name="value" value="">' +
-                        '<input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>' +
-                        '</div>' +
-                    '</div>' +
-                    '<button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>' +
-                '</div>' +
-            '</div>'
-        ),
+        templateSelector: '#choice-filter-template',
 
         /**
          * Selectors for filter criteria elements
@@ -68,7 +48,10 @@ function($, _, __, app, TextFilter) {
          *
          * @param {Object} options
          */
-        initialize: function() {
+        initialize: function(options) {
+            options = _.pick(options || {}, 'choices');
+            _.extend(this, options);
+
             // init filter content options if it was not initialized so far
             if (_.isUndefined(this.choices)) {
                 this.choices = [];
@@ -94,7 +77,7 @@ function($, _, __, app, TextFilter) {
         /**
          * @inheritDoc
          */
-        _renderCriteria: function(el) {
+        render: function () {
             var selectedChoice = this.emptyValue.type;
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
@@ -103,14 +86,13 @@ function($, _, __, app, TextFilter) {
                     });
                 selectedChoiceLabel = foundChoice.label;
             }
-            $(el).append(
-                this.popupCriteriaTemplate({
-                    name: this.name,
-                    choices: this.choices,
-                    selectedChoice: selectedChoice,
-                    selectedChoiceLabel: selectedChoiceLabel
-                })
-            );
+            var $filter = $(this.template({
+                name: this.name,
+                choices: this.choices,
+                selectedChoice: selectedChoice,
+                selectedChoiceLabel: selectedChoiceLabel
+            }));
+            this._wrap($filter);
             return this;
         },
 
@@ -201,7 +183,9 @@ function($, _, __, app, TextFilter) {
             $(e.currentTarget).parent().addClass('active');
             var parentDiv = $(e.currentTarget).parent().parent().parent();
             parentDiv.find('.name_input').val($(e.currentTarget).attr('data-value'));
-            parentDiv.find('button').html($(e.currentTarget).html() + '<span class="caret"></span>');
+            var choiceName = $(e.currentTarget).html();
+            choiceName += '<span class="caret"></span>';
+            parentDiv.find('.dropdown-toggle').html(choiceName);
             e.preventDefault();
         }
     });

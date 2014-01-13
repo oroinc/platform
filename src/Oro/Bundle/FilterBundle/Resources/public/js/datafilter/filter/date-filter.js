@@ -12,31 +12,11 @@ function($, _, __, ChoiceFilter, localeSettings) {
      */
     return ChoiceFilter.extend({
         /**
-         * Template for filter criteria
+         * Template selector for filter criteria
          *
-         * @property {function(Object, ?Object=): String}
+         * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div>' +
-                '<div class="horizontal clearfix">' +
-                    '<select name="<%= name %>" class="filter-select-oro">' +
-                        '<% _.each(choices, function (option) { %>' +
-                            '<option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>' +
-                        '<% }); %>' +
-                    '</select>' +
-                '</div>' +
-                '<div>' +
-                    '<input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">' +
-                    '<span class="filter-separator">-</span>' +
-                    '<input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">' +
-                '</div>' +
-                '<div class="oro-action">' +
-                    '<div class="btn-group">' +
-                        '<button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>' +
-                    '</div>' +
-                '</div>' +
-            '</div>'
-        ),
+        templateSelector: '#date-filter-template',
 
         /**
          * Selectors for filter data
@@ -144,17 +124,16 @@ function($, _, __, ChoiceFilter, localeSettings) {
         /**
          * @inheritDoc
          */
-        _renderCriteria: function(el) {
-            $(el).append(
-                this.popupCriteriaTemplate({
-                    name: this.name,
-                    choices: this.choices,
-                    selectedChoice: this.emptyValue.type,
-                    inputClass: this.inputClass
-                })
-            );
+        render: function () {
+            var $filter = $(this.template({
+                name: this.name,
+                choices: this.choices,
+                selectedChoice: this.emptyValue.type,
+                inputClass: this.inputClass
+            }));
+            this._wrap($filter);
 
-            $(el).find('select:first').bind('change', _.bind(this.changeFilterType, this));
+            $filter.find('select:first').bind('change', _.bind(this.changeFilterType, this));
 
             _.each(this.criteriaValueSelectors.value, function(actualSelector, name) {
                 this.dateWidgets[name] = this._initializeDateWidget(actualSelector);

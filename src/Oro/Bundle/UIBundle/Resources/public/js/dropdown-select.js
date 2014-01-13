@@ -61,6 +61,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
         },
 
         _onSelect: function (e) {
+            e.preventDefault();
             this._select($(e.target).data('value'));
         },
 

@@ -1,0 +1,96 @@
+<script type="text/template" id="filter-wrapper-template">
+    <div class="btn-group filter-item oro-drop">
+        <button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <strong class="filter-criteria-hint"><%= criteriaHint %></strong>
+            <span class="caret"></span>
+        </button>
+        <% if (canDisable) { %>
+            <a href="<%= nullLink %>" class="disable-filter">
+                <i class="icon-remove hide-text"><%- _.__("Close") %></i>
+            </a>
+        <% } %>
+        <div class="filter-criteria dropdown-menu" />
+    </div>
+</script>
+<script type="text/template" id="none-filter-template">
+    <div><%= popupHint %></div>
+</script>
+<script type="text/template" id="text-filter-template">
+    <div>
+        <div>
+            <input type="text" name="value" value=""/>
+        </div>
+        <div class="oro-action">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary filter-update"><%- _.__("Update") %></button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="choice-filter-template">
+    <div class="choicefilter">
+        <div class="input-prepend">
+            <div class="btn-group">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                    <%= selectedChoiceLabel %><span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <% _.each(choices, function (option) { %>
+                        <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                            <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
+                        </li>
+                    <% }); %>
+                </ul>
+                <input type="text" name="value" value="">
+                <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
+            </div>
+        </div>
+        <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+    </div>
+</script>
+<script type="text/template" id="date-filter-template">
+    <div>
+        <div class="horizontal clearfix">
+            <select name="<%= name %>" class="filter-select-oro">
+                <% _.each(choices, function (option) { %>
+                    <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
+                <% }); %>
+            </select>
+        </div>
+        <div>
+            <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
+            <span class="filter-separator">-</span>
+            <input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">
+        </div>
+        <div class="oro-action">
+            <div class="btn-group">
+                <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/template" id="select-filter-template">
+    <div class="btn-group filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <select>
+                <% _.each(options, function (option) { %>
+                <option value="<%= option.value %>"<% if (option.value == emptyValue.type) { %> selected="selected"<% } %>>
+                    <%= option.label %>
+                </option>
+                <% }); %>
+            </select>
+        </div>
+        <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
+    </div>
+</script>
+<script type="text/template" id="multiselect-filter-template">
+    <div class="btn filter-select filter-criteria-selector">
+        <% if (showLabel) { %><%= label %>: <% } %>
+        <select multiple>
+            <% _.each(options, function (option) { %><option value="<%= option.value %>"><%= option.label %></option><% }); %>
+            </select>
+        </div>
+    <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
+</script>
