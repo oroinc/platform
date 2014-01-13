@@ -31,7 +31,7 @@
     {% endspaceless %}
 {% endblock form_errors %}
 
-{{ form_start(form, {'attr': {'class': 'form', 'name': 'composer_config', 'id': 'composer-config'}}) }}
+<form method="post" action="" class="form" name="composer_config" id="composer-config">
     {{ form_label(form.oauth) }}
     {{ form_widget(form.oauth) }}
     {{ form_errors(form.oauth) }}
@@ -51,4 +51,5 @@
             Save
         </a>
     </div>
-{{ form_end(form) }}
+    {{ form_widget(form._token) }}
+</form>
