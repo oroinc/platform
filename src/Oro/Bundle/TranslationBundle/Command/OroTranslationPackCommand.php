@@ -176,9 +176,9 @@ EOF
 
         $projects = explode(',', $projectName);
         $languagePackPath = rtrim(
-                $this->getLangPackDir(implode('_', $projects)),
-                DIRECTORY_SEPARATOR
-            ) . '.zip';
+            $this->getLangPackDir(implode('_', $projects)),
+            DIRECTORY_SEPARATOR
+        ) . '.zip';
 
         $result = $this
             ->getTranslationService($input, $output)
