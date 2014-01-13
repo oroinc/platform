@@ -287,7 +287,7 @@ class PackageManager
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
-
+        $justInstalledPackages = [];
         try {
             if ($this->doInstall($package->getName())) {
                 $installedPackages = $this->getInstalled();
@@ -323,6 +323,19 @@ class PackageManager
                 $this->logger->error($e->getVerboseMessage());
             }
             $this->removeFromComposerJson([$packageName]);
+            if ($justInstalledPackages) {
+                $justInstalledPackageNames = array_reduce(
+                    $justInstalledPackages,
+                    function ($names, PackageInterface $p) {
+                        $names[] = $p->getPrettyName();
+                        return $names;
+                    },
+                    []
+                );
+                $this->logger->info('Removing just installed packages', $justInstalledPackageNames);
+                $this->uninstall($justInstalledPackageNames);
+            }
+
             throw $e;
         }
         $this->logger->info(sprintf('%s (%s) installed', $packageName, $packageVersion));
