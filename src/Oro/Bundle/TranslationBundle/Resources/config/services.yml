@@ -13,6 +13,8 @@ parameters:
     oro_translation.js_dumper.class:                            Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
     oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
 
+    oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
+
 services:
     oro_translation.controller:
         class: %oro_translation.controller.class%
@@ -100,3 +102,10 @@ services:
             - %kernel.root_dir%
             - %kernel.default_locale%
 
+    oro_translation.twig.translation_status.extension:
+        class: %oro_translation.twig.translation_status.extension.class%
+        arguments:
+            - @oro_config.global
+            - @oro_translation.statistic_provider
+        tags:
+            - { name: twig.extension }

@@ -48,8 +48,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
 
             var $el = $(e.currentTarget),
                 action = $el.data('action'),
-                code = $el.data('lang'),
-                translationStatus = $el.data('translationStatus') || 0
+                code = $el.data('lang')
             ;
 
             if (_.isUndefined(action)) {
@@ -65,8 +64,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
             var actionMediator = {
                 el: $el,
                 action: action,
-                code: code,
-                translationStatus: translationStatus
+                code: code
             };
             this.performAction(actionMediator);
         },
@@ -83,10 +81,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
                     navigation.loadingMask.show();
                 }
 
-                var url = routing.generate(this.route, {
-                    code: actionMediator.code,
-                    translationStatus: actionMediator.translationStatus
-                });
+                var url = routing.generate(this.route, { code: actionMediator.code });
                 $.post(url, _.bind(function () {
                         this.markAsUpToDate(actionMediator);
                         this.postAction(actionMediator);

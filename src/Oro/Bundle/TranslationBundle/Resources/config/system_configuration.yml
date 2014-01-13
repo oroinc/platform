@@ -15,6 +15,6 @@ oro_system_configuration:
                         children:
                             language_settings:
                                 children:
-                                    language_general:
+                                    language_languages:
                                         children:
                                             - oro_translation.available_translations

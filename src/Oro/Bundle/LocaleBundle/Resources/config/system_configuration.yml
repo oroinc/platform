@@ -6,8 +6,8 @@ oro_system_configuration:
         language_settings:
             title: 'Language settings'
             icon:  'icon-font'
-        language_general:
-            title: 'General'
+        language_languages:
+            title: 'Languages'
         locale_settings:
             title: 'Localization options'
 
@@ -51,7 +51,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.languages:
-            type: oro_locale
+            type: oro_language
             priority: 35
             options:
                 label: 'Supported languages'
@@ -100,7 +100,7 @@ oro_system_configuration:
                                             - oro_locale.currency
                             language_settings:
                                 children:
-                                    language_general:
+                                    language_languages:
                                         children:
                                             - oro_locale.language
                                             - oro_locale.languages

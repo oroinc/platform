@@ -44,4 +44,4 @@ interface APIAdapterInterface
      * @throws \RuntimeException
      */
     public function parseResponse($response);
-} 
+}

@@ -35,9 +35,8 @@
                     <b>{{ (language.translationStatus / 100)|oro_format_percent }}</b>
                 </td>
                 <td class="translation-status">
-                    {% set installedStatus = metaConfig[language.code] is defined ? metaConfig[language.code].translationStatus : 0 %}
                     {% if status != constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
-                        {% if (language.translationStatus == installedStatus) %}
+                        {% if not oro_translation_is_fresh(language.code) %}
                             <span class="status-up-to-date">{% trans %}Up to date{% endtrans %}</span>
                         {% else %}
                             <span class="status-needs-update">{% trans %}Needs update{% endtrans %}</span>
@@ -46,18 +45,18 @@
                 </td>
                 <td>
                     {% if status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
-                        {{ _self.renderButton(language.code, 'download', 'Download', language.translationStatus) }}
+                        {{ _self.renderButton(language.code, 'download', 'Download') }}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_DOWNLOADED') %}
                         {{ _self.renderButton(language.code, 'enable', 'Enable') }}
 
-                        {% if language.translationStatus != installedStatus %}
-                            {{ _self.renderButton(language.code, 'update', 'Update', language.translationStatus) }}
+                        {% if not oro_translation_is_fresh(language.code) %}
+                            {{ _self.renderButton(language.code, 'update', 'Update') }}
                         {% endif %}
                     {% elseif status == constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_ENABLED') %}
                         {{ _self.renderButton(language.code, 'disable', 'Disable') }}
 
-                        {% if language.translationStatus != installedStatus %}
-                            {{ _self.renderButton(language.code, 'update', 'Update', language.translationStatus) }}
+                        {% if not oro_translation_is_fresh(language.code) %}
+                            {{ _self.renderButton(language.code, 'update', 'Update') }}
                         {% endif %}
                     {% endif %}
                 </td>
@@ -77,12 +76,9 @@
         langCode - code of the row language
         action   - enable | disable | download | update
         label    - any label you want
-        translationStatus - translation coverage percent
 #}
-{% macro renderButton(langCode, action, label, translationStatus = 0) %}
-    <button class="btn btn-mini" data-lang="{{ langCode }}"
-            data-action="{{ action }}"
-            data-translation-status="{{ translationStatus }}">
+{% macro renderButton(langCode, action, label) %}
+    <button class="btn btn-mini" data-lang="{{ langCode }}" data-action="{{ action }}">
         {{ label|trans }}
     </button>
 {% endmacro %}

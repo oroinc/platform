@@ -9,7 +9,8 @@ use Psr\Log\LoggerInterface;
 
 class OroTranslationAdapter implements APIAdapterInterface
 {
-    const URL_STATS = '/stats';
+    const URL_STATS    = '/stats';
+    const URL_DOWNLOAD = '/download';
 
     /** @var string */
     protected $apiKey;
@@ -39,8 +40,8 @@ class OroTranslationAdapter implements APIAdapterInterface
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
 
         $fileHandler = fopen($path, 'wb');
-        $result = $this->request(
-            '/download',
+        $result      = $this->request(
+            self::URL_DOWNLOAD,
             [
                 'packages' => implode(',', $projects),
                 'lang'     => $package,
@@ -65,7 +66,7 @@ class OroTranslationAdapter implements APIAdapterInterface
      *
      * @throws \RuntimeException
      * @return array [
-     *     ['code' => 'en', 'translationStatus' => 30]
+     *     ['code' => 'en', 'translationStatus' => 30, 'lastBuildDate' => \DateTime::ISO8601 - string ]
      * ]
      */
     public function fetchStatistic(array $packages = [])
@@ -83,7 +84,7 @@ class OroTranslationAdapter implements APIAdapterInterface
             $filtered = array_filter(
                 $result,
                 function ($item) {
-                    return isset($item['code']) && isset($item['translationStatus']);
+                    return isset($item['code']) && isset($item['translationStatus']) && isset($item['lastBuildDate']);
                 }
             );
 
