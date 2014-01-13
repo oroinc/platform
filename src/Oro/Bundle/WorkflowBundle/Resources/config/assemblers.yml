@@ -15,12 +15,24 @@ services:
         arguments:
             - "data"
 
+    oro_workflow.process.configuration_pass.replace_property_path:
+        class: %oro_workflow.configuration_pass.replace_property_path.class%
+        arguments:
+            - "entity"
+
     oro_workflow.condition_assembler:
         class: %oro_workflow.condition_assembler.class%
         arguments:
             - @oro_workflow.condition_factory
         calls:
             - [addConfigurationPass, [@oro_workflow.configuration_pass.replace_property_path]]
+
+    oro_workflow.process.condition_assembler:
+        class: %oro_workflow.condition_assembler.class%
+        arguments:
+            - @oro_workflow.condition_factory
+        calls:
+            - [addConfigurationPass, [@oro_workflow.process.configuration_pass.replace_property_path]]
 
     oro_workflow.action_assembler:
         class: %oro_workflow.action_assembler.class%
@@ -29,6 +41,14 @@ services:
             - @oro_workflow.condition_factory
         calls:
             - [addConfigurationPass, [@oro_workflow.configuration_pass.replace_property_path]]
+
+    oro_workflow.process.action_assembler:
+        class: %oro_workflow.action_assembler.class%
+        arguments:
+            - @oro_workflow.action_factory
+            - @oro_workflow.condition_factory
+        calls:
+            - [addConfigurationPass, [@oro_workflow.process.configuration_pass.replace_property_path]]
 
     oro_workflow.attribute_assembler:
         class: %oro_workflow.attribute_assembler.class%
