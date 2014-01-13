@@ -36,7 +36,7 @@ class CurlRequest implements ApiRequestInterface
     {
         $result = curl_exec($this->handler);
 
-        if (!$result) {
+        if ($result === false) {
             $errorCode = curl_errno($this->handler);
             $error     = curl_error($this->handler);
 
