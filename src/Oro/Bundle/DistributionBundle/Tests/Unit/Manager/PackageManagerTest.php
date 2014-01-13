@@ -26,6 +26,7 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
  */
 class PackageManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -561,6 +562,9 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $localRepository->expects($this->at(1))
             ->method('getCanonicalPackages')
             ->will($this->returnValue([$newPackage]));
+        $localRepository->expects($this->any())
+            ->method('findPackages')
+            ->will($this->returnValue([$newPackage]));
 
         // Package repositories
         $repositoryManager->expects($this->once())
@@ -594,7 +598,29 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $logger->expects($this->at(3))
             ->method('info')
             ->with($this->stringContains('Removing from composer.json'));
-
+        /** Clean up after error during running install scripts */
+        $logger->expects($this->at(4))
+            ->method('info')
+            ->with($this->stringContains('Removing just installed packages'), [$newPackageName]);
+        // Cache clear
+        $eventDispatcher = $this->createConstructorLessMock('Composer\EventDispatcher\EventDispatcher');
+        $composer->expects($this->once())
+            ->method('getEventDispatcher')
+            ->will($this->returnValue($eventDispatcher));
+        $eventDispatcher->expects($this->once())
+            ->method('dispatchCommandEvent')
+            ->with('cache-clear', false);
+        $installationManager = $this->createInstallationManagerMock();
+        $installationManager->expects($this->once())
+            ->method('uninstall')
+            ->with(
+                $this->equalTo($localRepository),
+                $this->isInstanceOf('Composer\DependencyResolver\Operation\UninstallOperation')
+            );
+        $composer->expects($this->any())
+            ->method('getInstallationManager')
+            ->will($this->returnValue($installationManager));
+        /** End clean up */
 
         $manager = $this->createPackageManager(
             $composer,
