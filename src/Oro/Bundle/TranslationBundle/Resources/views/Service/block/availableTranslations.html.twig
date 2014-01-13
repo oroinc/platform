@@ -9,7 +9,7 @@
         <thead>
             <tr>
                 <th>{% trans %}Language{% endtrans %}</th>
-                <th>{% trans %}Translation coverage{% endtrans %}<sup>&nbsp;1&nbsp;</sup></th>
+                <th>{% trans %}Translation coverage{% endtrans %}<sup>&nbsp;1</sup></th>
                 <th>{% trans %}Translation status{% endtrans %}</th>
                 <th>{% trans %}Action{% endtrans %}</th>
             </tr>
@@ -39,7 +39,7 @@
                         {% if oro_translation_is_fresh(language.code) %}
                             <span class="status-up-to-date">{% trans %}Up to date{% endtrans %}</span>
                         {% else %}
-                            <span class="status-needs-update">{% trans %}Needs update{% endtrans %}</span>
+                            <span class="status-needs-update">{% trans %}Update needed{% endtrans %}</span>
                         {% endif %}
                     {% endif %}
                 </td>

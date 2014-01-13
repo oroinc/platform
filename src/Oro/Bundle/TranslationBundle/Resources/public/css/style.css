@@ -13,6 +13,11 @@
     margin-bottom: 0;
 }
 
+.available-translation-widget-container table tr td,
+.available-translation-widget-container table tr th {
+    font-size: 13px;
+}
+
 .available-translation-widget-container .no-statistic {
     text-align: center;
 }
