@@ -14,7 +14,6 @@ class PackageController extends Controller
 {
     const CODE_INSTALLED = 0;
     const CODE_UPDATED = 0;
-    const CODE_UNINSTALLED = 0;
     const CODE_ERROR = 1;
     const CODE_CONFIRM = 2;
 
@@ -67,54 +66,6 @@ class PackageController extends Controller
         $this->setUpEnvironment();
 
         return ['updates' => $this->container->get('oro_distribution.package_manager')->getAvailableUpdates()];
-    }
-
-    /**
-     * @Route("/package/uninstall")
-     */
-    public function uninstallAction()
-    {
-        $this->setUpEnvironment();
-
-        $params = $this->getRequest()->get('params');
-        $packageName = $this->getParamValue($params, 'packageName', null);
-        $forceDependentsUninstalling = $this->getParamValue($params, 'force', false);
-
-        /** @var PackageManager $manager */
-        $manager = $this->container->get('oro_distribution.package_manager');
-        $responseContent = [];
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
-
-        if (!$manager->isPackageInstalled($packageName)) {
-            $responseContent = [
-                'code' => self::CODE_ERROR,
-                'message' => sprintf('Package % not found', $packageName)
-            ];
-            $response->setContent(json_encode($responseContent));
-
-            return $response;
-        }
-
-        $dependents = $manager->getDependents($packageName);
-        if (!$forceDependentsUninstalling && $dependents) {
-            $params['force'] = true;
-            $responseContent = [
-                'code' => self::CODE_CONFIRM,
-                'packages' => $dependents,
-                'params' => $params
-            ];
-            $response->setContent(json_encode($responseContent));
-
-            return $response;
-
-        }
-
-        $manager->uninstall(array_merge($dependents, [$packageName]));
-        $responseContent = ['code' => self::CODE_UNINSTALLED];
-        $response->setContent(json_encode($responseContent));
-
-        return $response;
     }
 
     /**
