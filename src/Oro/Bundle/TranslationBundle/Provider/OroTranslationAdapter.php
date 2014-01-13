@@ -66,8 +66,15 @@ class OroTranslationAdapter implements APIAdapterInterface
      *
      * @throws \RuntimeException
      * @return array [
-     *     ['code' => 'en', 'translationStatus' => 30, 'lastBuildDate' => \DateTime::ISO8601 - string ]
+     *     [
+     *         'code' => 'en_US',
+     *         'realCode' => 'en',
+     *         'translationStatus' => 30,
+     *         'lastBuildDate' => \DateTime::ISO8601 - string
+     *     ]
      * ]
+     *  RealCode - language code for download API (not used in BAP)
+     *  Code     - 5 symbols locale code
      */
     public function fetchStatistic(array $packages = [])
     {

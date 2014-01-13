@@ -25,8 +25,8 @@ class ServiceController extends BaseController
         $statisticProvider = $this->get('oro_translation.statistic_provider');
         $cm                = $this->get('oro_config.global');
 
-        $stats         = $statisticProvider->get();
-        $defaultValue  = $cm->get(LanguageType::CONFIG_KEY, true);
+        $stats        = $statisticProvider->get();
+        $defaultValue = $cm->get(LanguageType::CONFIG_KEY, true);
 
         // @TODO find better solution
         if ($defaultValue == 'en') {
