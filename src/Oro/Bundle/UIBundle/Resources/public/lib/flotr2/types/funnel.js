@@ -9,6 +9,7 @@ Flotr.addType('funnel', {
         explode: 5,
         marginX: 450,
         marginY: 20,
+        leftMargin: 160,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
         formatter: '',
         nozzleSteps: []
@@ -47,7 +48,7 @@ Flotr.addType('funnel', {
             }
         });
         Flotr._.each(data, function (funnel, iterator) {
-            if (funnel == 0) {
+            if (funnel == 0 && !self.in_array(iterator, options.nozzleSteps)) {
                 reSumm += summ / 100 * 2;
                 data[iterator] = summ / 100 * 2;
                 self.shiftLabels = true;
@@ -64,10 +65,10 @@ Flotr.addType('funnel', {
         context.lineJoin = 'round';
         context.translate(0.5, 0.5);
         context.beginPath();
-        context.moveTo(0, options.marginY);
+        context.moveTo(options.leftMargin || 0, options.marginY);
 
         self.stack[0] = {};
-        self.stack[0].x1 = 0;
+        self.stack[0].x1 = options.leftMargin || 0;
         self.stack[0].y1 = options.marginY;
 
         var segmentData = {
@@ -256,19 +257,19 @@ Flotr.addType('funnel', {
             BC = Math.ceil((AD * (prevStepHeight - funnel)) / prevStepHeight);
 
         if (renderable) {
-            this.stack[iterator].x2 = prevStepWidth + prevStepWidthDelta;
+            this.stack[iterator].x2 = prevStepWidth + prevStepWidthDelta + (options.leftMargin || 0);
             this.stack[iterator].y2 = funnelSumm;
 
             if (isNozzleStep) {
-                x3 = this.stack[iterator].x2;
-                x4 = Math.ceil(marginWidth / 2 - AD);
+                var x3 = this.stack[iterator].x2;
+                var x4 = Math.ceil(marginWidth / 2 - AD) + (options.leftMargin || 0);
             } else {
-                var x3 = Math.round(marginWidth / 2 + BC);
-                var x4 = Math.round(marginWidth / 2 - BC);
+                var x3 = Math.round(marginWidth / 2 + BC) + (options.leftMargin || 0);
+                var x4 = Math.round(marginWidth / 2 - BC) + (options.leftMargin || 0);
             }
 
-            this.stack[iterator].x3 = (x3 <= marginWidth / 2) ? marginWidth / 2 : x3;
-            this.stack[iterator].x4 = (x4 >= marginWidth / 2) ? marginWidth / 2 : x4;
+            this.stack[iterator].x3 = x3;
+            this.stack[iterator].x4 = x4;
 
             this.stack[iterator].y3 =
             this.stack[iterator].y4 = (funnelSumm + funnel);
@@ -290,11 +291,11 @@ Flotr.addType('funnel', {
 
         context.beginPath();
         if (isNozzleStep) {
-            var nextX = Math.ceil(marginWidth / 2 - AD);
+            var nextX = Math.ceil(marginWidth / 2 - AD) + (options.leftMargin || 0);
         } else {
-            var nextX = Math.ceil(marginWidth / 2 - BC);
+            var nextX = Math.ceil(marginWidth / 2 - BC) + (options.leftMargin || 0);
         }
-        context.moveTo(nextX, funnelSumm);
+        context.moveTo(nextX , funnelSumm);
 
         self.stack[iterator + 1] = {};
         self.stack[iterator + 1].x1 = nextX;

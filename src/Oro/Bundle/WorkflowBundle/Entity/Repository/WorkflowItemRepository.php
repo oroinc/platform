@@ -94,7 +94,7 @@ class WorkflowItemRepository extends EntityRepository
             }
             $data = $query->getArrayResult();
 
-            if (!empty($data)) {
+            if (!empty($data) || !empty($visibleSteps)) {
                 if (!empty($visibleSteps)) {
                     $steps = $visibleSteps;
                 } else {
