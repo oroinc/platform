@@ -35,6 +35,7 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
+        $this->writer->close();
         if (is_file($this->filePath)) {
             unlink($this->filePath);
         }

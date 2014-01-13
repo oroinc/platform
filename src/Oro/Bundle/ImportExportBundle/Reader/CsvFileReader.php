@@ -149,7 +149,7 @@ class CsvFileReader extends AbstractReader
      * @param string $filePath
      * @throws InvalidArgumentException
      */
-    public function setFilePath($filePath)
+    protected function setFilePath($filePath)
     {
         $this->fileInfo = new \SplFileInfo($filePath);
 

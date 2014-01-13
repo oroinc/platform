@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 
-class MassActionMediator implements MassActionMediatorInterface
+class MassActionHandlerArgs
 {
     /** @var MassActionInterface */
     protected $massAction;
@@ -39,7 +39,7 @@ class MassActionMediator implements MassActionMediatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return MassActionInterface
      */
     public function getMassAction()
     {
@@ -47,7 +47,7 @@ class MassActionMediator implements MassActionMediatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return IterableResultInterface
      */
     public function getResults()
     {
@@ -55,7 +55,7 @@ class MassActionMediator implements MassActionMediatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return array
      */
     public function getData()
     {
@@ -63,7 +63,7 @@ class MassActionMediator implements MassActionMediatorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @return DatagridInterface
      */
     public function getDatagrid()
     {
