@@ -22,7 +22,8 @@ define(function (require) {
         cellTypes = {
             integer:   'number',
             decimal:   'number',
-            percent:   'number'
+            percent:   'number',
+            currency:  'number'
         },
 
         helpers = {

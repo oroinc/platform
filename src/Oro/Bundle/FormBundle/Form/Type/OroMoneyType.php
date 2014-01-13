@@ -20,7 +20,7 @@ class OroMoneyType extends AbstractType
     protected $localeSettings;
 
     /**
-     * @var
+     * @var NumberFormatter
      */
     protected $numberFormatter;
 

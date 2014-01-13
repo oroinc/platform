@@ -60,16 +60,6 @@
                 </td>
                 <td>
                     {{ item.update.currentVersionString|default(item.package.prettyVersion) }}
-                    {% if item.canBeDeleted %}
-                        <br />
-                        <a href="#" class="ajax uninstall"
-                           data-action="uninstall"
-                           data-params='{"packageName": "{{ item.package.prettyName }}" }'>
-                            <i class="icon-remove"></i>
-                            Uninstall
-                        </a>
-
-                    {% endif %}
                 </td>
                 <td>
                     {% if item.update %}

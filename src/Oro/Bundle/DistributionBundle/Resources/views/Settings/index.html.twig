@@ -1,0 +1,22 @@
+{% extends 'OroDistributionBundle::base_inner.html.twig' %}
+
+{% block title %}Composer Settings{% endblock %}
+
+{% block menu %}
+    <a id="back-to-installed" href="{{ path('oro_distribution_package_listinstalled') }}">
+        <i class="icon icon-reply"></i>
+        Back to Installed Packages
+    </a>
+{% endblock %}
+
+{% block body %}
+    {% if saved %}
+        <div class="alert fade in alert-success">
+            <i class="icon icon-success"></i>
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            The settings were saved.
+        </div>
+    {% endif %}
+
+    {% include 'OroDistributionBundle:Settings:settings_form.html.twig' with { 'form': form } %}
+{% endblock %}
