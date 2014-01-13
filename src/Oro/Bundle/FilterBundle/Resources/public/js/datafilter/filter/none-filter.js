@@ -14,36 +14,25 @@ function($, _, __, AbstractFilter) {
      * @extends oro.datafilter.AbstractFilter
      */
     return AbstractFilter.extend({
-        /**
-         * Filter template
-         *
-         * @property
-         */
-        template: _.template(
-            '<button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">' +
-                '<% if (showLabel) { %><%= label %>: <% } %>' +
-                '<strong class="filter-criteria-hint"><%= criteriaHint %></strong>' +
-                '<span class="caret"></span>' +
-            '</button>' +
-            '<% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>' +
-            '<div class="filter-criteria dropdown-menu" />'
-        ),
+        wrappable: true,
+
+        wrapperTemplate: '',
+
+        wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
          * Template for filter criteria
          *
          * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div>' +
-                '<%= popupHint %>' +
-            '</div>'
-        ),
+        template: '',
 
         /**
-         * @property {Boolean}
+         * Template selector for filter criteria
+         *
+         * @property
          */
-        popupCriteriaShowed: false,
+        templateSelector: '#none-filter-template',
 
         /**
          * Selector to element of criteria hint
@@ -82,11 +71,12 @@ function($, _, __, AbstractFilter) {
          *
          * @param {Object} options
          */
-        initialize: function(options) {
-            options = options || {};
-            if (_.has(options, 'popupHint')) {
-                this.popupHint = options.popupHint;
-            }
+        initialize: function (options) {
+            options = _.pick(options || {}, 'popupHint', 'templateSelector');
+            _.extend(this, options);
+
+            this.template = _.template($(this.templateSelector).text());
+
             this.label = 'None';
             AbstractFilter.prototype.initialize.apply(this, arguments);
         },
@@ -157,42 +147,15 @@ function($, _, __, AbstractFilter) {
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
-            this.$el.append(
-                this.template({
-                    label: this.label,
-                    showLabel: this.showLabel,
-                    criteriaHint:  this._getCriteriaHint(),
-                    nullLink: this.nullLink,
-                    canDisable: this.canDisable
-                })
-            );
-
-            this._renderCriteria(this.$(this.criteriaSelector));
-            this._clickOutsideCriteriaCallback = _.bind(function(e) {
-                if (this.popupCriteriaShowed) {
-                    this._onClickOutsideCriteria(e);
-                }
-            }, this);
-            $('body').on('click', this._clickOutsideCriteriaCallback);
-
+            var $filter = $(this.template({
+                popupHint: this._getPopupHint()
+            }));
+            this._wrap($filter);
             return this;
         },
 
-        /**
-         * Render filter criteria popup
-         *
-         * @param {Object} el
-         * @protected
-         * @return {*}
-         */
-        _renderCriteria: function(el) {
-            $(el).append(
-                this.popupCriteriaTemplate({
-                    popupHint: this._getPopupHint()
-                })
-            );
-            return this;
+        _wrap: function ($filter) {
+            this.$el.append($filter);
         },
 
         /**

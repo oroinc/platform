@@ -1,16 +1,12 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'backbone', 'jquery-ui', 'oroui/js/dropdown-select'], function ($, _, Backbone) {
+define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroquerydesigner/js/compare-field'], function ($, _) {
     'use strict';
 
     /**
-     * Basic grid filter
-     *
-     * @export  ororeport/js/conditions-group
-     * @class   oro.report.ConditionsGroup
-     * @extends Backbone.View
+     * Conditions group widget
      */
-    return Backbone.View.extend({
+    $.widget('oro.conditionsGroup', {
         defaultOptions: {
             sortable: {
                 // see jquery-ui sortable's options
@@ -22,7 +18,7 @@ define(['jquery', 'underscore', 'backbone', 'jquery-ui', 'oroui/js/dropdown-sele
             conditionsGroup: {
                 items: '>.condition[data-criteria]',
                 cursorAt: "10 10",
-                cancel: 'a, input, .btn'
+                cancel: 'a, input, .btn, select'
             },
             conditionsGroupSelector: '#segmentation-conditions',
             criteriaList: {},
@@ -33,7 +29,7 @@ define(['jquery', 'underscore', 'backbone', 'jquery-ui', 'oroui/js/dropdown-sele
             conditionsGroupHTML: '<ul class="conditions-group" />'
         },
 
-        initialize: function (options) {
+        _create: function (options) {
             this._prepareOptions(options);
             this._initCriteriaList(this.options.criteriaListSelector);
             this._initConditionsGroup(this.options.conditionsGroupSelector);
@@ -41,7 +37,6 @@ define(['jquery', 'underscore', 'backbone', 'jquery-ui', 'oroui/js/dropdown-sele
             $(this.options.conditionsGroupSelector)
                 .on('closed', _.debounce(_.bind(this._updateOperators, this), 1))
                 .on('change', '.operator', _.bind(this._onChangeOperator, this));
-
         },
 
         _prepareOptions: function (options) {
@@ -83,13 +78,13 @@ define(['jquery', 'underscore', 'backbone', 'jquery-ui', 'oroui/js/dropdown-sele
         _createCondition: function (criteria) {
             var $el;
             switch (criteria) {
-            case 'compare-fields':
-                $el = $(this.options.compareFieldsHTML);
-                break;
-            case 'conditions-group':
-                $el = $(this.options.conditionsGroupHTML);
-                this._initConditionsGroup($el);
-                break;
+                case 'compare-fields':
+                    $el = $(this.options.compareFieldsHTML).compareField();
+                    break;
+                case 'conditions-group':
+                    $el = $(this.options.conditionsGroupHTML);
+                    this._initConditionsGroup($el);
+                    break;
             }
             $el.wrap(this.options.conditionHTML);
             return $el.parent().attr('data-criteria', criteria).attr('data-value', Math.random());

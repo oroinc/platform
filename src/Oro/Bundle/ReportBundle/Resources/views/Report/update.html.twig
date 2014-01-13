@@ -47,7 +47,7 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {#<div class="container-fluid">
+    <div class="container-fluid">
         <div class="row-fluid">
             <div class="span3 filter-criteria">
                 <h4>Filter Criteria</h4>
@@ -95,17 +95,9 @@
                         </div>
                     </li>
                 </ul>
-                <script type="text/javascript">
-                    require(['oroquerydesigner/js/conditions-group'], function (ConditionsGroup) {
-                        new ConditionsGroup({
-                            conditionsGroupSelector: '#segmentation-conditions',
-                            criteriaListSelector: '#filter-criteria-list'
-                        });
-                    });
-                </script>
             </div>
         </div>
-    </div>#}
+    </div>
 
     {% set id = 'report-profile' %}
     {% set ownerDataBlock = {
@@ -182,7 +174,7 @@
     {{ QD.query_designer_column_chain_template('report-column-chain-template') }}
 
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/translator', 'routing', 'oro/query-designer', 'oro/delete-confirmation'],
+        require(['jquery', 'underscore', 'oro/translator', 'routing', 'oro/query-designer', 'oro/delete-confirmation', 'oroquerydesigner/js/conditions-group'],
         function($, _, __, routing, QueryDesigner, DeleteConfirmation) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
@@ -237,6 +229,11 @@
                             designer.changeEntity(newVal);
                         }
                     }
+                });
+
+                $('.report-designer').conditionsGroup({
+                    conditionsGroupSelector: '#segmentation-conditions',
+                    criteriaListSelector: '#filter-criteria-list'
                 });
             });
         });

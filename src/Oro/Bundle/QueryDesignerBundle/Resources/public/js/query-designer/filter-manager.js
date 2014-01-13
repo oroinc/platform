@@ -1,6 +1,6 @@
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/query-designer/util'],
-function($, _, Backbone, mediator, util) {
+define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/query-designer/util', 'oro/datafilter-wrapper'],
+function($, _, Backbone, mediator, util, filterWrapper) {
     'use strict';
 
     /**
@@ -37,10 +37,14 @@ function($, _, Backbone, mediator, util) {
          * @param {Object} options
          * @param {Object} [options.filters] List of filter objects
          */
-        initialize: function()
-        {
+        initialize: function () {
             this.options.filters = this.options.filters || [];
-            _.each(this.options.filters, function(filter) {
+
+            _.each(this.options.filters, function (filter) {
+                if (filter.wrappable) {
+                    _.extend(filter, filterWrapper);
+                }
+
                 this.listenTo(filter, "update", _.partial(this._onFilterUpdated, filter));
             }, this);
 
