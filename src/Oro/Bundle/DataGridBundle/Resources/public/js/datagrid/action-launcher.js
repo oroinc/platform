@@ -96,7 +96,7 @@ function($, _, Backbone) {
 
         attributesTemplate: _.template(
             '<% _.each(attributes, function(attribute, name) { %>' +
-                '<%= name %>="<%= attribute %>" ' +
+                '<%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %> ' +
             '<% }) %>'
         ),
 
@@ -152,12 +152,13 @@ function($, _, Backbone) {
                 this.onClickReturnValue = options.onClickReturnValue;
             }
 
+            this.events = {};
             var linkSelector = '';
             if (_.has(options, 'links')) {
+                this.events['click .dropdown-toggle'] = 'onToggle';
                 this.links = options.links;
                 linkSelector = ' .dropdown-menu a';
             }
-            this.events = {};
             this.events['click' + linkSelector] = 'onClick';
 
             this.action = options.action;
@@ -200,7 +201,7 @@ function($, _, Backbone) {
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
-            this.trigger('click', this);
+            this.trigger('click', this, e.currentTarget);
             if (this.runAction) {
                 if (this.links) {
                     var $link = $(e.currentTarget);
@@ -216,6 +217,13 @@ function($, _, Backbone) {
                 return false;
             }
             return this.onClickReturnValue;
+        },
+
+        onToggle: function(e) {
+            var $link = $(e.currentTarget);
+            if (!$link.closest('.btn-group').hasClass('open')) {
+                this.trigger('expand', this);
+            }
         },
 
         /**

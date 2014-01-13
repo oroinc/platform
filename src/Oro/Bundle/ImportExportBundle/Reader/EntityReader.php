@@ -10,21 +10,10 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
-class EntityReader extends AbstractReader
+class EntityReader extends IteratorBasedReader
 {
-    /**
-     * @var \Iterator
-     */
-    protected $sourceIterator;
-
-    /**
-     * @var bool
-     */
-    protected $rewound = false;
-
     /**
      * @var ManagerRegistry
      */
@@ -39,41 +28,6 @@ class EntityReader extends AbstractReader
         parent::__construct($contextRegistry);
 
         $this->registry = $registry;
-    }
-
-    /**
-     * @return object|null
-     */
-    public function read()
-    {
-        $iterator = $this->getSourceIterator();
-        if (!$this->rewound) {
-            $iterator->rewind();
-            $this->rewound = true;
-        }
-
-        $result = null;
-        if ($iterator->valid()) {
-            $result = $iterator->current();
-            $context = $this->getContext();
-            $context->incrementReadOffset();
-            $context->incrementReadCount();
-            $iterator->next();
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return \Iterator
-     * @throws LogicException
-     */
-    protected function getSourceIterator()
-    {
-        if (null === $this->sourceIterator) {
-            throw new LogicException('Reader must be configured with source');
-        }
-        return $this->sourceIterator;
     }
 
     /**
@@ -127,13 +81,5 @@ class EntityReader extends AbstractReader
         }
 
         $this->setSourceQueryBuilder($qb);
-    }
-
-    /**
-     * @param \Iterator $sourceIterator
-     */
-    public function setSourceIterator(\Iterator $sourceIterator)
-    {
-        $this->sourceIterator = $sourceIterator;
     }
 }

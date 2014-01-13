@@ -4,14 +4,14 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Symfony\Component\Translation\Translator;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Converter\AbstractTableDataConverter;
+use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
-class DatagridDataConverter extends AbstractTableDataConverter implements ContextAwareInterface
+class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
     /**
      * @var ManagerInterface
@@ -59,40 +59,20 @@ class DatagridDataConverter extends AbstractTableDataConverter implements Contex
     /**
      * {@inheritdoc}
      */
-    protected function fillEmptyColumns(array $header, array $data)
+    public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
         $gridName   = $this->context->getOption('gridName');
         $gridConfig = $this->gridManager->getConfigurationForGrid($gridName);
+        $columns    = $gridConfig->offsetGet('columns');
 
         $result = array();
-        foreach ($header as $headerKey) {
-            $val = $data[$headerKey];
-            if (empty($val)) {
-                $val = '';
-            } else {
-                $frontendType = $gridConfig->offsetGetByPath(sprintf('[columns][%s][frontend_type]', $headerKey));
-                switch ($frontendType) {
-                    case PropertyInterface::TYPE_DATE:
-                        $val = $this->dateTimeFormatter->formatDate($val);
-                        break;
-                    case PropertyInterface::TYPE_DATETIME:
-                        $val = $this->dateTimeFormatter->format($val);
-                        break;
-                    case PropertyInterface::TYPE_DECIMAL:
-                        $val = $this->numberFormatter->formatDecimal($val);
-                        break;
-                    case PropertyInterface::TYPE_INTEGER:
-                        $val = $this->numberFormatter->formatDecimal($val);
-                        break;
-                    case PropertyInterface::TYPE_PERCENT:
-                        $val = $this->numberFormatter->formatPercent($val);
-                        break;
-                    default:
-                        $val = $data[$headerKey];
-                        break;
-                }
-            }
-            $result[$headerKey] = $val;
+        foreach ($columns as $columnName => $column) {
+            $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
+            $val = $this->applyFrontendFormatting(
+                $val,
+                isset($column['frontend_type']) ? $column['frontend_type'] : null
+            );
+            $result[$this->translator->trans($column['label'])] = $val;
         }
 
         return $result;
@@ -101,35 +81,39 @@ class DatagridDataConverter extends AbstractTableDataConverter implements Contex
     /**
      * {@inheritdoc}
      */
-    protected function getHeaderConversionRules()
+    public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
-        $gridName   = $this->context->getOption('gridName');
-        $gridConfig = $this->gridManager->getConfigurationForGrid($gridName);
-        $columns    = $gridConfig->offsetGet('columns');
-
-        $rules = [];
-        foreach ($columns as $columnName => $column) {
-            $rules[$this->translator->trans($column['label'])] = $columnName;
-        }
-
-        return $rules;
+        throw new \RuntimeException('The convertToImportFormat method is not implemented.');
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed $val
+     * @param string|null $frontendType
+     * @return string|null
      */
-    protected function getBackendHeader()
+    protected function applyFrontendFormatting($val, $frontendType)
     {
-        $gridName   = $this->context->getOption('gridName');
-        $gridConfig = $this->gridManager->getConfigurationForGrid($gridName);
-        $columns    = $gridConfig->offsetGet('columns');
-
-        $header = [];
-        foreach ($columns as $columnName => $column) {
-            $header[] = $columnName;
+        if (null !== $val) {
+            switch ($frontendType) {
+                case PropertyInterface::TYPE_DATE:
+                    $val = $this->dateTimeFormatter->formatDate($val);
+                    break;
+                case PropertyInterface::TYPE_DATETIME:
+                    $val = $this->dateTimeFormatter->format($val);
+                    break;
+                case PropertyInterface::TYPE_DECIMAL:
+                    $val = $this->numberFormatter->formatDecimal($val);
+                    break;
+                case PropertyInterface::TYPE_INTEGER:
+                    $val = $this->numberFormatter->formatDecimal($val);
+                    break;
+                case PropertyInterface::TYPE_PERCENT:
+                    $val = $this->numberFormatter->formatPercent($val);
+                    break;
+            }
         }
 
-        return $header;
+        return $val;
     }
 
     /**

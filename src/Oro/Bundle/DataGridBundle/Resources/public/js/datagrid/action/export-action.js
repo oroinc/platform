@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'oro/translator', 'oro/datagrid/abstract-action', 'oro/export-handler'],
-function(_, __, AbstractAction, exportHandler) {
+define(['underscore', 'oro/translator', 'oro/datagrid/abstract-action'],
+function(_, __, AbstractAction) {
     'use strict';
 
     /**
@@ -15,11 +15,8 @@ function(_, __, AbstractAction, exportHandler) {
         /** @property oro.PageableCollection */
         collection: undefined,
 
-        /** @property {String} */
-        actionKey: '',
-
-        /** @property {Object} */
-        exportStartedNotification: null,
+        /** @property {oro.datagrid.ActionLauncher} */
+        launcher: null,
 
         /**
          * {@inheritdoc}
@@ -27,15 +24,13 @@ function(_, __, AbstractAction, exportHandler) {
         initialize: function(options) {
             this.launcherOptions = {
                 links: [
-                    {key: 'csv', label: 'CSV'}
-                ]
+                    {key: 'csv', label: 'CSV', attributes: {'class': 'no-hash', 'download': null}}
+                ],
+                runAction: false
             };
-            this.frontend_handle = 'ajax';
-            this.reloadData = false;
-            this.route = 'oro_datagrid_extra_action';
+            this.route = 'oro_datagrid_export_action';
             this.route_parameters = {
-                gridName: options.datagrid.name,
-                actionName: 'export'
+                gridName: options.datagrid.name
             };
             this.collection = options.datagrid.collection;
 
@@ -45,47 +40,18 @@ function(_, __, AbstractAction, exportHandler) {
         /**
          * {@inheritdoc}
          */
-        getActionParameters: function() {
-            var result = _.extend({
-                    format: this.actionKey
-                },
-                this.collection.getFetchData()
-            );
-            result[this.route_parameters.gridName + '[_pager][_disabled]'] = 1;
-            return result;
-        },
+        createLauncher: function(options) {
+            this.launcher = AbstractAction.prototype.createLauncher.apply(this, arguments);
+            // update 'href' attribute for each export type
+            this.listenTo(this.launcher, 'expand', _.bind(function (launcher) {
+                var fetchData = this.collection.getFetchData();
+                _.each(launcher.$el.find('.dropdown-menu a'), function (el) {
+                    var $el = $(el);
+                    $el.attr('href', this.getLink(_.extend({format: $el.data('key')}, fetchData)));
+                }, this);
+            }, this));
 
-        /**
-         * {@inheritdoc}
-         */
-        _doAjaxRequest: function () {
-            this.exportStartedNotification = exportHandler.startExportNotificationMessage();
-            AbstractAction.prototype._doAjaxRequest.apply(this, arguments);
-        },
-
-        /**
-         * {@inheritdoc}
-         */
-        _onAjaxError: function(jqXHR, textStatus, errorThrown) {
-            this.exportStartedNotification.close();
-            this.exportStartedNotification = null;
-            AbstractAction.prototype._onAjaxError.apply(this, arguments);
-        },
-
-        /**
-         * {@inheritdoc}
-         */
-        _onAjaxSuccess: function(data, textStatus, jqXHR) {
-            this.exportStartedNotification.close();
-            this.exportStartedNotification = null;
-            AbstractAction.prototype._onAjaxSuccess.apply(this, arguments);
-        },
-
-        /**
-         * {@inheritdoc}
-         */
-        _showAjaxSuccessMessage: function(data) {
-            exportHandler.handleExportResponse(data);
+            return this.launcher;
         }
     });
 });

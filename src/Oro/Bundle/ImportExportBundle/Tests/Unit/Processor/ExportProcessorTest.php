@@ -26,7 +26,6 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([]));
 
         $this->processor = new ExportProcessor();
-        $this->processor->setImportExportContext($this->context);
     }
 
     /**
@@ -37,6 +36,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $entity = $this->getMock('MockEntity');
 
+        $this->processor->setImportExportContext($this->context);
         $this->processor->process($entity);
     }
 
@@ -60,6 +60,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->processor->setSerializer($serializer);
         $this->processor->setDataConverter($dataConverter);
+        $this->processor->setImportExportContext($this->context);
 
         $this->assertEquals($expectedValue, $this->processor->process($entity));
     }
@@ -76,6 +77,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($expectedValue));
 
         $this->processor->setSerializer($serializer);
+        $this->processor->setImportExportContext($this->context);
 
         $this->assertEquals($expectedValue, $this->processor->process($entity));
     }
@@ -89,6 +91,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
+        $this->processor->setImportExportContext($this->context);
     }
 
     public function testSetImportExportContextWithQueryBuilderIgnored()
@@ -104,6 +107,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
+        $this->processor->setImportExportContext($this->context);
     }
 
     public function testSetImportExportContextWithQueryBuilder()
@@ -123,6 +127,7 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryBuilder));
 
         $this->processor->setDataConverter($dataConverter);
+        $this->processor->setImportExportContext($this->context);
     }
 
     // @codingStandardsIgnoreStart
@@ -142,5 +147,6 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $dataConverter->expects($this->never())->method($this->anything());
 
         $this->processor->setDataConverter($dataConverter);
+        $this->processor->setImportExportContext($this->context);
     }
 }

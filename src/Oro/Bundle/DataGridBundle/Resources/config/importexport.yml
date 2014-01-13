@@ -1,6 +1,7 @@
 parameters:
-    oro_datagrid.importexport.export_connector.class:   Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector
-    oro_datagrid.importexport.data_converter.class:     Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter
+    oro_datagrid.importexport.data_converter.class:             Oro\Bundle\DataGridBundle\ImportExport\DatagridDataConverter
+    oro_datagrid.importexport.export_reader.class:              Oro\Bundle\DataGridBundle\ImportExport\DatagridExportReader
+    oro_datagrid.importexport.export_connector.class:           Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector
 
 services:
     oro_datagrid.importexport.processor.export:
@@ -10,13 +11,6 @@ services:
         tags:
             - { name: oro_importexport.processor, type: export, entity: datagrid, alias: oro_datagrid }
 
-    oro_datagrid.importexport.export_connector:
-        class: %oro_datagrid.importexport.export_connector.class%
-        arguments:
-            - @oro_datagrid.datagrid.manager
-            - @oro_importexport.context_registry
-            - @doctrine
-
     oro_datagrid.importexport.data_converter:
         class: %oro_datagrid.importexport.data_converter.class%
         arguments:
@@ -24,3 +18,15 @@ services:
             - @translator
             - @oro_locale.formatter.number
             - @oro_locale.formatter.date_time
+
+    oro_datagrid.importexport.export_reader:
+        class: %oro_datagrid.importexport.export_reader.class%
+        arguments:
+            - @oro_importexport.context_registry
+            - @oro_datagrid.importexport.export_connector
+
+    oro_datagrid.importexport.export_connector:
+        class: %oro_datagrid.importexport.export_connector.class%
+        arguments:
+            - @oro_datagrid.datagrid.manager
+            - @oro_datagrid.datagrid.request_params

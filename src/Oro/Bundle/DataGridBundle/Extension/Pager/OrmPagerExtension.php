@@ -29,7 +29,7 @@ class OrmPagerExtension extends AbstractExtension
     const PER_PAGE_PARAM   = '_per_page';
     const DISABLED_PARAM   = '_disabled';
 
-    const TOTAL_PARAM = 'totalRecords';
+    const TOTAL_PATH_PARAM = '[options][totalRecords]';
 
     /** @var Pager */
     protected $pager;
@@ -77,7 +77,7 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $result->offsetAddToArray('options', [self::TOTAL_PARAM => $this->pager->getNbResults()]);
+        $result->offsetSetByPath(self::TOTAL_PATH_PARAM, $this->pager->getNbResults());
     }
 
     /**
