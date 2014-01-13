@@ -64,7 +64,7 @@ class TranslationServiceProvider
         }
         $targetDir = $targetDir . DIRECTORY_SEPARATOR . 'en' . DIRECTORY_SEPARATOR;
 
-        $isDownloaded = $this->download($pathToSave, 'en', false);
+        $isDownloaded = $this->download($pathToSave, [], 'en', false);
         if (!$isDownloaded) {
             return false;
         }
@@ -171,7 +171,7 @@ class TranslationServiceProvider
                 $targetDir
             );
             if ($appliedLocales) {
-                $this->cleanup($targetDir);
+                // $this->cleanup($targetDir);
                 $this->jsTranslationDumper->dumpTranslations($appliedLocales);
             }
 

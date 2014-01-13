@@ -343,16 +343,6 @@ EOF
         $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
         $messageCatalogue = $operation->getResult();
 
-        // fix extracted strings with hashes
-        $messages = $messageCatalogue->all('messages');
-        $fixedMessages = [];
-        foreach ($messages as $key => $message) {
-            $key = str_replace('#', '"#"', $key);
-            $fixedMessages[$key] = $message;
-        }
-        $messageCatalogue = new MessageCatalogue($defaultLocale);
-        $messageCatalogue->add($fixedMessages);
-
         return $messageCatalogue;
     }
 }
