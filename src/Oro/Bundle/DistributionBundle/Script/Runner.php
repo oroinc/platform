@@ -346,5 +346,4 @@ class Runner
 
         return $commands;
     }
-
 }

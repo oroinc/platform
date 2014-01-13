@@ -68,4 +68,3 @@ class RepositoryTypeTest extends \PHPUnit_Framework_TestCase
         $type->buildForm($builder, []);
     }
 }
- 

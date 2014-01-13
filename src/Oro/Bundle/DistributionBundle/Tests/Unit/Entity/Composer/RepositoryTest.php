@@ -45,4 +45,3 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($type, $repo->getType());
     }
 }
- 

@@ -322,7 +322,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $runner->expects($this->once())
             ->method('clearDistApplicationCache');
         $runner->expects($this->once())
-            ->method('clearAppCache');
+            ->method('clearApplicationCache');
         $runner->expects($this->once())
             ->method('runPlatformUpdate');
         $runner->expects($this->once())
@@ -347,17 +347,10 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composerInstaller = $this->prepareInstallerMock($newPackage->getName(), 0);
 
         $logger = $this->createLoggerMock();
-        $logger->expects($this->at(0))
-            ->method('info')
-            ->with($this->stringContains('installing begin'));
-        $logger->expects($this->at(1))
-            ->method('info')
-            ->with($this->stringContains('Updating composer.json'));
-        $logger->expects($this->at(2))
-            ->method('info')
-            ->with($this->stringContains('installed'));
-        $logger->expects($this->never())
-            ->method('error');
+        $logger->expects($this->at(0))->method('info')->with($this->stringContains('installing begin'));
+        $logger->expects($this->at(1))->method('info')->with($this->stringContains('Updating composer.json'));
+        $logger->expects($this->at(2))->method('info')->with($this->stringContains('installed'));
+        $logger->expects($this->never())->method('error');
 
         $manager = $this->createPackageManager(
             $composer,
