@@ -1,0 +1,54 @@
+{% block javascripts %}
+    <script type="text/javascript">
+        $(function () {
+            fieldset = $('fieldset.repos');
+            fieldset.data('index', fieldset.find(':input').length);
+
+            $('#add_repo_link').on('click', function (e) {
+                event.preventDefault()
+                var index = fieldset.data('index');
+                var field = fieldset.data('prototype').replace(/__name__/g, index);
+
+                fieldset.data('index', index + 1);
+                $(this).before(field);
+            });
+        });
+
+        function submit() {
+            document.composer_config.submit();
+        }
+    </script>
+{% endblock %}
+
+{% form_theme form _self %}
+{% block form_errors %}
+    {% spaceless %}
+        {% if errors|length > 0 %}
+            {% for error in errors %}
+                <span for="oro_entity_config_type_entity_label" class="validation-faled">{{ error.message }}</span>
+            {% endfor %}
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_errors %}
+
+{{ form_start(form, {'attr': {'class': 'form', 'name': 'composer_config', 'id': 'composer-config'}}) }}
+    {{ form_label(form.oauth) }}
+    {{ form_widget(form.oauth) }}
+    {{ form_errors(form.oauth) }}
+
+    <fieldset class="repos" data-prototype="{% filter escape %}{% include 'OroDistributionBundle:Settings:repo_prototype.html.twig' with { 'repo': form.repositories.vars.prototype } %}{% endfilter %}">
+        <legend>Repositories</legend>
+        {% for repo in form.repositories %}
+            {% include 'OroDistributionBundle:Settings:repo_prototype.html.twig' with { 'repo': repo } %}
+        {% endfor %}
+        <a href="javascript:void(0);" id="add_repo_link">Add a repository</a>
+    </fieldset>
+
+
+    <div class="actions">
+        <a class="btn btn-primary btn-large" id="install-new-package" href="javascript:submit();">
+            <i class="icon-settings"></i>
+            Save
+        </a>
+    </div>
+{{ form_end(form) }}

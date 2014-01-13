@@ -25,21 +25,18 @@ class RunnerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->applicationRootDir = $this->client->getKernel()->getRootDir();
+        if (!is_dir($this->applicationRootDir . '/config/dist')) {
+            $this->markTestSkipped('Distribution tests are not compatibility with CRM environment');
+        }
     }
 
-    /**
-     * @test
-     */
-    public function shouldBeConstructedWithInstallationManager()
+    public function testShouldBeConstructedWithInstallationManager()
     {
         new Runner($this->createInstallationManagerMock(), $this->createLoggerMock(
         ), 'path/to/application/root/dir', 'test');
     }
 
-    /**
-     * @test
-     */
-    public function shouldRunValidInstallScriptOfPackageAndReturnOutput()
+    public function testShouldRunValidInstallScriptOfPackageAndReturnOutput()
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid';
@@ -57,10 +54,7 @@ class RunnerTest extends WebTestCase
         $this->assertEquals($expectedOutput, $runner->install($package));
     }
 
-    /**
-     * @test
-     */
-    public function shouldDoNothingWhenInstallScriptIsAbsent()
+    public function testShouldDoNothingWhenInstallScriptIsAbsent()
     {
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
@@ -73,12 +67,10 @@ class RunnerTest extends WebTestCase
     }
 
     /**
-     * @test
-     *
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      * @expectedExceptionMessage The command
      */
-    public function throwExceptionWhenProcessFailed()
+    public function testThrowExceptionWhenProcessFailed()
     {
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
@@ -90,10 +82,7 @@ class RunnerTest extends WebTestCase
         $runner->install($package);
     }
 
-    /**
-     * @test
-     */
-    public function shouldRunValidUninstallScriptOfPackageAndReturnOutput()
+    public function testShouldRunValidUninstallScriptOfPackageAndReturnOutput()
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid';
@@ -110,10 +99,7 @@ class RunnerTest extends WebTestCase
         $this->assertEquals($expectedOutput, $runner->uninstall($package));
     }
 
-    /**
-     * @test
-     */
-    public function shouldDoNothingWhenUninstallScriptIsAbsent()
+    public function testShouldDoNothingWhenUninstallScriptIsAbsent()
     {
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
@@ -126,12 +112,10 @@ class RunnerTest extends WebTestCase
     }
 
     /**
-     * @test
-     *
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      * @expectedExceptionMessage The command
      */
-    public function throwExceptionWhenProcessFailedDuringUninstalling()
+    public function testThrowExceptionWhenProcessFailedDuringUninstalling()
     {
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
@@ -143,10 +127,7 @@ class RunnerTest extends WebTestCase
         $runner->uninstall($package);
     }
 
-    /**
-     * @test
-     */
-    public function shouldRunValidUpdateScriptOfPackageAndReturnOutput()
+    public function testShouldRunValidUpdateScriptOfPackageAndReturnOutput()
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid';
@@ -163,10 +144,7 @@ class RunnerTest extends WebTestCase
         $this->assertEquals($expectedOutput, $runner->update($package, 'any version'));
     }
 
-    /**
-     * @test
-     */
-    public function shouldDoNothingWhenUpdateScriptIsAbsent()
+    public function testShouldDoNothingWhenUpdateScriptIsAbsent()
     {
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
@@ -179,12 +157,10 @@ class RunnerTest extends WebTestCase
     }
 
     /**
-     * @test
-     *
      * @expectedException \Symfony\Component\Process\Exception\ProcessFailedException
      * @expectedExceptionMessage The command
      */
-    public function throwExceptionWhenProcessFailedDuringUpdating()
+    public function testThrowExceptionWhenProcessFailedDuringUpdating()
     {
         $package = $this->createPackageMock();
         $logger = $this->createLoggerMock();
@@ -196,10 +172,7 @@ class RunnerTest extends WebTestCase
         $runner->update($package, 'any version');
     }
 
-    /**
-     * @test
-     */
-    public function shouldRunMigrationScriptsUpToCurrentPackageVersionSimple()
+    public function testShouldRunMigrationScriptsUpToCurrentPackageVersionSimple()
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid/update-migrations/simple';
@@ -211,7 +184,9 @@ class RunnerTest extends WebTestCase
             'Simple migration 2 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_2.php',
             'update 2'
-        ) . PHP_EOL . $this->formatExpectedResult(
+        );
+        $expectedRunnerOutput .= PHP_EOL;
+        $expectedRunnerOutput .= $this->formatExpectedResult(
             'Simple migration 3 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_3.php',
             'update 3'
@@ -220,10 +195,7 @@ class RunnerTest extends WebTestCase
         $this->assertEquals($expectedRunnerOutput, $runner->update($package, '1'));
     }
 
-    /**
-     * @test
-     */
-    public function shouldRunMigrationScriptsUpToCurrentPackageVersionComplex()
+    public function testShouldRunMigrationScriptsUpToCurrentPackageVersionComplex()
     {
         $package = $this->createPackageMock();
         $targetDir = __DIR__ . '/../Fixture/Script/valid/update-migrations/complex';
@@ -235,7 +207,9 @@ class RunnerTest extends WebTestCase
             'Complex migration 0_1_9_1 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_0.1.9.1.php',
             'update 0.1.9.1'
-        ) . PHP_EOL . $this->formatExpectedResult(
+        );
+        $expectedRunnerOutput .= PHP_EOL;
+        $expectedRunnerOutput .= $this->formatExpectedResult(
             'Complex migration 0_1_10 script',
             $targetDir . DIRECTORY_SEPARATOR . 'update_0.1.10.php',
             'update 0.1.10'
@@ -244,10 +218,7 @@ class RunnerTest extends WebTestCase
         $this->assertEquals($expectedRunnerOutput, $runner->update($package, '0.1.9'));
     }
 
-    /**
-     * @test
-     */
-    public function shouldRunUpdatePlatformCommandWithoutErrors()
+    public function testShouldRunUpdatePlatformCommandWithoutErrors()
     {
         $logger = $this->createLoggerMock();
         $logger->expects($this->exactly(2))
@@ -257,10 +228,7 @@ class RunnerTest extends WebTestCase
         $runner->runPlatformUpdate();
     }
 
-    /**
-     * @test
-     */
-    public function shouldRemoveCachedFiles()
+    public function testShouldRemoveCachedFiles()
     {
         $tempDir = sys_get_temp_dir() . '/platform-app-tmp';
         if (is_dir($tempDir)) {
@@ -284,10 +252,7 @@ class RunnerTest extends WebTestCase
         $this->assertFileNotExists($containerFileName);
     }
 
-    /**
-     * @test
-     */
-    public function shouldRunClearCacheCommandWithoutErrors()
+    public function testShouldRunClearCacheCommandForDistApplicationWithoutErrors()
     {
         $logger = $this->createLoggerMock();
         $logger->expects($this->exactly(2))
@@ -295,6 +260,16 @@ class RunnerTest extends WebTestCase
         $runner = $this->createRunner(null, $logger);
 
         $runner->clearDistApplicationCache();
+    }
+
+    public function testShouldRunClearCacheCommandWithoutErrors()
+    {
+        $logger = $this->createLoggerMock();
+        $logger->expects($this->exactly(2))
+            ->method('info');
+        $runner = $this->createRunner(null, $logger);
+
+        $runner->clearApplicationCache();
     }
 
     /**
