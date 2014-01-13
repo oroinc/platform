@@ -37,6 +37,7 @@ services:
             - @oro_translation.uploader.default_adapter
             - @oro_translation.js_dumper
             - %kernel.root_dir%
+            - @doctrine.orm.entity_manager
 
     oro_translation.statistic_provider:
         class: %oro_translation.statistic_provider.class%
