@@ -36,4 +36,12 @@ interface APIAdapterInterface
      * @param LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger);
+
+    /**
+     * @param $response
+     *
+     * @return \stdObject
+     * @throws \RuntimeException
+     */
+    public function parseResponse($response);
 } 

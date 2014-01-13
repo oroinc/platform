@@ -96,13 +96,13 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
      * @param $response
      *
      * @return \SimpleXMLElement
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function parseResponse($response)
     {
         $result = new \SimpleXMLElement($response);
         if ($result->getName() == 'error') {
-            throw new \Exception($result->message, (int)$result->code);
+            throw new \RuntimeException($result->message, (int)$result->code);
         }
 
         return $result;
