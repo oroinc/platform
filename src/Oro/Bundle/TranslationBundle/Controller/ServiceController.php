@@ -88,10 +88,11 @@ class ServiceController extends BaseController
      */
     protected function setLanguageInstalled($code)
     {
-        $stats       = $this->get('oro_translation.statistic_provider')->get();
-        $cm          = $this->get('oro_config.global');
-        $configValue = $cm->get(TranslationStatusInterface::CONFIG_KEY);
-        $configValue = $configValue ? $configValue : [];
+        $statisticProvider = $this->get('oro_translation.statistic_provider');
+        $stats             = $statisticProvider->get();
+        $cm                = $this->get('oro_config.global');
+        $configValue       = $cm->get(TranslationStatusInterface::CONFIG_KEY);
+        $configValue       = $configValue ? $configValue : [];
 
         $updatedConfigValue = array_merge(
             $configValue,
@@ -115,5 +116,8 @@ class ServiceController extends BaseController
 
         $cm->set(TranslationStatusInterface::META_CONFIG_KEY, $configMetaValue);
         $cm->flush();
+
+        // clear statistic cache
+        $statisticProvider->clear();
     }
 }

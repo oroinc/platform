@@ -11,7 +11,7 @@ use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 class TranslationStatisticProvider
 {
     const CACHE_KEY = 'translation_statistic';
-    const CACHE_TTL = 86400;
+    const CACHE_TTL = 60; // TODO: change this before mege to master
 
     /** @var Cache */
     protected $cache;
@@ -40,9 +40,7 @@ class TranslationStatisticProvider
      */
     public function get()
     {
-        // TODO: change this before mege to master
-        $data = false;
-        //$this->cache->fetch(static::CACHE_KEY);
+        $data = $this->cache->fetch(static::CACHE_KEY);
 
         if (false === $data) {
             $data = $this->fetch();
@@ -54,21 +52,11 @@ class TranslationStatisticProvider
     }
 
     /**
-     * Fetches data from service
-     *
-     * @return array
+     * Clear cache
      */
-    protected function fetch()
+    public function clear()
     {
-        try {
-            $data = $this->adapter->fetchStatistic(
-                $this->getInstalledPackages()
-            );
-        } catch (\Exception $e) {
-            $data = [];
-        }
-
-        return $data;
+        $this->cache->delete(static::CACHE_KEY);
     }
 
     /**
@@ -94,5 +82,23 @@ class TranslationStatisticProvider
         }
 
         return array_unique($packages);
+    }
+
+    /**
+     * Fetches data from service
+     *
+     * @return array
+     */
+    protected function fetch()
+    {
+        try {
+            $data = $this->adapter->fetchStatistic(
+                $this->getInstalledPackages()
+            );
+        } catch (\Exception $e) {
+            $data = [];
+        }
+
+        return $data;
     }
 }
