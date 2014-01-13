@@ -327,12 +327,12 @@ class TranslationServiceProvider
             }
 
             $target = $targetDir . preg_replace(
-                    '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
-                    '',
-                    $fileInfo->getPathname()
-                );
+                '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
+                '',
+                $fileInfo->getPathname()
+            );
 
-            $locale                  = str_replace(
+            $locale = str_replace(
                 '-',
                 '_',
                 preg_replace(
@@ -347,6 +347,7 @@ class TranslationServiceProvider
                 mkdir($target);
             }
 
+            $isMultiLine = false;
             if ($fileInfo->isFile()) {
                 rename($fileInfo->getPathname(), $target);
 
@@ -360,7 +361,7 @@ class TranslationServiceProvider
                 foreach ($contents as $i => $line) {
                     $line = explode(':', $line);
 
-                    if (!isset($line[0]) || count($line) != 2) {
+                    if (!isset($line[0]) || count($line) != 2 || $isMultiLine) {
                         continue;
                     }
 
@@ -370,6 +371,9 @@ class TranslationServiceProvider
                     } else {
                         $lineQuote = '';
                     }
+
+                    // check if it's starting multiline string
+                    $isMultiLine = trim($line[1])[0] == '|';
 
                     $key = trim($key, '"\'');
                     if (strpos($key, '"') !== false) {
