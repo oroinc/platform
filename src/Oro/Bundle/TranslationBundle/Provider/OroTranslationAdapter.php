@@ -152,9 +152,9 @@ class OroTranslationAdapter implements APIAdapterInterface
     public function parseResponse($response)
     {
         $result = json_decode($response);
-        if (isset($result->error)) {
+        if (isset($result->message)) {
             $code = isset($result->code) ? (int)$result->code : 0;
-            throw new \RuntimeException($result->error, $code);
+            throw new \RuntimeException($result->message, $code);
         }
 
         return $result;

@@ -60,8 +60,7 @@ class ServiceController extends BaseController
         $service      = $this->get('oro_translation.service_provider');
         $service->setAdapter($proxyAdapter);
 
-        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('download_') .
-            DIRECTORY_SEPARATOR . $code . '.zip';
+        $path = sys_get_temp_dir() . uniqid('download_') . DIRECTORY_SEPARATOR . $code . '.zip';
 
         try {
             $installed = $service->download($path, $projects, $code);
