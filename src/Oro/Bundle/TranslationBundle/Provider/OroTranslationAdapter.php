@@ -40,7 +40,7 @@ class OroTranslationAdapter implements APIAdapterInterface
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
 
         $fileHandler = fopen($path, 'wb');
-        $result      = $this->request(
+        $result      = (bool)$this->request(
             self::URL_DOWNLOAD,
             [
                 'packages' => implode(',', $projects),
