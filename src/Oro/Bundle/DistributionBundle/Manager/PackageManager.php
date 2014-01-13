@@ -131,9 +131,15 @@ class PackageManager
             } else {
                 /** @var PackageInterface[] $repoPackages */
                 $repoPackages = $repo->getPackages();
-                foreach ($repoPackages as $package) {
-                    $packageNames[] = $package->getPrettyName();
-                }
+
+                $packageNames = array_reduce(
+                    $repoPackages,
+                    function ($result, PackageInterface $package) {
+                        $result[] = $package->getPrettyName();
+                        return $result;
+                    },
+                    $packageNames
+                );
             }
         }
 
@@ -638,9 +644,12 @@ class PackageManager
         $this->logger->info('Removing from composer.json', $packageNames);
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
-        foreach ($packageNames as $name) {
-            unset($composerData['require'][$name]);
-        }
+        array_map(
+            function ($name) use (&$composerData) {
+                unset($composerData['require'][$name]);
+            },
+            $packageNames
+        );
 
         $composerFile->write($composerData);
     }

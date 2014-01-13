@@ -57,4 +57,3 @@ class ConfigTypeTest extends \PHPUnit_Framework_TestCase
         $type->buildForm($builder, []);
     }
 }
- 

@@ -4,7 +4,8 @@ namespace Oro\Bundle\DistributionBundle\Entity\Composer;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class Repository {
+class Repository
+{
 
     /**
      * @Assert\Choice(choices = {"composer", "vcs", "pear"}, message = "Choose a valid type.")
