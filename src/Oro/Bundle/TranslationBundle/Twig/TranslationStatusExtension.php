@@ -14,6 +14,9 @@ class TranslationStatusExtension extends \Twig_Extension
     /** @var TranslationStatisticProvider */
     protected $statisticProvider;
 
+    /** @var array */
+    protected $processedLanguages = [];
+
     /**
      * @param ConfigManager                $cm
      * @param TranslationStatisticProvider $statisticProvider
@@ -51,17 +54,35 @@ class TranslationStatusExtension extends \Twig_Extension
      */
     public function isFresh($languageCode)
     {
-        $configData = $this->cm->get(TranslationStatusInterface::META_CONFIG_KEY);
-        $stats      = $this->statisticProvider->get();
+        if (!isset($this->processedLanguages[$languageCode])) {
+            $configData = $this->cm->get(TranslationStatusInterface::META_CONFIG_KEY);
+            $stats      = $this->statisticProvider->get();
 
-        if (!isset($configData[$languageCode])) {
-            return false;
+            if (!isset($configData[$languageCode])) {
+                // if we do not have information about installed time then assume that needs update
+                $this->processedLanguages[$languageCode] = false;
+            }
+
+            $stats = array_filter(
+                $stats,
+                function ($langInfo) use ($languageCode) {
+                    return $langInfo['code'] === $languageCode;
+                }
+            );
+            $lang  = array_pop($stats);
+
+            if ($lang) {
+                $installationDate = $this->getDateTimeFromString($configData[$languageCode]['lastBuildDate']);
+                $currentBuildDate = $this->getDateTimeFromString($lang['lastBuildDate']);
+
+                $this->processedLanguages[$languageCode] = $installationDate >= $currentBuildDate;
+            } else {
+                // could not retrieve current language stats, so assume that it's fresh
+                $this->processedLanguages[$languageCode] = true;
+            }
         }
 
-        $installationDate = $this->getDateTimeFromString($configData[$languageCode]);
-        $currentBuildDate = $this->getDateTimeFromString($stats[$languageCode]['lastBuildDate']);
-
-        return $installationDate >= $currentBuildDate;
+        return $this->processedLanguages[$languageCode];
     }
 
     /**

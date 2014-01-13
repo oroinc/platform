@@ -138,6 +138,8 @@ class OroTranslationAdapter implements APIAdapterInterface
      */
     public function request($uri, $data = array(), $method = 'GET', $curlOptions = [])
     {
+        $this->apiRequest->reset();
+
         $data['key'] = $this->apiKey;
         $data        = '?' . http_build_query($data, '', '&');
 

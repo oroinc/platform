@@ -60,8 +60,10 @@ class ServiceController extends BaseController
         $service      = $this->get('oro_translation.service_provider');
         $service->setAdapter($proxyAdapter);
 
+
         $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $path = $path . ltrim(uniqid('download_'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $code . '.zip';
+
 
         try {
             $installed = $service->download($path, $projects, $code);
@@ -100,8 +102,16 @@ class ServiceController extends BaseController
         $configMetaValue = $cm->get(TranslationStatusInterface::META_CONFIG_KEY);
         $configMetaValue = $configMetaValue ? $configMetaValue : [];
 
+        $stats = array_filter(
+            $stats,
+            function ($langInfo) use ($code) {
+                return $langInfo['code'] === $code;
+            }
+        );
+        $lang  = array_pop($stats);
+
         $configMetaValue[$code]                  = isset($configMetaValue[$code]) ? $configMetaValue[$code] : [];
-        $configMetaValue[$code]['lastBuildDate'] = $stats['lastBuildDate'];
+        $configMetaValue[$code]['lastBuildDate'] = $lang['lastBuildDate'];
 
         $cm->set(TranslationStatusInterface::META_CONFIG_KEY, $configMetaValue);
         $cm->flush();

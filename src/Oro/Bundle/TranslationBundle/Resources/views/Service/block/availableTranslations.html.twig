@@ -36,7 +36,7 @@
                 </td>
                 <td class="translation-status">
                     {% if status != constant('Oro\\Bundle\\TranslationBundle\\Translation\\TranslationStatusInterface::STATUS_NEW') %}
-                        {% if not oro_translation_is_fresh(language.code) %}
+                        {% if oro_translation_is_fresh(language.code) %}
                             <span class="status-up-to-date">{% trans %}Up to date{% endtrans %}</span>
                         {% else %}
                             <span class="status-needs-update">{% trans %}Needs update{% endtrans %}</span>
