@@ -38,7 +38,6 @@ div.navbar-inner .help a:hover {
     width: 1127px;
 }
 
-
 .wrapper {
     margin: 0 auto;
     padding: 27px 25px;
@@ -75,6 +74,7 @@ div.navbar-inner .help a:hover {
     border-collapse: separate;
     width: 100%
 }
+
 .table, table.table {
     border: 1px solid #e1e1e1;
     width: 100%;
@@ -227,5 +227,51 @@ table.table {
 .desktop-version #oroplatform-header .logo a {
     display: inline-block;
     font-size: 17px;
+}
+
+#load-demo-data {
+    display: none;
+}
+#load-demo-data + span {
+    font-size: 15px;
+}
+#load-demo-data + span:before {
+    font-family: 'FontAwesome';
+    padding-right: 2px;
+    content: "\f096";
+}
+#load-demo-data:checked + span:before {
+    content: "\f046";
+}
+.form {
+    width: 420px;
+}
+
+.form .actions .btn {
+    float: right;
+}
+
+.form .actions {
+    height: 40px;
+}
+
+.form legend {
+    margin-bottom: 10px;
+}
+
+.form fieldset .field {
+    margin-top: 10px;
+}
+
+.form fieldset .field select {
+    width: 90px;
+}
+
+.form fieldset .field input[type="text"], .form fieldset .field select {
+    margin-bottom: 0px;
+}
+
+.form fieldset .field .validation-faled {
+    padding-left: 95px;
 }
 

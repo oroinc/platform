@@ -6,12 +6,16 @@ parameters:
     oro_distribution.composer.io.class:                       Composer\IO\BufferIO
     oro_distribution.composer.installer.class:                Composer\Installer
     oro_distribution.composer.installation_manager.class:     Composer\Installer\InstallationManager
+    oro_distribution.composer.json_file.class:                Composer\Json\JsonFile
     oro_distribution.composer_json:                           %kernel.root_dir%/../composer.json
 
     oro_distribution.listener.navigation_listener.class:      Oro\Bundle\DistributionBundle\EventListener\NavigationListener
     oro_distribution.entry_point:                             ~
 
     oro_distribution.security.access_denied_listener.class:   Oro\Bundle\DistributionBundle\Security\AccessDeniedListener
+
+    oro_distribution.form.type.composer_config.class:         Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType
+    oro_distribution.form.type.composer_repository.class:     Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType
 
 services:
     oro_distribution.routing_loader:
@@ -68,6 +72,11 @@ services:
         factory_service: oro_distribution.composer
         factory_method: getInstallationManager
 
+    oro_distribution.composer.json_file:
+        class: %oro_distribution.composer.json_file.class%
+        arguments:
+          - %oro_distribution.composer_json%
+
     ### Menu
     oro_distribution.listener.navigation_listener:
         class: %oro_distribution.listener.navigation_listener.class%
@@ -76,3 +85,15 @@ services:
             - %oro_distribution.entry_point%
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+
+    ### Form
+    oro_distribution.form.type.composer_config:
+        class: %oro_distribution.form.type.composer_config.class%
+        tags:
+            - { name: form.type, alias: oro_composer_config }
+
+    oro_distribution.form.type.composer_repository:
+        class: %oro_distribution.form.type.composer_repository.class%
+        tags:
+            - { name: form.type, alias: oro_composer_repository }
