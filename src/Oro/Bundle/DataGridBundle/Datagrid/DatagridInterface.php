@@ -57,9 +57,9 @@ interface DatagridInterface
 
     /**
      * Converts datasource into the result array
-     * return array (
-     *    'results' => converted source
-     *    ....      => some additional info added by extensions
+     * return ResultsObject
+     *    'data' => converted source
+     *    ....   => some additional info added by extensions
      * )
      *
      * @return ResultsObject

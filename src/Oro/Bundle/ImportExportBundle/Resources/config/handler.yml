@@ -19,4 +19,5 @@ services:
             - @oro_importexport.job_executor
             - @oro_importexport.processor.registry
             - @oro_importexport.file.file_system_operator
+            - @oro_importexport.file.mime_type_guesser
             - @router

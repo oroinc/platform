@@ -375,7 +375,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                         launcherOptions: {
                             label: 'Export',
                             className: 'btn',
-                            iconClassName: 'icon-signout'
+                            iconClassName: 'icon-download-alt'
                         }
                     });
 

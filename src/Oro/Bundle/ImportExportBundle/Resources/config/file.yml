@@ -1,5 +1,6 @@
 parameters:
     oro_importexport.file.file_system_operator.class: Oro\Bundle\ImportExportBundle\File\FileSystemOperator
+    oro_importexport.file.mime_type_guesser.class:    Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser
 
 services:
     oro_importexport.file.file_system_operator:
@@ -7,3 +8,6 @@ services:
         arguments:
             - %kernel.cache_dir%
             - "import_export"
+
+    oro_importexport.file.mime_type_guesser:
+        class: %oro_importexport.file.mime_type_guesser.class%

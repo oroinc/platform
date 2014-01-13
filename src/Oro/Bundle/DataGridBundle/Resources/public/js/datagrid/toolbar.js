@@ -130,8 +130,16 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
             this.$('.pagination').replaceWith($pagination);
             this.$('.page-size').append(this.pageSize.render().$el);
             this.$('.actions-panel').append(this.actionsPanel.render().$el);
-            this.$('.extra-actions-panel').append(this.extraActionsPanel.render().$el);
-            this.$('.mass-actions-panel').append(this.massActionsPanel.render().$el);
+            if (this.extraActionsPanel.haveActions()) {
+                this.$('.extra-actions-panel').append(this.extraActionsPanel.render().$el);
+            } else {
+                this.$('.extra-actions-panel').hide();
+            }
+            if (this.massActionsPanel.haveActions()) {
+                this.$('.mass-actions-panel').append(this.massActionsPanel.render().$el);
+            } else {
+                this.$('.mass-actions-panel').hide();
+            }
 
             return this;
         }

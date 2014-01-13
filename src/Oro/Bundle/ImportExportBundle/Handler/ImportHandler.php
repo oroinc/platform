@@ -75,7 +75,7 @@ class ImportHandler extends AbstractHandler
         );
 
         $configuration = array(
-            'import' =>
+            'import_validation' =>
                 array_merge(
                     array(
                         'processorAlias' => $processorAlias,

@@ -6,10 +6,39 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
+use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 
 class ExportHandler extends AbstractHandler
 {
+    /**
+     * @var MimeTypeGuesser
+     */
+    protected $mimeTypeGuesser;
+
+    /**
+     * Constructor
+     *
+     * @param JobExecutor        $jobExecutor
+     * @param ProcessorRegistry  $processorRegistry
+     * @param FileSystemOperator $fileSystemOperator
+     * @param MimeTypeGuesser    $mimeTypeGuesser
+     * @param Router             $router
+     */
+    public function __construct(
+        JobExecutor $jobExecutor,
+        ProcessorRegistry $processorRegistry,
+        FileSystemOperator $fileSystemOperator,
+        MimeTypeGuesser $mimeTypeGuesser,
+        Router $router
+    ) {
+        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator, $router);
+        $this->mimeTypeGuesser = $mimeTypeGuesser;
+    }
+
     /**
      * Handles export action
      *
@@ -97,7 +126,7 @@ class ExportHandler extends AbstractHandler
             ->getTemporaryFile($fileName)
             ->getRealPath();
 
-        $headers = [];
+        $headers     = [];
         $contentType = $this->getFileContentType($fullFileName);
         if ($contentType !== null) {
             $headers['Content-Type'] = $contentType;
@@ -118,14 +147,23 @@ class ExportHandler extends AbstractHandler
     protected function getFileContentType($fileName)
     {
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-        switch (strtolower($ext))
-        {
-            case 'csv':
-                return 'text/csv';
-            default:
-                // allow BinaryFileResponse to guess content type automatically
-                return null;
-        }
+
+        return $this->mimeTypeGuesser->guessByFileExtension($ext);
+    }
+
+    /**
+     * Get a mimetype value from a file extension
+     *
+     * @param string $extension File extension
+     *
+     * @return string|null
+     *
+     */
+    protected function guessMimetypeByFileExtension($extension)
+    {
+        $extension = strtolower($extension);
+
+        return isset($this->mimetypes[$extension]) ? $this->mimetypes[$extension] : null;
     }
 
     /**
