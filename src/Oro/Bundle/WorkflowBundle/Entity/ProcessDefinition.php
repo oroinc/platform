@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table("oro_process_definition")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class ProcessDefinition
 {
@@ -260,5 +261,22 @@ class ProcessDefinition
     public function preUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param ProcessDefinition $definition
+     * @return ProcessDefinition
+     */
+    public function import(ProcessDefinition $definition)
+    {
+        // enabled flag should not be imported
+        $this->setName($definition->getName())
+            ->setLabel($definition->getLabel())
+            ->setRelatedEntity($definition->getRelatedEntity())
+            ->setExecutionOrder($definition->getExecutionOrder())
+            ->setExecutionOrder($definition->getExecutionOrder())
+            ->setActionsConfiguration($definition->getActionsConfiguration());
+
+        return $this;
     }
 }

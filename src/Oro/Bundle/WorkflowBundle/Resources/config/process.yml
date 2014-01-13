@@ -6,13 +6,21 @@ definitions:
         order: 20
         execution_required: true
         actions_configuration:
-            - @assign_value: [$entity.field, 'value']
+            - @assign_value: [$namePrefix, 'Pr.']
+
+    another_definition:
+        label: 'Another definition'
+        entity: My\Entity
+        actions_configuration: []
 
 triggers:
     test_definition:
         -
             event: update
             field: some_field
-            time_shift: 123456 or P6YT5M
+            time_shift: 123456
         -
             event: create
+            time_shift: P6YT5M
+        -
+            event: delete

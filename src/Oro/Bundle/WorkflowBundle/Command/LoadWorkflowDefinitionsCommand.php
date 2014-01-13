@@ -22,7 +22,7 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:workflow:definitions:load')
-            ->setDescription('Load workflow definitions from configuration files to the database.')
+            ->setDescription('Load workflow definitions from configuration files to the database')
             ->addOption(
                 'directories',
                 null,

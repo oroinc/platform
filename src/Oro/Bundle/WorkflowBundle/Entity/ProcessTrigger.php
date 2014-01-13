@@ -5,8 +5,17 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Table("oro_process_trigger")
- * @ORM\Entity
+ * @ORM\Table(
+ *  "oro_process_trigger",
+ *  uniqueConstraints={
+ *      @ORM\UniqueConstraint(
+ *          name="process_trigger_unique_idx",
+ *          columns={"event", "field", "time_shift", "definition_name"}
+ *      )
+ *  }
+ * )
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class ProcessTrigger
 {
