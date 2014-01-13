@@ -10,63 +10,17 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{% block title %}  {% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block stylesheet %}
         <link rel="stylesheet" type="text/css" href="/css/oro.css"/>
-        <link rel="stylesheet" type="text/css" href="/bundles/oroinstaller/css/style.css"/>
         <link rel="stylesheet" type="text/css" href="/bundles/orodistribution/css/style.css"/>
     {% endblock %}
 
     {% block javascripts %}
-        <script type="text/javascript" src="/bundles/oroinstaller/lib/jquery-2.0.3.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/loader.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/util.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/package.manager.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/bootbox.min.js"></script>
-        <script type="text/javascript" src="/bundles/orodistribution/js/jquery.cookie.js"></script>
-
-        <script type="text/javascript">
-
-            $(function () {
-
-                $(document).ajaxError(function (e) {
-                    loader.displayOriginalElement();
-                    util.error('Ajax error');
-                });
-
-                var Urls = {
-                    install: "{{ path('oro_distribution_package_install') }}",
-                    uninstall: "{{ path('oro_distribution_package_uninstall') }}",
-                    update: "{{ path('oro_distribution_package_update') }}",
-                    available: "{{ path('oro_distribution_package_listavailable') }}",
-                    installed: "{{ path('oro_distribution_package_listinstalled') }}"
-                };
-
-                var loader = new Loader($('.ajax-loading'));
-                var util = new Util($('#alerts'));
-                var pm = new PackageManager(Urls, util);
-
-                $('.ajax').on('click', function () {
-                    var me = $(this);
-                    var action = me.data('action');
-                    var params = me.data('params');
-                    loader.setClickedElement(me);
-                    loader.displayLoadingProgress();
-                    pm[action](params, function () {
-                        loader.displayOriginalElement();
-                    });
-
-                    return false;
-                });
-
-                util.displayCookieMessage();
-            });
-        </script>
     {% endblock %}
 </head>
-<body class="desktop-version">
+<body class="desktop-version {% block bodyClass %}{% endblock %}">
 <header id="oroplatform-header">
     <div class="navbar-inner">
         <h1 class="logo">
@@ -81,6 +35,9 @@
                 <i class="icon-question-sign" title="Get help"></i>
             </a>
             {% if app.user %}
+                <a href="{{ path('oro_distribution_settings_index') }}">
+                    <i class="icon-cogs" title="Composer Settings"></i>
+                </a>
                 <a href="{{ path('oro_distribution_security_logout') }}">
                     <i class="icon-signout" title="Sign Out"></i>
                 </a>
@@ -89,25 +46,8 @@
 
     </div>
 </header>
-<div class="wrapper">
-    <div id="alerts">
-
-    </div>
-    <div class="content">
-        <img src="/bundles/oroinstaller/img/icon/wait.png" alt="" class="ajax-loading"/>
-
-        <div class="title clearfix">
-            <h2 class="pull-left">{{ block('title') }}</h2>
-
-            <div class="menu pull-right ">
-                {% block menu %} {% endblock %}
-            </div>
-        </div>
-
-        <div class="body">
-            {% block body %} {% endblock %}
-        </div>
-    </div>
+<div id="page">
+    {% block page %} {% endblock %}
 </div>
 </body>
 </html>

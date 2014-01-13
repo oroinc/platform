@@ -7,7 +7,7 @@ class EntityCacheClearerTest extends \PHPUnit_Framework_TestCase
     public function testClear()
     {
         $clearer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Cache\EntityCacheClearer')
-            ->setConstructorArgs(array('SomeDir', 'Test\SomeNamespace', 'Test%sProxy'))
+            ->setConstructorArgs(array('SomeDir', 'Test%sProxy'))
             ->setMethods(array('createFilesystem'))
             ->getMock();
 
@@ -19,10 +19,12 @@ class EntityCacheClearerTest extends \PHPUnit_Framework_TestCase
             ->method('createFilesystem')
             ->will($this->returnValue($fs));
 
-        // Temporary fix till EmailAddress will be moved to the cache folder
-        // $fs->expects($this->once())
-        //    ->method('remove')
-        //    ->with($this->equalTo('SomeDir/Test/SomeNamespace/TestEmailAddressProxy.php'));
+        $fs->expects($this->at(0))
+            ->method('remove')
+            ->with($this->equalTo('SomeDir' . DIRECTORY_SEPARATOR . 'TestEmailAddressProxy.php'));
+        $fs->expects($this->at(1))
+            ->method('remove')
+            ->with($this->equalTo('SomeDir' . DIRECTORY_SEPARATOR . 'TestEmailAddressProxy.orm.yml'));
 
         $clearer->clear('');
     }

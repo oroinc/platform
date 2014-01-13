@@ -54,10 +54,13 @@ config:
     map:
         '*':
             'jquery': 'oro/jquery-setup'
+            'jquery.select2': 'oroui/js/select2-setup'
             'jquery-ui': 'oro/jquery-ui-datepicker-l10n'
             'jquery-ui-timepicker': 'oro/jquery-ui-timepicker-l10n'
         'oro/jquery-setup':
             'jquery': 'jquery'
+        'oroui/js/select2-setup':
+            'jquery.select2': 'jquery.select2'
         'oro/jquery-ui-datepicker-l10n':
             'jquery-ui': 'jquery-ui'
         'oro/jquery-ui-timepicker-l10n':

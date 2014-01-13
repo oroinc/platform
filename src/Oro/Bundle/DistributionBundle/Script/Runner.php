@@ -4,7 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Script;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
-
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -24,18 +24,29 @@ class Runner
     protected $applicationRootDir;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var string
      */
     protected $environment;
 
     /**
      * @param InstallationManager $installationManager
+     * @param LoggerInterface $logger
      * @param string $applicationRootDir
      * @param string $environment
      */
-    public function __construct(InstallationManager $installationManager, $applicationRootDir, $environment)
-    {
+    public function __construct(
+        InstallationManager $installationManager,
+        LoggerInterface $logger,
+        $applicationRootDir,
+        $environment
+    ) {
         $this->installationManager = $installationManager;
+        $this->logger = $logger;
         $this->applicationRootDir = realpath($applicationRootDir);
         $this->environment = $environment;
     }
@@ -91,16 +102,25 @@ class Runner
      */
     public function runPlatformUpdate()
     {
-        $phpPath = $this->getPhpExecutablePath();
+        return $this->runCommand('oro:platform:update');
+    }
 
-        $command = sprintf(
-            '"%s" "%s/console" oro:platform:update --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $this->environment
-        );
+    /**
+     * @return string
+     * @throws ProcessFailedException
+     */
+    public function clearApplicationCache()
+    {
+        return $this->runCommand('cache:clear');
+    }
 
-        return $this->runCommand($command);
+    /**
+     * @return string
+     * @throws ProcessFailedException
+     */
+    public function updateDBSchema()
+    {
+        return $this->runCommand('doctrine:schema:update --force');
     }
 
     /**
@@ -120,6 +140,7 @@ class Runner
         foreach ($finder as $file) {
             /** @var SplFileInfo $file */
             if (is_file($file->getPathname())) {
+                $this->logger->info(sprintf('Removing %s', $file->getPathname()));
                 unlink($file->getPathname());
             }
         }
@@ -132,51 +153,25 @@ class Runner
      */
     public function loadFixtures(array $packages)
     {
-        $phpPath = $this->getPhpExecutablePath();
-        $paths = [];
-        foreach ($packages as $package) {
-            $paths[] = $this->installationManager->getInstallPath($package);
-        }
-
-        $commandPrefix = sprintf(
-            '"%s" "%s/console" oro:package:fixtures:load --env=%s',
-            $phpPath,
-            $this->applicationRootDir,
-            $this->environment
-        );
-
-        $commands = $this->makeCommands($paths, $commandPrefix);
-        $output = '';
-        foreach ($commands as $command) {
-            $output .= $this->runCommand($command);
-        }
-
-        return $output;
-
+        return $this->executeBatchCommand($packages, 'oro:package:fixtures:load');
     }
 
     /**
-     * @param array $paths
-     * @param string $commandPrefix
-     * @param int $commandSize - windows shell-command is limited by 8kb
+     * @param PackageInterface[] $packages
      *
-     * @return array of commands to be executed
+     * @return string
      */
-    protected function makeCommands(array $paths, $commandPrefix, $commandSize = 8000)
+    public function loadDemoData(array $packages)
     {
-        $commands = [];
-        $commandIndex = 0;
+        return $this->executeBatchCommand($packages, 'oro:package:demo:load');
+    }
 
-        $commands[$commandIndex] = $commandPrefix;
-        foreach ($paths as $path) {
-            if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
-                $commands[$commandIndex] .=  ' ' . $path ;
-            } else {
-                $commands[++$commandIndex] = $commandPrefix . ' ' . $path ;
-            }
-        }
-
-        return $commands;
+    /**
+     * @return string
+     */
+    public function clearDistApplicationCache()
+    {
+        return $this->runCommand('cache:clear --no-warmup', 'dist');
     }
 
     /**
@@ -187,22 +182,38 @@ class Runner
     protected function run($path)
     {
         if (file_exists($path)) {
-            $phpPath = $this->getPhpExecutablePath();
-
-            $command = sprintf(
-                '"%s" "%s/console" oro:platform:run-script "%s" --env=%s',
-                $phpPath,
-                $this->applicationRootDir,
-                $path,
-                $this->environment
-            );
+            $command = sprintf('oro:platform:run-script "%s"', $path);
 
             return $this->runCommand($command);
+        } else {
+            $this->logger->info(sprintf('There is no %s file', $path));
         }
+
+        return null;
     }
 
-    protected function runCommand($command)
+    /**
+     * @param string $command - e.g. clear:cache --no-warmup
+     * @param string $application - console or dist
+     *
+     * @return string
+     * @throws ProcessFailedException
+     */
+    protected function runCommand($command, $application = 'console')
     {
+        $phpPath = $this->getPhpExecutablePath();
+
+        $command = sprintf(
+            '"%s" "%s/%s" %s --env=%s',
+            $phpPath,
+            $this->applicationRootDir,
+            $application,
+            $command,
+            $this->environment
+        );
+
+        $this->logger->info(sprintf('Executing "%s"', $command));
+
         $process = new Process($command);
         $process->setWorkingDirectory(realpath($this->applicationRootDir . '/..')); // project root
         $process->setTimeout(600);
@@ -210,11 +221,17 @@ class Runner
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
+            $processFailedException = new ProcessFailedException($process);
+            $this->logger->error($processFailedException->getMessage());
+            throw $processFailedException;
         }
 
-        return $process->getOutput();
+        $output = $process->getOutput();
+        $this->logger->info($output);
+
+        return $output;
     }
+
 
     /**
      * @param PackageInterface $package
@@ -282,5 +299,51 @@ class Runner
         }
 
         throw new \RuntimeException('PHP cannot be found');
+    }
+
+    /**
+     * @param PackageInterface[] $packages
+     * @param string $command
+     *
+     * @return string
+     */
+    protected function executeBatchCommand(array $packages, $command)
+    {
+        $paths = [];
+        foreach ($packages as $package) {
+            $paths[] = $this->installationManager->getInstallPath($package);
+        }
+
+        $commands = $this->makeCommands($paths, $command);
+        $output = '';
+        foreach ($commands as $command) {
+            $output .= $this->runCommand($command);
+        }
+
+        return $output;
+    }
+
+    /**
+     * @param array $paths
+     * @param string $commandPrefix
+     * @param int $commandSize - windows shell-command is limited by 8kb
+     *
+     * @return array of commands to be executed
+     */
+    protected function makeCommands(array $paths, $commandPrefix, $commandSize = 8000)
+    {
+        $commands = [];
+        $commandIndex = 0;
+
+        $commands[$commandIndex] = $commandPrefix;
+        foreach ($paths as $path) {
+            if (strlen($commands[$commandIndex] . $path . ' ') <= $commandSize) {
+                $commands[$commandIndex] .= ' ' . $path;
+            } else {
+                $commands[++$commandIndex] = $commandPrefix . ' ' . $path;
+            }
+        }
+
+        return $commands;
     }
 }

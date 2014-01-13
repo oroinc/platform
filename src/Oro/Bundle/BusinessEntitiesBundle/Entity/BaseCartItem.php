@@ -101,6 +101,17 @@ class BaseCartItem
     }
 
     /**
+     * @param int $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
      * @param string $name
      */
     public function setName($name)
@@ -125,7 +136,7 @@ class BaseCartItem
     }
 
     /**
-     * @return mixed
+     * @return Cart
      */
     public function getCart()
     {
@@ -222,10 +233,13 @@ class BaseCartItem
 
     /**
      * @param \DateTime $createdAt
+     *
+     * @return $this
      */
     public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
+        return $this;
     }
 
     /**
@@ -234,5 +248,43 @@ class BaseCartItem
     public function getCreatedAt()
     {
         return $this->createdAt;
+    }
+
+    /**
+     * @param float $discountAmount
+     *
+     * @return $this
+     */
+    public function setDiscountAmount($discountAmount)
+    {
+        $this->discountAmount = $discountAmount;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getDiscountAmount()
+    {
+        return $this->discountAmount;
+    }
+
+    /**
+     * @param float $taxPercent
+     *
+     * @return $this
+     */
+    public function setTaxPercent($taxPercent)
+    {
+        $this->taxPercent = $taxPercent;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getTaxPercent()
+    {
+        return $this->taxPercent;
     }
 }

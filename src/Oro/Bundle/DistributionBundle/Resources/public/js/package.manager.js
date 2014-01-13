@@ -32,21 +32,33 @@ function PackageManager(Urls, util) {
                 break;
             case InstallStatus.CONFIRM:
                 var title = 'Confirm installation of ' + response.params.packageName;
-                var requirementsList = '';
-                for (var i = 0; i < response.requirements.length; i++) {
-                    var r = response.requirements[i];
-                    requirementsList += "\n - " + r.name;
-                    requirementsList += r.installed?' [installed]':'';
+                var message = '';
+                message += "\n" + '<label>' +
+                    ' <input type="checkbox" id="load-demo-data" checked="checked" />' +
+                    '<span>Load demo data</span>' +
+                    '</label>';
+
+                if (response.requirements) {
+                    var requirementsList = '';
+                    for (var i = 0; i < response.requirements.length; i++) {
+                        var r = response.requirements[i];
+                        requirementsList += "\n - " + r.name;
+                        requirementsList += r.installed ? ' [installed]' : '';
+                    }
+                    message += "\n";
+                    message += response.params.packageName + ' requires following packages: ' +
+                        requirementsList +
+                        "\n\n" + 'All missing packages will be installed';
                 }
-                var message = response.params.packageName + ' requires following packages: ' +
-                    requirementsList +
-                    "\n" + "\n" + 'All missing packages will be installed';
 
                 util.confirm(
                     title,
                     message,
                     function () {
-                        pm.install(response.params)
+                        var params = response.params;
+                        params['loadDemoData'] = $('#load-demo-data').is(':checked') ? 1 : 0;
+
+                        pm.install(params);
                     },
                     'Continue',
                     reflectUICallback
