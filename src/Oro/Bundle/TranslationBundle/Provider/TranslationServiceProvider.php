@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Yaml\Yaml;
 
 class TranslationServiceProvider
 {
@@ -21,16 +23,25 @@ class TranslationServiceProvider
     /** @var string */
     protected $rootDir;
 
+    /** @var EntityManager */
+    protected $em;
+
     /**
      * @param AbstractAPIAdapter  $adapter
      * @param JsTranslationDumper $jsTranslationDumper
-     * @param string              $rootFolder
+     * @param string              $rootDir
+     * @param EntityManager       $em
      */
-    public function __construct(AbstractAPIAdapter $adapter, JsTranslationDumper $jsTranslationDumper, $rootDir)
-    {
+    public function __construct(
+        AbstractAPIAdapter $adapter,
+        JsTranslationDumper $jsTranslationDumper,
+        $rootDir,
+        EntityManager $em
+    ) {
         $this->adapter             = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
         $this->rootDir             = $rootDir;
+        $this->em                  = $em;
 
         $this->setLogger(new NullLogger());
     }
@@ -151,11 +162,54 @@ class TranslationServiceProvider
             unlink($pathToSave);
         }
 
-        if ($toApply) {
-            $this->apply($this->rootDir . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR, $targetDir);
+        if ($toApply && $isExtracted) {
+            $appliedLocales = $this->apply(
+                $this->rootDir . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR,
+                $targetDir
+            );
+            if ($appliedLocales) {
+                $this->cleanup($targetDir);
+                $this->jsTranslationDumper->dumpTranslations($appliedLocales);
+            }
+
+            $this->dumpToDb($this->rootDir . DIRECTORY_SEPARATOR . 'Resources');
         }
 
         return $isExtracted && $isDownloaded;
+    }
+
+    /**
+     * @param string $targetDir
+     */
+    protected function dumpToDb($targetDir)
+    {
+        return true;
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        $repo = $this->em->getRepository('OroTranslationBundle:Translation');
+        $this->em->beginTransaction();
+
+        foreach ($iterator as $fileInfo) {
+            try {
+                $strings = Yaml::parse($fileInfo);
+            } catch (\Exception $e) {
+                $this->logger->error(sprintf('Can\'t parse yaml %s', $fileInfo));
+                continue;
+            }
+
+            foreach ($strings as $key => $item) {
+                try {
+                    $a = 1;
+                } catch (\Exception $e) {
+                    $a = 2;
+                }
+            }
+        }
+
+        $this->em->commit();
     }
 
     /**
@@ -312,11 +366,6 @@ class TranslationServiceProvider
                     trim(implode('', $contents))
                 );
             }
-        }
-
-        if ($appliedLocales) {
-            $this->cleanup($sourceDir);
-            $this->jsTranslationDumper->dumpTranslations($appliedLocales);
         }
 
         return $appliedLocales;

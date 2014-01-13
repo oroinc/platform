@@ -40,7 +40,7 @@ interface APIAdapterInterface
     /**
      * @param $response
      *
-     * @return \stdObject
+     * @return \stdClass
      * @throws \RuntimeException
      */
     public function parseResponse($response);
