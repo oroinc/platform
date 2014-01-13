@@ -40,6 +40,8 @@ class SchemaStep extends AbstractStep
                 );
             case 'workflows':
                 return $this->handleAjaxAction('oro:workflow:definitions:load');
+            case 'processes':
+                return $this->handleAjaxAction('oro:process:configuration:load');
         }
 
         return $this->render('OroInstallerBundle:Process/Step:schema.html.twig');

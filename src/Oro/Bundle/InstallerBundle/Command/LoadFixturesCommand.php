@@ -73,15 +73,15 @@ class LoadFixturesCommand extends ContainerAwareCommand
             $executor->execute($loader->getFixtures(), true);
         }
 
-        // load workflow definitions
-        $this->loadWorkflowDefinitions($input, $output);
+        // load workflow fixtures
+        $this->loadWorkflowFixtures($input, $output);
     }
 
     /**
      * @param InputInterface  $input
      * @param OutputInterface $output
      */
-    protected function loadWorkflowDefinitions(InputInterface $input, OutputInterface $output)
+    protected function loadWorkflowFixtures(InputInterface $input, OutputInterface $output)
     {
         $commandExecutor = new CommandExecutor(
             $input->hasOption('env') ? $input->getOption('env') : null,
@@ -91,9 +91,17 @@ class LoadFixturesCommand extends ContainerAwareCommand
 
         $commandExecutor->runCommand(
             'oro:workflow:definitions:load',
-            array_merge(
-                $input->getArgument('package'),
-                array('--process-isolation' => true)
+            array(
+                '--process-isolation' => true,
+                '--directories' => $input->getArgument('package')
+            )
+        );
+
+        $commandExecutor->runCommand(
+            'oro:process:configuration:load',
+            array(
+                '--process-isolation' => true,
+                '--directories' => $input->getArgument('package')
             )
         );
     }

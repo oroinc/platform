@@ -54,4 +54,34 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
             'updatedAt' => array('updatedAt', new \DateTime()),
         );
     }
+
+    public function testImport()
+    {
+        $importedEntity = new ProcessDefinition();
+        $importedEntity->setName('my_name')
+            ->setLabel('My Label')
+            ->setEnabled(false)
+            ->setRelatedEntity('My/Entity')
+            ->setExecutionOrder(25)
+            ->setExecutionRequired(true)
+            ->setActionsConfiguration(array('key' => 'value'));
+
+        $this->assertNotEquals($importedEntity->getName(), $this->entity->getName());
+        $this->assertNotEquals($importedEntity->getLabel(), $this->entity->getLabel());
+        $this->assertNotEquals($importedEntity->getRelatedEntity(), $this->entity->getRelatedEntity());
+        $this->assertNotEquals($importedEntity->getExecutionOrder(), $this->entity->getExecutionOrder());
+        $this->assertNotEquals($importedEntity->isExecutionRequired(), $this->entity->isExecutionRequired());
+        $this->assertNotEquals($importedEntity->getActionsConfiguration(), $this->entity->getActionsConfiguration());
+        $this->assertTrue($this->entity->isEnabled());
+
+        $this->entity->import($importedEntity);
+
+        $this->assertEquals($importedEntity->getName(), $this->entity->getName());
+        $this->assertEquals($importedEntity->getLabel(), $this->entity->getLabel());
+        $this->assertEquals($importedEntity->getRelatedEntity(), $this->entity->getRelatedEntity());
+        $this->assertEquals($importedEntity->getExecutionOrder(), $this->entity->getExecutionOrder());
+        $this->assertEquals($importedEntity->isExecutionRequired(), $this->entity->isExecutionRequired());
+        $this->assertEquals($importedEntity->getActionsConfiguration(), $this->entity->getActionsConfiguration());
+        $this->assertTrue($this->entity->isEnabled()); // enabled must not be changed
+    }
 }

@@ -146,6 +146,9 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand(
                 'oro:workflow:definitions:load',
                 array('--process-isolation' => true)
+            )->runCommand(
+                'oro:process:configuration:load',
+                array('--process-isolation' => true)
             );
 
         $output->writeln('');

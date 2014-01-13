@@ -274,7 +274,7 @@ class ProcessDefinition
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())
             ->setExecutionOrder($definition->getExecutionOrder())
-            ->setExecutionOrder($definition->getExecutionOrder())
+            ->setExecutionRequired($definition->isExecutionRequired())
             ->setActionsConfiguration($definition->getActionsConfiguration());
 
         return $this;
