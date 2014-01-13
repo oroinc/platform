@@ -45,7 +45,7 @@ All routes from your bundles will be imported automatically.
 
 
 ## Packages management ##
-There are console commands 6 console commands: for installing, uninstalling, updating packages, viewing lists of installed in the system projects, packages available for installation and available updates for installed packages
+There are console commands 6 console commands: for installing, updating packages, viewing lists of installed in the system projects, packages available for installation and available updates for installed packages
 
 ### Installing a package ###
 
@@ -54,19 +54,13 @@ Command syntax is: `oro:package:install [-f|--force] package [version]`
  - `version` - version of the package. Optional parameter. If omitted latest available version will be installed base on `minimum-stability` setting of the root `composer.json` file. Version can be specified in any format acceptable by composer (`1.0.2`, `>v0.1, <=0.3`)
  - `--force` - if command run with this option all package dependencies will be installed/updated along with the package. If omitted - command will ask about required packages(if any), process may be either continued or aborted then.
 
-### Uninstalling a package ###
-Command syntax is: `oro:package:uninstall [-f|--force] package`
- - `package` - name of the package you want to be uninstalled (`vendor/package`)
- - `--force` - if command run with this option all packages which depends on the package being uninstalled will be installed/updated along with the package. If omitted - command will ask about dependant packages(if any), process may be either continued or aborted then.
-
 ### Update a package ###
 Command syntax is: `oro:package:update package`
  - `package` - name of the package you want to be updated (`vendor/package`). Package will be updated to the latest available in repository and acceptable by application version (defined in root `composer.json`).
 
 ### Package scripts ###
-Along with installing/uninstalling/updating install/uninstall/update scripts are being executed.
+Along with installing/updating install/update scripts are being executed.
 `install.php` - install script of a package
-`uninstall.php` - uninstall script of a package
 `update_<version>.php` - update script of a package. `<version>` - package version being updated to. Package must contain update scripts of all previous package versions so that migrations could be applied one by one. E.g if package is being update from `v1` to `v3`, then `update_v2.php` and `update_v3.php` will be executed.
 **Note:** `v` is not required symbol for update script name (`update_v1.php`). `v` is part of version name. `<version>` is version as it is in package `composer.json`.
 Examples:
