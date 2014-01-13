@@ -40,7 +40,9 @@ class TranslationStatisticProvider
      */
     public function get()
     {
-        $data = false; //$this->cache->fetch(static::CACHE_KEY);
+        // TODO: change this before mege to master
+        $data = false;
+        //$this->cache->fetch(static::CACHE_KEY);
 
         if (false === $data) {
             $data = $this->fetch();
