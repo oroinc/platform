@@ -4,6 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+
 class TranslationRepository extends EntityRepository
 {
     const DEFAULT_DOMAIN = 'messages';
@@ -12,7 +14,8 @@ class TranslationRepository extends EntityRepository
      * @param string $key
      * @param string $locale
      * @param string $domain
-     * @return array
+     *
+     * @return Translation
      */
     public function findValue($key, $locale, $domain = self::DEFAULT_DOMAIN)
     {
@@ -25,6 +28,12 @@ class TranslationRepository extends EntityRepository
         );
     }
 
+    /**
+     * @param        $locale
+     * @param string $domain
+     *
+     * @return Translation[]
+     */
     public function findValues($locale, $domain = self::DEFAULT_DOMAIN)
     {
         return $this->findBy(

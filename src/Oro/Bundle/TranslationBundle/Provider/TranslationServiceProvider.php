@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -163,8 +164,10 @@ class TranslationServiceProvider
         }
 
         if ($toApply && $isExtracted) {
+            //$applyDir = $this->getTmpDir('trans_');
             $appliedLocales = $this->apply(
                 $this->rootDir . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR,
+                //$applyDir,
                 $targetDir
             );
             if ($appliedLocales) {
@@ -172,7 +175,7 @@ class TranslationServiceProvider
                 $this->jsTranslationDumper->dumpTranslations($appliedLocales);
             }
 
-            $this->dumpToDb($this->rootDir . DIRECTORY_SEPARATOR . 'Resources');
+            //$this->dumpToDb($applyDir);
         }
 
         return $isExtracted && $isDownloaded;
@@ -183,7 +186,6 @@ class TranslationServiceProvider
      */
     protected function dumpToDb($targetDir)
     {
-        return true;
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::LEAVES_ONLY
@@ -200,9 +202,26 @@ class TranslationServiceProvider
                 continue;
             }
 
+            if (preg_match('#^([\.]+)\.([\w_]+)\.yml$#', $fileInfo->getFilename(), $match)) {
+                $locale = $match;
+                $domain = $match;
+            } else {
+                continue;
+            }
+
             foreach ($strings as $key => $item) {
+                $value = $repo->findValue($key, $locale, $domain);
+
+                if (!$value) {
+                    $value = new Translation();
+                    $value->setDomain($domain)
+                        ->setKey($key)
+                        ->setLocale($locale)
+                        ->setValue($item);
+                }
+
                 try {
-                    $a = 1;
+                    $this->em->persist($value);
                 } catch (\Exception $e) {
                     $a = 2;
                 }
@@ -398,5 +417,22 @@ class TranslationServiceProvider
 
         $this->adapter->setLogger($this->logger);
         $this->jsTranslationDumper->setLogger($this->logger);
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected function getTmpDir($prefix)
+    {
+        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = $path . ltrim(uniqid($prefix), DIRECTORY_SEPARATOR);
+
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        return $path;
     }
 }
