@@ -11,8 +11,13 @@ Flotr.addType('funnel', {
         marginY: 20,
         leftMargin: 160,
         colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87', '#8985C2', '#ECB574', '#84A377'],
-        formatter: '',
-        nozzleSteps: []
+        nozzleSteps: [],
+        tickFormatter: function(label, value) {
+            return label + ': ' + value;
+        },
+        nozzleFormatter: function(label, value) {
+            return label + ': ' + value;
+        }
     },
 
     stack: [],
@@ -284,7 +289,7 @@ Flotr.addType('funnel', {
             context.stroke();
             context.fill();
 
-            self.renderLabel(context, options, Object.keys(options.data)[iterator], funnelSumm, iterator);
+            self.renderLabel(context, options, Object.keys(options.data)[iterator], funnelSumm, iterator, isNozzleStep);
         }
 
         funnelSumm += funnel;
@@ -309,7 +314,7 @@ Flotr.addType('funnel', {
         };
     },
 
-    renderLabel: function(context, options, label, startY, iterator) {
+    renderLabel: function(context, options, label, startY, iterator, isNozzleStep) {
         var distX = (options.width - options.marginX) / 2,
             count = Object.keys(options.data).length,
             distY = (iterator == 0)
@@ -328,15 +333,15 @@ Flotr.addType('funnel', {
         style.wordWrap     = 'break-word';
 
         var html = [],
-            formattedValue = (options.formatter)
-                ? options.formatter(this.originData[label])
-                : this.originData[label],
             divStyle =
                 'position:absolute;' +
                 style.textBaseline + ':' + (distY - style.size)  + 'px;' +
-                style.textAlign + ':' + (distX + (options.marginX + options.width)/3 + 10) + 'px;';
+                style.textAlign + ':' + (distX + (options.marginX + options.width)/3 + 10) + 'px;',
+            labelString = isNozzleStep
+                ? options.nozzleFormatter(label, this.originData[label])
+                : options.tickFormatter(label, this.originData[label]);
 
-        html.push('<div style="', divStyle, '" class="flotr-grid-label">', label + ': ' + formattedValue, '</div>');
+        html.push('<div style="', divStyle, '" class="flotr-grid-label">', labelString, '</div>');
 
         var div = Flotr.DOM.node('<div style="color:#454545" class="flotr-labels"></div>');
         Flotr.DOM.insert(div, html.join(''));
