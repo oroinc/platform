@@ -1,13 +1,15 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
 define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'oro/loading-mask',
-    'oro/datagrid/header',
-    'oro/datagrid/body',
-    'oro/datagrid/footer',
-    'oro/datagrid/toolbar', 'oro/datagrid/action-column',
-    'oro/datagrid/select-row-cell', 'oro/datagrid/select-all-header-cell',
-    'oro/datagrid/refresh-collection-action', 'oro/datagrid/reset-collection-action'],
-    function ($, _, Backgrid, __, mediator, LoadingMask, GridHeader, GridBody, GridFooter, Toolbar, ActionColumn, SelectRowCell, SelectAllHeaderCell, RefreshCollectionAction, ResetCollectionAction) {
+    'oro/datagrid/header', 'oro/datagrid/body', 'oro/datagrid/footer', 'oro/datagrid/toolbar',
+    'oro/datagrid/action-column', 'oro/datagrid/select-row-cell', 'oro/datagrid/select-all-header-cell',
+    'oro/datagrid/refresh-collection-action', 'oro/datagrid/reset-collection-action',
+    'oro/datagrid/export-action'],
+    function ($, _, Backgrid, __, mediator, LoadingMask,
+              GridHeader, GridBody, GridFooter, Toolbar, ActionColumn,
+              SelectRowCell, SelectAllHeaderCell,
+              RefreshCollectionAction, ResetCollectionAction,
+              ExportAction) {
         'use strict';
 
         /**
@@ -84,7 +86,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             defaults: {
                 rowClickActionClass: 'row-click-action',
                 rowClassName:        '',
-                toolbarOptions:      {addResetAction: true, addRefreshAction: true},
+                toolbarOptions:      {addResetAction: true, addRefreshAction: true, addExportAction: false},
                 rowClickAction:      undefined,
                 multipleSorting:     true,
                 rowActions:          [],
@@ -234,9 +236,10 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              */
             _createToolbar: function (toolbarOptions) {
                 return new this.toolbar(_.extend({}, toolbarOptions, {
-                    collection:  this.collection,
-                    actions:     this._getToolbarActions(),
-                    massActions: this._getToolbarMassActions()
+                    collection:   this.collection,
+                    actions:      this._getToolbarActions(),
+                    extraActions: this._getToolbarExtraActions(),
+                    massActions:  this._getToolbarMassActions()
                 }));
             },
 
@@ -253,6 +256,20 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 }
                 if (this.toolbarOptions.addResetAction) {
                     result.push(this.getResetAction());
+                }
+                return result;
+            },
+
+            /**
+             * Get actions of toolbar
+             *
+             * @return {Array}
+             * @private
+             */
+            _getToolbarExtraActions: function () {
+                var result = [];
+                if (this.toolbarOptions.addExportAction) {
+                    result.push(this.getExportAction());
                 }
                 return result;
             },
@@ -345,6 +362,32 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 }
 
                 return grid.resetAction;
+            },
+
+            /**
+             * Get action that exports grid's data
+             *
+             * @return oro.datagrid.ExportAction
+             */
+            getExportAction: function () {
+                var grid = this;
+
+                if (!grid.exportAction) {
+                    grid.exportAction = new ExportAction({
+                        datagrid: grid,
+                        launcherOptions: {
+                            label: 'Export',
+                            className: 'btn',
+                            iconClassName: 'icon-download-alt'
+                        }
+                    });
+
+                    grid.exportAction.on('preExecute', function (action, options) {
+                        grid.$el.trigger('preExecute:export:' + grid.name, [action, options]);
+                    });
+                }
+
+                return grid.exportAction;
             },
 
             /**
@@ -456,7 +499,6 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
 
                 $el.append(this.header.render().$el);
                 if (this.footer) {
-                    console.log(this.footer);
                     $el.append(this.footer.render().$el);
                 }
                 $el.append(this.body.render().$el);

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -49,15 +50,23 @@ class OrmDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $query = $this->aclHelper->apply($this->qb->getQuery());
-
-        $results = $query->execute();
+        $results = $this->getResultQuery()->execute();
         $rows    = [];
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
         }
 
         return $rows;
+    }
+
+    /**
+     * Returns query is used to retrieve grid data
+     *
+     * @return Query
+     */
+    public function getResultQuery()
+    {
+        return $this->aclHelper->apply($this->qb->getQuery());
     }
 
     /**
