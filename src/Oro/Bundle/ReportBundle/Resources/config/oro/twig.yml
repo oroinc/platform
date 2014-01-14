@@ -1,0 +1,2 @@
+bundles:
+    - OroReportBundle:Form:fields.html.twig
