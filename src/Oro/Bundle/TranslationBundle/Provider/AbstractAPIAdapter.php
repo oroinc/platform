@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractAPIAdapter implements APIAdapterInterface
 {
+    use LoggerAwareTrait;
+
     /** @var string */
     protected $apiKey;
 
@@ -80,16 +83,6 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
         $this->apiRequest->setOptions($requestParams);
 
         return $this->apiRequest->execute();
-    }
-
-    /**
-     * Sets a logger
-     *
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**

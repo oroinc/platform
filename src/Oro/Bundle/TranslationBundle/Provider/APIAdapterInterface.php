@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
 
-interface APIAdapterInterface
+interface APIAdapterInterface extends LoggerAwareInterface
 {
     /**
      * Download translations
@@ -23,19 +23,12 @@ interface APIAdapterInterface
      * @param string $uri
      * @param array  $data
      * @param string $method
-     * @param array  $curlOptions
+     * @param array  $options
      *
      * @throws \RuntimeException
      * @return mixed
      */
-    public function request($uri, $data = array(), $method = 'GET', $curlOptions = []);
-
-    /**
-     * Sets a logger
-     *
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger);
+    public function request($uri, $data = array(), $method = 'GET', $options = []);
 
     /**
      * @param $response
