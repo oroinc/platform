@@ -71,7 +71,7 @@ class LanguageTypeTest extends FormIntegrationTestCase
                 'en',
                 ['en']
             ],
-            'disabled langauage should not appears' => [
+            'disabled language should not appears' => [
                 ['fr' => TranslationStatusInterface::STATUS_DOWNLOADED],
                 'en',
                 ['en']

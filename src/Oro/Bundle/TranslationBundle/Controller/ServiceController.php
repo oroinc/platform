@@ -55,7 +55,7 @@ class ServiceController extends BaseController
         $status = Codes::HTTP_OK;
         $data   = [];
 
-        $projects     = $this->get('oro_translation.statistic_provider')->getInstalledPackages();
+        $projects     = $this->get('oro_translation.packagemanager_provider')->getInstalledPackages();
         $proxyAdapter = $this->get('oro_translation.oro_translation_adapter');
         $service      = $this->get('oro_translation.service_provider');
         $service->setAdapter($proxyAdapter);
@@ -63,7 +63,6 @@ class ServiceController extends BaseController
 
         $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
         $path = $path . ltrim(uniqid('download_'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $code . '.zip';
-
 
         try {
             $installed = $service->download($path, $projects, $code);
