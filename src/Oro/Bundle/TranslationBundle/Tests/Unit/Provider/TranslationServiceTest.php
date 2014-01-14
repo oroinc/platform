@@ -141,6 +141,60 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \RuntimeException
+     */
+    public function testDownloadException()
+    {
+        $service = $this->getServiceMock(
+            ['cleanup', 'renameFiles', 'apply', 'unzip'],
+            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+        );
+
+        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zip';
+        mkdir(dirname($path), 0777, true);
+        touch($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
+
+        $service->expects($this->once())
+            ->method('cleanup');
+
+        $this->adapter->expects($this->once())
+            ->method('download')
+            ->will($this->returnValue(true));
+
+        $ex = new \RuntimeException('error', \ZipArchive::ER_NOZIP);
+        $service->expects($this->once())
+            ->method('unzip')
+            ->will($this->throwException($ex));
+
+        $this->adapter->expects($this->once())
+            ->method('parseResponse');
+
+        $service->download($path, ['Oro'], 'en');
+        unlink($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
+    }
+
+    public function testCleanUp()
+    {
+        $path     = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $dir      = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+        $path     = $dir . DIRECTORY_SEPARATOR . 'zip';
+        $fileName = $path . TranslationServiceProvider::FILE_NAME_SUFFIX;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        touch($fileName);
+
+        $this->assertTrue(file_exists($fileName));
+
+        $method = new \ReflectionMethod('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider', 'cleanup');
+        $method->setAccessible(true);
+        $method->invoke($this->service, $dir);
+
+        $this->assertFalse(file_exists($fileName));
+    }
+
+    /**
      * Data provider for testUpdate
      */
     public function updateDataProvider()
