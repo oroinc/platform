@@ -82,9 +82,11 @@ function (Backbone, _, routing, __, Navigation, messenger) {
                 }
 
                 var url = routing.generate(this.route, { code: actionMediator.code });
-                $.post(url, _.bind(function () {
-                        this.markAsUpToDate(actionMediator);
-                        this.postAction(actionMediator);
+                $.getJSON(url, _.bind(function (response) {
+                        if (true === response.success) {
+                            this.markAsUpToDate(actionMediator);
+                            this.postAction(actionMediator);
+                        }
                     }, this))
                     .always(_.bind(function (response, status) {
                         var message;
@@ -92,10 +94,11 @@ function (Backbone, _, routing, __, Navigation, messenger) {
                         if (navigation) {
                             navigation.loadingMask.hide();
                         }
-                        if (status !== 'success') {
-                            response = response.responseJSON || {};
-                            message = _.isUndefined(response.message) ? __('unknown') : __(response.message);
-                            message = __('Could not download translations, error: ') + message;
+
+                        if (status !== 'success' || response.success !== true) {
+                            response = response.responseJSON ? response.responseJSON : (response || {});
+                            message  = _.isUndefined(response.message) ? __('unknown') : __(response.message);
+                            message  = __('Could not download translations, error: ') + message;
                         } else {
                             message = actionMediator.action == 'download'
                                 ? __('Download finished.')

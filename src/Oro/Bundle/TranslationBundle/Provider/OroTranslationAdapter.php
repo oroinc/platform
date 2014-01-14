@@ -6,7 +6,6 @@ use FOS\Rest\Util\Codes;
 
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Psr\Log\LoggerInterface;
 
 class OroTranslationAdapter implements APIAdapterInterface
 {
@@ -20,9 +19,6 @@ class OroTranslationAdapter implements APIAdapterInterface
 
     /** @var string endpoint URL */
     protected $endpoint;
-
-    /** @var LoggerInterface */
-    protected $logger;
 
     /** @var ApiRequestInterface */
     protected $apiRequest;

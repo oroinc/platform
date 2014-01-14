@@ -14,6 +14,7 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class TranslationServiceProvider
 {
+    const FILE_NAME_SUFFIX      = '.zip';
     const DEFAULT_SOURCE_LOCALE = 'en';
 
     /** @var AbstractAPIAdapter */
@@ -135,12 +136,13 @@ class TranslationServiceProvider
      */
     public function download($pathToSave, array $projects, $locale = null, $toApply = true)
     {
-        $targetDir = dirname($pathToSave);
+        $pathToSave = $pathToSave . self::FILE_NAME_SUFFIX;
+        $targetDir  = dirname($pathToSave);
         $this->cleanup($targetDir);
 
         $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
         try {
-            $isExtracted  = $this->unzip(
+            $isExtracted = $this->unzip(
                 $pathToSave,
                 is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
             );
@@ -333,10 +335,10 @@ class TranslationServiceProvider
 
             // get target path form source by replacing $sourceDir part
             $target = $targetDir . preg_replace(
-                '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
-                '',
-                $fileInfo->getPathname()
-            );
+                    '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
+                    '',
+                    $fileInfo->getPathname()
+                );
 
             if ($fileInfo->isDir() && !file_exists($target)) {
                 mkdir($target, 0777, true);

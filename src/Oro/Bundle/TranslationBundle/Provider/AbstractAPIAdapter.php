@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
 
 abstract class AbstractAPIAdapter implements APIAdapterInterface
 {
@@ -17,9 +16,6 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
 
     /** @var string endpoint URL */
     protected $endpoint;
-
-    /** @var LoggerInterface */
-    protected $logger;
 
     /** @var ApiRequestInterface */
     protected $apiRequest;

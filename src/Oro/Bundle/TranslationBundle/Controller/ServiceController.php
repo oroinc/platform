@@ -53,7 +53,7 @@ class ServiceController extends BaseController
     public function downloadAction($code)
     {
         $status = Codes::HTTP_OK;
-        $data   = [];
+        $data   = ['success' => false];
 
         $projects     = $this->get('oro_translation.packagemanager_provider')->getInstalledPackages();
         $proxyAdapter = $this->get('oro_translation.oro_translation_adapter');
@@ -68,6 +68,7 @@ class ServiceController extends BaseController
 
             if ($installed) {
                 $this->setLanguageInstalled($code);
+                $data['success'] = true;
             } else {
                 $data['message'] = $this->get('translator')->trans('oro.translation.download.error');
             }
