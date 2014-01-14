@@ -7,7 +7,7 @@ use Doctrine\Common\Cache\Cache;
 class TranslationStatisticProvider
 {
     const CACHE_KEY = 'translation_statistic';
-    const CACHE_TTL = 60; // TODO: change this before mege to master
+    const CACHE_TTL = 86400;
 
     /** @var Cache */
     protected $cache;
