@@ -1,10 +1,13 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
 define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'oro/loading-mask',
-    'oro/datagrid/header', 'oro/datagrid/body', 'oro/datagrid/toolbar', 'oro/datagrid/action-column',
+    'oro/datagrid/header',
+    'oro/datagrid/body',
+    'oro/datagrid/footer',
+    'oro/datagrid/toolbar', 'oro/datagrid/action-column',
     'oro/datagrid/select-row-cell', 'oro/datagrid/select-all-header-cell',
     'oro/datagrid/refresh-collection-action', 'oro/datagrid/reset-collection-action'],
-    function ($, _, Backgrid, __, mediator, LoadingMask, GridHeader, GridBody, Toolbar, ActionColumn, SelectRowCell, SelectAllHeaderCell, RefreshCollectionAction, ResetCollectionAction) {
+    function ($, _, Backgrid, __, mediator, LoadingMask, GridHeader, GridBody, GridFooter, Toolbar, ActionColumn, SelectRowCell, SelectAllHeaderCell, RefreshCollectionAction, ResetCollectionAction) {
         'use strict';
 
         /**
@@ -59,6 +62,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
 
             /** @property {oro.datagrid.Body} */
             body: GridBody,
+
+            /** @property {oro.datagrid.Footer} */
+            footer: GridFooter,
 
             /** @property {oro.datagrid.Toolbar} */
             toolbar: Toolbar,
@@ -450,6 +456,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
 
                 $el.append(this.header.render().$el);
                 if (this.footer) {
+                    console.log(this.footer);
                     $el.append(this.footer.render().$el);
                 }
                 $el.append(this.body.render().$el);
