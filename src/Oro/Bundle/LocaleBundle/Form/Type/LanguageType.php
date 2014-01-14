@@ -28,7 +28,7 @@ class LanguageType extends AbstractType
     {
         $resolver->setDefaults(
             array(
-                'choices'     => $this->getLocaleChoices(),
+                'choices'     => $this->getLanguageChoices(),
                 'empty_value' => 'Please select...',
             )
         );
@@ -37,7 +37,7 @@ class LanguageType extends AbstractType
     /**
      * @return array
      */
-    protected function getLocaleChoices()
+    protected function getLanguageChoices()
     {
         // ensure that default value is always in choice list
         $defaultValue          = $this->cm->get(self::CONFIG_KEY, true);
