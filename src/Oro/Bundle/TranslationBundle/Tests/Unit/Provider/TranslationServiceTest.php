@@ -18,6 +18,9 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
+    /** @var string */
+    protected $className = 'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider';
+
     public function setUp()
     {
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
@@ -187,7 +190,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue(file_exists($fileName));
 
-        $method = new \ReflectionMethod('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider', 'cleanup');
+        $method = new \ReflectionMethod($this->className, 'cleanup');
         $method->setAccessible(true);
         $method->invoke($this->service, $dir);
         $method->invoke($this->service, $dir . '1');
@@ -198,14 +201,23 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testApply()
     {
-        $method = new \ReflectionMethod('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider', 'apply');
-        $method->setAccessible(true);
+        $apply = new \ReflectionMethod($this->className, 'apply');
+        $apply->setAccessible(true);
 
-        $source = $this->getLangFixturesDir();
-        $target = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $target = $target . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+        $basePath = $target = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR
+            . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+        $target = $basePath . DIRECTORY_SEPARATOR . 'target';
+        $source = $basePath . DIRECTORY_SEPARATOR . 'source';
 
-        $method->invoke($this->service, $target, $source);
+        $tmpDirName = $source . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'test';
+        mkdir($tmpDirName, 0777, true);
+        touch($tmpDirName . DIRECTORY_SEPARATOR . 'test.en.yml');
+
+        $apply->invoke($this->service, $target, $source);
+
+        $cleanup = new \ReflectionMethod($this->className, 'cleanup');
+        $cleanup->setAccessible(true);
+        $cleanup->invoke($this->service, $basePath);
     }
 
     /**
@@ -246,7 +258,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         );
 
         $method = new \ReflectionMethod(
-            'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider',
+            $this->className,
             'renameFiles'
         );
         $method->setAccessible(true);
@@ -280,7 +292,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     protected function getServiceMock($methods = [], $args = [])
     {
         return $this->getMock(
-            'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider',
+            $this->className,
             $methods,
             $args
         );
