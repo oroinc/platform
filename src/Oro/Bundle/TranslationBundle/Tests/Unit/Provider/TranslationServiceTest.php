@@ -46,6 +46,8 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('array'), $mode);
 
         $this->service->setAdapter($this->adapter);
+        $this->assertEquals($this->adapter, $this->service->getAdapter());
+
         $this->service->upload($this->getLangFixturesDir(), $mode);
     }
 
@@ -99,6 +101,111 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->method('cleanup');
 
         $service->update($dir);
+    }
+
+    public function testDownload()
+    {
+        $service = $this->getServiceMock(
+            ['cleanup', 'renameFiles', 'apply', 'unzip'],
+            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+        );
+
+        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zip';
+        mkdir(dirname($path), 0777, true);
+        touch($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
+
+        $service->expects($this->exactly(2))
+            ->method('cleanup');
+
+        $this->adapter->expects($this->once())
+            ->method('download')
+            ->will($this->returnValue(true));
+
+        $service->expects($this->once())
+            ->method('unzip')
+            ->will($this->returnValue(true));
+
+        $service->expects($this->once())
+            ->method('renameFiles');
+
+        $service->expects($this->once())
+            ->method('apply')
+            ->will($this->returnValue(['en']));
+
+        $this->dumper->expects($this->once())
+            ->method('dumpTranslations')
+            ->with(['en']);
+
+        $service->download($path, ['Oro'], 'en');
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testDownloadException()
+    {
+        $service = $this->getServiceMock(
+            ['cleanup', 'renameFiles', 'apply', 'unzip'],
+            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+        );
+
+        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zip';
+        mkdir(dirname($path), 0777, true);
+        touch($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
+
+        $service->expects($this->once())
+            ->method('cleanup');
+
+        $this->adapter->expects($this->once())
+            ->method('download')
+            ->will($this->returnValue(true));
+
+        $ex = new \RuntimeException('error', \ZipArchive::ER_NOZIP);
+        $service->expects($this->once())
+            ->method('unzip')
+            ->will($this->throwException($ex));
+
+        $this->adapter->expects($this->once())
+            ->method('parseResponse');
+
+        $service->download($path, ['Oro'], 'en');
+        unlink($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
+    }
+
+    public function testCleanUp()
+    {
+        $path     = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $dir      = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+        $path     = $dir . DIRECTORY_SEPARATOR . 'zip';
+        $fileName = $path . TranslationServiceProvider::FILE_NAME_SUFFIX;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        touch($fileName);
+
+        $this->assertTrue(file_exists($fileName));
+
+        $method = new \ReflectionMethod('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider', 'cleanup');
+        $method->setAccessible(true);
+        $method->invoke($this->service, $dir);
+        $method->invoke($this->service, $dir . '1');
+
+        $this->assertFalse(file_exists($fileName));
+
+    }
+
+    public function testApply()
+    {
+        $method = new \ReflectionMethod('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider', 'apply');
+        $method->setAccessible(true);
+
+        $source = $this->getLangFixturesDir();
+        $target = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $target = $target . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+
+        $method->invoke($this->service, $target, $source);
     }
 
     /**
