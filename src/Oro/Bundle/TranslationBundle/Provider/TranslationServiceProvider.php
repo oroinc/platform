@@ -332,10 +332,10 @@ class TranslationServiceProvider
 
             // get target path form source by replacing $sourceDir part
             $target = $targetDir . preg_replace(
-                    '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
-                    '',
-                    $fileInfo->getPathname()
-                );
+                '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
+                '',
+                $fileInfo->getPathname()
+            );
 
             if ($fileInfo->isDir() && !file_exists($target)) {
                 mkdir($target, 0777, true);

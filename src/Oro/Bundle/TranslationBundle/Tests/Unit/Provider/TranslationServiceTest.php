@@ -46,6 +46,8 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->isType('array'), $mode);
 
         $this->service->setAdapter($this->adapter);
+        $this->assertEquals($this->adapter, $this->service->getAdapter());
+
         $this->service->upload($this->getLangFixturesDir(), $mode);
     }
 
@@ -99,6 +101,43 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->method('cleanup');
 
         $service->update($dir);
+    }
+
+    public function testDownload()
+    {
+        $service = $this->getServiceMock(
+            ['cleanup', 'renameFiles', 'apply', 'unzip'],
+            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+        );
+
+        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zip';
+        mkdir(dirname($path), 0777, true);
+        touch($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
+
+        $service->expects($this->exactly(2))
+            ->method('cleanup');
+
+        $this->adapter->expects($this->once())
+            ->method('download')
+            ->will($this->returnValue(true));
+
+        $service->expects($this->once())
+            ->method('unzip')
+            ->will($this->returnValue(true));
+
+        $service->expects($this->once())
+            ->method('renameFiles');
+
+        $service->expects($this->once())
+            ->method('apply')
+            ->will($this->returnValue(['en']));
+
+        $this->dumper->expects($this->once())
+            ->method('dumpTranslations')
+            ->with(['en']);
+
+        $service->download($path, ['Oro'], 'en');
     }
 
     /**
