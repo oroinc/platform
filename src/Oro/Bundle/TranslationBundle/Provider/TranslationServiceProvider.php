@@ -152,14 +152,11 @@ class TranslationServiceProvider
         }
 
         if ($toApply && $isExtracted) {
-            //$applyDir = $this->getTmpDir('trans_');
             $appliedLocales = $this->apply(
                 $this->rootDir . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR,
-                //$applyDir,
                 $targetDir
             );
 
-            //$this->dumpToDb($applyDir);
             if ($appliedLocales) {
                 $this->cleanup($targetDir);
                 $this->jsTranslationDumper->dumpTranslations($appliedLocales);
