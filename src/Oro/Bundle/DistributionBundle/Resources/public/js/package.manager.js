@@ -21,7 +21,7 @@ function PackageManager(Urls, util) {
 
         switch (response.code) {
             case InstallStatus.INSTALLED:
-                util.redirect(Urls.installed, 'Package installed');
+                util.redirect(Urls.installed, 'Package installed successfully');
 
                 break;
             case InstallStatus.ERROR:
@@ -42,7 +42,7 @@ function PackageManager(Urls, util) {
                     for (var i = 0; i < response.requirements.length; i++) {
                         var r = response.requirements[i];
                         requirementsList += "\n - " + r.name;
-                        requirementsList += r.installed ? ' [installed]' : '';
+                        requirementsList += r.installed ? ' <span class="installed">[installed]</span>' : '';
                     }
                     message += "\n";
                     message += response.params.packageName + ' requires following packages: ' +
@@ -76,7 +76,7 @@ function PackageManager(Urls, util) {
 
         switch (response.code) {
             case UpdateStatus.UPDATED:
-                util.redirect(Urls.installed, 'Package updated');
+                util.redirect(Urls.installed, 'Package updated successfully');
 
                 break;
 
