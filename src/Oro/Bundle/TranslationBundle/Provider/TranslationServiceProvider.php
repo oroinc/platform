@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
+
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -13,6 +14,8 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class TranslationServiceProvider
 {
+    const DEFAULT_SOURCE_LOCALE = 'en';
+
     /** @var AbstractAPIAdapter */
     protected $adapter;
 
@@ -63,9 +66,9 @@ class TranslationServiceProvider
         if (!is_dir($targetDir)) {
             mkdir($targetDir, 0777, true);
         }
-        $targetDir = $targetDir . DIRECTORY_SEPARATOR . 'en' . DIRECTORY_SEPARATOR;
+        $targetDir = $targetDir . DIRECTORY_SEPARATOR . self::DEFAULT_SOURCE_LOCALE . DIRECTORY_SEPARATOR;
 
-        $isDownloaded = $this->download($pathToSave, [], 'en', false);
+        $isDownloaded = $this->download($pathToSave, [], self::DEFAULT_SOURCE_LOCALE, false);
         if (!$isDownloaded) {
             return false;
         }
@@ -133,11 +136,7 @@ class TranslationServiceProvider
     public function download($pathToSave, array $projects, $locale = null, $toApply = true)
     {
         $targetDir = dirname($pathToSave);
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        } else {
-            $this->cleanup($targetDir);
-        }
+        $this->cleanup($targetDir);
 
         $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
         try {
@@ -174,7 +173,7 @@ class TranslationServiceProvider
 
             //$this->dumpToDb($applyDir);
             if ($appliedLocales) {
-                // $this->cleanup($targetDir);
+                $this->cleanup($targetDir);
                 $this->jsTranslationDumper->dumpTranslations($appliedLocales);
             }
         }
@@ -295,6 +294,11 @@ class TranslationServiceProvider
      */
     protected function cleanup($targetDir)
     {
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+            return;
+        }
+
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
@@ -327,81 +331,35 @@ class TranslationServiceProvider
                 continue;
             }
 
-            // clear target path
+            // get target path form source by replacing $sourceDir part
             $target = $targetDir . preg_replace(
                 '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
                 '',
                 $fileInfo->getPathname()
             );
 
-            // get locale from path
-            $locale = str_replace(
+            if ($fileInfo->isDir() && !file_exists($target)) {
+                mkdir($target, 0777, true);
+            }
+
+            if ($fileInfo->isDir()) {
+                continue;
+            }
+
+            // get locale from path, e.g. ../translations/messages.en.yml -> en
+            $appliedLocales[] = str_replace(
                 '-',
                 '_',
                 preg_replace('#' . $sourceDir . '[/|\\\]+([^/]+)[/|\\\]+.*#', '$1', $fileInfo->getPathname())
             );
 
-            $appliedLocales[$locale] = $locale;
-
-            if ($fileInfo->isDir() && !file_exists($target)) {
-                mkdir($target);
-            }
-
-            $isMultiLine = false;
-            if (!$fileInfo->isFile()) {
-                continue;
-            }
-
             rename($fileInfo->getPathname(), $target);
-            $this->fixAppliedStrings($target, $isMultiLine);
+
+            // fix bad formatted yaml that may come from third-party service
+            YamlFixer::fixStrings($target);
         }
 
-        return $appliedLocales;
-    }
-
-    /**
-     * @param $target
-     * @param $isMultiLine
-     */
-    protected function fixAppliedStrings($target, $isMultiLine)
-    {
-        $contents = file($target);
-        // remove first dashes line
-        if (isset($contents[0]) && trim($contents[0]) == '---') {
-            array_shift($contents);
-        }
-
-        // fix downloaded translations
-        foreach ($contents as $i => $line) {
-            $line = explode(':', $line);
-
-            if (!isset($line[0]) || count($line) != 2 || $isMultiLine) {
-                continue;
-            }
-
-            $key = $line[0];
-            if (in_array($key[0], ['"', "'"])) {
-                $lineQuote = $key[0];
-            } else {
-                $lineQuote = '';
-            }
-
-            // check if it's starting multiline string
-            $isMultiLine = trim($line[1])[0] == '|';
-
-            $key = trim($key, '"\'');
-            if (strpos($key, '"') !== false) {
-                $key = "'" . $key . "'";
-            } else {
-                $key = $lineQuote . $key . $lineQuote;
-            }
-            $contents[$i] = $key . ':' . $line[1];
-        }
-
-        file_put_contents(
-            $target,
-            trim(implode('', $contents))
-        );
+        return array_combine($appliedLocales, $appliedLocales);
     }
 
     /**

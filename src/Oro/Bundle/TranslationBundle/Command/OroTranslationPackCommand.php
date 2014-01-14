@@ -174,15 +174,14 @@ EOF
         $projectName = $input->getArgument('project');
         $locale      = $input->getArgument('locale');
 
-        $projects = explode(',', $projectName);
         $languagePackPath = rtrim(
-            $this->getLangPackDir(implode('_', $projects)),
+            $this->getLangPackDir($projectName),
             DIRECTORY_SEPARATOR
         ) . '.zip';
 
         $result = $this
             ->getTranslationService($input, $output)
-            ->download($languagePackPath, $projects, $locale);
+            ->download($languagePackPath, [$projectName], $locale);
 
         $output->writeln(sprintf("Download %s", $result ? 'successful' : 'failed'));
     }

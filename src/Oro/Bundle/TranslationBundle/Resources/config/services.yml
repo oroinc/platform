@@ -14,6 +14,7 @@ parameters:
     oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
 
     oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
+    oro_translation.packagemanager_provider.class:              Oro\Bundle\TranslationBundle\Provider\PackageManagerProvider
 
 services:
     oro_translation.controller:
@@ -44,8 +45,7 @@ services:
         arguments:
             - @oro_translation.cache
             - @oro_translation.oro_translation_adapter
-            - @oro_distribution.package_manager
-            - %kernel.bundles%
+            - @oro_translation.packagemanager_provider
 
     oro_translation.curl_request:
         class: %oro_translation.curl_request.class%
@@ -110,3 +110,7 @@ services:
             - @oro_translation.statistic_provider
         tags:
             - { name: twig.extension }
+
+    oro_translation.packagemanager_provider:
+        class: %oro_translation.packagemanager_provider.class%
+        arguments: [ @oro_distribution.package_manager, %kernel.bundles% ]
