@@ -80,7 +80,6 @@ class TranslationStatusExtension extends \Twig_Extension
                 // if we do not have information about installed time then assume that needs update
                 $this->processedLanguages[$languageCode] = false;
             }
-
         }
 
         return $this->processedLanguages[$languageCode];
