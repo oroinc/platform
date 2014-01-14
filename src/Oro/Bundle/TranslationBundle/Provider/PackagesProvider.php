@@ -6,7 +6,7 @@ use Composer\Package\PackageInterface;
 
 use Oro\Bundle\DistributionBundle\Manager\PackageManager;
 
-class PackageManagerProvider
+class PackagesProvider
 {
     /** @var PackageManager */
     protected $pm;

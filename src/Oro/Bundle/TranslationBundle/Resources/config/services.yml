@@ -14,7 +14,7 @@ parameters:
     oro_translation.curl_request.class:                         Oro\Bundle\TranslationBundle\Provider\CurlRequest
 
     oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
-    oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackageManagerProvider
+    oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
 
 services:
     oro_translation.controller:

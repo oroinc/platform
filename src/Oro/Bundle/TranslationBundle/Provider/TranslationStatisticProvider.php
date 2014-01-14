@@ -15,10 +15,10 @@ class TranslationStatisticProvider
     /** @var OroTranslationAdapter */
     protected $adapter;
 
-    /** @var PackageManagerProvider */
+    /** @var PackagesProvider */
     protected $pm;
 
-    public function __construct(Cache $cache, OroTranslationAdapter $adapter, PackageManagerProvider $pm)
+    public function __construct(Cache $cache, OroTranslationAdapter $adapter, PackagesProvider $pm)
     {
         $this->cache   = $cache;
         $this->adapter = $adapter;

@@ -236,4 +236,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         return $translator;
     }
+
+    public function testHasTrans()
+    {
+        $locale = 'en';
+        $locales = array_keys($this->messages);
+        $translator = $this->getTranslator($this->getLoader());
+
+        $translator->setLocale($locale);
+        $translator->setFallbackLocales($locales);
+
+        $this->assertTrue($translator->hasTrans('foo', 'jsmessages', $locale));
+        $this->assertTrue($translator->hasTrans('foo'));
+
+        $this->assertFalse($translator->hasTrans('foo11111'));
+    }
 }
