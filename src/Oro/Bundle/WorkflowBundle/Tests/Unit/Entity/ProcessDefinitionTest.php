@@ -84,4 +84,27 @@ class ProcessDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($importedEntity->getActionsConfiguration(), $this->entity->getActionsConfiguration());
         $this->assertTrue($this->entity->isEnabled()); // enabled must not be changed
     }
+
+    public function testPrePersist()
+    {
+        $this->assertNull($this->entity->getCreatedAt());
+        $this->assertNull($this->entity->getUpdatedAt());
+
+        $this->entity->prePersist();
+
+        $this->assertInstanceOf('\DateTime', $this->entity->getCreatedAt());
+        $this->assertInstanceOf('\DateTime', $this->entity->getUpdatedAt());
+        $this->assertEquals('UTC', $this->entity->getCreatedAt()->getTimezone()->getName());
+        $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
+    }
+
+    public function testPreUpdate()
+    {
+        $this->assertNull($this->entity->getUpdatedAt());
+
+        $this->entity->preUpdate();
+
+        $this->assertInstanceOf('\DateTime', $this->entity->getUpdatedAt());
+        $this->assertEquals('UTC', $this->entity->getUpdatedAt()->getTimezone()->getName());
+    }
 }

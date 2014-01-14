@@ -24,6 +24,18 @@ class ProcessJobTest extends \PHPUnit_Framework_TestCase
         unset($this->entity);
     }
 
+    public function testGetId()
+    {
+        $this->assertNull($this->entity->getId());
+
+        $testValue = 1;
+        $reflectionProperty = new \ReflectionProperty('\Oro\Bundle\WorkflowBundle\Entity\ProcessJob', 'id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->entity, $testValue);
+
+        $this->assertEquals($testValue, $this->entity->getId());
+    }
+
     /**
      * @param mixed $propertyName
      * @param mixed $testValue

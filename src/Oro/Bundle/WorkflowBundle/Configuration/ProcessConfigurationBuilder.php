@@ -55,7 +55,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      * @return ProcessTrigger[]
      * @throws \LogicException
      */
-    public function buildProcessTriggers(array $configuration, $definitionsByName)
+    public function buildProcessTriggers(array $configuration, array $definitionsByName)
     {
         $triggers = array();
         foreach ($configuration as $definitionName => $triggersConfiguration) {
