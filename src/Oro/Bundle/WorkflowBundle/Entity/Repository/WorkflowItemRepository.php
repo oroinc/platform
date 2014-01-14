@@ -63,7 +63,7 @@ class WorkflowItemRepository extends EntityRepository
         $visibleSteps = [],
         AclHelper $aclHelper = null,
         \DateTime $dateStart = null,
-        \DateTime $dateEnd= null
+        \DateTime $dateEnd = null
     ) {
         $resultData = [];
         $definition = $this->getEntityManager()
