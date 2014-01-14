@@ -73,17 +73,15 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
         },
 
         _render: function ($option) {
-            var that = this;
+            var self = this;
 
-            var conditions = that._getFieldApplicableConditions($option);
-            var filterIndex = that._getActiveFilterName(conditions);
+            var conditions = self._getFieldApplicableConditions($option);
+            var filterIndex = self._getActiveFilterName(conditions);
 
-            that._createFilter(filterIndex, function (filter) {
-                filter.render();
-
-                that.element.find('.active-filter').empty().append(filter.$el);
-
-//                console.log(filter);
+            self._createFilter(filterIndex, function () {
+                self._appendFilter();
+                self._serialize();
+                self._triggerSerialize();
             });
         },
 
@@ -166,14 +164,14 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
         },
 
         _createFilter: function (filterIndex, cb) {
-            var that = this;
+            var self = this;
 
-            var metadata = that._getFiltersMetadata();
+            var metadata = self._getFiltersMetadata();
             var filterOptions = metadata.filters[filterIndex];
             var filterModuleName = getFilterModuleName(filterOptions.type);
 
             requirejs([filterModuleName], function (Filter) {
-                var filter = new (Filter.extend(filterOptions));
+                var filter = self.filter = new (Filter.extend(filterOptions));
 
                 if (filter.templateSelector === '#text-filter-template') {
                     filter.templateSelector = '#text-filter-embedded-template';
@@ -195,10 +193,28 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                     filter.template = _.template($(filter.templateSelector).text());
                 }
 
-//                console.log(filter.templateSelector);
-
-                cb(filter);
+                cb();
             });
+        },
+
+        _appendFilter: function () {
+            this.filter.render();
+
+            this.element.find('.active-filter').empty().append(this.filter.$el);
+
+            this.filter.on('update', this._triggerSerialize.bind(this));
+        },
+
+        _serialize: function () {
+            var value = {
+                type: this.filter.type,
+                value: this.filter.getValue()
+            };
+            this.element.data('value', value);
+        },
+
+        _triggerSerialize: function () {
+            this.element.trigger('serialize');
         },
     });
 });

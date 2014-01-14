@@ -36,7 +36,8 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
             this._updateOperators();
             $(this.options.conditionsGroupSelector)
                 .on('closed', _.debounce(_.bind(this._updateOperators, this), 1))
-                .on('change', '.operator', _.bind(this._onChangeOperator, this));
+                .on('change', '.operator', _.bind(this._onChangeOperator, this))
+                .on('serialize', _.bind(this._serialize, this));
         },
 
         _prepareOptions: function (options) {
@@ -129,11 +130,52 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
                         selected: operation
                     });
                 });
-
+            this._serialize();
         },
 
         _onChangeOperator: function (e) {
             $(e.target).data('operation', e.value);
+            this._serialize();
+        },
+
+        _serialize: function () {
+            var $group = $(this.options.conditionsGroupSelector).children('ul.conditions-group').first();
+            var value = [];
+            this._serializeConditionsGroup(value, $group);
+            this.element.data('value', value)
+            console.log('value', this.element.data('value'));
+        },
+
+        _serializeConditionsGroup: function (result, $group) {
+            var self = this;
+
+            $group.children('li.condition').each(function () {
+                var $condition = $(this);
+                var criteria = $condition.data('criteria');
+                var resultItem = {
+                    criteria: criteria
+                };
+                var operation = $condition.children('.operator').first().data('operation');
+                if (operation) {
+                    resultItem.operation = operation;
+                }
+
+                switch (criteria) {
+                case 'conditions-group':
+                    resultItem.value = [];
+                    self._serializeConditionsGroup(resultItem.value, $condition.children('ul.conditions-group').first());
+                    break;
+                case 'compare-fields':
+                    self._serializeCompareFields(resultItem, $condition);
+                    break;
+                }
+
+                result.push(resultItem);
+            });
+        },
+
+        _serializeCompareFields: function (resultItem, $condition) {
+            resultItem.value = $condition.children('div.field-filter').first().data('value') || {};
         }
     });
 });
