@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\EventListener;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\SearchBundle\Engine\AbstractEngine;
 
@@ -119,10 +120,9 @@ class IndexListener
     /**
      * @param string $entity
      * @return bool
-     * TODO::don`t use get_class()
      */
     protected function isSupported($entity)
     {
-        return isset($this->entities[get_class($entity)]);
+        return isset($this->entities[ClassUtils::getRealClass($entity)]);
     }
 }
