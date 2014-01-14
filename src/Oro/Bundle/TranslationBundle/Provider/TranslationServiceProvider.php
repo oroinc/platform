@@ -62,12 +62,9 @@ class TranslationServiceProvider
      */
     public function update($dir)
     {
-        $pathToSave = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' . DIRECTORY_SEPARATOR . 'update.zip';
-        $targetDir  = dirname($pathToSave);
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetDir = $targetDir . DIRECTORY_SEPARATOR . self::DEFAULT_SOURCE_LOCALE . DIRECTORY_SEPARATOR;
+        $targetDir  = $this->getTmpDir('oro-trans');
+        $pathToSave = $targetDir . DIRECTORY_SEPARATOR . 'update';
+        $targetDir  = $targetDir . DIRECTORY_SEPARATOR . self::DEFAULT_SOURCE_LOCALE . DIRECTORY_SEPARATOR;
 
         $isDownloaded = $this->download($pathToSave, [], self::DEFAULT_SOURCE_LOCALE, false);
         if (!$isDownloaded) {
