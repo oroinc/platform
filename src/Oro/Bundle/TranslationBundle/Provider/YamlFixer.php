@@ -23,6 +23,7 @@ class YamlFixer
             $line = explode(':', $line);
 
             if (!isset($line[0]) || count($line) != 2 || $isMultiLine) {
+                $isMultiLine = false;
                 continue;
             }
 

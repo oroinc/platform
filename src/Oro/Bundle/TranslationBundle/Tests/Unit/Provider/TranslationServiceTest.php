@@ -15,12 +15,18 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationServiceProvider */
     protected $service;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $em;
+
     public function setUp()
     {
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
         $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->service = new TranslationServiceProvider($this->adapter, $this->dumper, 'someTestRootDir');
+        $this->service = new TranslationServiceProvider($this->adapter, $this->dumper, 'someTestRootDir', $this->em);
     }
 
     public function tearDown()
