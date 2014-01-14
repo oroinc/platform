@@ -55,17 +55,4 @@ class EmailTemplatesGridHelper
             'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
         ];
     }
-
-    /**
-     * Returns choice list for isSystem field and filter
-     *
-     * @return array
-     */
-    public function getSystemChoices()
-    {
-        return [
-            'oro.email.datagrid.emailtemplate.filter.isSystem.no',
-            'oro.email.datagrid.emailtemplate.filter.isSystem.yes'
-        ];
-    }
 }

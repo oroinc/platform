@@ -76,9 +76,8 @@ datagrid:
                 label:          oro.email.emailtemplate.type.label
                 choices:        @oro_email.emailtemplate.datagrid_helper->getTypeChoices
             isSystem:
-                frontend_type:  select
+                frontend_type:  boolean
                 label:          oro.email.emailtemplate.is_system.label
-                choices:        @oro_email.emailtemplate.datagrid_helper->getSystemChoices
         properties:
             id: ~
             update_link:
