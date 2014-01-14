@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 
-abstract class FormProvider implements ProviderInterface
+abstract class Provider implements ProviderInterface
 {
-    const TAG_NAME = 'oro_config.configuration_form_provider';
+    const TAG_NAME = 'oro_config.configuration_provider';
 
     /** @var array */
     protected $config;
@@ -23,7 +21,10 @@ abstract class FormProvider implements ProviderInterface
     /** @var array */
     protected $processedSubTrees = array();
 
-    public function __construct($config)
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    public function __construct($config, SecurityFacade $securityFacade)
     {
         $this->config = $config;
     }
@@ -125,29 +126,15 @@ abstract class FormProvider implements ProviderInterface
         return new FieldNodeDefinition($node, $this->config[ProcessorDecorator::FIELDS_ROOT][$node]);
     }
 
-
-    protected function addFieldToForm(FormBuilderInterface $form, FieldNodeDefinition $fieldDefinition)
-    {
-        if ($fieldDefinition->getAclResource() && !$this->checkIsGranted($fieldDefinition->getAclResource())) {
-            // field is not allowed to be shown, do nothing
-            return;
-        }
-
-        $name = str_replace(
-            ConfigManager::SECTION_MODEL_SEPARATOR,
-            ConfigManager::SECTION_VIEW_SEPARATOR,
-            $fieldDefinition->getName()
-        );
-
-        $form->add($name, 'oro_config_form_field_type', $fieldDefinition->toFormFieldOptions());
-    }
-
     /**
      * Check ACL resource
      *
      * @param string $resourceName
      *
-     * @return mixed
+     * @return bool
      */
-    abstract protected function checkIsGranted($resourceName);
+    protected function checkIsGranted($resourceName)
+    {
+        return $this->securityFacade->isGranted($resourceName);
+    }
 }
