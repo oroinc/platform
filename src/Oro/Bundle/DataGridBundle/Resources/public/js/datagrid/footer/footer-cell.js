@@ -16,7 +16,7 @@ function ($, _, Backbone, Backgrid) {
 
         /** @property */
         template:_.template(
-            '<span><%= label %>: <%= value %></span>' // wrap label into span otherwise underscore will not render it
+            '<span><%= label %><%= value ? ": " + value : "" %></span>' // wrap label into span otherwise underscore will not render it
         ),
 
         /**
@@ -32,7 +32,7 @@ function ($, _, Backbone, Backgrid) {
         },
 
         /**
-         * Renders a footer cell with a sorter and a label.
+         * Renders a footer cell.
          *
          * @return {*}
          */
