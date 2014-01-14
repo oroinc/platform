@@ -23,7 +23,7 @@
 {% form_theme form _self %}
 {% block form_errors %}
     {% spaceless %}
-        {% if errors|length > 0 %}
+        {% if errors is defined and errors|length > 0 %}
             {% for error in errors %}
                 <span for="oro_entity_config_type_entity_label" class="validation-faled">{{ error.message }}</span>
             {% endfor %}

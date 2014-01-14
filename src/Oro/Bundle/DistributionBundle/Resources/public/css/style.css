@@ -169,6 +169,7 @@ table.table {
 
 #alerts .icon {
     font-size: 20px;
+    vertical-align: bottom;
 }
 
 #alerts .icon-success:before {
@@ -278,4 +279,8 @@ table.table {
 .confirm-dialog span.installed {
     font-weight: bold;
     color: #1b801b;
+}
+
+#alerts ul{
+    margin-left: 50px;
 }
