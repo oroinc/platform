@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -50,6 +51,18 @@ class ProcessJob
      * @ORM\Column(name="serialized_data", type="text")
      */
     protected $serializedData;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="entity_id", type="array")
+     */
+    protected $entityId;
+
+    /**
+     * @var Collection
+     */
+    protected $data;
 
     /**
      * @return integer
@@ -133,5 +146,43 @@ class ProcessJob
     public function getSerializedData()
     {
         return $this->serializedData;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * @param array $entityId
+     * @return ProcessJob
+     */
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param Collection $data
+     * @return ProcessJob
+     */
+    public function setData(Collection $data)
+    {
+        $this->data = $data;
+
+        return $this;
     }
 }

@@ -5,6 +5,7 @@ parameters:
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.process.process_factory.class: Oro\Bundle\WorkflowBundle\Model\ProcessFactory
+    oro_workflow.process.process_handler.class: Oro\Bundle\WorkflowBundle\Model\ProcessHandler
 
 services:
     oro_workflow.context_accessor:
@@ -32,3 +33,8 @@ services:
         class: %oro_workflow.process.process_factory.class%
         arguments:
             - @oro_workflow.process.action_assembler
+
+    oro_workflow.process.process_handler:
+        class: %oro_workflow.process.process_handler.class%
+        arguments:
+            - @oro_workflow.process.process_factory
