@@ -275,3 +275,7 @@ table.table {
     padding-left: 95px;
 }
 
+.confirm-dialog span.installed {
+    font-weight: bold;
+    color: #1b801b;
+}
