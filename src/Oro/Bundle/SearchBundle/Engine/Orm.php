@@ -119,7 +119,7 @@ class Orm extends AbstractEngine
      * @param bool   $realtime [optional] Perform immediate insert/update to
      *                              search attributes table(s). True by default.
      * @param bool   $needToCompute
-     * @return Item Index item id on success, false otherwise
+     * @return Item Index item on success, null otherwise
      */
     public function save($entity, $realtime = true, $needToCompute = false)
     {
