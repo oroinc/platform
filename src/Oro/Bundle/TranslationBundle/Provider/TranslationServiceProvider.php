@@ -353,7 +353,7 @@ class TranslationServiceProvider
             }
 
             rename($fileInfo->getPathname(), $target);
-            $this->fixAppliedString($target, $isMultiLine);
+            $this->fixAppliedStrings($target, $isMultiLine);
         }
 
         return $appliedLocales;
