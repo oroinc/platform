@@ -190,8 +190,22 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $method = new \ReflectionMethod('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider', 'cleanup');
         $method->setAccessible(true);
         $method->invoke($this->service, $dir);
+        $method->invoke($this->service, $dir . '1');
 
         $this->assertFalse(file_exists($fileName));
+
+    }
+
+    public function testApply()
+    {
+        $method = new \ReflectionMethod('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider', 'apply');
+        $method->setAccessible(true);
+
+        $source = $this->getLangFixturesDir();
+        $target = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $target = $target . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+
+        $method->invoke($this->service, $target, $source);
     }
 
     /**
