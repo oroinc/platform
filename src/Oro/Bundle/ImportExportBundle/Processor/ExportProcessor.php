@@ -17,6 +17,11 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 class ExportProcessor implements ProcessorInterface, ContextAwareInterface
 {
     /**
+     * @var ContextInterface
+     */
+    protected $context;
+
+    /**
      * @var SerializerInterface
      */
     protected $serializer;
@@ -38,7 +43,11 @@ class ExportProcessor implements ProcessorInterface, ContextAwareInterface
         if (!$this->serializer) {
             throw new RuntimeException('Serializer must be injected.');
         }
-        $data = $this->serializer->serialize($object, null);
+        $data = $this->serializer->serialize(
+            $object,
+            null,
+            $this->context->getConfiguration()
+        );
         if ($this->dataConverter) {
             $data = $this->dataConverter->convertToExportFormat($data);
         }
@@ -46,12 +55,14 @@ class ExportProcessor implements ProcessorInterface, ContextAwareInterface
     }
 
     /**
-     * @param ContextInterface $importExportContext
+     * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
-    public function setImportExportContext(ContextInterface $importExportContext)
+    public function setImportExportContext(ContextInterface $context)
     {
-        $queryBuilder = $importExportContext->getOption('queryBuilder');
+        $this->context = $context;
+
+        $queryBuilder = $context->getOption('queryBuilder');
         if (isset($queryBuilder) && $this->dataConverter instanceof QueryBuilderAwareInterface) {
             if (!$queryBuilder instanceof QueryBuilder) {
                 throw new InvalidConfigurationException(
@@ -63,6 +74,10 @@ class ExportProcessor implements ProcessorInterface, ContextAwareInterface
                 );
             }
             $this->dataConverter->setQueryBuilder($queryBuilder);
+        }
+
+        if ($this->dataConverter && $this->dataConverter instanceof ContextAwareInterface) {
+            $this->dataConverter->setImportExportContext($context);
         }
     }
 

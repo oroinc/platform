@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Context;
 interface ContextAwareInterface
 {
     /**
-     * @param ContextInterface $importExportContext
+     * @param ContextInterface $context
      */
-    public function setImportExportContext(ContextInterface $importExportContext);
+    public function setImportExportContext(ContextInterface $context);
 }

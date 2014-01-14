@@ -14,7 +14,6 @@ class PackageController extends Controller
 {
     const CODE_INSTALLED = 0;
     const CODE_UPDATED = 0;
-    const CODE_UNINSTALLED = 0;
     const CODE_ERROR = 1;
     const CODE_CONFIRM = 2;
 
@@ -70,54 +69,6 @@ class PackageController extends Controller
     }
 
     /**
-     * @Route("/package/uninstall")
-     */
-    public function uninstallAction()
-    {
-        $this->setUpEnvironment();
-
-        $params = $this->getRequest()->get('params');
-        $packageName = $this->getParamValue($params, 'packageName', null);
-        $forceDependentsUninstalling = $this->getParamValue($params, 'force', false);
-
-        /** @var PackageManager $manager */
-        $manager = $this->container->get('oro_distribution.package_manager');
-        $responseContent = [];
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
-
-        if (!$manager->isPackageInstalled($packageName)) {
-            $responseContent = [
-                'code' => self::CODE_ERROR,
-                'message' => sprintf('Package % not found', $packageName)
-            ];
-            $response->setContent(json_encode($responseContent));
-
-            return $response;
-        }
-
-        $dependents = $manager->getDependents($packageName);
-        if (!$forceDependentsUninstalling && $dependents) {
-            $params['force'] = true;
-            $responseContent = [
-                'code' => self::CODE_CONFIRM,
-                'packages' => $dependents,
-                'params' => $params
-            ];
-            $response->setContent(json_encode($responseContent));
-
-            return $response;
-
-        }
-
-        $manager->uninstall(array_merge($dependents, [$packageName]));
-        $responseContent = ['code' => self::CODE_UNINSTALLED];
-        $response->setContent(json_encode($responseContent));
-
-        return $response;
-    }
-
-    /**
      * @Route("/package/install")
      */
     public function installAction()
@@ -127,7 +78,10 @@ class PackageController extends Controller
         $params = $this->getRequest()->get('params');
         $packageName = $this->getParamValue($params, 'packageName', null);
         $packageVersion = $this->getParamValue($params, 'version', null);
+        $loadDemoData = $this->getParamValue($params, 'loadDemoData', null);
         $forceDependenciesInstalling = $this->getParamValue($params, 'force', false);
+
+        $isConfirmationRequired = ($loadDemoData === null);
 
         /** @var PackageManager $manager */
         $manager = $this->container->get('oro_distribution.package_manager');
@@ -145,26 +99,32 @@ class PackageController extends Controller
             return $response;
         }
 
+
         try {
-            if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName)) {
+            if ($isConfirmationRequired) {
                 $params['force'] = true;
                 $responseContent = [
                     'code' => self::CODE_CONFIRM,
-                    'requirements' => array_map(
+                    'params' => $params
+                ];
+
+                if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName)) {
+
+                    $responseContent['requirements'] = array_map(
                         function (PackageRequirement $pr) {
                             return $pr->toArray();
                         },
                         $requirements
-                    ),
-                    'params' => $params
-                ];
+                    );
+                }
+
                 $response->setContent(json_encode($responseContent));
 
                 return $response;
+
             }
 
-            $manager->install($packageName, $packageVersion);
-
+            $manager->install($packageName, $packageVersion, (bool)$loadDemoData);
 
         } catch (\Exception $e) {
             $message = $e instanceof VerboseException ?
