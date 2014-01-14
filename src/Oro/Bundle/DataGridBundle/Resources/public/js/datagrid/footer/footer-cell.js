@@ -38,7 +38,7 @@ function ($, _, Backbone, Backgrid) {
          */
         render: function () {
             this.$el.empty();
-
+console.log(this);
             var columnName = this.column.get('name');
             var state = this.collection.state;
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -10,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 
 class OrmTotalsExtension extends AbstractExtension
 {
@@ -23,6 +25,8 @@ class OrmTotalsExtension extends AbstractExtension
 
     /** @var  Translator */
     protected $translator;
+
+    protected $totals;
 
     public function __construct(
         RequestParameters $requestParams = null,
@@ -60,7 +64,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $totals = $this->getTotalsToApply($config);
+        $totals = $this->getTotalsToApply($config, $datasource);
 
         /*
         $multisort = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
@@ -76,6 +80,14 @@ class OrmTotalsExtension extends AbstractExtension
                 $datasource->getQueryBuilder()->addOrderBy($sortKey, $direction);
             }
         }*/
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    {
+        $result->offsetSetByPath('[options][totals]', $this->totals);
     }
 
     /**
@@ -152,11 +164,32 @@ class OrmTotalsExtension extends AbstractExtension
      *
      * @return array
      */
-    protected function getTotalsToApply(DatagridConfiguration $config)
+    protected function getTotalsToApply(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $result = [];
         $totals = $this->getTotals($config);
-        //var_dump($totals);
+        /** @var QueryBuilder $qb */
+        $qb = clone $datasource->getQueryBuilder();
+
+        $totalSelects = [];
+        foreach ($totals as $field => $total) {
+            if (isset($total['query'])) {
+                $totalSelects[] = $total['query'] . ' as ' . $field;
+            }
+        };
+        $qb->select($totalSelects);
+
+        $data = $qb->getQuery()->getScalarResult();
+
+        if (!empty($data)) {
+            foreach ($totals as $field => &$total) {
+                if (isset($data[0][$field])) {
+                    $total['query'] = $data[0][$field];
+                }
+            };
+        }
+
+        $this->totals = $totals;
 
         //$defaultSorters = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, []);
         //$sortBy         = $this->requestParams->get(self::SORTERS_ROOT_PARAM) ? : $defaultSorters;
