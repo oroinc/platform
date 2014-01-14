@@ -55,7 +55,7 @@ class ServiceController extends BaseController
         $status = Codes::HTTP_OK;
         $data   = ['success' => false];
 
-        $projects     = $this->get('oro_translation.packagemanager_provider')->getInstalledPackages();
+        $projects     = $this->get('oro_translation.packages_provider')->getInstalledPackages();
         $proxyAdapter = $this->get('oro_translation.oro_translation_adapter');
         $service      = $this->get('oro_translation.service_provider');
         $service->setAdapter($proxyAdapter);
