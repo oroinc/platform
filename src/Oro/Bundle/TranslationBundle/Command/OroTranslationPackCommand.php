@@ -177,7 +177,7 @@ EOF
         $languagePackPath = rtrim(
             $this->getLangPackDir($projectName),
             DIRECTORY_SEPARATOR
-        ) . '.zip';
+        );
 
         $result = $this
             ->getTranslationService($input, $output)

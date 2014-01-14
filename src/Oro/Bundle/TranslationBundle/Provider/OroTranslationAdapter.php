@@ -4,11 +4,14 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use FOS\Rest\Util\Codes;
 
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
 
 class OroTranslationAdapter implements APIAdapterInterface
 {
+    use LoggerAwareTrait;
+
     const URL_STATS    = '/stats';
     const URL_DOWNLOAD = '/download';
 
@@ -121,16 +124,6 @@ class OroTranslationAdapter implements APIAdapterInterface
     public function setEndpoint($endpoint)
     {
         $this->endpoint = $endpoint;
-    }
-
-    /**
-     * Sets a logger
-     *
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
