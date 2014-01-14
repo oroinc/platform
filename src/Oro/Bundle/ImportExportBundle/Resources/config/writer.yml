@@ -4,6 +4,7 @@ parameters:
     oro_importexport.writer.entity_detach_fixer.class: Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer
     oro_importexport.writer.dummy.class: Oro\Bundle\ImportExportBundle\Writer\DummyWriter
     oro_importexport.writer.doctrine_clear.class: Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter
+    oro_importexport.writer.echo.csv.class: Oro\Bundle\ImportExportBundle\Writer\CsvEchoWriter
 
 services:
     oro_importexport.writer.csv:
@@ -33,3 +34,6 @@ services:
         class: %oro_importexport.writer.doctrine_clear.class%
         arguments:
             - @doctrine.orm.entity_manager
+
+    oro_importexport.writer.echo.csv:
+        class: %oro_importexport.writer.echo.csv.class%

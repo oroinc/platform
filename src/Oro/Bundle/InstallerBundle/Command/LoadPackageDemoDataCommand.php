@@ -88,4 +88,3 @@ class LoadPackageDemoDataCommand extends ContainerAwareCommand
         }
     }
 }
-
