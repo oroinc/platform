@@ -22,7 +22,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
         $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->em      = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -70,7 +70,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
                     $this->returnCallback(
                         function ($pathToSave) {
                             $tmpDir = dirname($pathToSave);
-                            $path = $tmpDir . DIRECTORY_SEPARATOR . 'en';
+                            $path   = $tmpDir . DIRECTORY_SEPARATOR . 'en';
                             if (!is_dir($path)) {
                                 mkdir($path, 0777, true);
                             }
@@ -113,6 +113,49 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testRenameFiles()
+    {
+        $targetPath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $targetPath = $targetPath . ltrim(uniqid('download_'), DIRECTORY_SEPARATOR);
+        mkdir($targetPath, 0777, true);
+
+        $files = [
+            $targetPath . DIRECTORY_SEPARATOR . 'messages.en.yml',
+            $targetPath . DIRECTORY_SEPARATOR . 'validation.en.yml'
+        ];
+
+        $filesExpected = [
+            $targetPath . DIRECTORY_SEPARATOR . 'messages.en_US.yml',
+            $targetPath . DIRECTORY_SEPARATOR . 'validation.en_US.yml'
+        ];
+
+        foreach ($files as $file) {
+            touch($file);
+        }
+
+        $service = $this->getServiceMock(
+            ['__construct'],
+            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+        );
+
+        $method = new \ReflectionMethod(
+            'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider',
+            'renameFiles'
+        );
+        $method->setAccessible(true);
+
+        $method->invoke($service, '.en.', '.en_US.', $targetPath);
+
+        foreach ($files as $k => $file) {
+            $this->assertFalse(file_exists($file));
+            $this->assertTrue(file_exists($filesExpected[$k]));
+
+            unlink($filesExpected[$k]);
+        }
+
+        rmdir($targetPath);
+    }
+
     /**
      * @return string
      */
@@ -121,6 +164,12 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         return __DIR__ . '/../Fixtures/Resources/lang-pack/';
     }
 
+    /**
+     * @param array $methods
+     * @param array $args
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|TranslationServiceProvider
+     */
     protected function getServiceMock($methods = [], $args = [])
     {
         return $this->getMock(

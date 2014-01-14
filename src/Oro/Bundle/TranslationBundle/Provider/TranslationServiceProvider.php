@@ -2,15 +2,10 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
-
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
-
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class TranslationServiceProvider
 {
@@ -29,25 +24,19 @@ class TranslationServiceProvider
     /** @var string */
     protected $rootDir;
 
-    /** @var EntityManager */
-    protected $em;
-
     /**
      * @param AbstractAPIAdapter  $adapter
      * @param JsTranslationDumper $jsTranslationDumper
      * @param string              $rootDir
-     * @param EntityManager       $em
      */
     public function __construct(
         AbstractAPIAdapter $adapter,
         JsTranslationDumper $jsTranslationDumper,
-        $rootDir,
-        EntityManager $em
+        $rootDir
     ) {
         $this->adapter             = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
         $this->rootDir             = $rootDir;
-        $this->em                  = $em;
 
         $this->setLogger(new NullLogger());
     }
@@ -181,56 +170,6 @@ class TranslationServiceProvider
     }
 
     /**
-     * @param string $targetDir
-     */
-    protected function dumpToDb($targetDir)
-    {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        $repo = $this->em->getRepository('OroTranslationBundle:Translation');
-        $this->em->beginTransaction();
-
-        foreach ($iterator as $fileInfo) {
-            try {
-                $strings = Yaml::parse($fileInfo);
-            } catch (\Exception $e) {
-                $this->logger->error(sprintf('Can\'t parse yaml %s', $fileInfo));
-                continue;
-            }
-
-            if (preg_match('#^([\.]+)\.([\w_]+)\.yml$#', $fileInfo->getFilename(), $match)) {
-                $locale = $match;
-                $domain = $match;
-            } else {
-                continue;
-            }
-
-            foreach ($strings as $key => $item) {
-                $value = $repo->findValue($key, $locale, $domain);
-
-                if (!$value) {
-                    $value = new Translation();
-                    $value->setDomain($domain)
-                        ->setKey($key)
-                        ->setLocale($locale)
-                        ->setValue($item);
-                }
-
-                try {
-                    $this->em->persist($value);
-                } catch (\Exception $e) {
-                    $a = 2;
-                }
-            }
-        }
-
-        $this->em->commit();
-    }
-
-    /**
      * @param string $find    find string in file name
      * @param string $replace replacement
      * @param string $dir     where to search
@@ -332,10 +271,10 @@ class TranslationServiceProvider
 
             // get target path form source by replacing $sourceDir part
             $target = $targetDir . preg_replace(
-                    '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
-                    '',
-                    $fileInfo->getPathname()
-                );
+                '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
+                '',
+                $fileInfo->getPathname()
+            );
 
             if ($fileInfo->isDir() && !file_exists($target)) {
                 mkdir($target, 0777, true);
