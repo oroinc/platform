@@ -20,6 +20,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
                 cursorAt: "10 10",
                 cancel: 'a, input, .btn, select'
             },
+            filterMetadataSelector: '.report-designer',
             conditionsGroupSelector: '#segmentation-conditions',
             criteriaList: {},
             criteriaListSelector: '#filter-criteria-list',
@@ -31,6 +32,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
 
         _create: function (options) {
             this._prepareOptions(options);
+            this._deserialize();
             this._initCriteriaList(this.options.criteriaListSelector);
             this._initConditionsGroup(this.options.conditionsGroupSelector);
             this._updateOperators();
@@ -80,7 +82,9 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
             var $el;
             switch (criteria) {
                 case 'compare-fields':
-                    $el = $(this.options.compareFieldsHTML).compareField();
+                    $el = $(this.options.compareFieldsHTML).compareField({
+                        filterMetadataSelector: this.options.filterMetadataSelector
+                    });
                     break;
                 case 'conditions-group':
                     $el = $(this.options.conditionsGroupHTML);
@@ -143,7 +147,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
             var value = [];
             this._serializeConditionsGroup(value, $group);
             this.element.data('value', value)
-            console.log('value', this.element.data('value'));
+            console.log('_ser', this.element.data('value'));
         },
 
         _serializeConditionsGroup: function (result, $group) {
@@ -176,6 +180,38 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
 
         _serializeCompareFields: function (resultItem, $condition) {
             resultItem.value = $condition.children('div.field-filter').first().data('value') || {};
-        }
+        },
+
+        _deserialize: function () {
+            var val = this.element.data('value');
+            this._deserializeConditionsGroup($(this.options.conditionsGroupSelector).children('ul.conditions-group').first(), val);
+        },
+
+        _deserializeConditionsGroup: function ($parent, val) {
+            var self = this;
+
+            val.forEach(function (item) {
+                switch (item.criteria) {
+                case 'conditions-group':
+                    var $child = $parent.append('<li class="condition" data-criteria="conditions-group">\
+                            <a class="close" data-dismiss="alert" href="#">×</a>\
+                            <ul class="conditions-group">\
+                            </ul>\
+                        </li>').find('.conditions-group');
+                    self._deserializeConditionsGroup($child, item.value);
+                    break;
+                case 'compare-fields':
+                    $parent.append('<li class="condition" data-criteria="compare-fields">\
+                        <a class="close" data-dismiss="alert" href="#">×</a>\
+                        <div class="field-filter">\
+                    </li>').find('.field-filter').compareField({
+                        filterMetadataSelector: self.options.filterMetadataSelector,
+                        data: item.value
+                    });
+                    break;
+                }
+                console.log('_desConGro', item);
+            });
+        },
     });
 });

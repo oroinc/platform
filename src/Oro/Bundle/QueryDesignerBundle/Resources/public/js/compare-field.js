@@ -66,28 +66,33 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             var $select = self.element.find('select');
             $select.change(function () {
                 var $option = $select.find(':selected');
-                self._render($option);
+                var conditions = self._getFieldApplicableConditions($option);
+                var filterIndex = self._getActiveFilterName(conditions);
+                self._render(filterIndex);
             });
 
-            $select.find('option').first().prop('selected', true).change();
+            var index = 0;
+
+            if (this.options.data) {
+                var data = this.options.data;
+                this.element.data('value', data);
+                index = this.options.data.index;
+            }
+
+            var $option = $($select.find('option')[index]);
+            $option.prop('selected', true).change();
         },
 
-        _render: function ($option) {
+        _render: function (filterIndex) {
             var self = this;
-
-            var conditions = self._getFieldApplicableConditions($option);
-            var filterIndex = self._getActiveFilterName(conditions);
-
             self._createFilter(filterIndex, function () {
                 self._appendFilter();
-                self._serialize();
-                self._triggerSerialize();
+                self._onUpdate();
             });
         },
 
         _getFiltersMetadata: function () {
-            //var metadata = this.element.closest('[data-metadata]').data('metadata');
-            var metadata = $('.report-designer').data('metadata');
+            var metadata = $(this.options.filterMetadataSelector).data('metadata');
 
             metadata.filters.push({
                 type: 'none',
@@ -171,6 +176,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             var filterModuleName = getFilterModuleName(filterOptions.type);
 
             requirejs([filterModuleName], function (Filter) {
+                self.filterIndex = filterIndex;
                 var filter = self.filter = new (Filter.extend(filterOptions));
 
                 if (filter.templateSelector === '#text-filter-template') {
@@ -193,7 +199,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                     filter.template = _.template($(filter.templateSelector).text());
                 }
 
-                cb();
+                cb(filter);
             });
         },
 
@@ -202,19 +208,33 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
 
             this.element.find('.active-filter').empty().append(this.filter.$el);
 
-            this.filter.on('update', this._triggerSerialize.bind(this));
+            this.filter.on('update', this._onUpdate.bind(this));
+
+            this._deserialize();
         },
 
         _serialize: function () {
             var value = {
-                type: this.filter.type,
+                index: this.element.find('select')[0].selectedIndex,
                 value: this.filter.getValue()
             };
             this.element.data('value', value);
         },
 
+        _deserialize: function () {
+            var value = this.element.data('value');
+            if (value) {
+                this.filter.setValue(value.value);
+            }
+        },
+
         _triggerSerialize: function () {
             this.element.trigger('serialize');
         },
+
+        _onUpdate: function () {
+            this._serialize();
+            this._triggerSerialize();
+        }
     });
 });

@@ -47,7 +47,55 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    <div class="container-fluid">
+    {% set segmentationDesignerValue = [
+        {
+            "criteria": "compare-fields",
+            "value": {
+                "index": 1,
+                "value": {
+                    "type": "1",
+                    "value": "@gmail.com, @hotmail.com, @yahoo.com"
+                }
+            }
+        },
+        {
+            "criteria": "conditions-group",
+            "value": [
+                {
+                    "criteria": "compare-fields",
+                    "value": {
+                        "index": 1,
+                        "value": {
+                            "type": "1",
+                            "value": "VP of Engineering, Marketing Director"
+                        }
+                    }
+                },
+                {
+                    "criteria": "compare-fields",
+                    "value": {
+                        "index": 1,
+                        "value": {
+                            "type": "1",
+                            "value": "Tiffany"
+                        }
+                    }
+                },
+            ]
+        },
+        {
+            "criteria": "compare-fields",
+            "operation": "and",
+            "value": {
+                "index": 3,
+                "value": {
+                    "type": "1",
+                    "value": "United States"
+                }
+            }
+        }
+    ] %}
+    <div id="segmentation-designer" class="container-fluid" data-value="{{ segmentationDesignerValue|json_encode }}">
         <div class="row-fluid">
             <div class="span3 filter-criteria">
                 <h4>Filter Criteria</h4>
@@ -62,7 +110,7 @@
             </div>
             <div class="span9" id="segmentation-conditions">
                 <ul class="conditions-group">
-                    <li class="condition" data-criteria="compare-fields">
+                    <!--<li class="condition" data-criteria="compare-fields">
                         <a class="close" data-dismiss="alert" href="#">×</a>
                         <div class="field-filter">
                             <a href="#">Contacts email</a> field value <a href="#">contains</a> <a href="#">all</a> of the following:<br />
@@ -93,7 +141,7 @@
                         <div class="field-filter">
                             <a href="#">Contact country</a> field value <a href="#">is</a> <a href="#">United States</a>
                         </div>
-                    </li>
+                    </li>-->
                 </ul>
             </div>
         </div>
@@ -231,7 +279,8 @@
                     }
                 });
 
-                $('.report-designer').conditionsGroup({
+                $('#segmentation-designer').conditionsGroup({
+                    filterMetadataSelector: '.report-designer',
                     conditionsGroupSelector: '#segmentation-conditions',
                     criteriaListSelector: '#filter-criteria-list'
                 });
