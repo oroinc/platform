@@ -11,7 +11,14 @@ use Oro\Bundle\InstallerBundle\Tests\Selenium\Pages\OroRequirements;
 
 class InstallTest extends Selenium2TestCase
 {
-    public function testInstallation()
+    protected function setUp()
+    {
+        parent::setUp();
+        //to prevent timeout exception on step pages
+        $this->setSeleniumServerRequestsTimeout(MAX_EXECUTION_TIME);
+    }
+
+        public function testInstallation()
     {
         /** @var OroInstall $installer */
         $installer = new OroInstall($this);
