@@ -138,7 +138,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                         ),
                         'view_attributes' => array(
                             array('attribute' => 'attribute_one'),
-                            array('path' => '$attribute_one.foo', 'label' => 'Custom Label')
+                            array('path' => '$attribute_one.foo', 'label' => 'Custom Label'),
                         )
                     )
                 ),
@@ -167,7 +167,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                                 'path' => new PropertyPath('data.attribute_one'),
                                 'label' => 'Attribute One'
                             ),
-                            array('path' => new PropertyPath('data.attribute_one.foo'), 'label' => 'Custom Label')
+                            array('path' => new PropertyPath('data.attribute_one.foo'), 'label' => 'Custom Label'),
                         )
                     )
             ),

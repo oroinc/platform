@@ -307,4 +307,30 @@ class WorkflowManager
 
         throw new WorkflowException('Can\'t find workflow by given identifier.');
     }
+
+    /**
+     * @param object $entity
+     * @param null|string $skippedWorkflow
+     * @param null|string $workflowName
+     * @param null|string $workflowType
+     * @return int
+     */
+    public function checkWorkflowItemsByEntity(
+        $entity,
+        $skippedWorkflow = null,
+        $workflowName = null,
+        $workflowType = null
+    ) {
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
+        $workflowItemsRepository = $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
+
+        return $workflowItemsRepository->checkWorkflowItemsByEntityMetadata(
+            $entityClass,
+            $entityIdentifier,
+            $workflowName,
+            $workflowType,
+            $skippedWorkflow
+        );
+    }
 }

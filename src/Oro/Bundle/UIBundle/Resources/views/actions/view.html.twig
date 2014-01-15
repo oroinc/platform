@@ -91,11 +91,9 @@
     </div>
 
     <div class="layout-content scrollable-container">
-        {# Primary workflow view variant 1 #}
-        {% set viewContentBefore = null %}
-        {#{%- set viewContentBefore -%}#}
-            {#{% placeholder view_content_before with {entity: entity} %}#}
-        {#{%- endset -%}#}
+        {%- set viewContentBefore -%}
+            {% placeholder view_content_before with {entity: entity} %}
+        {%- endset -%}
 
         {% block content_data %}
             {% set dataBlocks = data.dataBlocks %}

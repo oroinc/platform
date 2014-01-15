@@ -341,9 +341,29 @@ class Workflow
     {
         $workflowItem = new WorkflowItem();
         $workflowItem->setWorkflowName($this->getName());
-        $workflowItem->getData()->add($data);
+        $workflowItem->getData()
+            ->setFieldsMapping($this->getAttributesMapping())
+            ->add($data);
 
         return $workflowItem;
+    }
+
+    /**
+     * Get attribute names mapped to property paths if any.
+     *
+     * @return array
+     */
+    public function getAttributesMapping()
+    {
+        $mapping = array();
+        /** @var Attribute $attribute */
+        foreach ($this->attributeManager->getAttributes() as $attribute) {
+            if ($attribute->getPropertyPath()) {
+                $mapping[$attribute->getName()] = $attribute->getPropertyPath();
+            }
+        }
+
+        return $mapping;
     }
 
     /**

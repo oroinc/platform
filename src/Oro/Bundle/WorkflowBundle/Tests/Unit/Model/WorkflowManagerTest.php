@@ -575,4 +575,52 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         return $worklflow;
     }
+
+    /**
+     * @dataProvider trueFalseDataProvider
+     */
+    public function testCheckWorkflowItemsByEntity($result)
+    {
+        $entity = new \stdClass();
+        $entityId = 1;
+        $workflowName = 'test';
+        $workflowType = 'wizard';
+        $skippedWorkflow = 'primary_name';
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->with($entity)
+            ->will($this->returnValue(get_class($entity)));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityIdentifier')
+            ->with($entity)
+            ->will($this->returnValue($entityId));
+
+        $workflowItemsRepository =
+            $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $workflowItemsRepository->expects($this->once())
+            ->method('checkWorkflowItemsByEntityMetadata')
+            ->with(get_class($entity), $entityId, $workflowName, $workflowType, $skippedWorkflow)
+            ->will($this->returnValue($result));
+
+        $this->registry->expects($this->once())
+            ->method('getRepository')
+            ->with('OroWorkflowBundle:WorkflowItem')
+            ->will($this->returnValue($workflowItemsRepository));
+
+        $this->assertEquals(
+            $result,
+            $this->workflowManager->checkWorkflowItemsByEntity($entity, $skippedWorkflow, $workflowName, $workflowType)
+        );
+    }
+
+    public function trueFalseDataProvider()
+    {
+        return array(
+            array(true),
+            array(false)
+        );
+    }
 }

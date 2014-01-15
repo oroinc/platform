@@ -44,7 +44,14 @@ return array(
                 'type' => 'object',
                 'options' => array(
                     'class' => 'DateTime'
-                )
+                ),
+                'property_path' => null
+            ),
+            'second_attribute' => array(
+                'label' => 'Second Attribute',
+                'type' => 'string',
+                'property_path' => 'first_attribute.test',
+                'options' => array()
             )
         ),
         'transitions' => array(
