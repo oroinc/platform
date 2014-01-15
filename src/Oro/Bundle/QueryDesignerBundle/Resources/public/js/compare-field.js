@@ -188,7 +188,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             var $filter = this.element.find('.active-filter').empty().append(this.filter.$el);
 
             $filter.on('change', this._onUpdate.bind(this));
-
+            $filter.find('.choice_value').on('click', this._onUpdate.bind(this));
 
             this._deserialize();
         },
