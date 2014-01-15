@@ -11,10 +11,14 @@ services:
         tags:
             - { name: oro_importexport.processor, type: export, entity: datagrid, alias: oro_datagrid }
 
+    oro_datagrid.datagrid.manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_datagrid.datagrid.manager }
+
     oro_datagrid.importexport.data_converter:
         class: %oro_datagrid.importexport.data_converter.class%
         arguments:
-            - @oro_datagrid.datagrid.manager
+            - @oro_datagrid.datagrid.manager.link
             - @translator
             - @oro_locale.formatter.number
             - @oro_locale.formatter.date_time
@@ -28,5 +32,5 @@ services:
     oro_datagrid.importexport.export_connector:
         class: %oro_datagrid.importexport.export_connector.class%
         arguments:
-            - @oro_datagrid.datagrid.manager
+            - @oro_datagrid.datagrid.manager.link
             - @oro_datagrid.datagrid.request_params

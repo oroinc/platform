@@ -4,10 +4,10 @@ namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Oro\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -16,9 +16,9 @@ use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 class DatagridExportConnector implements ItemReaderInterface, \Countable, ContextAwareInterface
 {
     /**
-     * @var ManagerInterface
+     * @var ServiceLink
      */
-    protected $gridManager;
+    protected $gridManagerLink;
 
     /**
      * @var RequestParameters
@@ -61,14 +61,14 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
     protected $sourceData;
 
     /**
-     * @param ManagerInterface  $gridManager
+     * @param ServiceLink       $gridManagerLink
      * @param RequestParameters $requestParameters
      */
     public function __construct(
-        ManagerInterface $gridManager,
+        ServiceLink $gridManagerLink,
         RequestParameters $requestParameters
     ) {
-        $this->gridManager       = $gridManager;
+        $this->gridManagerLink   = $gridManagerLink;
         $this->requestParameters = $requestParameters;
         $this->pageSize          = BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE;
     }
@@ -125,7 +125,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         $this->context = $context;
 
         if ($context->hasOption('gridName')) {
-            $this->grid = $this->gridManager->getDatagrid($context->getOption('gridName'));
+            $this->grid = $this->gridManagerLink->getService()->getDatagrid($context->getOption('gridName'));
         } else {
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export reader must contain "gridName".'
