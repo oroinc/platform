@@ -6,7 +6,7 @@ Table of contents
 
 - [Overview](#overview)
 - [oro:translation:dump](#orotranslationdump)
-- [oro:translation:pack](#orotranslationdump)
+- [oro:translation:pack](#orotranslationpack)
 - [Examples](#examples)
 
 Overview
