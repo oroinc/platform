@@ -5,8 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * WorkflowTransitionRecord
- *
  * @ORM\Table(name="oro_workflow_transition_log")
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
@@ -43,11 +41,27 @@ class WorkflowTransitionRecord
     protected $stepFromName;
 
     /**
+     * @var WorkflowStep
+     *
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="step_from_id", referencedColumnName="id")
+     */
+    protected $stepFrom;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="step_to", type="string", length=255)
      */
     protected $stepToName;
+
+    /**
+     * @var WorkflowStep
+     *
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="step_to_id", referencedColumnName="id")
+     */
+    protected $stepTo;
 
     /**
      * @var \DateTime
@@ -83,6 +97,24 @@ class WorkflowTransitionRecord
     }
 
     /**
+     * @param WorkflowStep $stepFrom
+     * @return WorkflowTransitionRecord
+     */
+    public function setStepFrom($stepFrom)
+    {
+        $this->stepFrom = $stepFrom;
+        return $this;
+    }
+
+    /**
+     * @return WorkflowStep
+     */
+    public function getStepFrom()
+    {
+        return $this->stepFrom;
+    }
+
+    /**
      * @param string $stepToName
      * @return WorkflowTransitionRecord
      */
@@ -98,6 +130,24 @@ class WorkflowTransitionRecord
     public function getStepToName()
     {
         return $this->stepToName;
+    }
+
+    /**
+     * @param WorkflowStep $stepTo
+     * @return WorkflowTransitionRecord
+     */
+    public function setStepTo($stepTo)
+    {
+        $this->stepTo = $stepTo;
+        return $this;
+    }
+
+    /**
+     * @return WorkflowStep
+     */
+    public function getStepTo()
+    {
+        return $this->stepTo;
     }
 
     /**

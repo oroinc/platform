@@ -7,8 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * Definition of Workflow
- *
  * @ORM\Table(
  *      name="oro_workflow_definition", indexes={
  *          @ORM\Index(name="oro_workflow_definition_enabled_idx", columns={"enabled"})
@@ -66,6 +64,18 @@ class WorkflowDefinition
      * @var Collection
      *
      * @ORM\OneToMany(
+     *      targetEntity="WorkflowStep",
+     *      mappedBy="definition",
+     *      orphanRemoval=true,
+     *      cascade={"all"}
+     * )
+     */
+    protected $steps;
+
+    /**
+     * @var Collection
+     *
+     * @ORM\OneToMany(
      *      targetEntity="WorkflowDefinitionEntity",
      *      mappedBy="workflowDefinition",
      *      orphanRemoval=true,
@@ -81,6 +91,7 @@ class WorkflowDefinition
     {
         $this->enabled = false;
         $this->configuration = array();
+        $this->steps = new ArrayCollection();
         $this->workflowDefinitionEntities = new ArrayCollection();
     }
 
@@ -216,6 +227,41 @@ class WorkflowDefinition
     public function getStartStep()
     {
         return $this->startStep;
+    }
+
+    /**
+     * @return WorkflowStep[]
+     */
+    public function getSteps()
+    {
+        return $this->steps;
+    }
+
+    /**
+     * @param WorkflowStep $step
+     * @return WorkflowItem
+     */
+    public function addStep(WorkflowStep $step)
+    {
+        if (!$this->steps->contains($step)) {
+            $step->setDefinition($this);
+            $this->steps->add($step);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowStep $step
+     * @return WorkflowItem
+     */
+    public function removeStep(WorkflowStep $step)
+    {
+        if ($this->steps->contains($step)) {
+            $this->steps->removeElement($step);
+        }
+
+        return $this;
     }
 
     /**

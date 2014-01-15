@@ -13,8 +13,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 
 use JMS\Serializer\Annotation as Serializer;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-
 /**
  * Workflow item
  *
@@ -59,6 +57,14 @@ class WorkflowItem
      * @Serializer\Expose()
      */
     protected $currentStepName;
+
+    /**
+     * @var WorkflowStep
+     *
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="current_step_id", referencedColumnName="id")
+     */
+    protected $currentStep;
 
     /**
      * @var string
