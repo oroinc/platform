@@ -1,13 +1,13 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroquerydesigner/js/compare-field'], function ($, _) {
+define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './compare-field'], function ($, _) {
     'use strict';
 
     /**
      * Conditions group widget
      */
     $.widget('oro.conditionsGroup', {
-        defaultOptions: {
+        options: {
             sortable: {
                 // see jquery-ui sortable's options
                 containment: '#container',
@@ -21,7 +21,9 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
                 cancel: 'a, input, .btn, select'
             },
             conditionsGroupSelector: '#segmentation-conditions',
-            criteriaList: {},
+            criteriaList: {
+                helper: 'clone'
+            },
             criteriaListSelector: '#filter-criteria-list',
             helperClass: 'ui-grabbing',
             conditionHTML: '<li class="condition" />',
@@ -29,8 +31,8 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
             conditionsGroupHTML: '<ul class="conditions-group" />'
         },
 
-        _create: function (options) {
-            this._prepareOptions(options);
+        _create: function () {
+            this._prepareOptions();
             this._initCriteriaList(this.options.criteriaListSelector);
             this._initConditionsGroup(this.options.conditionsGroupSelector);
             this._updateOperators();
@@ -39,15 +41,15 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
                 .on('change', '.operator', _.bind(this._onChangeOperator, this));
         },
 
-        _prepareOptions: function (options) {
-            this.options = $.extend(true, {}, this.defaultOptions, options);
-            this.options.conditionsGroup = _.extend({}, this.options.sortable, this.options.conditionsGroup);
-            this.options.conditionsGroup.appendTo = this.options.criteriaListSelector;
-            this.options.conditionsGroup.helper = _.bind(this._createHelper, this);
-            this.options.conditionsGroup.update = _.bind(this._onUpdate, this);
-            this.options.criteriaList = _.extend({}, this.options.sortable, this.options.criteriaList);
-            this.options.criteriaList.start = _.bind(this._onCriteriaGrab, this);
-            this.options.criteriaList.stop = _.bind(this._onCriteriaDrop, this);
+        _prepareOptions: function () {
+            var opts = this.options;
+            opts.conditionsGroup = _.extend({}, opts.sortable, opts.conditionsGroup);
+            opts.conditionsGroup.appendTo = opts.criteriaListSelector;
+            opts.conditionsGroup.helper = _.bind(this._createHelper, this);
+            opts.conditionsGroup.update = _.bind(this._onUpdate, this);
+            opts.criteriaList = _.extend({}, opts.sortable, opts.criteriaList);
+            opts.criteriaList.start = _.bind(this._onCriteriaGrab, this);
+            opts.criteriaList.stop = _.bind(this._onCriteriaDrop, this);
         },
 
         _initCriteriaList: function (el) {
@@ -67,24 +69,27 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
         },
 
         _onCriteriaGrab: function (e, ui) {
-            ui.item.clone().removeAttr('style').insertAfter(ui.item);
+            // create clone element just to remember place of item
+            ui.item.data('clone', ui.item.clone().insertAfter(ui.item)).removeAttr('style');
             ui.helper.addClass(this.options.helperClass);
         },
 
         _onCriteriaDrop: function (e, ui) {
-            ui.item.remove();
+            // put item back instead of it's clone
+            ui.item.data('clone').replaceWith(ui.item.removeData('clone'));
         },
 
-        _createCondition: function (criteria) {
+        _createCondition: function (criteria, options) {
             var $el;
             switch (criteria) {
-                case 'compare-fields':
-                    $el = $(this.options.compareFieldsHTML).compareField();
-                    break;
-                case 'conditions-group':
-                    $el = $(this.options.conditionsGroupHTML);
-                    this._initConditionsGroup($el);
-                    break;
+            case 'compare-fields':
+                $el = $(this.options.compareFieldsHTML);
+                $el.compareField(options);
+                break;
+            case 'conditions-group':
+                $el = $(this.options.conditionsGroupHTML);
+                this._initConditionsGroup($el);
+                break;
             }
             $el.wrap(this.options.conditionHTML);
             return $el.parent().attr('data-criteria', criteria).attr('data-value', Math.random());
@@ -99,10 +104,11 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', 'oroque
         },
 
         _onUpdate: function (e, ui) {
-            var $condition;
+            var $condition, options;
             // new condition
             if (ui.sender && ui.sender.is(this.options.criteriaListSelector)) {
-                $condition = this._createCondition(ui.item.data('criteria'));
+                options = _.omit(ui.item.data(), ['clone', 'sortableItem', 'criteria']);
+                $condition = this._createCondition(ui.item.data('criteria'), options);
                 $condition.insertBefore(ui.item);
                 $condition.prepend('<a class="close" data-dismiss="alert" href="#">&times;</a>');
             } else {

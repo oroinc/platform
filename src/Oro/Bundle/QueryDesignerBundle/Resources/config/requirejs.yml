@@ -14,3 +14,5 @@ config:
         'oro/query-designer/filter/model': 'bundles/oroquerydesigner/js/query-designer/filter/model.js'
         'oro/query-designer/filter/view': 'bundles/oroquerydesigner/js/query-designer/filter/view.js'
         'oro/query-designer/grouping/view': 'bundles/oroquerydesigner/js/query-designer/grouping/view.js'
+
+        'oroquerydesigner/js/conditions-group': 'bundles/oroquerydesigner/js/conditions-group.js'
