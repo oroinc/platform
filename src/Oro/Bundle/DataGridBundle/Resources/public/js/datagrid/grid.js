@@ -481,6 +481,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.renderGrid();
                 this.renderNoDataBlock();
                 this.renderLoadingMask();
+                this.collection.on('reset', _.bind(function() {
+                    this._updateNoDataBlock();
+                }, this));
 
                 /**
                  * Backbone event. Fired when the grid has been successfully rendered.
@@ -553,8 +556,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.requestsCount -= 1;
                 if (this.requestsCount === 0) {
                     this.hideLoading();
-                    // render block instead of update in order to change message depending on filter state
-                    this.renderNoDataBlock();
+
                     /**
                      * Backbone event. Fired when data for grid has been successfully rendered.
                      * @event grid_load:complete

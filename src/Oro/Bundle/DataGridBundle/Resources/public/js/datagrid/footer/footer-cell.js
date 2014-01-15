@@ -16,8 +16,7 @@ function ($, _, Backbone, Backgrid) {
 
         /** @property */
         template:_.template(
-            //'<span><%= label %><%= total ? ": " + total : "" %></span>' // wrap label into span otherwise underscore will not render it
-            '<span><%= label %>: <%= total  %></span>' // wrap label into span otherwise underscore will not render it
+            '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>' // wrap label into span otherwise underscore will not render it
         ),
 
         /**
@@ -30,6 +29,8 @@ function ($, _, Backbone, Backgrid) {
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
+
+            this.listenTo(options.collection, "reset", this.render);
         },
 
         /**
@@ -39,27 +40,23 @@ function ($, _, Backbone, Backgrid) {
          */
         render: function () {
             this.$el.empty();
+            this.$el[0].style.backgroundColor = '#f2f2f2';
 
             var columnName = this.column.get('name'),
-                state = this.collection.state,
-                totals = this.collection.state.totals;
+                state      = this.collection.state || {},
+                totals     = state.totals || {};
 
-            console.log(totals);
-
-            if (_.has(state.totals, columnName)) {
-
-                var columnTotals = state.totals[columnName];
-
-                console.log('*********************************');
-                console.log(columnName, state.totals, _.omit(state.totals, columnName).name );
-
+            if (_.has(totals, columnName)) {
+                var columnTotals = totals[columnName];
+                if (columnTotals.query && !columnTotals.total) {
+                    return this;
+                }
                 this.$el.append($(this.template({
                     label: columnTotals.label,
-                    total: columnTotals.total + ' test'
+                    total: columnTotals.total
                 })));
             }
 
-            this.$el[0].style.backgroundColor = '#f2f2f2';
             return this;
         }
     });

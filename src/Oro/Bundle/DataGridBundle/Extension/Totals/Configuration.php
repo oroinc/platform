@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const SORTERS_PATH         = '[totals]';
+    const TOTALS_PATH          = '[totals]';
     const COLUMNS_PATH         = '[totals][columns]';
 
     const TOTALS_LABEL_KEY     = 'label';
@@ -27,7 +27,7 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode(self::TOTALS_LABEL_KEY)
                                 ->isRequired()
-                                ->cannotBeEmpty()
+                                ->defaultFalse()
                                 ->end()
                             ->scalarNode(self::TOTALS_QUERY_KEY)
                                 ->defaultFalse()

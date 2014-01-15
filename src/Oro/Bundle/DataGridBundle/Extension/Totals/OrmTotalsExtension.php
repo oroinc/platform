@@ -21,9 +21,7 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var  Translator */
     protected $translator;
 
-    /**
-     * @var QueryBuilder
-     */
+    /** @var QueryBuilder */
     protected $masterQB;
 
     public function __construct(
@@ -53,7 +51,7 @@ class OrmTotalsExtension extends AbstractExtension
     {
         $this->validateConfiguration(
             new Configuration(),
-            ['footer' => $config->offsetGetByPath(Configuration::SORTERS_PATH)]
+            ['totals' => $config->offsetGetByPath(Configuration::TOTALS_PATH)]
         );
     }
 
@@ -96,6 +94,7 @@ class OrmTotalsExtension extends AbstractExtension
                 if (isset($data[0][$field])) {
                     $total['total'] = $data[0][$field];
                 }
+                $total['label'] = $this->translator->trans($total['label']);
             };
         }
 
@@ -114,7 +113,6 @@ class OrmTotalsExtension extends AbstractExtension
         foreach ($data->offsetGetOr('columns', []) as $key => $column) {
             if (isset($column['name']) && isset($totals[$column['name']])) {
                 $totals[$column['name']]['label'] = $this->translator->trans($totals[$column['name']]['label']);
-                $proceed[] = $column['name'];
             }
         }
 
