@@ -145,7 +145,7 @@ class CrowdinAdapterTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->will($this->returnValue(true));
 
-        $res = $this->adapter->download($path, $locale);
+        $res = $this->adapter->download($path, [$locale]);
         $this->assertTrue($res);
         unlink($path);
     }

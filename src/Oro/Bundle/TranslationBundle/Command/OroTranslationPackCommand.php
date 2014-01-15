@@ -18,8 +18,6 @@ use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
 
 class OroTranslationPackCommand extends ContainerAwareCommand
 {
-    const DEFAULT_ADAPTER = 'crowdin';
-
     /** @var string */
     protected $path;
 
@@ -43,8 +41,7 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                     new InputArgument(
                         'adapter',
                         InputArgument::OPTIONAL,
-                        'Uploader adapter, representing third-party service API',
-                        self::DEFAULT_ADAPTER
+                        'Uploader adapter, representing third-party service API, config value will be used if empty'
                     ),
                     new InputOption(
                         'project-id',
@@ -83,7 +80,7 @@ class OroTranslationPackCommand extends ContainerAwareCommand
                         'dump',
                         null,
                         InputOption::VALUE_NONE,
-                        'Create language pack for  uploading to translation service'
+                        'Create language pack for uploading to translation service'
                     ),
                     new InputOption(
                         'upload',
@@ -136,12 +133,6 @@ EOF
             $this->dump($input, $output);
         }
 
-        $projectName = $input->getArgument('project');
-        $projectId = $input->getOption('project-id');
-        if (!$projectId) {
-            $input->setOption('project-id', strtolower($projectName));
-        }
-
         if ($input->getOption('upload') === true) {
             $this->upload($input, $output);
         }
@@ -183,11 +174,14 @@ EOF
         $projectName = $input->getArgument('project');
         $locale      = $input->getArgument('locale');
 
-        $languagePackPath = rtrim($this->getLangPackDir($projectName), DIRECTORY_SEPARATOR) . '.zip';
+        $languagePackPath = rtrim(
+            $this->getLangPackDir($projectName),
+            DIRECTORY_SEPARATOR
+        );
 
         $result = $this
             ->getTranslationService($input, $output)
-            ->download($languagePackPath, $locale);
+            ->download($languagePackPath, [$projectName], $locale);
 
         $output->writeln(sprintf("Download %s", $result ? 'successful' : 'failed'));
     }
@@ -200,28 +194,47 @@ EOF
      */
     protected function getTranslationService(InputInterface $input, OutputInterface $output)
     {
-        return $this->getContainer()
-            ->get('oro_translation.service_provider')
-            ->setAdapter($this->getAdapterFromInput($input, $output))
-            ->setLogger(new OutputLogger($output));
+        $service = $this->getContainer()->get('oro_translation.service_provider');
+        $service->setLogger(new OutputLogger($output));
+
+        // set non default adapter if comes from input
+        if ($adapter = $this->getAdapterFromInput($input)) {
+            $service->setAdapter($adapter);
+        }
+
+        /*
+         * Set project id and api key to adapter anyway if its provided
+         */
+        $projectId = $input->getOption('project-id');
+        if (null !== $projectId) {
+            $service->getAdapter()->setProjectId($projectId);
+        }
+        $apiKey = $input->getOption('api-key');
+        if (null !== $apiKey) {
+            $service->getAdapter()->setApiKey($apiKey);
+        }
+
+        return $service;
     }
 
     /**
-     * @param InputInterface  $input
+     * @param InputInterface $input
      *
+     * @throws \RuntimeException
      * @return AbstractAPIAdapter
      */
     protected function getAdapterFromInput(InputInterface $input)
     {
-        /** @var AbstractAPIAdapter $adapter */
-        $adapter = $this->getContainer()->get(
-            sprintf('oro_translation.uploader.%s_adapter', $input->getArgument('adapter'))
-        );
+        $adapterOption = $input->getArgument('adapter');
+        if (null === $adapterOption) {
+            return false;
+        }
 
-        $adapter->setProjectId($input->getOption('project-id'));
-        $adapter->setApiKey($input->getOption('api-key'));
-
-        return $adapter;
+        $serviceId = sprintf('oro_translation.uploader.%s_adapter', $adapterOption);
+        if (!$this->getContainer()->has($serviceId)) {
+            throw new \RuntimeException('Invalid adapter name given');
+        }
+        return $this->getContainer()->get($serviceId);
     }
 
     /**
@@ -328,16 +341,6 @@ EOF
 
         $operation = new MergeOperation($currentCatalogue, $extractedCatalogue);
         $messageCatalogue = $operation->getResult();
-
-        // fix extracted strings with hashes
-        $messages = $messageCatalogue->all('messages');
-        $fixedMessages = [];
-        foreach ($messages as $key => $message) {
-            $key = str_replace('#', '"#"', $key);
-            $fixedMessages[$key] = $message;
-        }
-        $messageCatalogue = new MessageCatalogue($defaultLocale);
-        $messageCatalogue->add($fixedMessages);
 
         return $messageCatalogue;
     }

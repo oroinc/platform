@@ -75,7 +75,7 @@ Flotr.addType('funnel', {
 
         Flotr._.each(data, function (funnel) {
             var funnelSize = marginHeight / summ * funnel;
-            if (options.explode > 0) {
+            if (options.explode > 0 && funnelSize > options.explode) {
                 funnelSize -= options.explode;
             }
 

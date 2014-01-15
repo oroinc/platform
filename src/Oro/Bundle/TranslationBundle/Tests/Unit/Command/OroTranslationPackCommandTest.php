@@ -170,13 +170,13 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $projectId = 'someproject';
         $adapterMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
 
-        $adapterMock->expects($this->once())
+        $adapterMock->expects($this->any())
             ->method('setProjectId')
             ->with($projectId);
 
         $uploaderMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider');
 
-        $uploaderMock->expects($this->once())
+        $uploaderMock->expects($this->any())
             ->method('setAdapter')
             ->with($adapterMock)
             ->will($this->returnSelf());

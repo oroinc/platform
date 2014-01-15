@@ -37,5 +37,12 @@ class OroTranslationExtension extends Extension
                 }
             }
         }
+
+        $serviceId = sprintf('oro_translation.uploader.%s_adapter', $config['default_api_adapter']);
+        if ($container->has($serviceId)) {
+            $container->setAlias('oro_translation.uploader.default_adapter', $serviceId);
+        }
+
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }
