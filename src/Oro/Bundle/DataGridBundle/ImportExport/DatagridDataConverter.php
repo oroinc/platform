@@ -3,10 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Symfony\Component\Translation\Translator;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Converter\DataConverterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
@@ -14,9 +15,9 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 class DatagridDataConverter implements DataConverterInterface, ContextAwareInterface
 {
     /**
-     * @var ManagerInterface
+     * @var ServiceLink
      */
-    protected $gridManager;
+    protected $gridManagerLink;
 
     /**
      * @var Translator
@@ -39,18 +40,19 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     protected $context;
 
     /**
-     * @param ManagerInterface  $gridManager
+     *
+     * @param ServiceLink       $gridManagerLink
      * @param Translator        $translator
      * @param NumberFormatter   $numberFormatter
      * @param DateTimeFormatter $dateTimeFormatter
      */
     public function __construct(
-        ManagerInterface $gridManager,
+        ServiceLink $gridManagerLink,
         Translator $translator,
         NumberFormatter $numberFormatter,
         DateTimeFormatter $dateTimeFormatter
     ) {
-        $this->gridManager       = $gridManager;
+        $this->gridManagerLink   = $gridManagerLink;
         $this->translator        = $translator;
         $this->numberFormatter   = $numberFormatter;
         $this->dateTimeFormatter = $dateTimeFormatter;
@@ -62,7 +64,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
         $gridName   = $this->context->getOption('gridName');
-        $gridConfig = $this->gridManager->getConfigurationForGrid($gridName);
+        $gridConfig = $this->gridManagerLink->getService()->getConfigurationForGrid($gridName);
         $columns    = $gridConfig->offsetGet('columns');
 
         $result = array();

@@ -23,9 +23,6 @@ function(_, __, AbstractAction) {
          */
         initialize: function(options) {
             this.launcherOptions = {
-                links: [
-                    {key: 'csv', label: 'CSV', attributes: {'class': 'no-hash', 'download': null}}
-                ],
                 runAction: false
             };
             this.route = 'oro_datagrid_export_action';
