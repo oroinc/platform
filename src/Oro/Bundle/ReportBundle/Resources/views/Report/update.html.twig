@@ -95,7 +95,7 @@
             }
         }
     ] %}
-    <div id="segmentation-designer" class="container-fluid" data-value="{{ segmentationDesignerValue|json_encode|raw }}">
+    <div id="segmentation-designer" class="container-fluid" data-value="{{ segmentationDesignerValue|json_encode }}">
         <div class="row-fluid">
             <div class="span3 filter-criteria">
                 <h4>Filter Criteria</h4>
@@ -165,7 +165,7 @@
 
             updateCompareFieldsCriteria();
 
-            $('.report-designer')
+            $('#segmentation-designer')
                 .append(loadingMask.render().$el)
                 .conditionsGroup({
                     filterMetadataSelector: '.report-designer',
