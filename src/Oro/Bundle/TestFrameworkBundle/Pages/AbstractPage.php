@@ -26,7 +26,7 @@ abstract class AbstractPage
         $this->test = $testCase;
         // @codingStandardsIgnoreStart
         $this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
-        // @codingStandardsIgnoreУтв
+        // @codingStandardsIgnoreEnd
         if (!is_null($this->redirectUrl) && $redirect) {
             $this->test->url($this->redirectUrl);
             $this->waitPageToLoad();
@@ -166,7 +166,7 @@ abstract class AbstractPage
     /**
      * @param $title
      * @param string $message
-     * @return mixed
+     * @return $this
      */
     public function assertTitle($title, $message = '')
     {
