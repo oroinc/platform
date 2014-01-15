@@ -185,9 +185,10 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
         _appendFilter: function () {
             this.filter.render();
 
-            this.element.find('.active-filter').empty().append(this.filter.$el);
+            var $filter = this.element.find('.active-filter').empty().append(this.filter.$el);
 
-            this.filter.on('update', this._onUpdate.bind(this));
+            $filter.on('change', this._onUpdate.bind(this));
+
 
             this._deserialize();
         },
