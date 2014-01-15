@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -10,8 +11,10 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 use Oro\Bundle\TranslationBundle\Controller\Controller;
 
-class JsTranslationDumper
+class JsTranslationDumper implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var Controller */
     protected $translationController;
 
@@ -32,9 +35,6 @@ class JsTranslationDumper
      * @var string
      */
     protected $jsTranslationRoute;
-
-    /** @var LoggerInterface */
-    protected $logger;
 
     /**
      * @param Controller $translationController
@@ -102,19 +102,5 @@ class JsTranslationDumper
         }
 
         return true;
-    }
-
-    /**
-     * Sets a logger
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return $this
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-
-        return $this;
     }
 }

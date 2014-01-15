@@ -352,7 +352,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
 
         data.children().appendTo(cList);
         /* temporary solution need add init only for new created row */
-        layout.styleForm(data);
+        layout.styleForm(cList);
         /* temporary solution finish */
     });
 

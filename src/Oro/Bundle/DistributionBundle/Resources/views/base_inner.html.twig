@@ -21,7 +21,6 @@
 
                 var Urls = {
                     install: "{{ path('oro_distribution_package_install') }}",
-                    uninstall: "{{ path('oro_distribution_package_uninstall') }}",
                     update: "{{ path('oro_distribution_package_update') }}",
                     available: "{{ path('oro_distribution_package_listavailable') }}",
                     installed: "{{ path('oro_distribution_package_listinstalled') }}"
@@ -52,7 +51,17 @@
     {% block page %}
         <div class="wrapper">
             <div id="alerts">
-
+                <div class="alert fade in alert-notice">
+                    <i class="icon icon-info-sign"></i>
+                    Following directories/files have to be writable by web user:
+                    <ul>
+                        <li>vendor</li>
+                        <li>web/bundles</li>
+                        <li>web/js</li>
+                        <li>web/css</li>
+                        <li>composer.json</li>
+                    </ul>
+                </div>
             </div>
             <div class="content">
                 <img src="/bundles/oroinstaller/img/icon/wait.png" alt="" class="ajax-loading"/>

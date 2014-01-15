@@ -5,10 +5,10 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Config\Definition\Processor;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
@@ -16,6 +16,8 @@ use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
+use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
@@ -86,7 +88,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repository->expects($this->once())
             ->method('loadSettings')
-            ->with('app', 0, null)
+            ->with('app', 0)
             ->will($this->returnValue($loadedSettings));
 
         $this->om
@@ -170,7 +172,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
-            array('getChanged'),
+            array('calculateChangeSet', 'reload'),
             array($this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
@@ -179,9 +181,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         );
 
         $object->expects($this->once())
-            ->method('getChanged')
+            ->method('calculateChangeSet')
             ->with($this->equalTo($settings))
             ->will($this->returnValue($changes));
+
+        $object->expects($this->once())
+            ->method('reload');
 
         $configMock = $this->getMock('Oro\Bundle\ConfigBundle\Entity\Config');
         $configMock->expects($this->once())
@@ -250,7 +255,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with('oro_user.level')
             ->will($this->returnValue($currentValue));
 
-        $object->getChanged($settings);
+        $object->calculateChangeSet($settings);
     }
 
     /**
@@ -262,21 +267,23 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $config = Yaml::parse(file_get_contents($configPath));
 
-        $processor = new ProcessorDecorator();
+        $processor = new ProcessorDecorator(new Processor());
         $config = $processor->process($config);
 
         $subscriber    = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber')
             ->setMethods(array('__construct'))
             ->disableOriginalConstructor()->getMock();
 
-        $formType      = new FormType($subscriber);
-        $formFieldType = new FormFieldType();
+        $formType       = new FormType($subscriber);
+        $formFieldType  = new FormFieldType();
+        $useParentScope = new ParentScopeCheckbox();
 
         $extensions = array(
             new PreloadedExtension(
                 array(
-                    $formType->getName()      => $formType,
-                    $formFieldType->getName() => $formFieldType
+                    $formType->getName()       => $formType,
+                    $formFieldType->getName()  => $formFieldType,
+                    $useParentScope->getName() => $useParentScope
                 ),
                 array()
             ),

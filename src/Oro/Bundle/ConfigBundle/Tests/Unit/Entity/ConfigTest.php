@@ -77,39 +77,4 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $value->getSection());
         $this->assertEquals('test', $value->getName());
     }
-
-    /**
-     * Test Lifecycle event callbacks
-     */
-    public function testConfigValueLifecycleEvents()
-    {
-        $configValue = new ConfigValue();
-
-        $configValue->setValue([1, 2]);
-        $configValue->doOnPreUpdate();
-        $this->assertEquals('1,2', $configValue->getValue());
-        $this->assertEquals(ConfigValue::FIELD_LIST_TYPE, $configValue->getType());
-
-        $obj = new \stdClass();
-        $configValue->setValue($obj);
-        $configValue->doOnPrePersist();
-        $this->assertEquals(serialize($obj), $configValue->getValue());
-        $this->assertEquals(ConfigValue::FIELD_SERIALIZED_TYPE, $configValue->getType());
-
-        $configValue->setValue(1);
-        $configValue->doOnPrePersist();
-        $this->assertEquals(1, $configValue->getValue());
-        $this->assertEquals($configValue::FIELD_SCALAR_TYPE, $configValue->getType());
-
-        $configValue->setValue(serialize($obj));
-        $configValue->setType($configValue::FIELD_SERIALIZED_TYPE);
-        $configValue->doOnPostLoad();
-        $this->assertEquals($obj, $configValue->getValue());
-        $this->assertNull($configValue->getId());
-
-        $configValue->setValue('1,2');
-        $configValue->setType($configValue::FIELD_LIST_TYPE);
-        $configValue->doOnPostLoad();
-        $this->assertCount(2, $configValue->getValue());
-    }
 }

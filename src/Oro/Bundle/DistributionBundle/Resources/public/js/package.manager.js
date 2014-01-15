@@ -1,6 +1,5 @@
 function PackageManager(Urls, util) {
 
-    var UninstallStatus = {UNINSTALLED: 0, ERROR: 1, CONFIRM: 2};
     var InstallStatus = {INSTALLED: 0, ERROR: 1, CONFIRM: 2};
     var UpdateStatus = {UPDATED: 0, ERROR: 1};
 
@@ -22,7 +21,7 @@ function PackageManager(Urls, util) {
 
         switch (response.code) {
             case InstallStatus.INSTALLED:
-                util.redirect(Urls.installed, 'Package installed');
+                util.redirect(Urls.installed, 'Package installed successfully');
 
                 break;
             case InstallStatus.ERROR:
@@ -43,7 +42,7 @@ function PackageManager(Urls, util) {
                     for (var i = 0; i < response.requirements.length; i++) {
                         var r = response.requirements[i];
                         requirementsList += "\n - " + r.name;
-                        requirementsList += r.installed ? ' [installed]' : '';
+                        requirementsList += r.installed ? ' <span class="installed">[installed]</span>' : '';
                     }
                     message += "\n";
                     message += response.params.packageName + ' requires following packages: ' +
@@ -72,50 +71,12 @@ function PackageManager(Urls, util) {
 
     }
 
-    function uninstallCompleteCallback(xhr) {
-        var response = xhr.responseJSON;
-
-        switch (response.code) {
-            case UninstallStatus.UNINSTALLED:
-                util.redirect(Urls.installed, 'Package uninstalled');
-
-                break;
-
-            case UninstallStatus.ERROR:
-                util.error(response.message);
-                reflectUICallback();
-
-                break;
-
-            case UninstallStatus.CONFIRM:
-                var message = 'Following packages depend on ' +
-                    response.params.packageName + ':' +
-                    "\n" + "\n" + response.packages.join("\n") +
-                    "\n" + "\n" + 'Do you want to uninstall them all?';
-                util.confirm(
-                    message,
-                    function () {
-                        pm.uninstall(response.params)
-                    },
-                    'Yes, delete',
-                    reflectUICallback
-                );
-
-                break;
-
-            default:
-                util.error('Unknown error');
-                reflectUICallback();
-
-        }
-    }
-
     function updateCompleteCallback(xhr) {
         var response = xhr.responseJSON;
 
         switch (response.code) {
             case UpdateStatus.UPDATED:
-                util.redirect(Urls.installed, 'Package updated');
+                util.redirect(Urls.installed, 'Package updated successfully');
 
                 break;
 
@@ -135,10 +96,6 @@ function PackageManager(Urls, util) {
         install: function (params, _reflectUICallback) {
             reflectUICallback = _reflectUICallback || reflectUICallback;
             sendRequest(Urls.install, params, installCompleteCallback);
-        },
-        uninstall: function (params, _reflectUICallback) {
-            reflectUICallback = _reflectUICallback || reflectUICallback;
-            sendRequest(Urls.uninstall, params, uninstallCompleteCallback);
         },
         update: function (params, _reflectUICallback) {
             reflectUICallback = _reflectUICallback || reflectUICallback;

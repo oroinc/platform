@@ -46,10 +46,14 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /** @property {Object} */
         frontend_options: null,
 
-        /** @property {string} */
+        /** @property {String} */
         identifierFieldName: 'id',
 
+        /** @property {Boolean} */
         dispatched: false,
+
+        /** @property {Boolean} */
+        reloadData: true,
 
         /** @property {Object} */
         defaultMessages: {
@@ -170,7 +174,13 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             if (this.dispatched) {
                 return;
             }
-            this.datagrid.showLoading();
+            if (this.reloadData) {
+                this.datagrid.showLoading();
+            }
+            this._doAjaxRequest();
+        },
+
+        _doAjaxRequest: function () {
             $.ajax({
                 url: this.getLink(),
                 data: this.getActionParameters(),
@@ -183,13 +193,20 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
 
         _onAjaxError: function(jqXHR, textStatus, errorThrown) {
             error.dispatch(null, jqXHR);
-            this.datagrid.hideLoading();
+            if (this.reloadData) {
+                this.datagrid.hideLoading();
+            }
         },
 
         _onAjaxSuccess: function(data, textStatus, jqXHR) {
-            this.datagrid.hideLoading();
-            this.datagrid.collection.fetch();
+            if (this.reloadData) {
+                this.datagrid.hideLoading();
+                this.datagrid.collection.fetch();
+            }
+            this._showAjaxSuccessMessage(data);
+        },
 
+        _showAjaxSuccessMessage: function(data) {
             var defaultMessage = data.successful ? this.messages.success : this.messages.error,
                 message = data.message || defaultMessage;
             if (message) {
