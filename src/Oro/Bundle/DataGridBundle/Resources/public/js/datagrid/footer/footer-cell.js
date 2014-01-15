@@ -16,7 +16,8 @@ function ($, _, Backbone, Backgrid) {
 
         /** @property */
         template:_.template(
-            '<span><%= label %><%= value ? ": " + value : "" %></span>' // wrap label into span otherwise underscore will not render it
+            //'<span><%= label %><%= total ? ": " + total : "" %></span>' // wrap label into span otherwise underscore will not render it
+            '<span><%= label %>: <%= total  %></span>' // wrap label into span otherwise underscore will not render it
         ),
 
         /**
@@ -38,15 +39,23 @@ function ($, _, Backbone, Backgrid) {
          */
         render: function () {
             this.$el.empty();
-console.log(this);
-            var columnName = this.column.get('name');
-            var state = this.collection.state;
+
+            var columnName = this.column.get('name'),
+                state = this.collection.state,
+                totals = this.collection.state.totals;
+
+            console.log(totals);
 
             if (_.has(state.totals, columnName)) {
+
                 var columnTotals = state.totals[columnName];
+
+                console.log('*********************************');
+                console.log(columnName, state.totals, _.omit(state.totals, columnName).name );
+
                 this.$el.append($(this.template({
                     label: columnTotals.label,
-                    value: columnTotals.query
+                    total: columnTotals.total + ' test'
                 })));
             }
 

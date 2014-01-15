@@ -11,7 +11,7 @@ function ($, _, Backbone, Backgrid) {
      */
     return Backgrid.FooterRow = Backgrid.Row.extend({
 
-        requiredOptions: ["columns", "collection"],
+        requiredOptions: ["columns", "collection", "footerCell"],
 
         initialize: function () {
             Backgrid.Row.prototype.initialize.apply(this, arguments);

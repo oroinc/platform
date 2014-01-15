@@ -22,8 +22,7 @@ define(function (require) {
         cellTypes = {
             integer:   'number',
             decimal:   'number',
-            percent:   'number',
-            currency:  'number'
+            percent:   'number'
         },
 
         helpers = {
@@ -93,6 +92,8 @@ define(function (require) {
              */
             buildGrid: function () {
                 var options, collection, grid, obj;
+
+                //debugger;
 
                 // collection can be stored in the page cache
                 mediator.trigger('datagrid_collection_set_before', obj = {});

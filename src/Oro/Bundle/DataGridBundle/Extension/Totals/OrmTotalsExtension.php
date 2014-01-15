@@ -15,11 +15,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 
 class OrmTotalsExtension extends AbstractExtension
 {
-    const AGGREGATE_SUM = 'SUM';
-    const AGGREGATE_AVG = 'AVG';
-    const AGGREGATE_MIN = 'MIN';
-    const AGGREGATE_MAX = 'MAX';
-
     /** @var RequestParameters */
     protected $requestParams;
 
@@ -87,7 +82,9 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $result->offsetSetByPath('[options][totals]', $this->totals);
+        $result->offsetAddToArray('options', ['totals' => $this->totals]);
+
+        return $result;
     }
 
     /**
@@ -95,39 +92,18 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $proceed = [];
         $totals = $this->getTotals($config);
 
         foreach ($data->offsetGetOr('columns', []) as $key => $column) {
             if (isset($column['name']) && isset($totals[$column['name']])) {
-                //$data->offsetSetByPath(sprintf('[columns][%s][total]', $key), true);
-
                 $totals[$column['name']]['label'] = $this->translator->trans($totals[$column['name']]['label']);
                 $proceed[] = $column['name'];
             }
         }
 
-        /*
-        $extraSorters = array_diff(array_keys($sorters), $proceed);
-        if (count($extraSorters)) {
-            throw new \LogicException(
-                sprintf('Could not found column(s) "%s" for sorting', implode(', ', $extraSorters))
-            );
-        }
-
-        $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multisort]);
-        */
-
-        /*$totalsState = $data->offsetGetByPath('[state][totals]', []);
-        $sorters      = $this->getTotalsToApply($config);
-        foreach ($sorters as $column => $definition) {
-            list($direction) = $definition;
-            $sortersState[$column] = $this->normalizeDirection($direction);
-        }*/
-
-
-        $data->offsetAddToArray('state', ['totals' => $totals]);
-        //$data->offsetAddToArray('state', ['totals' => $totalsState]);
+        $data
+            ->offsetAddToArray('state', ['totals' => $totals])
+            ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['oro/datagrid/totals-builder']);
     }
 
     /**
@@ -162,11 +138,11 @@ class OrmTotalsExtension extends AbstractExtension
      *
      * @param DatagridConfiguration $config
      *
+     * @param DatasourceInterface $datasource
      * @return array
      */
     protected function getTotalsToApply(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $result = [];
         $totals = $this->getTotals($config);
         /** @var QueryBuilder $qb */
         $qb = clone $datasource->getQueryBuilder();
@@ -184,34 +160,13 @@ class OrmTotalsExtension extends AbstractExtension
         if (!empty($data)) {
             foreach ($totals as $field => &$total) {
                 if (isset($data[0][$field])) {
-                    $total['query'] = $data[0][$field];
+                    $total['total'] = $data[0][$field];
                 }
             };
         }
 
         $this->totals = $totals;
 
-        //$defaultSorters = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, []);
-        //$sortBy         = $this->requestParams->get(self::SORTERS_ROOT_PARAM) ? : $defaultSorters;
-
-        // if default sorter was not specified, just take first sortable column
-        /*
-        if (!$sortBy && $sorters) {
-            $names           = array_keys($sorters);
-            $firstSorterName = reset($names);
-            $sortBy          = [$firstSorterName => self::DIRECTION_ASC];
-        }
-
-        foreach ($sortBy as $column => $direction) {
-            $sorter = isset($sorters[$column]) ? $sorters[$column] : false;
-
-            if ($sorter !== false) {
-                $direction       = $this->normalizeDirection($direction);
-                $result[$column] = [$direction, $sorter];
-            }
-        }*/
-        $result = $totals;
-
-        return $result;
+        return $totals;
     }
 }

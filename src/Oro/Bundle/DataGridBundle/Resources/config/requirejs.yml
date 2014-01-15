@@ -50,6 +50,7 @@ config:
         'oro/datagrid/select-all-header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/select-all-header-cell.js'
         'oro/datagrid/header': 'bundles/orodatagrid/js/datagrid/header.js'
 
+        'oro/datagrid/totals-builder': 'bundles/orodatagrid/js/totals-builder.js'
         'oro/datagrid/footer': 'bundles/orodatagrid/js/datagrid/footer.js'
         'oro/datagrid/footer-row': 'bundles/orodatagrid/js/datagrid/footer/footer-row.js'
         'oro/datagrid/footer-cell': 'bundles/orodatagrid/js/datagrid/footer/footer-cell.js'

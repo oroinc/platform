@@ -4,7 +4,7 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
     "use strict";
 
     /**
-     * Datagrid header widget
+     * Datagrid footer widget
      *
      * @export  oro/datagrid/footer
      * @class   oro.datagrid.Footer
@@ -24,6 +24,9 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
          * @inheritDoc
          */
         initialize: function (options) {
+
+            //console.log(options);
+
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
             }
