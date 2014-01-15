@@ -21,7 +21,10 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var  Translator */
     protected $translator;
 
-    protected $totals;
+    /**
+     * @var QueryBuilder
+     */
+    protected $masterQB;
 
     public function __construct(
         RequestParameters $requestParams = null,
@@ -59,22 +62,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $totals = $this->getTotalsToApply($config, $datasource);
-
-        /*
-        $multisort = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
-        foreach ($sorters as $definition) {
-            list($direction, $sorter) = $definition;
-
-            $sortKey = $sorter['data_name'];
-
-            // if need customized behavior, just pass closure under "apply_callback" node
-            if (isset($sorter['apply_callback']) && is_callable($sorter['apply_callback'])) {
-                $sorter['apply_callback']($datasource, $sortKey, $direction);
-            } else {
-                $datasource->getQueryBuilder()->addOrderBy($sortKey, $direction);
-            }
-        }*/
+        $this->masterQB = clone $datasource->getQueryBuilder();
     }
 
     /**
@@ -82,9 +70,42 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
+<<<<<<< HEAD
         $result->offsetAddToArray('options', ['totals' => $this->totals]);
 
         return $result;
+=======
+        $totals = $this->getTotals($config);
+        $totalQueries = [];
+        foreach ($totals as $field => $total) {
+            if (isset($total['query'])) {
+                $totalQueries[] = $total['query'] . ' AS ' . $field;
+            }
+        };
+
+        $ids = [];
+        foreach ($result['data'] as $res) {
+            $ids[] = $res['id'];
+        };
+
+        $data = $this->masterQB
+            ->select($totalQueries)
+            ->andWhere($this->masterQB->expr()->in($this->masterQB->getRootAliases()[0].'.id', $ids))
+            ->getQuery()
+            ->setFirstResult(null)
+            ->setMaxResults(null)
+            ->getScalarResult();
+
+        if (!empty($data)) {
+            foreach ($totals as $field => &$total) {
+                if (isset($data[0][$field])) {
+                    $total['value'] = $data[0][$field];
+                }
+            };
+        }
+
+        $result->offsetSetByPath('[options][totals]', $totals);
+>>>>>>> 97f4291902006854669b9c57ae772df9bb2eda18
     }
 
     /**
@@ -132,6 +153,7 @@ class OrmTotalsExtension extends AbstractExtension
 
         return $totals;
     }
+<<<<<<< HEAD
 
     /**
      * Prepare sorters array
@@ -169,4 +191,6 @@ class OrmTotalsExtension extends AbstractExtension
 
         return $totals;
     }
+=======
+>>>>>>> 97f4291902006854669b9c57ae772df9bb2eda18
 }
