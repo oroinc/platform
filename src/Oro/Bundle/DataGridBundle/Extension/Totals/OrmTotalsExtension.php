@@ -70,11 +70,6 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-<<<<<<< HEAD
-        $result->offsetAddToArray('options', ['totals' => $this->totals]);
-
-        return $result;
-=======
         $totals = $this->getTotals($config);
         $totalQueries = [];
         foreach ($totals as $field => $total) {
@@ -99,13 +94,14 @@ class OrmTotalsExtension extends AbstractExtension
         if (!empty($data)) {
             foreach ($totals as $field => &$total) {
                 if (isset($data[0][$field])) {
-                    $total['value'] = $data[0][$field];
+                    $total['total'] = $data[0][$field];
                 }
             };
         }
 
-        $result->offsetSetByPath('[options][totals]', $totals);
->>>>>>> 97f4291902006854669b9c57ae772df9bb2eda18
+        $result->offsetAddToArray('options', ['totals' => $totals]);
+
+        return $result;
     }
 
     /**
@@ -153,44 +149,4 @@ class OrmTotalsExtension extends AbstractExtension
 
         return $totals;
     }
-<<<<<<< HEAD
-
-    /**
-     * Prepare sorters array
-     *
-     * @param DatagridConfiguration $config
-     *
-     * @param DatasourceInterface $datasource
-     * @return array
-     */
-    protected function getTotalsToApply(DatagridConfiguration $config, DatasourceInterface $datasource)
-    {
-        $totals = $this->getTotals($config);
-        /** @var QueryBuilder $qb */
-        $qb = clone $datasource->getQueryBuilder();
-
-        $totalSelects = [];
-        foreach ($totals as $field => $total) {
-            if (isset($total['query'])) {
-                $totalSelects[] = $total['query'] . ' as ' . $field;
-            }
-        };
-        $qb->select($totalSelects);
-
-        $data = $qb->getQuery()->getScalarResult();
-
-        if (!empty($data)) {
-            foreach ($totals as $field => &$total) {
-                if (isset($data[0][$field])) {
-                    $total['total'] = $data[0][$field];
-                }
-            };
-        }
-
-        $this->totals = $totals;
-
-        return $totals;
-    }
-=======
->>>>>>> 97f4291902006854669b9c57ae772df9bb2eda18
 }
