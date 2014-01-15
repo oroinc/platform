@@ -11,10 +11,6 @@ services:
         tags:
             - { name: oro_importexport.processor, type: export, entity: datagrid, alias: oro_datagrid }
 
-    oro_datagrid.datagrid.manager.link:
-        tags:
-            - { name: oro_service_link,  service: oro_datagrid.datagrid.manager }
-
     oro_datagrid.importexport.data_converter:
         class: %oro_datagrid.importexport.data_converter.class%
         arguments:
