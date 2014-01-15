@@ -3,11 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Configuration\ConfigurationWorkflowDefinitionBuilder;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
-class ConfigurationWorkflowDefinitionBuilderTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param WorkflowDefinition $definition
@@ -37,7 +36,7 @@ class ConfigurationWorkflowDefinitionBuilderTest extends \PHPUnit_Framework_Test
      */
     public function testBuildFromConfiguration(array $expectedData, array $inputData)
     {
-        $builder = new ConfigurationWorkflowDefinitionBuilder();
+        $builder = new WorkflowDefinitionConfigurationBuilder();
         $workflowDefinitions = $builder->buildFromConfiguration($inputData);
         $this->assertCount(1, $workflowDefinitions);
 
@@ -133,7 +132,7 @@ class ConfigurationWorkflowDefinitionBuilderTest extends \PHPUnit_Framework_Test
     {
         $this->setExpectedException($expectedException, $expectedMessage);
 
-        $builder = new ConfigurationWorkflowDefinitionBuilder();
+        $builder = new WorkflowDefinitionConfigurationBuilder();
         $builder->buildFromConfiguration($inputData);
     }
 

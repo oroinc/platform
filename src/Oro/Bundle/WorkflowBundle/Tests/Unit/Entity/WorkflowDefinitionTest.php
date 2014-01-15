@@ -91,7 +91,6 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $newDefinition = new WorkflowDefinition();
         $newDefinition->setName($expectedData['name'])
             ->setLabel($expectedData['label'])
-            ->setEnabled($expectedData['enabled'])
             ->setStartStep($expectedData['start_step'])
             ->setConfiguration($expectedData['configuration'])
             ->setWorkflowDefinitionEntities(array($definitionEntity));

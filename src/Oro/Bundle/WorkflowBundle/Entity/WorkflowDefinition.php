@@ -256,14 +256,14 @@ class WorkflowDefinition
 
     /**
      * @param WorkflowDefinition $definition
-     * @return $this
+     * @return WorkflowDefinition
      */
     public function import(WorkflowDefinition $definition)
     {
+        // enabled flag should not be imported
         $this->setName($definition->getName())
             ->setType($definition->getType())
             ->setLabel($definition->getLabel())
-            ->setEnabled($definition->isEnabled())
             ->setConfiguration($definition->getConfiguration())
             ->setStartStep($definition->getStartStep())
             ->setWorkflowDefinitionEntities($definition->getWorkflowDefinitionEntities());
