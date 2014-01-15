@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jquery-ui'], function ($, _, __, util) {
+define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jquery-ui', 'jquery.select2'], function ($, _, __, util) {
     'use strict';
 
     var filterModuleNameTemplate = 'oro/datafilter/{{type}}-filter';
@@ -43,6 +43,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             <div class="active-filter" />\
             ');
 
+            this.options.fields = [{"name":"name","type":"string","label":"Account name"},{"name":"createdAt","type":"datetime","label":"Created"},{"name":"field_extend_description","type":"text","label":"Description"},{"name":"field_extend_email","type":"string","label":"Email"},{"name":"field_extend_employees","type":"integer","label":"Employees"},{"name":"field_extend_fax","type":"string","label":"Fax"},{"name":"id","type":"integer","label":"Id","identifier":true},{"name":"field_extend_ownership","type":"string","label":"Ownership"},{"name":"field_extend_phone","type":"string","label":"Phone"},{"name":"field_extend_rating","type":"string","label":"Rating"},{"name":"field_extend_ticker_symbol","type":"string","label":"Ticker Symbol"},{"name":"updatedAt","type":"datetime","label":"Updated"},{"name":"field_extend_website","type":"string","label":"Website"},{"name":"billingAddress","label":"Billing Address","relation_type":"ref-one","related_entity_name":"Oro\\Bundle\\AddressBundle\\Entity\\Address","related_entity_label":"Address","related_entity_plural_label":"Addresses","related_entity_fields":[{"name":"city","type":"string","label":"City"},{"name":"created","type":"datetime","label":"Created at"},{"name":"firstName","type":"string","label":"First name"},{"name":"id","type":"integer","label":"Id","identifier":true},{"name":"label","type":"string","label":"Label"},{"name":"lastName","type":"string","label":"Last name"},{"name":"middleName","type":"string","label":"Middle name"},{"name":"namePrefix","type":"string","label":"Name prefix"},{"name":"nameSuffix","type":"string","label":"Name suffix"},{"name":"organization","type":"string","label":"Organization"},{"name":"regionText","type":"string","label":"State"},{"name":"street","type":"string","label":"Street"},{"name":"street2","type":"string","label":"Street 2"},{"name":"updated","type":"datetime","label":"Updated at"},{"name":"postalCode","type":"string","label":"Zip\/postal code"}]},{"name":"contacts","label":"Contacts","relation_type":"ref-many","related_entity_name":"OroCRM\\Bundle\\ContactBundle\\Entity\\Contact","related_entity_label":"Contact","related_entity_plural_label":"Contacts","related_entity_fields":[{"name":"birthday","type":"datetime","label":"Birthday"},{"name":"createdAt","type":"datetime","label":"Created At"},{"name":"description","type":"text","label":"Description"},{"name":"email","type":"string","label":"Email"},{"name":"facebook","type":"string","label":"Facebook"},{"name":"fax","type":"string","label":"Fax"},{"name":"firstName","type":"string","label":"First name"},{"name":"gender","type":"string","label":"Gender"},{"name":"googlePlus","type":"string","label":"Google+"},{"name":"id","type":"integer","label":"Id","identifier":true},{"name":"jobTitle","type":"string","label":"Job Title"},{"name":"lastName","type":"string","label":"Last name"},{"name":"linkedIn","type":"string","label":"LinkedIn"},{"name":"middleName","type":"string","label":"Middle name"},{"name":"namePrefix","type":"string","label":"Name prefix"},{"name":"nameSuffix","type":"string","label":"Name suffix"},{"name":"skype","type":"string","label":"Skype"},{"name":"twitter","type":"string","label":"Twitter"},{"name":"updatedAt","type":"datetime","label":"Updated At"}]},{"name":"defaultContact","label":"Default contact","relation_type":"ref-one","related_entity_name":"OroCRM\\Bundle\\ContactBundle\\Entity\\Contact","related_entity_label":"Contact","related_entity_plural_label":"Contacts","related_entity_fields":[{"name":"birthday","type":"datetime","label":"Birthday"},{"name":"createdAt","type":"datetime","label":"Created At"},{"name":"description","type":"text","label":"Description"},{"name":"email","type":"string","label":"Email"},{"name":"facebook","type":"string","label":"Facebook"},{"name":"fax","type":"string","label":"Fax"},{"name":"firstName","type":"string","label":"First name"},{"name":"gender","type":"string","label":"Gender"},{"name":"googlePlus","type":"string","label":"Google+"},{"name":"id","type":"integer","label":"Id","identifier":true},{"name":"jobTitle","type":"string","label":"Job Title"},{"name":"lastName","type":"string","label":"Last name"},{"name":"linkedIn","type":"string","label":"LinkedIn"},{"name":"middleName","type":"string","label":"Middle name"},{"name":"namePrefix","type":"string","label":"Name prefix"},{"name":"nameSuffix","type":"string","label":"Name suffix"},{"name":"skype","type":"string","label":"Skype"},{"name":"twitter","type":"string","label":"Twitter"},{"name":"updatedAt","type":"datetime","label":"Updated At"}]},{"name":"owner","label":"Owner","relation_type":"ref-one","related_entity_name":"Oro\\Bundle\\UserBundle\\Entity\\User","related_entity_label":"User","related_entity_plural_label":"Users","related_entity_icon":"icon-user","related_entity_fields":[{"name":"image","type":"string","label":"Avatar"},{"name":"birthday","type":"date","label":"Birthday"},{"name":"confirmationToken","type":"string","label":"Confirmation token"},{"name":"createdAt","type":"datetime","label":"Created"},{"name":"email","type":"string","label":"Email"},{"name":"firstName","type":"string","label":"First name"},{"name":"id","type":"integer","label":"Id","identifier":true},{"name":"lastLogin","type":"datetime","label":"Last logged in"},{"name":"lastName","type":"string","label":"Last name"},{"name":"loginCount","type":"integer","label":"Login count"},{"name":"middleName","type":"string","label":"Middle name"},{"name":"namePrefix","type":"string","label":"Name prefix"},{"name":"nameSuffix","type":"string","label":"Name suffix"},{"name":"password","type":"string","label":"Password"},{"name":"passwordRequestedAt","type":"datetime","label":"Password requested at"},{"name":"salt","type":"string","label":"Salt"},{"name":"enabled","type":"boolean","label":"Status"},{"name":"updatedAt","type":"datetime","label":"Updated"},{"name":"username","type":"string","label":"Username"}]},{"name":"shippingAddress","label":"Shipping Address","relation_type":"ref-one","related_entity_name":"Oro\\Bundle\\AddressBundle\\Entity\\Address","related_entity_label":"Address","related_entity_plural_label":"Addresses","related_entity_fields":[{"name":"city","type":"string","label":"City"},{"name":"created","type":"datetime","label":"Created at"},{"name":"firstName","type":"string","label":"First name"},{"name":"id","type":"integer","label":"Id","identifier":true},{"name":"label","type":"string","label":"Label"},{"name":"lastName","type":"string","label":"Last name"},{"name":"middleName","type":"string","label":"Middle name"},{"name":"namePrefix","type":"string","label":"Name prefix"},{"name":"nameSuffix","type":"string","label":"Name suffix"},{"name":"organization","type":"string","label":"Organization"},{"name":"regionText","type":"string","label":"State"},{"name":"street","type":"string","label":"Street"},{"name":"street2","type":"string","label":"Street 2"},{"name":"updated","type":"datetime","label":"Updated at"},{"name":"postalCode","type":"string","label":"Zip\/postal code"}]}];
             self.element.append(self.template(this.options));
 
             var $select = self.element.find('select');
@@ -54,16 +55,11 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                 self._render(filterIndex);
             });
 
-            var index = 0;
-
             if (this.options.data) {
                 var data = this.options.data;
                 this.element.data('value', data);
-                index = this.options.data.index;
+                $select.val(data.column).change();
             }
-
-            var $option = $($select.find('option')[index]);
-            $option.prop('selected', true).change();
         },
 
         _render: function (filterIndex) {
@@ -198,8 +194,8 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
 
         _serialize: function () {
             var value = {
-                index: this.element.find('select')[0].selectedIndex,
-                value: this.filter.getValue()
+                column: this.element.find('select').val(),
+                filter: this.filter.getValue()
             };
             this.element.data('value', value);
         },
@@ -207,7 +203,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
         _deserialize: function () {
             var value = this.element.data('value');
             if (value) {
-                this.filter.setValue(value.value);
+                this.filter.setValue(value.filter);
             }
         },
 
