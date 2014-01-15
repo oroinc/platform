@@ -32,7 +32,7 @@ class OroAdministration extends AbstractPage
         $s = microtime(true);
         do {
             sleep(5);
-            $this->waitPageToLoad();
+            //$this->waitPageToLoad();
             $e = microtime(true);
             $this->test->assertTrue(($e-$s) <= MAX_EXECUTION_TIME);
         } while ($this->isElementPresent("//a[@class = 'button next primary disabled']"));
