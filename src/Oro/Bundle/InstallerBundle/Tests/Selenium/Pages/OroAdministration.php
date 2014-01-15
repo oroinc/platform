@@ -34,7 +34,7 @@ class OroAdministration extends AbstractPage
             sleep(5);
             //$this->waitPageToLoad();
             $e = microtime(true);
-            $this->test->assertTrue(($e-$s) <= MAX_EXECUTION_TIME);
+            $this->test->assertTrue(($e-$s) <= (int)(MAX_EXECUTION_TIME / 1000));
         } while ($this->isElementPresent("//a[@class = 'button next primary disabled']"));
 
         $this->test->moveto($this->test->byXpath("//a[@class = 'button next primary']"));
