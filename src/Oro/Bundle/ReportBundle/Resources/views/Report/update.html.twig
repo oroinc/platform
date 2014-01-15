@@ -46,7 +46,7 @@
     {% endif %}
 {% endblock pageHeader %}
 
-{% block content_data %}
+{% macro segmentation_group(filterFields) %}
     {% set segmentationDesignerValue = [
         {
             "criteria": "compare-fields",
@@ -95,7 +95,7 @@
             }
         }
     ] %}
-    <div id="segmentation-designer" class="container-fluid" data-value="{{ segmentationDesignerValue|json_encode }}">
+    <div id="segmentation-designer" class="container-fluid" data-value="{{ segmentationDesignerValue|json_encode|raw }}">
         <div class="row-fluid">
             <div class="span3 filter-criteria">
                 <h4>Filter Criteria</h4>
@@ -146,7 +146,37 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript">
+        require(['jquery', 'oro/loading-mask', 'oroquerydesigner/js/conditions-group'], function ($, LoadingMask) {
+            var loadingMask = new LoadingMask(),
+                $entityChoice = $('#oro_report_form_entity'),
+                $compareFieldsCriteria = $('#filter-criteria-list').find('[data-criteria=compare-fields]');
 
+            function updateCompareFieldsCriteria() {
+                $compareFieldsCriteria
+                    .data('entity', $entityChoice.val())
+                    .data('fields', $entityChoice.data('fields'));
+            }
+
+            $entityChoice
+                .on('fieldsloadersuccess', updateCompareFieldsCriteria)
+                .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
+                .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
+
+            updateCompareFieldsCriteria();
+
+            $('.report-designer')
+                .append(loadingMask.render().$el)
+                .conditionsGroup({
+                    filterMetadataSelector: '.report-designer',
+                    conditionsGroupSelector: '#segmentation-conditions',
+                    criteriaListSelector: '#filter-criteria-list'
+                });
+        });
+    </script>
+{% endmacro %}
+
+{% block content_data %}
     {% set id = 'report-profile' %}
     {% set ownerDataBlock = {
         'dataBlocks': [{
@@ -186,6 +216,18 @@
     %}
 
     {% set dataBlocks = dataBlocks|merge( [{
+        'title' : 'Demo condition builder'|trans,
+        'subblocks': [
+            {
+                'title': 'Build'|trans,
+                'data': [
+                    _self.segmentation_group(form.filter.columnName)
+                ]
+            }
+        ]
+    }]) %}
+
+    {% set dataBlocks = dataBlocks|merge( [{
         'title' : 'oro.report.form.designer'|trans,
         'content_attr': {'class': 'report-designer', 'data-metadata': metadata|json_encode|raw},
         'subblocks': [
@@ -222,7 +264,7 @@
     {{ QD.query_designer_column_chain_template('report-column-chain-template') }}
 
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/translator', 'routing', 'oro/query-designer', 'oro/delete-confirmation', 'oroquerydesigner/js/conditions-group'],
+        require(['jquery', 'underscore', 'oro/translator', 'routing', 'oro/query-designer', 'oro/delete-confirmation'],
         function($, _, __, routing, QueryDesigner, DeleteConfirmation) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
@@ -277,12 +319,6 @@
                             designer.changeEntity(newVal);
                         }
                     }
-                });
-
-                $('#segmentation-designer').conditionsGroup({
-                    filterMetadataSelector: '.report-designer',
-                    conditionsGroupSelector: '#segmentation-conditions',
-                    criteriaListSelector: '#filter-criteria-list'
                 });
             });
         });

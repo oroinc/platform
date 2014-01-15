@@ -26,44 +26,27 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             self.template = _.template('<select>\
                 <option value="" data-label=""></option>\
                 <optgroup label="Fields">\
-                    <option value="name" data-type="string" data-label="Account name">Account name</option>\
-                    <option value="createdAt" data-type="datetime" data-label="Created">Created</option>\
-                    <option value="extend_description" data-type="text" data-label="Description">Description</option>\
-                    <option value="extend_email" data-type="string" data-label="Email">Email</option>\
-                    <option value="extend_employees" data-type="integer" data-label="Employees">Employees</option>\
-                    <option value="extend_fax" data-type="string" data-label="Fax">Fax</option>\
-                    <option value="id" data-type="integer" data-label="Id" data-identifier="true">Id</option>\
-                    <option value="extend_ownership" data-type="string" data-label="Ownership">Ownership</option>\
-                    <option value="extend_phone" data-type="string" data-label="Phone">Phone</option>\
-                    <option value="extend_rating" data-type="string" data-label="Rating">Rating</option>\
-                    <option value="extend_ticker_symbol" data-type="string" data-label="Ticker Symbol">Ticker Symbol</option>\
-                    <option value="updatedAt" data-type="datetime" data-label="Updated">Updated</option>\
-                    <option value="extend_website" data-type="string" data-label="Website">Website</option>\
+                    <% _.each(fields, function (field) { if (!field.related_entity_fields) {%>\
+                    <option value="<%- field.name %>" data-type="<%- field.type %>" \
+                        data-label="<%- field.label %>"><%- field.label %></option>\
+                    <% } }) %>\
                 </optgroup>\
-                <optgroup label="Billing Address">\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::city" data-type="string" data-label="City">City</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::created" data-type="datetime" data-label="Created at">Created at</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::firstName" data-type="string" data-label="First name">First name</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::id" data-type="integer" data-label="Id" data-identifier="true">Id</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::label" data-type="string" data-label="Label">Label</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::lastName" data-type="string" data-label="Last name">Last name</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::middleName" data-type="string" data-label="Middle name">Middle name</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::namePrefix" data-type="string" data-label="Name prefix">Name prefix</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::nameSuffix" data-type="string" data-label="Name suffix">Name suffix</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::organization" data-type="string" data-label="Organization">Organization</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::regionText" data-type="string" data-label="State">State</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::street" data-type="string" data-label="Street">Street</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::street2" data-type="string" data-label="Street 2">Street 2</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::updated" data-type="datetime" data-label="Updated at">Updated at</option>\
-                    <option value="billingAddress,Oro\Bundle\AddressBundle\Entity\Address::postalCode" data-type="string" data-label="Zip/postal code">Zip/postal code</option>\
+                <% _.each(fields, function (group) { if (group.related_entity_fields) {%>\
+                <optgroup label="<%- group.label %>">\
+                    <% _.each(group.related_entity_fields, function (field) { %>\
+                    <option value="<%- group.name %>,<%- group.related_entity_name %>::<%- field.name %>" \
+                        data-type="<%- field.type %>" data-label="<%- field.label %>"><%- field.label %></option>\
+                    <% }) %>\
                 </optgroup>\
+                <% } }) %>\
             </select>\
             <div class="active-filter" />\
             ');
 
-            self.element.append(self.template());
+            self.element.append(self.template(this.options));
 
             var $select = self.element.find('select');
+            $select.select2({collapsibleResults: true});
             $select.change(function () {
                 var $option = $select.find(':selected');
                 var conditions = self._getFieldApplicableConditions($option);
