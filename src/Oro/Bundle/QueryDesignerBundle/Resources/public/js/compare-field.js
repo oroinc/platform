@@ -58,7 +58,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             if (this.options.data) {
                 var data = this.options.data;
                 this.element.data('value', data);
-                $select.val(data.column).change();
+                $select.val(data.columnName).change();
             }
         },
 
@@ -194,8 +194,11 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
 
         _serialize: function () {
             var value = {
-                column: this.element.find('select').val(),
-                filter: this.filter.getValue()
+                columnName: this.element.find('select').val(),
+                criterion: {
+                    filter: this.filter.type,
+                    data: this.filter.getValue()
+                }
             };
             this.element.data('value', value);
         },
@@ -203,7 +206,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
         _deserialize: function () {
             var value = this.element.data('value');
             if (value) {
-                this.filter.setValue(value.filter);
+                this.filter.setValue(value.criterion.data);
             }
         },
 

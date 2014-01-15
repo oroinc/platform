@@ -51,10 +51,13 @@
         {
             "criteria": "compare-fields",
             "value": {
-                "column": "name",
-                "filter": {
-                    "type": "1",
-                    "value": "@gmail.com, @hotmail.com, @yahoo.com"
+                "columnName": "name",
+                "criterion": {
+                    "filter": "string",
+                    "data": {
+                        "type": "1",
+                        "value": "@gmail.com, @hotmail.com, @yahoo.com"
+                    }
                 }
             }
         },
@@ -64,20 +67,26 @@
                 {
                     "criteria": "compare-fields",
                     "value": {
-                        "column": "name",
-                        "filter": {
-                            "type": "1",
-                            "value": "VP of Engineering, Marketing Director"
+                        "columnName": "name",
+                        "criterion": {
+                            "filter": "string",
+                            "data": {
+                                "type": "1",
+                                "value": "VP of Engineering, Marketing Director"
+                            }
                         }
                     }
                 },
                 {
                     "criteria": "compare-fields",
                     "value": {
-                        "column": "name",
-                        "filter": {
-                            "type": "1",
-                            "value": "Tiffany"
+                        "columnName": "name",
+                        "criterion": {
+                            "filter": "string",
+                            "data": {
+                                "type": "1",
+                                "value": "Tiffany"
+                            }
                         }
                     }
                 },
@@ -87,10 +96,13 @@
             "criteria": "compare-fields",
             "operation": "and",
             "value": {
-                "column": "field_extend_description",
-                "filter": {
-                    "type": "1",
-                    "value": "United States"
+                "columnName": "field_extend_description",
+                "criterion": {
+                    "filter": "string",
+                    "data": {
+                        "type": "1",
+                        "value": "United States"
+                    }
                 }
             }
         }
