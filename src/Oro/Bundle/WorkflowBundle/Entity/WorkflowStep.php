@@ -41,9 +41,9 @@ class WorkflowStep
     /**
      * @var integer
      *
-     * @ORM\Column(name="order", type="integer")
+     * @ORM\Column(name="step_order", type="integer")
      */
-    protected $order = 0;
+    protected $stepOrder = 0;
 
     /**
      * @var WorkflowDefinition
@@ -63,7 +63,7 @@ class WorkflowStep
 
     /**
      * @param string $name
-     * @return WorkflowDefinition
+     * @return WorkflowStep
      */
     public function setName($name)
     {
@@ -82,7 +82,7 @@ class WorkflowStep
 
     /**
      * @param string $label
-     * @return WorkflowDefinition
+     * @return WorkflowStep
      */
     public function setLabel($label)
     {
@@ -100,8 +100,27 @@ class WorkflowStep
     }
 
     /**
+     * @param int $order
+     * @return WorkflowStep
+     */
+    public function setStepOrder($order)
+    {
+        $this->stepOrder = $order;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStepOrder()
+    {
+        return $this->stepOrder;
+    }
+
+    /**
      * @param WorkflowDefinition $definition
-     * @return WorkflowItem
+     * @return WorkflowStep
      */
     public function setDefinition(WorkflowDefinition $definition)
     {
@@ -111,7 +130,7 @@ class WorkflowStep
     }
 
     /**
-     * @return WorkflowDefinition
+     * @return WorkflowStep
      */
     public function getDefinition()
     {

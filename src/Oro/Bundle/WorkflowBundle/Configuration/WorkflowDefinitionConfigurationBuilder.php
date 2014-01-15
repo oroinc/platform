@@ -4,10 +4,25 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinitionEntity;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
 {
+    /**
+     * @var WorkflowAssembler
+     */
+    protected $workflowAssembler;
+
+    /**
+     * @param WorkflowAssembler $workflowAssembler
+     */
+    public function __construct(WorkflowAssembler $workflowAssembler)
+    {
+        $this->workflowAssembler = $workflowAssembler;
+    }
+
     /**
      * @param array $configurationData
      * @return WorkflowDefinition[]
@@ -20,7 +35,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
             $type = $this->getConfigurationOption($workflowConfiguration, 'type', Workflow::TYPE_ENTITY);
             $enabled = $this->getConfigurationOption($workflowConfiguration, 'enabled', true);
-            $startStep = $this->getConfigurationOption($workflowConfiguration, 'start_step', null);
+            $startStepName = $this->getConfigurationOption($workflowConfiguration, 'start_step', null);
 
             $managedEntityClasses = $this->getManagedEntityClasses($workflowConfiguration);
             $definitionEntities = $this->buildDefinitionEntities($managedEntityClasses);
@@ -31,9 +46,11 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
                 ->setLabel($workflowConfiguration['label'])
                 ->setType($type)
                 ->setEnabled($enabled)
-                ->setStartStep($startStep)
                 ->setConfiguration($workflowConfiguration)
                 ->setWorkflowDefinitionEntities($definitionEntities);
+
+            $this->setWorkflowSteps($workflowDefinition);
+            $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
 
             $workflowDefinitions[] = $workflowDefinition;
         }
@@ -87,5 +104,26 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         }
 
         return $managedEntityClasses;
+    }
+
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     */
+    protected function setWorkflowSteps(WorkflowDefinition $workflowDefinition)
+    {
+        $workflow = $this->workflowAssembler->assemble($workflowDefinition);
+
+        $workflowSteps = array();
+        foreach ($workflow->getStepManager()->getSteps() as $step) {
+            $workflowStep = new WorkflowStep();
+            $workflowStep
+                ->setName($step->getName())
+                ->setLabel($step->getLabel())
+                ->setStepOrder($step->getOrder());
+
+            $workflowSteps[] = $workflowStep;
+        }
+
+        $workflowDefinition->setSteps($workflowSteps);
     }
 }

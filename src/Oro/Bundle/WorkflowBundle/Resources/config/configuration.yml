@@ -23,3 +23,5 @@ services:
 
     oro_workflow.configuration.builder.workflow_definition:
         class: %oro_workflow.configuration.builder.workflow_definition.class%
+        arguments:
+            - @oro_workflow.workflow_assembler

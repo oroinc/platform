@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\PrepareAttributePath;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
@@ -144,7 +143,12 @@ class WorkflowAssembler extends AbstractAssembler
 
     protected function prepareDefaultStartTransition(WorkflowDefinition $workflowDefinition, $configuration)
     {
-        if ($workflowDefinition->getStartStep()) {
+        if ($workflowDefinition->getStartStep()
+            && !array_key_exists(
+                Workflow::DEFAULT_START_TRANSITION_NAME,
+                $configuration[WorkflowConfiguration::NODE_TRANSITIONS]
+            )
+        ) {
             $startTransitionDefinitionName = Workflow::DEFAULT_START_TRANSITION_NAME . '_definition';
             if (!array_key_exists(
                 $startTransitionDefinitionName,
@@ -154,18 +158,13 @@ class WorkflowAssembler extends AbstractAssembler
                     array();
             }
 
-            if (!array_key_exists(
-                Workflow::DEFAULT_START_TRANSITION_NAME,
-                $configuration[WorkflowConfiguration::NODE_TRANSITIONS]
-            )) {
-                $configuration[WorkflowConfiguration::NODE_TRANSITIONS][Workflow::DEFAULT_START_TRANSITION_NAME] =
-                    array(
-                        'label' => $workflowDefinition->getLabel(),
-                        'step_to' => $workflowDefinition->getStartStep(),
-                        'is_start' => true,
-                        'transition_definition' => $startTransitionDefinitionName
-                    );
-            }
+            $configuration[WorkflowConfiguration::NODE_TRANSITIONS][Workflow::DEFAULT_START_TRANSITION_NAME] =
+                array(
+                    'label' => $workflowDefinition->getLabel(),
+                    'step_to' => $workflowDefinition->getStartStep()->getName(),
+                    'is_start' => true,
+                    'transition_definition' => $startTransitionDefinitionName
+                );
         }
 
         return $configuration;

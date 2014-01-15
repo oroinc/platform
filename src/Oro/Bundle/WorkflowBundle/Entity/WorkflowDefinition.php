@@ -47,13 +47,6 @@ class WorkflowDefinition
     protected $enabled;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="start_step", type="string", length=255, nullable=true)
-     */
-    protected $startStep;
-
-    /**
      * @var array
      *
      * @ORM\Column(name="configuration", type="array")
@@ -61,7 +54,7 @@ class WorkflowDefinition
     protected $configuration;
 
     /**
-     * @var Collection
+     * @var WorkflowStep[]|Collection
      *
      * @ORM\OneToMany(
      *      targetEntity="WorkflowStep",
@@ -71,6 +64,14 @@ class WorkflowDefinition
      * )
      */
     protected $steps;
+
+    /**
+     * @var WorkflowStep
+     *
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="start_step_id", referencedColumnName="id")
+     */
+    protected $startStep;
 
     /**
      * @var Collection
@@ -211,18 +212,31 @@ class WorkflowDefinition
     }
 
     /**
-     * @param string $startStep
+     * @param WorkflowStep $startStep
      * @return WorkflowDefinition
+     * @throws \LogicException
      */
     public function setStartStep($startStep)
     {
-        $this->startStep = $startStep;
+        if (null !== $startStep) {
+            $stepName = $startStep->getName();
+
+            if (!$this->hasStepByName($stepName)) {
+                throw new \LogicException(
+                    sprintf('Workflow "%s" does not contain step "%s"', $this->getName(), $stepName)
+                );
+            }
+
+            $this->startStep = $this->getStepByName($stepName);
+        } else {
+            $this->startStep = null;
+        }
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return WorkflowStep
      */
     public function getStartStep()
     {
@@ -238,12 +252,38 @@ class WorkflowDefinition
     }
 
     /**
+     * @param WorkflowStep[]|Collection $steps
+     * @return WorkflowDefinition
+     */
+    public function setSteps($steps)
+    {
+        $newStepNames = array();
+        foreach ($steps as $step) {
+            $newStepNames[] = $step->getName();
+        }
+
+        foreach ($this->steps as $step) {
+            if (!in_array($step->getName(), $newStepNames)) {
+                $this->removeStep($step);
+            }
+        }
+
+        foreach ($steps as $step) {
+            $this->addStep($step);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param WorkflowStep $step
      * @return WorkflowItem
      */
     public function addStep(WorkflowStep $step)
     {
-        if (!$this->steps->contains($step)) {
+        $stepName = $step->getName();
+
+        if (!$this->hasStepByName($stepName)) {
             $step->setDefinition($this);
             $this->steps->add($step);
         }
@@ -257,11 +297,38 @@ class WorkflowDefinition
      */
     public function removeStep(WorkflowStep $step)
     {
-        if ($this->steps->contains($step)) {
+        $stepName = $step->getName();
+
+        if ($this->hasStepByName($stepName)) {
+            $step = $this->getStepByName($stepName);
             $this->steps->removeElement($step);
         }
 
         return $this;
+    }
+
+    /**
+     * @param string $stepName
+     * @return bool
+     */
+    public function hasStepByName($stepName)
+    {
+        return $this->getStepByName($stepName) !== null;
+    }
+
+    /**
+     * @param string $stepName
+     * @return null|WorkflowStep
+     */
+    public function getStepByName($stepName)
+    {
+        foreach ($this->steps as $step) {
+            if ($step->getName() == $stepName) {
+                return $step;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -311,6 +378,7 @@ class WorkflowDefinition
             ->setType($definition->getType())
             ->setLabel($definition->getLabel())
             ->setConfiguration($definition->getConfiguration())
+            ->setSteps($definition->getSteps())
             ->setStartStep($definition->getStartStep())
             ->setWorkflowDefinitionEntities($definition->getWorkflowDefinitionEntities());
 
