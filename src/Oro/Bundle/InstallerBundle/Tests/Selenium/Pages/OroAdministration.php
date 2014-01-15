@@ -41,7 +41,7 @@ class OroAdministration extends AbstractPage
         $this->test->byXpath("//a[@class = 'button next primary']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Finish - Oro Application installation');
-        return new OroFinish($this);
+        return new OroFinish($this->test);
 
 
     }

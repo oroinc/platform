@@ -39,7 +39,7 @@ class OroConfiguration extends AbstractPage
         $this->test->byXpath("//a[@class = 'button next primary']")->click();
         $this->waitPageToLoad();
         $this->assertTitle('Administration setup - Oro Application installation');
-        return new OroAdministration($this);
+        return new OroAdministration($this->test);
     }
 
     public function setPassword($value)

@@ -56,6 +56,6 @@ class OroRequirements extends AbstractPage
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->assertTitle('Configuration - Oro Application installation');
-        return new OroConfiguration($this);
+        return new OroConfiguration($this->test);
     }
 }
