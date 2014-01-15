@@ -148,10 +148,10 @@ class ConfigManager
             ->getRepository('OroConfigBundle:Config')
             ->getByEntity($this->getScopedEntityName(), $this->getScopeId());
 
-        list ($updated, $removed) = $this->getChanged($newSettings);
+        list ($updated, $removed) = $this->calculateChangeSet($newSettings);
 
         if (!empty($removed)) {
-            $repository->removeValues($config->getId(), $removed);
+            $repository->removeValues($config, $removed);
         }
 
         foreach ($updated as $newItemKey => $newItemValue) {
@@ -167,13 +167,18 @@ class ConfigManager
 
         $this->om->persist($config);
         $this->om->flush();
+
+        $this->reload();
     }
 
     /**
+     * Calculates and returns config change set
+     * Does not modify anything, so even if you call flush after calculating you will not persist any changes
+     *
      * @param $newSettings
      * @return array
      */
-    public function getChanged($newSettings)
+    public function calculateChangeSet($newSettings)
     {
         // find new and updated
         $updated = array();
@@ -209,13 +214,12 @@ class ConfigManager
     }
 
     /**
-     * @param string      $entity
-     * @param int         $entityId
-     * @param null|string $section
+     * @param string $entity
+     * @param int    $entityId
      *
      * @return bool
      */
-    public function loadStoredSettings($entity, $entityId, $section = null)
+    public function loadStoredSettings($entity, $entityId)
     {
         if (isset($this->storedSettings[$entity][$entityId])) {
             return false;
@@ -223,20 +227,31 @@ class ConfigManager
 
         $config = $this->om
             ->getRepository('OroConfigBundle:Config')
-            ->loadSettings($entity, $entityId, $section);
+            ->loadSettings($entity, $entityId);
 
         // TODO: optimize it
         // merge app settings with scope settings
         if ($entity != static::SCOPE_NAME) {
             $appConfig = $this->om
                 ->getRepository('OroConfigBundle:Config')
-                ->loadSettings(static::SCOPE_NAME, 0, $section);
+                ->loadSettings(static::SCOPE_NAME, 0);
             $config = array_merge($appConfig, $config);
         }
 
         $this->storedSettings[$entity][$entityId] = $config;
 
         return true;
+    }
+
+    /**
+     * Reload settings data
+     */
+    public function reload()
+    {
+        $entity   = $this->getScopedEntityName();
+        $entityId = $this->getScopeId();
+        unset($this->storedSettings[$entity][$entityId]);
+        $this->loadStoredSettings($entity, $entityId);
     }
 
     /**

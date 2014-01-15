@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class EntityFieldProvider
 {
@@ -19,6 +20,11 @@ class EntityFieldProvider
      * @var ConfigProvider
      */
     protected $entityConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $extendConfigProvider;
 
     /**
      * @var EntityClassResolver
@@ -44,6 +50,7 @@ class EntityFieldProvider
      * Constructor
      *
      * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
      * @param ManagerRegistry $doctrine
      * @param EntityProvider $entityProvider
@@ -51,12 +58,14 @@ class EntityFieldProvider
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         EntityProvider $entityProvider,
         Translator $translator
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
         $this->doctrine             = $doctrine;
         $this->entityProvider       = $entityProvider;
@@ -133,15 +142,21 @@ class EntityFieldProvider
         if ($this->entityConfigProvider->hasConfig($className)) {
             $metadata = $em->getClassMetadata($className);
 
-            /** @var FieldConfigId[] $entityFields */
-            $entityFields = $this->entityConfigProvider->getIds($className);
-            foreach ($entityFields as $field) {
+            foreach ($metadata->getFieldNames() as $fieldName) {
+                $extendFieldName = null;
+                if (strpos($fieldName, ExtendConfigDumper::FIELD_PREFIX) === 0) {
+                    $guessedExtendFieldName = substr($fieldName, strlen(ExtendConfigDumper::FIELD_PREFIX));
+                    if ($this->extendConfigProvider->getConfig($className, $guessedExtendFieldName)->is('is_extend')) {
+                        $extendFieldName = $guessedExtendFieldName;
+                    }
+                }
+
                 $this->addField(
                     $result,
-                    $field->getFieldName(),
-                    $field->getFieldType(),
-                    $this->getFieldLabel($className, $field->getFieldName()),
-                    $metadata->isIdentifier($field->getFieldName()),
+                    $fieldName,
+                    $metadata->getTypeOfField($fieldName),
+                    $this->getFieldLabel($className, $extendFieldName ? $extendFieldName : $fieldName),
+                    $metadata->isIdentifier($fieldName),
                     $translate
                 );
             }

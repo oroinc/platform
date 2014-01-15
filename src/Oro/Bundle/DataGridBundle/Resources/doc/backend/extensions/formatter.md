@@ -10,7 +10,7 @@ Formatters
 ```
 column_name:
     type: field # default value `field`, so this key could be skipped here
-    frontend_type: date|datetime|decimal|integer|percent|select|text|html|boolean # optional default string
+    frontend_type: date|datetime|decimal|integer|percent|currency|select|text|html|boolean # optional default string
     data_name: someAlias.someField # optional, key in result that should represent this field
 ```
 Represents default data field.

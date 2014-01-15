@@ -7,7 +7,7 @@ oro_menu_config:
                 position: 30
 
         manage_reports:
-            label: 'Manage Reports'
+            label: 'Manage Custom Reports'
             route: 'oro_report_index'
             extras:
                 position: 10

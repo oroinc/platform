@@ -129,11 +129,11 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repository->expects($this->at(0))
             ->method('loadSettings')
-            ->with('user', 0, null)
+            ->with('user', 0)
             ->will($this->returnValue($loadedSettings));
         $repository->expects($this->at(1))
             ->method('loadSettings')
-            ->with('app', 0, null)
+            ->with('app', 0)
             ->will($this->returnValue($loadedSettings));
 
         $this->om
