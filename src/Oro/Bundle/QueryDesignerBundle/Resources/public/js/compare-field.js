@@ -195,10 +195,13 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             $filter.find('.choice_value').on('click', apply);
             this.filter.on('update', this._onUpdate.bind(this));
 
-            this._deserialize();
+            var value = this.element.data('value');
+            if (value) {
+                this.filter.setValue(value.criterion.data);
+            }
         },
 
-        _serialize: function () {
+        _onUpdate: function () {
             var value = {
                 columnName: this.element.find('select').val(),
                 criterion: {
@@ -207,22 +210,8 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                 }
             };
             this.element.data('value', value);
-        },
 
-        _deserialize: function () {
-            var value = this.element.data('value');
-            if (value) {
-                this.filter.setValue(value.criterion.data);
-            }
-        },
-
-        _triggerSerialize: function () {
             this.element.trigger('changed');
-        },
-
-        _onUpdate: function () {
-            this._serialize();
-            this._triggerSerialize();
         }
     });
 });
