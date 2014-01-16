@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ReportBundle\Grid;
 
-use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 
 class ReportDatagridConfigurationBuilder extends DatagridConfigurationBuilder
 {
@@ -27,9 +27,6 @@ class ReportDatagridConfigurationBuilder extends DatagridConfigurationBuilder
         parent::__construct($gridName, $report, $functionProvider, $doctrine);
 
         $this->config->offsetSetByPath('[source][acl_resource]', 'oro_report_view');
-        $this->config->offsetSetByPath(
-            sprintf('%s[addExportAction]', ToolbarExtension::TOOLBAR_OPTION_PATH),
-            true
-        );
+        $this->config->offsetSetByPath(ExportExtension::EXPORT_OPTION_PATH, true);
     }
 }

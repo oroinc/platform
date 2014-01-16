@@ -86,7 +86,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             defaults: {
                 rowClickActionClass: 'row-click-action',
                 rowClassName:        '',
-                toolbarOptions:      {addResetAction: true, addRefreshAction: true, addExportAction: false},
+                toolbarOptions:      {addResetAction: true, addRefreshAction: true},
                 rowClickAction:      undefined,
                 multipleSorting:     true,
                 rowActions:          [],
@@ -102,6 +102,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              * @param {String} [options.rowClickActionClass] CSS class for row with click action
              * @param {String} [options.rowClassName] CSS class for row
              * @param {Object} [options.toolbarOptions] Options for toolbar
+             * @param {Object} [options.exportOptions] Options for export
              * @param {Array<oro.datagrid.AbstractAction>} [options.rowActions] Array of row actions prototypes
              * @param {Array<oro.datagrid.AbstractAction>} [options.massActions] Array of mass actions prototypes
              * @param {oro.datagrid.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
@@ -128,6 +129,8 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 _.extend(this, this.defaults, options);
                 this.toolbarOptions = {};
                 _.extend(this.toolbarOptions, this.defaults.toolbarOptions, options.toolbarOptions);
+                this.exportOptions = {};
+                _.extend(this.exportOptions, options.exportOptions);
 
                 this.collection.multipleSorting = this.multipleSorting;
 
@@ -268,7 +271,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              */
             _getToolbarExtraActions: function () {
                 var result = [];
-                if (this.toolbarOptions.addExportAction) {
+                if (!_.isEmpty(this.exportOptions)) {
                     result.push(this.getExportAction());
                 }
                 return result;
@@ -373,12 +376,17 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 var grid = this;
 
                 if (!grid.exportAction) {
+                    var links = [];
+                    _.each(this.exportOptions, function (val, key) {
+                        links.push({key: key, label: val.label, attributes: {'class': 'no-hash', 'download': null}});
+                    });
                     grid.exportAction = new ExportAction({
                         datagrid: grid,
                         launcherOptions: {
                             label: 'Export',
                             className: 'btn',
-                            iconClassName: 'icon-download-alt'
+                            iconClassName: 'icon-download-alt',
+                            links: links
                         }
                     });
 

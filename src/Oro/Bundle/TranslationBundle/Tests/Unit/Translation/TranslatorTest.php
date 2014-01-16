@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\MessageCatalogue;
+
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -235,5 +236,20 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->addResource('loader', 'foo', 'pt_BR'); // Brazilian Portuguese
 
         return $translator;
+    }
+
+    public function testHasTrans()
+    {
+        $locale = 'en';
+        $locales = array_keys($this->messages);
+        $translator = $this->getTranslator($this->getLoader());
+
+        $translator->setLocale($locale);
+        $translator->setFallbackLocales($locales);
+
+        $this->assertTrue($translator->hasTrans('foo', 'jsmessages', $locale));
+        $this->assertTrue($translator->hasTrans('foo'));
+
+        $this->assertFalse($translator->hasTrans('foo11111'));
     }
 }

@@ -33,7 +33,6 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode('hide')->defaultFalse()->end()
                     ->end()
                 ->end()
-                ->booleanNode('addExportAction')->defaultFalse()->end()
             ->end();
 
         return $builder;

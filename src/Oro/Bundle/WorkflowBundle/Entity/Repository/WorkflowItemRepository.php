@@ -63,7 +63,7 @@ class WorkflowItemRepository extends EntityRepository
         $visibleSteps = [],
         AclHelper $aclHelper = null,
         \DateTime $dateStart = null,
-        \DateTime $dateEnd= null
+        \DateTime $dateEnd = null
     ) {
         $resultData = [];
         $definition = $this->getEntityManager()
@@ -75,9 +75,15 @@ class WorkflowItemRepository extends EntityRepository
             $qb = $this->getEntityManager()->createQueryBuilder();
             $qb->select('wi.currentStepName', 'SUM(opp.' . $fieldName .') as budget')
                 ->from($entityClass, 'opp')
-                ->join('OroWorkflowBundle:WorkflowBindEntity', 'wbe', 'WITH', 'wbe.entityId = opp.id')
+                ->join(
+                    'OroWorkflowBundle:WorkflowBindEntity',
+                    'wbe',
+                    'WITH',
+                    'wbe.entityId = opp.id and wbe.entityClass = :entityClass'
+                )
                 ->join('wbe.workflowItem', 'wi')
                 ->andWhere('wi.workflowName = :workFlowName')
+                ->setParameter('entityClass', $entityClass)
                 ->setParameter('workFlowName', $workFlow->getName())
                 ->groupBy('wi.currentStepName');
 
