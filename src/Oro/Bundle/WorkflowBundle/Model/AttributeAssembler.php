@@ -4,22 +4,47 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
 
 class AttributeAssembler extends AbstractAssembler
 {
     /**
+     * @param WorkflowDefinition $definition,
      * @param array $configuration
      * @return ArrayCollection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(array $configuration)
+    public function assemble(WorkflowDefinition $definition, array $configuration)
     {
         $attributes = new ArrayCollection();
         foreach ($configuration as $name => $options) {
             $attribute = $this->assembleAttribute($name, $options);
             $attributes->set($name, $attribute);
+        }
+
+        // add entity attribute
+        if (!$attributes->containsKey(AttributeManager::ATTRIBUTE_ENTITY)) {
+            $options = array(
+                'label' => AttributeManager::ATTRIBUTE_ENTITY,
+                'type' => 'entity',
+                'options' => array(
+                    'class' => '\DateTime' // TODO Use something like $definition->getRelatedEntity()
+                ),
+            );
+            $attribute = $this->assembleAttribute(AttributeManager::ATTRIBUTE_ENTITY, $options);
+            $attributes->set(AttributeManager::ATTRIBUTE_ENTITY, $attribute);
+        }
+
+        // add step attribute
+        if (!$attributes->containsKey(AttributeManager::ATTRIBUTE_STEP)) {
+            $options = array(
+                'label' => AttributeManager::ATTRIBUTE_STEP,
+                'type' => 'string', // TODO Remove type after configuration refactoring
+                'property_path' => AttributeManager::ATTRIBUTE_ENTITY . '.' . EntityConnector::PROPERTY_WORKFLOW_STEP
+            );
+            $attribute = $this->assembleAttribute(AttributeManager::ATTRIBUTE_STEP, $options);
+            $attributes->set(AttributeManager::ATTRIBUTE_STEP, $attribute);
         }
 
         return $attributes;
@@ -40,7 +65,7 @@ class AttributeAssembler extends AbstractAssembler
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
-        $attribute->setPropertyPath($options['property_path']);
+        $attribute->setPropertyPath($this->getOption($options, 'property_path', null));
         $attribute->setOptions($this->getOption($options, 'options', array()));
 
         $this->validateAttribute($attribute);

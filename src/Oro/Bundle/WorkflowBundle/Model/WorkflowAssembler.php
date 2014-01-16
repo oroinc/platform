@@ -76,8 +76,7 @@ class WorkflowAssembler extends AbstractAssembler
             )
         );
 
-        $attributes = $this->assembleAttributes($configuration);
-
+        $attributes = $this->assembleAttributes($definition, $configuration);
         $steps = $this->assembleSteps($definition, $configuration, $attributes);
         $transitions = $this->assembleTransitions($configuration, $steps, $attributes);
 
@@ -171,21 +170,22 @@ class WorkflowAssembler extends AbstractAssembler
     }
 
     /**
+     * @param WorkflowDefinition $definition
      * @param array $configuration
-     * @return Collection
+     * @return Attribute[]|Collection
      */
-    protected function assembleAttributes(array $configuration)
+    protected function assembleAttributes(WorkflowDefinition $definition, array $configuration)
     {
         $attributesConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_ATTRIBUTES, array());
 
-        return $this->attributeAssembler->assemble($attributesConfiguration);
+        return $this->attributeAssembler->assemble($definition, $attributesConfiguration);
     }
 
     /**
      * @param WorkflowDefinition $definition
      * @param array $configuration
      * @param Collection $attributes
-     * @return Collection
+     * @return Step[]|Collection
      */
     protected function assembleSteps(WorkflowDefinition $definition, array $configuration, Collection $attributes)
     {
@@ -198,7 +198,7 @@ class WorkflowAssembler extends AbstractAssembler
      * @param array $configuration
      * @param Collection $steps
      * @param Collection $attributes
-     * @return Collection
+     * @return Transition[]|Collection
      */
     protected function assembleTransitions(array $configuration, Collection $steps, Collection $attributes)
     {

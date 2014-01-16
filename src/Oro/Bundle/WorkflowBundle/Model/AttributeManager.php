@@ -5,15 +5,20 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
+
 class AttributeManager
 {
+    const ATTRIBUTE_ENTITY = 'entity';
+    const ATTRIBUTE_STEP = 'step';
+
     /**
-     * @var Collection
+     * @var Attribute[]|Collection
      */
     protected $attributes;
 
     /**
-     * @param Collection $attributes
+     * @param Attribute[]|Collection $attributes
      */
     public function __construct(Collection $attributes = null)
     {
@@ -21,7 +26,7 @@ class AttributeManager
     }
 
     /**
-     * @return Collection
+     * @return Attribute[]|Collection
      */
     public function getAttributes()
     {
@@ -100,5 +105,31 @@ class AttributeManager
         }
 
         return $result;
+    }
+
+    /**
+     * @return Attribute
+     * @throws UnknownAttributeException
+     */
+    public function getEntityAttribute()
+    {
+        if (!$this->attributes->containsKey(self::ATTRIBUTE_ENTITY)) {
+            throw new UnknownAttributeException('There is no entity attribute');
+        }
+
+        return $this->attributes->get(self::ATTRIBUTE_ENTITY);
+    }
+
+    /**
+     * @return Attribute
+     * @throws UnknownAttributeException
+     */
+    public function getStepAttribute()
+    {
+        if (!$this->attributes->containsKey(self::ATTRIBUTE_STEP)) {
+            throw new UnknownAttributeException('There is no step attribute');
+        }
+
+        return $this->attributes->get(self::ATTRIBUTE_STEP);
     }
 }

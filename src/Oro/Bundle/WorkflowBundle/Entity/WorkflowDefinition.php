@@ -6,6 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+
 /**
  * @ORM\Table(
  *      name="oro_workflow_definition", indexes={
@@ -214,7 +216,7 @@ class WorkflowDefinition
     /**
      * @param WorkflowStep $startStep
      * @return WorkflowDefinition
-     * @throws \LogicException
+     * @throws WorkflowException
      */
     public function setStartStep($startStep)
     {
@@ -222,7 +224,7 @@ class WorkflowDefinition
             $stepName = $startStep->getName();
 
             if (!$this->hasStepByName($stepName)) {
-                throw new \LogicException(
+                throw new WorkflowException(
                     sprintf('Workflow "%s" does not contain step "%s"', $this->getName(), $stepName)
                 );
             }

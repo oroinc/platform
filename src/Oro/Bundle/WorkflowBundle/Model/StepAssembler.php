@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class StepAssembler extends AbstractAssembler
 {
@@ -204,7 +205,7 @@ class StepAssembler extends AbstractAssembler
      * @param WorkflowDefinition $workflowDefinition
      * @param string $stepName
      * @return WorkflowStep|null
-     * @throws \LogicException
+     * @throws WorkflowException
      */
     protected function getStepEntity(WorkflowDefinition $workflowDefinition, $stepName)
     {
@@ -226,7 +227,7 @@ class StepAssembler extends AbstractAssembler
         // in case of not existing definition steps are only creating, so we can return null
         if (empty($this->stepEntities[$workflowName][$stepName])) {
             if ($this->getEntityManager()->getUnitOfWork()->isInIdentityMap($workflowDefinition)) {
-                throw new \LogicException(
+                throw new WorkflowException(
                     sprintf('Workflow "%s" does not have step entity "%s"', $workflowName, $stepName)
                 );
             } else {
