@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
@@ -26,7 +27,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
      */
     protected function createWorkflow($workflowName, array $attributes = array(), array $steps = array())
     {
-        $workflow = new Workflow();
+        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflow = new Workflow($entityConnector);
 
         $workflow->setName($workflowName);
 
@@ -80,13 +84,13 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
 
     /**
      * @param Workflow $workflow
-     * @param string $currentStepName
+     * @param WorkflowStep $currentStep
      * @return WorkflowItem
      */
-    protected function createWorkflowItem(Workflow $workflow, $currentStepName = null)
+    protected function createWorkflowItem(Workflow $workflow, $currentStep = null)
     {
         $result = new WorkflowItem();
-        $result->setCurrentStepName($currentStepName);
+        $result->setCurrentStep($currentStep);
         $result->setWorkflowName($workflow->getName());
         return $result;
     }

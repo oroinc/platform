@@ -118,7 +118,6 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                 null,
                 $this->createStep('step_one')
                     ->setLabel('label')
-                    ->setFormType(WorkflowStepType::NAME)
                     ->setOrder(0)
                     ->setIsFinal(false),
             ),
@@ -148,28 +147,9 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                 ),
                 $this->createStep('step_two')
                     ->setLabel('label')
-                    ->setFormType('custom_workflow_step')
-                    ->setTemplate('template')
                     ->setIsFinal(true)
                     ->setOrder(10)
                     ->setAllowedTransitions(array('transition_one'))
-                    ->setFormOptions(
-                        array(
-                            'attribute_fields' => array(
-                                'attribute_one' => array('form_type' => 'text')
-                            )
-                        )
-                    )
-                    ->setViewAttributes(
-                        array(
-                            array(
-                                'attribute' => 'attribute_one',
-                                'path' => new PropertyPath('data.attribute_one'),
-                                'label' => 'Attribute One'
-                            ),
-                            array('path' => new PropertyPath('data.attribute_one.foo'), 'label' => 'Custom Label'),
-                        )
-                    )
             ),
         );
     }

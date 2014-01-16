@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -43,10 +42,12 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
 
     public function testCurrentStepName()
     {
-        $this->assertNull($this->workflowItem->getCurrentStepName());
-        $value = 'foo';
-        $this->workflowItem->setCurrentStepName($value);
-        $this->assertEquals($value, $this->workflowItem->getCurrentStepName());
+        $this->assertNull($this->workflowItem->getCurrentStep());
+        $value = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->workflowItem->setCurrentStep($value);
+        $this->assertEquals($value, $this->workflowItem->getCurrentStep());
     }
 
     public function testData()
@@ -155,107 +156,6 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->workflowItem->isClosed());
     }
 
-    public function testAddBindEntity()
-    {
-        $entityFoo = $this->createBindEntity();
-        $entityBar = $this->createBindEntity();
-        $this->workflowItem->addBindEntity($entityFoo);
-        $this->workflowItem->addBindEntity($entityBar);
-
-        $this->assertEquals(2, $this->workflowItem->getBindEntities()->count());
-        $this->assertEquals($entityFoo, $this->workflowItem->getBindEntities()->get(0));
-        $this->assertEquals($entityBar, $this->workflowItem->getBindEntities()->get(1));
-        $this->assertEquals($this->workflowItem, $entityFoo->getWorkflowItem());
-        $this->assertEquals($this->workflowItem, $entityBar->getWorkflowItem());
-    }
-
-    public function testRemoveEntity()
-    {
-        $entityFoo = $this->createBindEntity('Foo');
-        $entityBar = $this->createBindEntity('Bar');
-        $entityBaz = $this->createBindEntity('Baz');
-        $this->workflowItem->addBindEntity($entityFoo);
-        $this->workflowItem->addBindEntity($entityBar);
-        $this->workflowItem->addBindEntity($entityBaz);
-
-        $this->workflowItem->removeBindEntity($entityBar);
-
-        $this->assertEquals(2, $this->workflowItem->getBindEntities()->count());
-        $this->assertEquals($entityFoo, $this->workflowItem->getBindEntities()->get(0));
-        $this->assertEquals($entityBaz, $this->workflowItem->getBindEntities()->get(2));
-
-        $this->workflowItem->removeBindEntity($entityFoo);
-
-        $this->assertEquals(1, $this->workflowItem->getBindEntities()->count());
-        $this->assertEquals($entityBaz, $this->workflowItem->getBindEntities()->get(2));
-
-        $this->workflowItem->removeBindEntity($entityBaz);
-        $this->assertTrue($this->workflowItem->getBindEntities()->isEmpty());
-    }
-
-    /**
-     * @dataProvider syncBindEntitiesDataProvider
-     *
-     * @param WorkflowBindEntity[] $initialEntities
-     * @param WorkflowBindEntity[] $syncEntities
-     * @param WorkflowBindEntity[] $expectedEntities
-     */
-    public function testSyncBindEntities(array $initialEntities, array $syncEntities, array $expectedEntities)
-    {
-        foreach ($initialEntities as $bindEntity) {
-            $this->workflowItem->addBindEntity($bindEntity);
-        }
-
-        foreach ($expectedEntities as $expectedEntity) {
-            $expectedEntity->setWorkflowItem($this->workflowItem);
-        }
-
-        $this->workflowItem->syncBindEntities($syncEntities);
-        $this->assertEquals($expectedEntities, $this->workflowItem->getBindEntities()->getValues());
-    }
-
-    public function syncBindEntitiesDataProvider()
-    {
-        return array(
-            'add' => array(
-                'initial' => array(),
-                'sync' => array($this->createBindEntity('Foo', 1)),
-                'expected' => array($this->createBindEntity('Foo', 1)),
-            ),
-            'remove' => array(
-                'initial' => array($this->createBindEntity('Foo', 1), $this->createBindEntity('Bar', 2)),
-                'sync' => array($this->createBindEntity('Bar', 2)),
-                'expected' => array($this->createBindEntity('Bar', 2)),
-            ),
-            'add_and_remove' => array(
-                'initial' => array($this->createBindEntity('Foo', 1), $this->createBindEntity('Bar', 2)),
-                'sync' => array($this->createBindEntity('Foo', 1), $this->createBindEntity('Baz', 3)),
-                'expected' => array($this->createBindEntity('Foo', 1), $this->createBindEntity('Baz', 3)),
-            ),
-        );
-    }
-
-    public function testHasBindEntity()
-    {
-        $entityFoo = $this->createBindEntity(null, 1);
-        $entityBar = $this->createBindEntity(null, 2);
-
-        $entityBaz = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity', array('hasSameEntity'));
-        $this->assertFalse($this->workflowItem->hasBindEntity($entityBaz));
-
-        $this->workflowItem->addBindEntity($entityFoo);
-        $this->workflowItem->addBindEntity($entityBar);
-
-        $entityBaz->expects($this->at(0))->method('hasSameEntity')->with($entityFoo)->will($this->returnValue(false));
-        $entityBaz->expects($this->at(1))->method('hasSameEntity')->with($entityBar)->will($this->returnValue(false));
-
-        $this->assertFalse($this->workflowItem->hasBindEntity($entityBaz));
-
-        $entityBaz->expects($this->at(0))->method('hasSameEntity')->with($entityFoo)->will($this->returnValue(true));
-
-        $this->assertTrue($this->workflowItem->hasBindEntity($entityBaz));
-    }
-
     public function testDefinition()
     {
         $this->assertNull($this->workflowItem->getDefinition());
@@ -292,22 +192,5 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->workflowItem, $this->workflowItem->addTransitionRecord($transitionRecord));
         $this->assertEquals(array($transitionRecord), $this->workflowItem->getTransitionRecords()->getValues());
         $this->assertEquals($this->workflowItem, $transitionRecord->getWorkflowItem());
-    }
-
-    /**
-     * @param string $entityClass
-     * @param mixed $entityId
-     * @return WorkflowBindEntity
-     */
-    protected function createBindEntity($entityClass = null, $entityId = null)
-    {
-        $result = new WorkflowBindEntity();
-        if ($entityClass) {
-            $result->setEntityClass($entityClass);
-        }
-        if ($entityId) {
-            $result->setEntityId($entityId);
-        }
-        return $result;
     }
 }

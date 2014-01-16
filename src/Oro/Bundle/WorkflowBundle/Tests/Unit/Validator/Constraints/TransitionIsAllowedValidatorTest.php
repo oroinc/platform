@@ -33,6 +33,7 @@ class TransitionIsAllowedValidatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidateExceptions($workflowException, $expectedViolations)
     {
+        $this->markTestSkipped('BAP-2901');
         $workflowName = 'test_workflow';
         $workflowItem = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
 

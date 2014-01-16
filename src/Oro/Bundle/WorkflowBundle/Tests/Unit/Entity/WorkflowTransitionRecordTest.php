@@ -53,6 +53,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetStepFromName()
     {
+        $this->markTestSkipped('BAP-2901');
         $this->assertNull($this->transitionRecord->getStepFromName());
 
         $value = 'step_from_name';
@@ -62,6 +63,7 @@ class WorkflowTransitionRecordTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetStepToName()
     {
+        $this->markTestSkipped('BAP-2901');
         $this->assertNull($this->transitionRecord->getStepToName());
 
         $value = 'step_to_name';

@@ -723,8 +723,9 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAllowedTransitionsUnknownStepException()
     {
+        $this->markTestSkipped('BAP-2901');
         $workflowItem = new WorkflowItem();
-        $workflowItem->setCurrentStepName('unknown_step');
+        $workflowItem->setCurrentStep('unknown_step');
 
         $workflow = $this->createWorkflow();
         $workflow->getTransitionsByWorkflowItem($workflowItem);
