@@ -20,13 +20,12 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
         /** @property */
         footerCell: FooterCell,
 
+        renderable: false,
+
         /**
          * @inheritDoc
          */
         initialize: function (options) {
-
-            //console.log(options);
-
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
             }
@@ -39,18 +38,24 @@ function (Backbone, Backgrid , FooterRow, FooterCell) {
                 this.columns = new Backgrid.Columns(this.columns);
             }
 
-            this.row = new this.row({
-                columns: this.columns,
-                collection: this.collection,
-                footerCell: this.footerCell
-            });
+            var state = options.collection.state || {};
+            if (state.totals && Object.keys(state.totals).length) {
+                this.renderable = true;
+                this.row = new this.row({
+                    columns: this.columns,
+                    collection: this.collection,
+                    footerCell: this.footerCell
+                });
+            }
         },
 
         /**
          Renders this table footer with a single row of footer cells.
          */
         render: function () {
-            this.$el.append(this.row.render().$el);
+            if (this.renderable) {
+                this.$el.append(this.row.render().$el);
+            }
             this.delegateEvents();
             return this;
         }

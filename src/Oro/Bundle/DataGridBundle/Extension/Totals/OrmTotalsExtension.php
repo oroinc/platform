@@ -3,17 +3,21 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 
 class OrmTotalsExtension extends AbstractExtension
 {
@@ -26,36 +30,22 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var QueryBuilder */
     protected $masterQB;
 
-    /** @var array */
-    protected $formatter = [];
+    /** @var NumberFormatter */
+    protected $numberFormatter;
 
-    protected $formatterMap = [
-        'number' => [
-            'currency',
-            'decimal',
-            'percent',
-            'spellout',
-            'duration',
-            'ordinal'
-        ],
-        'datetime' => [
-            'time',
-            'date'
-        ]
-    ];
+    /** @var DateTimeFormatter */
+    protected $dateTimeFormatter;
 
     public function __construct(
         RequestParameters $requestParams = null,
         Translator $translator,
-        DateTimeFormatter $dataTimeFormatter,
-        NumberFormatter $numberFormatter
+        NumberFormatter $numberFormatter,
+        DateTimeFormatter $dateTimeFormatter
     ) {
-        $this->requestParams = $requestParams;
-        $this->translator    = $translator;
-        $this->formatter     = [
-            'number'   => $numberFormatter,
-            'datetime' => $dataTimeFormatter
-        ];
+        $this->requestParams     = $requestParams;
+        $this->translator        = $translator;
+        $this->numberFormatter   = $numberFormatter;
+        $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
     /**
@@ -94,7 +84,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $totals = $this->getTotals($config);
+        $totals       = $this->getTotals($config);
         $totalQueries = [];
         foreach ($totals as $field => $total) {
             if (isset($total['query'])) {
@@ -109,7 +99,7 @@ class OrmTotalsExtension extends AbstractExtension
 
         $data = $this->masterQB
             ->select($totalQueries)
-            ->andWhere($this->masterQB->expr()->in($this->masterQB->getRootAliases()[0].'.id', $ids))
+            ->andWhere($this->masterQB->expr()->in($this->masterQB->getRootAliases()[0] . '.id', $ids))
             ->getQuery()
             ->setFirstResult(null)
             ->setMaxResults(null)
@@ -118,9 +108,14 @@ class OrmTotalsExtension extends AbstractExtension
         if (!empty($data)) {
             foreach ($totals as $field => &$total) {
                 if (isset($data[0][$field])) {
-                    $total['total'] = $data[0][$field];
+                    $total['total'] = $this->applyFrontendFormatting(
+                        $data[0][$field],
+                        $total[Configuration::TOTALS_FORMATTER]
+                    );
                 }
-                $total['label'] = $this->translator->trans($total['label']);
+                if (isset($total['label'])) {
+                    $total['label'] = $this->translator->trans($total['label']);
+                }
             };
         }
 
@@ -132,17 +127,10 @@ class OrmTotalsExtension extends AbstractExtension
     /**
      * {@inheritDoc}
      */
-    public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
+    public function visitMetadata(DatagridConfiguration $config, MetadataObject $metaData)
     {
         $totals = $this->getTotals($config);
-
-        foreach ($data->offsetGetOr('columns', []) as $key => $column) {
-            if (isset($column['name']) && isset($totals[$column['name']])) {
-                $totals[$column['name']]['label'] = $this->translator->trans($totals[$column['name']]['label']);
-            }
-        }
-
-        $data
+        $metaData
             ->offsetAddToArray('state', ['totals' => $totals])
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['oro/datagrid/totals-builder']);
     }
@@ -172,5 +160,35 @@ class OrmTotalsExtension extends AbstractExtension
         }
 
         return $totals;
+    }
+
+    /**
+     * @param mixed $val
+     * @param string $formatter
+     * @return string|null
+     */
+    protected function applyFrontendFormatting($val = null, $formatter = null)
+    {
+        if (null != $formatter) {
+            switch ($formatter) {
+                case PropertyInterface::TYPE_DATE:
+                    $val = $this->dateTimeFormatter->formatDate($val);
+                    break;
+                case PropertyInterface::TYPE_DATETIME:
+                    $val = $this->dateTimeFormatter->format($val);
+                    break;
+                case PropertyInterface::TYPE_DECIMAL:
+                    $val = $this->numberFormatter->formatDecimal($val);
+                    break;
+                case PropertyInterface::TYPE_INTEGER:
+                    $val = $this->numberFormatter->formatDecimal($val);
+                    break;
+                case PropertyInterface::TYPE_PERCENT:
+                    $val = $this->numberFormatter->formatPercent($val);
+                    break;
+            }
+        }
+
+        return $val;
     }
 }

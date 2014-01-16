@@ -26,7 +26,6 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->scalarNode(self::TOTALS_LABEL_KEY)
-                                ->isRequired()
                                 ->defaultFalse()
                                 ->end()
                             ->scalarNode(self::TOTALS_QUERY_KEY)
