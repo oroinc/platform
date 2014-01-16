@@ -38,10 +38,6 @@ services:
         tags:
             - { name: monolog.logger, channel: oro_distribution }
 
-    oro_distribution.package_manager.link:
-        tags:
-            - { name: oro_service_link,  service: oro_distribution.package_manager }
-
     oro_distribution.script_runner:
         class: %oro_distribution.script_runner.class%
         public: false

@@ -111,9 +111,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_translation.distribution.package_manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_distribution.package_manager }
+
     oro_translation.packages_provider:
         class: %oro_translation.packages_provider.class%
         arguments:
-            - @oro_distribution.package_manager.link
+            - @oro_translation.distribution.package_manager.link
             - %kernel.bundles%
             - %kernel.root_dir%
