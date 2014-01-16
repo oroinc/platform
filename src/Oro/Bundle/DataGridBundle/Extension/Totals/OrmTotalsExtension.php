@@ -10,6 +10,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 
@@ -24,12 +26,36 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var QueryBuilder */
     protected $masterQB;
 
+    /** @var array */
+    protected $formatter = [];
+
+    protected $formatterMap = [
+        'number' => [
+            'currency',
+            'decimal',
+            'percent',
+            'spellout',
+            'duration',
+            'ordinal'
+        ],
+        'datetime' => [
+            'time',
+            'date'
+        ]
+    ];
+
     public function __construct(
         RequestParameters $requestParams = null,
-        Translator $translator
+        Translator $translator,
+        DateTimeFormatter $dataTimeFormatter,
+        NumberFormatter $numberFormatter
     ) {
         $this->requestParams = $requestParams;
         $this->translator    = $translator;
+        $this->formatter     = [
+            'number'   => $numberFormatter,
+            'datetime' => $dataTimeFormatter
+        ];
     }
 
     /**
