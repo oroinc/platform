@@ -6,7 +6,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
     /**
      * Conditions group widget
      */
-    $.widget('oro.conditionsGroup', {
+    $.widget('oroquerydesigner.conditionsGroup', {
         options: {
             sortable: {
                 // see jquery-ui sortable's options
@@ -20,12 +20,12 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
                 cursorAt: "10 10",
                 cancel: 'a, input, .btn, select'
             },
-            filterMetadataSelector: '.report-designer',
-            conditionsGroupSelector: '#segmentation-conditions',
             criteriaList: {
                 helper: 'clone'
             },
+            operations: ['AND', 'OR'],
             criteriaListSelector: '#filter-criteria-list',
+            valueSourceSelector: '',
             helperClass: 'ui-grabbing',
             conditionHTML: '<li class="condition" />',
             compareFieldsHTML: '<div class="field-filter" />',
@@ -34,191 +34,215 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
 
         _create: function () {
             this._prepareOptions();
-            this._deserialize();
-            this._initCriteriaList(this.options.criteriaListSelector);
-            this._initConditionsGroup(this.options.conditionsGroupSelector);
+            this._initCriteriaList();
+            this._initConditionBuilder();
             this._updateOperators();
-            $(this.options.conditionsGroupSelector)
-                .on('closed', _.debounce(_.bind(this._updateOperators, this), 1))
-                .on('change', '.operator', _.bind(this._onChangeOperator, this))
-                .on('serialize', _.bind(this._serialize, this));
+            this._on({
+                closed: this._onConditionClose,
+                reset: this._onReset
+            });
+            this.element
+                .on('change', '.operator', $.proxy(this._onChangeOperator, this));
         },
 
         _prepareOptions: function () {
             var opts = this.options;
-            opts.conditionsGroup = _.extend({}, opts.sortable, opts.conditionsGroup);
+            opts.conditionsGroup = $.extend({}, opts.sortable, opts.conditionsGroup);
             opts.conditionsGroup.appendTo = opts.criteriaListSelector;
-            opts.conditionsGroup.helper = _.bind(this._createHelper, this);
-            opts.conditionsGroup.update = _.bind(this._onUpdate, this);
-            opts.criteriaList = _.extend({}, opts.sortable, opts.criteriaList);
-            opts.criteriaList.start = _.bind(this._onCriteriaGrab, this);
-            opts.criteriaList.stop = _.bind(this._onCriteriaDrop, this);
+            opts.conditionsGroup.helper = $.proxy(this._createHelper, this);
+            opts.conditionsGroup.update = $.proxy(this._onUpdate, this);
+            opts.criteriaList = $.extend({}, opts.sortable, opts.criteriaList);
+            opts.criteriaList.start = $.proxy(this._onCriteriaGrab, this);
+            opts.criteriaList.stop = $.proxy(this._onCriteriaDrop, this);
         },
 
-        _initCriteriaList: function (el) {
-            $(el).sortable(this.options.criteriaList);
+        getValue: function () {
+            var value = $(this.options.valueSourceSelector).val();
+            return value ? JSON.parse(value) : [];
         },
 
-        _initConditionsGroup: function (el) {
-            var $el = $(el),
+        setValue: function (value) {
+            $(this.options.valueSourceSelector).val(JSON.stringify(value));
+        },
+
+        _initCriteriaList: function () {
+            $(this.options.criteriaListSelector).sortable(this.options.criteriaList);
+        },
+
+        _initConditionBuilder: function () {
+            var $content,
+                $root = this.element,
                 sortableConnectWith = this.options.sortable.connectWith;
-            if (!$el.is(sortableConnectWith)) {
-                $el = $el.find(sortableConnectWith);
-                if (!$el.length) {
-                    $el = $(this.options.conditionsGroupHTML).appendTo($el.end());
+            if (!$root.is(sortableConnectWith)) {
+                $root = $root.find(sortableConnectWith);
+                if (!$root.length) {
+                    $root = $(this.options.conditionsGroupHTML).appendTo(this.element);
                 }
             }
-            $el.sortable(this.options.conditionsGroup);
+
+            $content = this._createConditionContent($root, this.getValue());
+            this._initConditionsGroup($content);
+            $root.on('changed', $.proxy(this._onChanged, this));
+
+            this.$rootCondition = $root;
+        },
+
+        _initConditionsGroup: function ($group) {
+            // make the group sortable
+            $group.sortable(this.options.conditionsGroup);
+            // on change update group's value
+            $group.on('changed', function () {
+                var value = [];
+                $group.find('>[data-criteria]>[data-value]').each(function () {
+                    value.push($(this).data('value'));
+                });
+                $group.data('value', value);
+            });
         },
 
         _onCriteriaGrab: function (e, ui) {
             // create clone element just to remember place of item
-            ui.item.data('clone', ui.item.clone().insertAfter(ui.item)).removeAttr('style');
+            var $origin = ui.item,
+                $clone = $origin.clone();
+            $origin.data('clone', $clone);
+            $clone.data('origin', $origin).removeAttr('style').insertAfter($origin);
             ui.helper.addClass(this.options.helperClass);
         },
 
         _onCriteriaDrop: function (e, ui) {
             // put item back instead of it's clone
-            ui.item.data('clone').replaceWith(ui.item.removeData('clone'));
+            var $origin = ui.item,
+                $clone = $origin.data('clone');
+            $clone.removeData('origin').replaceWith($origin.removeData('clone'));
         },
 
-        _createCondition: function (criteria, options) {
-            var $el;
+        _getCriteriaOrigin: function (criteria) {
+            var $criteria = $(this.options.criteriaListSelector).find('[data-criteria="' + criteria + '"]');
+            return $criteria.data('origin') || $criteria;
+        },
+
+        _createCondition: function (criteria, value) {
+            var $content, $condition, $criteria, options;
+            if (!criteria) {
+                // if criteria is not passed, define it from value
+                criteria = $.isArray(value) ? 'conditions-group' : 'compare-fields';
+            }
+            $criteria = this._getCriteriaOrigin(criteria);
+            options = _.omit($criteria.data(), ['clone', 'sortableItem', 'criteria']);
+
             switch (criteria) {
             case 'compare-fields':
-                $el = $(this.options.compareFieldsHTML);
-                $.extend(options, {
-                    filterMetadataSelector: this.options.filterMetadataSelector
-                })
-                $el.compareField(options);
+                $content = this._createConditionContent(this.options.compareFieldsHTML, value || {});
+                $content.compareField(options);
                 break;
             case 'conditions-group':
-                $el = $(this.options.conditionsGroupHTML);
-                this._initConditionsGroup($el);
+                $content = this._createConditionContent(this.options.conditionsGroupHTML, value || []);
+                this._initConditionsGroup($content);
                 break;
             }
-            $el.wrap(this.options.conditionHTML);
-            return $el.parent().attr('data-criteria', criteria).attr('data-value', Math.random());
+
+            $condition = $(this.options.conditionHTML)
+                .attr('data-criteria', criteria)
+                .prepend($content)
+                .prepend('<a class="close" data-dismiss="alert" href="#">&times;</a>');
+            return $condition;
+        },
+
+        _createConditionContent: function (html, value) {
+            var operation, self = this,
+                $content = $(html);
+            if ($.isArray(value)) {
+                // build sub-conditions, if value is array
+                operation = null;
+                $.each(value, function (i, val) {
+                    var $condition;
+                    if ($.type(val) === 'string') {
+                        operation = val;
+                    } else {
+                        $condition = self._createCondition(null, val);
+                        if (operation) {
+                            self._initConditionOperation($condition, operation);
+                            operation = null;
+                        }
+                        $content.append($condition);
+                    }
+                });
+            }
+            return $content
+                .attr('data-value', '')
+                .data('value', value);
         },
 
         _createHelper: function (e, $el) {
-            var $criteria = $(this.options.conditionsGroup.appendTo)
-                .find('[data-criteria="' + $el.data('criteria') + '"]');
+            var $criteria = this._getCriteriaOrigin($el.data('criteria'));
             return $criteria.clone()
                 .css({width: $criteria.outerWidth(), height: $criteria.outerHeight()})
                 .addClass(this.options.helperClass);
         },
 
         _onUpdate: function (e, ui) {
-            var $condition, options;
+            var $condition;
             // new condition
             if (ui.sender && ui.sender.is(this.options.criteriaListSelector)) {
-                options = _.omit(ui.item.data(), ['clone', 'sortableItem', 'criteria']);
-                $condition = this._createCondition(ui.item.data('criteria'), options);
+                $condition = this._createCondition(ui.item.data('criteria'));
                 $condition.insertBefore(ui.item);
-                $condition.prepend('<a class="close" data-dismiss="alert" href="#">&times;</a>');
-            } else {
-                $condition = ui.item;
+                $condition.trigger('changed');
             }
             this._updateOperators();
         },
 
         _updateOperators: function () {
-            var $conditions = $(this.options.conditionsGroupSelector)
-                .find(this.options.conditionsGroup.connectWith + this.options.conditionsGroup.items);
+            var self = this,
+                options = this.options.conditionsGroup,
+                $conditions = this.element.find(options.connectWith + options.items);
             // remove operators for first items in groups
             $conditions.filter(':first-child')
-                .find('>.operator').remove();
-            // add operators for needed conditions
+                .find('>.operator').each(function () {
+                    var $operator = $(this),
+                        $condition = $operator.parent();
+                    $operator.remove();
+                    $condition.trigger('changed');
+                });
+            // add operators to proper conditions
             $conditions.filter(':not(:first-child)').not(':has(>.operator)')
                 .each(function () {
-                    var $condition = $(this),
-                        operation = $condition.data('operation') || 'and';
-                    $condition.data('operation', operation);
-                    $('<div class="operator"/>').prependTo($condition).dropdownSelect({
-                        buttonClass: 'btn btn-mini',
-                        options: ['and', 'or'],
-                        selected: operation
-                    });
+                    self._initConditionOperation(this);
+                }).trigger('changed');
+        },
+
+        _initConditionOperation: function ($condition, operation) {
+            operation = operation || this.options.operations[0] || '';
+            $('<div class="operator"/>')
+                .attr('data-value', '')
+                .data('value', operation)
+                .prependTo($condition)
+                .dropdownSelect({
+                    buttonClass: 'btn btn-mini',
+                    options: this.options.operations,
+                    selected: operation
                 });
-            this._serialize();
         },
 
         _onChangeOperator: function (e) {
-            $(e.target).data('operation', e.value);
-            this._serialize();
+            $(e.target)
+                .data('value', e.value)
+                .trigger('changed');
         },
 
-        _serialize: function () {
-            var $group = $(this.options.conditionsGroupSelector).children('ul.conditions-group').first();
-            var value = [];
-            this._serializeConditionsGroup(value, $group);
-            this.element.data('value', value)
-            console.log('_ser', this.element.data('value'));
+        _onConditionClose: function (e) {
+            var $group = $(e.target).parent();
+            _.delay($.proxy(function () {
+                this._updateOperators();
+                $group.trigger('changed');
+            }, this), 1);
         },
 
-        _serializeConditionsGroup: function (result, $group) {
-            var self = this;
-
-            $group.children('li.condition').each(function () {
-                var $condition = $(this);
-                var criteria = $condition.data('criteria');
-                var resultItem = {
-                    criteria: criteria
-                };
-                var operation = $condition.children('.operator').first().data('operation');
-                if (operation) {
-                    resultItem.operation = operation;
-                }
-
-                switch (criteria) {
-                case 'conditions-group':
-                    resultItem.value = [];
-                    self._serializeConditionsGroup(resultItem.value, $condition.children('ul.conditions-group').first());
-                    break;
-                case 'compare-fields':
-                    self._serializeCompareFields(resultItem, $condition);
-                    break;
-                }
-
-                result.push(resultItem);
-            });
+        _onChanged: function () {
+            this.setValue(this.$rootCondition.data('value'));
         },
 
-        _serializeCompareFields: function (resultItem, $condition) {
-            resultItem.value = $condition.children('div.field-filter').first().data('value') || {};
-        },
-
-        _deserialize: function () {
-            var val = this.element.data('value');
-            this._deserializeConditionsGroup($(this.options.conditionsGroupSelector).children('ul.conditions-group').first(), val);
-        },
-
-        _deserializeConditionsGroup: function ($parent, val) {
-            var self = this;
-
-            val.forEach(function (item) {
-                switch (item.criteria) {
-                case 'conditions-group':
-                    var $child = $parent.append('<li class="condition" data-criteria="conditions-group">\
-                            <a class="close" data-dismiss="alert" href="#">×</a>\
-                            <ul class="conditions-group">\
-                            </ul>\
-                        </li>').find('.conditions-group');
-                    self._deserializeConditionsGroup($child, item.value);
-                    break;
-                case 'compare-fields':
-                    $parent.append('<li class="condition" data-criteria="compare-fields">\
-                        <a class="close" data-dismiss="alert" href="#">×</a>\
-                        <div class="field-filter">\
-                    </li>').find('.field-filter').compareField({
-                        filterMetadataSelector: self.options.filterMetadataSelector,
-                        data: item.value
-                    });
-                    break;
-                }
-                console.log('_desConGro', item);
-            });
-        },
+        _onReset: function () {
+            this.$rootCondition.empty().trigger('changed');
+        }
     });
 });

@@ -20,6 +20,11 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
      * Compare field widget
      */
     $.widget('oro.compareField', {
+        options: {
+            fields: [],
+            filterMetadataSelector: '#report-designer'
+        },
+
         _create: function() {
             var self = this;
 

@@ -49,106 +49,64 @@
 {% macro segmentation_group(filterFields) %}
     {% set segmentationDesignerValue = [
         {
-            "criteria": "compare-fields",
-            "value": {
-                "index": 1,
-                "value": {
-                    "type": "1",
-                    "value": "@gmail.com, @hotmail.com, @yahoo.com"
+            "columnName": "name",
+            "criterion": {
+                "filter": "string",
+                "data": {
+                    "value": "asd",
+                    "type": "1"
                 }
             }
         },
-        {
-            "criteria": "conditions-group",
-            "value": [
-                {
-                    "criteria": "compare-fields",
-                    "value": {
-                        "index": 1,
+        "AND",
+        [
+            {
+                "columnName": "defaultContact,OroCRM\\Bundle\\ContactBundle\\Entity\\Contact::birthday",
+                "criterion": {
+                    "filter": "datetime",
+                    "data": {
+                        "type": "1",
                         "value": {
-                            "type": "1",
-                            "value": "VP of Engineering, Marketing Director"
+                            "start": "2014-01-16 sd 12:00 AM",
+                            "end": "2014-01-21 00:00"
                         }
                     }
-                },
-                {
-                    "criteria": "compare-fields",
-                    "value": {
-                        "index": 1,
+                }
+            },
+            "OR",
+            {
+                "columnName": "contacts,OroCRM\\Bundle\\ContactBundle\\Entity\\Contact::birthday",
+                "criterion": {
+                    "filter": "datetime",
+                    "data": {
+                        "type": "3",
                         "value": {
-                            "type": "1",
-                            "value": "Tiffany"
+                            "start": "2014-01-08 00:00",
+                            "end": ""
                         }
                     }
-                },
-            ]
-        },
-        {
-            "criteria": "compare-fields",
-            "operation": "and",
-            "value": {
-                "index": 3,
-                "value": {
-                    "type": "1",
-                    "value": "United States"
                 }
             }
-        }
+        ]
     ] %}
-    <div id="segmentation-designer" class="container-fluid" data-value="{{ segmentationDesignerValue|json_encode }}">
-        <div class="row-fluid">
-            <div class="span3 filter-criteria">
-                <h4>Filter Criteria</h4>
-                <ul class="criteria-list" id="filter-criteria-list">
-                    <li class="option" data-criteria="compare-fields">
-                        Compare Fields
-                    </li>
-                    <li class="option" data-criteria="conditions-group">
-                        Conditions Group
-                    </li>
-                </ul>
-            </div>
-            <div class="span9" id="segmentation-conditions">
-                <ul class="conditions-group">
-                    <!--<li class="condition" data-criteria="compare-fields">
-                        <a class="close" data-dismiss="alert" href="#">×</a>
-                        <div class="field-filter">
-                            <a href="#">Contacts email</a> field value <a href="#">contains</a> <a href="#">all</a> of the following:<br />
-                            <input type="text" value="@gmail.com, @hotmail.com, @yahoo.com">
-                        </div>
-                    </li>
-                    <li class="condition" data-criteria="conditions-group" data-operation="and">
-                        <a class="close" data-dismiss="alert" href="#">×</a>
-                        <ul class="conditions-group">
-                            <li class="condition" data-criteria="compare-fields">
-                                <a class="close" data-dismiss="alert" href="#">×</a>
-                                <div class="field-filter">
-                                    <a href="#">Title</a> field value <a href="#">includes</a> <a href="#">any</a> of the following:<br />
-                                    <input type="text" value="VP of Engineering, Marketing Director">
-                                </div>
-                            </li>
-                            <li class="condition" data-criteria="compare-fields" data-operation="or">
-                                <a class="close" data-dismiss="alert" href="#">×</a>
-                                <div class="field-filter">
-                                    <a href="#">Contact name</a> field value <a href="#">starts with</a>:<br />
-                                    <input type="text" value="Tiffany">
-                                </div>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="condition" data-criteria="compare-fields" data-operation="and">
-                        <a class="close" data-dismiss="alert" href="#">×</a>
-                        <div class="field-filter">
-                            <a href="#">Contact country</a> field value <a href="#">is</a> <a href="#">United States</a>
-                        </div>
-                    </li>-->
-                </ul>
-            </div>
+    <div class="row-fluid">
+        <div class="span3 filter-criteria">
+            <h4>Filter Criteria</h4>
+            <ul class="criteria-list" id="filter-criteria-list">
+                <li class="option" data-criteria="compare-fields">
+                    Compare Fields
+                </li>
+                <li class="option" data-criteria="conditions-group">
+                    Conditions Group
+                </li>
+            </ul>
         </div>
+        <div class="span9" id="segmentation-conditions"></div>
+        <input type="hidden" id="segmentation-conditions-value" value="{{ segmentationDesignerValue|json_encode }}" >
     </div>
     <script type="text/javascript">
         require(['jquery', 'oro/loading-mask', 'oroquerydesigner/js/conditions-group'], function ($, LoadingMask) {
-            var loadingMask = new LoadingMask(),
+            var //loadingMask = new LoadingMask(),
                 $entityChoice = $('#oro_report_form_entity'),
                 $compareFieldsCriteria = $('#filter-criteria-list').find('[data-criteria=compare-fields]');
 
@@ -156,21 +114,21 @@
                 $compareFieldsCriteria
                     .data('entity', $entityChoice.val())
                     .data('fields', $entityChoice.data('fields'));
+                $('#segmentation-conditions').trigger('reset');
             }
 
+//            $('#report-designer').append(loadingMask.render().$el);
             $entityChoice
-                .on('fieldsloadersuccess', updateCompareFieldsCriteria)
-                .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
-                .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
+//                .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
+//                .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask))
+                .on('fieldsloadersuccess', updateCompareFieldsCriteria);
 
             updateCompareFieldsCriteria();
 
-            $('#segmentation-designer')
-                .append(loadingMask.render().$el)
+            $('#segmentation-conditions')
                 .conditionsGroup({
-                    filterMetadataSelector: '.report-designer',
-                    conditionsGroupSelector: '#segmentation-conditions',
-                    criteriaListSelector: '#filter-criteria-list'
+                    criteriaListSelector: '#filter-criteria-list',
+                    valueSourceSelector: '#segmentation-conditions-value'
                 });
         });
     </script>
@@ -216,20 +174,8 @@
     %}
 
     {% set dataBlocks = dataBlocks|merge( [{
-        'title' : 'Demo condition builder'|trans,
-        'subblocks': [
-            {
-                'title': 'Build'|trans,
-                'data': [
-                    _self.segmentation_group(form.filter.columnName)
-                ]
-            }
-        ]
-    }]) %}
-
-    {% set dataBlocks = dataBlocks|merge( [{
         'title' : 'oro.report.form.designer'|trans,
-        'content_attr': {'class': 'report-designer', 'data-metadata': metadata|json_encode|raw},
+        'content_attr': {'id': 'report-designer', 'data-metadata': metadata|json_encode|raw},
         'subblocks': [
             {
                 'title': 'oro.report.form.columns'|trans,
@@ -247,7 +193,8 @@
                 'data': [
                     QD.query_designer_filter_form(form.filter, form.filters_logic, {'id': 'report-filter-form'}),
                     QD.query_designer_filter_list(),
-                    QD.query_designer_filter_template('report-filter-row')
+                    QD.query_designer_filter_template('report-filter-row'),
+                    _self.segmentation_group(form.filter.columnName)
                 ]
             },
         ]
@@ -275,7 +222,7 @@
                 };
 
                 var options = {
-                    el: '.report-designer',
+                    el: '#report-designer',
                     entityName: entityChoice.val(),
                     storageElementSelector: '#oro_report_form_definition',
                     columnChainTemplateSelector: '#report-column-chain-template',
