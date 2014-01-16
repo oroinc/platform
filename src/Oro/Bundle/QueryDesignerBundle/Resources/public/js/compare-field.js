@@ -1,20 +1,8 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jquery-ui', 'jquery.select2'], function ($, _, __, util) {
+define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/module-name-map', 'oro/query-designer/util',
+    'jquery-ui', 'jquery.select2'], function ($, _, __, getFilterModuleName, util) {
     'use strict';
-
-    var filterModuleNameTemplate = 'oro/datafilter/{{type}}-filter';
-    var filterTypes = {
-        string:      'choice',
-        choice:      'select',
-        selectrow:   'select-row',
-        multichoice: 'multiselect',
-        boolean:     'select'
-    };
-
-    var getFilterModuleName = function (filterTypeName) {
-        return filterModuleNameTemplate.replace('{{type}}', filterTypes[filterTypeName] || filterTypeName);
-    };
 
     /**
      * Compare field widget

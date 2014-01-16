@@ -1,18 +1,12 @@
-/* jshint browser:true */
-/* global define, require */
-define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'oro/query-designer/filter-manager'],
-function($, _, __, tools, mediator, FilterManager) {
+/*jshint browser:true*/
+/*jslint nomen: true*/
+/*global define, require*/
+define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'orofilter/js/module-name-map',
+    'oro/query-designer/filter-manager'],
+function($, _, __, tools, mediator, filterModuleNameMap, FilterManager) {
     'use strict';
 
     var initialized = false,
-        filterModuleName = 'oro/datafilter/{{type}}-filter',
-        filterTypes = {
-            string:      'choice',
-            choice:      'select',
-            selectrow:   'select-row',
-            multichoice: 'multiselect',
-            boolean:     'select'
-        },
         methods = {
             /**
              * Initializes data filters
@@ -37,7 +31,7 @@ function($, _, __, tools, mediator, FilterManager) {
                 var modules = this.modules;
                 _.each(this.metadata.filters || {}, function (filter) {
                     var type = filter.type;
-                    modules[type] = filterModuleName.replace('{{type}}', filterTypes[type] || type);
+                    modules[type] = filterModuleNameMap(type);
                 });
             },
 
