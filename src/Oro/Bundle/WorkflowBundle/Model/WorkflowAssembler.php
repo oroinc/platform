@@ -85,7 +85,6 @@ class WorkflowAssembler extends AbstractAssembler
         $workflow
             ->setName($workflowDefinition->getName())
             ->setLabel($workflowDefinition->getLabel())
-            ->setType($workflowDefinition->getType())
             ->setEnabled($workflowDefinition->isEnabled());
 
         $workflow->getStepManager()->setSteps($steps);
@@ -115,21 +114,6 @@ class WorkflowAssembler extends AbstractAssembler
                     $workflow->getName()
                 )
             );
-        }
-
-        if ($workflow->getType() == Workflow::TYPE_ENTITY) {
-            /** @var Step $step */
-            foreach ($workflow->getStepManager()->getSteps() as $step) {
-                if ($step->getFormOptions()) {
-                    throw new AssemblerException(
-                        sprintf(
-                            'Workflow "%s" has type "entity" and cannot support form options in step "%s"',
-                            $workflow->getName(),
-                            $step->getName()
-                        )
-                    );
-                }
-            }
         }
     }
 

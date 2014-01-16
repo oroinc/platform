@@ -1,0 +1,64 @@
+<div class="container-fluid widget-content">
+    <style type="text/css">
+        /** Wizard styles **/
+        .wizard span {
+            padding: 5px 5px 5px 20px;
+            margin-right: 0;
+            color: #898989;
+            background: #e5e5e5;
+            position: relative;
+            display: inline-block;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .wizard span:before {
+            width: 0;
+            height: 0;
+            border-top: 14px inset transparent;
+            border-bottom: 14px inset transparent;
+            border-left: 15px solid #f2f2f2;
+            position: absolute;
+            content: "";
+            top: 0;
+            left: 0;
+        }
+        .wizard span:after {
+            width: 0;
+            height: 0;
+            border-top: 14px inset transparent;
+            border-bottom: 14px inset transparent;
+            border-left: 15px solid #e5e5e5;
+            position: absolute;
+            content: "";
+            top: 0;
+            right: -15px;
+            z-index: 2;
+        }
+        .wizard span:first-child:before {
+            border: none;
+        }
+        .wizard span:first-child {
+            padding-left: 15px;
+        }
+        .wizard .processed {
+            background: #1f8fd7;
+            color: #fff;
+        }
+        .wizard .processed:after {
+            border-left-color: #1f8fd7;
+        }
+    </style>
+
+    <div class="step-form-header wizard">
+        {% set isProcessed = false %}
+        {% for step in steps %}
+            <span class="{% if not isProcessed %}processed{% endif %} {% if step.name == currentStep.name %}current{% endif %}">
+                {{ step.label|trans }}
+            </span>
+            {% if step.name == currentStep.name %}
+                {% set isProcessed = true %}
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

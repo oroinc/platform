@@ -4,7 +4,6 @@ parameters:
     oro_workflow.form.event_listener.required_attributes.class: Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener
 
     oro_workflow.form.type.attributes.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType
-    oro_workflow.form.type.step.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType
     oro_workflow.form.type.transition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType
 
     oro_workflow.form.type.workflow_selector.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectorType
@@ -29,11 +28,6 @@ services:
             - @oro_workflow.form.event_listener.required_attributes
         tags:
             - { name: form.type, alias: oro_workflow_attributes }
-
-    oro_workflow.form.type.step:
-        class: %oro_workflow.form.type.step.class%
-        tags:
-            - { name: form.type, alias: oro_workflow_step }
 
     oro_workflow.form.type.transition:
         class: %oro_workflow.form.type.transition.class%
