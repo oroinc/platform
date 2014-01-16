@@ -22,7 +22,6 @@ class OroWorkflowExtension extends Extension
         $loader->load('assemblers.yml');
         $loader->load('form_types.yml');
         $loader->load('serializer.yml');
-        $loader->load('entity_binder.yml');
         $loader->load('configuration.yml');
         $loader->load('twig_extensions.yml');
         $loader->load('listener.yml');

@@ -172,21 +172,15 @@ class WorkflowManager
                 $allowedWorkflows = array();
             }
         } else {
-            $allowedWorkflows = $this->workflowRegistry->getWorkflowsByEntityClass($entityClass);
+            $allowedWorkflows = $this->workflowRegistry->getWorkflowByEntityClass($entityClass);
         }
 
         $applicableWorkflows = array();
+        /** @var Workflow $workflow */
         foreach ($allowedWorkflows as $workflow) {
             if ($workflow->isEnabled()) {
-                $managedEntityAttribute = $this->getManagedEntityAttributeByEntity($workflow, $entity);
-                if ($managedEntityAttribute) {
-                    $isMultiple = $managedEntityAttribute->getOption('multiple') == true;
-
-                    // if workflow allows multiple workflow items or there is no workflow item for current class
-                    if ($isMultiple || !in_array($workflow->getName(), $usedWorkflows)) {
-                        $applicableWorkflows[$workflow->getName()] = $workflow;
-                    }
-                }
+                // TODO: BAP-2839 check this logic to use related entity maybe?
+                $applicableWorkflows[$workflow->getName()] = $workflow;
             }
         }
 
@@ -216,72 +210,22 @@ class WorkflowManager
     }
 
     /**
-     * @param WorkflowItem $workflowItem
-     * @return bool
-     */
-    public function isAllManagedEntitiesSpecified(WorkflowItem $workflowItem)
-    {
-        $workflow = $this->getWorkflow($workflowItem);
-
-        foreach ($workflow->getAttributeManager()->getManagedEntityAttributes() as $attribute) {
-            $attributeName = $attribute->getName();
-            if (!$workflowItem->getData()->get($attributeName)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * @param Workflow $workflow
      * @param object $entity
      * @param array $data
      * @return array
      * @throws UnknownAttributeException
+     * @todo: remove workflow from parameters
      */
     public function getWorkflowData(Workflow $workflow, $entity = null, array $data = array())
     {
         // try to find appropriate entity
         if ($entity) {
-            $entityAttributeName = null;
-            $managedEntityAttribute = $this->getManagedEntityAttributeByEntity($workflow, $entity);
-            if ($managedEntityAttribute) {
-                $entityAttributeName = $managedEntityAttribute->getName();
-            }
-
-            if (!$entityAttributeName) {
-                throw new UnknownAttributeException(
-                    sprintf(
-                        'Can\'t find attribute for managed entity in workflow "%s"',
-                        $workflow->getName()
-                    )
-                );
-            }
-
-            $data[$entityAttributeName] = $entity;
+            //TODO: BAP-2839 - use constant
+            $data['entity'] = $entity;
         }
 
         return $data;
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param object $entity
-     * @return null|Attribute
-     */
-    protected function getManagedEntityAttributeByEntity(Workflow $workflow, $entity)
-    {
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-
-        /** @var Attribute $attribute */
-        foreach ($workflow->getAttributeManager()->getManagedEntityAttributes() as $attribute) {
-            if ($attribute->getOption('class') == $entityClass) {
-                return $attribute;
-            }
-        }
-
-        return null;
     }
 
     /**

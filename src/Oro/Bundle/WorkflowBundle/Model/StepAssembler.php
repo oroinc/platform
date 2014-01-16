@@ -39,18 +39,11 @@ class StepAssembler extends AbstractAssembler
     protected $entityManager;
 
     /**
-     * @var FormOptionsAssembler
-     */
-    protected $formOptionsAssembler;
-
-    /**
      * @param ContainerInterface $container
-     * @param FormOptionsAssembler $formOptionsAssembler
      */
-    public function __construct(ContainerInterface $container, FormOptionsAssembler $formOptionsAssembler)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->formOptionsAssembler = $formOptionsAssembler;
     }
 
     /**
@@ -104,73 +97,10 @@ class StepAssembler extends AbstractAssembler
             ->setTemplate($this->getOption($options, 'template', null))
             ->setOrder($this->getOption($options, 'order', 0))
             ->setIsFinal($this->getOption($options, 'is_final', false))
-            ->setAllowedTransitions($this->getOption($options, 'allowed_transitions', array()))
             ->setEntity($this->getStepEntity($workflowDefinition, $stepName))
-            ->setFormType($this->getOption($options, 'form_type', WorkflowStepType::NAME))
-            ->setFormOptions($this->assembleFormOptions($options, $stepName))
-            ->setViewAttributes($this->assembleViewAttributes($options, $stepName));
+            ->setAllowedTransitions($this->getOption($options, 'allowed_transitions', array()));
 
         return $step;
-    }
-
-    /**
-     * @param array $options
-     * @param string $stepName
-     * @return array
-     */
-    protected function assembleFormOptions(array $options, $stepName)
-    {
-        $formOptions = $this->getOption($options, 'form_options', array());
-        return $this->formOptionsAssembler->assemble($formOptions, $this->attributes, 'step', $stepName);
-    }
-
-    /**
-     * @param array $options
-     * @param string $stepName
-     * @return array
-     * @throws InvalidParameterException
-     */
-    protected function assembleViewAttributes(array $options, $stepName)
-    {
-        $viewAttributes = $this->getOption($options, 'view_attributes', array());
-
-        if (!is_array($viewAttributes)) {
-            throw new InvalidParameterException(
-                sprintf('Option "view_attributes" at step "%s" must be an array', $stepName)
-            );
-        }
-
-        $result = array();
-        foreach ($viewAttributes as $index => $viewAttribute) {
-            if (isset($viewAttribute['attribute'])) {
-                $attributeName = $viewAttribute['attribute'];
-                $this->assertAttributeExists($attributeName, $stepName);
-                if (!isset($viewAttribute['path'])) {
-                    $viewAttribute['path'] = '$' . $viewAttribute['attribute'];
-                }
-                if (!isset($viewAttribute['label'])) {
-                    $viewAttribute['label'] = $this->attributes[$viewAttribute['attribute']]->getLabel();
-                }
-            } elseif (!isset($viewAttribute['path'])) {
-                throw new InvalidParameterException(
-                    sprintf(
-                        'Option "path" or "attribute" at view attribute "%s" of step "%s" is required',
-                        $index,
-                        $stepName
-                    )
-                );
-            } elseif (!isset($viewAttribute['label'])) {
-                throw new InvalidParameterException(
-                    sprintf(
-                        'Option "label" at view attribute "%s" of step "%s" is required',
-                        $index,
-                        $stepName
-                    )
-                );
-            }
-            $result[] = $this->passConfiguration($viewAttribute);
-        }
-        return $result;
     }
 
     /**
@@ -184,6 +114,18 @@ class StepAssembler extends AbstractAssembler
             foreach ($attributes as $attribute) {
                 $this->attributes[$attribute->getName()] = $attribute;
             }
+        }
+    }
+
+    /**
+     * @param array $attributeNames
+     * @param string $stepName
+     * @throws UnknownAttributeException
+     */
+    protected function assertAttributesExist(array $attributeNames, $stepName)
+    {
+        foreach ($attributeNames as $attributeName) {
+            $this->assertAttributeExists($attributeName, $stepName);
         }
     }
 

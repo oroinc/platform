@@ -133,7 +133,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler);
         $expectedWorkflows = array($workflowName => $workflow);
-        $actualWorkflows = $workflowRegistry->getWorkflowsByEntityClass($entityClass);
+        $actualWorkflows = $workflowRegistry->getWorkflowByEntityClass($entityClass);
         $this->assertEquals($expectedWorkflows, $actualWorkflows);
     }
 }

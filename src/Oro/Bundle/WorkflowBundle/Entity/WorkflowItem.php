@@ -75,20 +75,6 @@ class WorkflowItem
     protected $closed;
 
     /**
-     * Entities related to this WorkflowItems
-     *
-     * @var Collection|WorkflowBindEntity[]
-     *
-     * @ORM\OneToMany(
-     *  targetEntity="WorkflowBindEntity",
-     *  mappedBy="workflowItem",
-     *  cascade={"persist", "remove"},
-     *  orphanRemoval=true
-     * )
-     */
-    protected $bindEntities;
-
-    /**
      * Corresponding Workflow Definition
      *
      * @var WorkflowDefinition
@@ -163,7 +149,6 @@ class WorkflowItem
      */
     public function __construct()
     {
-        $this->bindEntities = new ArrayCollection();
         $this->transitionRecords = new ArrayCollection();
         $this->closed = false;
         $this->data = new WorkflowData();
@@ -260,102 +245,6 @@ class WorkflowItem
     public function isClosed()
     {
         return $this->closed;
-    }
-
-    /**
-     * Get entities
-     *
-     * @return Collection
-     */
-    public function getBindEntities()
-    {
-        return $this->bindEntities;
-    }
-
-    /**
-     * Add WorkflowBindEntity
-     *
-     * @param WorkflowBindEntity $entity
-     * @return WorkflowItem
-     */
-    public function addBindEntity(WorkflowBindEntity $entity)
-    {
-        if (!$this->hasBindEntity($entity)) {
-            $entity->setWorkflowItem($this);
-            $this->getBindEntities()->add($entity);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Is entity already bind to WorkflowItem
-     *
-     * @param WorkflowBindEntity $originalEntity
-     * @return bool
-     */
-    public function hasBindEntity(WorkflowBindEntity $originalEntity)
-    {
-        $bindEntities = $this->getBindEntities()->filter(
-            function (WorkflowBindEntity $existedEntity) use ($originalEntity) {
-                return $originalEntity->hasSameEntity($existedEntity);
-            }
-        );
-
-        return $bindEntities->count() > 0;
-    }
-
-    /**
-     * Remove WorkflowBindEntity
-     *
-     * @param WorkflowBindEntity $entity
-     * @return WorkflowItem
-     */
-    public function removeBindEntity(WorkflowBindEntity $entity)
-    {
-        if ($this->getBindEntities()->contains($entity)) {
-            $this->getBindEntities()->removeElement($entity);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Synchronize current bind entities with the list of actual bind entities, removes entities that are outdated and
-     * adds new entities.
-     *
-     * @param WorkflowBindEntity[] $actualBindEntities
-     * @return bool
-     */
-    public function syncBindEntities(array $actualBindEntities)
-    {
-        $hasChanges = false;
-
-        // Remove connections with WorkflowBindEntity that are outdated
-        /** @var $bindEntity WorkflowBindEntity */
-        foreach ($this->getBindEntities() as $bindEntity) {
-            $isActual = false;
-            foreach ($actualBindEntities as $actualBindEntity) {
-                if ($actualBindEntity->hasSameEntity($bindEntity)) {
-                    $isActual = true;
-                    break;
-                }
-            }
-            if (!$isActual) {
-                $hasChanges = true;
-                $this->removeBindEntity($bindEntity);
-            }
-        }
-
-        // Add WorkflowBindEntity that are missing entities
-        foreach ($actualBindEntities as $bindEntity) {
-            if (!$this->hasBindEntity($bindEntity)) {
-                $this->addBindEntity($bindEntity);
-                $hasChanges = true;
-            }
-        }
-
-        return $hasChanges;
     }
 
     /**

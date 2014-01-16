@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class WorkflowItemRepository extends EntityRepository
@@ -66,8 +65,7 @@ class WorkflowItemRepository extends EntityRepository
         $workflowName = null,
         $workflowType = null
     ) {
-        $entityIdentifierString = WorkflowBindEntity::convertIdentifiersToString($entityIdentifier);
-
+        //TODO: remove bindEntities usage in BAP-2888
         $qb = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('wi')
@@ -76,7 +74,7 @@ class WorkflowItemRepository extends EntityRepository
             ->where('wbe.entityClass = :entityClass')
             ->andWhere('wbe.entityId = :entityId')
             ->setParameter('entityClass', $entityClass)
-            ->setParameter('entityId', $entityIdentifierString);
+            ->setParameter('entityId', $entityIdentifier);
 
         if ($workflowName) {
             $qb->andWhere('wi.workflowName = :workflowName')
@@ -112,12 +110,11 @@ class WorkflowItemRepository extends EntityRepository
         \DateTime $dateEnd = null
     ) {
         $resultData = [];
-        $definition = $this->getEntityManager()
+        $workflow = $this->getEntityManager()
             ->getRepository('OroWorkflowBundle:WorkflowDefinition')
             ->findByEntityClass($entityClass);
 
-        if (isset($definition[0])) {
-            $workFlow = $definition[0];
+        if ($workflow) {
             $qb = $this->getEntityManager()->createQueryBuilder();
             $qb->select('wi.currentStepName', 'SUM(opp.' . $fieldName .') as budget')
                 ->from($entityClass, 'opp')
@@ -130,7 +127,7 @@ class WorkflowItemRepository extends EntityRepository
                 ->join('wbe.workflowItem', 'wi')
                 ->andWhere('wi.workflowName = :workFlowName')
                 ->setParameter('entityClass', $entityClass)
-                ->setParameter('workFlowName', $workFlow->getName())
+                ->setParameter('workFlowName', $workflow->getName())
                 ->groupBy('wi.currentStepName');
 
             if ($dateStart && $dateEnd) {
@@ -150,10 +147,10 @@ class WorkflowItemRepository extends EntityRepository
                 if (!empty($visibleSteps)) {
                     $steps = $visibleSteps;
                 } else {
-                    $steps = array_keys($workFlow->getConfiguration()['steps']);
+                    $steps = array_keys($workflow->getConfiguration()['steps']);
                 }
                 foreach ($steps as $stepName) {
-                    $stepLabel = $workFlow->getConfiguration()['steps'][$stepName]['label'];
+                    $stepLabel = $workflow->getConfiguration()['steps'][$stepName]['label'];
                     foreach ($data as $dataValue) {
                         if ($dataValue['currentStepName'] == $stepName) {
                             $resultData[$stepLabel] = (double)$dataValue['budget'];

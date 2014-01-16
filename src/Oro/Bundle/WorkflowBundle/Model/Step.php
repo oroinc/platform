@@ -17,11 +17,6 @@ class Step
     protected $label;
 
     /**
-     * @var string
-     */
-    protected $template;
-
-    /**
      * @var int
      */
     protected $order;
@@ -35,21 +30,6 @@ class Step
      * @var WorkflowStep
      */
     protected $entity;
-
-    /**
-     * @var string
-     */
-    protected $formType;
-
-    /**
-     * @var array
-     */
-    protected $formOptions = array();
-
-    /**
-     * @var array[]
-     */
-    protected $viewAttributes = array();
 
     /**
      * @var string[]
@@ -190,28 +170,6 @@ class Step
     }
 
     /**
-     * Set template.
-     *
-     * @param string $template
-     * @return Step
-     */
-    public function setTemplate($template)
-    {
-        $this->template = $template;
-        return $this;
-    }
-
-    /**
-     * Get template.
-     *
-     * @return string
-     */
-    public function getTemplate()
-    {
-        return $this->template;
-    }
-
-    /**
      * Set label.
      *
      * @param string $label
@@ -249,59 +207,5 @@ class Step
     public function getEntity()
     {
         return $this->entity;
-    }
-
-    /**
-     * @param string $formType
-     * @return Step
-     */
-    public function setFormType($formType)
-    {
-        $this->formType = $formType;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFormType()
-    {
-        return $this->formType;
-    }
-
-    /**
-     * @param array $formOptions
-     * @return Step
-     */
-    public function setFormOptions(array $formOptions)
-    {
-        $this->formOptions = $formOptions;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFormOptions()
-    {
-        return $this->formOptions;
-    }
-
-    /**
-     * @param array $viewAttributes
-     * @return Step
-     */
-    public function setViewAttributes(array $viewAttributes)
-    {
-        $this->viewAttributes = $viewAttributes;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getViewAttributes()
-    {
-        return $this->viewAttributes;
     }
 }

@@ -63,51 +63,6 @@ class AttributeManager
     }
 
     /**
-     * Get attributes with option "managed_entity"
-     *
-     * @return Collection|Attribute[]
-     */
-    public function getManagedEntityAttributes()
-    {
-        return $this->getAttributes()->filter(
-            function (Attribute $attribute) {
-                return $attribute->getType() == 'entity' && $attribute->getOption('managed_entity');
-            }
-        );
-    }
-
-    /**
-     * Get list of attributes that require binding
-     *
-     * @return Collection|Attribute[]
-     */
-    public function getBindEntityAttributes()
-    {
-        return $this->getAttributes()->filter(
-            function (Attribute $attribute) {
-                return $attribute->getType() == 'entity' && $attribute->getOption('bind');
-            }
-        );
-    }
-
-    /**
-     * Get list of attributes names that require binding
-     *
-     * @return array
-     */
-    public function getBindEntityAttributeNames()
-    {
-        $result = array();
-
-        /** @var Attribute $attribute  */
-        foreach ($this->getBindEntityAttributes() as $attribute) {
-            $result[] = $attribute->getName();
-        }
-
-        return $result;
-    }
-
-    /**
      * @return Attribute
      * @throws UnknownAttributeException
      */

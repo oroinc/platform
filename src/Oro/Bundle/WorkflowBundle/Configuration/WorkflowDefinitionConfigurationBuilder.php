@@ -3,9 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinitionEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
@@ -31,23 +29,17 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     {
         $workflowDefinitions = array();
         foreach ($configurationData as $workflowName => $workflowConfiguration) {
-            $this->assertConfigurationOptions($workflowConfiguration, array('label', 'type'));
+            $this->assertConfigurationOptions($workflowConfiguration, array('label'));
 
-            $type = $this->getConfigurationOption($workflowConfiguration, 'type', Workflow::TYPE_ENTITY);
             $enabled = $this->getConfigurationOption($workflowConfiguration, 'enabled', true);
             $startStepName = $this->getConfigurationOption($workflowConfiguration, 'start_step', null);
-
-            $managedEntityClasses = $this->getManagedEntityClasses($workflowConfiguration);
-            $definitionEntities = $this->buildDefinitionEntities($managedEntityClasses);
 
             $workflowDefinition = new WorkflowDefinition();
             $workflowDefinition
                 ->setName($workflowName)
                 ->setLabel($workflowConfiguration['label'])
-                ->setType($type)
                 ->setEnabled($enabled)
-                ->setConfiguration($workflowConfiguration)
-                ->setWorkflowDefinitionEntities($definitionEntities);
+                ->setConfiguration($workflowConfiguration);
 
             $this->setWorkflowSteps($workflowDefinition);
             $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
@@ -56,54 +48,6 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         }
 
         return $workflowDefinitions;
-    }
-
-    /**
-     * @param array $managedEntityClasses
-     * @return WorkflowDefinitionEntity[]
-     */
-    protected function buildDefinitionEntities(array $managedEntityClasses)
-    {
-        $definitionEntities = array();
-
-        foreach ($managedEntityClasses as $entityClass) {
-            $definitionEntity = new WorkflowDefinitionEntity();
-            $definitionEntity->setClassName($entityClass);
-
-            $definitionEntities[] = $definitionEntity;
-        }
-
-        return $definitionEntities;
-    }
-
-    /**
-     * @param array $workflowConfiguration
-     * @return array
-     */
-    protected function getManagedEntityClasses(array $workflowConfiguration)
-    {
-        $managedEntityClasses = array();
-
-        $attributesData = $this->getConfigurationOption(
-            $workflowConfiguration,
-            WorkflowConfiguration::NODE_ATTRIBUTES,
-            array()
-        );
-
-        foreach ($attributesData as $attributeData) {
-            $type = $this->getConfigurationOption($attributeData, 'type', null);
-
-            if ($type == 'entity') {
-                $options = $this->getConfigurationOption($attributeData, 'options', array());
-                $this->assertConfigurationOptions($options, array('class'));
-
-                if (!empty($options['managed_entity'])) {
-                    $managedEntityClasses[] = $this->getConfigurationOption($options, 'class', null);
-                }
-            }
-        }
-
-        return $managedEntityClasses;
     }
 
     /**

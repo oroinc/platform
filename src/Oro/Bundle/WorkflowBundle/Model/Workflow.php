@@ -23,11 +23,6 @@ class Workflow
     protected $name;
 
     /**
-     * @var string
-     */
-    protected $type;
-
-    /**
      * @var boolean
      */
     protected $enabled = true;
@@ -46,11 +41,6 @@ class Workflow
      * @var TransitionManager
      */
     protected $transitionManager;
-
-    /**
-     * @var EntityBinder
-     */
-    protected $entityBinder;
 
     /**
      * @var string
@@ -75,14 +65,6 @@ class Workflow
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager  = $attributeManager ? $attributeManager : new AttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
-    }
-
-    /**
-     * @param EntityBinder $entityBinder
-     */
-    public function setEntityBinder(EntityBinder $entityBinder)
-    {
-        $this->entityBinder = $entityBinder;
     }
 
     /**
@@ -127,28 +109,6 @@ class Workflow
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * Set type.
-     *
-     * @param string $type
-     * @return Workflow
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * Get type.
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
@@ -312,22 +272,6 @@ class Workflow
         $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
         $transition->transit($workflowItem);
         $workflowItem->addTransitionRecord($transitionRecord);
-        $this->bindEntities($workflowItem);
-    }
-
-    /**
-     * Bind entities to workflow item
-     *
-     * @param WorkflowItem $workflowItem
-     * @return bool
-     * @throws \LogicException
-     */
-    public function bindEntities(WorkflowItem $workflowItem)
-    {
-        if (!$this->entityBinder) {
-            throw new \LogicException('Entity binder is not set.');
-        }
-        return $this->entityBinder->bindEntities($workflowItem);
     }
 
     /**

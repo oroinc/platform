@@ -35,13 +35,6 @@ class WorkflowDefinition
     protected $label;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $type;
-
-    /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
@@ -76,18 +69,6 @@ class WorkflowDefinition
     protected $startStep;
 
     /**
-     * @var Collection
-     *
-     * @ORM\OneToMany(
-     *      targetEntity="WorkflowDefinitionEntity",
-     *      mappedBy="workflowDefinition",
-     *      orphanRemoval=true,
-     *      cascade={"all"}
-     * )
-     */
-    protected $workflowDefinitionEntities;
-
-    /**
      * Constructor
      */
     public function __construct()
@@ -95,7 +76,6 @@ class WorkflowDefinition
         $this->enabled = false;
         $this->configuration = array();
         $this->steps = new ArrayCollection();
-        $this->workflowDefinitionEntities = new ArrayCollection();
     }
 
     /**
@@ -142,29 +122,6 @@ class WorkflowDefinition
     public function getLabel()
     {
         return $this->label;
-    }
-
-    /**
-     * Get label
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set type
-     *
-     * @param string $type
-     * @return WorkflowDefinition
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-
-        return $this;
     }
 
     /**
@@ -334,42 +291,6 @@ class WorkflowDefinition
     }
 
     /**
-     * @param Collection|WorkflowDefinitionEntity[] $definitionEntities
-     * @return WorkflowDefinition
-     */
-    public function setWorkflowDefinitionEntities($definitionEntities)
-    {
-        /** @var WorkflowDefinitionEntity $entity */
-        $newEntities = array();
-        foreach ($definitionEntities as $entity) {
-            $newEntities[$entity->getClassName()] = $entity;
-        }
-
-        foreach ($this->workflowDefinitionEntities as $entity) {
-            if (array_key_exists($entity->getClassName(), $newEntities)) {
-                unset($newEntities[$entity->getClassName()]);
-            } else {
-                $this->workflowDefinitionEntities->removeElement($entity);
-            }
-        }
-
-        foreach ($newEntities as $entity) {
-            $entity->setWorkflowDefinition($this);
-            $this->workflowDefinitionEntities->add($entity);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|WorkflowDefinitionEntity[]
-     */
-    public function getWorkflowDefinitionEntities()
-    {
-        return $this->workflowDefinitionEntities;
-    }
-
-    /**
      * @param WorkflowDefinition $definition
      * @return WorkflowDefinition
      */
@@ -377,12 +298,10 @@ class WorkflowDefinition
     {
         // enabled flag should not be imported
         $this->setName($definition->getName())
-            ->setType($definition->getType())
             ->setLabel($definition->getLabel())
             ->setConfiguration($definition->getConfiguration())
             ->setSteps($definition->getSteps())
-            ->setStartStep($definition->getStartStep())
-            ->setWorkflowDefinitionEntities($definition->getWorkflowDefinitionEntities());
+            ->setStartStep($definition->getStartStep());
 
         return $this;
     }
