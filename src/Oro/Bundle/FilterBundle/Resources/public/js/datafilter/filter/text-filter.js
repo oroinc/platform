@@ -103,7 +103,7 @@ function($, _, __, AbstractFilter) {
         ensurePopupCriteriaClosed: function () {
             if (this.popupCriteriaShowed) {
                 this._hideCriteria();
-                this.setValue(this._formatRawValue(this._readDOMValue()));
+                this.apply()
             }
         },
 
@@ -116,7 +116,7 @@ function($, _, __, AbstractFilter) {
         _onReadCriteriaInputKey: function(e) {
             if (e.which === 13) {
                 this._hideCriteria();
-                this.setValue(this._formatRawValue(this._readDOMValue()));
+                this.apply();
             }
         },
 
@@ -128,7 +128,7 @@ function($, _, __, AbstractFilter) {
          */
         _onClickUpdateCriteria: function(e) {
             this._hideCriteria();
-            this.setValue(this._formatRawValue(this._readDOMValue()));
+            this.apply();
         },
 
         /**
@@ -178,7 +178,7 @@ function($, _, __, AbstractFilter) {
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
                 this._hideCriteria();
-                this.setValue(this._formatRawValue(this._readDOMValue()));
+                this.apply();
                 e.stopPropagation();
             }
         },

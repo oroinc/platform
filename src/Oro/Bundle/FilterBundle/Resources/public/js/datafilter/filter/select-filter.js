@@ -282,7 +282,7 @@ function ($, _, __, AbstractFilter, MultiselectDecorator) {
          */
         _onSelectChange: function() {
             // set value
-            this.setValue(this._formatRawValue(this._readDOMValue()));
+            this.apply();
 
             // update dropdown
             var widget = this.$(this.containerSelector);
