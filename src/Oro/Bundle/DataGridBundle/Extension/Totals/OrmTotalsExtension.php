@@ -84,7 +84,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $totals       = $this->getTotals($config);
+        $totals       = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $totalQueries = [];
         foreach ($totals as $field => $total) {
             if (isset($total['query'])) {
@@ -129,7 +129,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metaData)
     {
-        $totals = $this->getTotals($config);
+        $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $metaData
             ->offsetAddToArray('state', ['totals' => $totals])
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['oro/datagrid/totals-builder']);
@@ -145,26 +145,8 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * Retrieve and prepare list of sorters
-     *
-     * @param DatagridConfiguration $config
-     *
-     * @return array
-     */
-    protected function getTotals(DatagridConfiguration $config)
-    {
-        $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-        foreach ($totals as $name => $definition) {
-            $definition     = is_array($definition) ? $definition : [];
-            $sorters[$name] = $definition;
-        }
-
-        return $totals;
-    }
-
-    /**
-     * @param mixed $val
-     * @param string $formatter
+     * @param mixed|null $val
+     * @param string|null $formatter
      * @return string|null
      */
     protected function applyFrontendFormatting($val = null, $formatter = null)
