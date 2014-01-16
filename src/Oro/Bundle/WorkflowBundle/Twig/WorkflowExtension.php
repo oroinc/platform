@@ -36,8 +36,8 @@ class WorkflowExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('has_workflows', array($this, 'hasWorkflows')),
-            new \Twig_SimpleFunction('has_workflow_items', array($this, 'hasWorkflowItems')),
+            new \Twig_SimpleFunction('has_workflow', array($this, 'hasWorkflow')),
+            new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
             new \Twig_SimpleFunction('get_workflow', array($this, 'getWorkflow')),
             new \Twig_SimpleFunction('get_workflow_item_current_step', array($this, 'getWorkflowItemCurrentStep')),
         );
@@ -49,7 +49,7 @@ class WorkflowExtension extends \Twig_Extension
      * @param string $entityClass
      * @return bool
      */
-    public function hasWorkflows($entityClass)
+    public function hasWorkflow($entityClass)
     {
         if (!$entityClass) {
             return false;
@@ -59,15 +59,14 @@ class WorkflowExtension extends \Twig_Extension
     }
 
     /**
-     * Check for started workflow instances.
+     * Check for started workflow instance.
      *
      * @param object $entity
      * @return bool
      */
-    public function hasWorkflowItems($entity)
+    public function hasWorkflowItem($entity)
     {
-        $skippedWorkflowName = null;
-        return $this->workflowManager->checkWorkflowItemsByEntity($entity, $skippedWorkflowName);
+        return $this->workflowManager->getWorkflowItemByEntity($entity) !== null;
     }
 
     /**

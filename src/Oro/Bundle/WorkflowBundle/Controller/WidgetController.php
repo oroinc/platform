@@ -167,7 +167,7 @@ class WidgetController extends Controller
     }
 
     /**
-     * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons_entity")
+     * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons")
      * @Template
      * @AclAncestor("oro_workflow")
      */

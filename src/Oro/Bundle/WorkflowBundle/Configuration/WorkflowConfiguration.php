@@ -63,6 +63,9 @@ class WorkflowConfiguration implements ConfigurationInterface
             ->scalarNode('start_step')
                 ->defaultNull()
             ->end()
+            ->booleanNode('steps_display_ordered')
+                ->defaultFalse()
+            ->end()
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
             ->append($this->getTransitionsNode())
@@ -118,8 +121,7 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->cannotBeEmpty()
                     ->end()
                     ->scalarNode('type')
-                        ->isRequired()
-                        ->cannotBeEmpty()
+                        ->defaultNull()
                     ->end()
                     ->scalarNode('property_path')
                         ->defaultNull()
@@ -128,6 +130,17 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
+                ->end()
+                ->validate()
+                    ->always(
+                        function ($value) {
+                            if (!isset($value['type']) && !isset($value['property_path'])) {
+                                throw new \Exception('"type" or "property_path" is required option.');
+                            }
+
+                            return $value;
+                        }
+                    )
                 ->end()
             ->end();
 

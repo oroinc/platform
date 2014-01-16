@@ -1,12 +1,12 @@
-{% if has_workflows(oro_class_name(entity)) %}
+{% if has_workflow(oro_class_name(entity)) %}
     {{
         oro_widget_render({
             'widgetType': 'buttons',
-            'url': path('oro_workflow_widget_buttons_entity', {
+            'url': path('oro_workflow_widget_buttons', {
                 entityClass: oro_class_name(entity),
                 entityId: entity.id
             }),
-            'alias': 'workflow_entity_buttons'
+            'alias': 'workflow_buttons'
         })
     }}
 {% endif %}

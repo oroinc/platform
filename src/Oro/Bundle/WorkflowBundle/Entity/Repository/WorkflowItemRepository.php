@@ -26,21 +26,6 @@ class WorkflowItemRepository extends EntityRepository
     /**
      * @param string $entityClass
      * @param int $entityIdentifier
-     * @return int
-     * @todo: Seems this method in unused now. BAP-2888
-     */
-    public function checkWorkflowItemsByEntityMetadata($entityClass, $entityIdentifier)
-    {
-        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier);
-        $qb->select('wi.id');
-        $qb->setMaxResults(1);
-
-        return count($qb->getQuery()->getResult()) > 0;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param int $entityIdentifier
      * @return QueryBuilder
      */
     protected function getWorkflowQueryBuilder($entityClass, $entityIdentifier)
