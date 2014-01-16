@@ -36,6 +36,7 @@ services:
     oro_workflow.step_assembler:
         class: %oro_workflow.step_assembler.class%
         arguments:
+            - @service_container
             - @oro_workflow.form_options_assembler
         calls:
             - [addConfigurationPass, [@oro_workflow.configuration_pass.replace_property_path]]

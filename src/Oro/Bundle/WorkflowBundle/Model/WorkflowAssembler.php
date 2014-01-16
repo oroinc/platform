@@ -59,14 +59,14 @@ class WorkflowAssembler extends AbstractAssembler
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
+     * @param WorkflowDefinition $definition
      * @throws UnknownStepException
      * @throws AssemblerException
      * @return Workflow
      */
-    public function assemble(WorkflowDefinition $workflowDefinition)
+    public function assemble(WorkflowDefinition $definition)
     {
-        $configuration = $this->parseConfiguration($workflowDefinition);
+        $configuration = $this->parseConfiguration($definition);
         $this->assertOptions(
             $configuration,
             array(
@@ -78,15 +78,15 @@ class WorkflowAssembler extends AbstractAssembler
 
         $attributes = $this->assembleAttributes($configuration);
 
-        $steps = $this->assembleSteps($configuration, $attributes);
+        $steps = $this->assembleSteps($definition, $configuration, $attributes);
         $transitions = $this->assembleTransitions($configuration, $steps, $attributes);
 
         $workflow = $this->createWorkflow();
         $workflow
-            ->setName($workflowDefinition->getName())
-            ->setLabel($workflowDefinition->getLabel())
-            ->setType($workflowDefinition->getType())
-            ->setEnabled($workflowDefinition->isEnabled());
+            ->setName($definition->getName())
+            ->setLabel($definition->getLabel())
+            ->setType($definition->getType())
+            ->setEnabled($definition->isEnabled());
 
         $workflow->getStepManager()->setSteps($steps);
         $workflow->getAttributeManager()->setAttributes($attributes);
@@ -182,15 +182,16 @@ class WorkflowAssembler extends AbstractAssembler
     }
 
     /**
+     * @param WorkflowDefinition $definition
      * @param array $configuration
      * @param Collection $attributes
      * @return Collection
      */
-    protected function assembleSteps(array $configuration, Collection $attributes)
+    protected function assembleSteps(WorkflowDefinition $definition, array $configuration, Collection $attributes)
     {
         $stepsConfiguration = $this->getOption($configuration, WorkflowConfiguration::NODE_STEPS, array());
 
-        return $this->stepAssembler->assemble($stepsConfiguration, $attributes);
+        return $this->stepAssembler->assemble($definition, $stepsConfiguration, $attributes);
     }
 
     /**

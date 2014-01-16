@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+
 class Step
 {
     /**
@@ -28,6 +30,11 @@ class Step
      * @var boolean
      */
     protected $isFinal = false;
+
+    /**
+     * @var WorkflowStep
+     */
+    protected $entity;
 
     /**
      * @var string
@@ -224,6 +231,24 @@ class Step
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * @param WorkflowStep $entity
+     * @return Step
+     */
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+        return $this;
+    }
+
+    /**
+     * @return WorkflowStep
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 
     /**
