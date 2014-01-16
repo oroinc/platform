@@ -12,7 +12,6 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
@@ -94,7 +93,6 @@ class StepAssembler extends AbstractAssembler
         $step = new Step();
         $step->setName($stepName)
             ->setLabel($options['label'])
-            ->setTemplate($this->getOption($options, 'template', null))
             ->setOrder($this->getOption($options, 'order', 0))
             ->setIsFinal($this->getOption($options, 'is_final', false))
             ->setEntity($this->getStepEntity($workflowDefinition, $stepName))
