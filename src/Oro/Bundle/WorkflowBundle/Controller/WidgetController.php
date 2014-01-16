@@ -71,7 +71,7 @@ class WidgetController extends Controller
         $entityId = $this->getRequest()->get('entityId');
         if ($entityClass && $entityId) {
             $entity = $this->getEntityReference($entityClass, $entityId);
-            $initData = $workflowManager->getWorkflowData($workflow, $entity, $initData);
+            $initData = $workflowManager->getWorkflowData($entity, $initData);
         }
 
         $workflowItem = $workflow->createWorkflowItem($initData);

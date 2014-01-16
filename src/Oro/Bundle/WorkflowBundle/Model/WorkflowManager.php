@@ -89,7 +89,7 @@ class WorkflowManager
     public function isStartTransitionAvailable($workflow, $transition, $entity = null, Collection $errors = null)
     {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($workflow, $entity);
+        $initData = $this->getWorkflowData($entity);
 
         return $workflow->isStartTransitionAvailable($transition, $initData, $errors);
     }
@@ -105,7 +105,7 @@ class WorkflowManager
     public function startWorkflow($workflow, $entity = null, $transition = null, array $data = array())
     {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($workflow, $entity, $data);
+        $initData = $this->getWorkflowData($entity, $data);
 
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
@@ -210,19 +210,15 @@ class WorkflowManager
     }
 
     /**
-     * @param Workflow $workflow
      * @param object $entity
      * @param array $data
      * @return array
      * @throws UnknownAttributeException
-     * @todo: remove workflow from parameters
      */
-    public function getWorkflowData(Workflow $workflow, $entity = null, array $data = array())
+    public function getWorkflowData($entity = null, array $data = array())
     {
-        // try to find appropriate entity
         if ($entity) {
-            //TODO: BAP-2839 - use constant
-            $data['entity'] = $entity;
+            $data[AttributeManager::ATTRIBUTE_ENTITY] = $entity;
         }
 
         return $data;

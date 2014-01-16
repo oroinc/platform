@@ -327,7 +327,7 @@ class WorkflowItem
                 $this->serializer->setWorkflowName($this->workflowName);
                 $this->data = $this->serializer->deserialize(
                     $this->serializedData,
-                    'Oro\Bundle\WorkflowBundle\Model\WorkflowData', // @TODO Make this class name configurable?
+                    'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
                     $this->serializeFormat
                 );
             }
