@@ -94,8 +94,6 @@ define(function (require) {
             buildGrid: function () {
                 var options, collection, grid, obj;
 
-                //debugger;
-
                 // collection can be stored in the page cache
                 mediator.trigger('datagrid_collection_set_before', obj = {});
                 if (obj.collection) {
