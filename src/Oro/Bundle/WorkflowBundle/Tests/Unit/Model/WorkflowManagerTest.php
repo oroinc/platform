@@ -384,13 +384,13 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         // with automatic workflow item extraction
         $this->assertEquals(
             $expectedWorkflows,
-            $this->workflowManager->getApplicableWorkflows($entity, null, $requiredWorkflowName)
+            $this->workflowManager->getApplicableWorkflow($entity, null, $requiredWorkflowName)
         );
 
         // with manual workflow item setting
         $this->assertEquals(
             $expectedWorkflows,
-            $this->workflowManager->getApplicableWorkflows($entity, $workflowItems, $requiredWorkflowName)
+            $this->workflowManager->getApplicableWorkflow($entity, $workflowItems, $requiredWorkflowName)
         );
     }
 
@@ -427,7 +427,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $workflowItems,
-            $this->workflowManager->getWorkflowItemsByEntity($entity, $requiredWorkflowName)
+            $this->workflowManager->getWorkflowItemByEntity($entity, $requiredWorkflowName)
         );
     }
 

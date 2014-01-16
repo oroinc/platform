@@ -49,20 +49,20 @@ class WorkflowItem
     protected $workflowName;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(name="entity_id", type="integer")
+     * @Serializer\Expose()
+     */
+    protected $entityId;
+
+    /**
      * @var WorkflowStep
      *
      * @ORM\ManyToOne(targetEntity="WorkflowStep")
      * @ORM\JoinColumn(name="current_step_id", referencedColumnName="id")
      */
     protected $currentStep;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="entity_id", type="integer")
-     * @Serializer\Expose()
-     */
-    protected $entityId;
 
     /**
      * @var string

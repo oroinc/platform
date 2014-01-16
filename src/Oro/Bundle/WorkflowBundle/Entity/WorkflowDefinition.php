@@ -35,6 +35,13 @@ class WorkflowDefinition
     protected $label;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="related_entity", type="string", length=255, unique=true)
+     */
+    protected $relatedEntity;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
@@ -122,6 +129,25 @@ class WorkflowDefinition
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * @param string $relatedEntity
+     * @return WorkflowDefinition
+     */
+    public function setRelatedEntity($relatedEntity)
+    {
+        $this->relatedEntity = $relatedEntity;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelatedEntity()
+    {
+        return $this->relatedEntity;
     }
 
     /**
@@ -299,6 +325,7 @@ class WorkflowDefinition
         // enabled flag should not be imported
         $this->setName($definition->getName())
             ->setLabel($definition->getLabel())
+            ->setRelatedEntity($definition->getRelatedEntity())
             ->setConfiguration($definition->getConfiguration())
             ->setSteps($definition->getSteps())
             ->setStartStep($definition->getStartStep());

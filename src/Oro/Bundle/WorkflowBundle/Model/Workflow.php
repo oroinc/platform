@@ -14,8 +14,6 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 class Workflow
 {
     const DEFAULT_START_TRANSITION_NAME = '__start__';
-    const TYPE_ENTITY = 'entity';
-    const TYPE_WIZARD = 'wizard';
 
     /**
      * @var string

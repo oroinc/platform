@@ -76,7 +76,7 @@ class WorkflowRegistry
      * Get Workflow that is applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow
+     * @return Workflow|null
      */
     public function getWorkflowByEntityClass($entityClass)
     {

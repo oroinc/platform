@@ -6,46 +6,33 @@ use Doctrine\ORM\EntityRepository;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 class WorkflowItemRepository extends EntityRepository
 {
     /**
-     * Get workflow items associated with entity.
+     * Get workflow item associated with entity.
      *
      * @param string $entityClass
-     * @param string|array $entityIdentifier
-     * @param string|null $workflowName
-     * @param string|null $workflowType
-     * @return array
+     * @param int $entityIdentifier
+     * @return WorkflowItem|null
      */
-    public function findByEntityMetadata($entityClass, $entityIdentifier, $workflowName = null, $workflowType = null)
+    public function findByEntityMetadata($entityClass, $entityIdentifier)
     {
-        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier, $workflowName, $workflowType);
-        return $qb->getQuery()->getResult();
+        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier);
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
      * @param string $entityClass
-     * @param string|array $entityIdentifier
-     * @param null|string $workflowName
-     * @param null|string $workflowType
-     * @param null|string $skippedWorkflow
+     * @param int $entityIdentifier
      * @return int
+     * @todo: Seems this method in unused now. BAP-2888
      */
-    public function checkWorkflowItemsByEntityMetadata(
-        $entityClass,
-        $entityIdentifier,
-        $workflowName = null,
-        $workflowType = null,
-        $skippedWorkflow = null
-    ) {
-        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier, $workflowName, $workflowType);
+    public function checkWorkflowItemsByEntityMetadata($entityClass, $entityIdentifier)
+    {
+        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier);
         $qb->select('wi.id');
-
-        if ($skippedWorkflow) {
-            $qb->andWhere('wi.workflowName != :skippedWorkflowName')
-                ->setParameter('skippedWorkflowName', $skippedWorkflow);
-        }
         $qb->setMaxResults(1);
 
         return count($qb->getQuery()->getResult()) > 0;
@@ -53,45 +40,25 @@ class WorkflowItemRepository extends EntityRepository
 
     /**
      * @param string $entityClass
-     * @param string|array $entityIdentifier
-     * @param null|string $workflowName
-     * @param null|string $workflowType
-     * @internal param null|string $skippedWorkflow
+     * @param int $entityIdentifier
      * @return QueryBuilder
      */
-    protected function getWorkflowQueryBuilder(
-        $entityClass,
-        $entityIdentifier,
-        $workflowName = null,
-        $workflowType = null
-    ) {
-        //TODO: remove bindEntities usage in BAP-2888
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('wi')
-            ->from('OroWorkflowBundle:WorkflowItem', 'wi')
-            ->innerJoin('wi.bindEntities', 'wbe')
-            ->where('wbe.entityClass = :entityClass')
-            ->andWhere('wbe.entityId = :entityId')
+    protected function getWorkflowQueryBuilder($entityClass, $entityIdentifier)
+    {
+        $qb = $this->createQueryBuilder('wi')
+            ->innerJoin('wi.definition', 'wd')
+            ->where('wd.relatedEntity = :entityClass')
+            ->andWhere('wi.entityId = :entityId')
             ->setParameter('entityClass', $entityClass)
             ->setParameter('entityId', $entityIdentifier);
-
-        if ($workflowName) {
-            $qb->andWhere('wi.workflowName = :workflowName')
-                ->setParameter('workflowName', $workflowName);
-        }
-
-        if ($workflowType) {
-            $qb->innerJoin('wi.definition', 'wd')
-                ->andWhere('wd.type = :workflowType')
-                ->setParameter('workflowType', $workflowType);
-        }
 
         return $qb;
     }
 
     /**
      * Get data for funnel chart
+     *
+     * @todo: Move this somewhere else from Workflow bundle
      *
      * @param $entityClass
      * @param $fieldName

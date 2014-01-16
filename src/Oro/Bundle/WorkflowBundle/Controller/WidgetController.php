@@ -175,23 +175,14 @@ class WidgetController extends Controller
     {
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-
         $entity = $this->getEntityReference($entityClass, $entityId);
-        $workflowName = $this->getRequest()->get('workflowName');
 
-        $transitionsData = array();
-
-        $existingWorkflowItems = $workflowManager->getWorkflowItemsByEntity($entity, $workflowName);
-        $newWorkflows = $workflowManager->getApplicableWorkflows($entity, $existingWorkflowItems, $workflowName);
-
-        /** @var Workflow $workflow */
-        foreach ($newWorkflows as $workflow) {
-            $transitionsData += $this->getAvailableStartTransitionsData($workflow, $entity);
-        }
-
-        /** @var WorkflowItem $workflowItem */
-        foreach ($existingWorkflowItems as $workflowItem) {
-            $transitionsData += $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+        $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+        if ($workflowItem) {
+            $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+        } else {
+            $workflow = $workflowManager->getApplicableWorkflow($entity);
+            $transitionsData = $this->getAvailableStartTransitionsData($workflow, $entity);
         }
 
         return array(

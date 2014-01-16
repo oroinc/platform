@@ -29,7 +29,7 @@ class AttributeAssembler extends AbstractAssembler
                 'label' => AttributeManager::ATTRIBUTE_ENTITY,
                 'type' => 'entity',
                 'options' => array(
-                    'class' => 'OroCRM\Bundle\SalesBundle\Entity\Lead', // TODO Use something like $definition->getRelatedEntity() BAP-2888
+                    'class' => $definition->getRelatedEntity(),
                 ),
             );
             $attribute = $this->assembleAttribute(AttributeManager::ATTRIBUTE_ENTITY, $options);
@@ -46,8 +46,6 @@ class AttributeAssembler extends AbstractAssembler
      */
     protected function assembleAttribute($name, array $options)
     {
-        $options = $this->addDefaultOptions($options);
-
         $this->assertOptions($options, array('label', 'type'));
 
         $attribute = new Attribute();
@@ -62,20 +60,6 @@ class AttributeAssembler extends AbstractAssembler
         return $attribute;
     }
 
-    protected function addDefaultOptions(array $options)
-    {
-        if (isset($options['type']) && $options['type'] == 'entity') {
-            $options['options'] = isset($options['options']) && is_array($options['options']) ?
-                $options['options'] : array();
-
-            $options['options'] = array_merge(
-                array('multiple' => false, 'bind' => !empty($options['options']['managed_entity'])),
-                $options['options']
-            );
-        }
-        return $options;
-    }
-
     /**
      * @param Attribute $attribute
      * @throws AssemblerException If attribute is invalid
@@ -88,31 +72,6 @@ class AttributeAssembler extends AbstractAssembler
             $this->assertAttributeHasClassOption($attribute);
         } else {
             $this->assertAttributeHasNoOptions($attribute, 'class');
-        }
-
-        if ($attribute->getType() == 'entity') {
-            $managedEntity = $attribute->getOption('managed_entity');
-            $multiple = $attribute->getOption('multiple');
-            $bind = $attribute->getOption('bind');
-            if ($managedEntity && $attribute->getPropertyPath()) {
-                throw new AssemblerException(
-                    sprintf(
-                        'Property path can not be set for managed entity in attribute "%s"',
-                        $attribute->getName()
-                    )
-                );
-            }
-            if ($managedEntity && !$multiple && !$bind) {
-                throw new AssemblerException(
-                    sprintf(
-                        'Options "multiple" and "bind" for managed entity in attribute "%s" ' .
-                        'cannot be both false simultaneously',
-                        $attribute->getName()
-                    )
-                );
-            }
-        } else {
-            $this->assertAttributeHasNoOptions($attribute, array('managed_entity', 'bind', 'multiple'));
         }
     }
 

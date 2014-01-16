@@ -152,51 +152,19 @@ class WorkflowManager
 
     /**
      * @param object $entity
-     * @param WorkflowItem[]|Collection $workflowItems
-     * @param string|null $workflowName
-     * @return Workflow[]
+     * @return Workflow
      */
-    public function getApplicableWorkflows($entity, $workflowItems = null, $workflowName = null)
+    public function getApplicableWorkflow($entity)
     {
-        if (null === $workflowItems) {
-            $workflowItems = $this->getWorkflowItemsByEntity($entity, $workflowName);
-        }
-
-        $usedWorkflows = array();
-        foreach ($workflowItems as $workflowItem) {
-            $usedWorkflows[] = $workflowItem->getWorkflowName();
-        }
-
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        if ($workflowName) {
-            try {
-                $allowedWorkflows = array($this->workflowRegistry->getWorkflow($workflowName));
-            } catch (WorkflowNotFoundException $e) {
-                $allowedWorkflows = array();
-            }
-        } else {
-            $allowedWorkflows = $this->workflowRegistry->getWorkflowByEntityClass($entityClass);
-        }
-
-        $applicableWorkflows = array();
-        /** @var Workflow $workflow */
-        foreach ($allowedWorkflows as $workflow) {
-            if ($workflow->isEnabled()) {
-                // TODO: BAP-2839 check this logic to use related entity maybe?
-                $applicableWorkflows[$workflow->getName()] = $workflow;
-            }
-        }
-
-        return $applicableWorkflows;
+        return $this->workflowRegistry->getWorkflowByEntityClass($entityClass);
     }
 
     /**
      * @param object $entity
-     * @param string|null $workflowName
-     * @param string|null $workflowType
-     * @return WorkflowItem[]
+     * @return WorkflowItem|null
      */
-    public function getWorkflowItemsByEntity($entity, $workflowName = null, $workflowType = null)
+    public function getWorkflowItemByEntity($entity)
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
@@ -204,12 +172,7 @@ class WorkflowManager
         /** @var WorkflowItemRepository $workflowItemsRepository */
         $workflowItemsRepository = $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
 
-        return $workflowItemsRepository->findByEntityMetadata(
-            $entityClass,
-            $entityIdentifier,
-            $workflowName,
-            $workflowType
-        );
+        return $workflowItemsRepository->findByEntityMetadata($entityClass, $entityIdentifier);
     }
 
     /**

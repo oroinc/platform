@@ -12,12 +12,11 @@ class WorkflowDefinitionRepository extends EntityRepository
      * Get available workflow definitions for entity class
      *
      * @param string $entityClass
-     * @return WorkflowDefinition
+     * @return WorkflowDefinition|null
      */
     public function findByEntityClass($entityClass)
     {
         $queryBuilder = $this->createQueryBuilder('wd');
-        //TODO: replace with real attribute name in task BAP-2888
         $queryBuilder
             ->where('wd.relatedEntity = :relatedEntity')
             ->setParameter('relatedEntity', $entityClass);

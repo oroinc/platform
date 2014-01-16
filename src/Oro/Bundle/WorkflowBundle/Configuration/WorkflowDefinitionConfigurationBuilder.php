@@ -29,7 +29,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     {
         $workflowDefinitions = array();
         foreach ($configurationData as $workflowName => $workflowConfiguration) {
-            $this->assertConfigurationOptions($workflowConfiguration, array('label'));
+            $this->assertConfigurationOptions($workflowConfiguration, array('label', 'entity'));
 
             $enabled = $this->getConfigurationOption($workflowConfiguration, 'enabled', true);
             $startStepName = $this->getConfigurationOption($workflowConfiguration, 'start_step', null);
@@ -38,6 +38,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             $workflowDefinition
                 ->setName($workflowName)
                 ->setLabel($workflowConfiguration['label'])
+                ->setRelatedEntity($workflowConfiguration['entity'])
                 ->setEnabled($enabled)
                 ->setConfiguration($workflowConfiguration);
 
