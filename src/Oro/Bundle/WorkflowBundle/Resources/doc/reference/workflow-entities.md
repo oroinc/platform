@@ -379,19 +379,6 @@ Context is used in action and conditions and thereby it's usually an instance of
 This class is a simple helper that encapsulates logic of accessing properties of context using
 Symfony\Component\PropertyAccess\PropertyAccessor.
 
-Entity Binder
--------------
-**Class:**
-Oro\Bundle\WorkflowBundle\Model\EntityBinder
-
-**Description:**
-Ensures that all values of bind attributes of WorkflowItem are actually persisted or removed (if values was unset).
-This class delegates operations with Doctrine classes to special helper - a class
-Oro\Bundle\WorkflowBundle\Model\DoctrineHelper.
-
-**Methods:**
-* **bindEntities(WorkflowItem)** - bind all corresponding attribute values.
-
 Workflow Configuration
 ----------------------
 **Class:**
