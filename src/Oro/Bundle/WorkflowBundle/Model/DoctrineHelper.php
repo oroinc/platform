@@ -35,7 +35,7 @@ class DoctrineHelper
     public function getEntityIdentifier($entity)
     {
         $entityManager = $this->getEntityManager($entity);
-        $metadata = $entityManager->getClassMetadata(get_class($entity));
+        $metadata = $entityManager->getClassMetadata(ClassUtils::getClass($entity));
         $identifier = $metadata->getIdentifierValues($entity);
 
         return $identifier;

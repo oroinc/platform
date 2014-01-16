@@ -49,22 +49,20 @@ class WorkflowItem
     protected $workflowName;
 
     /**
-     * Name of current Step
-     *
-     * @var string
-     *
-     * @ORM\Column(name="current_step", type="string", length=255)
-     * @Serializer\Expose()
-     */
-    protected $currentStepName;
-
-    /**
      * @var WorkflowStep
      *
      * @ORM\ManyToOne(targetEntity="WorkflowStep")
      * @ORM\JoinColumn(name="current_step_id", referencedColumnName="id")
      */
     protected $currentStep;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="entity_id", type="integer")
+     * @Serializer\Expose()
+     */
+    protected $entityId;
 
     /**
      * @var string
@@ -202,26 +200,41 @@ class WorkflowItem
     }
 
     /**
-     * Set current Step name
-     *
-     * @param string $currentStep
+     * @param WorkflowStep $currentStep
      * @return WorkflowItem
      */
-    public function setCurrentStepName($currentStep)
+    public function setCurrentStep($currentStep)
     {
-        $this->currentStepName = $currentStep;
+        $this->currentStep = $currentStep;
 
         return $this;
     }
 
     /**
-     * Get current Step name
-     *
-     * @return string
+     * @return WorkflowStep
      */
-    public function getCurrentStepName()
+    public function getCurrentStep()
     {
-        return $this->currentStepName;
+        return $this->currentStep;
+    }
+
+    /**
+     * @param int $entityId
+     * @return WorkflowItem
+     */
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
     }
 
     /**
@@ -408,6 +421,7 @@ class WorkflowItem
     public function prePersist()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->setUpdated();
     }
 
     /**

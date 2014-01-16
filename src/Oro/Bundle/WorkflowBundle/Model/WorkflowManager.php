@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
@@ -82,36 +81,40 @@ class WorkflowManager
     /**
      * @param string|Transition $transition
      * @param string|Workflow $workflow
-     * @param object|null $entity
+     * @param object $entity
+     * @param array $data
      * @param Collection $errors
      * @return bool
      */
-    public function isStartTransitionAvailable($workflow, $transition, $entity = null, Collection $errors = null)
-    {
+    public function isStartTransitionAvailable(
+        $workflow,
+        $transition,
+        $entity,
+        array $data = array(),
+        Collection $errors = null
+    ) {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($entity);
 
-        return $workflow->isStartTransitionAvailable($transition, $initData, $errors);
+        return $workflow->isStartTransitionAvailable($transition, $entity, $data, $errors);
     }
 
     /**
      * @param string $workflow
-     * @param object|null $entity
+     * @param object $entity
      * @param string|Transition|null $transition
      * @param array $data
      * @return WorkflowItem
      * @throws \Exception
      */
-    public function startWorkflow($workflow, $entity = null, $transition = null, array $data = array())
+    public function startWorkflow($workflow, $entity, $transition = null, array $data = array())
     {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($entity, $data);
 
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            $workflowItem = $workflow->start($initData, $transition);
+            $workflowItem = $workflow->start($entity, $data, $transition);
             $em->persist($workflowItem);
             $em->flush();
             $em->commit();
@@ -207,21 +210,6 @@ class WorkflowManager
             $workflowName,
             $workflowType
         );
-    }
-
-    /**
-     * @param object $entity
-     * @param array $data
-     * @return array
-     * @throws UnknownAttributeException
-     */
-    public function getWorkflowData($entity = null, array $data = array())
-    {
-        if ($entity) {
-            $data[AttributeManager::ATTRIBUTE_ENTITY] = $entity;
-        }
-
-        return $data;
     }
 
     /**

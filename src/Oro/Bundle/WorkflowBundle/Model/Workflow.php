@@ -28,6 +28,11 @@ class Workflow
     protected $enabled = true;
 
     /**
+     * @var EntityConnector
+     */
+    protected $entityConnector;
+
+    /**
      * @var StepManager
      */
     protected $stepManager;
@@ -53,15 +58,18 @@ class Workflow
     protected $errors;
 
     /**
+     * @param EntityConnector $entityConnector
      * @param StepManager|null $stepManager
      * @param AttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
      */
     public function __construct(
+        EntityConnector $entityConnector,
         StepManager $stepManager = null,
         AttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
     ) {
+        $this->entityConnector = $entityConnector;
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager  = $attributeManager ? $attributeManager : new AttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
@@ -161,16 +169,17 @@ class Workflow
      * Start workflow.
      *
      * @param array $data
+     * @param object $entity
      * @param string $startTransitionName
      * @return WorkflowItem
      */
-    public function start(array $data = array(), $startTransitionName = null)
+    public function start($entity, array $data = array(), $startTransitionName = null)
     {
         if (null === $startTransitionName) {
             $startTransitionName = self::DEFAULT_START_TRANSITION_NAME;
         }
 
-        $workflowItem = $this->createWorkflowItem($data);
+        $workflowItem = $this->createWorkflowItem($entity, $data);
         $this->transit($workflowItem, $startTransitionName);
 
         return $workflowItem;
@@ -224,8 +233,7 @@ class Workflow
     {
         // get current step
         $currentStep = null;
-        $currentStepName = $workflowItem->getCurrentStepName();
-        if ($currentStepName) {
+        if ($workflowItem->getCurrentStep() && $currentStepName = $workflowItem->getCurrentStep()->getName()) {
             $currentStep = $this->stepManager->getStep($currentStepName);
         }
 
@@ -272,22 +280,31 @@ class Workflow
         $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
         $transition->transit($workflowItem);
         $workflowItem->addTransitionRecord($transitionRecord);
+
+        $entity = $this->getRelatedEntity($workflowItem);
+        $this->entityConnector->setWorkflowItem($entity, $workflowItem);
+        $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
     }
 
     /**
      * Create workflow item.
      *
+     * @param object $entity
      * @param array $data
      * @return WorkflowItem
-     * @throws \LogicException
      */
-    public function createWorkflowItem(array $data = array())
+    public function createWorkflowItem($entity, array $data = array())
     {
+        $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
+        $data[$entityAttributeName] = $entity;
+
         $workflowItem = new WorkflowItem();
         $workflowItem->setWorkflowName($this->getName());
         $workflowItem->getData()
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
+
+        $this->entityConnector->setEntityId($workflowItem, $entity);
 
         return $workflowItem;
     }
@@ -318,14 +335,14 @@ class Workflow
     protected function createTransitionRecord(WorkflowItem $workflowItem, Transition $transition)
     {
         $transitionName = $transition->getName();
-        $stepFrom = $workflowItem->getCurrentStepName();
-        $stepTo = $transition->getStepTo()->getName();
+        $stepFrom = $workflowItem->getCurrentStep();
+        $stepTo = $transition->getStepTo()->getEntity();
 
         $transitionRecord = new WorkflowTransitionRecord();
         $transitionRecord
             ->setTransitionName($transitionName)
-            ->setStepFromName($stepFrom)
-            ->setStepToName($stepTo);
+            ->setStepFrom($stepFrom)
+            ->setStepTo($stepTo);
 
         return $transitionRecord;
     }
@@ -334,13 +351,14 @@ class Workflow
      * Check that start transition is available to show.
      *
      * @param string|Transition $transition
+     * @param object $entity
      * @param array $data
      * @param Collection $errors
      * @return bool
      */
-    public function isStartTransitionAvailable($transition, array $data = array(), Collection $errors = null)
+    public function isStartTransitionAvailable($transition, $entity, array $data = array(), Collection $errors = null)
     {
-        $workflowItem = $this->createWorkflowItem($data);
+        $workflowItem = $this->createWorkflowItem($entity, $data);
 
         return $this->isTransitionAvailable($workflowItem, $transition, $errors);
     }
@@ -369,7 +387,7 @@ class Workflow
      */
     public function getTransitionsByWorkflowItem(WorkflowItem $workflowItem)
     {
-        $currentStepName = $workflowItem->getCurrentStepName();
+        $currentStepName = $workflowItem->getCurrentStep()->getName();
         $currentStep = $this->stepManager->getStep($currentStepName);
         if (!$currentStep) {
             throw new UnknownStepException($currentStepName);
@@ -395,11 +413,11 @@ class Workflow
     {
         $transitionRecords = $workflowItem->getTransitionRecords();
         $minStepIdx = count($transitionRecords) - 1;
-        $minStep = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepToName());
+        $minStep = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
         $steps = array($minStep);
         $minStepIdx--;
         while ($minStepIdx > -1) {
-            $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepToName());
+            $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
             if ($step->getOrder() < $minStep->getOrder()) {
                 $minStepIdx--;
                 $minStep = $step;
@@ -411,5 +429,16 @@ class Workflow
             }
         }
         return new ArrayCollection(array_reverse($steps));
+    }
+
+    /**
+     * @param WorkflowItem $workflowItem
+     * @return object
+     */
+    protected function getRelatedEntity(WorkflowItem $workflowItem)
+    {
+        $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
+
+        return $workflowItem->getData()->get($entityAttributeName);
     }
 }

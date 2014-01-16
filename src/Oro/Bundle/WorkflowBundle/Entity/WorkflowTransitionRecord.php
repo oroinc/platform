@@ -34,26 +34,12 @@ class WorkflowTransitionRecord
     protected $transitionName;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="step_from", type="string", length=255, nullable=true)
-     */
-    protected $stepFromName;
-
-    /**
      * @var WorkflowStep
      *
      * @ORM\ManyToOne(targetEntity="WorkflowStep")
      * @ORM\JoinColumn(name="step_from_id", referencedColumnName="id")
      */
     protected $stepFrom;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="step_to", type="string", length=255)
-     */
-    protected $stepToName;
 
     /**
      * @var WorkflowStep
@@ -79,24 +65,6 @@ class WorkflowTransitionRecord
     }
 
     /**
-     * @param string $stepFromName
-     * @return WorkflowTransitionRecord
-     */
-    public function setStepFromName($stepFromName)
-    {
-        $this->stepFromName = $stepFromName;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStepFromName()
-    {
-        return $this->stepFromName;
-    }
-
-    /**
      * @param WorkflowStep $stepFrom
      * @return WorkflowTransitionRecord
      */
@@ -112,24 +80,6 @@ class WorkflowTransitionRecord
     public function getStepFrom()
     {
         return $this->stepFrom;
-    }
-
-    /**
-     * @param string $stepToName
-     * @return WorkflowTransitionRecord
-     */
-    public function setStepToName($stepToName)
-    {
-        $this->stepToName = $stepToName;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStepToName()
-    {
-        return $this->stepToName;
     }
 
     /**

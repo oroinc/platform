@@ -29,22 +29,11 @@ class AttributeAssembler extends AbstractAssembler
                 'label' => AttributeManager::ATTRIBUTE_ENTITY,
                 'type' => 'entity',
                 'options' => array(
-                    'class' => '\DateTime' // TODO Use something like $definition->getRelatedEntity() BAP-2888
+                    'class' => 'OroCRM\Bundle\SalesBundle\Entity\Lead', // TODO Use something like $definition->getRelatedEntity() BAP-2888
                 ),
             );
             $attribute = $this->assembleAttribute(AttributeManager::ATTRIBUTE_ENTITY, $options);
             $attributes->set(AttributeManager::ATTRIBUTE_ENTITY, $attribute);
-        }
-
-        // add step attribute
-        if (!$attributes->containsKey(AttributeManager::ATTRIBUTE_STEP)) {
-            $options = array(
-                'label' => AttributeManager::ATTRIBUTE_STEP,
-                'type' => 'string', // TODO Remove type after configuration refactoring BAP-2889
-                'property_path' => AttributeManager::ATTRIBUTE_ENTITY . '.' . EntityConnector::PROPERTY_WORKFLOW_STEP
-            );
-            $attribute = $this->assembleAttribute(AttributeManager::ATTRIBUTE_STEP, $options);
-            $attributes->set(AttributeManager::ATTRIBUTE_STEP, $attribute);
         }
 
         return $attributes;

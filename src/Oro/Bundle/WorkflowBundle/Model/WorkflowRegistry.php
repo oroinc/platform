@@ -80,8 +80,10 @@ class WorkflowRegistry
      */
     public function getWorkflowByEntityClass($entityClass)
     {
-        return $this->getWorkflowDefinitionRepository()
+        $definition = $this->getWorkflowDefinitionRepository()
             ->findByEntityClass($entityClass);
+
+        return $this->getAssembledWorkflow($definition);
     }
 
     /**

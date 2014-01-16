@@ -10,7 +10,6 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 class AttributeManager
 {
     const ATTRIBUTE_ENTITY = 'entity';
-    const ATTRIBUTE_STEP = 'step';
 
     /**
      * @var Attribute[]|Collection
@@ -73,18 +72,5 @@ class AttributeManager
         }
 
         return $this->attributes->get(self::ATTRIBUTE_ENTITY);
-    }
-
-    /**
-     * @return Attribute
-     * @throws UnknownAttributeException
-     */
-    public function getStepAttribute()
-    {
-        if (!$this->attributes->containsKey(self::ATTRIBUTE_STEP)) {
-            throw new UnknownAttributeException('There is no step attribute');
-        }
-
-        return $this->attributes->get(self::ATTRIBUTE_STEP);
     }
 }

@@ -21,6 +21,7 @@ services:
         class: %oro_workflow.prototype.workflow.class%
         scope: prototype
         arguments:
+            - @oro_workflow.entity_connector
             - @oro_workflow.prototype.step_manager
             - @oro_workflow.prototype.attribute_manager
             - @oro_workflow.prototype.transition_manager

@@ -15,6 +15,19 @@ class EntityConnector
     const PROPERTY_WORKFLOW_STEP = 'workflowStep';
 
     /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
      * @param object $entity
      * @param WorkflowItem $workflowItem
      */
@@ -30,6 +43,22 @@ class EntityConnector
     public function setWorkflowStep($entity, WorkflowStep $workflowStep)
     {
         $this->setProperty($entity, self::PROPERTY_WORKFLOW_STEP, $workflowStep);
+    }
+
+    /**
+     * @param WorkflowItem $workflowItem
+     * @param object $entity
+     * @throws WorkflowException
+     */
+    public function setEntityId(WorkflowItem $workflowItem, $entity)
+    {
+        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
+        if (count($entityIdentifier) != 1) {
+            throw new WorkflowException('Can\'t get single identifier for entity');
+        }
+
+        $entityIdentifier = current($entityIdentifier);
+        $workflowItem->setEntityId($entityIdentifier);
     }
 
     /**

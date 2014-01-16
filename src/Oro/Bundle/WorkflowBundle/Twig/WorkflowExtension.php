@@ -90,7 +90,8 @@ class WorkflowExtension extends \Twig_Extension
     public function getWorkflowItemCurrentStep(WorkflowItem $workflowItem)
     {
         $workflow = $this->getWorkflow($workflowItem);
-        return $workflow->getStepManager()->getStep($workflowItem->getCurrentStepName());
+
+        return $workflow->getStepManager()->getStep($workflowItem->getCurrentStep()->getName());
     }
 
     /**

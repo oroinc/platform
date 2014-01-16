@@ -52,9 +52,11 @@ class WorkflowController extends FOSRestController
             /** @var WorkflowManager $workflowManager */
             $workflowManager = $this->get('oro_workflow.manager');
 
-            $entity = null;
             $entityClass = $this->getRequest()->get('entityClass');
             $entityId = $this->getRequest()->get('entityId');
+            if (!$entityClass || !$entityId) {
+                throw new BadRequestHttpException('Entity class and identifier are required');
+            }
 
             $data = $this->getRequest()->get('data');
             $dataArray = array();
@@ -70,9 +72,7 @@ class WorkflowController extends FOSRestController
                 $dataArray = $data->getValues();
             }
 
-            if ($entityClass && $entityId) {
-                $entity = $this->getEntityReference($entityClass, $entityId);
-            }
+            $entity = $this->getEntityReference($entityClass, $entityId);
 
             $workflowItem = $workflowManager->startWorkflow($workflowName, $entity, $transitionName, $dataArray);
         } catch (HttpException $e) {
@@ -143,8 +143,6 @@ class WorkflowController extends FOSRestController
      */
     public function transitAction(WorkflowItem $workflowItem, $transitionName)
     {
-        $this->get('oro_workflow.http.workflow_item_validator')->validate($workflowItem);
-
         try {
             $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName);
         } catch (WorkflowNotFoundException $e) {
@@ -181,8 +179,6 @@ class WorkflowController extends FOSRestController
      */
     public function getAction(WorkflowItem $workflowItem)
     {
-        $this->get('oro_workflow.http.workflow_item_validator')->validate($workflowItem);
-
         return $this->handleView(
             $this->view(
                 array(
