@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -121,6 +122,11 @@ class WorkflowItem
     protected $serializedData;
 
     /**
+     * @var object
+     */
+    protected $entity;
+
+    /**
      * @var WorkflowData
      */
     protected $data;
@@ -219,6 +225,8 @@ class WorkflowItem
     }
 
     /**
+     * This method should be called only from WorkflowDataSerializeSubscriber.
+     *
      * @param int $entityId
      * @return WorkflowItem
      */
@@ -230,6 +238,8 @@ class WorkflowItem
     }
 
     /**
+     * This method should be called only from WorkflowDataSerializeSubscriber.
+     *
      * @return int
      */
     public function getEntityId()
@@ -311,8 +321,6 @@ class WorkflowItem
     }
 
     /**
-     * Set data
-     *
      * @param WorkflowData $data
      * @return WorkflowItem
      */
@@ -321,6 +329,27 @@ class WorkflowItem
         $this->data = $data;
 
         return $this;
+    }
+
+    /**
+     * This method should be called only during creation of WorkflowItem.
+     *
+     * @param object $entity
+     * @return WorkflowItem
+     */
+    public function setEntity($entity)
+    {
+        $this->entity = $entity;
+
+        return $this;
+    }
+
+    /**
+     * @return object
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 
     /**
@@ -333,7 +362,9 @@ class WorkflowItem
     {
         if (!$this->data) {
             if (!$this->serializedData) {
-                $this->data = new WorkflowData();
+                $this->data = new WorkflowData(
+                    array(AttributeManager::ATTRIBUTE_ENTITY => $this->getEntity())
+                );
             } elseif (!$this->serializer) {
                 throw new WorkflowException('Cannot deserialize data of workflow item. Serializer is not available.');
             } else {
@@ -343,6 +374,7 @@ class WorkflowItem
                     'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
                     $this->serializeFormat
                 );
+                $this->data->set(AttributeManager::ATTRIBUTE_ENTITY, $this->getEntity(), false);
             }
         }
         return $this->data;

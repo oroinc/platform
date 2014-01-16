@@ -10,6 +10,8 @@ use Doctrine\ORM\Events;
 
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
+use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
@@ -23,6 +25,11 @@ class WorkflowDataSerializeSubscriber implements EventSubscriber
     protected $serializer;
 
     /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
      * @var string
      */
     protected $format = 'json';
@@ -31,12 +38,13 @@ class WorkflowDataSerializeSubscriber implements EventSubscriber
      * Constructor
      *
      * @param WorkflowAwareSerializer $serializer
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(WorkflowAwareSerializer $serializer)
+    public function __construct(WorkflowAwareSerializer $serializer, DoctrineHelper $doctrineHelper)
     {
         $this->serializer = $serializer;
+        $this->doctrineHelper = $doctrineHelper;
     }
-
 
     /**
      * {@inheritdoc}
@@ -99,7 +107,10 @@ class WorkflowDataSerializeSubscriber implements EventSubscriber
             $oldValue = $workflowItem->getSerializedData();
 
             $this->serializer->setWorkflowName($workflowItem->getWorkflowName());
-            $serializedData = $this->serializer->serialize($workflowItem->getData(), $this->format);
+
+            // entity attribute must not be serialized
+            $workflowData = $workflowItem->getData()->remove(AttributeManager::ATTRIBUTE_ENTITY);
+            $serializedData = $this->serializer->serialize($workflowData, $this->format);
             $workflowItem->setSerializedData($serializedData);
 
             $uow->propertyChanged($workflowItem, 'serializedData', $oldValue, $serializedData);
@@ -115,6 +126,13 @@ class WorkflowDataSerializeSubscriber implements EventSubscriber
     {
         // Pass serializer into $workflowItem to make lazy loading of workflow item data.
         $workflowItem->setSerializer($this->serializer, $this->format);
+
+        // Set related entity
+        $relatedEntity = $this->doctrineHelper->getEntityReference(
+            $workflowItem->getDefinition()->getRelatedEntity(),
+            $workflowItem->getEntityId()
+        );
+        $workflowItem->setEntity($relatedEntity);
     }
 
     /**

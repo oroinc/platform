@@ -101,13 +101,14 @@ class WorkflowData implements \ArrayAccess, \IteratorAggregate, \Countable
      *
      * @param string $name
      * @param mixed $value
+     * @param boolean $changeModified
      * @return WorkflowData
      */
-    public function set($name, $value)
+    public function set($name, $value, $changeModified = true)
     {
         try {
             $propertyPath = $this->getMappedPath($name);
-            if ($this->propertyAccessor->getValue($this->data, $propertyPath) !== $value) {
+            if ($changeModified && $this->propertyAccessor->getValue($this->data, $propertyPath) !== $value) {
                 $this->modified = true;
             }
             $this->propertyAccessor->setValue($this->data, $propertyPath, $value);

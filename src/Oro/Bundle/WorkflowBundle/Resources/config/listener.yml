@@ -12,5 +12,6 @@ services:
         class: %oro_workflow.listener.subscriber.workflow_data_serialize.class%
         arguments:
             - @oro_workflow.serializer.data.serializer
+            - @oro_workflow.doctrine_helper
         tags:
             - { name: doctrine.event_subscriber }

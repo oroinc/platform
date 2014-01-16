@@ -279,7 +279,7 @@ class Workflow
         $transition->transit($workflowItem);
         $workflowItem->addTransitionRecord($transitionRecord);
 
-        $entity = $this->getRelatedEntity($workflowItem);
+        $entity = $workflowItem->getEntity();
         $this->entityConnector->setWorkflowItem($entity, $workflowItem);
         $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
     }
@@ -302,7 +302,7 @@ class Workflow
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
 
-        $this->entityConnector->setEntityId($workflowItem, $entity);
+        $this->entityConnector->setEntity($workflowItem, $entity);
 
         return $workflowItem;
     }
@@ -427,16 +427,5 @@ class Workflow
             }
         }
         return new ArrayCollection(array_reverse($steps));
-    }
-
-    /**
-     * @param WorkflowItem $workflowItem
-     * @return object
-     */
-    protected function getRelatedEntity(WorkflowItem $workflowItem)
-    {
-        $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
-
-        return $workflowItem->getData()->get($entityAttributeName);
     }
 }

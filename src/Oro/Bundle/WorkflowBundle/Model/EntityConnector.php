@@ -50,15 +50,10 @@ class EntityConnector
      * @param object $entity
      * @throws WorkflowException
      */
-    public function setEntityId(WorkflowItem $workflowItem, $entity)
+    public function setEntity(WorkflowItem $workflowItem, $entity)
     {
-        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
-        if (count($entityIdentifier) != 1) {
-            throw new WorkflowException('Can\'t get single identifier for entity');
-        }
-
-        $entityIdentifier = current($entityIdentifier);
-        $workflowItem->setEntityId($entityIdentifier);
+        $workflowItem->setEntity($entity);
+        $workflowItem->setEntityId($this->getSingleEntityIdentifier($entity));
     }
 
     /**
@@ -75,5 +70,20 @@ class EntityConnector
         }
 
         $entity->$setter($value);
+    }
+
+    /**
+     * @param string $entity
+     * @return integer
+     * @throws WorkflowException
+     */
+    protected function getSingleEntityIdentifier($entity)
+    {
+        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
+        if (count($entityIdentifier) != 1) {
+            throw new WorkflowException('Can\'t get single identifier for entity');
+        }
+
+        return current($entityIdentifier);
     }
 }
