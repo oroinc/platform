@@ -192,10 +192,11 @@ abstract class AbstractPageGrid extends AbstractPage
     /**
      * @param array  $entityData
      * @param string $actionName Default is Delete
+     * @param bool   $confirmation
      *
      * @return $this
      */
-    public function deleteEntity($entityData = array(), $actionName = 'Delete')
+    public function deleteEntity($entityData = array(), $actionName = 'Delete', $confirmation = true)
     {
         $entity = $this->getEntity($entityData);
         $entity->element($this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]"))
@@ -203,7 +204,9 @@ abstract class AbstractPageGrid extends AbstractPage
         $entity->element(
             $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '{$actionName}')]")
         )->click();
-        $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
+        if ($confirmation) {
+            $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
+        }
 
         $this->waitPageToLoad();
         $this->waitForAjax();
