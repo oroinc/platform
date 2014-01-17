@@ -97,9 +97,14 @@ class OrmTotalsExtension extends AbstractExtension
             $ids[] = $res['id'];
         };
 
+        $rootAlias      = $this->masterQB->getRootAliases()[0];
+        $rootIdentifier = $this->masterQB->getEntityManager()->getClassMetadata(
+            $this->masterQB->getRootEntities()[0]
+        )->getIdentifier()[0];
+
         $data = $this->masterQB
             ->select($totalQueries)
-            ->andWhere($this->masterQB->expr()->in($this->masterQB->getRootAliases()[0] . '.id', $ids))
+            ->andWhere($this->masterQB->expr()->in($rootAlias . '.' . $rootIdentifier, $ids))
             ->getQuery()
             ->setFirstResult(null)
             ->setMaxResults(null)
