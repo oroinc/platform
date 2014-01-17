@@ -1,20 +1,8 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jquery-ui', 'jquery.select2'], function ($, _, __, util) {
+define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name', 'oro/query-designer/util',
+    'jquery-ui', 'jquery.select2'], function ($, _, __, mapFilterModuleName, util) {
     'use strict';
-
-    var filterModuleNameTemplate = 'oro/datafilter/{{type}}-filter';
-    var filterTypes = {
-        string:      'choice',
-        choice:      'select',
-        selectrow:   'select-row',
-        multichoice: 'multiselect',
-        boolean:     'select'
-    };
-
-    var getFilterModuleName = function (filterTypeName) {
-        return filterModuleNameTemplate.replace('{{type}}', filterTypes[filterTypeName] || filterTypeName);
-    };
 
     /**
      * Compare field widget
@@ -155,7 +143,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
 
             var metadata = self._getFiltersMetadata();
             var filterOptions = metadata.filters[filterIndex];
-            var filterModuleName = getFilterModuleName(filterOptions.type);
+            var filterModuleName = mapFilterModuleName(filterOptions.type);
 
             requirejs([filterModuleName], function (Filter) {
                 self.filterIndex = filterIndex;
