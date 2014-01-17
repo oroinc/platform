@@ -2,12 +2,10 @@
 
 {% set blockId = 'entity-transitions-container-' ~ random() %}
 <div class="widget-content" id="{{ blockId }}">
-    {# Show buttons for entity workflows #}
     <div class="btn-group">
         {% for data in transitionsData %}
-            {# Show button for start or transit entity workflow #}
+            {# Show button for start or transit workflow #}
             {% set transitionData = {
-                'redirect-to-workflow': false,
                 'enabled': data.isAllowed,
                 'transition-label': data.transition.label|trans,
                 'message': data.transition.message|trans,

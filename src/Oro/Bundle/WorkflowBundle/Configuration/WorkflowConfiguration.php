@@ -126,7 +126,8 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->cannotBeEmpty()
                     ->end()
                     ->scalarNode('type')
-                        ->defaultNull()
+                        ->isRequired()
+                        ->cannotBeEmpty()
                     ->end()
                     ->scalarNode('property_path')
                         ->defaultNull()
@@ -135,17 +136,6 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
-                ->end()
-                ->validate()
-                    ->always(
-                        function ($value) {
-                            if (!isset($value['type']) && !isset($value['property_path'])) {
-                                throw new \Exception('"type" or "property_path" is required option.');
-                            }
-
-                            return $value;
-                        }
-                    )
                 ->end()
             ->end();
 

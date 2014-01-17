@@ -47,12 +47,12 @@ class AttributeAssembler extends AbstractAssembler
      */
     protected function assembleAttribute($name, array $options)
     {
-        $this->assertOptions($options, array('label'));
+        $this->assertOptions($options, array('label', 'type'));
 
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
-        $attribute->setType($this->getOption($options, 'type', null));
+        $attribute->setType($options['type']);
         $attribute->setPropertyPath($this->getOption($options, 'property_path', null));
         $attribute->setOptions($this->getOption($options, 'options', array()));
 
@@ -83,18 +83,16 @@ class AttributeAssembler extends AbstractAssembler
     protected function assertAttributeHasValidType(Attribute $attribute)
     {
         $attributeType = $attribute->getType();
-        if ($attributeType) {
-            $allowedTypes = array('bool', 'boolean', 'int', 'integer', 'float', 'string', 'array', 'object', 'entity');
+        $allowedTypes = array('bool', 'boolean', 'int', 'integer', 'float', 'string', 'array', 'object', 'entity');
 
-            if (!in_array($attributeType, $allowedTypes)) {
-                throw new AssemblerException(
-                    sprintf(
-                        'Invalid attribute type "%s", allowed types are "%s"',
-                        $attributeType,
-                        implode('", "', $allowedTypes)
-                    )
-                );
-            }
+        if (!in_array($attributeType, $allowedTypes)) {
+            throw new AssemblerException(
+                sprintf(
+                    'Invalid attribute type "%s", allowed types are "%s"',
+                    $attributeType,
+                    implode('", "', $allowedTypes)
+                )
+            );
         }
     }
 

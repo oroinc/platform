@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -88,7 +89,11 @@ class WidgetController extends Controller
                 /** @var WorkflowAwareSerializer $serializer */
                 $serializer = $this->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflow->getName());
-                $data = $serializer->serialize($workflowItem->getData(), 'json');
+
+                $formOptions = $transition->getFormOptions();
+                $attributes = array_keys($formOptions['attribute_fields']);
+                $dataArray = $workflowItem->getData()->getValues() + $workflowItem->getData()->getValues($attributes);
+                $data = $serializer->serialize(new WorkflowData($dataArray), 'json');
 
                 $saved = true;
             }

@@ -47,15 +47,13 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(6, $functions);
+        $this->assertCount(4, $functions);
 
         $expectedFunctions = array(
-            'has_workflows',
-            'has_workflow_items',
+            'has_workflow',
+            'has_workflow_item',
             'get_workflow',
             'get_workflow_item_current_step',
-            'get_primary_workflow_name',
-            'get_primary_workflow_item'
         );
 
         /** @var \Twig_SimpleFunction $function */
