@@ -37,8 +37,9 @@ class WorkflowExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('has_workflow', array($this, 'hasWorkflow')),
-            new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
             new \Twig_SimpleFunction('get_workflow', array($this, 'getWorkflow')),
+            new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
+            new \Twig_SimpleFunction('get_workflow_item', array($this, 'getWorkflowItem')),
             new \Twig_SimpleFunction('get_workflow_item_current_step', array($this, 'getWorkflowItemCurrentStep')),
         );
     }
@@ -67,6 +68,15 @@ class WorkflowExtension extends \Twig_Extension
     public function hasWorkflowItem($entity)
     {
         return $this->workflowManager->getWorkflowItemByEntity($entity) !== null;
+    }
+
+    /**
+     * @param object $entity
+     * @return null|WorkflowItem
+     */
+    public function getWorkflowItem($entity)
+    {
+        return $this->workflowManager->getWorkflowItemByEntity($entity);
     }
 
     /**

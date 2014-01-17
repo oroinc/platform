@@ -5,6 +5,7 @@
 {% block content %}
 <div class="layout-content">
     <div class="container-fluid page-title">
+        {% placeholder page_title_before with {entity: entity} %}
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="span9">
@@ -88,28 +89,11 @@
                 </div>
             </div>
         </div>
+        {% placeholder page_title_after with {entity: entity} %}
     </div>
 
     <div class="layout-content scrollable-container">
-        {%- set viewContentBefore -%}
-            {% placeholder view_content_before with {entity: entity} %}
-        {%- endset -%}
-
         {% block content_data %}
-            {% set dataBlocks = data.dataBlocks %}
-            {% if viewContentBefore is not empty %}
-                {% set dataBlocks = [
-                    {
-                        'title': 'Workflow'|trans,
-                        'subblocks': [
-                        {
-                            'spanClass': 'empty',
-                            'data': [viewContentBefore]
-                        }]
-                }]|merge(dataBlocks) %}
-            {% endif %}
-
-            {% set data = data|merge({'dataBlocks': dataBlocks}) %}
             {{ UI.scrollData(id, data) }}
         {% endblock content_data %}
     </div>

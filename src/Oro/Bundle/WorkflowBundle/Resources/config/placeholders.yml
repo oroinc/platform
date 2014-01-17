@@ -4,6 +4,13 @@ placeholders:
         items:
             workflow_buttons:
                 order: 100
+    page_title_before:
+        label: Workflow Steps
+        items:
+            workflow_steps:
+                order: 100
 items:
-   workflow_buttons:
+    workflow_buttons:
         template: OroWorkflowBundle:Widget:buttons.html.twig
+    workflow_steps:
+        template: OroWorkflowBundle:Widget:steps.html.twig

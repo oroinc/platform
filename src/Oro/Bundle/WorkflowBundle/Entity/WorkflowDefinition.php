@@ -49,6 +49,12 @@ class WorkflowDefinition
     protected $entityAttributeName;
 
     /**
+     * @var bool
+     * @ORM\Column(name="steps_display_ordered", type="boolean")
+     */
+    protected $stepsDisplayOrdered = false;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
@@ -197,6 +203,25 @@ class WorkflowDefinition
     public function isEnabled()
     {
         return $this->enabled;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isStepsDisplayOrdered()
+    {
+        return $this->stepsDisplayOrdered;
+    }
+
+    /**
+     * @param boolean $stepsDisplayOrdered
+     * @return WorkflowDefinition
+     */
+    public function setStepsDisplayOrdered($stepsDisplayOrdered)
+    {
+        $this->stepsDisplayOrdered = $stepsDisplayOrdered;
+
+        return $this;
     }
 
     /**
@@ -355,7 +380,8 @@ class WorkflowDefinition
             ->setEntityAttributeName($definition->getEntityAttributeName())
             ->setConfiguration($definition->getConfiguration())
             ->setSteps($definition->getSteps())
-            ->setStartStep($definition->getStartStep());
+            ->setStartStep($definition->getStartStep())
+            ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered());
 
         return $this;
     }

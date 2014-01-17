@@ -44,8 +44,14 @@ class WidgetController extends Controller
             throw new BadRequestHttpException(sprintf('There is no step "%s"', $currentStepName));
         }
 
+        if ($workflowItem->getDefinition()->isStepsDisplayOrdered()) {
+            $steps = $workflow->getStepManager()->getOrderedSteps();
+        } else {
+            $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
+        }
+
         return array(
-            'steps' => $workflow->getPassedStepsByWorkflowItem($workflowItem),
+            'steps' => $steps,
             'currentStep' => $currentStep,
         );
     }
