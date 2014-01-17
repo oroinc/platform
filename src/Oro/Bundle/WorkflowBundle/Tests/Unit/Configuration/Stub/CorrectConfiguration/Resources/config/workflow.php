@@ -11,31 +11,9 @@ return array(
         'steps' => array(
             'first_step' => array(
                 'label' => 'First Step',
-                'template' => 'My:Custom:template.html.twig',
                 'order' => 1,
                 'is_final' => true,
-                'form_type' => WorkflowStepType::NAME,
-                'form_options' => array(
-                    'attribute_fields' => array(
-                        'first_attribute' => array(
-                            'label' => 'First Attribute',
-                            'form_type' => 'text',
-                            'options' => array(
-                                'required' => 1
-                            )
-                        )
-                    )
-                ),
                 'allowed_transitions' => array('first_transition'),
-                'view_attributes' => array(
-                    array(
-                        'attribute' => 'first_attribute',
-                        'view_type' => 'custom_view_type',
-                        'default' => 'Default value'
-                    ),
-                    array('path' => '$first_attribute.name', 'label' => 'Custom label'),
-                    array('attribute' => 'first_attribute'),
-                ),
             )
         ),
         'attributes' => array(
