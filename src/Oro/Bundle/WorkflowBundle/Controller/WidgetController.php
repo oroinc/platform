@@ -90,6 +90,9 @@ class WidgetController extends Controller
                 $serializer = $this->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflow->getName());
 
+                // Create new WorkflowData instance with all data required to start.
+                // Original WorkflowData can not be used, as some attributes may be set by reference
+                // So, serialized data will not contain all required data.
                 $formOptions = $transition->getFormOptions();
                 $attributes = array_keys($formOptions['attribute_fields']);
                 $dataArray = $workflowItem->getData()->getValues() + $workflowItem->getData()->getValues($attributes);
