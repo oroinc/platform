@@ -275,7 +275,7 @@ class ConfigFieldGridController extends Controller
 
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item deleted.', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(array('message' => 'Item was removed.', 'successful' => true), Codes::HTTP_OK);
     }
 
     /**
@@ -322,6 +322,6 @@ class ConfigFieldGridController extends Controller
 
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item restored', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(array('message' => 'Item was restored', 'successful' => true), Codes::HTTP_OK);
     }
 }
