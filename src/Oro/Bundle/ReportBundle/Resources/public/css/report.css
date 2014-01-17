@@ -4,3 +4,10 @@
 .form-horizontal .report-descr textarea {
     height: 54px;
 }
+.compare-field .select2-container {
+    background: none !important;
+    border: none !important;
+}
+.compare-field .select2-arrow {
+    display: none !important;
+}

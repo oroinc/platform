@@ -16,7 +16,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
         _create: function() {
             var self = this;
 
-            self.template = _.template('<input class="select" /><div class="active-filter" />');
+            self.template = _.template('<div class="compare-field"><input class="select compare-field" /><div class="active-filter" /></div>');
             self.element.append(self.template(this.options));
 
             var $select = self.element.find('input.select');
