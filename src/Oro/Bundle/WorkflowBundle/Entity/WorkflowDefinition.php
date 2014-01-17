@@ -42,6 +42,13 @@ class WorkflowDefinition
     protected $relatedEntity;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="entity_attribute_name", type="string", length=255)
+     */
+    protected $entityAttributeName;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(type="boolean")
@@ -148,6 +155,25 @@ class WorkflowDefinition
     public function getRelatedEntity()
     {
         return $this->relatedEntity;
+    }
+
+    /**
+     * @param string $entityAttributeName
+     * @return WorkflowDefinition
+     */
+    public function setEntityAttributeName($entityAttributeName)
+    {
+        $this->entityAttributeName = $entityAttributeName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityAttributeName()
+    {
+        return $this->entityAttributeName;
     }
 
     /**
@@ -326,6 +352,7 @@ class WorkflowDefinition
         $this->setName($definition->getName())
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())
+            ->setEntityAttributeName($definition->getEntityAttributeName())
             ->setConfiguration($definition->getConfiguration())
             ->setSteps($definition->getSteps())
             ->setStartStep($definition->getStartStep());

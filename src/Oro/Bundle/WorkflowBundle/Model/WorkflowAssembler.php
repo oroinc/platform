@@ -86,9 +86,13 @@ class WorkflowAssembler extends AbstractAssembler
             ->setLabel($definition->getLabel())
             ->setEnabled($definition->isEnabled());
 
-        $workflow->getStepManager()->setSteps($steps);
-        $workflow->getAttributeManager()->setAttributes($attributes);
-        $workflow->getTransitionManager()->setTransitions($transitions);
+        $workflow->getStepManager()
+            ->setSteps($steps);
+        $workflow->getAttributeManager()
+            ->setAttributes($attributes)
+            ->setEntityAttributeName($definition->getEntityAttributeName());
+        $workflow->getTransitionManager()
+            ->setTransitions($transitions);
 
         $this->validateWorkflow($workflow);
 

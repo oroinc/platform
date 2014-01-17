@@ -17,6 +17,8 @@ class WorkflowConfiguration implements ConfigurationInterface
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
 
+    const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+
     /**
      * @param array $configs
      * @return array
@@ -62,6 +64,9 @@ class WorkflowConfiguration implements ConfigurationInterface
             ->end()
             ->scalarNode('start_step')
                 ->defaultNull()
+            ->end()
+            ->scalarNode('entity_attribute')
+                ->defaultValue(self::DEFAULT_ENTITY_ATTRIBUTE)
             ->end()
             ->booleanNode('steps_display_ordered')
                 ->defaultFalse()

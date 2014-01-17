@@ -28,7 +28,7 @@ abstract class AbstractConfigurationBuilder
      */
     protected function getConfigurationOption(array $options, $key, $default)
     {
-        if (isset($options[$key])) {
+        if (array_key_exists($key, $options)) {
             return $options[$key];
         }
         return $default;

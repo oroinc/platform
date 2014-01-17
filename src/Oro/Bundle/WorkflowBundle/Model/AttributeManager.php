@@ -9,7 +9,10 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 
 class AttributeManager
 {
-    const ATTRIBUTE_ENTITY = 'entity';
+    /**
+     * @var string
+     */
+    protected $entityAttributeName;
 
     /**
      * @var Attribute[]|Collection
@@ -25,6 +28,25 @@ class AttributeManager
     }
 
     /**
+     * @param string $entityAttributeName
+     * @return AttributeManager
+     */
+    public function setEntityAttributeName($entityAttributeName)
+    {
+        $this->entityAttributeName = $entityAttributeName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityAttributeName()
+    {
+        return $this->entityAttributeName;
+    }
+
+    /**
      * @return Attribute[]|Collection
      */
     public function getAttributes()
@@ -34,7 +56,7 @@ class AttributeManager
 
     /**
      * @param Attribute[]|Collection $attributes
-     * @return Workflow
+     * @return AttributeManager
      */
     public function setAttributes($attributes)
     {
@@ -67,10 +89,10 @@ class AttributeManager
      */
     public function getEntityAttribute()
     {
-        if (!$this->attributes->containsKey(self::ATTRIBUTE_ENTITY)) {
+        if (!$this->attributes->containsKey($this->entityAttributeName)) {
             throw new UnknownAttributeException('There is no entity attribute');
         }
 
-        return $this->attributes->get(self::ATTRIBUTE_ENTITY);
+        return $this->attributes->get($this->entityAttributeName);
     }
 }

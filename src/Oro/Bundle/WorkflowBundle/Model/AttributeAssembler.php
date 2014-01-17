@@ -24,16 +24,17 @@ class AttributeAssembler extends AbstractAssembler
         }
 
         // add entity attribute
-        if (!$attributes->containsKey(AttributeManager::ATTRIBUTE_ENTITY)) {
+        $entityAttributeName = $definition->getEntityAttributeName();
+        if (!$attributes->containsKey($entityAttributeName)) {
             $options = array(
-                'label' => AttributeManager::ATTRIBUTE_ENTITY,
+                'label' => $entityAttributeName,
                 'type' => 'entity',
                 'options' => array(
                     'class' => $definition->getRelatedEntity(),
                 ),
             );
-            $attribute = $this->assembleAttribute(AttributeManager::ATTRIBUTE_ENTITY, $options);
-            $attributes->set(AttributeManager::ATTRIBUTE_ENTITY, $attribute);
+            $attribute = $this->assembleAttribute($entityAttributeName, $options);
+            $attributes->set($entityAttributeName, $attribute);
         }
 
         return $attributes;

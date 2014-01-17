@@ -362,9 +362,7 @@ class WorkflowItem
     {
         if (!$this->data) {
             if (!$this->serializedData) {
-                $this->data = new WorkflowData(
-                    array(AttributeManager::ATTRIBUTE_ENTITY => $this->getEntity())
-                );
+                $this->data = new WorkflowData();
             } elseif (!$this->serializer) {
                 throw new WorkflowException('Cannot deserialize data of workflow item. Serializer is not available.');
             } else {
@@ -374,7 +372,7 @@ class WorkflowItem
                     'Oro\Bundle\WorkflowBundle\Model\WorkflowData',
                     $this->serializeFormat
                 );
-                $this->data->set(AttributeManager::ATTRIBUTE_ENTITY, $this->getEntity(), false);
+                $this->data->set($this->getDefinition()->getEntityAttributeName(), $this->getEntity(), false);
             }
         }
         return $this->data;

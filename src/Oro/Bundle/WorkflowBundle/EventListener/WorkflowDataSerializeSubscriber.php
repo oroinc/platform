@@ -109,7 +109,7 @@ class WorkflowDataSerializeSubscriber implements EventSubscriber
             $this->serializer->setWorkflowName($workflowItem->getWorkflowName());
 
             // entity attribute must not be serialized
-            $workflowData = $workflowItem->getData()->remove(AttributeManager::ATTRIBUTE_ENTITY);
+            $workflowData = $workflowItem->getData()->remove($workflowItem->getDefinition()->getEntityAttributeName());
             $serializedData = $this->serializer->serialize($workflowData, $this->format);
             $workflowItem->setSerializedData($serializedData);
 
