@@ -29,6 +29,7 @@ config:
         'oro/datagrid/navigate-action': 'bundles/orodatagrid/js/datagrid/action/navigate-action.js'
         'oro/datagrid/refresh-collection-action': 'bundles/orodatagrid/js/datagrid/action/refresh-collection-action.js'
         'oro/datagrid/reset-collection-action': 'bundles/orodatagrid/js/datagrid/action/reset-collection-action.js'
+        'oro/datagrid/export-action': 'bundles/orodatagrid/js/datagrid/action/export-action.js'
         'oro/datagrid/actions-panel': 'bundles/orodatagrid/js/datagrid/actions-panel.js'
         'oro/datagrid/action-column': 'bundles/orodatagrid/js/datagrid/column/action-column.js'
         'oro/datagrid/body': 'bundles/orodatagrid/js/datagrid/body.js'

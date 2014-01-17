@@ -35,7 +35,10 @@ class FeatureContext extends BehatWebContext
         $route = 'oro_' . str_replace(' ', '_', strtolower($dialog));
         $client->request('GET', $client->generate($route));
         \Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI::assertJsonResponse($client->getResponse(), 200, '');
-        PHPUnit_Framework_Assert::assertContains('Create User - Users - System', $client->getCrawler()->html());
+        PHPUnit_Framework_Assert::assertContains(
+            'Create User - Users - Users Management - System',
+            $client->getCrawler()->html()
+        );
     }
 
     /**

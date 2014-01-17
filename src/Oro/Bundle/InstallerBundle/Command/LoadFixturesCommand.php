@@ -54,12 +54,11 @@ class LoadFixturesCommand extends ContainerAwareCommand
         $loader      = new ContainerAwareLoader($container);
         $hasFixtures = false;
         foreach ($container->get('kernel')->getBundles() as $bundle) {
-            $fixtureDir = $bundle->getPath() . '/DataFixtures/ORM';
+            $fixtureDir = $bundle->getPath() . DIRECTORY_SEPARATOR . 'DataFixtures' . DIRECTORY_SEPARATOR . 'ORM';
             if (is_dir($fixtureDir) && $filterByPackage($fixtureDir)) {
                 $loader->loadFromDirectory($fixtureDir);
                 $hasFixtures = true;
             }
-            break;
         }
 
         // load data fixtures

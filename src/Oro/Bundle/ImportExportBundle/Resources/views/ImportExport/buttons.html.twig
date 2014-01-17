@@ -17,8 +17,8 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'oro/translator', 'oro/dialog-widget', 'oro/messenger', 'oro/mediator'],
-    function($, __, DialogWidget, messenger, mediator) {
+    require(['jquery', 'oro/translator', 'oro/dialog-widget', 'oro/mediator', 'oro/export-handler'],
+    function($, __, DialogWidget, mediator, exportHandler) {
         $('.import-btn').on('click', function(e) {
             e.preventDefault();
 
@@ -48,41 +48,10 @@
         $('.export-btn').on('click', function(e) {
             e.preventDefault();
 
-            var exportStartedMessage = messenger.notificationMessage(
-                'info',
-                {{ 'Export started, please wait...'|trans|json_encode|raw }}
-            );
-
+            var exportStartedMessage = exportHandler.startExportNotificationMessage();
             $.getJSON(this.href, function(data) {
                 exportStartedMessage.close();
-                if (data.success) {
-                    if (data.readsCount > 0) {
-                        var $successMessage = __(
-                            'Export performed successfully, {{'{{ count }}'}} entities were exported.',
-                            {'count': data.readsCount}
-                        );
-                        var resultFileLink
-                            = '<a href="' + data.url + '" target="_blank">{{ 'Download result file'|trans }}</a>';
-                        $successMessage += ' ' + resultFileLink;
-
-                        messenger.notificationMessage('success', $successMessage);
-                    } else {
-                        messenger.notificationMessage(
-                            'info',
-                            {{ 'No entities found for export.'|trans|json_encode|raw }}
-                        );
-                    }
-                } else {
-                    var $errorMessage = __(
-                        'Export operation fails, {{'{{ count }}'}} error(s) found.',
-                        {'count': data.errorsCount}
-                    );
-                    var errorLogLink
-                        = '<a href="' + data.url + '" target="_blank">{{ 'Download error log'|trans }}</a>';
-                    $errorMessage += ' ' + errorLogLink;
-
-                    messenger.notificationMessage('error', $errorMessage);
-                }
+                exportHandler.handleExportResponse(data);
             });
         });
     });

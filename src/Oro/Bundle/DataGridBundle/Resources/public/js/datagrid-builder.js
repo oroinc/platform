@@ -22,7 +22,8 @@ define(function (require) {
         cellTypes = {
             integer:   'number',
             decimal:   'number',
-            percent:   'number'
+            percent:   'number',
+            currency:  'number'
         },
 
         helpers = {
@@ -189,6 +190,7 @@ define(function (require) {
                     toolbarOptions: metadata.options.toolbarOptions || {},
                     multipleSorting: metadata.options.multipleSorting || false,
                     entityHint: metadata.options.entityHint,
+                    exportOptions: metadata.options.export || {},
                     routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled
                 };
             },

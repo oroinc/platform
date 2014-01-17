@@ -3,7 +3,11 @@ oro_system_configuration:
         localization:
             title: 'Localization'
             icon:  'icon-flag'
-
+        language_settings:
+            title: 'Language settings'
+            icon:  'icon-font'
+        language_languages:
+            title: 'Languages'
         locale_settings:
             title: 'Localization options'
 
@@ -37,7 +41,7 @@ oro_system_configuration:
                 required: true
 
         oro_locale.language:
-            type: oro_locale
+            type: oro_language
             priority: 40
             options:
                 label: 'Default Language'
@@ -47,7 +51,7 @@ oro_system_configuration:
                     - NotBlank: ~
 
         oro_locale.languages:
-            type: oro_locale
+            type: oro_language
             priority: 35
             options:
                 label: 'Supported languages'
@@ -92,7 +96,11 @@ oro_system_configuration:
                                             - oro_locale.locale
                                             - oro_locale.country
                                             - oro_locale.format_address_by_address_country
-                                            - oro_locale.language
-                                            - oro_locale.languages
                                             - oro_locale.timezone
                                             - oro_locale.currency
+                            language_settings:
+                                children:
+                                    language_languages:
+                                        children:
+                                            - oro_locale.language
+                                            - oro_locale.languages

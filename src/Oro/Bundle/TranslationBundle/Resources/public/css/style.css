@@ -1,0 +1,55 @@
+.system-configuration-content .control-group.available-translation-widget-control-group {
+    max-width: none;
+    width: 890px;
+}
+
+.available-translation-widget-container {
+    position: relative;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.available-translation-widget-container table {
+    margin-bottom: 0;
+}
+
+.available-translation-widget-container table tr td,
+.available-translation-widget-container table tr th {
+    font-size: 13px;
+}
+
+.available-translation-widget-container .no-statistic {
+    text-align: center;
+}
+
+.available-translation-widget-container .progress {
+    margin: 0;
+}
+
+.available-translation-widget-container .translation-coverage b {
+    text-align: center;
+    display: block;
+    margin-top: -19px;
+}
+
+.available-translation-widget-container .translation-status .status-up-to-date {
+    color: #5eb95e;
+}
+
+.available-translation-widget-container .translation-status .status-needs-update {
+    color: #f89406;
+}
+
+.available-translation-widget-container .btn {
+    width: 90px;
+}
+
+.available-translation-widget-container .btn + .btn {
+    margin-top: 10px;
+}
+
+.available-translation-widget-note {
+    font-size: 11px;
+    color: #666;
+    padding: 10px 0;
+}

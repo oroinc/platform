@@ -218,6 +218,10 @@ class InstallCommand extends ContainerAwareCommand
                 $this->buildQuestion('Password'),
                 $passValidator
             );
+        $demo = isset($options['sample-data'])
+            ? strtolower($options['sample-data']) == 'y'
+            : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
+
         $user
             ->setUsername($userName)
             ->setEmail($userEmail)
@@ -228,7 +232,6 @@ class InstallCommand extends ContainerAwareCommand
             ->addRole($role)
             ->setOwner($businessUnit)
             ->addBusinessUnit($businessUnit);
-
         $container->get('oro_user.manager')->updateUser($user);
 
         // update company name and title if specified
@@ -239,10 +242,6 @@ class InstallCommand extends ContainerAwareCommand
             $configManager->set('oro_ui.application_title', $companyTitle);
         }
         $configManager->flush();
-
-        $demo = isset($options['sample-data'])
-            ? strtolower($options['sample-data']) == 'y'
-            : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
 
         // load demo fixtures
         if ($demo) {
@@ -285,7 +284,7 @@ class InstallCommand extends ContainerAwareCommand
         $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
-        $commandExecutor->runCommand('cache:clear');
+        $commandExecutor->runCommand('cache:clear', array('--process-isolation' => true, '--process-timeout' => 300));
 
         $output->writeln('');
 

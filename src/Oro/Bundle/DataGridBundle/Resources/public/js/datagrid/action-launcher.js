@@ -4,7 +4,7 @@ function($, _, Backbone) {
     'use strict';
 
     /**
-     * Action launcher implemented as simple link. Click on link triggers action run
+     * Action launcher implemented as simple link or a set of links. Click on a link triggers action run
      *
      * Events:
      * click: Fired when launcher was clicked
@@ -41,17 +41,25 @@ function($, _, Backbone) {
         /** @property {String} */
         link: 'javascript:void(0);',
 
+        /** @property {Array} */
+        links: undefined,
+
         /** @property {String} */
         runAction: true,
 
         /** @property {function(Object, ?Object=): String} */
         template:_.template(
-            '<<%= tagName %> href="<%= link %>" class="action' +
-                '<%= className ? " " + className : "" %>' +
-                '<%= !enabled ? " disabled" : "" %>' +
+            '<% if (links) { %><div class="btn-group"><% } %>' +
+            '<<%= tagName %>' +
+                '<% if (tagName == "a") { %> href="<%= link %>"<% } %>' +
+                ' class="action' +
+                    '<%= className ? " " + className : "" %>' +
+                    '<%= !enabled ? " disabled" : "" %>' +
+                    '<% if (links) { %> dropdown-toggle<% } %>' +
                 '"' +
                 ' <%= attributesTemplate({attributes: attributes}) %>' +
                 ' title="<%= label %>"' +
+                '<% if (links) { %> data-toggle="dropdown"<% } %>' +
             '>' +
                 '<% if (icon) { %>' +
                     '<i class="icon-<%= icon %> hide-text"><%= label %></i>' +
@@ -61,19 +69,36 @@ function($, _, Backbone) {
                     '<% } %>' +
                     ' <%= label %>' +
                 '<% } %>' +
-            '</<%= tagName %>>'
+                '<% if (links) { %><i class="caret"></i><% } %>' +
+            '</<%= tagName %>>' +
+            '<% if (links) { %>' +
+                '<ul class="dropdown-menu">' +
+                '<% _.each(links, function(item) { %>' +
+                    '<li><a href="<%= link %>"' +
+                        ' title="<%= item.label %>"' +
+                        '<% if (item.attributes) { %> <%= attributesTemplate(item) %><% } %>' +
+                        ' data-key="<%= item.key %>"' +
+                    '>' +
+                    '<% if (item.icon) { %>' +
+                        '<i class="icon-<%= item.icon %> hide-text"><%= item.label %></i>' +
+                    '<% } else { %>' +
+                        '<% if (item.iconClassName) { %>' +
+                            '<i class="<%= item.iconClassName %>"></i>' +
+                        '<% } %>' +
+                        ' <%= item.label %>' +
+                    '<% } %>' +
+                    '</a></li>' +
+                '<% }) %>' +
+                '</ul>' +
+            '</div>' +
+            '<% } %>'
         ),
 
         attributesTemplate: _.template(
             '<% _.each(attributes, function(attribute, name) { %>' +
-                '<%= name %>="<%= attribute %>" ' +
+                '<%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %> ' +
             '<% }) %>'
         ),
-
-        /** @property */
-        events: {
-            'click': 'onClick'
-        },
 
         /**
          * Initialize
@@ -86,6 +111,7 @@ function($, _, Backbone) {
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
          * @param {Boolean} [options.onClickReturnValue]
+         * @param {Array} [options.links]
          * @throws {TypeError} If mandatory option is undefined
          */
         initialize: function(options) {
@@ -126,6 +152,15 @@ function($, _, Backbone) {
                 this.onClickReturnValue = options.onClickReturnValue;
             }
 
+            this.events = {};
+            var linkSelector = '';
+            if (_.has(options, 'links')) {
+                this.events['click .dropdown-toggle'] = 'onToggle';
+                this.links = options.links;
+                linkSelector = ' .dropdown-menu a';
+            }
+            this.events['click' + linkSelector] = 'onClick';
+
             this.action = options.action;
             Backbone.View.prototype.initialize.apply(this, arguments);
         },
@@ -144,6 +179,7 @@ function($, _, Backbone) {
                 className: this.className,
                 iconClassName: this.iconClassName,
                 link: this.link,
+                links: this.links,
                 action: this.action,
                 attributes: this.attributes,
                 attributesTemplate: this.attributesTemplate,
@@ -161,18 +197,33 @@ function($, _, Backbone) {
          * @protected
          * @return {Boolean}
          */
-        onClick: function() {
+        onClick: function(e) {
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
-            this.trigger('click', this);
+            this.trigger('click', this, e.currentTarget);
             if (this.runAction) {
+                if (this.links) {
+                    var $link = $(e.currentTarget);
+                    var key = $link.data('key');
+                    if (!_.isUndefined(key)) {
+                        this.action.actionKey = key;
+                        $link.closest('.btn-group').toggleClass('open');
+                    }
+                }
                 this.action.run();
 
                 //  skip launcher functionality, if action was executed
                 return false;
             }
             return this.onClickReturnValue;
+        },
+
+        onToggle: function(e) {
+            var $link = $(e.currentTarget);
+            if (!$link.closest('.btn-group').hasClass('open')) {
+                this.trigger('expand', this);
+            }
         },
 
         /**

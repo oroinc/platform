@@ -3,13 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\ConstantPagerIterableResult;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
@@ -43,13 +41,13 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /**
      * {@inheritDoc}
      */
-    public function handle(MassActionMediatorInterface $mediator)
+    public function handle(MassActionHandlerArgs $args)
     {
         $iteration             = 0;
         $entityName            = null;
         $entityIdentifiedField = null;
 
-        $results = $this->prepareIterableResult($mediator->getResults());
+        $results = new DeletionIterableResult($args->getResults()->getSource());
         $results->setBufferSize(self::FLUSH_BATCH_SIZE);
 
         // batch remove should be processed in transaction
@@ -61,10 +59,10 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                 if (!$entity) {
                     // no entity in result record, it should be extracted from DB
                     if (!$entityName) {
-                        $entityName = $this->getEntityName($mediator);
+                        $entityName = $this->getEntityName($args);
                     }
                     if (!$entityIdentifiedField) {
-                        $entityIdentifiedField = $this->getEntityIdentifierField($mediator);
+                        $entityIdentifiedField = $this->getEntityIdentifierField($args);
                     }
                     $entity = $this->getEntity($entityName, $result->getValue($entityIdentifiedField));
                 }
@@ -94,36 +92,18 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
             throw $e;
         }
 
-        return $this->getResponse($mediator, $iteration);
+        return $this->getResponse($args, $iteration);
     }
 
     /**
-     * @param IterableResultInterface $result
-     *
-     * @return ConstantPagerIterableResult
-     */
-    protected function prepareIterableResult(IterableResultInterface $result)
-    {
-        $results =  new ConstantPagerIterableResult($result->getSource());
-        $params = [];
-        /** @var Parameter $param */
-        foreach ($result->getSource()->getParameters() as $param) {
-            $params[$param->getName()] = $param->getValue();
-        }
-        $results->setParameters($params);
-
-        return $results;
-    }
-
-    /**
-     * @param MassActionMediatorInterface $mediator
-     * @param int                         $entitiesCount
+     * @param MassActionHandlerArgs $args
+     * @param int                   $entitiesCount
      *
      * @return MassActionResponse
      */
-    protected function getResponse(MassActionMediatorInterface $mediator, $entitiesCount = 0)
+    protected function getResponse(MassActionHandlerArgs $args, $entitiesCount = 0)
     {
-        $massAction      = $mediator->getMassAction();
+        $massAction      = $args->getMassAction();
         $responseMessage = $massAction->getOptions()->offsetGetByPath('[messages][success]', $this->responseMessage);
 
         $successful = $entitiesCount > 0;
@@ -141,14 +121,14 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     }
 
     /**
-     * @param MassActionMediatorInterface $mediator
+     * @param MassActionHandlerArgs $args
      *
      * @return string
      * @throws \LogicException
      */
-    protected function getEntityName(MassActionMediatorInterface $mediator)
+    protected function getEntityName(MassActionHandlerArgs $args)
     {
-        $massAction = $mediator->getMassAction();
+        $massAction = $args->getMassAction();
         $entityName = $massAction->getOptions()->offsetGet('entity_name');
         if (!$entityName) {
             throw new \LogicException(sprintf('Mass action "%s" must define entity name', $massAction->getName()));
@@ -158,14 +138,14 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     }
 
     /**
-     * @param MassActionMediatorInterface $mediator
+     * @param MassActionHandlerArgs $args
      *
      * @throws \LogicException
      * @return string
      */
-    protected function getEntityIdentifierField(MassActionMediatorInterface $mediator)
+    protected function getEntityIdentifierField(MassActionHandlerArgs $args)
     {
-        $massAction = $mediator->getMassAction();
+        $massAction = $args->getMassAction();
         $identifier = $massAction->getOptions()->offsetGet('data_identifier');
         if (!$identifier) {
             throw new \LogicException(sprintf('Mass action "%s" must define identifier name', $massAction->getName()));

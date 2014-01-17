@@ -34,9 +34,9 @@ class EntityCacheWarmer extends CacheWarmer
      * Constructor.
      *
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param string $entityCacheDir
-     * @param string $entityCacheNamespace
-     * @param string $entityProxyNameTemplate
+     * @param string                    $entityCacheDir
+     * @param string                    $entityCacheNamespace
+     * @param string                    $entityProxyNameTemplate
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
@@ -48,8 +48,8 @@ class EntityCacheWarmer extends CacheWarmer
             $this->emailOwnerClasses[count($this->emailOwnerClasses) + 1] = $provider->getEmailOwnerClass();
         }
 
-        $this->entityCacheDir = $entityCacheDir;
-        $this->entityCacheNamespace = $entityCacheNamespace;
+        $this->entityCacheDir          = $entityCacheDir;
+        $this->entityCacheNamespace    = $entityCacheNamespace;
         $this->entityProxyNameTemplate = $entityProxyNameTemplate;
     }
 
@@ -58,24 +58,10 @@ class EntityCacheWarmer extends CacheWarmer
      */
     public function warmUp($cacheDir)
     {
-        $fs = $this->createFilesystem();
+        $fs   = $this->createFilesystem();
         $twig = $this->createTwigEnvironment();
 
-        $entityCacheDir = sprintf('%s/%s', $this->entityCacheDir, str_replace('\\', '/', $this->entityCacheNamespace));
-
-        // Ensure the cache directory exists
-        if (!$fs->exists($entityCacheDir)) {
-            $fs->mkdir($entityCacheDir, 0777);
-        }
-
-        // Temporary fix till EmailAddress will be moved to the cache folder
-        $className = sprintf($this->entityProxyNameTemplate, 'EmailAddress');
-        $fileName = sprintf('%s/%s.php', $entityCacheDir, $className);
-        if (!$fs->exists($fileName)) {
-            $this->processEmailAddressTemplate($entityCacheDir, $twig);
-        }
-
-        //$this->processEmailAddressTemplate($entityCacheDir, $twig);
+        $this->processEmailAddressTemplate($fs, $twig);
     }
 
     /**
@@ -111,11 +97,16 @@ class EntityCacheWarmer extends CacheWarmer
     /**
      * Create a proxy class for EmailAddress entity and save it in cache
      *
-     * @param string $entityCacheDir
+     * @param Filesystem        $fs
      * @param \Twig_Environment $twig
      */
-    protected function processEmailAddressTemplate($entityCacheDir, \Twig_Environment $twig)
+    protected function processEmailAddressTemplate(Filesystem $fs, \Twig_Environment $twig)
     {
+        // Ensure the cache directory exists
+        if (!$fs->exists($this->entityCacheDir)) {
+            $fs->mkdir($this->entityCacheDir, 0777);
+        }
+
         $args = array();
         foreach ($this->emailOwnerClasses as $key => $emailOwnerClass) {
             $prefix = strtolower(substr($emailOwnerClass, 0, strpos($emailOwnerClass, '\\')));
@@ -129,21 +120,29 @@ class EntityCacheWarmer extends CacheWarmer
 
             $args[] = array(
                 'targetEntity' => $emailOwnerClass,
-                'columnName' => sprintf('owner_%s%s_id', $prefix, $suffix),
-                'fieldName' => sprintf('owner%d', $key)
+                'columnName'   => sprintf('owner_%s%s_id', $prefix, $suffix),
+                'fieldName'    => sprintf('owner%d', $key)
             );
         }
 
-        $className = sprintf($this->entityProxyNameTemplate, 'EmailAddress');
-        $content = $twig->render(
-            'EmailAddress.php.twig',
-            array(
-                'namespace' => $this->entityCacheNamespace,
-                'className' => $className,
-                'owners' => $args
-            )
+        $className  = sprintf($this->entityProxyNameTemplate, 'EmailAddress');
+        $twigParams = array(
+            'namespace' => $this->entityCacheNamespace,
+            'className' => $className,
+            'owners'    => $args
         );
 
-        $this->writeCacheFile(sprintf('%s/%s.php', $entityCacheDir, $className), $content);
+        // generate a proxy class
+        $content = $twig->render('EmailAddress.php.twig', $twigParams);
+        $this->writeCacheFile(
+            sprintf('%s%s%s.php', $this->entityCacheDir, DIRECTORY_SEPARATOR, $className),
+            $content
+        );
+        // generate ORM mappings for a proxy class
+        $content = $twig->render('EmailAddress.orm.yml.twig', $twigParams);
+        $this->writeCacheFile(
+            sprintf('%s%s%s.orm.yml', $this->entityCacheDir, DIRECTORY_SEPARATOR, $className),
+            $content
+        );
     }
 }
