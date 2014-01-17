@@ -284,7 +284,7 @@ class InstallCommand extends ContainerAwareCommand
         $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
-        $commandExecutor->runCommand('cache:clear');
+        $commandExecutor->runCommand('cache:clear', array('--process-isolation' => true));
 
         $output->writeln('');
 
