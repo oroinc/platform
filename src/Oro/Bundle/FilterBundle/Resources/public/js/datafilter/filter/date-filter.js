@@ -111,7 +111,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
 
         changeFilterType: function (e) {
             var select = this.$el.find(e.currentTarget);
-            var selectedValue = select.val();
+            var selectedValue = select.val() || select.data('value');
 
             this.$el.find('.filter-separator').show().end().find('input').show();
             if (this.typeValues.moreThan == parseInt(selectedValue)) {
@@ -134,6 +134,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
             this._wrap($filter);
 
             $filter.find('select:first').bind('change', _.bind(this.changeFilterType, this));
+            $filter.find('.choice_value').bind('click', _.bind(this.changeFilterType, this));
 
             _.each(this.criteriaValueSelectors.value, function(actualSelector, name) {
                 this.dateWidgets[name] = this._initializeDateWidget(actualSelector);
