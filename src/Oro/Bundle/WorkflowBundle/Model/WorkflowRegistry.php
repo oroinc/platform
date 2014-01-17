@@ -83,7 +83,11 @@ class WorkflowRegistry
         $definition = $this->getWorkflowDefinitionRepository()
             ->findByEntityClass($entityClass);
 
-        return $this->getAssembledWorkflow($definition);
+        if ($definition) {
+            return $this->getAssembledWorkflow($definition);
+        }
+
+        return null;
     }
 
     /**
