@@ -16,40 +16,25 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
         _create: function() {
             var self = this;
 
-            self.template = _.template('<select class="select2">\
-                <option value="" data-label=""></option>\
-                <optgroup label="Fields">\
-                    <% _.each(fields, function (field) { if (!field.related_entity_fields) {%>\
-                    <option value="<%- field.name %>" data-type="<%- field.type %>" \
-                        data-label="<%- field.label %>"><%- field.label %></option>\
-                    <% } }) %>\
-                </optgroup>\
-                <% _.each(fields, function (group) { if (group.related_entity_fields) {%>\
-                <optgroup label="<%- group.label %>">\
-                    <% _.each(group.related_entity_fields, function (field) { %>\
-                    <option value="<%- group.name %>,<%- group.related_entity_name %>::<%- field.name %>" \
-                        data-type="<%- field.type %>" data-label="<%- field.label %>"><%- field.label %></option>\
-                    <% }) %>\
-                </optgroup>\
-                <% } }) %>\
-            </select>\
-            <div class="active-filter" />\
-            ');
-
+            self.template = _.template('<input class="select" /><div class="active-filter" />');
             self.element.append(self.template(this.options));
 
-            var $select = self.element.find('select');
-            $select.select2({collapsibleResults: true});
-            $select.change(function () {
-                var $option = $select.find(':selected');
-                var conditions = self._getFieldApplicableConditions($option);
-                var filterIndex = self._getActiveFilterName(conditions);
-                self._render(filterIndex);
+            var $select = self.element.find('input.select');
+            $select.select2({
+                collapsibleResults: false,
+                data: this.options.fields
+            });
+            $select.change(function (e) {
+                if (e.added) {
+                    var conditions = self._getFieldApplicableConditions(e.added);
+                    var filterIndex = self._getActiveFilterName(conditions);
+                    self._render(filterIndex);
+                }
             });
 
             var data = this.element.data('value');
             if (data && data.columnName) {
-                $select.val(data.columnName).change();
+                $select.select2('val', data.columnName, true);
             }
         },
 
@@ -77,7 +62,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             var result = {
                 parent_entity: null,
                 entity: this.options.entityName,
-                field: item.val()
+                field: item.value
             };
 
             var chain = result.field.split(',');
@@ -93,7 +78,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
                 }
             }
 
-            _.extend(result, _.pick(item.data(), ['type', 'identifier']));
+            _.extend(result, _.pick(item, ['type', 'identifier']));
 
             return result;
         },
@@ -191,7 +176,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
 
         _onUpdate: function () {
             var value = {
-                columnName: this.element.find('select').val(),
+                columnName: this.element.find('input.select').select2('val'),
                 criterion: {
                     filter: this.filter.type,
                     data: this.filter.getValue()

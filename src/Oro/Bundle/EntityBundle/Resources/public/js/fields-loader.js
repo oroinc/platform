@@ -16,6 +16,9 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
         },
 
         _create: function () {
+            var data = this.element.data('fields');
+            this.element.data('fields', this._convertFields(data));
+
             this._on({
                 change: this.loadFields
             });
@@ -38,13 +41,46 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
         },
 
         _onLoaded: function (data) {
-            this.element.data('fields', data);
+            this.element.data('fields', this._convertFields(data));
             this._trigger('success');
         },
 
         _onError: function () {
             var msg = __('Sorry, unexpected error was occurred');
             messenger.notificationFlashMessage('error', msg);
+        },
+
+        _convertFields: function (data) {
+            var fields = data.map(function (field) {
+                if (!field.related_entity_fields) {
+                    return {
+                        id: field.name,
+                        text: field.label,
+
+                        value: field.name,
+                        type: field.type,
+                        label: field.label
+                    };
+                }
+
+                return {
+                    id: field.name,
+                    text: field.label,
+
+                    children: field.related_entity_fields.map(function (child) {
+                        return {
+                            id: field.name + ',' + field.related_entity_name + '::' + child.name,
+                            text: child.label,
+
+                            value: child.name,
+                            type: child.type,
+                            label: child.label
+                        };
+                    })
+                };
+            });
+
+            return fields;
         }
     });
 });
