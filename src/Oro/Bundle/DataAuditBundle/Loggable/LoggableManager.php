@@ -311,10 +311,6 @@ class LoggableManager
                     continue;
                 }
 
-                if ($entityMeta->hasAssociation($field)) {
-                    continue;
-                }
-
                 $old = $changes[0];
                 $new = $changes[1];
 
