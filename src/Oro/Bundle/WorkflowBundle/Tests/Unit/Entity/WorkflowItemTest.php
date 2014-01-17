@@ -63,6 +63,8 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDataWithSerialization()
     {
+        $this->markTestSkipped('BAP-2901');
+
         /** @var WorkflowItem $workflowItem */
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
