@@ -17,6 +17,13 @@ parameters:
     oro_distribution.form.type.composer_config.class:         Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType
     oro_distribution.form.type.composer_repository.class:     Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType
 
+    oro_distribution.package_manager.system_paths:
+        - vendor
+        - web/bundles
+        - web/js
+        - web/css
+        - composer.json
+
 services:
     oro_distribution.routing_loader:
         class:                                        %oro_distribution.routing_loader.class%
