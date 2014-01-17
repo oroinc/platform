@@ -21,9 +21,7 @@ interface ConnectorTypeInterface
     /**
      * Returns job name for import
      *
-     * @param bool $isValidationOnly
-     *
      * @return string
      */
-    public function getImportJobName($isValidationOnly = false);
+    public function getImportJobName();
 }

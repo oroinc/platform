@@ -87,21 +87,6 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
     }
 
     /**
-     * Used to get/send data from/to remote channel using transport
-     *
-     * @param string $action
-     * @param array  $params
-     *
-     * @return mixed
-     */
-    protected function call($action, $params = [])
-    {
-        $params = is_array($params) ? $params : [$params];
-
-        return $this->transport->call($action, $params);
-    }
-
-    /**
      * Returns entity name that will be used for matching "import processor"
      *
      * @return string
