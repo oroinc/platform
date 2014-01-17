@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class SimpleTransport implements TransportInterface
 {
@@ -27,17 +27,16 @@ class SimpleTransport implements TransportInterface
     }
 
     /**
-     * @param ParameterBag $settings
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function init(ParameterBag $settings)
+    public function init(Channel $channel)
     {
-        return true;
     }
 
     /**
      * @param string $action
-     * @param array $params
+     * @param array  $params
+     *
      * @return mixed
      */
     public function call($action, array $params = [])

@@ -67,8 +67,6 @@ class SyncProcessor
                  * Clone object here because it will be modified and changes should not be shared between
                  */
                 $realConnector = clone $this->registry->getConnectorType($channel->getType(), $connector);
-                $realTransport = clone $this->registry
-                    ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
             } catch (\Exception $e) {
                 // log and continue
                 $this->logger->error($e->getMessage());
@@ -87,11 +85,9 @@ class SyncProcessor
             );
             $configuration    = [
                 ProcessorRegistry::TYPE_IMPORT => [
-                    'processorAlias'    => reset($processorAliases),
-                    'entityName'        => $realConnector->getImportEntityFQCN(),
-                    'channel'           => $channel->getId(),
-                    'transport'         => $realTransport,
-                    'transportSettings' => $channel->getTransport()->getSettingsBag(),
+                    'processorAlias' => reset($processorAliases),
+                    'entityName'     => $realConnector->getImportEntityFQCN(),
+                    'channel'        => $channel->getId()
                 ],
             ];
             $this->processImport($connector, $jobName, $configuration, $channel);

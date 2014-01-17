@@ -5,28 +5,38 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+
 /**
  * @package Oro\Bundle\IntegrationBundle
  */
 abstract class SOAPTransport implements TransportInterface
 {
+    /** @var ParameterBag */
+    protected $settings;
+
+    /** @var Channel */
+    protected $channel;
+
     /** @var \SoapClient */
     protected $client;
 
     /**
      * {@inheritdoc}
      */
-    public function init(ParameterBag $settings)
+    public function init(Channel $channel)
     {
-        $wsdlUrl = $settings->get('wsdl_url');
-        if ($wsdlUrl) {
-            $isDebug      = $settings->get('debug', false);
-            $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
+        $this->settings = $channel->getTransport()->getSettingsBag();
+        $this->channel  = $channel;
 
-            return true;
+        $wsdlUrl = $this->settings->get('wsdl_url');
+        if (!$wsdlUrl) {
+            throw new InvalidConfigurationException("SOAP Transport require 'wsdl_url' option to be defined.");
         }
 
-        throw new InvalidConfigurationException("SOAP Transport require 'wsdl_url' option to be defined.");
+        $isDebug      = $this->settings->get('debug', false);
+        $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
+
     }
 
     /**

@@ -6,19 +6,18 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
-use Oro\Bundle\ImportExportBundle\Reader\AbstractReader;
+use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 
-abstract class AbstractConnector extends AbstractReader implements ConnectorInterface
+abstract class AbstractConnector extends IteratorBasedReader implements ConnectorInterface, StepExecutionAwareInterface
 {
-    const ENTITY_NAME     = null;
-    const CONNECTOR_LABEL = null;
-
-    const JOB_VALIDATE_IMPORT = null;
-    const JOB_IMPORT          = null;
-
     /** @var TransportInterface */
     protected $transport;
+
+    /** @var Channel */
+    protected $channel;
 
     /** @var ParameterBag */
     protected $transportSettings;
@@ -26,93 +25,54 @@ abstract class AbstractConnector extends AbstractReader implements ConnectorInte
     /** @var LoggerStrategy */
     protected $logger;
 
+    /** @var ConnectorContextMediator */
+    protected $contextMediator;
+
     /**
-     * @param ContextRegistry $contextRegistry
-     * @param LoggerStrategy  $logger
+     * @param ContextRegistry          $contextRegistry
+     * @param LoggerStrategy           $logger
+     * @param ConnectorContextMediator $contextMediator
      */
-    public function __construct(ContextRegistry $contextRegistry, LoggerStrategy $logger)
-    {
+    public function __construct(
+        ContextRegistry $contextRegistry,
+        LoggerStrategy $logger,
+        ConnectorContextMediator $contextMediator
+    ) {
         parent::__construct($contextRegistry);
-        $this->logger = $logger;
+        $this->logger          = $logger;
+        $this->contextMediator = $contextMediator;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function read()
-    {
-        // read peace of data, skipping empty
-        do {
-            $data = $this->doRead();
-        } while ($data === false);
-
-        if (is_null($data)) {
-            return null; // no data anymore
-        }
-
-        $context = $this->getContext();
-        $context->incrementReadCount();
-        $context->incrementReadOffset();
-
-        // connectors should know how to advance
-        // batch counter/boundaries to the next ones
-        return $data;
-    }
-
-    /**
-     * Should be overridden in descendant classes
-     *
-     * Should return
-     *     null in case when no more data to read
-     *     false if just current batch is empty
-     *     data if read
-     *
-     * @return mixed
-     */
-    abstract protected function doRead();
 
     /**
      * {@inheritdoc}
      */
     protected function initializeFromContext(ContextInterface $context)
     {
-        $this->transport         = $context->getOption('transport');
-        $this->transportSettings = $context->getOption('transportSettings');
+        $this->transport = $this->contextMediator->getTransport($context);
+        $this->channel   = $this->contextMediator->getChannel($context);
 
-        if (!$this->transportSettings || !$this->transport) {
-            throw new \LogicException('Connector instance does not configured properly.');
-        }
-
-        $this->transport->init($this->transportSettings);
+        $this->validateConfiguration();
+        $this->transport->init($this->channel);
+        $this->sourceIterator = $this->getConnectorSource();
     }
 
     /**
-     * Returns entity name that will be used for matching "import processor"
+     * Validates initialization
+     * Basically added to be overridden in child classes
      *
-     * @return string
+     * @throws \LogicException
      */
-    public function getImportEntityFQCN()
+    protected function validateConfiguration()
     {
-        return static::ENTITY_NAME;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLabel()
-    {
-        return static::CONNECTOR_LABEL;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getImportJobName($isValidationOnly = false)
-    {
-        if ($isValidationOnly) {
-            return static::JOB_VALIDATE_IMPORT;
+        if (!$this->transport instanceof TransportInterface) {
+            throw new \LogicException('Could not retrieve transport from context');
         }
-
-        return static::JOB_IMPORT;
     }
+
+    /**
+     * Return source iterator to read from
+     *
+     * @return \Iterator
+     */
+    abstract protected function getConnectorSource();
 }

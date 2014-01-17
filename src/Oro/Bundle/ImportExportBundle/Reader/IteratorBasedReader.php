@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
-class IteratorBasedReader extends AbstractReader
+abstract class IteratorBasedReader extends AbstractReader
 {
     /**
      * @var \Iterator
