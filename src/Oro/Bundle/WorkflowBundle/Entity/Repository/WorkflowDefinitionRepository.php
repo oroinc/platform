@@ -23,4 +23,16 @@ class WorkflowDefinitionRepository extends EntityRepository
 
         return $queryBuilder->getQuery()->getOneOrNullResult();
     }
+
+    /**
+     * @return WorkflowDefinition[]
+     */
+    public function findAllWithStartStep()
+    {
+        $queryBuilder = $this->createQueryBuilder('wd');
+        $queryBuilder
+            ->where('wd.startStep IS NOT NULL');
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }
