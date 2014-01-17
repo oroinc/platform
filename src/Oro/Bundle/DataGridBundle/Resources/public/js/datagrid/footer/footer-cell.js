@@ -40,8 +40,6 @@ function ($, _, Backbone, Backgrid) {
          */
         render: function () {
             this.$el.empty();
-            this.$el[0].style.backgroundColor = '#f2f2f2';
-
             var columnName = this.column.get('name'),
                 state      = this.collection.state || {},
                 totals     = state.totals || {};
