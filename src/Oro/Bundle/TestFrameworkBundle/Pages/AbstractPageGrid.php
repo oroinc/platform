@@ -33,6 +33,7 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getRandomEntity($pageSize = 10)
     {
+        $pageSize = min($pageSize, $this->getRowsCount());
         $entityId = rand(1, $pageSize);
 
         $entity = $this->test
