@@ -7,6 +7,7 @@ parameters:
     oro_installer.yaml_persister.class:           Oro\Bundle\InstallerBundle\Persister\YamlPersister
     oro_installer.listener.request.class:         Oro\Bundle\InstallerBundle\EventListener\RequestListener
     oro_installer.script_manager.class:           Oro\Bundle\InstallerBundle\ScriptManager
+    oro_installer.fixtures.loader.class:          Oro\Bundle\InstallerBundle\Migrations\FixturesLoader
 
 services:
     oro_installer.scenario:
@@ -32,3 +33,9 @@ services:
     oro_installer.script_manager:
         class: %oro_installer.script_manager.class%
         arguments: [@kernel]
+
+    oro_installer.fixtures.loader:
+        class: %oro_installer.fixtures.loader.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @kernel
