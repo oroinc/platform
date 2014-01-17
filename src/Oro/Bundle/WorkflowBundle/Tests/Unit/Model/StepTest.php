@@ -84,15 +84,4 @@ class StepTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->step->isAllowedTransition('test'), 'Expected transition not allowed');
         $this->assertFalse($this->step->isAllowedTransition('test2'), 'Unexpected transition allowed');
     }
-
-    public function testSetGetViewAttributes()
-    {
-        $viewAttributes = array(
-            array('attribute' => 'foo'),
-            array('attribute' => 'bar')
-        );
-        $this->step->setViewAttributes($viewAttributes);
-
-        $this->assertEquals($viewAttributes, $this->step->getViewAttributes());
-    }
 }

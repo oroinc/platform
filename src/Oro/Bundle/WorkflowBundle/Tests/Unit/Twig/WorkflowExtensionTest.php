@@ -75,7 +75,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
      * @param array $result
      * @param bool $expected
      */
-    public function testHasWorkflows($result, $expected)
+    public function testHasWorkflow($result, $expected)
     {
         $class = '\stdClass';
         $this->workflowRegistry->expects($this->once())
@@ -83,7 +83,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($class)
             ->will($this->returnValue($result));
 
-        $this->assertEquals($expected, $this->extension->hasWorkflows($class));
+        $this->assertEquals($expected, $this->extension->hasWorkflow($class));
     }
 
     public function workflowsDataProvider()
@@ -104,6 +104,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetWorkflowItemCurrentStep()
     {
+        $this->markTestSkipped('BAP-2901');
         $stepName = 'testStep';
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
@@ -127,65 +128,6 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->getWorkflowItemCurrentStep($workflowItem);
     }
 
-    public function testGetPrimaryWorkflowNameNotConfigurable()
-    {
-        $className = '\stdClass';
-        $this->configProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($className);
-        $this->assertNull($this->extension->getPrimaryWorkflowName($className));
-    }
-
-    public function testGetPrimaryWorkflowName()
-    {
-        $className = '\stdClass';
-        $workflowName = 'primaryWorkflow';
-
-        $this->assertCallToGetPrimaryWorkflowName($className, $workflowName);
-        $this->assertEquals($workflowName, $this->extension->getPrimaryWorkflowName($className));
-    }
-
-    public function testGetPrimaryWorkflowItemNoWorkflow()
-    {
-        $object = new \stdClass();
-        $this->assertNull($this->extension->getPrimaryWorkflowItem($object));
-    }
-
-    public function testGetPrimaryWorkflowItemExisting()
-    {
-        $object = new \stdClass();
-        $workflowName = 'primaryWorkflow';
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->assertCallToGetPrimaryWorkflowName(get_class($object), $workflowName);
-        $this->workflowManager->expects($this->once())
-            ->method('getWorkflowItemsByEntity')
-            ->with($object, $workflowName)
-            ->will($this->returnValue(array($workflowItem)));
-
-        $this->assertSame($workflowItem, $this->extension->getPrimaryWorkflowItem($object));
-    }
-
-    public function testGetPrimaryWorkflowItemNew()
-    {
-        $object = new \stdClass();
-        $workflowName = 'primaryWorkflow';
-        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->assertCallToGetPrimaryWorkflowName(get_class($object), $workflowName);
-        $this->workflowManager->expects($this->once())
-            ->method('getWorkflowItemsByEntity')
-            ->with($object, $workflowName);
-
-        $workflow = $this->assertWorkflow($workflowName);
-        $workflow->expects($this->once())
-            ->method('createWorkflowItem')
-            ->will($this->returnValue($workflowItem));
-
-        $this->assertSame($workflowItem, $this->extension->getPrimaryWorkflowItem($object));
-    }
 
     /**
      * @dataProvider trueFalseDataProvider
@@ -197,7 +139,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('checkWorkflowItemsByEntity')
             ->with($entity)
             ->will($this->returnValue($result));
-        $this->assertEquals($result, $this->extension->hasWorkflowItems($entity));
+        $this->assertEquals($result, $this->extension->hasWorkflowItem($entity));
     }
 
     public function trueFalseDataProvider()
@@ -222,7 +164,7 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($entity, $workflowName)
             ->will($this->returnValue($result));
 
-        $this->assertEquals($result, $this->extension->hasWorkflowItems($entity, true));
+        $this->assertEquals($result, $this->extension->hasWorkflowItem($entity, true));
     }
 
     protected function assertCallToGetPrimaryWorkflowName($className, $workflowName)
