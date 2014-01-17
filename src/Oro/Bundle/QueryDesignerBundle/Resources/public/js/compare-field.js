@@ -1,7 +1,7 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/module-name-map', 'oro/query-designer/util',
-    'jquery-ui', 'jquery.select2'], function ($, _, __, getFilterModuleName, util) {
+define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name', 'oro/query-designer/util',
+    'jquery-ui', 'jquery.select2'], function ($, _, __, mapFilterModuleName, util) {
     'use strict';
 
     /**
@@ -143,7 +143,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/module-name-map'
 
             var metadata = self._getFiltersMetadata();
             var filterOptions = metadata.filters[filterIndex];
-            var filterModuleName = getFilterModuleName(filterOptions.type);
+            var filterModuleName = mapFilterModuleName(filterOptions.type);
 
             requirejs([filterModuleName], function (Filter) {
                 self.filterIndex = filterIndex;

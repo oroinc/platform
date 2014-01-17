@@ -1,9 +1,9 @@
 /*jshint browser:true*/
 /*jslint nomen: true*/
 /*global define, require*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'orofilter/js/module-name-map',
+define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'orofilter/js/map-filter-module-name',
     'oro/query-designer/filter-manager'],
-function($, _, __, tools, mediator, filterModuleNameMap, FilterManager) {
+function($, _, __, tools, mediator, mapFilterModuleName, FilterManager) {
     'use strict';
 
     var initialized = false,
@@ -31,7 +31,7 @@ function($, _, __, tools, mediator, filterModuleNameMap, FilterManager) {
                 var modules = this.modules;
                 _.each(this.metadata.filters || {}, function (filter) {
                     var type = filter.type;
-                    modules[type] = filterModuleNameMap(type);
+                    modules[type] = mapFilterModuleName(type);
                 });
             },
 
