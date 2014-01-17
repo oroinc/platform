@@ -73,7 +73,7 @@ class EntityConnector
     }
 
     /**
-     * @param string $entity
+     * @param object $entity
      * @return integer
      * @throws WorkflowException
      */
@@ -81,7 +81,7 @@ class EntityConnector
     {
         $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
         if (count($entityIdentifier) != 1) {
-            throw new WorkflowException('Can\'t get single identifier for entity');
+            throw new WorkflowException('Can\'t get single identifier for the entity');
         }
 
         return current($entityIdentifier);
