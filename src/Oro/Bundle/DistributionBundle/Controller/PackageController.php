@@ -17,12 +17,21 @@ class PackageController extends Controller
     const CODE_ERROR = 1;
     const CODE_CONFIRM = 2;
 
+    protected function setUpEnvironment()
+    {
+        $kernelRootDir = $this->container->getParameter('kernel.root_dir');
+        putenv(sprintf('COMPOSER_HOME=%s/cache/composer', $kernelRootDir));
+        chdir(realpath($kernelRootDir . '/../'));
+        set_time_limit(0);
+    }
+
     /**
      * @Route("/packages/installed")
      * @Template("OroDistributionBundle:Package:list_installed.html.twig")
      */
     public function listInstalledAction()
     {
+        $this->setUpEnvironment();
         $manager = $this->getPackageManager();
         $items = [];
 
@@ -43,6 +52,7 @@ class PackageController extends Controller
      */
     public function listAvailableAction()
     {
+        $this->setUpEnvironment();
         $packageManager = $this->getPackageManager();
 
         return ['packages' => $packageManager->getAvailable()];
@@ -54,6 +64,8 @@ class PackageController extends Controller
      */
     public function listUpdatesAction()
     {
+        $this->setUpEnvironment();
+
         return ['updates' => $this->container->get('oro_distribution.package_manager')->getAvailableUpdates()];
     }
 
@@ -62,6 +74,8 @@ class PackageController extends Controller
      */
     public function installAction()
     {
+        $this->setUpEnvironment();
+
         $params = $this->getRequest()->get('params');
         $packageName = $this->getParamValue($params, 'packageName', null);
         $packageVersion = $this->getParamValue($params, 'version', null);
@@ -139,6 +153,8 @@ class PackageController extends Controller
      */
     public function updateAction()
     {
+        $this->setUpEnvironment();
+
         $params = $this->getRequest()->get('params');
         $packageName = $this->getParamValue($params, 'packageName', null);
 
