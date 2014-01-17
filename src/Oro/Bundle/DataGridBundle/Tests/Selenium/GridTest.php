@@ -29,6 +29,10 @@ class GridTest extends Selenium2TestCase
     {
         $this->login();
         $users = new Users($this);
+        //check count of users, continue only for BAP
+        if ($users->getPagesCount() == 1) {
+            $this->markTestSkipped("Test skipped for current environment");
+        }
         $userData = $users->getRandomEntity();
         $this->assertTrue($users->entityExists($userData));
         $users->nextPage();
@@ -41,6 +45,10 @@ class GridTest extends Selenium2TestCase
     {
         $this->login();
         $users = new Users($this);
+        //check count of users, continue only for BAP
+        if ($users->getPagesCount() == 1) {
+            $this->markTestSkipped("Test skipped for current environment");
+        }
         $userData = $users->getRandomEntity();
         $this->assertTrue($users->entityExists($userData));
         $users->nextPage();
@@ -112,6 +120,10 @@ class GridTest extends Selenium2TestCase
     {
         $this->login();
         $users = new Users($this);
+        //check count of users, continue only for BAP
+        if ($users->getPagesCount() == 1) {
+            $this->markTestSkipped("Test skipped for current environment");
+        }
         $users->changePageSize('last');
         $columnId = $users->getColumnNumber($columnName);
 
