@@ -3,6 +3,11 @@ table.grid thead th > span {
     text-transform: uppercase;
 }
 
+
+table.grid tfoot th {
+    background-color: #f2f2f2;
+}
+
 table.grid tfoot th > a,
 table.grid tfoot th > span {
     text-transform: uppercase;
