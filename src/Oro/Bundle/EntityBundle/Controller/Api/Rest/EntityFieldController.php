@@ -29,16 +29,16 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *
      * @QueryParam(
-     *      name="with-relations", requirements="(true)|(false)", nullable=true, strict=true, default="false",
-     *      description="Indicates whether fields of related entities should be returned as well.")
+     *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="false",
+     *      description="Indicates whether association fields should be returned as well.")
      * @QueryParam(
-     *      name="with-entity-details", requirements="(true)|(false)", nullable=true, strict=true, default="false",
+     *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="false",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
      *      name="deep-level", requirements="\d+", nullable=true, strict=true, default="0",
      *      description="The maximum deep level of related entities.")
      * @QueryParam(
-     *      name="last-deep-level-relations", requirements="(true)|(false)",
+     *      name="last-deep-level-relations", requirements="(1)|(0)",
      *      nullable=true, strict=true, default="false",
      *      description="Indicates whether fields for the last deep level of related entities should be returned.")
      * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
@@ -52,12 +52,12 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
     public function getFieldsAction($entityName)
     {
         $entityName        = str_replace('_', '\\', $entityName);
-        $withRelations     = ('true' === $this->getRequest()->query->get('with-relations'));
-        $withEntityDetails = ('true' === $this->getRequest()->query->get('with-entity-details'));
+        $withRelations     = ('1' == $this->getRequest()->query->get('with-relations'));
+        $withEntityDetails = ('1' == $this->getRequest()->query->get('with-entity-details'));
         $deepLevel         = $this->getRequest()->query->has('deep-level')
             ? (int)$this->getRequest()->query->get('deep-level')
             : 0;
-        $lastDeepLevelRelations = ('true' === $this->getRequest()->query->get('last-deep-level-relations'));
+        $lastDeepLevelRelations = ('1' == $this->getRequest()->query->get('last-deep-level-relations'));
 
         $statusCode = Codes::HTTP_OK;
         /** @var EntityFieldProvider $provider */

@@ -75,12 +75,13 @@ class EntityFieldProvider
     /**
      * Returns fields for the given entity
      *
-     * @param string $entityName           Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool $withRelations          Indicates whether fields of related entities should be returned as well.
-     * @param bool $withEntityDetails      Indicates whether details of related entity should be returned as well.
-     * @param int $deepLevel               The maximum deep level of related entities.
-     * @param bool $lastDeepLevelRelations The maximum deep level of related entities.
-     * @param bool $translate              Flag means that label, plural label should be translated
+     * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations          Indicates whether association fields should be returned as well.
+     * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
+     * @param int    $deepLevel              The maximum deep level of related entities.
+     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
+     *                                       should be returned.
+     * @param bool   $translate              Flag means that label, plural label should be translated
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
@@ -241,10 +242,10 @@ class EntityFieldProvider
      *
      * @param array $result
      * @param array $relation
-     * @param bool   $withEntityDetails
-     * @param int    $relationDeepLevel
-     * @param bool   $lastDeepLevelRelations
-     * @param bool   $translate
+     * @param bool  $withEntityDetails
+     * @param int   $relationDeepLevel
+     * @param bool  $lastDeepLevelRelations
+     * @param bool  $translate
      */
     protected function addRelation(
         array &$result,

@@ -11,9 +11,9 @@
                 $(selectId).change(function (e) {
                     var $el = $(e.target);
                     var value = $el.val();
-                    var config = $el.data('entities');
+                    var config = $el.data('ownership-entities');
 
-                    if (config[value] === true) {
+                    if (_.has(config, value)) {
                         $(ownerFieldId).parents('.control-group').removeClass('hide');
                         $(ownerFieldId).removeAttr('disabled');
                     } else {

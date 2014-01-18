@@ -46,7 +46,6 @@ services:
     oro_notification.form.type.email_notification:
         class: %oro_notification.form.type.email_notification.class%
         arguments:
-            - %oro_config.entities%
             - @oro_email.form.subscriber.emailtemplate
             - @oro_entity_config.provider.ownership
         tags:
@@ -77,8 +76,8 @@ services:
     oro_notification.form.type.email_notification.api:
         class: %oro_notification.form.type.email_notification.api.class%
         arguments:
-            - %oro_config.entities%
             - @oro_email.form.subscriber.emailtemplate
+            - @oro_entity_config.provider.ownership
         tags:
             - { name: form.type, alias: emailnotification_api }
 
@@ -164,7 +163,6 @@ services:
         class: %oro_notification.event_listener.email_notification_service.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - %oro_config.entities%
 
     oro_notification.locale_listener:
         class: %oro_notification.locale_listener.class%

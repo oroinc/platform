@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/app', 'oro/entity-field-choice-view', 'jquery-ui'],
-function(_, Backbone, app, EntityFieldChoiceView) {
+define(['underscore', 'backbone', 'oro/app', 'oro/entity-field-view', 'jquery-ui'],
+function(_, Backbone, app, EntityFieldView) {
     'use strict';
 
     /**
@@ -11,7 +11,6 @@ function(_, Backbone, app, EntityFieldChoiceView) {
     return Backbone.View.extend({
         /** @property {Object} */
         options: {
-            entityName: null,
             fieldsLabel: null,
             relatedLabel: null,
             findEntity: null
@@ -22,7 +21,7 @@ function(_, Backbone, app, EntityFieldChoiceView) {
             columnSelector: '[data-purpose="column-selector"]'
         },
 
-        /** @property {oro.EntityFieldChoiceView} */
+        /** @property {oro.EntityFieldView} */
         columnSelector: null,
 
         /**
@@ -35,7 +34,7 @@ function(_, Backbone, app, EntityFieldChoiceView) {
             metadata = _.extend({grouping: {exclude: []}}, metadata);
             this.grouping = metadata.grouping;
 
-            this.columnSelector = new EntityFieldChoiceView({
+            this.columnSelector = new EntityFieldView({
                 el: this.$el.find(this.selectors.columnSelector),
                 fieldsLabel: this.options.fieldsLabel,
                 relatedLabel: this.options.relatedLabel,
@@ -57,12 +56,8 @@ function(_, Backbone, app, EntityFieldChoiceView) {
             }, this));
         },
 
-        changeEntity: function (entityName) {
-            this.options.entityName = entityName;
-        },
-
-        updateColumnSelector: function (columns) {
-            this.columnSelector.changeEntity(this.options.entityName, columns);
+        changeEntity: function (entityName, columns) {
+            this.columnSelector.changeEntity(entityName, columns);
         },
 
         isFieldAllowedForGrouping: function (criteria) {
@@ -79,9 +74,11 @@ function(_, Backbone, app, EntityFieldChoiceView) {
         },
 
         getGroupingColumns: function () {
-            return _.map(this.columnSelector.$el.select2("data"), function (val) {
-                return val.id;
-            });
+            var result = this.columnSelector.$el.val();
+            if (_.isString(result)) {
+                result = result.split(',');
+            }
+            return result;
         },
 
         setGroupingColumns: function (columns) {

@@ -54,6 +54,14 @@ datagrid:
                 name:
                     type:      string
                     data_name: r.name
+                entity:
+                    type:      choice
+                    data_name: r.entity
+                    options:
+                        is_translated_choices: true
+                        field_options:
+                            multiple:       true
+                            choices:        @oro_entity.datagrid_helper->getEntityNames
                 reportType:
                     type: choice
                     data_name: r.type

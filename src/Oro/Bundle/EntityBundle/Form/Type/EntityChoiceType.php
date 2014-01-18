@@ -43,9 +43,9 @@ class EntityChoiceType extends AbstractType
                 'empty_value' => '',
                 'show_plural' => true,
                 'configs'     => array(
-                    'is_translate_option'     => false,
-                    'is_group_collapsible'    => true,
+                    'is_translated_option'    => true,
                     'placeholder'             => 'oro.entity.form.choose_entity',
+                    'allowClear'              => true,
                     'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
                     'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
                 )
@@ -69,7 +69,7 @@ class EntityChoiceType extends AbstractType
             $attributes = [];
             foreach ($entity as $key => $val) {
                 if (!in_array($key, ['name'])) {
-                    $attributes['data-' . str_replace('_', '-', $key)] = $val;
+                    $attributes['data-' . $key] = $val;
                 }
             }
             $choices[$entity['name']] = new ChoiceListItem(

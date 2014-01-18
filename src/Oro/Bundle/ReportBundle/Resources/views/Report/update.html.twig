@@ -134,7 +134,14 @@
 
                 var options = {
                     el: '.report-designer',
-                    entityName: entityChoice.val(),
+                    getLoadColumnsUrl: function (entityName) {
+                        return routing.generate('oro_api_get_entity_fields', {
+                            'entityName': entityName,
+                            'with-relations': 1,
+                            'with-entity-details': 1,
+                            'deep-level': 3
+                        });
+                    },
                     storageElementSelector: '#oro_report_form_definition',
                     columnChainTemplateSelector: '#report-column-chain-template',
                     fieldsLabel: {{ 'oro.entity.form.entity_fields'|trans|json_encode|raw }},
@@ -153,11 +160,22 @@
                     }
                 };
                 var designer = new QueryDesigner(options);
+                {% if not form.entity.vars.value is empty %}
+                    designer.changeEntity(
+                        {{ form.entity.vars.value|json_encode|raw }},
+                        {{ render(path('oro_api_get_entity_fields', {
+                            'entityName': form.entity.vars.value|replace({'\\': '_'}),
+                            'with-relations': true,
+                            'with-entity-details': true,
+                            'deep-level': 3
+                        })) }}
+                    );
+                {% endif %}
                 designer.render();
 
                 entityChoice.on('change', function (e) {
                     if (!_.isUndefined(e.removed)) {
-                        var prevVal = e.removed.id || '';
+                        var prevVal = _.isNull(e.removed) ? '' : (e.removed.id || '');
                         var newVal = e.val;
                         if (!designer.isEmpty()) {
                             var confirm = new DeleteConfirmation({

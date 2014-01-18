@@ -37,8 +37,8 @@ class ColumnType extends AbstractType
                             'required'           => true,
                             'entity'             => $form->getConfig()->getOption('entity'),
                             'skip_load_entities' => true,
+                            'skip_load_data'     => true,
                             'with_relations'     => true,
-                            'deep_level'         => 1,
                             'auto_initialize'    => false
                         )
                     )
@@ -57,7 +57,7 @@ class ColumnType extends AbstractType
                 'entity'             => null,
                 'data_class'         => 'Oro\Bundle\QueryDesignerBundle\Model\Column',
                 'intention'          => 'query_designer_column',
-                'column_choice_type' => 'oro_entity_field_choice'
+                'column_choice_type' => 'oro_entity_field_select'
             )
         );
     }
