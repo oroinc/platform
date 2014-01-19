@@ -2,7 +2,7 @@ Oro Dashboard Bundle
 ====================
 
 This bundle allows you to manage dashboards for your application created using ORO Platform. You can have any number of dashboards in you application. The dashboard is a page is displayed as a first page of your application and contains a set of blocks (named as `widgets`) contain important or useful information for your customers.
-Currently the following widgets is available:
+Currently the following widgets are available:
 
  - Grid
  - Tabbed
@@ -210,4 +210,4 @@ oro_dashboard_config:
                     position:   50
 ```
 
-Also there are some additional TWIG templates for most used widgets, for example `tabbed`, `itemized` (a widget contains some items, for example links), `chart` and others. You can find them in `OroDashboardBundle/Resources/views/Dashboard` directory.
+Also there are some additional TWIG templates for mostly used widgets, for example `tabbed`, `itemized` (a widget contains some items, for example links), `chart` and others. You can find them in `OroDashboardBundle/Resources/views/Dashboard` directory.
