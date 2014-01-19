@@ -52,7 +52,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'entityName',
-            'oro_entity_choice',
+            'oro_email_notification_entity_choice',
             array(
                 'label'              => 'oro.notification.emailnotification.entity_name.label',
                 'required'           => true,
@@ -64,7 +64,7 @@ class EmailNotificationType extends AbstractType
 
         $builder->add(
             'event',
-            'entity',
+            'genemu_jqueryselect2_entity',
             array(
                 'label'         => 'oro.notification.emailnotification.event.label',
                 'class'         => 'OroNotificationBundle:Event',
@@ -73,6 +73,9 @@ class EmailNotificationType extends AbstractType
                     return $er->createQueryBuilder('c')
                         ->orderBy('c.name', 'ASC');
                 },
+                'configs' => array(
+                    'placeholder' => 'oro.notification.form.choose_event',
+                ),
                 'empty_value'   => '',
                 'empty_data'    => null,
                 'required'      => true

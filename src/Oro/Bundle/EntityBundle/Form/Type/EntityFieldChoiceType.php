@@ -106,6 +106,7 @@ class EntityFieldChoiceType extends AbstractType
      */
     protected function configsNormalizer(Options $options, &$configs, &$defaultConfigs)
     {
+        $configs = array_merge($defaultConfigs, $configs);
         if ($options['multiple'] && $configs['placeholder'] === $defaultConfigs['placeholder']) {
             $configs['placeholder'] .= 's';
         }

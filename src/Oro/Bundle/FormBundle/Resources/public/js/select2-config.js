@@ -62,6 +62,11 @@ function($, _) {
                 if (this.config.ajax.quietMillis === undefined) {
                     this.config.ajax.quietMillis = 700;
                 }
+            } else {
+                // configure non AJAX based Select2
+                if (this.config.minimumResultsForSearch === undefined) {
+                    this.config.minimumResultsForSearch = 7;
+                }
             }
             // set default values for other Select2 options
             if (this.config.formatResult === undefined) {

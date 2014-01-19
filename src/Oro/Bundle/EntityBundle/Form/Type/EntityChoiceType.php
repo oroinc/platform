@@ -37,18 +37,29 @@ class EntityChoiceType extends AbstractType
             return $that->getChoices($options['show_plural']);
         };
 
+        $defaultConfigs = array(
+            'is_translated_option'    => true,
+            'placeholder'             => 'oro.entity.form.choose_entity',
+            'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
+            'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
+        );
+
+        // this normalizer allows to add/override config options outside.
+        $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
+            return array_merge($defaultConfigs, $configs);
+        };
+
         $resolver->setDefaults(
             array(
                 'choices'     => $choices,
                 'empty_value' => '',
                 'show_plural' => true,
-                'configs'     => array(
-                    'is_translated_option'    => true,
-                    'placeholder'             => 'oro.entity.form.choose_entity',
-                    'allowClear'              => true,
-                    'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
-                    'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
-                )
+                'configs'     => $defaultConfigs
+            )
+        );
+        $resolver->setNormalizers(
+            array(
+                'configs' => $configsNormalizer
             )
         );
     }
