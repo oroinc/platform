@@ -76,7 +76,9 @@ function(_, Backbone, app, EntityFieldView) {
         getGroupingColumns: function () {
             var result = this.columnSelector.$el.val();
             if (_.isString(result)) {
-                result = result.split(',');
+                result = (result == '')
+                    ? []
+                    : result.split(',');
             }
             return result;
         },
