@@ -11,19 +11,7 @@ Currently the following widgets is available:
 
 But you can add you own widget type easily. It will be described in How to create new widget type section.
 
-Table of Contents
------------------
-
-- [Dashboard configuration](#dashboard_configuration)
-- [How to ...](#how-to)
-    - [make a dashboard a first page of your application](#how_to_first_page)
-    - [setup default dashboard](#how_to_default_dashboard)
-    - [rename or localize a name of existing dashboard](#how_to_rename_dashboard)
-    - [remove existing dashboard](#how_to_remove_dashboard)
-    - [remove existing widget from a dashboard](#how_to_remove_widget)
-    - [add new widget](#how_to_add_widget)
-
-<a href="dashboard_configuration"></a>Dashboard configuration
+Dashboard configuration
 -------------------------------------------------------------
 ``` yaml
 oro_dashboard_config:
@@ -49,10 +37,8 @@ To view all configuration options you can launch `config:dump-reference` command
 php app/console config:dump-reference OroDashboardBundle
 ```
 
-<a href="how_to"></a>How to ...
--------------------------------
-
-## <a href="how_to_first_page"></a>How to make a dashboard a first page of your application ##
+How to make a dashboard a first page of your application
+--------------------------------------------------------
 
 Make the following changes in `app/config/routing.yml`:
 ```yaml
@@ -70,7 +56,8 @@ oro_dashboard:
     default_dashboard: quick_launchpad
 ```
 
-## How to rename or localize a name of existing dashboard ##
+How to rename or localize a name of existing dashboard
+------------------------------------------------------
 
 To rename existing dashboard you need to change `label` option in `app/config/config.yml` or `dashboard.yml` of your bundle. For example to rename `quick_launchpad` dashboard you can use:
 ```yaml
@@ -88,7 +75,8 @@ acme:
             quick_launchpad: Quick Launchpad
 ```
 
-## How to remove existing dashboard ##
+How to remove existing dashboard
+--------------------------------
 
 To remove existing dashboard you need to make it invisible in `app/config/config.yml` or `dashboard.yml` of your bundle. For example to remove `quick_launchpad` dashboard you can use:
 ```yaml
@@ -99,7 +87,8 @@ oro_dashboard_config:
                 visible: false
 ```
 
-## How to remove existing widget from a dashboard ##
+How to remove existing widget from a dashboard
+----------------------------------------------
 
 To remove existing widget from a dashboard you need to make it invisible in `app/config/config.yml` or `dashboard.yml` of your bundle. For example to remove `quick_launchpad` widget from `main` dashboard you can use:
 ```yaml
@@ -111,7 +100,8 @@ oro_dashboard_config:
                     visible: false
 ```
 
-## How to add new widget ##
+How to add new widget
+---------------------
 
 In this example lets create a grid widget. First you need to create a grid. Use `datagrid.yml` of your bundle to do this. For example lets create `dashboard-recent-calls-grid` grid:
 ```yaml
