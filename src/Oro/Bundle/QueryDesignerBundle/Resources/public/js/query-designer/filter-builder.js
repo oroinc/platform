@@ -1,9 +1,10 @@
 /*jshint browser:true*/
 /*jslint nomen: true*/
 /*global define, require*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'orofilter/js/map-filter-module-name',
-    'oro/query-designer/filter-manager'],
-function($, _, __, tools, mediator, mapFilterModuleName, FilterManager) {
+define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'oro/mediator', 'oro/messenger',
+    'orofilter/js/map-filter-module-name', 'oro/query-designer/filter-manager'],
+function($, _, __, tools, mediator, messenger,
+         mapFilterModuleName, FilterManager) {
     'use strict';
 
     var initialized = false,
@@ -16,6 +17,7 @@ function($, _, __, tools, mediator, mapFilterModuleName, FilterManager) {
                 this.metadata = _.extend({filters: []}, metadata);
                 this.metadata.filters.push({
                     type: 'none',
+                    templateTheme: 'embedded',
                     applicable: {},
                     popupHint: __('Choose a column first')
                 });
@@ -57,8 +59,21 @@ function($, _, __, tools, mediator, mapFilterModuleName, FilterManager) {
                     options.showLabel = false;
                     options.canDisable = false;
                     options.placeholder = __('Choose a condition');
+                    // TODO: need refactoring of filters: options should be passed in constructor, rather than using .extend(options)
                     var Filter = modules[options.type].extend(options);
                     var filter = new Filter();
+                    if (!_.isUndefined(options.templateTheme)) {
+                        var templateSelector = filter.templateSelector += '-' + options.templateTheme;
+                        var $template = $(filter.templateSelector);
+                        if ($template.length) {
+                            filter.templateSelector += templateSelector;
+                            filter.template = _.template($(templateSelector).text());
+                        } else {
+                            messenger.notificationFlashMessage(
+                                'error',
+                                'The template "' + filter.templateSelector + '" was not found.');
+                        }
+                    }
                     filters[options.type] = filter;
                 });
                 return {filters: filters};

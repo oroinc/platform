@@ -133,27 +133,6 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             requirejs([filterModuleName], function (Filter) {
                 self.filterIndex = filterIndex;
                 var filter = self.filter = new (Filter.extend(filterOptions));
-
-                if (filter.templateSelector === '#text-filter-template') {
-                    filter.templateSelector = '#text-filter-embedded-template';
-                    filter.template = _.template($(filter.templateSelector).text());
-                }
-
-                if (filter.templateSelector === '#choice-filter-template') {
-                    filter.templateSelector = '#choice-filter-embedded-template';
-                    filter.template = _.template($(filter.templateSelector).text());
-                }
-
-                if (filter.templateSelector === '#date-filter-template') {
-                    filter.templateSelector = '#date-filter-embedded-template';
-                    filter.template = _.template($(filter.templateSelector).text());
-                }
-
-                if (filter.templateSelector === '#select-filter-template') {
-                    filter.templateSelector = '#select-filter-embedded-template';
-                    filter.template = _.template($(filter.templateSelector).text());
-                }
-
                 cb(filter);
             });
         },
