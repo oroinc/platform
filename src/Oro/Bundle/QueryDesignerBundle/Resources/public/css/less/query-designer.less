@@ -17,6 +17,9 @@
   }
   .condition {
     position: relative;
+    &.controls {
+      margin-left: 0;
+    }
     .operator {
       margin: 6px 0;
       text-transform: uppercase;
@@ -52,23 +55,33 @@
     & > .close {
       margin-right: 3px;
     }
-    &[data-criteria=conditions-group] > .close {
-      background-color: white;
-      color: #ccc;
-      opacity: 1;
-      float: left;
-      position: absolute;
-      top: 50%;
-      margin: -7px 0 0 -5px;
-      height: 14px;
-      line-height: 14px;
-      z-index: 1;
-      &:hover {
-        color: #999;
+    &[data-criteria=conditions-group] {
+      & > .close {
+        background-color: white;
+        color: #ccc;
+        opacity: 1;
+        float: left;
+        position: absolute;
+        top: 50%;
+        margin: -7px 0 0 -5px;
+        height: 14px;
+        line-height: 14px;
+        z-index: 1;
+        &:hover {
+          color: #999;
+        }
       }
-    }
-    &[data-criteria=conditions-group]:not(:first-child) > .close {
-      margin-top: 7px;
+      &.validation-error > .close {
+        margin-top: -17px;
+      }
+      &:not(:first-child) {
+        & > .close {
+          margin-top: 7px;
+        }
+        &.validation-error > .close {
+          margin-top: -2px
+        }
+      }
     }
   }
 }

@@ -1,78 +1,53 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jquery-ui'], function ($, _, __, util) {
+define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name', 'oro/query-designer/util',
+    'jquery-ui', 'jquery.select2'], function ($, _, __, mapFilterModuleName, util) {
     'use strict';
-
-    var filterModuleNameTemplate = 'oro/datafilter/{{type}}-filter';
-    var filterTypes = {
-        string:      'choice',
-        choice:      'select',
-        selectrow:   'select-row',
-        multichoice: 'multiselect',
-        boolean:     'select'
-    };
-
-    var getFilterModuleName = function (filterTypeName) {
-        return filterModuleNameTemplate.replace('{{type}}', filterTypes[filterTypeName] || filterTypeName);
-    };
 
     /**
      * Compare field widget
      */
     $.widget('oro.compareField', {
+        options: {
+            fields: [],
+            filterMetadataSelector: '#report-designer'
+        },
+
         _create: function() {
             var self = this;
 
-            self.template = _.template('<select>\
-                <option value="" data-label=""></option>\
-                <optgroup label="Fields">\
-                    <% _.each(fields, function (field) { if (!field.related_entity_fields) {%>\
-                    <option value="<%- field.name %>" data-type="<%- field.type %>" \
-                        data-label="<%- field.label %>"><%- field.label %></option>\
-                    <% } }) %>\
-                </optgroup>\
-                <% _.each(fields, function (group) { if (group.related_entity_fields) {%>\
-                <optgroup label="<%- group.label %>">\
-                    <% _.each(group.related_entity_fields, function (field) { %>\
-                    <option value="<%- group.name %>,<%- group.related_entity_name %>::<%- field.name %>" \
-                        data-type="<%- field.type %>" data-label="<%- field.label %>"><%- field.label %></option>\
-                    <% }) %>\
-                </optgroup>\
-                <% } }) %>\
-            </select>\
-            <div class="active-filter" />\
-            ');
-
+            self.template = _.template('<div class="compare-field"><input class="select compare-field" /><div class="active-filter" /></div>');
             self.element.append(self.template(this.options));
 
-            var $select = self.element.find('select');
-            $select.select2({collapsibleResults: true});
-            $select.change(function () {
-                var $option = $select.find(':selected');
-                self._render($option);
+            var $select = self.element.find('input.select');
+            $select.select2({
+                collapsibleResults: false,
+                data: this.options.fields
+            });
+            $select.change(function (e) {
+                if (e.added) {
+                    var conditions = self._getFieldApplicableConditions(e.added);
+                    var filterIndex = self._getActiveFilterName(conditions);
+                    self._render(filterIndex);
+                }
             });
 
-            $select.find('option').first().prop('selected', true).change();
+            var data = this.element.data('value');
+            if (data && data.columnName) {
+                $select.select2('val', data.columnName, true);
+            }
         },
 
-        _render: function ($option) {
-            var that = this;
-
-            var conditions = that._getFieldApplicableConditions($option);
-            var filterIndex = that._getActiveFilterName(conditions);
-
-            that._createFilter(filterIndex, function (filter) {
-                filter.render();
-
-                that.element.find('.active-filter').empty().append(filter.$el);
-
-//                console.log(filter);
+        _render: function (filterIndex) {
+            var self = this;
+            self._createFilter(filterIndex, function () {
+                self._appendFilter();
+                self._onUpdate();
             });
         },
 
         _getFiltersMetadata: function () {
-            //var metadata = this.element.closest('[data-metadata]').data('metadata');
-            var metadata = $('.report-designer').data('metadata');
+            var metadata = $(this.options.filterMetadataSelector).data('metadata');
 
             metadata.filters.push({
                 type: 'none',
@@ -87,7 +62,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
             var result = {
                 parent_entity: null,
                 entity: this.options.entityName,
-                field: item.val()
+                field: item.value
             };
 
             var chain = result.field.split(',');
@@ -103,7 +78,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                 }
             }
 
-            _.extend(result, _.pick(item.data(), ['type', 'identifier']));
+            _.extend(result, _.pick(item, ['type', 'identifier']));
 
             return result;
         },
@@ -149,14 +124,15 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
         },
 
         _createFilter: function (filterIndex, cb) {
-            var that = this;
+            var self = this;
 
-            var metadata = that._getFiltersMetadata();
+            var metadata = self._getFiltersMetadata();
             var filterOptions = metadata.filters[filterIndex];
-            var filterModuleName = getFilterModuleName(filterOptions.type);
+            var filterModuleName = mapFilterModuleName(filterOptions.type);
 
             requirejs([filterModuleName], function (Filter) {
-                var filter = new (Filter.extend(filterOptions));
+                self.filterIndex = filterIndex;
+                var filter = self.filter = new (Filter.extend(filterOptions));
 
                 if (filter.templateSelector === '#text-filter-template') {
                     filter.templateSelector = '#text-filter-embedded-template';
@@ -178,10 +154,37 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/query-designer/util', 'jq
                     filter.template = _.template($(filter.templateSelector).text());
                 }
 
-//                console.log(filter.templateSelector);
-
                 cb(filter);
             });
         },
+
+        _appendFilter: function () {
+            this.filter.render();
+
+            var $filter = this.element.find('.active-filter').empty().append(this.filter.$el);
+
+            var apply = this.filter.apply.bind(this.filter);
+            $filter.on('change', apply);
+            $filter.find('.choice_value').on('click', apply);
+            this.filter.on('update', this._onUpdate.bind(this));
+
+            var value = this.element.data('value');
+            if (value && value.criterion) {
+                this.filter.setValue(value.criterion.data);
+            }
+        },
+
+        _onUpdate: function () {
+            var value = {
+                columnName: this.element.find('input.select').select2('val'),
+                criterion: {
+                    filter: this.filter.type,
+                    data: this.filter.getValue()
+                }
+            };
+            this.element.data('value', value);
+
+            this.element.trigger('changed');
+        }
     });
 });

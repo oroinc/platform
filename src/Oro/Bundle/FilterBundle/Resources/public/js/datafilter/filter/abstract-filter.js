@@ -384,6 +384,15 @@ function($, _, Backbone, app) {
                 e.preventDefault();
                 e.stopPropagation();
             }
+        },
+
+        /**
+         * Apply changes manually
+         *
+         * @public
+         */
+        apply: function () {
+            this.setValue(this._formatRawValue(this._readDOMValue()));
         }
     });
 });
