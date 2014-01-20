@@ -213,7 +213,6 @@ services:
 
     oro_email.emailtemplate.datagrid_helper:
         class: %oro_email.emailtemplate.datagrid_helper.class%
-        arguments: [%oro_config.entities%]
 
     oro_email.mailer.processor:
         class: %oro_email.mailer.processor.class%

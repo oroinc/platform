@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,15 +21,26 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entitiesConfig = array(
-            'Oro\Bundle\UserBundle\Entity\User' => array('name' => 'bla bla')
-        );
-
         $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->type = new EmailNotificationType($entitiesConfig, $listener, $this->configProvider);
+        $configId = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface');
+        $configId->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue('Oro\Bundle\UserBundle\Entity\User'));
+        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $config->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue(OwnershipType::OWNER_TYPE_BUSINESS_UNIT));
+        $config->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($configId));
+        $this->configProvider->expects($this->once())
+            ->method('getConfigs')
+            ->will($this->returnValue([$config]));
+
+        $this->type = new EmailNotificationType($listener, $this->configProvider);
     }
 
     public function testSetDefaultOptions()
