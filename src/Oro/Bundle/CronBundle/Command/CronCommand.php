@@ -90,6 +90,12 @@ class CronCommand extends ContainerAwareCommand
                 continue;
             }
 
+            if ($dbCommand->getDefinition() != $command->getDefaultDefinition()) {
+                $dbCommand->setDefinition($command->getDefaultDefinition());
+
+                $em->persist($dbCommand);
+            }
+
             $cron = \Cron\CronExpression::factory($dbCommand->getDefinition());
 
             /**
