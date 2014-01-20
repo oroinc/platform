@@ -1,7 +1,7 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'routing', 'oro/loading-mask',
+define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oro/loading-mask',
     'oro/query-designer/column/view', 'oro/query-designer/filter/view'],
-function(_, Backbone, __, app, messenger, routing, LoadingMask,
+function(_, Backbone, __, app, messenger, LoadingMask,
          ColumnView, FilterView) {
     'use strict';
 
@@ -15,9 +15,10 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
     return Backbone.View.extend({
         /** @property {Object} */
         options: {
-            entityName: null,
             storageElementSelector: null,
-            getLoadColumnsUrl: null,
+            getLoadColumnsUrl: function (entityName) {
+                return '';
+            },
             columnChainTemplateSelector: null,
             fieldsLabel: 'Fields',
             relatedLabel: 'Related',
@@ -50,14 +51,22 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
         storageEl: null,
 
         initialize: function() {
-            this.options.getLoadColumnsUrl = this.options.getLoadColumnsUrl || function (entityName) {
-                return routing.generate('oro_api_get_entity_fields', {
-                    'entityName': entityName,
-                    'with-relations': true,
-                    'with-entity-details': true,
-                    'deep-level': 1
-                });
-            };
+            if (this.options.storageElementSelector) {
+                this.storageEl = $(this.options.storageElementSelector);
+            }
+
+            // initialize loading mask control
+            this.loadingMask = new LoadingMask();
+            this.$el.append(this.loadingMask.render().$el);
+
+            // initialize views
+            this.initColumnsView();
+            this.initFiltersView();
+
+            this.$el.closest('form').on('submit', _.bind(function (e) {
+                this.onPreSubmit();
+                return true;
+            }, this));
         },
 
         isEmpty: function () {
@@ -65,19 +74,33 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
                 && this.filtersView.getCollection().isEmpty();
         },
 
-        changeEntity: function (entityName) {
-            this.disableViews();
-            $.ajax({
-                url: this.options.getLoadColumnsUrl(entityName.replace(/\\/g,"_")),
-                success: _.bind(function(data) {
-                    this.updateColumnSelectors(entityName, data);
-                    this.enableViews();
-                }, this),
-                error: _.bind(function (jqXHR) {
-                    this.showError(jqXHR.responseJSON);
-                    this.enableViews();
-                }, this)
-            });
+        changeEntity: function (entityName, columns) {
+            if (_.isNull(entityName) || entityName == '') {
+                this.updateColumnSelectors(_.isNull(entityName) ? '' : entityName, []);
+            } else if (!_.isUndefined(columns) && !_.isNull(columns)) {
+                this.updateColumnSelectors(_.isNull(entityName) ? '' : entityName, columns);
+            } else {
+                var url = this.options.getLoadColumnsUrl(entityName.replace(/\\/g,"_"));
+                if (!_.isNull(url) && url != '') {
+                    this.disableViews();
+                    $.ajax({
+                        url: url,
+                        success: _.bind(function(data) {
+                            this.updateColumnSelectors(entityName, data);
+                            this.enableViews();
+                        }, this),
+                        error: _.bind(function (jqXHR) {
+                            this.showError(jqXHR.responseJSON);
+                            this.enableViews();
+                        }, this)
+                    });
+                }
+            }
+        },
+
+        updateColumnSelectors: function (entityName, data) {
+            this.columnsView.changeEntity(entityName, data);
+            this.filtersView.changeEntity(entityName, data);
         },
 
         updateStorage: function () {
@@ -108,36 +131,41 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
         },
 
         render: function() {
-            if (this.options.storageElementSelector) {
-                this.storageEl = $(this.options.storageElementSelector);
-            }
-
-            // initialize loading mask control
-            this.loadingMask = new LoadingMask();
-            this.$el.append(this.loadingMask.render().$el);
-
             // get source data
             var data = [];
             if (this.storageEl && this.storageEl.val() != '') {
                 data = JSON.parse(this.storageEl.val());
             }
 
-            // initialize views
-            this.initColumnsView(data);
-            this.initFiltersView(data);
+            // render ColumnsView
+            this.columnsView.render();
+            var groupingColumnNames = [];
+            _.each(data['grouping_columns'], function (column) {
+                groupingColumnNames.push(column['name']);
+            });
+            this.columnsView.setGroupingColumns(groupingColumnNames);
+            if (!_.isUndefined(data['columns']) && !_.isEmpty(data['columns'])) {
+                this.columnsView.getCollection().reset(data['columns']);
+            }
+            this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
+            this.listenTo(this.columnsView, 'grouping:change', _.bind(this.updateStorage, this));
 
-            this.$el.closest('form').on('submit', _.bind(function (e) {
-                this.onPreSubmit();
-                return true;
-            }, this));
+            // render FiltersView
+            this.filtersView.render();
+            if (!_.isUndefined(data['filters']) && !_.isEmpty(data['filters'])) {
+                this.filtersView.getCollection().reset(data['filters']);
+            }
+            if (!_.isUndefined(data['filters_logic']) && !_.isEmpty(data['filters_logic'])) {
+                this.filtersView.setFiltersLogic(data['filters_logic']);
+            }
+            this.listenTo(this.filtersView, 'collection:change', _.bind(this.updateStorage, this));
 
             return this;
         },
 
-        initColumnsView: function (data) {
+        initColumnsView: function () {
             var columnsOptions = _.extend(
                 {
-                    entityName: this.options.entityName,
                     columnChainTemplateSelector: this.options.columnChainTemplateSelector,
                     fieldsLabel: this.options.fieldsLabel,
                     relatedLabel: this.options.relatedLabel,
@@ -146,28 +174,12 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
                 this.options.columnsOptions
             );
             this.columnsView = new ColumnView(columnsOptions);
-            this.columnsView.render();
             delete this.options.columnsOptions;
-
-
-            var groupingColumnNames = [];
-            _.each(data['grouping_columns'], function (column) {
-                groupingColumnNames.push(column['name']);
-            });
-            this.columnsView.setGroupingColumns(groupingColumnNames);
-
-            if (!_.isUndefined(data['columns']) && !_.isEmpty(data['columns'])) {
-                this.columnsView.getCollection().reset(data['columns']);
-            }
-
-            this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
-            this.listenTo(this.columnsView, 'grouping:change', _.bind(this.updateStorage, this));
         },
 
-        initFiltersView: function (data) {
+        initFiltersView: function () {
             var filtersOptions = _.extend(
                 {
-                    entityName: this.options.entityName,
                     columnChainTemplateSelector: this.options.columnChainTemplateSelector,
                     fieldsLabel: this.options.fieldsLabel,
                     relatedLabel: this.options.relatedLabel,
@@ -176,15 +188,7 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
                 this.options.filtersOptions
             );
             this.filtersView = new FilterView(filtersOptions);
-            this.filtersView.render();
             delete this.options.filtersOptions;
-            if (!_.isUndefined(data['filters']) && !_.isEmpty(data['filters'])) {
-                this.filtersView.getCollection().reset(data['filters']);
-            }
-            if (!_.isUndefined(data['filters_logic']) && !_.isEmpty(data['filters_logic'])) {
-                this.filtersView.setFiltersLogic(data['filters_logic']);
-            }
-            this.listenTo(this.filtersView, 'collection:change', _.bind(this.updateStorage, this));
         },
 
         onPreSubmit: function () {
@@ -203,16 +207,6 @@ function(_, Backbone, __, app, messenger, routing, LoadingMask,
 
         disableViews: function () {
             this.loadingMask.show();
-        },
-
-        updateColumnSelectors: function (entityName, entityFields) {
-            this.options.entityName = entityName;
-
-            this.columnsView.changeEntity(entityName);
-            this.columnsView.updateColumnSelector(entityFields);
-
-            this.filtersView.changeEntity(entityName);
-            this.filtersView.updateColumnSelector(entityFields);
         },
 
         showError: function (err) {
