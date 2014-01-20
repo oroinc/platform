@@ -1,6 +1,5 @@
 datagrid:
     reports-grid:
-        extended_entity_name: %oro.report.report.entity.class%
         source:
             type:           orm
             acl_resource:   oro_report_view
@@ -11,7 +10,7 @@ datagrid:
                     - r.entity
                     - type.label as reportType
                 from:
-                    - { table: %oro.report.report.entity.class%, alias: r }
+                    - { table: %oro_report.report.entity.class%, alias: r }
                 join:
                     left:
                         - { join: r.type, alias: type }

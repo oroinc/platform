@@ -1,5 +1,5 @@
 parameters:
-    oro.report.report.entity.class:                    Oro\Bundle\ReportBundle\Entity\Report
+    oro_report.report.entity.class:                    Oro\Bundle\ReportBundle\Entity\Report
     oro_report.datagrid.configuration.provider.class:  Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider
     oro_report.listener.navigation_listener.class:     Oro\Bundle\ReportBundle\EventListener\NavigationListener
     oro_report.report_manager.class:                   Oro\Bundle\ReportBundle\Entity\Manager\ReportManager
