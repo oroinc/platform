@@ -169,7 +169,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             this.filter.on('update', this._onUpdate.bind(this));
 
             var value = this.element.data('value');
-            if (value) {
+            if (value && value.criterion) {
                 this.filter.setValue(value.criterion.data);
             }
         },
