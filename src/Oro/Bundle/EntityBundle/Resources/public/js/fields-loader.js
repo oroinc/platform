@@ -17,7 +17,7 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
 
         _create: function () {
             var data = this.element.data('fields');
-            this.element.data('fields', this._convertFields(data));
+            this.element.data('fields', this._convertFields(null, data));
 
             this._on({
                 change: this.loadFields
@@ -41,7 +41,7 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
         },
 
         _onLoaded: function (data) {
-            this.element.data('fields', this._convertFields(data));
+            this.element.data('fields', this._convertFields(null, data));
             this._trigger('success');
         },
 
@@ -50,13 +50,14 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
             messenger.notificationFlashMessage('error', msg);
         },
 
-        _convertFields: function (data) {
+        _convertFields: function (parent, data) {
+            var self = this;
+
             var fields = data.map(function (field) {
                 if (!field.related_entity_fields) {
                     return {
-                        id: field.name,
+                        id: parent ? (parent.name + ',' + parent.related_entity_name + '::' + field.name) : field.name,
                         text: field.label,
-
                         value: field.name,
                         type: field.type,
                         label: field.label
@@ -66,17 +67,7 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
                 return {
                     id: field.name,
                     text: field.label,
-
-                    children: field.related_entity_fields.map(function (child) {
-                        return {
-                            id: field.name + ',' + field.related_entity_name + '::' + child.name,
-                            text: child.label,
-
-                            value: child.name,
-                            type: child.type,
-                            label: child.label
-                        };
-                    })
+                    children: self._convertFields(field, field.related_entity_fields)
                 };
             });
 

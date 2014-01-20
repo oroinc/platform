@@ -8,6 +8,14 @@
     background: none !important;
     border: none !important;
 }
+.compare-field .select2-container,
+.compare-field .select2-choice,
+.compare-field .select2-chosen {
+    display: inline-block;
+}
 .compare-field .select2-arrow {
     display: none !important;
+}
+.active-filter {
+    display: inline-block;
 }
