@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
 
 use FOS\Rest\Util\Codes;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
@@ -50,7 +50,7 @@ abstract class RestController extends RestGetController implements
         $isProcessed = $this->processForm($entity);
 
         if ($isProcessed) {
-            $entityClass = ClassUtils::getRealClass(get_class($entity));
+            $entityClass = ClassUtils::getRealClass($entity);
             $classMetadata = $this->getManager()->getObjectManager()->getClassMetadata($entityClass);
             $view = $this->view($classMetadata->getIdentifierValues($entity), Codes::HTTP_CREATED);
         } else {
