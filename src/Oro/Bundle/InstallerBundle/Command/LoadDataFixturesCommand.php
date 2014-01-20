@@ -6,10 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
-
-use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
@@ -20,7 +17,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     {
         $this->setName('oro:data:fixtures:load')
             ->setDescription('Load versioned data fixtures. By default will load main data fixtures')
-            ->addOption('load-demo', null, InputOption::VALUE_OPTIONAL, 'True if need to load demo data', false);
+            ->addOption('load-demo', null, InputOption::VALUE_OPTIONAL, 'True if need to load demo data', 'false');
     }
 
     /**
@@ -29,10 +26,15 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container   = $this->getContainer();
-        $output->writeln('Loading data ...');
+        $output->writeln(
+            sprintf(
+                'Loading %s fixtures data ...',
+                $input->getOption('load-demo') == 'false' ? 'main' : 'demo'
+            )
+        );
         $executor = new ORMExecutor($container->get('doctrine.orm.entity_manager'));
         $loader = $container->get('oro_installer.fixtures.loader');
-        $loader->isLoadDemoData($input->getOption('load-demo'));
+        $loader->isLoadDemoData($input->getOption('load-demo') == 'false' ? false : true);
         $executor->setLogger(
             function ($message) use ($output) {
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
