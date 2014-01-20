@@ -25,14 +25,13 @@
         activeSubTabName - active subtab name
 #}
 {% macro renderScrollData(data, form, activeTabName = false, activeSubTabName = false) %}
-    {% import _self as __ %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="system-configuration-container left-panel-container">
         <div class="placeholder">
             <div class="scrollable-container">
                 {% if activeSubTabName and form != false %}
-                    {{ __.renderTabs(data, activeTabName, activeSubTabName) }}
-                    {{ __.renderTabContent(form) }}
+                    {{ _self.renderTabs(data, activeTabName, activeSubTabName) }}
+                    {{ _self.renderTabContent(form) }}
                 {% endif %}
             </div>
         </div>
@@ -65,7 +64,6 @@
         activeSubTabName  - Active subtab name
 #}
 {% macro renderTabs(data, activeTabName = false, activeSubTabName = false) %}
-    {% import _self as __ %}
     <div class="left-panel">
         <div class="system-configuration-search">
             {#div class="clearfix">
@@ -75,7 +73,7 @@
                 </div>
             </div>#}
             <div class="clearfix">
-                {{ __.renderCollapseExpandActions('#sidebar-menu-tree') }}
+                {{ _self.renderCollapseExpandActions('#sidebar-menu-tree') }}
             </div>
         </div>
         {% if data is iterable %}
@@ -126,7 +124,7 @@
                                         url: path('oro_config_configuration_system', {activeGroup: tab.name, activeSubGroup: subTab.name})
                                         }|merge(subTab.toViewData)
                                     %}
-                                    {{ __.renderTabNavItem(subTabData) }}
+                                    {{ _self.renderTabNavItem(subTabData) }}
                                 {% endfor %}
                                 </ul></div>
                             </div>
@@ -147,8 +145,6 @@
         form        - form view for active tab tree configuration
 #}
 {% macro renderTabContent(form) %}
-    {% import _self as __ %}
-
     {% set data = {
         'formErrors': form_errors(form),
         'dataBlocks': form_data_blocks(form),
@@ -177,7 +173,7 @@
                 <div class="accordion-heading">
                     {% if loop.first %}
                     <div class="pull-right">
-                        {{ __.renderCollapseExpandActions('#configuration-options-block') }}
+                        {{ _self.renderCollapseExpandActions('#configuration-options-block') }}
                     </div>
                     {% endif %}
                     <a href="#{{ accordionId }}" data-toggle="collapse" class="accordion-toggle">
@@ -191,7 +187,7 @@
                         {% endif %}
 
                         {% for subblock in scrollBlock.subblocks %}
-                            {{ __.renderFiedset(subblock) }}
+                            {{ _self.renderFiedset(subblock) }}
                         {% endfor %}
                     </div>
                 </div>
@@ -212,7 +208,6 @@
         block.data        - fields data
 #}
 {% macro renderFiedset(block) %}
-    {% import _self as __ %}
     <fieldset class="form-horizontal form-horizontal-large">
         <h5 class="user-fiedset">
             <span>{{ block.title|trans }}</span>
@@ -233,7 +228,7 @@
 {#
     Renders 'Expand All' and 'Collapse All' links
     params:
-        target       - CSS selector for accordions container
+        target - CSS selector for accordions container
 #}
 {% macro renderCollapseExpandActions(target) %}
     <ul class="inline small-text">

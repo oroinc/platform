@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\ConfigBundle\Provider\FormProvider;
+use Oro\Bundle\ConfigBundle\Provider\Provider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass;
 
 class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
@@ -36,7 +36,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
         if ($expectedSet) {
             $taggedServices = array('some.service.id' => 'some arguments');
 
-            $this->container->expects($this->once())->method('findTaggedServiceIds')->with(FormProvider::TAG_NAME)
+            $this->container->expects($this->once())->method('findTaggedServiceIds')->with(Provider::TAG_NAME)
                 ->will($this->returnValue($taggedServices));
 
             $definitionMock = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')

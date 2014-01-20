@@ -21,7 +21,6 @@
 
                 var Urls = {
                     install: "{{ path('oro_distribution_package_install') }}",
-                    uninstall: "{{ path('oro_distribution_package_uninstall') }}",
                     update: "{{ path('oro_distribution_package_update') }}",
                     available: "{{ path('oro_distribution_package_listavailable') }}",
                     installed: "{{ path('oro_distribution_package_listinstalled') }}"
@@ -52,7 +51,18 @@
     {% block page %}
         <div class="wrapper">
             <div id="alerts">
+                {% if notWritableSystemPaths|length > 0 %}
+                    <div class="alert fade in alert-notice">
+                        <i class="icon icon-info-sign"></i>
+                        Following directories/files have to be writable by web user:
+                        <ul>
+                            {% for path in notWritableSystemPaths %}
+                                <li>{{ path }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
 
+                {% endif %}
             </div>
             <div class="content">
                 <img src="/bundles/oroinstaller/img/icon/wait.png" alt="" class="ajax-loading"/>

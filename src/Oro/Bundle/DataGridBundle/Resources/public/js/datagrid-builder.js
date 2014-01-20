@@ -183,6 +183,7 @@ define(function (require) {
                     toolbarOptions: metadata.options.toolbarOptions || {},
                     multipleSorting: metadata.options.multipleSorting || false,
                     entityHint: metadata.options.entityHint,
+                    exportOptions: metadata.options.export || {},
                     routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled
                 };
             },

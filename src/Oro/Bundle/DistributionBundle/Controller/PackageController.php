@@ -14,7 +14,6 @@ class PackageController extends Controller
 {
     const CODE_INSTALLED = 0;
     const CODE_UPDATED = 0;
-    const CODE_UNINSTALLED = 0;
     const CODE_ERROR = 1;
     const CODE_CONFIRM = 2;
 
@@ -23,6 +22,7 @@ class PackageController extends Controller
         $kernelRootDir = $this->container->getParameter('kernel.root_dir');
         putenv(sprintf('COMPOSER_HOME=%s/cache/composer', $kernelRootDir));
         chdir(realpath($kernelRootDir . '/../'));
+        set_time_limit(0);
     }
 
     /**
@@ -43,7 +43,10 @@ class PackageController extends Controller
             ];
         }
 
-        return ['items' => $items];
+        return [
+            'items' => $items,
+            'notWritableSystemPaths' => $this->getNotWritablePaths()
+        ];
     }
 
     /**
@@ -55,7 +58,10 @@ class PackageController extends Controller
         $this->setUpEnvironment();
         $packageManager = $this->getPackageManager();
 
-        return ['packages' => $packageManager->getAvailable()];
+        return [
+            'packages' => $packageManager->getAvailable(),
+            'notWritableSystemPaths' => $this->getNotWritablePaths()
+        ];
     }
 
     /**
@@ -67,54 +73,6 @@ class PackageController extends Controller
         $this->setUpEnvironment();
 
         return ['updates' => $this->container->get('oro_distribution.package_manager')->getAvailableUpdates()];
-    }
-
-    /**
-     * @Route("/package/uninstall")
-     */
-    public function uninstallAction()
-    {
-        $this->setUpEnvironment();
-
-        $params = $this->getRequest()->get('params');
-        $packageName = $this->getParamValue($params, 'packageName', null);
-        $forceDependentsUninstalling = $this->getParamValue($params, 'force', false);
-
-        /** @var PackageManager $manager */
-        $manager = $this->container->get('oro_distribution.package_manager');
-        $responseContent = [];
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/json');
-
-        if (!$manager->isPackageInstalled($packageName)) {
-            $responseContent = [
-                'code' => self::CODE_ERROR,
-                'message' => sprintf('Package % not found', $packageName)
-            ];
-            $response->setContent(json_encode($responseContent));
-
-            return $response;
-        }
-
-        $dependents = $manager->getDependents($packageName);
-        if (!$forceDependentsUninstalling && $dependents) {
-            $params['force'] = true;
-            $responseContent = [
-                'code' => self::CODE_CONFIRM,
-                'packages' => $dependents,
-                'params' => $params
-            ];
-            $response->setContent(json_encode($responseContent));
-
-            return $response;
-
-        }
-
-        $manager->uninstall(array_merge($dependents, [$packageName]));
-        $responseContent = ['code' => self::CODE_UNINSTALLED];
-        $response->setContent(json_encode($responseContent));
-
-        return $response;
     }
 
     /**
@@ -276,5 +234,21 @@ class PackageController extends Controller
     protected function getParamValue(array $params, $paramName, $defaultValue)
     {
         return isset($params[$paramName]) ? $params[$paramName] : $defaultValue;
+    }
+
+    protected function getNotWritablePaths()
+    {
+        $paths = $this->container->getParameter('oro_distribution.package_manager.system_paths');
+        $kernelRootDir = $this->container->getParameter('kernel.root_dir');
+
+        $notWritablePaths = [];
+        foreach ($paths as $path) {
+            $realPath = realpath($kernelRootDir . '/../' . $path);
+            if (!is_writable($realPath)) {
+                $notWritablePaths[] = $path;
+            }
+        }
+
+        return $notWritablePaths;
     }
 }

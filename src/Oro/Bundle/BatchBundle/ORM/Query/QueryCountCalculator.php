@@ -16,49 +16,45 @@ class QueryCountCalculator
      * Calculates total count of query records
      *
      * @param Query $query
-     * @param \Doctrine\Common\Collections\ArrayCollection|array|null $parameters Query parameters.
      * @return integer
      */
-    public static function calculateCount(Query $query, $parameters = null)
+    public static function calculateCount(Query $query)
     {
         /** @var QueryCountCalculator $instance */
         $instance = new static();
-        return $instance->getCount($query, $parameters);
+
+        return $instance->getCount($query);
     }
 
     /**
      * Calculates total count of query records
+     * Notes: this method do not make any modifications of the given query
      *
      * @param Query $query
-     * @param \Doctrine\Common\Collections\ArrayCollection|array|null $parameters Query parameters.
      * @return integer
      */
-    public function getCount(Query $query, $parameters = null)
+    public function getCount(Query $query)
     {
-        if (!empty($parameters)) {
-            $query = clone $query;
-            $query->setParameters($parameters);
-        }
-        $parser = new Parser($query);
-        $parserResult = $parser->parse();
+        $parser            = new Parser($query);
+        $parserResult      = $parser->parse();
         $parameterMappings = $parserResult->getParameterMappings();
         list($sqlParameters, $parameterTypes) = $this->processParameterMappings($query, $parameterMappings);
 
         $statement = $query->getEntityManager()->getConnection()->executeQuery(
-            'SELECT COUNT(*) FROM (' . $query->getSQL() .') AS e',
+            'SELECT COUNT(*) FROM (' . $query->getSQL() . ') AS e',
             $sqlParameters,
             $parameterTypes
         );
-        $result = $statement->fetchColumn();
+        $result    = $statement->fetchColumn();
 
-        return $result ? (int) $result : 0;
+        return $result ? (int)$result : 0;
     }
 
     /**
-     * @param Query                              $query
-     * @param array                              $paramMappings
+     * @param Query $query
+     * @param array $paramMappings
      * @return array
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws QueryException
      */
     protected function processParameterMappings(Query $query, $paramMappings)
     {
@@ -83,8 +79,8 @@ class QueryCountCalculator
             }
 
             $sqlPositions = $paramMappings[$key];
-            $value = array($value);
-            $countValue = count($value);
+            $value        = array($value);
+            $countValue   = count($value);
 
             for ($i = 0, $l = count($sqlPositions); $i < $l; $i++) {
                 $sqlParams[$sqlPositions[$i]] = $value[($i % $countValue)];

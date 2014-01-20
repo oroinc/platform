@@ -15,6 +15,9 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var QueryBuilder */
     protected $qb;
 
+    /** @var boolean */
+    protected $isTotalCalculated = false;
+
     /** @var array */
     protected $parameters = [];
 
@@ -92,7 +95,10 @@ class Pager extends AbstractPager implements PagerInterface
     {
         $this->resetIterator();
 
-        $this->setNbResults($this->computeNbResult());
+        if (!$this->isTotalCalculated) {
+            $this->setNbResults($this->computeNbResult());
+            $this->isTotalCalculated = true;
+        }
 
         /** @var QueryBuilder $query */
         $query = $this->getQueryBuilder();

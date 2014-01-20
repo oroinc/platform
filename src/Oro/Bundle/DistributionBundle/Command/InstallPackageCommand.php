@@ -56,15 +56,18 @@ class InstallPackageCommand extends ContainerAwareCommand
             $requirementsString = array_reduce(
                 $requirements,
                 function ($result, PackageRequirement $requirement) {
-                    $result .= PHP_EOL . $requirement->getName();
+                    $result .= PHP_EOL . ' - ' . $requirement->getName();
+                    if ($requirement->isInstalled()) {
+                        $result .= ' [installed]';
+                    }
 
                     return $result;
                 },
                 ''
             );
-            $output->writeln(sprintf("Package requires:%s", $requirementsString));
+            $output->writeln(sprintf("%s requires:%s", $packageName, $requirementsString));
 
-            if (!$dialog->askConfirmation($output, 'Do you want to install all them? (yes/no) ')) {
+            if (!$dialog->askConfirmation($output, 'All missing packages will be installed. Continue? (yes/no) ')) {
                 return $output->writeln('<comment>Process aborted</comment>');
             }
         }

@@ -9,6 +9,9 @@ use Symfony\Component\Finder\Finder;
 
 class TranslationServiceProvider
 {
+    const FILE_NAME_SUFFIX      = '.zip';
+    const DEFAULT_SOURCE_LOCALE = 'en';
+
     /** @var AbstractAPIAdapter */
     protected $adapter;
 
@@ -18,14 +21,22 @@ class TranslationServiceProvider
     /** @var NullLogger */
     protected $logger;
 
+    /** @var string */
+    protected $rootDir;
+
     /**
      * @param AbstractAPIAdapter  $adapter
      * @param JsTranslationDumper $jsTranslationDumper
+     * @param string              $rootDir
      */
-    public function __construct(AbstractAPIAdapter $adapter, JsTranslationDumper $jsTranslationDumper)
-    {
-        $this->adapter = $adapter;
+    public function __construct(
+        AbstractAPIAdapter $adapter,
+        JsTranslationDumper $jsTranslationDumper,
+        $rootDir
+    ) {
+        $this->adapter             = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
+        $this->rootDir             = $rootDir;
 
         $this->setLogger(new NullLogger());
     }
@@ -40,14 +51,11 @@ class TranslationServiceProvider
      */
     public function update($dir)
     {
-        $pathToSave = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'oro-trans' . DIRECTORY_SEPARATOR . 'update.zip';
-        $targetDir  = dirname($pathToSave);
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        }
-        $targetDir = $targetDir . DIRECTORY_SEPARATOR . 'en' . DIRECTORY_SEPARATOR;
+        $targetDir  = $this->getTmpDir('oro-trans');
+        $pathToSave = $targetDir . DIRECTORY_SEPARATOR . 'update';
+        $targetDir  = $targetDir . DIRECTORY_SEPARATOR . self::DEFAULT_SOURCE_LOCALE . DIRECTORY_SEPARATOR;
 
-        $isDownloaded = $this->download($pathToSave, 'en', false);
+        $isDownloaded = $this->download($pathToSave, [], self::DEFAULT_SOURCE_LOCALE, false);
         if (!$isDownloaded) {
             return false;
         }
@@ -74,7 +82,7 @@ class TranslationServiceProvider
             file_put_contents($remoteFile, $content);
         }
 
-        $result =  $this->upload($targetDir, 'update');
+        $result = $this->upload($targetDir, 'update');
         $this->cleanup($targetDir);
 
         return $result;
@@ -96,8 +104,8 @@ class TranslationServiceProvider
         $files = array();
         foreach ($finder->files() as $file) {
             // crowdin understand only "/" as directory separator :)
-            $apiPath = str_replace(array($dir, DIRECTORY_SEPARATOR), array('', '/'), (string)$file);
-            $files[ $apiPath ] = (string)$file;
+            $apiPath         = str_replace(array($dir, DIRECTORY_SEPARATOR), array('', '/'), (string)$file);
+            $files[$apiPath] = (string)$file;
         }
 
         return $this->adapter->upload($files, $mode);
@@ -105,25 +113,33 @@ class TranslationServiceProvider
 
     /**
      * @param string      $pathToSave path to save translations
+     * @param array       $projects   project names
      * @param null|string $locale
-     * @param bool        $toApply whether apply download packs or not
+     * @param bool        $toApply    whether apply download packs or not
      *
+     * @throws \RuntimeException
      * @return bool
      */
-    public function download($pathToSave, $locale = null, $toApply = true)
+    public function download($pathToSave, array $projects, $locale = null, $toApply = true)
     {
-        $targetDir = dirname($pathToSave);
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
-        } else {
-            $this->cleanup($targetDir);
-        }
+        $pathToSave = $pathToSave . self::FILE_NAME_SUFFIX;
+        $targetDir  = dirname($pathToSave);
+        $this->cleanup($targetDir);
 
-        $isDownloaded = $this->adapter->download($pathToSave, $locale);
-        $isExtracted  = $this->unzip(
-            $pathToSave,
-            is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
-        );
+        $isDownloaded = $this->adapter->download($pathToSave, $projects, $locale);
+        try {
+            $isExtracted = $this->unzip(
+                $pathToSave,
+                is_null($locale) ? $targetDir : rtrim($targetDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $locale
+            );
+        } catch (\RuntimeException $e) {
+            // try to check possible error messages in file
+            if ($e->getCode() === \ZipArchive::ER_NOZIP) {
+                $this->adapter->parseResponse(file_get_contents($pathToSave));
+            }
+
+            throw $e;
+        }
 
         // TODO: consider move this in crowdin adapter or remove
         if ($locale == 'en') {
@@ -135,17 +151,25 @@ class TranslationServiceProvider
             unlink($pathToSave);
         }
 
-        if ($toApply) {
-            $this->apply('./app/Resources/', $targetDir);
+        if ($toApply && $isExtracted) {
+            $appliedLocales = $this->apply(
+                $this->rootDir . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR,
+                $targetDir
+            );
+
+            if ($appliedLocales) {
+                $this->cleanup($targetDir);
+                $this->jsTranslationDumper->dumpTranslations($appliedLocales);
+            }
         }
 
         return $isExtracted && $isDownloaded;
     }
 
     /**
-     * @param string $find      find string in file name
-     * @param string $replace   replacement
-     * @param string $dir       where to search
+     * @param string $find    find string in file name
+     * @param string $replace replacement
+     * @param string $dir     where to search
      */
     protected function renameFiles($find, $replace, $dir)
     {
@@ -181,14 +205,6 @@ class TranslationServiceProvider
             \ZipArchive::ER_SEEK   => 'Seek error.',
         ];
 
-        // try to check possible error messages in file
-        if ($res === \ZipArchive::ER_NOZIP) {
-            $result = $this->adapter->parseResponse(file_get_contents($file));
-            if ($result->getName() == 'error') {
-                throw new \RuntimeException($result->message, (int)$result->code);
-            }
-        }
-
         if ($res !== true) {
             throw new \RuntimeException($zipErrors[$res], $res);
         }
@@ -198,7 +214,7 @@ class TranslationServiceProvider
             throw new \RuntimeException(sprintf('Pack %s can\'t be extracted', $file));
         }
 
-        $isClosed    = $zip->close();
+        $isClosed = $zip->close();
         if (!$isClosed) {
             throw new \RuntimeException(sprintf('Pack %s can\'t be closed', $file));
         }
@@ -213,6 +229,11 @@ class TranslationServiceProvider
      */
     protected function cleanup($targetDir)
     {
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+            return;
+        }
+
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($targetDir, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::CHILD_FIRST
@@ -245,64 +266,57 @@ class TranslationServiceProvider
                 continue;
             }
 
+            // get target path form source by replacing $sourceDir part
             $target = $targetDir . preg_replace(
                 '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
                 '',
                 $fileInfo->getPathname()
             );
 
-            $locale = str_replace(
+            if ($fileInfo->isDir() && !file_exists($target)) {
+                mkdir($target, 0777, true);
+            }
+
+            if ($fileInfo->isDir()) {
+                continue;
+            }
+
+            // get locale from path, e.g. ../translations/messages.en.yml -> en
+            $appliedLocales[] = str_replace(
                 '-',
                 '_',
-                preg_replace(
-                    '#' . $sourceDir . '[/|\\\]+([^/]+)[/|\\\]+.*#',
-                    '$1',
-                    $fileInfo->getPathname()
-                )
+                preg_replace('#' . $sourceDir . '[/|\\\]+([^/]+)[/|\\\]+.*#', '$1', $fileInfo->getPathname())
             );
-            $appliedLocales[$locale] = $locale;
 
-            if ($fileInfo->isDir() && !file_exists($target)) {
-                mkdir($target);
-            }
+            rename($fileInfo->getPathname(), $target);
 
-            if ($fileInfo->isFile()) {
-                rename($fileInfo->getPathname(), $target);
-                file_put_contents(
-                    $target,
-                    trim(
-                        str_replace('---', '', file_get_contents($target))
-                    )
-                );
-            }
+            // fix bad formatted yaml that may come from third-party service
+            YamlFixer::fixStrings($target);
         }
 
-        if ($appliedLocales) {
-            $this->cleanup($sourceDir);
-            $this->jsTranslationDumper->dumpTranslations($appliedLocales);
-        }
-
-        return $appliedLocales;
+        return array_combine($appliedLocales, $appliedLocales);
     }
 
     /**
-     * @param AbstractAPIAdapter $adapter
-     *
-     * @return $this
+     * @param APIAdapterInterface $adapter
      */
-    public function setAdapter(AbstractAPIAdapter $adapter)
+    public function setAdapter(APIAdapterInterface $adapter)
     {
         $this->adapter = $adapter;
+    }
 
-        return $this;
+    /**
+     * @return AbstractAPIAdapter
+     */
+    public function getAdapter()
+    {
+        return $this->adapter;
     }
 
     /**
      * Sets a logger
      *
      * @param LoggerInterface $logger
-     *
-     * @return $this
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -310,7 +324,22 @@ class TranslationServiceProvider
 
         $this->adapter->setLogger($this->logger);
         $this->jsTranslationDumper->setLogger($this->logger);
+    }
 
-        return $this;
+    /**
+     * @param string $prefix
+     *
+     * @return string
+     */
+    protected function getTmpDir($prefix)
+    {
+        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = $path . ltrim(uniqid($prefix), DIRECTORY_SEPARATOR);
+
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        return $path;
     }
 }
