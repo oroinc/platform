@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -27,27 +28,48 @@ use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
 class WidgetController extends Controller
 {
     /**
-     * @Route("/steps/{workflowItemId}", name="oro_workflow_widget_steps")
-     * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
+     * @Route("/steps/{entityClass}/{entityId}", name="oro_workflow_widget_steps")
      * @Template
      * @AclAncestor("oro_workflow")
      */
-    public function stepsAction(WorkflowItem $workflowItem)
+    public function stepsAction($entityClass, $entityId)
     {
+        /** @var EntityConnector $entityConnector */
+        $entityConnector = $this->get('oro_workflow.entity_connector');
+        $entity = $this->getEntityReference($entityClass, $entityId);
+
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $workflow = $workflowManager->getWorkflow($workflowItem);
+        $workflowItem = $entityConnector->getWorkflowItem($entity);
+        $currentStep = $entityConnector->getWorkflowStep($entity);
+        $steps = array();
+        if ($workflowItem) {
+            $workflow = $workflowManager->getWorkflow($workflowItem);
 
-        $currentStepName = $workflowItem->getCurrentStep()->getName();
-        $currentStep = $workflow->getStepManager()->getStep($currentStepName);
-        if (!$currentStep) {
-            throw new BadRequestHttpException(sprintf('There is no step "%s"', $currentStepName));
+            $workflowDefinition = $workflow->getDefinition();
+            if (!$workflowDefinition->isStepsDisplayOrdered()) {
+                $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
+            }
+
+            if (!$currentStep) {
+                $currentStepName = $workflowItem->getCurrentStep()->getName();
+                $currentStep = $workflow->getStepManager()->getStep($currentStepName);
+            }
+        } else {
+            $workflow = $workflowManager->getApplicableWorkflow($entity);
+            $workflowDefinition = $workflow->getDefinition();
+            if (!$currentStep && $workflowDefinition->getStartStep()) {
+                $currentStep = $workflow->getStepManager()
+                    ->getStep($workflowDefinition->getStartStep()->getName());
+
+                if (!$workflowDefinition->isStepsDisplayOrdered()) {
+                    $steps = array($currentStep);
+                }
+            }
         }
 
-        if ($workflowItem->getDefinition()->isStepsDisplayOrdered()) {
+        if ($workflowDefinition->isStepsDisplayOrdered()) {
             $steps = $workflow->getStepManager()->getOrderedSteps();
-        } else {
-            $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
         }
 
         return array(

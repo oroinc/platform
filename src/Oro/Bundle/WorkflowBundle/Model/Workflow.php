@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
@@ -54,6 +55,11 @@ class Workflow
      * @var Collection
      */
     protected $errors;
+
+    /**
+     * @var WorkflowDefinition
+     */
+    protected $definition;
 
     /**
      * @param EntityConnector $entityConnector
@@ -427,5 +433,24 @@ class Workflow
             }
         }
         return new ArrayCollection(array_reverse($steps));
+    }
+
+    /**
+     * @return WorkflowDefinition
+     */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @return Workflow
+     */
+    public function setDefinition(WorkflowDefinition $definition)
+    {
+        $this->definition = $definition;
+
+        return $this;
     }
 }

@@ -2,31 +2,19 @@
 
 namespace Oro\Bundle\WorkflowBundle\Twig;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class WorkflowExtension extends \Twig_Extension
 {
     const NAME = 'oro_workflow';
 
     /**
-     * @var WorkflowRegistry
-     */
-    protected $workflowRegistry;
-
-    /**
      * @var WorkflowManager
      */
     protected $workflowManager;
 
-    public function __construct(
-        WorkflowRegistry $workflowRegistry,
-        WorkflowManager $workflowManager
-    ) {
-        $this->workflowRegistry = $workflowRegistry;
+    public function __construct(WorkflowManager $workflowManager)
+    {
         $this->workflowManager = $workflowManager;
     }
 
@@ -37,30 +25,28 @@ class WorkflowExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('has_workflow', array($this, 'hasWorkflow')),
-            new \Twig_SimpleFunction('get_workflow', array($this, 'getWorkflow')),
+            new \Twig_SimpleFunction('has_workflow_start_step', array($this, 'hasWorkflowStartStep')),
             new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
-            new \Twig_SimpleFunction('get_workflow_item', array($this, 'getWorkflowItem')),
-            new \Twig_SimpleFunction('get_workflow_item_current_step', array($this, 'getWorkflowItemCurrentStep')),
         );
     }
 
     /**
      * Check for workflow instances
      *
-     * @param string $entityClass
+     * @param object $entity
      * @return bool
      */
-    public function hasWorkflow($entityClass)
+    public function hasWorkflow($entity)
     {
-        if (!$entityClass) {
+        if (!$entity) {
             return false;
         }
 
-        return $this->workflowRegistry->getWorkflowByEntityClass($entityClass) !== null;
+        return $this->workflowManager->getApplicableWorkflow($entity) !== null;
     }
 
     /**
-     * Check for started workflow instance.
+     * Check that entity has workflow item.
      *
      * @param object $entity
      * @return bool
@@ -71,36 +57,19 @@ class WorkflowExtension extends \Twig_Extension
     }
 
     /**
+     * Check that workflow has start step
+     *
      * @param object $entity
-     * @return null|WorkflowItem
+     * @return bool
      */
-    public function getWorkflowItem($entity)
+    public function hasWorkflowStartStep($entity)
     {
-        return $this->workflowManager->getWorkflowItemByEntity($entity);
-    }
+        $workflow = $this->workflowManager->getApplicableWorkflow($entity);
+        if ($workflow) {
+            return $workflow->getDefinition()->getStartStep() !== null;
+        }
 
-    /**
-     * Get workflow by workflow identifier
-     *
-     * @param string|Workflow|WorkflowItem $workflowIdentifier
-     * @return Workflow
-     */
-    public function getWorkflow($workflowIdentifier)
-    {
-        return $this->workflowManager->getWorkflow($workflowIdentifier);
-    }
-
-    /**
-     * Get current step by workflow item.
-     *
-     * @param WorkflowItem $workflowItem
-     * @return Step
-     */
-    public function getWorkflowItemCurrentStep(WorkflowItem $workflowItem)
-    {
-        $workflow = $this->getWorkflow($workflowItem);
-
-        return $workflow->getStepManager()->getStep($workflowItem->getCurrentStep()->getName());
+        return false;
     }
 
     /**

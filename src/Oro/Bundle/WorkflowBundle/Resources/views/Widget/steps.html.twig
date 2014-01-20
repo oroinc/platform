@@ -1,5 +1,4 @@
-{% set workflowItem = get_workflow_item(entity) %}
-{% if workflowItem %}
+{% if has_workflow_item(entity) or has_workflow_start_step(entity) %}
     <style type="text/css">
         .workflow-steps-container {
             text-align: center;
@@ -10,7 +9,8 @@
     oro_widget_render({
         'widgetType': 'block',
         'url': path('oro_workflow_widget_steps', {
-            workflowItemId: workflowItem.id
+            entityClass: oro_class_name(entity),
+            entityId: entity.id
         }),
         'alias': 'workflow_steps'
     })

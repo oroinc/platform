@@ -84,7 +84,8 @@ class WorkflowAssembler extends AbstractAssembler
         $workflow
             ->setName($definition->getName())
             ->setLabel($definition->getLabel())
-            ->setEnabled($definition->isEnabled());
+            ->setEnabled($definition->isEnabled())
+            ->setDefinition($definition);
 
         $workflow->getStepManager()
             ->setSteps($steps);

@@ -51,7 +51,7 @@ class EntityConnector
      */
     public function getWorkflowItem($entity)
     {
-        $this->getProperty($entity, self::PROPERTY_WORKFLOW_ITEM);
+        return $this->getProperty($entity, self::PROPERTY_WORKFLOW_ITEM);
     }
 
     /**
@@ -60,7 +60,7 @@ class EntityConnector
      */
     public function getWorkflowStep($entity)
     {
-        $this->getProperty($entity, self::PROPERTY_WORKFLOW_STEP);
+        return $this->getProperty($entity, self::PROPERTY_WORKFLOW_STEP);
     }
 
     /**

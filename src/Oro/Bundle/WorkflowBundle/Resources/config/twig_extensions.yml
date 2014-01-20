@@ -13,7 +13,6 @@ services:
     oro_workflow.twig.extension.workflow:
         class: %oro_workflow.twig.extension.workflow.class%
         arguments:
-            - @oro_workflow.registry
             - @oro_workflow.manager
         tags:
             - { name: twig.extension }
