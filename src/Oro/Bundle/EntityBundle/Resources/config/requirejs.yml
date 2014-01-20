@@ -1,3 +1,5 @@
 config:
     paths:
         'oro/entity-field-choice-view': 'bundles/oroentity/js/entity-field-choice-view.js'
+
+        'oroentity/js/fields-loader': 'bundles/oroentity/js/fields-loader.js'

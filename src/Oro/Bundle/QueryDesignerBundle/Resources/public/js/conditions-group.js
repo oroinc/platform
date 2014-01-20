@@ -27,9 +27,13 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             criteriaListSelector: '#filter-criteria-list',
             valueSourceSelector: '',
             helperClass: 'ui-grabbing',
-            conditionHTML: '<li class="condition" />',
+            conditionHTML: '<li class="condition controls" />',
             compareFieldsHTML: '<div class="field-filter" />',
-            conditionsGroupHTML: '<ul class="conditions-group" />'
+            conditionsGroupHTML: '<ul class="conditions-group" />',
+            validation: {
+                'compare-fields': {NotBlank: {message: 'This condition should not be blank.'}},
+                'conditions-group': {NotBlank: {message: 'This group should not be blank.'}}
+            }
         },
 
         _create: function () {
@@ -92,11 +96,17 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             $group.sortable(this.options.conditionsGroup);
             // on change update group's value
             $group.on('changed', function () {
-                var value = [];
+                var values = [];
                 $group.find('>[data-criteria]>[data-value]').each(function () {
-                    value.push($(this).data('value'));
+                    var $el = $(this),
+                        value = $el.data('value');
+                    values.push(value);
+                    if ($.type(value) !== 'string') {
+                        // means, value is not an operator
+                        $el.parent().find('>input[name^=condition_group_]').prop('checked', !_.isEmpty(value));
+                    }
                 });
-                $group.data('value', value);
+                $group.data('value', values);
             });
         },
 
@@ -122,7 +132,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
         },
 
         _createCondition: function (criteria, value) {
-            var $content, $condition, $criteria, options;
+            var $content, $condition, $criteria, options, rule;
             if (!criteria) {
                 // if criteria is not passed, define it from value
                 criteria = $.isArray(value) ? 'conditions-group' : 'compare-fields';
@@ -145,6 +155,12 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
                 .attr('data-criteria', criteria)
                 .prepend($content)
                 .prepend('<a class="close" data-dismiss="alert" href="#">&times;</a>');
+
+            rule = this.options.validation[criteria];
+            if (rule) {
+                $condition.append(this._createValidationInput(rule, $content.data('value')));
+            }
+
             return $condition;
         },
 
@@ -171,6 +187,13 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             return $content
                 .attr('data-value', '')
                 .data('value', value);
+        },
+
+        _createValidationInput: function (rule, value) {
+            return $('<input class="select2-focusser select2-offscreen" type="checkbox"/>')
+                .prop('checked', !_.isEmpty(value))
+                .attr('name', 'condition_group_' + Date.now())
+                .data('validation', rule);
         },
 
         _createHelper: function (e, $el) {
