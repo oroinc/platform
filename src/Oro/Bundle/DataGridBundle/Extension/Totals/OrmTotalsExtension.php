@@ -10,7 +10,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
@@ -53,11 +52,7 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $columns      = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-        $isApplicable = $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) === OrmDatasource::TYPE
-            && is_array($columns);
-
-        return $isApplicable;
+        return true;
     }
 
     /**
@@ -85,46 +80,50 @@ class OrmTotalsExtension extends AbstractExtension
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $totals       = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-        $totalQueries = [];
-        foreach ($totals as $field => $total) {
-            if (isset($total['query'])) {
-                $totalQueries[] = $total['query'] . ' AS ' . $field;
-            }
-        };
-
-        $ids = [];
-        foreach ($result['data'] as $res) {
-            $ids[] = $res['id'];
-        };
-
-        $rootAlias      = $this->masterQB->getRootAliases()[0];
-        $rootIdentifier = $this->masterQB->getEntityManager()->getClassMetadata(
-            $this->masterQB->getRootEntities()[0]
-        )->getIdentifier()[0];
-
-        $data = $this->masterQB
-            ->select($totalQueries)
-            ->andWhere($this->masterQB->expr()->in($rootAlias . '.' . $rootIdentifier, $ids))
-            ->getQuery()
-            ->setFirstResult(null)
-            ->setMaxResults(null)
-            ->getScalarResult();
-
-        if (!empty($data)) {
-            foreach ($totals as $field => &$total) {
-                if (isset($data[0][$field])) {
-                    $total['total'] = $this->applyFrontendFormatting(
-                        $data[0][$field],
-                        $total[Configuration::TOTALS_FORMATTER]
-                    );
-                }
-                if (isset($total['label'])) {
-                    $total['label'] = $this->translator->trans($total['label']);
+        if (null != $totals) {
+            $totalQueries = [];
+            foreach ($totals as $field => $total) {
+                if (isset($total['query'])) {
+                    $totalQueries[] = $total['query'] . ' AS ' . $field;
                 }
             };
+
+            $ids = [];
+            foreach ($result['data'] as $res) {
+                $ids[] = $res['id'];
+            };
+
+            $rootAlias      = $this->masterQB->getRootAliases()[0];
+            $rootIdentifier = $this->masterQB->getEntityManager()->getClassMetadata(
+                $this->masterQB->getRootEntities()[0]
+            )->getIdentifier()[0];
+
+            $data = $this->masterQB
+                ->select($totalQueries)
+                ->andWhere($this->masterQB->expr()->in($rootAlias . '.' . $rootIdentifier, $ids))
+                ->getQuery()
+                ->setFirstResult(null)
+                ->setMaxResults(null)
+                ->getScalarResult();
+
+            if (!empty($data)) {
+                foreach ($totals as $field => &$total) {
+                    if (isset($data[0][$field])) {
+                        $total['total'] = $this->applyFrontendFormatting(
+                            $data[0][$field],
+                            $total[Configuration::TOTALS_FORMATTER]
+                        );
+                    }
+                    if (isset($total['label'])) {
+                        $total['label'] = $this->translator->trans($total['label']);
+                    }
+                };
+
+                $totals['__key'] = $config->getName();
+            }
         }
 
-        $result->offsetAddToArray('options', ['totals' => $totals]);
+        $result->offsetAddToArray('options', ['totals' => $totals ?: []]);
 
         return $result;
     }
