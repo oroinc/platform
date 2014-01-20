@@ -5,6 +5,7 @@ table.grid thead th > span {
 
 table.grid tfoot th {
     background-color: #f2f2f2;
+    padding: 4px 10px;
 }
 
 table.grid tfoot th > a,

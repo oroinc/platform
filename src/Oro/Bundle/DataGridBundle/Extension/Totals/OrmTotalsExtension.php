@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
+use Doctrine\ORM\Query\Expr\GroupBy;
+use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
@@ -79,7 +81,9 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $totals       = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
+        $rootIdentifier = [];
+
+        $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         if (null != $totals) {
             $totalQueries = [];
             foreach ($totals as $field => $total) {
@@ -88,19 +92,81 @@ class OrmTotalsExtension extends AbstractExtension
                 }
             };
 
-            $ids = [];
-            foreach ($result['data'] as $res) {
-                $ids[] = $res['id'];
-            };
+            $groupParts   = [];
+            $groupByParts = $this->masterQB->getDQLPart('groupBy');
+            if (!empty($groupByParts)) {
+                /** @var GroupBy $groupByPart */
+                foreach ($groupByParts as $groupByPart) {
+                    $groupParts = array_merge($groupParts, $groupByPart->getParts());
+                }
+            }
 
-            $rootAlias      = $this->masterQB->getRootAliases()[0];
-            $rootIdentifier = $this->masterQB->getEntityManager()->getClassMetadata(
-                $this->masterQB->getRootEntities()[0]
-            )->getIdentifier()[0];
+            if (empty($groupParts)) {
+                $rootIdentifiers = $this->masterQB->getEntityManager()
+                    ->getClassMetadata($this->masterQB->getRootEntities()[0])->getIdentifier();
+                $rootAlias = $this->masterQB->getRootAliases()[0];
+                foreach ($rootIdentifiers as $field) {
+                    $rootIdentifier[] = [
+                        'fieldAlias'  => $field,
+                        'alias'       => $field,
+                        'entityAlias' => $rootAlias
+                    ];
+                }
+            } else {
+                foreach ($groupParts as $groupPart) {
+                    if (strpos($groupPart, '.')) {
+                        list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
+                        $rootIdentifier[] = [
+                            'fieldAlias'  => $rootIdentifierPart,
+                            'entityAlias' => $rootAlias,
+                            'alias'       => $rootIdentifierPart
+                        ];
+                    } else {
+                        $selectParts = $this->masterQB->getDQLPart('select');
+                        /** @var Select $selectPart */
+                        foreach ($selectParts as $selectPart) {
+                            foreach ($selectPart->getParts() as $part) {
+                                if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
+                                    if (count($matches) == 3 && $groupPart == $matches[2]) {
+                                        $rootIdentifier[] = [
+                                            'fieldAlias' => $matches[1],
+                                            'alias'      => $matches[2]
+                                        ];
+                                    }
+                                } else {
+                                    $rootIdentifier[] = [
+                                        'fieldAlias' => $groupPart,
+                                        'alias'      => $groupPart
+                                    ];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
-            $data = $this->masterQB
+            $dataQueryBuilder = $this->masterQB
                 ->select($totalQueries)
-                ->andWhere($this->masterQB->expr()->in($rootAlias . '.' . $rootIdentifier, $ids))
+                ->resetDQLPart('groupBy');
+
+            foreach ($rootIdentifier as $identifier) {
+                $ids = [];
+                foreach ($result['data'] as $res) {
+                    $ids[] = $res[$identifier['alias']];
+                }
+
+                $dataQueryBuilder->andWhere(
+                    $this->masterQB->expr()->in(
+                        isset($identifier['entityAlias'])
+                            ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
+                            : $identifier['fieldAlias']
+                        ,
+                        $ids
+                    )
+                );
+            }
+
+            $data = $dataQueryBuilder
                 ->getQuery()
                 ->setFirstResult(null)
                 ->setMaxResults(null)
@@ -109,21 +175,18 @@ class OrmTotalsExtension extends AbstractExtension
             if (!empty($data)) {
                 foreach ($totals as $field => &$total) {
                     if (isset($data[0][$field])) {
-                        $total['total'] = $this->applyFrontendFormatting(
-                            $data[0][$field],
-                            $total[Configuration::TOTALS_FORMATTER]
-                        );
+                        $total['total'] = isset($total[Configuration::TOTALS_FORMATTER])
+                            ? $this->applyFrontendFormatting($data[0][$field], $total[Configuration::TOTALS_FORMATTER])
+                            : $data[0][$field];
                     }
                     if (isset($total['label'])) {
                         $total['label'] = $this->translator->trans($total['label']);
                     }
                 };
-
-                $totals['__key'] = $config->getName();
             }
         }
 
-        $result->offsetAddToArray('options', ['totals' => $totals ?: []]);
+        $result->offsetAddToArray('options', ['totals' => $totals ? : []]);
 
         return $result;
     }
