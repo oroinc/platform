@@ -128,7 +128,7 @@ class EntityFieldSelectType extends AbstractType
     {
         $attr['data-entity'] = $options['entity'];
         $data                = empty($options['entity']) || $options['skip_load_data']
-            ? array() // set empty data if entity is not specified or skip_load_data = true
+            ? [] // set empty data if entity is not specified or skip_load_data = true
             : $this->getData(
                 $options['entity'],
                 $options['with_relations'],
@@ -172,8 +172,8 @@ class EntityFieldSelectType extends AbstractType
      */
     protected function convertData(array &$fields, $entityName, $parentFieldId)
     {
-        $resultFields    = array();
-        $resultRelations = array();
+        $resultFields    = [];
+        $resultRelations = [];
         foreach ($fields as $field) {
             $fieldId = null !== $parentFieldId
                 ? sprintf('%s+%s::%s', $parentFieldId, $entityName, $field['name'])
@@ -202,7 +202,7 @@ class EntityFieldSelectType extends AbstractType
             }
         }
 
-        $result = array();
+        $result = [];
         if (!empty($resultFields)) {
             if (null === $parentFieldId && empty($resultRelations)) {
                 $result = $resultFields;

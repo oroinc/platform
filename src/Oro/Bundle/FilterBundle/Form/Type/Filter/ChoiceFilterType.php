@@ -65,9 +65,7 @@ class ChoiceFilterType extends AbstractChoiceType
      */
     protected function translateChoices(FormView $view, FormView $valueFormView, array $options)
     {
-        $needTranslation = !isset($options['is_translated_choices'])
-            || !$options['is_translated_choices'];
-        if ($needTranslation) {
+        if (!isset($options['is_translated_choices']) || !$options['is_translated_choices']) {
             parent::translateChoices($view, $valueFormView, $options);
         }
     }

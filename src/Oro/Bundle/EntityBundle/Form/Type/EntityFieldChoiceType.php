@@ -54,7 +54,7 @@ class EntityFieldChoiceType extends AbstractType
         $that    = $this;
         $choices = function (Options $options) use ($that) {
             return empty($options['entity']) || $options['skip_load_data']
-                ? array() // return empty list if entity is not specified or skip_load_data = true
+                ? [] // return empty list if entity is not specified or skip_load_data = true
                 : $that->getChoices(
                     $options['entity'],
                     $options['with_relations']
@@ -141,8 +141,8 @@ class EntityFieldChoiceType extends AbstractType
      */
     protected function getChoices($entityName, $withRelations)
     {
-        $choiceFields    = array();
-        $choiceRelations = array();
+        $choiceFields    = [];
+        $choiceRelations = [];
         $fields          = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
@@ -165,7 +165,7 @@ class EntityFieldChoiceType extends AbstractType
         if (empty($choiceRelations)) {
             return $choiceFields;
         }
-        $choices = array();
+        $choices = [];
         if (!empty($choiceFields)) {
             $choices[$this->translator->trans('oro.entity.form.entity_fields')] = $choiceFields;
         }

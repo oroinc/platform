@@ -29,17 +29,17 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *
      * @QueryParam(
-     *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="false",
+     *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether association fields should be returned as well.")
      * @QueryParam(
-     *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="false",
+     *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
      *      name="deep-level", requirements="\d+", nullable=true, strict=true, default="0",
      *      description="The maximum deep level of related entities.")
      * @QueryParam(
      *      name="last-deep-level-relations", requirements="(1)|(0)",
-     *      nullable=true, strict=true, default="false",
+     *      nullable=true, strict=true, default="0",
      *      description="Indicates whether fields for the last deep level of related entities should be returned.")
      * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
      * @ApiDoc(

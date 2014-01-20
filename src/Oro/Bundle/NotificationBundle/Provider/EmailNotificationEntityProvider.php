@@ -38,10 +38,8 @@ class EmailNotificationEntityProvider extends EntityProvider
      */
     protected function addEntities(array &$result, $translate)
     {
-        $entities = $this->em->createQueryBuilder()
-            ->from('OroEmailBundle:EmailTemplate', 't')
-            ->select('t.entityName')
-            ->distinct()
+        $entities = $this->em->getRepository('OroEmailBundle:EmailTemplate')
+            ->getDistinctByEntityNameQueryBuilder()
             ->getQuery()
             ->getScalarResult();
         foreach ($entities as $entity) {
