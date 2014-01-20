@@ -787,10 +787,6 @@ define(function (require) {
         processError: function(XMLHttpRequest, textStatus, errorThrown) {
             if (app.debug) {
                 this.updateDebugToolbar(XMLHttpRequest);
-
-                if (XMLHttpRequest.status != 403) {
-                    document.body.innerHTML = XMLHttpRequest.responseText;
-                }
             }
 
             this.handleResponse(XMLHttpRequest.responseText);
