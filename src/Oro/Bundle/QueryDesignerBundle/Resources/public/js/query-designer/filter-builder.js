@@ -66,12 +66,12 @@ function($, _, __, tools, mediator, messenger,
                         var templateSelector = filter.templateSelector += '-' + options.templateTheme;
                         var $template = $(filter.templateSelector);
                         if ($template.length) {
-                            filter.templateSelector += templateSelector;
+                            filter.templateSelector = templateSelector;
                             filter.template = _.template($(templateSelector).text());
                         } else {
                             messenger.notificationFlashMessage(
                                 'error',
-                                'The template "' + filter.templateSelector + '" was not found.');
+                                'The template "' + templateSelector + '" was not found.');
                         }
                     }
                     filters[options.type] = filter;
