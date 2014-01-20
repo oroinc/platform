@@ -2,7 +2,6 @@ parameters:
     oro_report.report.entity.class:                    Oro\Bundle\ReportBundle\Entity\Report
     oro_report.form.type.report.class:                 Oro\Bundle\ReportBundle\Form\Type\ReportType
     oro_report.form.type.entity_choice.class:          Oro\Bundle\ReportBundle\Form\Type\ReportEntityChoiceType
-    oro_report.form.type.entity_field_choice.class:    Oro\Bundle\ReportBundle\Form\Type\ReportEntityFieldChoiceType
     oro_report.form.handler.report.class:              Oro\Bundle\ReportBundle\Form\Handler\ReportHandler
     oro_report.report.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
@@ -40,12 +39,3 @@ services:
             - @oro_report.entity_provider
         tags:
             - { name: form.type, alias: oro_report_entity_choice }
-
-    oro_report.form.type.entity_field_choice:
-        class: %oro_report.form.type.entity_field_choice.class%
-        arguments:
-            - @oro_report.entity_provider
-            - @oro_report.entity_field_provider
-            - @translator
-        tags:
-            - { name: form.type, alias: oro_report_entity_field_choice }

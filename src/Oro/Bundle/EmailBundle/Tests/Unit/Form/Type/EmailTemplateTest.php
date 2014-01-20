@@ -26,7 +26,6 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->type = new EmailTemplateType(
-            [],
             $this->configManager,
             $this->localeSettings
         );
