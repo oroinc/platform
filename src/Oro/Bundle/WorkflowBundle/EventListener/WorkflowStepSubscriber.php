@@ -89,7 +89,9 @@ class WorkflowStepSubscriber implements EventSubscriber
      */
     protected function setStartStep($entity)
     {
-        $definition = $this->definitionsWithDefaultStep[ClassUtils::getClass($entity)];
-        $this->entityConnector->setWorkflowStep($entity, $definition->getStartStep());
+        if (!$this->entityConnector->getWorkflowStep($entity)) {
+            $definition = $this->definitionsWithDefaultStep[ClassUtils::getClass($entity)];
+            $this->entityConnector->setWorkflowStep($entity, $definition->getStartStep());
+        }
     }
 }

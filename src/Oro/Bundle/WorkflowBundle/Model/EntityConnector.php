@@ -46,6 +46,24 @@ class EntityConnector
     }
 
     /**
+     * @param object $entity
+     * @return WorkflowItem
+     */
+    public function getWorkflowItem($entity)
+    {
+        $this->getProperty($entity, self::PROPERTY_WORKFLOW_ITEM);
+    }
+
+    /**
+     * @param object $entity
+     * @return WorkflowStep
+     */
+    public function getWorkflowStep($entity)
+    {
+        $this->getProperty($entity, self::PROPERTY_WORKFLOW_STEP);
+    }
+
+    /**
      * @param WorkflowItem $workflowItem
      * @param object $entity
      * @throws WorkflowException
@@ -70,6 +88,22 @@ class EntityConnector
         }
 
         $entity->$setter($value);
+    }
+
+    /**
+     * @param object $entity
+     * @param string $property
+     * @return mixed
+     * @throws WorkflowException
+     */
+    protected function getProperty($entity, $property)
+    {
+        $getter = 'get' . ucfirst($property);
+        if (!method_exists($entity, $getter)) {
+            throw new WorkflowException(sprintf('Can\'t get property "%s" from entity', $property));
+        }
+
+        return $entity->$getter();
     }
 
     /**
