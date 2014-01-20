@@ -99,7 +99,7 @@ define(['jquery', 'jquery.select2'], function ($) {
     (function (prototype) {
         var prepareOpts = prototype.prepareOpts;
         prototype.prepareOpts = function (options) {
-            if (options.collapsibleResults || options.is_group_collapsible) {
+            if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
             }
             return prepareOpts.call(this, options);

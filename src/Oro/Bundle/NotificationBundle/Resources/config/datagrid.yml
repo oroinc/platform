@@ -27,9 +27,10 @@ datagrid:
                 label: oro.notification.emailnotification.entity_name.label
                 data_name: entityName
                 type: twig
-                template: OroNotificationBundle:EmailNotification:Datagrid/Property/entityName.html.twig
+                template: OroEntityBundle:Datagrid:Property/entity.html.twig
                 frontend_type: html
-                choices: @oro_notification.event_listener.email_notification_service->getEntityNameChoices
+                context:
+                    entity_provider: @oro_entity.entity_provider
 
             eventName:
                 label: oro.notification.emailnotification.event.label
@@ -95,10 +96,10 @@ datagrid:
                     type: choice
                     data_name: e.entityName
                     options:
-                        translation_domain: config
+                        is_translated_choices: true
                         field_options:
                             multiple: true
-                            choices: @oro_notification.event_listener.email_notification_service->getEntityNameChoices
+                            choices: @oro_entity.datagrid_helper->getEntityNames
 
                 eventName:
                     type: choice
