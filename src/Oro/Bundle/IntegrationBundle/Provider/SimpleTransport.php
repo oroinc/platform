@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 class SimpleTransport implements TransportInterface
 {
@@ -29,7 +29,7 @@ class SimpleTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function init(Channel $channel)
+    public function init(Transport $transportEntity)
     {
     }
 

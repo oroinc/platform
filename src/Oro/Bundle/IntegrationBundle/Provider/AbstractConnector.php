@@ -52,7 +52,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
         $this->channel   = $this->contextMediator->getChannel($context);
 
         $this->validateConfiguration();
-        $this->transport->init($this->channel);
+        $this->transport->init($this->channel->getTransport());
         $this->sourceIterator = $this->getConnectorSource();
     }
 

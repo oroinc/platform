@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 interface TransportInterface
 {
     /**
-     * @param Channel $channel
+     * @param Transport $transportEntity
      */
-    public function init(Channel $channel);
+    public function init(Transport $transportEntity);
 
     /**
      * @param string $action

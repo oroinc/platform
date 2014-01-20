@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
@@ -15,19 +15,15 @@ abstract class SOAPTransport implements TransportInterface
     /** @var ParameterBag */
     protected $settings;
 
-    /** @var Channel */
-    protected $channel;
-
     /** @var \SoapClient */
     protected $client;
 
     /**
      * {@inheritdoc}
      */
-    public function init(Channel $channel)
+    public function init(Transport $transportEntity)
     {
-        $this->settings = $channel->getTransport()->getSettingsBag();
-        $this->channel  = $channel;
+        $this->settings = $transportEntity->getSettingsBag();
 
         $wsdlUrl = $this->settings->get('wsdl_url');
         if (!$wsdlUrl) {
@@ -50,22 +46,6 @@ abstract class SOAPTransport implements TransportInterface
         $result = $this->client->__soapCall($action, $params);
 
         return $result;
-    }
-
-    /**
-     * @param string $wsdl_url
-     * @param bool   $isDebug
-     *
-     * @return \SoapClient
-     */
-    protected function getSoapClient($wsdl_url, $isDebug = false)
-    {
-        $options = [];
-        if ($isDebug) {
-            $options['trace'] = true;
-        }
-
-        return new \SoapClient($wsdl_url, $options);
     }
 
     /**
@@ -101,5 +81,21 @@ abstract class SOAPTransport implements TransportInterface
     public function __sleep()
     {
         return [];
+    }
+
+    /**
+     * @param string $wsdl_url
+     * @param bool   $isDebug
+     *
+     * @return \SoapClient
+     */
+    protected function getSoapClient($wsdl_url, $isDebug = false)
+    {
+        $options = [];
+        if ($isDebug) {
+            $options['trace'] = true;
+        }
+
+        return new \SoapClient($wsdl_url, $options);
     }
 }
