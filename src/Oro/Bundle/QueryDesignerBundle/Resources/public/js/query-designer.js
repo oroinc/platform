@@ -62,11 +62,6 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             // initialize views
             this.initColumnsView();
             this.initFiltersView();
-
-            this.$el.closest('form').on('submit', _.bind(function (e) {
-                this.onPreSubmit();
-                return true;
-            }, this));
         },
 
         isEmpty: function () {
@@ -123,8 +118,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 var data = {
                     columns: columns,
                     grouping_columns: groupingColumns,
-                    filters: filters,
-                    filters_logic: this.filtersView.getFiltersLogic()
+                    filters: filters
                 };
                 this.storageEl.val(JSON.stringify(data));
             }
@@ -154,9 +148,6 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             this.filtersView.render();
             if (!_.isUndefined(data['filters']) && !_.isEmpty(data['filters'])) {
                 this.filtersView.getCollection().reset(data['filters']);
-            }
-            if (!_.isUndefined(data['filters_logic']) && !_.isEmpty(data['filters_logic'])) {
-                this.filtersView.setFiltersLogic(data['filters_logic']);
             }
             this.listenTo(this.filtersView, 'collection:change', _.bind(this.updateStorage, this));
 
@@ -189,16 +180,6 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             );
             this.filtersView = new FilterView(filtersOptions);
             delete this.options.filtersOptions;
-        },
-
-        onPreSubmit: function () {
-            if (this.storageEl && this.storageEl.val() != '') {
-                var data = JSON.parse(this.storageEl.val());
-                if (!_.isUndefined(data['filters_logic']) && data['filters_logic'] != this.filtersView.getFiltersLogic()) {
-                    data['filters_logic'] = this.filtersView.getFiltersLogic();
-                    this.storageEl.val(JSON.stringify(data));
-                }
-            }
         },
 
         enableViews: function () {
