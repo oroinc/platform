@@ -78,9 +78,9 @@ services:
     oro_datagrid.extension.totals:
         class: %oro_datagrid.extension.totals.class%
         arguments:
-            - @oro_datagrid.datagrid.request_params
             - @translator
             - @oro_locale.formatter.number
             - @oro_locale.formatter.date_time
+            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: oro_datagrid.extension }
