@@ -16,7 +16,7 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
         },
 
         _create: function () {
-            var data = this.element.data('fields');
+            var data = this.element.data('fields') || [];
             this.element.data('fields', this._convertFields(null, data));
 
             this._on({
