@@ -55,6 +55,7 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *              "owner_column_name"="business_unit_owner_id"
  *          },
  *          "dataaudit"={"auditable"=true},
+ *          "extend"={"is_extend"=true},
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""

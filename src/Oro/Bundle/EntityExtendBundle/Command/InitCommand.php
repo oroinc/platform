@@ -127,7 +127,7 @@ class InitCommand extends ContainerAwareCommand
         foreach ($entityOptions['fields'] as $fieldName => $fieldConfig) {
             if ($this->configManager->hasConfig($className, $fieldName)) {
                 throw new \InvalidArgumentException(
-                    sprintf('Field "%s" for Entity "%s" already added', $className, $fieldName)
+                    sprintf('Field "%s" for Entity "%s" already added', $fieldName, $className)
                 );
             }
 
