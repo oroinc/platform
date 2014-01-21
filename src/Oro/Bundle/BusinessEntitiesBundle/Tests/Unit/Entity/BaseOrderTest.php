@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\BusinessEntitiesBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseCart;
+use Oro\Bundle\BusinessEntitiesBundle\Entity\BaseOrder;
 
-class BaseCartTest extends \PHPUnit_Framework_TestCase
+class BaseOrderTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_STRING    = 'testString';
     const TEST_ID        = 123;
     const TEST_FLOAT     = 123.123;
 
-    /** @var BaseCart */
+    /** @var BaseOrder */
     protected $entity;
 
     public function setUp()
     {
-        $this->entity = new BaseCart();
+        $this->entity = new BaseOrder();
     }
 
     public function tearDown()
@@ -51,9 +51,19 @@ class BaseCartTest extends \PHPUnit_Framework_TestCase
             'id'        => ['id', self::TEST_ID, self::TEST_ID],
             'createdAt' => ['createdAt', $created, $created],
             'updatedAt' => ['updatedAt', $updated, $updated],
-            'grandTotal' => ['grandTotal', self::TEST_FLOAT, self::TEST_FLOAT],
-            'subTotal' => ['subTotal', self::TEST_FLOAT, self::TEST_FLOAT],
+            'customer' => ['customer', self::TEST_STRING, self::TEST_STRING],
+            'paymentDetails' => ['paymentDetails', self::TEST_STRING, self::TEST_STRING],
+            'paymentMethod' => ['paymentMethod', self::TEST_STRING, self::TEST_STRING],
+            'discountAmount' => ['discountAmount', self::TEST_FLOAT, self::TEST_FLOAT],
+            'discountPercent' => ['discountPercent', self::TEST_FLOAT, self::TEST_FLOAT],
+            'shippingAmount' => ['shippingAmount', self::TEST_FLOAT, self::TEST_FLOAT],
+            'shippingMethod' => ['shippingMethod', self::TEST_STRING, self::TEST_STRING],
+            'currency' => ['currency', self::TEST_STRING, self::TEST_STRING],
+            'status' => ['status', self::TEST_STRING, self::TEST_STRING],
+            'subtotalAmount' => ['subtotalAmount', self::TEST_FLOAT, self::TEST_FLOAT],
             'taxAmount' => ['taxAmount', self::TEST_FLOAT, self::TEST_FLOAT],
+            'totalAmount' => ['totalAmount', self::TEST_FLOAT, self::TEST_FLOAT],
+            'items' => ['items', self::TEST_STRING, self::TEST_STRING],
         ];
     }
 }
