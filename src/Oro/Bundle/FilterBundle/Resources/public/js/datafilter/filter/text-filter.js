@@ -22,13 +22,6 @@ function($, _, __, AbstractFilter) {
         wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
-         * Template for filter criteria
-         *
-         * @property
-         */
-        template: '',
-
-        /**
          * Template selector for filter criteria
          *
          * @property
@@ -81,12 +74,6 @@ function($, _, __, AbstractFilter) {
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'templateSelector');
-            _.extend(this, options);
-
-            var templateSrc = $(this.templateSelector).text();
-            this.template = _.template(templateSrc);
-
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
