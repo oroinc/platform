@@ -82,7 +82,7 @@ class OrmTotalsExtension extends AbstractExtension
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-        if (null != $totals) {
+        if (null != $totals && !empty($result['data'])) {
             $totalQueries = [];
             foreach ($totals as $field => $total) {
                 if (isset($total['query'])) {
