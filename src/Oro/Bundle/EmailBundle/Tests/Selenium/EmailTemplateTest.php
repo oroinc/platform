@@ -22,7 +22,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
-            ->setEntityName('User')
+            ->setEntityName('Users')
             ->setType('Html')
             ->setName($templateName)
             ->setSubject('Subject')
