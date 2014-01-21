@@ -111,9 +111,9 @@ abstract class AbstractQueryDesignerType extends AbstractType
     {
         return
             array(
-                'grouping_column_choice_type' => 'oro_entity_field_choice',
-                'column_column_choice_type'   => 'oro_entity_field_choice',
-                'filter_column_choice_type'   => 'oro_entity_field_choice'
+                'grouping_column_choice_type' => 'oro_entity_field_select',
+                'column_column_choice_type'   => 'oro_entity_field_select',
+                'filter_column_choice_type'   => 'oro_entity_field_select'
             );
     }
 

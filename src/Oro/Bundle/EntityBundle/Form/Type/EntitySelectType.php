@@ -40,7 +40,7 @@ class EntitySelectType extends AbstractType
 
             $fieldName = $fieldConfig->get('target_field');
             $vars['attr'] = array(
-                'data-entities' => json_encode(
+                'data-selected-data' => json_encode(
                     array(array($fieldName => $form->getData()->{'get' . ucfirst($fieldName)}()))
                 )
             );

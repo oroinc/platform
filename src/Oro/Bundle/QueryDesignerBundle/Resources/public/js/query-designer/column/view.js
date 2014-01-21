@@ -42,7 +42,6 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
 
             this.groupingColumnsSelector = new GroupingView({
                 el: this.$el.find(this.options.groupingFormSelector),
-                entityName: this.options.entityName,
                 fieldsLabel: this.options.fieldsLabel,
                 relatedLabel: this.options.relatedLabel,
                 findEntity: this.options.findEntity
@@ -65,12 +64,8 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
                     }
                 }
                 // adjust function selector
-                var $el = $(e.currentTarget);
-                var value = $el.val();
                 this.functionManager.setActiveFunctions(
-                    (_.isNull(value) || value == '')
-                        ? {}
-                        : this.getFieldApplicableConditions(util.findSelectOption($el, value))
+                    this.columnSelector.getFieldApplicableConditions($(e.currentTarget).val())
                 );
             }, this));
 
@@ -79,14 +74,9 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
             this.initColumnSorting();
         },
 
-        changeEntity: function (entityName) {
+        changeEntity: function (entityName, columns) {
             AbstractView.prototype.changeEntity.apply(this, arguments);
-            this.groupingColumnsSelector.changeEntity(entityName);
-        },
-
-        updateColumnSelector: function (columns) {
-            AbstractView.prototype.updateColumnSelector.apply(this, arguments);
-            this.groupingColumnsSelector.updateColumnSelector(columns);
+            this.groupingColumnsSelector.changeEntity(entityName, columns);
         },
 
         getGroupingColumns: function () {
@@ -129,11 +119,11 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
 
         setFormFieldValue: function (name, field, value) {
             if (field.attr('name') == this.functionManager.$el.attr('name')) {
-                if (_.isNull(value) || value == '') {
-                    field.val('');
-                } else {
-                    field.val(value['name']);
-                }
+                field.val(
+                    (_.isNull(value) || value == '')
+                        ? ''
+                        : value['name']
+                );
                 return;
             }
             AbstractView.prototype.setFormFieldValue.apply(this, arguments);

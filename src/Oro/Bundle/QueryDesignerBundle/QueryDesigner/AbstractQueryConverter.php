@@ -90,10 +90,10 @@ abstract class AbstractQueryConverter
     public function ensureTableJoined($joinId)
     {
         $joinIds = [];
-        foreach (explode(',', $joinId) as $item) {
+        foreach (explode('+', $joinId) as $item) {
             $joinIds[] = empty($joinIds)
                 ? $item
-                : sprintf('%s,%s', $joinIds[count($joinIds) - 1], $item);
+                : sprintf('%s+%s', $joinIds[count($joinIds) - 1], $item);
         }
         $this->addTableAliasesForJoinIdentifiers($joinIds);
 
@@ -147,7 +147,7 @@ abstract class AbstractQueryConverter
             throw new \LogicException('Cannot get parent join identifier for root table.');
         }
 
-        $lastDelimiter = strrpos($joinId, ',');
+        $lastDelimiter = strrpos($joinId, '+');
         if (false === $lastDelimiter) {
             return '';
         }
@@ -580,17 +580,17 @@ abstract class AbstractQueryConverter
      */
     protected function getJoinIdentifiers($columnName)
     {
-        $lastDelimiter = strrpos($columnName, ',');
+        $lastDelimiter = strrpos($columnName, '+');
         if (false === $lastDelimiter) {
             return [''];
         }
 
         $result = [];
-        $items  = explode(',', sprintf('%s::%s', $this->entity, substr($columnName, 0, $lastDelimiter)));
+        $items  = explode('+', sprintf('%s::%s', $this->entity, substr($columnName, 0, $lastDelimiter)));
         foreach ($items as $item) {
             $result[] = empty($result)
                 ? $item
-                : sprintf('%s,%s', $result[count($result) - 1], $item);
+                : sprintf('%s+%s', $result[count($result) - 1], $item);
         }
 
         return $result;
@@ -618,7 +618,7 @@ abstract class AbstractQueryConverter
         if (false === $lastDelimiter) {
             return $this->entity;
         }
-        $lastItemDelimiter = strrpos($columnNameOrJoinId, ',');
+        $lastItemDelimiter = strrpos($columnNameOrJoinId, '+');
         if (false === $lastItemDelimiter) {
             return substr($columnNameOrJoinId, 0, $lastDelimiter);
         }
