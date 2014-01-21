@@ -804,7 +804,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('getOrder')
             ->will($this->returnValue(2));
 
-        $workflow = new Workflow();
+        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflow = new Workflow($entityConnector);
         $workflow->getStepManager()->setSteps(array($stepsOne, $stepsTwo, $stepsThree));
 
         $passedSteps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
@@ -903,7 +906,10 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
      */
     protected function createWorkflow($workflowName = null)
     {
-        $workflow = new Workflow();
+        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflow = new Workflow($entityConnector);
         $workflow->setName($workflowName);
         return $workflow;
     }

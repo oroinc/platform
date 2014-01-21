@@ -33,14 +33,15 @@ class StepTest extends \PHPUnit_Framework_TestCase
 
     public function propertiesDataProvider()
     {
+        $entity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
         return array(
             'name' => array('name', 'test'),
             'order' => array('order', 1),
-            'template' => array('template', 'test'),
             'allowedTransitions' => array('allowedTransitions', array('one', 'two')),
             'label' => array('label', 'Value'),
-            'form_type' => array('formType', 'custom_workflow_step'),
-            'form_options' => array('formOptions', array('one', 'two')),
+            'entity' => array('entity', $entity)
         );
     }
 
