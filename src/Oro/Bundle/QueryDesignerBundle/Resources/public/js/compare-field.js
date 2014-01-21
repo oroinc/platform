@@ -10,7 +10,8 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
     $.widget('oro.compareField', {
         options: {
             fields: [],
-            filterMetadataSelector: '#report-designer'
+            filterMetadataSelector: '#report-designer',
+            fieldDropdownWidth: '250px'
         },
 
         _create: function() {
@@ -19,11 +20,12 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             self.template = _.template('<div class="compare-field"><input class="select compare-field" /><div class="active-filter" /></div>');
             self.element.append(self.template(this.options));
 
-            var $select = self.element.find('input.select');
+            var $select = self.$select = self.element.find('input.select');
             $select.select2({
                 collapsibleResults: false,
                 data: this.options.fields
             });
+            this._adjustDropdownWidth();
             $select.change(function (e) {
                 if (e.added) {
                     var conditions = self._getFieldApplicableConditions(e.added);
@@ -35,6 +37,8 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             var data = this.element.data('value');
             if (data && data.columnName) {
                 $select.select2('val', data.columnName, true);
+            } else {
+                $select.select2('val', this.options.fields[0].id, true);
             }
         },
 
@@ -43,6 +47,18 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             self._createFilter(filterIndex, function () {
                 self._appendFilter();
                 self._onUpdate();
+            });
+        },
+
+        _adjustDropdownWidth: function () {
+            var self = this;
+            var $container = self.element.find('.select2-container');
+            $container.css({ width: 'auto' });
+            self.$select.on('select2-opening', function () {
+                $container.css({ width: self.options.fieldDropdownWidth });
+            });
+            self.$select.on('select2-open', function () {
+                $container.css({ width: 'auto' });
             });
         },
 

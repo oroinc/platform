@@ -8,6 +8,9 @@
     background: none !important;
     border: none !important;
 }
+.compare-field .select2-choice {
+    padding: 0;
+}
 .compare-field .select2-container,
 .compare-field .select2-choice,
 .compare-field .select2-chosen {
@@ -18,4 +21,5 @@
 }
 .active-filter {
     display: inline-block;
+    margin-left: 4px;
 }
