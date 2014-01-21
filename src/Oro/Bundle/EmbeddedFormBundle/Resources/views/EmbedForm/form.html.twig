@@ -1,0 +1,6 @@
+{% extends 'OroEmbeddedFormBundle::base.html.twig' %}
+
+{% block page %}
+    <h3>Form</h3>
+    {{ form(form, {'attr': {'novalidate': 'novalidate' }}) }}
+{% endblock %}

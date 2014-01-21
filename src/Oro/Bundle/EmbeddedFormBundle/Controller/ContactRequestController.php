@@ -11,7 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 class ContactRequestController extends Controller
 {
     /**
-     * @Route(name="oro_contact_request_list")
+     * @Route("contact-request", name="oro_contact_request_list")
      * @Template
      */
     public function indexAction()
