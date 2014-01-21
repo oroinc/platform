@@ -4,25 +4,3 @@
 .form-horizontal .report-descr textarea {
     height: 54px;
 }
-.compare-field .select2-container {
-    background: none !important;
-    border: none !important;
-}
-.compare-field .select2-choice {
-    padding: 0;
-}
-.compare-field .select2-container,
-.compare-field .select2-choice,
-.compare-field .select2-chosen {
-    display: inline-block;
-}
-.compare-field .select2-choice {
-    box-shadow: none;
-}
-.compare-field .select2-arrow {
-    display: none !important;
-}
-.active-filter {
-    display: inline-block;
-    margin-left: 4px;
-}
