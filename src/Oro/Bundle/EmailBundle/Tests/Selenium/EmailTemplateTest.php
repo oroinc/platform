@@ -55,7 +55,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->close()
             ->open(array($newTemplateName))
             ->getFields($fields);
-        $this->assertEquals('User', $fields['entityname']);
+        $this->assertEquals('Users', $fields['entityname']);
         // label with space according to markup in OroFormBundle:Form/fields.html.twig
         $this->assertEquals('Html ', $fields['type']);
         $this->assertEquals('Subject', $fields['subject']);
