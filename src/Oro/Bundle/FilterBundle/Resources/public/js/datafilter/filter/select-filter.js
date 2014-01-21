@@ -12,13 +12,6 @@ function ($, _, __, AbstractFilter, MultiselectDecorator) {
      */
     return AbstractFilter.extend({
         /**
-         * Filter template
-         *
-         * @property
-         */
-        template: '',
-
-        /**
          * Filter selector template
          *
          * @property
@@ -114,11 +107,8 @@ function ($, _, __, AbstractFilter, MultiselectDecorator) {
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'templateSelector', 'choices');
+            options = _.pick(options || {}, 'choices');
             _.extend(this, options);
-
-            var templateSrc = $(this.templateSelector).text();
-            this.template = _.template(templateSrc);
 
             // init filter content options if it was not initialized so far
             if (_.isUndefined(this.choices)) {

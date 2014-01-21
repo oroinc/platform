@@ -21,13 +21,6 @@ function($, _, __, AbstractFilter) {
         wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
-         * Template for filter criteria
-         *
-         * @property
-         */
-        template: '',
-
-        /**
          * Template selector for filter criteria
          *
          * @property
@@ -72,10 +65,8 @@ function($, _, __, AbstractFilter) {
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'popupHint', 'templateSelector');
+            options = _.pick(options || {}, 'popupHint');
             _.extend(this, options);
-
-            this.template = _.template($(this.templateSelector).text());
 
             this.label = 'None';
             AbstractFilter.prototype.initialize.apply(this, arguments);

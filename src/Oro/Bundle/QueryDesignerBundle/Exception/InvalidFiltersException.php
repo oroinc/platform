@@ -2,6 +2,6 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Exception;
 
-class InvalidFilterLogicException extends \RuntimeException
+class InvalidFiltersException extends \RuntimeException
 {
 }

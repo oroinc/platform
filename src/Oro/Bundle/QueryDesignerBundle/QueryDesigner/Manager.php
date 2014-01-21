@@ -80,18 +80,12 @@ class Manager implements FunctionProviderInterface
      */
     public function createFilter($name, array $params = null)
     {
-        $config        = null;
         $filtersConfig = $this->config->offsetGet('filters');
-        foreach ($filtersConfig as $filterName => $attr) {
-            if ($filterName === $name) {
-                $config = $attr;
-                break;
-            }
-        }
-        if ($config === null) {
+        if (!isset($filtersConfig[$name])) {
             throw new \RuntimeException(sprintf('Unknown filter "%s".', $name));
         }
 
+        $config = $filtersConfig[$name];
         if ($params !== null && !empty($params)) {
             $config = array_merge($config, $params);
         }

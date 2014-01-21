@@ -20,9 +20,6 @@ function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
         /** @property {oro.queryDesigner.FilterManager} */
         filterManager: null,
 
-        /** @property {jQuery} */
-        filtersLogic: null,
-
         initialize: function() {
             AbstractView.prototype.initialize.apply(this, arguments);
 
@@ -33,7 +30,6 @@ function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
             AbstractView.prototype.initForm.apply(this, arguments);
 
             this.criterionSelector = this.form.find('[data-purpose="criterion-selector"]');
-            this.filtersLogic = this.form.parent().find('[data-purpose="filter-logic"]');
 
             // load filters
             this.criterionSelector.hide();
@@ -77,26 +73,9 @@ function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
             AbstractView.prototype.beforeFormSubmit.apply(this, arguments);
         },
 
-        getFiltersLogic: function () {
-            return this.filtersLogic.val();
-        },
-
-        setFiltersLogic: function (str) {
-            this.filtersLogic.val(str);
-        },
-
         initModel: function (model, index) {
             AbstractView.prototype.initModel.apply(this, arguments);
             model.set('index', index + 1);
-        },
-
-        addModel: function(model) {
-            AbstractView.prototype.addModel.apply(this, arguments);
-            if (this.filtersLogic.val() == '') {
-                this.filtersLogic.val(this.filtersLogic.val() + model.get('index'));
-            } else {
-                this.filtersLogic.val(this.filtersLogic.val() + ' AND ' + model.get('index'));
-            }
         },
 
         deleteModel: function(model) {
@@ -106,54 +85,14 @@ function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
                     m.set('index', m.get('index') - 1);
                 }
             });
-
-            // try to remove the deleted filter from filters logic
-            var filtersLogic = this.getFiltersLogic();
-            var newFiltersLogic = filtersLogic;
-            var index = '' + model.get('index');
-            if (filtersLogic == index) {
-                newFiltersLogic = '';
-            } else {
-                var replacers = [
-                    {pattern: '^\\(' + index + '\\)$',          replaceValue: ''},
-                    {pattern: ' (AND|OR) \\(' + index + '\\) ', replaceValue: ' '},
-                    {pattern: ' (AND|OR) \\(' + index + '\\)$', replaceValue: ''},
-                    {pattern: '^\\(' + index + '\\) (AND|OR) ', replaceValue: ''},
-                    {pattern: ' (AND|OR) ' + index + ' ',       replaceValue: ' '},
-                    {pattern: ' (AND|OR) ' + index + '\\)',     replaceValue: ')'},
-                    {pattern: ' (AND|OR) ' + index + '$',       replaceValue: ''},
-                    {pattern: ' ' + index + ' (AND|OR) ',       replaceValue: ' '},
-                    {pattern: '\\(' + index + ' (AND|OR) ',     replaceValue: '('},
-                    {pattern: '^' + index + ' (AND|OR) ',       replaceValue: ''}
-                ];
-                _.each(replacers, function (replacer) {
-                    newFiltersLogic = newFiltersLogic.replace(new RegExp(replacer.pattern, 'i') , replacer.replaceValue);
-                });
-            }
-            if (newFiltersLogic != filtersLogic) {
-                index = Number(index);
-                newFiltersLogic = newFiltersLogic.replace(/(\d+)/g, function (match) {
-                    if (Number(match) > index) {
-                        return '' + (Number(match) - 1);
-                    }
-                    return match;
-                });
-                this.setFiltersLogic(newFiltersLogic);
-            }
         },
 
         onResetCollection: function () {
             if (!_.isNull(this.filterManager)) {
                 AbstractView.prototype.onResetCollection.apply(this, arguments);
-                if (this.getCollection().isEmpty()) {
-                    this.setFiltersLogic('');
-                }
             } else {
                 this.once('filter_manager_initialized', function() {
                     AbstractView.prototype.onResetCollection.apply(this, arguments);
-                    if (this.getCollection().isEmpty()) {
-                        this.setFiltersLogic('');
-                    }
                 }, this);
             }
         },
