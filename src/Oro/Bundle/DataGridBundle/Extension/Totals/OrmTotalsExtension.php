@@ -81,8 +81,6 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rootIdentifier = [];
-
         $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         if (null != $totals) {
             $totalQueries = [];
@@ -101,94 +99,113 @@ class OrmTotalsExtension extends AbstractExtension
                 }
             }
 
-            if (empty($groupParts)) {
-                $rootIdentifiers = $this->masterQB->getEntityManager()
-                    ->getClassMetadata($this->masterQB->getRootEntities()[0])->getIdentifier();
-                $rootAlias = $this->masterQB->getRootAliases()[0];
-                foreach ($rootIdentifiers as $field) {
-                    $rootIdentifier[] = [
-                        'fieldAlias'  => $field,
-                        'alias'       => $field,
-                        'entityAlias' => $rootAlias
-                    ];
-                }
-            } else {
-                foreach ($groupParts as $groupPart) {
-                    if (strpos($groupPart, '.')) {
-                        list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
-                        $rootIdentifier[] = [
-                            'fieldAlias'  => $rootIdentifierPart,
-                            'entityAlias' => $rootAlias,
-                            'alias'       => $rootIdentifierPart
-                        ];
-                    } else {
-                        $selectParts = $this->masterQB->getDQLPart('select');
-                        /** @var Select $selectPart */
-                        foreach ($selectParts as $selectPart) {
-                            foreach ($selectPart->getParts() as $part) {
-                                if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
-                                    if (count($matches) == 3 && $groupPart == $matches[2]) {
-                                        $rootIdentifier[] = [
-                                            'fieldAlias' => $matches[1],
-                                            'alias'      => $matches[2]
-                                        ];
-                                    }
-                                } else {
-                                    $rootIdentifier[] = [
-                                        'fieldAlias' => $groupPart,
-                                        'alias'      => $groupPart
-                                    ];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            $dataQueryBuilder = $this->masterQB
-                ->select($totalQueries)
-                ->resetDQLPart('groupBy');
-
-            foreach ($rootIdentifier as $identifier) {
-                $ids = [];
-                foreach ($result['data'] as $res) {
-                    $ids[] = $res[$identifier['alias']];
-                }
-
-                $dataQueryBuilder->andWhere(
-                    $this->masterQB->expr()->in(
-                        isset($identifier['entityAlias'])
-                            ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
-                            : $identifier['fieldAlias']
-                        ,
-                        $ids
-                    )
-                );
-            }
-
-            $data = $dataQueryBuilder
-                ->getQuery()
-                ->setFirstResult(null)
-                ->setMaxResults(null)
-                ->getScalarResult();
-
+            $data = $this->getData($result, $totalQueries, $groupParts);
             if (!empty($data)) {
                 foreach ($totals as $field => &$total) {
                     if (isset($data[0][$field])) {
-                        $total['total'] = isset($total[Configuration::TOTALS_FORMATTER])
-                            ? $this->applyFrontendFormatting($data[0][$field], $total[Configuration::TOTALS_FORMATTER])
-                            : $data[0][$field];
+                        $totalValue = $data[0][$field];
+                        if (isset($total[Configuration::TOTALS_FORMATTER])) {
+                            $totalValue = $this->applyFrontendFormatting(
+                                $totalValue,
+                                $total[Configuration::TOTALS_FORMATTER]
+                            );
+                        }
+                        $total['total'] = $totalValue;
                     }
                     if (isset($total['label'])) {
                         $total['label'] = $this->translator->trans($total['label']);
                     }
                 };
             }
+        } else {
+            $totals = [];
         }
 
-        $result->offsetAddToArray('options', ['totals' => $totals ? : []]);
+        $result->offsetAddToArray('options', ['totals' => $totals]);
 
         return $result;
+    }
+
+    /**
+     * @param $result
+     * @param $totalQueries
+     * @param $groupParts
+     * @return array
+     */
+    protected function getData($result, $totalQueries, $groupParts)
+    {
+        $rootIdentifier = [];
+
+        if (empty($groupParts)) {
+            $rootIdentifiers = $this->masterQB->getEntityManager()
+                ->getClassMetadata($this->masterQB->getRootEntities()[0])->getIdentifier();
+            $rootAlias = $this->masterQB->getRootAliases()[0];
+            foreach ($rootIdentifiers as $field) {
+                $rootIdentifier[] = [
+                    'fieldAlias'  => $field,
+                    'alias'       => $field,
+                    'entityAlias' => $rootAlias
+                ];
+            }
+        } else {
+            foreach ($groupParts as $groupPart) {
+                if (strpos($groupPart, '.')) {
+                    list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
+                    $rootIdentifier[] = [
+                        'fieldAlias'  => $rootIdentifierPart,
+                        'entityAlias' => $rootAlias,
+                        'alias'       => $rootIdentifierPart
+                    ];
+                } else {
+                    $selectParts = $this->masterQB->getDQLPart('select');
+                    /** @var Select $selectPart */
+                    foreach ($selectParts as $selectPart) {
+                        foreach ($selectPart->getParts() as $part) {
+                            if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
+                                if (count($matches) == 3 && $groupPart == $matches[2]) {
+                                    $rootIdentifier[] = [
+                                        'fieldAlias' => $matches[1],
+                                        'alias'      => $matches[2]
+                                    ];
+                                }
+                            } else {
+                                $rootIdentifier[] = [
+                                    'fieldAlias' => $groupPart,
+                                    'alias'      => $groupPart
+                                ];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $dataQueryBuilder = $this->masterQB
+            ->select($totalQueries)
+            ->resetDQLPart('groupBy');
+
+        foreach ($rootIdentifier as $identifier) {
+            $ids = [];
+            foreach ($result['data'] as $res) {
+                $ids[] = $res[$identifier['alias']];
+            }
+
+            $dataQueryBuilder->andWhere(
+                $this->masterQB->expr()->in(
+                    isset($identifier['entityAlias'])
+                        ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
+                        : $identifier['fieldAlias']
+                    ,
+                    $ids
+                )
+            );
+        }
+
+        return $dataQueryBuilder
+            ->getQuery()
+            ->setFirstResult(null)
+            ->setMaxResults(null)
+            ->getScalarResult();
     }
 
     /**
