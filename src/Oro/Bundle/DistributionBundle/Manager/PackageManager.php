@@ -350,23 +350,25 @@ class PackageManager
     {
         $localRepository = $this->getLocalRepository();
         $dependents = [];
-        /** @var PackageInterface $localPackage */
-        foreach ($localRepository->getCanonicalPackages() as $localPackage) {
-            $packageRequirements = array_reduce(
-                array_merge($localPackage->getRequires(), $localPackage->getDevRequires()),
-                function (array $result, Link $item) {
-                    $result[] = $item->getTarget();
-                    return $result;
-                },
-                []
-            );
+        array_map(
+            function (PackageInterface $localPackage) use (&$dependents, $needleName) {
+                $packageRequirements = array_reduce(
+                    array_merge($localPackage->getRequires(), $localPackage->getDevRequires()),
+                    function (array $result, Link $item) {
+                        $result[] = $item->getTarget();
+                        return $result;
+                    },
+                    []
+                );
 
-            if (in_array($needleName, $packageRequirements)) {
-                $dependents[] = $localPackage->getName();
-                $dependents = array_merge($dependents, $this->getDependents($localPackage->getName()));
+                if (in_array($needleName, $packageRequirements)) {
+                    $dependents[] = $localPackage->getName();
+                    $dependents = array_merge($dependents, $this->getDependents($localPackage->getName()));
 
-            }
-        }
+                }
+            },
+            $localRepository->getCanonicalPackages()
+        );
 
         return $dependents;
     }

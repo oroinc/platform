@@ -1,3 +1,6 @@
+/*global define*/
+define(['flotr2'], function (Flotr) {
+
 Flotr.addType('funnel', {
     options: {
         show: false,
@@ -336,4 +339,6 @@ Flotr.addType('funnel', {
         context.lineTo(distX + (options.marginX + options.width)/3, distY);
         context.stroke();
     }
+});
+
 });

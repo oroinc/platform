@@ -49,7 +49,9 @@ function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
                     if (_.isNull(this.filterManager) && !_.isUndefined(console)) {
                         console.error('Cannot choose a filer because the filter manager was not initialized yet.');
                     } else {
-                        this.filterManager.setActiveFilter(this.getFieldApplicableConditions($(e.added.element)));
+                        this.filterManager.setActiveFilter(
+                            this.columnSelector.getFieldApplicableConditions(e.added.id)
+                        );
                     }
                 }
             }, this));
@@ -195,11 +197,11 @@ function(_, Backbone, __, AbstractView, FilterCollection, filterBuilder) {
 
         setFormFieldValue: function (name, field, value) {
             if (field.attr('name') == this.criterionSelector.attr('name')) {
-                if (_.isNull(value) || value == '') {
-                    field.val('');
-                } else {
-                    field.val(JSON.stringify(value));
-                }
+                field.val(
+                    (_.isNull(value) || value == '')
+                        ? ''
+                        : JSON.stringify(value)
+                );
                 return;
             }
             AbstractView.prototype.setFormFieldValue.apply(this, arguments);

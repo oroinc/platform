@@ -155,7 +155,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
-                ['name' => 'rc1,' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
+                ['name' => 'rc1+' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
             ],
             'filters' => []
         ];
@@ -199,7 +199,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     ],
                     'column_aliases' => [
                         'column1'                   => 'c1',
-                        'rc1,' . $en1 . '::column2' => 'c2',
+                        'rc1+' . $en1 . '::column2' => 'c2',
                     ],
                 ],
             ],
@@ -236,7 +236,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
             ],
             'filters'       => [
                 [
-                    'columnName' => 'rc1,' . $en1 . '::column2',
+                    'columnName' => 'rc1+' . $en1 . '::column2',
                     'criterion'  => [
                         'filter' => 'string',
                         'data'   => [
@@ -429,12 +429,12 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         $definition = [
             'columns'       => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
-                ['name' => 'rc1,' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
-                ['name' => 'rc2,' . $en2 . '::column3', 'label' => 'lbl3', 'sorting' => 'ASC'],
+                ['name' => 'rc1+' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
+                ['name' => 'rc2+' . $en2 . '::column3', 'label' => 'lbl3', 'sorting' => 'ASC'],
             ],
             'filters'       => [
                 [
-                    'columnName' => 'rc1,' . $en1 . '::column2',
+                    'columnName' => 'rc1+' . $en1 . '::column2',
                     'criterion'  => [
                         'filter' => 'string',
                         'data'   => [
@@ -444,7 +444,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     ]
                 ],
                 [
-                    'columnName' => 'rc1,' . $en1 . '::rc4,' . $en3 . '::column5',
+                    'columnName' => 'rc1+' . $en1 . '::rc4+' . $en3 . '::column5',
                     'criterion'  => [
                         'filter' => 'string',
                         'data'   => [
@@ -454,7 +454,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     ]
                 ],
                 [
-                    'columnName' => 'rc1,' . $en1 . '::rc4,' . $en3 . '::column6',
+                    'columnName' => 'rc1+' . $en1 . '::rc4+' . $en3 . '::column6',
                     'criterion'  => [
                         'filter' => 'string',
                         'data'   => [
@@ -511,13 +511,13 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     'table_aliases'  => [
                         ''                              => 't1',
                         $en . '::rc1'                   => 't2',
-                        $en . '::rc1,' . $en1 . '::rc4' => 't3',
+                        $en . '::rc1+' . $en1 . '::rc4' => 't3',
                         $en . '::rc2'                   => 't4',
                     ],
                     'column_aliases' => [
                         'column1'                   => 'c1',
-                        'rc1,' . $en1 . '::column2' => 'c2',
-                        'rc2,' . $en2 . '::column3' => 'c3',
+                        'rc1+' . $en1 . '::column2' => 'c2',
+                        'rc2+' . $en2 . '::column3' => 'c3',
                     ],
                     'filters'        => [
                         [

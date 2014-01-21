@@ -164,7 +164,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'extra_config' => 'autocomplete'
                     ),
                     'attr' => array(
-                        'data-entities' => json_encode(
+                        'data-selected-data' => json_encode(
                             array(
                                 array('id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value')
                             )
@@ -207,7 +207,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'route_name' => 'custom_route'
                     ),
                     'attr' => array(
-                        'data-entities' => json_encode(
+                        'data-selected-data' => json_encode(
                             array(
                                 array('id' => 1, 'bar' => 'Bar value', 'baz' => 'Baz value')
                             )
@@ -255,11 +255,11 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
     public function createErrorsDataProvider()
     {
         return array(
-            'configs.route_name or configs.ajax.url must be set' => array(
+            'configs.route_name must be set' => array(
                 array(),
                 'expectedCalls' => array(),
                 'expectedException' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
-                'expectedExceptionMessage' => 'Either option "configs.route_name" or "configs.ajax.url" must be set.'
+                'expectedExceptionMessage' => 'Option "configs.route_name" must be set.'
             ),
             'converter must be set' => array(
                 array(
