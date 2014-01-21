@@ -16,6 +16,9 @@
 .compare-field .select2-chosen {
     display: inline-block;
 }
+.compare-field .select2-choice {
+    box-shadow: none;
+}
 .compare-field .select2-arrow {
     display: none !important;
 }
