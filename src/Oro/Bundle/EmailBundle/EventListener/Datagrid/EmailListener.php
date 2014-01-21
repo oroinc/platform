@@ -40,9 +40,6 @@ class EmailListener
             if (!is_array($emailIds)) {
                 $emailIds = explode(',', $emailIds);
             }
-            if (empty($emailIds)) {
-                $emailIds = array(0);
-            }
             $queryBuilder->andWhere($queryBuilder->expr()->in('e.id', $emailIds));
         }
     }
