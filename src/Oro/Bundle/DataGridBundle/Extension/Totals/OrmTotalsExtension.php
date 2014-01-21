@@ -194,9 +194,7 @@ class OrmTotalsExtension extends AbstractExtension
                 ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
                 : $identifier['fieldAlias'];
 
-            $dataQueryBuilder->andWhere(
-                $this->masterQB->expr()->in($field, $ids)
-            );
+            $dataQueryBuilder->andWhere($this->masterQB->expr()->in($field, $ids));
         }
 
         return $dataQueryBuilder
