@@ -1,0 +1,27 @@
+oro_menu_config:
+    items:
+        embedded_forms:
+            label: 'Embedded Forms'
+            uri: '#'
+
+        manage_forms:
+            label: 'Manage Forms'
+            route: 'oro_embedded_form_list'
+
+        submitted_data:
+            label: 'Submitted Data'
+            uri: '#'
+
+        contact_requests:
+            label: 'Contact Requests'
+            route: 'oro_contact_request_list'
+
+    tree:
+        application_menu:
+            children:
+                embedded_forms:
+                    children:
+                        manage_forms: ~
+                        submitted_data:
+                            children:
+                                contact_requests: ~

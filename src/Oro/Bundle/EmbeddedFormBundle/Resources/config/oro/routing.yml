@@ -1,0 +1,9 @@
+oro_embedded_form:
+    resource: "@OroEmbeddedFormBundle/Controller/EmbeddedFormController.php"
+    type: annotation
+    prefix: /embedded-form
+
+oro_contact_request:
+    resource: "@OroEmbeddedFormBundle/Controller/ContactRequestController.php"
+    type: annotation
+    prefix: /contact-request
