@@ -70,33 +70,37 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $expected = [
             'filters'    => [
                 'filter1' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['type' => 'string'],
                         ['type' => 'text'],
                     ],
-                    'type'       => 'string',
-                    'query_type' => ['all']
+                    'type'           => 'string',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['all']
                 ],
                 'filter2' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['entity' => 'TestEntity', 'field' => 'TestField']
                     ],
-                    'type'       => 'string',
-                    'query_type' => ['all']
+                    'type'           => 'string',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['all']
                 ],
                 'filter3' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['type' => 'integer']
                     ],
-                    'type'       => 'number',
-                    'query_type' => ['all']
+                    'type'           => 'number',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['all']
                 ],
                 'filter4' => [
-                    'applicable' => [
+                    'applicable'     => [
                         ['type' => 'boolean']
                     ],
-                    'type'       => 'boolean',
-                    'query_type' => ['type1', 'type2']
+                    'type'           => 'boolean',
+                    'template_theme' => 'embedded',
+                    'query_type'     => ['type1', 'type2']
                 ],
             ],
             'grouping'   => [

@@ -10,7 +10,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\FilterLogicConstraint;
 
 abstract class AbstractQueryDesignerType extends AbstractType
 {
@@ -20,18 +19,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('definition', 'hidden', array('required' => false))
-            ->add(
-                'filters_logic',
-                'text',
-                array(
-                    'constraints' => array(
-                        new FilterLogicConstraint(),
-                    ),
-                    'required'    => false,
-                    'mapped'      => false
-                )
-            );
+            ->add('definition', 'hidden', array('required' => false));
 
         $factory = $builder->getFormFactory();
         $that    = $this;
@@ -62,42 +50,6 @@ abstract class AbstractQueryDesignerType extends AbstractType
                     $entity = null;
                 }
                 $that->addFields($form, $factory, $entity);
-            }
-        );
-
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $form        = $event->getForm();
-                $filterLogic = $form['filters_logic']->getData();
-                $definition  = $form['definition']->getData();
-
-                $definition = json_decode($definition);
-
-                $digits = [];
-                preg_match_all('!\d+!', $filterLogic, $digits);
-                if (isset($digits[0]) && !empty($digits[0])) {
-                    $maxDigit     = max($digits[0]);
-                    $filtersCount = count($definition->filters);
-
-                    if ($maxDigit > $filtersCount) {
-                        $form['filters_logic']->addError(
-                            new FormError(
-                                'You use extra filters'
-                            )
-                        );
-                    }
-
-                    for ($i = 1; $i <= $filtersCount; $i++) {
-                        if (!in_array($i, $digits[0])) {
-                            $form['filters_logic']->addError(
-                                new FormError(
-                                    'You use not all filters'
-                                )
-                            );
-                        }
-                    }
-                }
             }
         );
     }
