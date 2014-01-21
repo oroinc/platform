@@ -10,6 +10,7 @@
 <script type="text/template" id="choice-filter-template-embedded">
     <div class="filter-item-simple">
         <div class="choicefilter">
+            <span>field value </span>
             <div class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <%= selectedChoiceLabel %>
@@ -22,7 +23,6 @@
                     <% }); %>
                 </ul>
             </div>
-            <span>of the following: </span>
             <input type="text" name="value" value="">
             <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
         </div>
@@ -31,6 +31,7 @@
 <script type="text/template" id="date-filter-template-embedded">
     <div class="filter-item-simple">
         <div class="choicefilter">
+            <span>field value </span>
             <div class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <%= name %>
@@ -43,7 +44,6 @@
                     <% }); %>
                 </ul>
             </div>
-            <span>of the following: </span>
             <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
             <span class="filter-separator">-</span>
             <input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">
@@ -52,7 +52,7 @@
 </script>
 <script type="text/template" id="select-filter-template-embedded">
     <div class="filter-item filter-item-simple">
-        <span>is </span>
+        <span>field value is </span>
         <div class="filter-select filter-criteria-selector">
             <select>
                 <% _.each(options, function (option) { %>

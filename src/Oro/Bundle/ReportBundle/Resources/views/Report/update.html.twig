@@ -105,16 +105,17 @@
         <input type="hidden" id="segmentation-conditions-value" va1lue="{{ segmentationDesignerValue|json_encode }}" >
     </div>
     <script type="text/javascript">
-        require(['jquery', 'oro/loading-mask', 'oroquerydesigner/js/conditions-group'], function ($, LoadingMask) {
+        require(['jquery', 'underscore', 'oro/loading-mask', 'oroquerydesigner/js/conditions-group'
+        ], function ($, _, LoadingMask) {
             var //loadingMask = new LoadingMask(),
                 $entityChoice = $('#oro_report_form_entity'),
                 $compareFieldsCriteria = $('#filter-criteria-list').find('[data-criteria=compare-fields]');
 
             function updateCompareFieldsCriteria() {
+                var fields = $entityChoice.data('fields');
                 $compareFieldsCriteria
-                    .data('entity', $entityChoice.val())
-                    .data('fields', $entityChoice.data('fields'));
-                $('#segmentation-conditions').trigger('reset');
+                        .data('fields', fields)
+                        .toggleClass('disabled', _.isEmpty(fields));
             }
 
 //            $('#report-designer').append(loadingMask.render().$el);
@@ -216,6 +217,7 @@
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
                 var entityChoice = $('#oro_report_form_entity');
+                var filtersInput = $('#segmentation-conditions-value');
 
                 var findEntity = function (entityName) {
                     return _.findWhere(entities, {name: entityName});
@@ -266,7 +268,7 @@
                     if (!_.isUndefined(e.removed)) {
                         var prevVal = _.isNull(e.removed) ? '' : (e.removed.id || '');
                         var newVal = e.val;
-                        if (!designer.isEmpty()) {
+                        if (!designer.isEmpty() || !_.isEmpty(filtersInput.val())) {
                             var confirm = new DeleteConfirmation({
                                 title: __('Change Entity Confirmation'),
                                 okText: __('Yes, I Agree'),
@@ -274,6 +276,7 @@
                             });
                             confirm.on('ok', function () {
                                 designer.changeEntity(newVal);
+                                $('#segmentation-conditions').trigger('reset');
                             });
                             confirm.on('cancel', function () {
                                 entityChoice.val(prevVal);

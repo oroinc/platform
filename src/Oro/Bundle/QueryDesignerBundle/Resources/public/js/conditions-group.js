@@ -21,7 +21,8 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
                 cancel: 'a, input, .btn, select'
             },
             criteriaList: {
-                helper: 'clone'
+                helper: 'clone',
+                cancel: '.disabled'
             },
             operations: ['AND', 'OR'],
             criteriaListSelector: '#filter-criteria-list',

@@ -178,3 +178,6 @@
 .filter-item-simple .filter-select {
     display: inline-block;
 }
+.filter-item-simple .caret {
+    display: none;
+}

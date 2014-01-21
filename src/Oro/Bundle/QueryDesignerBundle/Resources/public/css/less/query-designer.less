@@ -105,10 +105,42 @@
     padding: 3px 8px;
     margin-bottom: 3px;
     .cursor(grab);
+    &.disabled{
+      cursor: auto;
+      color: #909090;
+    }
     &.ui-grabbing {
       .box-shadow(2px 2px 5px 0px rgba(50, 50, 50, 0.7));
       .cursor(grabbing);
       z-index: 1200;
     }
   }
+}
+.compare-field {
+  .select2-container,
+  .select2-choice,
+  .select2-chosen {
+    background: none !important;
+    border: none !important;
+    display: inline-block;
+  }
+  .select2-choice {
+    box-shadow: none !important;
+    border: none !important;
+    color: #006acc;
+    padding: 0;
+  }
+  .select2-choice:hover, .select2-choice:focus {
+    color: #005db3;
+  }
+  .select2-arrow {
+    display: none !important;
+  }
+  .select2-chosen {
+    line-height: 28px;
+  }
+}
+.active-filter {
+  display: inline-block;
+  margin-left: 4px;
 }
