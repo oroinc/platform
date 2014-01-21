@@ -25,4 +25,11 @@ interface ConnectorInterface
      * @return string
      */
     public function getImportJobName();
+
+    /**
+     * Returns type name, the same as registered in service tag
+     *
+     * @return string
+     */
+    public function getType();
 }
