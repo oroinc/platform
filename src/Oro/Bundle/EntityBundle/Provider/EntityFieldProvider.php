@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class EntityFieldProvider
 {
@@ -19,6 +20,11 @@ class EntityFieldProvider
      * @var ConfigProvider
      */
     protected $entityConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $extendConfigProvider;
 
     /**
      * @var EntityClassResolver
@@ -44,6 +50,7 @@ class EntityFieldProvider
      * Constructor
      *
      * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
      * @param ManagerRegistry $doctrine
      * @param EntityProvider $entityProvider
@@ -51,12 +58,14 @@ class EntityFieldProvider
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
         EntityProvider $entityProvider,
         Translator $translator
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
         $this->doctrine             = $doctrine;
         $this->entityProvider       = $entityProvider;
@@ -66,12 +75,13 @@ class EntityFieldProvider
     /**
      * Returns fields for the given entity
      *
-     * @param string $entityName           Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool $withRelations          Indicates whether fields of related entities should be returned as well.
-     * @param bool $withEntityDetails      Indicates whether details of related entity should be returned as well.
-     * @param int $deepLevel               The maximum deep level of related entities.
-     * @param bool $lastDeepLevelRelations The maximum deep level of related entities.
-     * @param bool $translate              Flag means that label, plural label should be translated
+     * @param string $entityName             Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations          Indicates whether association fields should be returned as well.
+     * @param bool   $withEntityDetails      Indicates whether details of related entity should be returned as well.
+     * @param int    $deepLevel              The maximum deep level of related entities.
+     * @param bool   $lastDeepLevelRelations Indicates whether fields for the last deep level of related entities
+     *                                       should be returned.
+     * @param bool   $translate              Flag means that label, plural label should be translated
      * @return array of fields sorted by field label (relations follows fields)
      *                                       .       'name'          - field name
      *                                       .       'type'          - field type
@@ -133,15 +143,17 @@ class EntityFieldProvider
         if ($this->entityConfigProvider->hasConfig($className)) {
             $metadata = $em->getClassMetadata($className);
 
-            /** @var FieldConfigId[] $entityFields */
-            $entityFields = $this->entityConfigProvider->getIds($className);
-            foreach ($entityFields as $field) {
+            foreach ($metadata->getFieldNames() as $fieldName) {
+                $fieldLabel = $this->getFieldLabel(
+                    $className,
+                    $this->getFieldNameToTranslate($className, $fieldName)
+                );
                 $this->addField(
                     $result,
-                    $field->getFieldName(),
-                    $field->getFieldType(),
-                    $this->getFieldLabel($className, $field->getFieldName()),
-                    $metadata->isIdentifier($field->getFieldName()),
+                    $fieldName,
+                    $metadata->getTypeOfField($fieldName),
+                    $fieldLabel,
+                    $metadata->isIdentifier($fieldName),
                     $translate
                 );
             }
@@ -197,14 +209,24 @@ class EntityFieldProvider
             foreach ($metadata->getAssociationNames() as $associationName) {
                 $targetClassName = $metadata->getAssociationTargetClass($associationName);
                 if ($this->entityConfigProvider->hasConfig($targetClassName)) {
+                    // skip 'default_' extend field
+                    if (strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
+                        $guessedFieldName = substr($associationName, strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+                        if ($this->isExtendField($className, $guessedFieldName)) {
+                            continue;
+                        }
+                    }
+
                     $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
                     $targetMetadata  = $em->getClassMetadata($targetClassName);
-
-                    $fieldLabel = $this->getFieldLabel($className, $associationName);
+                    $fieldLabel = $this->getFieldLabel(
+                        $className,
+                        $this->getFieldNameToTranslate($className, $associationName)
+                    );
                     $relationData = array(
                         'name' => $associationName,
                         'type' => $targetMetadata->getTypeOfField($targetFieldName),
-                        'label' => $translate ? $this->translator->trans($fieldLabel) : $fieldLabel,
+                        'label' => $fieldLabel,
                         'relation_type' => $this->getRelationType($className, $associationName),
                         'related_entity_name' => $targetClassName
                     );
@@ -226,10 +248,10 @@ class EntityFieldProvider
      *
      * @param array $result
      * @param array $relation
-     * @param bool   $withEntityDetails
-     * @param int    $relationDeepLevel
-     * @param bool   $lastDeepLevelRelations
-     * @param bool   $translate
+     * @param bool  $withEntityDetails
+     * @param int   $relationDeepLevel
+     * @param bool  $lastDeepLevelRelations
+     * @param bool  $translate
      */
     protected function addRelation(
         array &$result,
@@ -240,6 +262,9 @@ class EntityFieldProvider
         $translate
     ) {
         $name = $relation['name'];
+        if ($translate) {
+            $relation['label'] = $this->translator->trans($relation['label']);
+        }
         $relatedEntityName = $relation['related_entity_name'];
         if ($withEntityDetails) {
             $entity = $this->entityProvider->getEntity($relatedEntityName, $translate);
@@ -289,6 +314,44 @@ class EntityFieldProvider
         }
 
         return $manager;
+    }
+
+    /**
+     * Checks whether the given field is extend or not.
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @return bool
+     */
+    protected function isExtendField($className, $fieldName)
+    {
+        if ($this->extendConfigProvider->hasConfig($className, $fieldName)) {
+            if ($this->extendConfigProvider->getConfig($className, $fieldName)->is('extend')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns a string can be used to translate the given field name.
+     * For extend fields the field prefix is removed from the given field name.
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @return string
+     */
+    protected function getFieldNameToTranslate($className, $fieldName)
+    {
+        if (strpos($fieldName, ExtendConfigDumper::FIELD_PREFIX) === 0) {
+            $guessedFieldName = substr($fieldName, strlen(ExtendConfigDumper::FIELD_PREFIX));
+            if ($this->isExtendField($className, $guessedFieldName)) {
+                $fieldName = $guessedFieldName;
+            }
+        }
+
+        return $fieldName;
     }
 
     /**

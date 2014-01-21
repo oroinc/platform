@@ -248,7 +248,7 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                'expected' => '123,457%',
+                'expected' => '123,456.789%',
                 'value' => 1234.56789,
                 'attributes' => array(),
                 'textAttributes' => array(),

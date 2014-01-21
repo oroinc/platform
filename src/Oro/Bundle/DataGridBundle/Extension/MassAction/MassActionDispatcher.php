@@ -80,11 +80,11 @@ class MassActionDispatcher
         $identifier     = $this->getIdentifierField($massAction);
         $qb             = $this->getDatagridQuery($datagrid, $identifier, $inset, $values);
         $resultIterator = $this->getResultIterator($qb);
-        $mediator       = new MassActionMediator($massAction, $datagrid, $resultIterator, $data);
+        $handlerArgs    = new MassActionHandlerArgs($massAction, $datagrid, $resultIterator, $data);
 
         // perform mass action
-        $handle = $this->getMassActionHandler($massAction);
-        $result = $handle->handle($mediator);
+        $handler = $this->getMassActionHandler($massAction);
+        $result  = $handler->handle($handlerArgs);
 
         return $result;
     }

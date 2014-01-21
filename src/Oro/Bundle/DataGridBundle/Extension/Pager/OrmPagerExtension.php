@@ -27,8 +27,9 @@ class OrmPagerExtension extends AbstractExtension
     const PAGER_ROOT_PARAM = '_pager';
     const PAGE_PARAM       = '_page';
     const PER_PAGE_PARAM   = '_per_page';
+    const DISABLED_PARAM   = '_disabled';
 
-    const TOTAL_PARAM = 'totalRecords';
+    const TOTAL_PATH_PARAM = '[options][totalRecords]';
 
     /** @var Pager */
     protected $pager;
@@ -54,7 +55,8 @@ class OrmPagerExtension extends AbstractExtension
     {
         /** @TODO disabled when hidden on toolbar */
         // enabled by default for ORM datasource
-        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        return !(bool)$this->getOr(self::DISABLED_PARAM, false)
+            && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
     }
 
     /**
@@ -75,7 +77,7 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $result->offsetAddToArray('options', [self::TOTAL_PARAM => $this->pager->getNbResults()]);
+        $result->offsetSetByPath(self::TOTAL_PATH_PARAM, $this->pager->getNbResults());
     }
 
     /**

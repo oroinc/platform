@@ -8,6 +8,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\CronBundle\Command\Logger\OutputLogger;
+
 class OroTranslationDumpCommand extends ContainerAwareCommand
 {
     /**
@@ -42,30 +44,8 @@ class OroTranslationDumpCommand extends ContainerAwareCommand
             $locales[] = $this->getContainer()->getParameter('kernel.default_locale');
         }
 
-        $domains = $this->getContainer()->getParameter('oro_translation.js_translation.domains');
-        $targetPattern = realpath($this->getContainer()->getParameter('kernel.root_dir') . '/../web')
-            . $this->getContainer()->get('router')->getRouteCollection()
-                ->get('oro_translation_jstranslation')->getPath();
-
-        foreach ($locales as $locale) {
-            $target = strtr($targetPattern, array('{_locale}' => $locale));
-
-            $output->writeln(
-                sprintf(
-                    '<comment>%s</comment> <info>[file+]</info> %s',
-                    date('H:i:s'),
-                    basename($target)
-                )
-            );
-
-            $content = $this->getContainer()->get('oro_translation.controller')
-                ->renderJsTranslationContent($domains, $locale, $input->getOption('debug'));
-
-            $this->getContainer()->get('filesystem')->mkdir(dirname($target), 0777);
-
-            if (false === @file_put_contents($target, $content)) {
-                throw new \RuntimeException('Unable to write file ' . $target);
-            }
-        }
+        $dumper = $this->getContainer()->get('oro_translation.js_dumper');
+        $dumper->setLogger(new OutputLogger($output));
+        $dumper->dumpTranslations($locales);
     }
 }

@@ -26,7 +26,7 @@ class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, Seri
     /**
      * @var DataConverterInterface
      */
-    protected $converter;
+    protected $dataConverter;
 
     /**
      * @var StrategyInterface
@@ -43,6 +43,10 @@ class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, Seri
         if ($this->strategy && $this->strategy instanceof ContextAwareInterface) {
             $this->strategy->setImportExportContext($this->context);
         }
+
+        if ($this->dataConverter && $this->dataConverter instanceof ContextAwareInterface) {
+            $this->dataConverter->setImportExportContext($context);
+        }
     }
 
     /**
@@ -54,11 +58,11 @@ class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, Seri
     }
 
     /**
-     * @param DataConverterInterface $converter
+     * @param DataConverterInterface $dataConverter
      */
-    public function setDataConverter(DataConverterInterface $converter)
+    public function setDataConverter(DataConverterInterface $dataConverter)
     {
-        $this->converter = $converter;
+        $this->dataConverter = $dataConverter;
     }
 
     /**
@@ -74,8 +78,8 @@ class ImportProcessor implements ProcessorInterface, ContextAwareProcessor, Seri
      */
     public function process($item)
     {
-        if ($this->converter) {
-            $item = $this->converter->convertToImportFormat($item);
+        if ($this->dataConverter) {
+            $item = $this->dataConverter->convertToImportFormat($item);
         }
 
         $object = $this->serializer->deserialize(

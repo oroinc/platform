@@ -131,9 +131,15 @@ class PackageManager
             } else {
                 /** @var PackageInterface[] $repoPackages */
                 $repoPackages = $repo->getPackages();
-                foreach ($repoPackages as $package) {
-                    $packageNames[] = $package->getPrettyName();
-                }
+
+                $packageNames = array_reduce(
+                    $repoPackages,
+                    function ($result, PackageInterface $package) {
+                        $result[] = $package->getPrettyName();
+                        return $result;
+                    },
+                    $packageNames
+                );
             }
         }
 
@@ -263,17 +269,25 @@ class PackageManager
     /**
      * @param string $packageName
      * @param string $packageVersion
+     * @param bool $loadDemoData
      *
      * @throws VerboseException
      * @throws \Exception
      */
-    public function install($packageName, $packageVersion = null)
+    public function install($packageName, $packageVersion = null, $loadDemoData = false)
     {
-        $this->logger->info(sprintf('%s (%s) installing begin', $packageName, $packageVersion));
+        $this->logger->info(
+            sprintf(
+                '%s (%s) installing begin (%s)',
+                $packageName,
+                $packageVersion,
+                $loadDemoData ? 'with demo data' : 'without demo data'
+            )
+        );
         $previousInstalled = $this->getFlatListInstalledPackages();
         $package = $this->getPreferredPackage($packageName, $packageVersion);
         $this->updateComposerJsonFile($package, $packageVersion);
-
+        $justInstalledPackages = [];
         try {
             if ($this->doInstall($package->getName())) {
                 $installedPackages = $this->getInstalled();
@@ -283,6 +297,7 @@ class PackageManager
                         return !in_array($package->getName(), $previousInstalled);
                     }
                 );
+                $this->scriptRunner->clearApplicationCache();
                 $this->scriptRunner->runPlatformUpdate();
                 array_map(
                     function (PackageInterface $package) {
@@ -290,7 +305,11 @@ class PackageManager
                     },
                     $justInstalledPackages
                 );
+                $this->scriptRunner->updateDBSchema();
                 $this->scriptRunner->loadFixtures($justInstalledPackages);
+                if ($loadDemoData) {
+                    $this->scriptRunner->loadDemoData($justInstalledPackages);
+                }
                 $this->scriptRunner->clearDistApplicationCache();
             } else {
                 throw new VerboseException(
@@ -304,6 +323,19 @@ class PackageManager
                 $this->logger->error($e->getVerboseMessage());
             }
             $this->removeFromComposerJson([$packageName]);
+            if ($justInstalledPackages) {
+                $justInstalledPackageNames = array_reduce(
+                    $justInstalledPackages,
+                    function ($names, PackageInterface $p) {
+                        $names[] = $p->getPrettyName();
+                        return $names;
+                    },
+                    []
+                );
+                $this->logger->info('Removing just installed packages', $justInstalledPackageNames);
+                $this->uninstall($justInstalledPackageNames);
+            }
+
             throw $e;
         }
         $this->logger->info(sprintf('%s (%s) installed', $packageName, $packageVersion));
@@ -318,23 +350,25 @@ class PackageManager
     {
         $localRepository = $this->getLocalRepository();
         $dependents = [];
-        /** @var PackageInterface $localPackage */
-        foreach ($localRepository->getCanonicalPackages() as $localPackage) {
-            $packageRequirements = array_reduce(
-                array_merge($localPackage->getRequires(), $localPackage->getDevRequires()),
-                function (array $result, Link $item) {
-                    $result[] = $item->getTarget();
-                    return $result;
-                },
-                []
-            );
+        array_map(
+            function (PackageInterface $localPackage) use (&$dependents, $needleName) {
+                $packageRequirements = array_reduce(
+                    array_merge($localPackage->getRequires(), $localPackage->getDevRequires()),
+                    function (array $result, Link $item) {
+                        $result[] = $item->getTarget();
+                        return $result;
+                    },
+                    []
+                );
 
-            if (in_array($needleName, $packageRequirements)) {
-                $dependents[] = $localPackage->getName();
-                $dependents = array_merge($dependents, $this->getDependents($localPackage->getName()));
+                if (in_array($needleName, $packageRequirements)) {
+                    $dependents[] = $localPackage->getName();
+                    $dependents = array_merge($dependents, $this->getDependents($localPackage->getName()));
 
-            }
-        }
+                }
+            },
+            $localRepository->getCanonicalPackages()
+        );
 
         return $dependents;
     }
@@ -625,9 +659,12 @@ class PackageManager
         $this->logger->info('Removing from composer.json', $packageNames);
         $composerFile = new JsonFile($this->pathToComposerJson);
         $composerData = $composerFile->read();
-        foreach ($packageNames as $name) {
-            unset($composerData['require'][$name]);
-        }
+        array_map(
+            function ($name) use (&$composerData) {
+                unset($composerData['require'][$name]);
+            },
+            $packageNames
+        );
 
         $composerFile->write($composerData);
     }

@@ -3,7 +3,7 @@
     top: 66px;
     bottom: 0;
     width: 33px;
-    position: absolute;
+    position: fixed;
     z-index: 1000;
     overflow-y: auto;
 

@@ -52,6 +52,13 @@ function(_, Backbone) {
         },
 
         /**
+         * Checks if there is at least one action in this panel
+         */
+        haveActions: function () {
+            return !_.isEmpty(this.actions);
+        },
+
+        /**
          * Set actions
          *
          * @param {Array.<oro.datagrid.AbstractAction>} actions

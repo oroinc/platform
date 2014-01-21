@@ -31,10 +31,13 @@
         </h1>
 
         <div class="pull-right help">
-            <a href="#" target="_blank">
+            <a href="{{ get_help_link() }}" target="_blank">
                 <i class="icon-question-sign" title="Get help"></i>
             </a>
             {% if app.user %}
+                <a href="{{ path('oro_distribution_settings_index') }}">
+                    <i class="icon-cogs" title="Composer Settings"></i>
+                </a>
                 <a href="{{ path('oro_distribution_security_logout') }}">
                     <i class="icon-signout" title="Sign Out"></i>
                 </a>

@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oro/export-handler': 'bundles/oroimportexport/js/export-handler.js'
