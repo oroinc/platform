@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Psr\Log\LoggerAwareInterface;
+
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
-use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
+use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 abstract class AbstractConnector extends IteratorBasedReader implements ConnectorInterface, StepExecutionAwareInterface
 {
@@ -54,6 +56,10 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
         $this->validateConfiguration();
         $this->transport->init($this->channel->getTransport());
         $this->sourceIterator = $this->getConnectorSource();
+
+        if ($this->sourceIterator instanceof LoggerAwareInterface) {
+            $this->sourceIterator->setLogger($this->logger);
+        }
     }
 
     /**
