@@ -55,10 +55,10 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
 
         $this->validateConfiguration();
         $this->transport->init($this->channel->getTransport());
-        $this->sourceIterator = $this->getConnectorSource();
+        $this->setSourceIterator($this->getConnectorSource());
 
-        if ($this->sourceIterator instanceof LoggerAwareInterface) {
-            $this->sourceIterator->setLogger($this->logger);
+        if ($this->getSourceIterator() instanceof LoggerAwareInterface) {
+            $this->getSourceIterator()->setLogger($this->logger);
         }
     }
 

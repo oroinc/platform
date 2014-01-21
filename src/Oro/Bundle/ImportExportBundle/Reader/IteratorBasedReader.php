@@ -9,7 +9,7 @@ abstract class IteratorBasedReader extends AbstractReader
     /**
      * @var \Iterator
      */
-    protected $sourceIterator;
+    private $sourceIterator;
 
     /**
      * @var bool
@@ -21,7 +21,7 @@ abstract class IteratorBasedReader extends AbstractReader
      */
     public function read()
     {
-        if (null === $this->sourceIterator) {
+        if (null === $this->getSourceIterator()) {
             throw new LogicException('Reader must be configured with source');
         }
         if (!$this->rewound) {
@@ -31,7 +31,7 @@ abstract class IteratorBasedReader extends AbstractReader
 
         $result = null;
         if ($this->sourceIterator->valid()) {
-            $result = $this->sourceIterator->current();
+            $result  = $this->sourceIterator->current();
             $context = $this->getContext();
             $context->incrementReadOffset();
             $context->incrementReadCount();
@@ -39,5 +39,26 @@ abstract class IteratorBasedReader extends AbstractReader
         }
 
         return $result;
+    }
+
+    /**
+     * Setter for iterator
+     *
+     * @param \Iterator $sourceIterator
+     */
+    protected function setSourceIterator(\Iterator $sourceIterator)
+    {
+        $this->sourceIterator = $sourceIterator;
+        $this->rewound        = false;
+    }
+
+    /**
+     * Getter for iterator
+     *
+     * @return \Iterator|null
+     */
+    protected function getSourceIterator()
+    {
+        return $this->sourceIterator;
     }
 }
