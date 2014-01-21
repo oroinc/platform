@@ -38,10 +38,10 @@ class OrmTotalsExtension extends AbstractExtension
     protected $dateTimeFormatter;
 
     public function __construct(
-        RequestParameters $requestParams = null,
         Translator $translator,
         NumberFormatter $numberFormatter,
-        DateTimeFormatter $dateTimeFormatter
+        DateTimeFormatter $dateTimeFormatter,
+        RequestParameters $requestParams = null
     ) {
         $this->requestParams     = $requestParams;
         $this->translator        = $translator;
@@ -190,14 +190,12 @@ class OrmTotalsExtension extends AbstractExtension
                 $ids[] = $res[$identifier['alias']];
             }
 
+            $field = isset($identifier['entityAlias'])
+                ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
+                : $identifier['fieldAlias'];
+
             $dataQueryBuilder->andWhere(
-                $this->masterQB->expr()->in(
-                    isset($identifier['entityAlias'])
-                        ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
-                        : $identifier['fieldAlias']
-                    ,
-                    $ids
-                )
+                $this->masterQB->expr()->in($field, $ids)
             );
         }
 
