@@ -40,10 +40,11 @@ class ChoiceFilterType extends AbstractChoiceType
 
         $resolver->setDefaults(
             array(
-                'field_type'       => 'choice',
-                'field_options'    => array('choices' => array()),
-                'operator_choices' => $choices,
-                'populate_default' => true
+                'field_type'            => 'choice',
+                'field_options'         => array('choices' => array()),
+                'operator_choices'      => $choices,
+                'populate_default'      => true,
+                'is_translated_choices' => false
             )
         );
     }
@@ -56,6 +57,16 @@ class ChoiceFilterType extends AbstractChoiceType
         parent::finishView($view, $form, $options);
         if (isset($options['populate_default'])) {
             $view->vars['populate_default'] = $options['populate_default'];
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function translateChoices(FormView $view, FormView $valueFormView, array $options)
+    {
+        if (!isset($options['is_translated_choices']) || !$options['is_translated_choices']) {
+            parent::translateChoices($view, $valueFormView, $options);
         }
     }
 }
