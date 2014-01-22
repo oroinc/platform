@@ -10,8 +10,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
     $.widget('oro.compareField', {
         options: {
             fields: [],
-            filterMetadataSelector: '#report-designer',
-            fieldDropdownWidth: '250px'
+            filterMetadataSelector: '#report-designer'
         },
 
         _create: function() {
