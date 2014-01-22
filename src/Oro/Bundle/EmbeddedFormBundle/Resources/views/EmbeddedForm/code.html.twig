@@ -23,12 +23,13 @@
 
     {% set getCodeSection %}
         <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
-<script type="text/javascript" src="http://crm-app.local/bundles/oroembeddedform/js/embed.form.js"></script>
+<div id="embedded-form-container-{{ entity.id }}"></div>
+<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
 <script type="text/javascript">
     new EmbedForm({
-        container: 'form-container',
+        container: 'embedded-form-container-{{ entity.id }}',
         iframe: {
-            src: "http://crm-app.local/embedded-form/submit",
+            src: {{ url('oro_embedded_form_submit') }},
             width: 450,
             height: 600,
             frameBorder: 0
