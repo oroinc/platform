@@ -177,13 +177,4 @@ class StepAssembler extends AbstractAssembler
 
         return $this->stepEntities[$workflowName][$stepName];
     }
-
-    /**
-     * @return StepAssembler
-     */
-    public function resetStepEntities()
-    {
-        $this->stepEntities = array();
-        return $this;
-    }
 }

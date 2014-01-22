@@ -73,16 +73,6 @@ class WorkflowRegistry
     }
 
     /**
-     * @return WorkflowRegistry
-     */
-    public function resetAssembledWorkflows()
-    {
-        $this->workflowByName = array();
-
-        return $this;
-    }
-
-    /**
      * Get Workflow that is applicable to entity class
      *
      * @param string $entityClass
