@@ -105,11 +105,6 @@ class ConfigManager
     protected $configChangeSets;
 
     /**
-     * @var ExtendManager
-     */
-    protected $extendManager;
-
-    /**
      * @param MetadataFactory    $metadataFactory
      * @param EventDispatcher    $eventDispatcher
      * @param ServiceLink        $providerBagLink
