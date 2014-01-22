@@ -1,12 +1,12 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
 define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'oro/loading-mask',
-    'oro/datagrid/header', 'oro/datagrid/body', 'oro/datagrid/toolbar', 'oro/datagrid/action-column',
-    'oro/datagrid/select-row-cell', 'oro/datagrid/select-all-header-cell',
+    'oro/datagrid/header', 'oro/datagrid/body', 'oro/datagrid/footer', 'oro/datagrid/toolbar',
+    'oro/datagrid/action-column', 'oro/datagrid/select-row-cell', 'oro/datagrid/select-all-header-cell',
     'oro/datagrid/refresh-collection-action', 'oro/datagrid/reset-collection-action',
     'oro/datagrid/export-action'],
     function ($, _, Backgrid, __, mediator, LoadingMask,
-              GridHeader, GridBody, Toolbar, ActionColumn,
+              GridHeader, GridBody, GridFooter, Toolbar, ActionColumn,
               SelectRowCell, SelectAllHeaderCell,
               RefreshCollectionAction, ResetCollectionAction,
               ExportAction) {
@@ -64,6 +64,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
 
             /** @property {oro.datagrid.Body} */
             body: GridBody,
+
+            /** @property {oro.datagrid.Footer} */
+            footer: GridFooter,
 
             /** @property {oro.datagrid.Toolbar} */
             toolbar: Toolbar,
@@ -486,6 +489,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.renderGrid();
                 this.renderNoDataBlock();
                 this.renderLoadingMask();
+                this.collection.on('reset', _.bind(function() {
+                    this._updateNoDataBlock();
+                }, this));
 
                 /**
                  * Backbone event. Fired when the grid has been successfully rendered.
@@ -558,8 +564,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.requestsCount -= 1;
                 if (this.requestsCount === 0) {
                     this.hideLoading();
-                    // render block instead of update in order to change message depending on filter state
-                    this.renderNoDataBlock();
+
                     /**
                      * Backbone event. Fired when data for grid has been successfully rendered.
                      * @event grid_load:complete
