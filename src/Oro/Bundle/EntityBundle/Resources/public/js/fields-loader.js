@@ -65,7 +65,6 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
                 }
 
                 return {
-                    id: field.name,
                     text: field.label,
                     children: self._convertFields(field, field.related_entity_fields)
                 };

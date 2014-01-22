@@ -22,10 +22,10 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
 
             var $select = self.$select = self.element.find('input.select');
             $select.select2({
-                collapsibleResults: false,
-                data: this.options.fields
+                collapsibleResults: true,
+                data: this.options.fields,
+                dropdownAutoWidth: true
             });
-            this._adjustDropdownWidth();
             $select.change(function (e) {
                 if (e.added) {
                     var conditions = self._getFieldApplicableConditions(e.added);
@@ -47,18 +47,6 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             self._createFilter(filterIndex, function () {
                 self._appendFilter();
                 self._onUpdate();
-            });
-        },
-
-        _adjustDropdownWidth: function () {
-            var self = this;
-            var $container = self.element.find('.select2-container');
-            $container.css({ width: 'auto' });
-            self.$select.on('select2-opening', function () {
-                $container.css({ width: self.options.fieldDropdownWidth });
-            });
-            self.$select.on('select2-open', function () {
-                $container.css({ width: 'auto' });
             });
         },
 
