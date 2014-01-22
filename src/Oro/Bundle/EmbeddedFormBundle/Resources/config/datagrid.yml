@@ -4,6 +4,8 @@ datagrid:
             type: orm
             query:
                 select:
+                    - embedded_form.id
+                    - embedded_form.title
                     - embedded_form.formType
                     - channel.name as channelName
                 from:
@@ -11,9 +13,41 @@ datagrid:
                 join:
                     left:
                         - { join: embedded_form.channel, alias: channel }
-
         columns:
+            title:
+                label: oro.ebemedded_form.title
             formType:
                 label: oro.ebemedded_form.form_type
             channelName:
                 label: oro.channel.name
+        properties:
+            id: ~
+            update_link:
+                type:       url
+                route:      oro_embedded_form_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_embedded_form_delete
+                params:     [ id ]
+            code_link:
+                type:       url
+                route:      oro_embedded_form_code
+                params:     [ id ]
+        actions:
+            view:
+                type: navigate
+                label: Update
+                icon: edit
+                link: update_link
+                rowAction: true
+            delete:
+                type: delete
+                label: Update
+                icon: trash
+                link: delete_link
+            code:
+                type: navigate
+                label: oro.embedded_form.datagrid.get-code
+                icon: code
+                link: code_link

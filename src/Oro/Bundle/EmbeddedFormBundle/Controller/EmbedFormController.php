@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\ContactRequestType;
+use Doctrine\ORM\EntityManager;
+use OroCRM\Bundle\ContactUsBundle\Entity\ContactRequest;
+use OroCRM\Bundle\ContactUsBundle\Form\Type\ContactRequestType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -18,15 +20,21 @@ class EmbedFormController extends Controller
      */
     public function formAction(Request $request)
     {
-        $form = $this->createForm(new ContactRequestType());
+        /** @var EntityManager $em */
+        $em = $this->get('doctrine.orm.entity_manager');
+
+        $contactRequest = new ContactRequest();
+        $channel = $em->getRepository('OroIntegrationBundle:Channel')->find(1);
+        $contactRequest->setChannel($channel);
+
+        $form = $this->createForm(new ContactRequestType(), $contactRequest);
         $form->handleRequest($request);
         if ($form->isValid()) {
             $entity = $form->getData();
-            $em = $this->get('doctrine.orm.entity_manager');
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('oro_embed_form_success'));
+            return $this->redirect($this->generateUrl('oro_embedded_form_success'));
         }
 
         return [

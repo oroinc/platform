@@ -1,0 +1,55 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+
+{% block navButtons %}
+    {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
+{% endblock %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_embedded_form_list'),
+        'indexLabel': 'oro.embedded_form.entity_plural_label'|trans,
+        'entityTitle': entity.title
+    } %}
+    {{ parent() }}
+        {#{% include 'OroUIBundle::page_title_block.html.twig' %}#}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'embedded-form-get-code' %}
+
+    {% block stats %}
+    {% endblock stats %}
+
+    {% set getCodeSection %}
+        <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
+<script type="text/javascript" src="http://crm-app.local/bundles/oroembeddedform/js/embed.form.js"></script>
+<script type="text/javascript">
+    new EmbedForm({
+        container: 'form-container',
+        iframe: {
+            src: "http://crm-app.local/embedded-form/submit",
+            width: 450,
+            height: 600,
+            frameBorder: 0
+        }
+    });
+</script>
+        </textarea>
+    {% endset %}
+
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+        {
+            'title': 'Code'|trans,
+            'data': [getCodeSection]
+        }
+        ]
+    }] %}
+    {% set data = {
+        'dataBlocks': dataBlocks
+    } %}
+    {{ parent() }}
+{% endblock content_data %}
