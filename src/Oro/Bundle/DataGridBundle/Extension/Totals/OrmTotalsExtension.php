@@ -248,6 +248,9 @@ class OrmTotalsExtension extends AbstractExtension
                 case PropertyInterface::TYPE_PERCENT:
                     $val = $this->numberFormatter->formatPercent($val);
                     break;
+                case PropertyInterface::TYPE_CURRENCY:
+                    $val = $this->numberFormatter->formatCurrency($val);
+                    break;
             }
         }
 
