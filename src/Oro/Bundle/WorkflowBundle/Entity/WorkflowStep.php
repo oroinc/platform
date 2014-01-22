@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  *          @ORM\UniqueConstraint(name="oro_workflow_step_unique_idx", columns={"workflow_name", "name"})
  *      }
  * )
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowStepRepository")
  */
 class WorkflowStep
 {
