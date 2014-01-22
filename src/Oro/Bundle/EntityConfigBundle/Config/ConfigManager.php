@@ -559,12 +559,12 @@ class ConfigManager
     {
         if (!$entityModel = $this->modelManager->findModel($className)) {
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
+            $metadata    = $this->getEntityMetadata($className);
 
             foreach ($this->getProviders() as $provider) {
                 $translatable = $provider->getPropertyConfig()
                     ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
 
-                $metadata      = $this->getEntityMetadata($className);
                 $defaultValues = [];
                 if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
                     $defaultValues = $metadata->defaultValues[$provider->getScope()];
@@ -613,10 +613,15 @@ class ConfigManager
                 $defaultValues = $metadata->defaultValues[$scope];
             }
             // combine them with default values from config file
-            $defaultValues = array_merge(
-                $provider->getPropertyConfig()->getDefaultValues(),
-                $defaultValues
-            );
+
+            $translatable = $provider->getPropertyConfig()
+                ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
+
+            foreach ($translatable as $code) {
+                if (!in_array($code, $defaultValues)) {
+                    $defaultValues[$code] = ConfigHelper::getTranslationKey($className, null, $code);
+                }
+            }
 
             // set missing values with default ones
             $hasChanges = false;
@@ -653,11 +658,11 @@ class ConfigManager
     {
         if (!$fieldModel = $this->modelManager->findModel($className, $fieldName)) {
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
+            $metadata   = $this->getFieldMetadata($className, $fieldName);
 
             foreach ($this->getProviders() as $provider) {
                 $translatable  = $provider->getPropertyConfig()->getTranslatableValues();
                 $defaultValues = [];
-                $metadata      = $this->getFieldMetadata($className, $fieldName);
                 if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
                     $defaultValues = $metadata->defaultValues[$provider->getScope()];
                 }
