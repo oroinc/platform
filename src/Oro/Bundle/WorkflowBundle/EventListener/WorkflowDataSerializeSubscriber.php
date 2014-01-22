@@ -10,7 +10,6 @@ use Doctrine\ORM\Events;
 
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
 use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
@@ -108,8 +107,10 @@ class WorkflowDataSerializeSubscriber implements EventSubscriber
 
             $this->serializer->setWorkflowName($workflowItem->getWorkflowName());
 
+            // Cloning workflow data instance to prevent changing of original data.
+            $workflowData = clone $workflowItem->getData();
             // entity attribute must not be serialized
-            $workflowData = $workflowItem->getData()->remove($workflowItem->getDefinition()->getEntityAttributeName());
+            $workflowData->remove($workflowItem->getDefinition()->getEntityAttributeName());
             $serializedData = $this->serializer->serialize($workflowData, $this->format);
             $workflowItem->setSerializedData($serializedData);
 
