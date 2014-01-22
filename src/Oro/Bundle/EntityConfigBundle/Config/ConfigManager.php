@@ -35,6 +35,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\UpdateEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -102,6 +103,11 @@ class ConfigManager
      * @var array
      */
     protected $configChangeSets;
+
+    /**
+     * @var ExtendManager
+     */
+    protected $extendManager;
 
     /**
      * @param MetadataFactory    $metadataFactory
@@ -628,6 +634,15 @@ class ConfigManager
             }
             if ($hasChanges) {
                 $provider->persist($config);
+            }
+
+            if (in_array($scope, UpdateEntityConfigModelEvent::$scopes)) {
+                if ($entityModel = $this->getConfigEntityModel($className)) {
+                    $this->eventDispatcher->dispatch(
+                        Events::UPDATE_ENTITY_CONFIG_MODEL,
+                        new UpdateEntityConfigModelEvent($entityModel, $this)
+                    );
+                }
             }
         }
     }

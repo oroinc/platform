@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
+use Oro\Bundle\EntityConfigBundle\Event\UpdateEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
@@ -49,9 +50,10 @@ class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::PRE_PERSIST_CONFIG      => 'persistConfig',
-            Events::NEW_ENTITY_CONFIG_MODEL => 'newEntity',
-            Events::NEW_FIELD_CONFIG_MODEL  => 'newField',
+            Events::PRE_PERSIST_CONFIG         => 'persistConfig',
+            Events::NEW_ENTITY_CONFIG_MODEL    => 'newEntity',
+            Events::UPDATE_ENTITY_CONFIG_MODEL => 'newEntity',
+            Events::NEW_FIELD_CONFIG_MODEL     => 'newField',
         ];
     }
 
