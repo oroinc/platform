@@ -129,6 +129,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
                 name: this.name,
                 choices: this.choices,
                 selectedChoice: this.emptyValue.type,
+                selectedChoiceLabel: this.choices[0].label,
                 inputClass: this.inputClass
             }));
             this._wrap($filter);
