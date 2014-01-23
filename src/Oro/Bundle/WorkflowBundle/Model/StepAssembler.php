@@ -116,32 +116,6 @@ class StepAssembler extends AbstractAssembler
     }
 
     /**
-     * @param array $attributeNames
-     * @param string $stepName
-     * @throws UnknownAttributeException
-     */
-    protected function assertAttributesExist(array $attributeNames, $stepName)
-    {
-        foreach ($attributeNames as $attributeName) {
-            $this->assertAttributeExists($attributeName, $stepName);
-        }
-    }
-
-    /**
-     * @param string $attributeName
-     * @param string $stepName
-     * @throws UnknownAttributeException
-     */
-    protected function assertAttributeExists($attributeName, $stepName)
-    {
-        if (!isset($this->attributes[$attributeName])) {
-            throw new UnknownAttributeException(
-                sprintf('Unknown attribute "%s" at step "%s"', $attributeName, $stepName)
-            );
-        }
-    }
-
-    /**
      * @param WorkflowDefinition $workflowDefinition
      * @param string $stepName
      * @return WorkflowStep|null

@@ -67,14 +67,14 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function assertEntityStepCalls()
+    public function assertEntityStepCalls($stepName = 'entity_step')
     {
         $stepEntity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
             ->disableOriginalConstructor()
             ->getMock();
         $stepEntity->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('entity_step'));
+            ->will($this->returnValue($stepName));
         $stepEntities = array($stepEntity);
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
@@ -84,19 +84,10 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->will($this->returnValue($stepEntities));
 
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow->expects($this->once())
-            ->method('isInIdentityMap')
-            ->will($this->returnValue(true));
-
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $em->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+
         $em->expects($this->once())
             ->method('getRepository')
             ->with('OroWorkflowBundle:WorkflowStep')
@@ -105,6 +96,8 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->with('doctrine.orm.default_entity_manager')
             ->will($this->returnValue($em));
+
+        return $stepEntity;
     }
 
     /**
@@ -112,7 +105,8 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssemble($configuration, $attributes, Step $expectedStep)
     {
-        $this->assertEntityStepCalls();
+        $stepEntity = $this->assertEntityStepCalls($expectedStep->getName());
+        $expectedStep->setEntity($stepEntity);
         $configurationPass = $this->getMockBuilder(
             'Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface'
         )->getMockForAbstractClass();
