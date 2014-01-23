@@ -622,8 +622,7 @@ class ConfigManager
             $hasChanges = false;
             $config     = $provider->getConfig($className);
             foreach ($defaultValues as $code => $value) {
-                $valueHasChanges = $config->has($code) && $config->get($code) != $value;
-                if (!$config->has($code) || $valueHasChanges || $force) {
+                if (!$config->has($code) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }
@@ -707,8 +706,7 @@ class ConfigManager
             $hasChanges = false;
             $config     = $provider->getConfig($className, $fieldName);
             foreach ($defaultValues as $code => $value) {
-                $valueHasChanges = $config->has($code) && $config->get($code) != $value;
-                if (!$config->has($code) || $valueHasChanges || $force) {
+                if (!$config->has($code) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }
