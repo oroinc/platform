@@ -83,7 +83,6 @@ class ApplyController extends Controller
             $flashBag->add(
                 'error',
                 $this->get('translator')->trans('Sorry, page was not loaded correctly')
-
             );
         }
 
