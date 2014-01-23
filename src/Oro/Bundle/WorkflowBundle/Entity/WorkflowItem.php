@@ -52,7 +52,7 @@ class WorkflowItem
     /**
      * @var int
      *
-     * @ORM\Column(name="entity_id", type="integer")
+     * @ORM\Column(name="entity_id", type="integer", nullable=true)
      * @Serializer\Expose()
      */
     protected $entityId;
@@ -229,9 +229,14 @@ class WorkflowItem
      *
      * @param int $entityId
      * @return WorkflowItem
+     * @throws WorkflowException
      */
     public function setEntityId($entityId)
     {
+        if ($this->entityId !== null && $this->entityId !== $entityId) {
+            throw new WorkflowException('Workflow item entity ID can not be changed');
+        }
+
         $this->entityId = $entityId;
 
         return $this;
@@ -336,9 +341,14 @@ class WorkflowItem
      *
      * @param object $entity
      * @return WorkflowItem
+     * @throws WorkflowException
      */
     public function setEntity($entity)
     {
+        if ($this->entity !== null && $this->entity !== $entity) {
+            throw new WorkflowException('Workflow item entity can not be changed');
+        }
+
         $this->entity = $entity;
 
         return $this;

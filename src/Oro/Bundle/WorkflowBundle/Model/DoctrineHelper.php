@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class DoctrineHelper
 {
@@ -39,6 +40,21 @@ class DoctrineHelper
         $identifier = $metadata->getIdentifierValues($entity);
 
         return $identifier;
+    }
+
+    /**
+     * @param object $entity
+     * @return integer
+     * @throws WorkflowException
+     */
+    public function getSingleEntityIdentifier($entity)
+    {
+        $entityIdentifier = $this->getEntityIdentifier($entity);
+        if (count($entityIdentifier) != 1) {
+            throw new WorkflowException('Can\'t get single identifier for the entity');
+        }
+
+        return current($entityIdentifier);
     }
 
     /**

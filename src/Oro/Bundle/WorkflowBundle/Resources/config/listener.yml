@@ -2,6 +2,7 @@ parameters:
     oro_workflow.listener.subscriver.workflow_definition.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDefinitionSubscriber
     oro_workflow.listener.subscriber.workflow_data_serialize.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowDataSerializeSubscriber
     oro_workflow.listener.subscriber.workflow_step.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowStepSubscriber
+    oro_workflow.listener.subscriber.workflow_item.class: Oro\Bundle\WorkflowBundle\EventListener\WorkflowItemSubscriber
 
 services:
     oro_workflow.listener.subscriver.workflow_definition:
@@ -22,5 +23,12 @@ services:
         arguments:
             - @doctrine
             - @oro_workflow.entity_connector
+        tags:
+            - { name: doctrine.event_subscriber }
+
+    oro_workflow.listener.subscriber.workflow_item:
+        class: %oro_workflow.listener.subscriber.workflow_item.class%
+        arguments:
+            - @oro_workflow.doctrine_helper
         tags:
             - { name: doctrine.event_subscriber }

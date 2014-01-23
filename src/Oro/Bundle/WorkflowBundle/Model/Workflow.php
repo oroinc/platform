@@ -302,13 +302,13 @@ class Workflow
         $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
 
         $workflowItem = new WorkflowItem();
-        $workflowItem->setWorkflowName($this->getName());
+        $workflowItem
+            ->setWorkflowName($this->getName())
+            ->setEntity($entity);
         $workflowItem->getData()
             ->set($entityAttributeName, $entity)
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
-
-        $this->entityConnector->setEntity($workflowItem, $entity);
 
         return $workflowItem;
     }
