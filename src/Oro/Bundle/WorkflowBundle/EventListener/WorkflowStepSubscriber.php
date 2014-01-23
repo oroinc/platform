@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Common\Util\ClassUtils;
@@ -91,7 +92,11 @@ class WorkflowStepSubscriber implements EventSubscriber
     {
         if (!$this->entityConnector->getWorkflowStep($entity)) {
             $definition = $this->definitionsWithDefaultStep[ClassUtils::getClass($entity)];
-            $this->entityConnector->setWorkflowStep($entity, $definition->getStartStep());
+            $startStep = $definition->getStartStep();
+            if ($startStep instanceof Proxy && !$startStep->__isInitialized()) {
+                $startStep->__load();
+            }
+            $this->entityConnector->setWorkflowStep($entity, $startStep);
         }
     }
 }
