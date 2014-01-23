@@ -37,8 +37,8 @@ class OwnerAssignmentChecker implements OwnerAssignmentCheckerInterface
             ->createQueryBuilder('entity')
             ->select('owner.id')
             ->innerJoin(sprintf('entity.%s', $ownerFieldName), 'owner')
-            ->where('owner.id = ?1')
-            ->setParameter(1, $ownerId)
+            ->where('owner.id = :ownerId')
+            ->setParameter('ownerId', $ownerId)
             ->setMaxResults(1);
     }
 }
