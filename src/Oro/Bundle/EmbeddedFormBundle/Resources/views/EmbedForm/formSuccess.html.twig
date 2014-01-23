@@ -3,5 +3,5 @@
 {% block page %}
     <h3>Form submitted successfully!</h3>
 
-    <a href="{{ path('oro_embedded_form_submit') }}">Back</a>
+    <a href="{{ path('oro_embedded_form_submit', {'id': id}) }}">Back</a>
 {% endblock %}

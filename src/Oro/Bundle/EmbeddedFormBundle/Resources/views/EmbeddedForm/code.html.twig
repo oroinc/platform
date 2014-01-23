@@ -28,7 +28,7 @@
     new EmbedForm({
         container: 'embedded-form-container-{{ entity.id }}',
         iframe: {
-            src: "{{ url('oro_embedded_form_submit') }}",
+            src: "{{ url('oro_embedded_form_submit', {'id': entity.id}) }}",
             width: 450,
             height: 600,
             frameBorder: 0

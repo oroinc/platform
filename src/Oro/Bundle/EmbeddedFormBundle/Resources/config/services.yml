@@ -1,0 +1,17 @@
+parameters:
+    oro.embedded_form.form_type.available_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
+    oro_embedded_form.manager.class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
+
+services:
+    oro_embedded_form.form_type.available_embedded_form:
+        class: %oro.embedded_form.form_type.available_form.class%
+        arguments:
+            - @oro_embedded_form.manager
+        tags:
+            - { name: form.type, alias: oro_available_embedded_forms }
+
+    oro_embedded_form.manager:
+        class: %oro_embedded_form.manager.class%
+        arguments:
+            - @service_container
+            - @form.factory

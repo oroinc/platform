@@ -22,7 +22,7 @@ class EmbeddedFormType extends AbstractType
     {
         $builder
             ->add('title', 'text')
-            ->add('formType', 'text')
+            ->add('formType', 'oro_available_embedded_forms')
             ->add('channel', 'entity', [
                 'class' => 'OroIntegrationBundle:Channel',
                 'property' => 'name'
@@ -31,12 +31,13 @@ class EmbeddedFormType extends AbstractType
         ;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity'
-            )
-        );
+        $resolver->setDefaults([
+            'data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity'
+        ]);
     }
 }
