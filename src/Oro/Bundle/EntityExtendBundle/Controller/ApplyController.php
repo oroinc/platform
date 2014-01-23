@@ -77,12 +77,7 @@ class ApplyController extends Controller
         if ($exitCode === 0) {
             $flashBag->add(
                 'success',
-                $this->get('translator')->trans('Schema updated')
-            );
-        } else {
-            $flashBag->add(
-                'error',
-                $this->get('translator')->trans('Sorry, page was not loaded correctly')
+                $this->get('translator')->trans('oro.extend.controller.schema.update.message')
             );
         }
 
