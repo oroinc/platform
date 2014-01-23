@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -30,6 +31,11 @@ class Workflow
      * @var EntityConnector
      */
     protected $entityConnector;
+
+    /**
+     * @var SecurityFacade
+     */
+    protected $securityFacade;
 
     /**
      * @var StepManager
@@ -63,17 +69,20 @@ class Workflow
 
     /**
      * @param EntityConnector $entityConnector
+     * @param SecurityFacade $securityFacade,
      * @param StepManager|null $stepManager
      * @param AttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
      */
     public function __construct(
         EntityConnector $entityConnector,
+        SecurityFacade $securityFacade,
         StepManager $stepManager = null,
         AttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
     ) {
         $this->entityConnector = $entityConnector;
+        $this->securityFacade = $securityFacade;
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager  = $attributeManager ? $attributeManager : new AttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
@@ -218,7 +227,9 @@ class Workflow
 
         $transitionIsValid = $this->checkTransitionValid($transition, $workflowItem, $fireExceptions);
 
-        return $transitionIsValid && $transition->isAllowed($workflowItem, $errors);
+        return $transitionIsValid
+            && $this->isTransitionAclGranted($workflowItem, $transition)
+            && $transition->isAllowed($workflowItem, $errors);
     }
 
     /**
@@ -352,6 +363,25 @@ class Workflow
     }
 
     /**
+     * Check transition ACL for workflow item
+     *
+     * @param WorkflowItem $workflowItem
+     * @param Transition $transition
+     * @return bool
+     */
+    protected function isTransitionAclGranted(WorkflowItem $workflowItem, Transition $transition)
+    {
+        // if ACL is set then check by ACL resource
+        $transitionAclResource = $transition->getAclResource();
+        if ($transitionAclResource) {
+            return $this->securityFacade->isGranted($transitionAclResource);
+        }
+
+        // default ACL is entity EDIT
+        return $this->securityFacade->isGranted('EDIT', $workflowItem->getEntity());
+    }
+
+    /**
      * Check that start transition is available to show.
      *
      * @param string|Transition $transition
@@ -379,7 +409,8 @@ class Workflow
     {
         $transition = $this->transitionManager->extractTransition($transition);
 
-        return $transition->isAvailable($workflowItem, $errors);
+        return $this->isTransitionAclGranted($workflowItem, $transition)
+            && $transition->isAvailable($workflowItem, $errors);
     }
 
     /**

@@ -117,6 +117,7 @@ class TransitionAssembler extends AbstractAssembler
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
+            ->setAclResource($this->getOption($options, 'acl_resource', null))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
             ->setFrontendOptions($this->getOption($options, 'frontend_options', array()));
