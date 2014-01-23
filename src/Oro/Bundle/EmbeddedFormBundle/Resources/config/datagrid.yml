@@ -15,11 +15,11 @@ datagrid:
                         - { join: embedded_form.channel, alias: channel }
         columns:
             title:
-                label: oro.ebemedded_form.title
+                label: oro.embedded_form.title
             formType:
-                label: oro.ebemedded_form.form_type
+                label: oro.embedded_form.form_type
             channelName:
-                label: oro.channel.name
+                label: oro.embedded_form.channel_name
         properties:
             id: ~
             update_link:

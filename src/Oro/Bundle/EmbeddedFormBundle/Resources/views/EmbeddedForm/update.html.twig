@@ -2,6 +2,8 @@
 
 {% set formAction = form.vars.value.id ? path('oro_embedded_form_update', { 'id': form.vars.value.id }) : path('oro_embedded_form_create') %}
 
+{% set title = 'New'|trans ~ ' ' ~ 'oro.embedded_form.entity.label'|trans|lower %}
+
 {% block navButtons %}
     {#{% if form.vars.value.id and resource_granted('orocrm_contact_delete') %}#}
     {% if form.vars.value.id %}
@@ -11,7 +13,7 @@
         'aCss': 'no-hash remove-button',
         'id': 'btn-remove-embedded-form',
         'dataId': form.vars.value.id,
-        'entity_label': 'oro.embedded_form.entity_label'|trans,
+        'entity_label': 'oro.embedded_form.entity.label'|trans,
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -25,7 +27,7 @@
         {% set breadcrumbs = {
         'entity':      form.vars.value,
         'indexPath':   path('oro_embedded_form_list'),
-        'indexLabel': 'oro.embedded_form.entity_plural_label'|trans,
+        'indexLabel': 'oro.embedded_form.entity.plural_label'|trans,
         'entityTitle': form.vars.value.title
         } %}
         {{ parent() }}

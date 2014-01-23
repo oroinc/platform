@@ -8,11 +8,10 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_embedded_form_list'),
-        'indexLabel': 'oro.embedded_form.entity_plural_label'|trans,
+        'indexLabel': 'oro.embedded_form.entity.plural_label'|trans,
         'entityTitle': entity.title
     } %}
     {{ parent() }}
-        {#{% include 'OroUIBundle::page_title_block.html.twig' %}#}
 {% endblock pageHeader %}
 
 {% block content_data %}

@@ -1,0 +1,8 @@
+oro:
+    embedded_form:
+        entity:
+            label: Embedded Form
+            plural_label: Embedded Forms
+        title: Title
+        form_type: Form Type
+        channel_name: Channel Name
