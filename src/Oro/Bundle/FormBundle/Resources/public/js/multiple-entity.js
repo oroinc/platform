@@ -128,8 +128,11 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
         },
 
         processSelectedEntities: function(added, addedModels, removed) {
-            this.$addedEl.val(added.join(','));
-            this.$removedEl.val(removed.join(','));
+            var intersection = _.intersection(added, removed);
+            var addedNormalized = _.difference(added, intersection);
+            var removedNormalized = _.difference(removed, intersection);
+            this.$addedEl.val(addedNormalized.join(','));
+            this.$removedEl.val(removedNormalized.join(','));
 
             _.each(addedModels, _.bind(function(model) {
                 this.getCollection().add(model);
