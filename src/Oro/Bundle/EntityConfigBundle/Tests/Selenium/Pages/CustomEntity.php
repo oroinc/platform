@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages;
 
-use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntity;
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
 
 /**
@@ -68,8 +67,6 @@ class CustomEntity extends AbstractPageEntity
      */
     public function selectEntity($entityData = array())
     {
-        $this->waitForAjax();
-        $this->waitPageToLoad();
         $this->test->byXpath(
             "//tr[td[normalize-space(text())='{$entityData[0]}'] and td[normalize-space(text())=" .
                 "'{$entityData[1]}']]//td[@class='boolean-cell']/input"
@@ -98,7 +95,7 @@ class CustomEntity extends AbstractPageEntity
 
     public function addOptions($options = array())
     {
-        // $i used for counting adding new options to Option Set field
+        // $flag used for counting adding new options to Option Set field
         $flag = 0;
         foreach ($options as $option) {
             $field = $this->test->byId("oro_entity_config_type_extend_set_options_{$flag}_label");

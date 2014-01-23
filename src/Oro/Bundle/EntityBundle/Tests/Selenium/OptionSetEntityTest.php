@@ -6,21 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 class OptionSetEntityTest extends Selenium2TestCase
 {
-    protected $coverageScriptUrl = PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE;
-
-    protected function setUp()
-    {
-        $this->setHost(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
-        $this->setPort(intval(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT));
-        $this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
-        $this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL);
-    }
-
-    protected function tearDown()
-    {
-        $this->cookie()->clear();
-    }
-
     /**
      * @return array
      */
@@ -69,7 +54,7 @@ class OptionSetEntityTest extends Selenium2TestCase
      */
     public function testCreateNewOptionSetEntityRecord($entitydata)
     {
-        //TODO complete test when BAP-2966 will be fixed
+        //TODO: complete test when BAP-2966 will be fixed
         $this->markTestIncomplete('Due to BAP-2966');
         $login = $this->login();
         $login->openNavigation('Oro\Bundle\NavigationBundle')

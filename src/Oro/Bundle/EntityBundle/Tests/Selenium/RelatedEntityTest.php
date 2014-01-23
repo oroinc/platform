@@ -6,21 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 class RelatedEntityTest extends Selenium2TestCase
 {
-    protected $coverageScriptUrl = PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL_COVERAGE;
-
-    protected function setUp()
-    {
-        $this->setHost(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
-        $this->setPort(intval(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT));
-        $this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
-        $this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL);
-    }
-
-    protected function tearDown()
-    {
-        $this->cookie()->clear();
-    }
-
     /**
      * @return string
      */
@@ -58,7 +43,7 @@ class RelatedEntityTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Field saved')
             ->updateSchema()
-//            ->assertMessage('Schema updated')
+            ->assertMessage('Schema updated')
             ->close();
 
         return $entitydata;
