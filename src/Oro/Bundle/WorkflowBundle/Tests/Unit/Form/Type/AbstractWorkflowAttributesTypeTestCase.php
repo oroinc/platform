@@ -30,7 +30,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
             ->getMock();
-        $workflow = new Workflow($entityConnector);
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflow = new Workflow($entityConnector, $securityFacade);
 
         $workflow->setName($workflowName);
 

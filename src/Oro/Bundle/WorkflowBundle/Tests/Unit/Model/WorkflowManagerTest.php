@@ -541,8 +541,11 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
         $worklflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array($entityConnector, null, $attributeManager, $transitionManager))
+            ->setConstructorArgs(array($entityConnector, $securityFacade, null, $attributeManager, $transitionManager))
             ->setMethods(
                 array(
                     'isTransitionAvailable',
