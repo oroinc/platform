@@ -18,8 +18,8 @@ class EmbeddedFormEntity
      * @var integer
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="string", name="id")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     protected $id;
 

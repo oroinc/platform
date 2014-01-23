@@ -36,7 +36,7 @@ class EmbeddedFormController extends Controller
     }
 
     /**
-     * @Route("delete/{id}", name="oro_embedded_form_delete", requirements={"id"="\d+"})
+     * @Route("delete/{id}", name="oro_embedded_form_delete", requirements={"id"="[-\d\w]+"})
      */
     public function deleteAction(EmbeddedFormEntity $entity)
     {
@@ -50,7 +50,7 @@ class EmbeddedFormController extends Controller
     }
 
     /**
-     * @Route("update/{id}", name="oro_embedded_form_update", requirements={"id"="\d+"})
+     * @Route("update/{id}", name="oro_embedded_form_update", requirements={"id"="[-\d\w]+"})
      * @Template()
      */
     public function updateAction(EmbeddedFormEntity $entity)
@@ -59,7 +59,7 @@ class EmbeddedFormController extends Controller
     }
 
     /**
-     * @Route("code/{id}", name="oro_embedded_form_code", requirements={"id"="\d+"})
+     * @Route("code/{id}", name="oro_embedded_form_code", requirements={"id"="[-\d\w]+"})
      * @Template()
      */
     public function codeAction(EmbeddedFormEntity $entity)
