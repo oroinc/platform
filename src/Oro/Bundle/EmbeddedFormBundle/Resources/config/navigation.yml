@@ -2,15 +2,11 @@ oro_menu_config:
     items:
         embedded_forms:
             label: 'Embedded Forms'
-            uri: '#'
-
-        manage_forms:
-            label: 'Manage Forms'
             route: 'oro_embedded_form_list'
 
     tree:
         application_menu:
             children:
-                embedded_forms:
+                system_tab:
                     children:
-                        manage_forms: ~
+                        embedded_forms: ~
