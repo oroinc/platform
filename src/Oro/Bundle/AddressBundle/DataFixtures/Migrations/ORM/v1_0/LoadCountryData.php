@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\DataFixtures\ORM;
+namespace Oro\Bundle\AddressBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Symfony\Component\Yaml\Yaml;
 
@@ -29,7 +29,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture
     /**
      * @var string
      */
-    protected $structureFileName = '/../data/countries.yml';
+    protected $structureFileName = '/data/countries.yml';
 
     /**
      * {@inheritdoc}

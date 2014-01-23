@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\DataFixtures\ORM\Email;
+namespace Oro\Bundle\EmailBundle\DataFixtures\Demo\Migrations\ORM\v1_0;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;

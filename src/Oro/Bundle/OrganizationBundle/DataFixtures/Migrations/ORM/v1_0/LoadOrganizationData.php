@@ -1,5 +1,5 @@
 <?php
-namespace Oro\Bundle\OrganizationBundle\DataFixtures\ORM;
+namespace Oro\Bundle\OrganizationBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -7,7 +7,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-class LoadOrganizationData extends AbstractFixture implements OrderedFixtureInterface
+class LoadOrganizationData extends AbstractFixture
 {
     public function load(ObjectManager $manager)
     {
@@ -22,10 +22,5 @@ class LoadOrganizationData extends AbstractFixture implements OrderedFixtureInte
 
         $manager->persist($defaultOrganization);
         $manager->flush();
-    }
-
-    public function getOrder()
-    {
-        return 1;
     }
 }

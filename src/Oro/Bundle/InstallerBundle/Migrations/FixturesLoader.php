@@ -7,15 +7,16 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Doctrine\Common\DataFixtures\Loader;
+use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\InstallerBundle\Entity\BundleVersion;
 use Oro\Bundle\InstallerBundle\Migrations\UpdateBundleVersionFixture;
 
-class FixturesLoader extends Loader
+class FixturesLoader extends ContainerAwareLoader
 {
     const FIXTURES_PATH           = 'DataFixtures/Migrations/ORM';
-    const DEMO_DATA_FIXTURES_PATH = 'DataFixtures/DemoData/Migrations/ORM';
+    const DEMO_DATA_FIXTURES_PATH = 'DataFixtures/Demo/Migrations/ORM';
 
     /**
      * @var EntityManager
@@ -46,10 +47,12 @@ class FixturesLoader extends Loader
      * @param EntityManager $em
      * @param KernelInterface $kernel
      */
-    public function __construct(EntityManager $em, KernelInterface $kernel)
+    public function __construct(EntityManager $em, KernelInterface $kernel, ContainerInterface $container)
     {
         $this->em     = $em;
         $this->kernel = $kernel;
+
+        parent::__construct($container);
     }
 
     /**
@@ -68,19 +71,20 @@ class FixturesLoader extends Loader
         if (empty($this->fixturesDirs)) {
             $this->getFixturePath();
         }
-        $fixtures = [];
+
         foreach ($this->fixturesDirs as $fixtureDir) {
-            $fixtures = array_merge($fixtures, $this->orderFixtures($this->loadFromDirectory($fixtureDir)));
+            $this->loadFromDirectory($fixtureDir);
         }
+
         // add update bundle data version fixture
         if (!empty($this->bundleDataVersions)) {
             $updateFixture = new UpdateBundleVersionFixture();
             $updateFixture->setBundleVersions($this->bundleDataVersions);
             $updateFixture->setIsDemoDataUpdate($this->loadDemoData);
-            $fixtures[] = $updateFixture;
+            $this->addFixture($updateFixture);
         }
 
-        return $fixtures;
+        return parent::getFixtures();
     }
 
     /**
@@ -119,20 +123,20 @@ class FixturesLoader extends Loader
                         if ($versionData) {
                             $bundleDataVersion = $this->getVersionInfo(
                                 $this->loadDemoData
-                                ? $versionData->getDataVersion()
-                                : $versionData->getDemoDataVersion()
+                                ? $versionData->getDemoDataVersion()
+                                : $versionData->getDataVersion()
                             );
                         } else {
                             $bundleDataVersion = false;
                         }
                     }
 
-                    $relativePath   = $directory->getRelativePathname();
-                    $fixtureVersion = $this->getVersionInfo($relativePath);
+                    $relativePathVersion   = $directory->getRelativePathname();
+                    $fixtureVersion = $this->getVersionInfo($relativePathVersion);
                     if (!is_array($bundleDataVersion)
                         || $this->compareVersions($bundleDataVersion, $fixtureVersion) > 0
                     ) {
-                        $bundleDirFixtures[] = $relativePath;
+                        $bundleDirFixtures[] = $relativePathVersion;
                     }
                 }
             } catch (\Exception $e) {
@@ -211,33 +215,5 @@ class FixturesLoader extends Loader
         preg_match_all('/\d+/', $pathString, $matches);
 
         return isset($matches[0]) ? $matches[0] : [];
-    }
-
-    /**
-     * @param $fixtures
-     * @return array
-     */
-    protected function orderFixtures($fixtures)
-    {
-        usort(
-            $fixtures,
-            function ($a, $b) {
-                if ($a instanceof OrderedFixtureInterface && $b instanceof OrderedFixtureInterface) {
-                    if ($a->getOrder() === $b->getOrder()) {
-                        return 0;
-                    }
-
-                    return $a->getOrder() < $b->getOrder() ? -1 : 1;
-                } elseif ($a instanceof OrderedFixtureInterface) {
-                    return $a->getOrder() === 0 ? 0 : 1;
-                } elseif ($b instanceof OrderedFixtureInterface) {
-                    return $b->getOrder() === 0 ? 0 : -1;
-                }
-
-                return 0;
-            }
-        );
-
-        return $fixtures;
     }
 }

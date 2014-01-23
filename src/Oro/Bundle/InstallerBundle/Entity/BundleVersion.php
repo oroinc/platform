@@ -4,7 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class PackageMigration
+ * Class BundleVersion
  * @ORM\Table("oro_installer_bundle_version")
  * @ORM\Entity()
  */

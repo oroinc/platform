@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\DataFixtures\ORM;
+namespace Oro\Bundle\NotificationBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;

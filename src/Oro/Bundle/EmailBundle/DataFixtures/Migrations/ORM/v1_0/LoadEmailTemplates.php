@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\DataFixtures\ORM;
+namespace Oro\Bundle\EmailBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Oro\Bundle\EmailBundle\DataFixtures\ORM\AbstractEmailFixture;
 

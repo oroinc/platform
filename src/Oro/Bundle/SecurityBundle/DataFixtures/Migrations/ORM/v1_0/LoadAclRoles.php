@@ -1,20 +1,35 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\DataFixtures\ORM;
+namespace Oro\Bundle\SecurityBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Oro\Bundle\UserBundle\Entity\Role;
+
+class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
      */
     protected $container;
+
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return ['Oro\Bundle\UserBundle\DataFixtures\Migrations\ORM\v1_0\LoadRolesData'];
+    }
 
     /**
      * {@inheritdoc}
@@ -31,6 +46,8 @@ class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, C
      */
     public function load(ObjectManager $manager)
     {
+        $this->objectManager = $manager;
+
         /** @var AclManager $manager */
         $manager = $this->container->get('oro_security.acl.manager');
 
@@ -45,7 +62,7 @@ class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, C
 
     protected function loadSuperAdminRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getReference('admin_role'));
+        $sid = $manager->getSid($this->getRole('ROLE_ADMINISTRATOR'));
 
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
@@ -60,7 +77,7 @@ class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, C
 
     protected function loadAdminRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getReference('administrator_role'));
+        $sid = $manager->getSid($this->getRole('administrator_role'));
 
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
@@ -89,7 +106,7 @@ class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, C
 
     protected function loadManagerRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getReference('manager_role'));
+        $sid = $manager->getSid($this->getRole('ROLE_MANAGER'));
 
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
@@ -118,7 +135,7 @@ class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, C
 
     protected function loadUserRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getReference('user_role'));
+        $sid = $manager->getSid($this->getRole('ROLE_USER'));
 
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
@@ -146,10 +163,11 @@ class LoadAclRoles extends AbstractFixture implements OrderedFixtureInterface, C
     }
 
     /**
-     * {@inheritDoc}
+     * @param string $roleName
+     * @return Role
      */
-    public function getOrder()
+    protected function getRole($roleName)
     {
-        return 25;
+        return $this->objectManager->getRepository('OroUserBundle:Role')->findOneBy(['role' => $roleName]);
     }
 }

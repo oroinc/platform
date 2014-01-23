@@ -1,20 +1,25 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\DataFixtures\ORM;
+namespace Oro\Bundle\CalendarBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 
-class UpdateAclRoles extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
     /**
      * @var ContainerInterface
      */
     protected $container;
+
+    /**
+     * @var ObjectManager
+     */
+    protected $objectManager;
 
     /**
      * {@inheritdoc}
@@ -25,12 +30,22 @@ class UpdateAclRoles extends AbstractFixture implements OrderedFixtureInterface,
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return ['Oro\Bundle\SecurityBundle\DataFixtures\Migrations\ORM\v1_0\LoadAclRoles'];
+    }
+
+    /**
      * Load ACL for security roles
      *
      * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {
+        $this->objectManager = $manager;
+
         /** @var AclManager $manager */
         $manager = $this->container->get('oro_security.acl.manager');
 
@@ -43,7 +58,7 @@ class UpdateAclRoles extends AbstractFixture implements OrderedFixtureInterface,
 
     protected function updateUserRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getReference('user_role'));
+        $sid = $manager->getSid($this->getRole('ROLE_USER'));
 
         // deny to view other user's calendar
         $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarConnection');
@@ -67,7 +82,7 @@ class UpdateAclRoles extends AbstractFixture implements OrderedFixtureInterface,
 
     protected function updateManagerRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getReference('manager_role'));
+        $sid = $manager->getSid($this->getRole('ROLE_MANAGER'));
 
         // grant to view other user's calendar for the same business unit
         $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarConnection');
@@ -93,10 +108,11 @@ class UpdateAclRoles extends AbstractFixture implements OrderedFixtureInterface,
     }
 
     /**
-     * {@inheritDoc}
+     * @param string $roleName
+     * @return Role
      */
-    public function getOrder()
+    protected function getRole($roleName)
     {
-        return 26;
+        return $this->objectManager->getRepository('OroUserBundle:Role')->findOneBy(['role' => $roleName]);
     }
 }

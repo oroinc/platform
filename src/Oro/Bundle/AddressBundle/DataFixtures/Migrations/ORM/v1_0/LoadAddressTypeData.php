@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\DataFixtures\ORM;
+namespace Oro\Bundle\AddressBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Doctrine\Common\Persistence\ObjectManager;
 

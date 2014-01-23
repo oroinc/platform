@@ -39,3 +39,4 @@ services:
         arguments:
             - @doctrine.orm.entity_manager
             - @kernel
+            - @service_container

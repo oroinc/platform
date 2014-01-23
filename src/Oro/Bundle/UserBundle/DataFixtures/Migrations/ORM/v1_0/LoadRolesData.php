@@ -1,15 +1,23 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\DataFixtures\ORM;
+namespace Oro\Bundle\UserBundle\DataFixtures\Migrations\ORM\v1_0;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 
-class LoadRolesData extends AbstractFixture implements OrderedFixtureInterface
+class LoadRolesData extends AbstractFixture implements DependentFixtureInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return ['Oro\Bundle\OrganizationBundle\DataFixtures\Migrations\ORM\v1_0\LoadBusinessUnitData'];
+    }
+
     /**
      * Load roles
      *
@@ -33,7 +41,9 @@ class LoadRolesData extends AbstractFixture implements OrderedFixtureInterface
         $roleManager->setLabel('Manager');
         $this->addReference('manager_role', $roleManager);
         if ($this->hasReference('default_business_unit')) {
-            $defaultBusinessUnit = $this->getReference('default_business_unit');
+            $defaultBusinessUnit = $manager
+                ->getRepository('OroOrganizationBundle:BusinessUnit')
+                ->findOneBy(['name' => 'Main']);
             if ($defaultBusinessUnit) {
                 $roleAnonymous->setOwner($defaultBusinessUnit);
                 $roleUser->setOwner($defaultBusinessUnit);
@@ -47,10 +57,5 @@ class LoadRolesData extends AbstractFixture implements OrderedFixtureInterface
         $manager->persist($roleManager);
 
         $manager->flush();
-    }
-
-    public function getOrder()
-    {
-        return 20;
     }
 }
