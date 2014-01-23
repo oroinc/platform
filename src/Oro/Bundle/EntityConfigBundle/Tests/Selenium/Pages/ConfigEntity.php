@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages;
 
-use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
+use \Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\CustomEntity;
 
 /**
  * Class ConfigEntity
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
  */
-class ConfigEntity extends AbstractPageEntity
+class ConfigEntity extends CustomEntity
 {
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $name;
@@ -134,7 +134,6 @@ class ConfigEntity extends AbstractPageEntity
         $this->test->byXpath("//div[@class='pull-right title-buttons-container']/a[contains(., 'Create')]")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
-
         return $this;
     }
 
