@@ -300,11 +300,11 @@ class Workflow
     public function createWorkflowItem($entity, array $data = array())
     {
         $entityAttributeName = $this->attributeManager->getEntityAttribute()->getName();
-        $data[$entityAttributeName] = $entity;
 
         $workflowItem = new WorkflowItem();
         $workflowItem->setWorkflowName($this->getName());
         $workflowItem->getData()
+            ->set($entityAttributeName, $entity)
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
 
