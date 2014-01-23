@@ -22,7 +22,7 @@ class EmbeddedFormType extends AbstractType
     {
         $builder
             ->add('title', 'text')
-            ->add('formType')
+            ->add('formType', 'text')
             ->add('channel', 'entity', [
                 'class' => 'OroIntegrationBundle:Channel',
                 'property' => 'name'

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ContactBundle\Entity\Repository;
+namespace Oro\Bundle\EmbeddedFormBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 

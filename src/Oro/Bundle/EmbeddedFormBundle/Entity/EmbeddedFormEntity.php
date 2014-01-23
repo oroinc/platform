@@ -66,15 +66,15 @@ class EmbeddedFormEntity
     }
 
     /**
-     * @param \Oro\Bundle\IntegrationBundle\Entity\Channel $channel
+     * @param Channel $channel
      */
-    public function setChannel($channel)
+    public function setChannel(Channel $channel)
     {
         $this->channel = $channel;
     }
 
     /**
-     * @return \Oro\Bundle\IntegrationBundle\Entity\Channel
+     * @return Channel
      */
     public function getChannel()
     {
