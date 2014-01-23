@@ -1,6 +1,7 @@
 <div class="widget-content">
-    {% if steps|length > 0 %}
-        <ul class="workflow-step-list nav">
+    {% set stepsCount = steps|length %}
+    {% if stepsCount > 0 %}
+        <ul class="workflow-step-list nav {% if stepsCount == 1 %}single-step{% endif %}">
             {% set isProcessed = true %}
             {% for step in steps %}
                 {% set isCurrent = currentStep and step.name == currentStep.name %}

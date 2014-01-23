@@ -6,29 +6,37 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
 
 class StepAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $formOptionsAssembler;
-
-    /**
      * @var StepAssembler
      */
     protected $assembler;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $container;
+
     protected function setUp()
     {
-        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler')
-            ->disableOriginalConstructor()
-            ->setMethods(array('assemble'))
+        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
             ->getMock();
 
-        $this->assembler = new StepAssembler($this->formOptionsAssembler);
+        $this->assembler = new StepAssembler($this->container);
+    }
+
+    protected function getWorkflowDefinitionMock()
+    {
+        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $definition->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('test_workflow'));
+        return $definition;
     }
 
     /**
@@ -38,7 +46,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssembleRequiredOptionException($configuration)
     {
-        $this->assembler->assemble($configuration, null);
+        $this->assembler->assemble($this->getWorkflowDefinitionMock(), $configuration, null);
     }
 
     public function invalidOptionsDataProvider()
@@ -59,11 +67,52 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function assertEntityStepCalls()
+    {
+        $stepEntity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stepEntity->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('entity_step'));
+        $stepEntities = array($stepEntity);
+
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository->expects($this->once())
+            ->method('findBy')
+            ->will($this->returnValue($stepEntities));
+
+        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $uow->expects($this->once())
+            ->method('isInIdentityMap')
+            ->will($this->returnValue(true));
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with('OroWorkflowBundle:WorkflowStep')
+            ->will($this->returnValue($repository));
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('doctrine.orm.default_entity_manager')
+            ->will($this->returnValue($em));
+    }
+
     /**
      * @dataProvider configurationDataProvider
      */
     public function testAssemble($configuration, $attributes, Step $expectedStep)
     {
+        $this->assertEntityStepCalls();
         $configurationPass = $this->getMockBuilder(
             'Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface'
         )->getMockForAbstractClass();
@@ -89,16 +138,12 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assembler->addConfigurationPass($configurationPass);
 
         $expectedAttributes = array();
+        /** @var Attribute $attribute */
         foreach ($attributes ? $attributes : array() as $attribute) {
             $expectedAttributes[$attribute->getName()] = $attribute;
         }
 
-        $this->formOptionsAssembler->expects($this->once())
-            ->method('assemble')
-            ->with($this->isType('array'), $expectedAttributes, 'step', $expectedStep->getName())
-            ->will($this->returnArgument(0));
-
-        $steps = $this->assembler->assemble($configuration, $attributes);
+        $steps = $this->assembler->assemble($this->getWorkflowDefinitionMock(), $configuration, $attributes);
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $steps);
         $this->assertCount(1, $steps);
         $this->assertTrue($steps->containsKey($expectedStep->getName()));
@@ -152,93 +197,6 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                     ->setAllowedTransitions(array('transition_one'))
             ),
         );
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException
-     * @expectedExceptionMessage Unknown attribute "unknown_attribute" at step "step_one"
-     */
-    public function testUnknownAttributeInViewAttributesException()
-    {
-        $this->formOptionsAssembler->expects($this->once())
-            ->method('assemble')
-            ->will($this->returnValue(array()));
-
-        $configuration = array(
-            'step_one' => array(
-                'label' => 'label',
-                'view_attributes' => array(
-                    array('attribute' => 'unknown_attribute')
-                )
-            )
-        );
-
-        $attributes = array($this->createAttribute('attribute_one'));
-        $this->assembler->assemble($configuration, $attributes);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "view_attributes" at step "step_one" must be an array
-     */
-    public function testInvalidViewAttributesOptionException()
-    {
-        $this->formOptionsAssembler->expects($this->once())
-            ->method('assemble')
-            ->will($this->returnValue(array()));
-
-        $configuration = array(
-            'step_one' => array(
-                'label' => 'label',
-                'view_attributes' => 'string'
-            )
-        );
-        $attributes = array($this->createAttribute('attribute_one'));
-        $this->assembler->assemble($configuration, $attributes);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "path" or "attribute" at view attribute "0" of step "step_one" is required
-     */
-    public function testViewAttributeRequiredOptionsException()
-    {
-        $this->formOptionsAssembler->expects($this->once())
-            ->method('assemble')
-            ->will($this->returnValue(array()));
-
-        $configuration = array(
-            'step_one' => array(
-                'label' => 'label',
-                'view_attributes' => array(
-                    array('label' => 'Label')
-                )
-            )
-        );
-        $attributes = array($this->createAttribute('attribute_one'));
-        $this->assembler->assemble($configuration, $attributes);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @expectedExceptionMessage Option "label" at view attribute "0" of step "step_one" is required
-     */
-    public function testViewAttributeRequiredLabelException()
-    {
-        $this->formOptionsAssembler->expects($this->once())
-            ->method('assemble')
-            ->will($this->returnValue(array()));
-
-        $configuration = array(
-            'step_one' => array(
-                'label' => 'label',
-                'view_attributes' => array(
-                    array('path' => '$path')
-                )
-            )
-        );
-        $attributes = array($this->createAttribute('attribute_one'));
-        $this->assembler->assemble($configuration, $attributes);
     }
 
     /**
