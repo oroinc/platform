@@ -26,4 +26,18 @@ class WorkflowStepRepository extends EntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @param string $entityClass
+     * @return WorkflowStep[]
+     */
+    public function findByRelatedEntityByName($entityClass)
+    {
+        $workflowStepsByName = array();
+        foreach ($this->findByRelatedEntity($entityClass) as $workflowStep) {
+            $workflowStepsByName[$workflowStep->getName()] = $workflowStep;
+        }
+
+        return $workflowStepsByName;
+    }
 }
