@@ -232,7 +232,8 @@ class ConfigManager
     /**
      * @param string $scope
      * @param string $className
-     * @param bool   $withHidden
+     * @param bool   $withHidden Set true if you need all configurable entities,
+     *                           including entities marked as mode="hidden"
      * @return array
      */
     public function getIds($scope, $className = null, $withHidden = false)
