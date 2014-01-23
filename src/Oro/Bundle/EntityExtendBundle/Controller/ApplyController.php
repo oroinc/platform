@@ -64,9 +64,27 @@ class ApplyController extends Controller
             $this->get('oro_platform.maintenance')
         );
 
+        $exitCode = 0;
         foreach ($commands as $command) {
             /** @var $command Process */
-            $command->run();
+            $code = $command->run();
+            if ($code !== 0) {
+                $exitCode = $code;
+            }
+        }
+
+        $flashBag = $this->get('session')->getFlashBag();
+        if ($exitCode === 0) {
+            $flashBag->add(
+                'success',
+                $this->get('translator')->trans('Schema updated')
+            );
+        } else {
+            $flashBag->add(
+                'error',
+                $this->get('translator')->trans('Sorry, page was not loaded correctly')
+
+            );
         }
 
         /**
