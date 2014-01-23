@@ -193,7 +193,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
                 if (!app.isMobile()) {
-                    content.css('overflow', 'auto');
+                    content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
                 } else {
                     content.css('overflow', 'hidden');
                     content.last().css('overflow-y', 'auto');

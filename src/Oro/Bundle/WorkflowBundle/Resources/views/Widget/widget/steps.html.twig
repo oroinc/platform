@@ -1,27 +1,5 @@
 <div class="widget-content">
     {% if steps|length > 0 %}
-        <style type="text/css">
-            .workflow-step-list {
-                list-style: none outside none;
-            }
-
-            .workflow-step-list li {
-                display: inline-block;
-                color: #a2a2a2;
-                border-bottom: 1px solid #a2a2a2;
-                padding: 0 5px;
-            }
-
-            li.processed {
-                color: #000000;
-                border-bottom-color: #000000;
-            }
-
-            li.current {
-                color: #2F8206;
-                border-bottom-color: #2F8206;
-            }
-        </style>
         <ul class="workflow-step-list nav">
             {% set isProcessed = true %}
             {% for step in steps %}

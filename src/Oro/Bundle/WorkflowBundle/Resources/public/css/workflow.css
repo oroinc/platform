@@ -1,0 +1,69 @@
+.workflow-step-list {
+    list-style: none outside none;
+}
+
+.workflow-step-list li:before{
+    background: url("../images/workflow-sprite.png") no-repeat 50% -8px;
+    width:100%;
+    height: 4px;
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+.workflow-step-list li:first-child:before{
+    background-position: 50% 0;
+}
+.workflow-step-list li:last-child:before{
+    background-position: 50% -4px;
+}
+.workflow-step-list li {
+    display: inline-block;
+    color: #a2a2a2;
+    padding: 0 14px 5px;
+    margin: 0 -4px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    font-size: 11px;
+}
+
+li.processed {
+    color: #62626f;
+}
+li.processed:before {
+    background-position: 50% -20px;
+}
+li.processed:first-child:before {
+    background-position: 50% -12px;
+}
+li.processed:last-child:before {
+    background-position: 50% -16px;
+}
+li.current {
+    color: #68b93c;
+}
+li.current:before{
+    background-position: 50% -24px;
+}
+.workflow-step-list li.current:last-child:before{
+    background-position: 50% -28px;
+}
+.workflow-step-list li.current:first-child:before{
+    background-position: 50% -32px;
+}
+.workflow-steps-container{
+    text-align: center;
+    position: relative;
+}
+.workflow-steps-container .widget-content{
+    position: absolute;
+    top: -25px;
+    left: 25%;
+    margin: 0;
+    width: 50%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
