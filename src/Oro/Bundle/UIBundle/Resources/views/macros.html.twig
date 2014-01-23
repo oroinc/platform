@@ -178,11 +178,12 @@
             'title' - button title | 'Delete' by default
             'label' - button label | 'Delete' by default
             'entity_label' - if specified will be added for title, label and messages| 'item' by default
+            'disabled' - if true this control is rendered as disabled
         ]
 #}
 {% macro deleteButton(parameters) %}
     <div class="pull-left btn-group icons-holder">
-        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined ? parameters.aCss : '' }}{{ parameters.disabled is defined and parameters.disabled ? ' disabled' : ''}}"
             {% if (parameters.id is defined) %}
                 id="{{ parameters.id }}"
             {% endif %}
