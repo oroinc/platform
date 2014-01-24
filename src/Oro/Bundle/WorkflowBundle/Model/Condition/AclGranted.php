@@ -66,9 +66,15 @@ class AclGranted extends AbstractCondition
         }
 
         $this->attributes = array_shift($options);
+        if (!$this->attributes) {
+            throw new ConditionException('ACL attributes can not be empty');
+        }
 
         if ($options) {
             $this->object = array_shift($options);
+            if (!$this->object) {
+                throw new ConditionException('ACL object can not be empty');
+            }
         }
 
         return $this;
