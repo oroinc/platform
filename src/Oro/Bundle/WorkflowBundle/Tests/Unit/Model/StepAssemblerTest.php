@@ -60,7 +60,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
             'no label' => array(
                 array(
                     'name' => array(
-                        'template' => 'test'
+                        'isFinal' => false
                     )
                 )
             )
@@ -164,20 +164,9 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                 array(
                     'step_two' => array(
                         'label' => 'label',
-                        'template' => 'template',
                         'order' => 10,
                         'is_final' => true,
                         'allowed_transitions' => array('transition_one'),
-                        'form_type' => 'custom_workflow_step',
-                        'form_options' => array(
-                            'attribute_fields' => array(
-                                'attribute_one' => array('form_type' => 'text')
-                            )
-                        ),
-                        'view_attributes' => array(
-                            array('attribute' => 'attribute_one'),
-                            array('path' => '$attribute_one.foo', 'label' => 'Custom Label'),
-                        )
                     )
                 ),
                 array(
