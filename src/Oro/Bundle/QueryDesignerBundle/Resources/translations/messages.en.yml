@@ -32,6 +32,7 @@ oro:
             condition:          Condition
         condition_builder:
             criteria:
+                drag_hint: click and drag
                 conditions_field: Compare Fields
                 conditions_group: Conditions Group
 

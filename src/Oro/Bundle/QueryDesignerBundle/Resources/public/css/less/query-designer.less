@@ -88,8 +88,11 @@
 
 .filter-criteria {
   padding: 0 @contentPadding * .5 @contentPadding * .5;
-  background-color: #eff2f5;
-  border: 1px solid #c9c9c9;
+  .hint {
+    text-transform: uppercase;
+    margin: 10px 0 2px;
+    font-size: @fontSizeMini;
+  }
   .criteria-list {
     list-style: none;
     margin: 0;
@@ -116,6 +119,7 @@
     }
   }
 }
+
 .condition-field {
   .select2-container,
   .select2-choice,
@@ -174,6 +178,23 @@
     }
     .caret {
       display: none;
+    }
+  }
+}
+
+.left-panel-container{
+  background-color: #eff2f5;
+  border: 1px solid #c9c9c9;
+  margin-bottom: @bottomPadding;
+  & > .panel-placeholder {
+    background-color: white;
+    margin-left: 23.4%;
+    border-left: 1px solid #c9c9c9;
+    & > * {
+      margin-left: -30.55%;
+      .condition-builder {
+        padding: 15px 15px 15px 0;
+      }
     }
   }
 }
