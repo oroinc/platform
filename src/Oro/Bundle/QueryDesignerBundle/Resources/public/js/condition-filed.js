@@ -157,15 +157,21 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
         },
 
         _onUpdate: function () {
-            var value = {
-                columnName: this.element.find('input.select').select2('val'),
-                criterion: {
-                    filter: this.filter.type,
-                    data: this.filter.getValue()
-                }
-            };
-            this.element.data('value', value);
+            var value;
 
+            if (!this.filter.isEmptyValue()) {
+                value = {
+                    columnName: this.element.find('input.select').select2('val'),
+                    criterion: {
+                        filter: this.filter.type,
+                        data: this.filter.getValue()
+                    }
+                };
+            } else {
+                value = {};
+            }
+
+            this.element.data('value', value);
             this.element.trigger('changed');
         }
     });
