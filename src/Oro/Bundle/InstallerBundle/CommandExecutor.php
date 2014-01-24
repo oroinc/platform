@@ -28,7 +28,7 @@ class CommandExecutor
     /**
      * @var int
      */
-    protected $lastCommandExitCode = 0;
+    protected $lastCommandExitCode;
 
     /**
      * Constructor
