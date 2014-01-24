@@ -10,37 +10,36 @@
         <div class="span3 filter-criteria">
             <h4>Filter Criteria</h4>
             <ul class="criteria-list" id="filter-criteria-list">
-                <li class="option" data-criteria="compare-fields"
+                <li class="option" data-criteria="condition-filed"
                     data-select2="{{ select2Options|json_encode }}"
                     data-util="{{ util2Options|json_encode }}"
                     data-filter-metadata-selector="#{{ params.filters_metadata_holder_id }}">
-                    Compare Fields
+                    {{ 'oro.query_designer.condition_builder.criteria.conditions_field'|trans }}
                 </li>
-                <li class="option" data-criteria="conditions-group">
-                    Conditions Group
+                <li class="option" data-criteria="condition-group">
+                    {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
                 </li>
             </ul>
         </div>
         <div class="span9" id="{{ params.id }}"></div>
     </div>
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oroquerydesigner/js/conditions-group'], function ($, _) {
-            var $compareFieldsCriteria = $('#filter-criteria-list').find('[data-criteria=compare-fields]'),
-                $conditionsBuilder = $('#{{ params.id }}');
+        require(['jquery', 'underscore', 'oroquerydesigner/js/condition-builder'], function ($, _) {
+            var $conditionFieldCriteria = $('#filter-criteria-list').find('[data-criteria=condition-filed]'),
+                $conditions = $('#{{ params.id }}');
 
             $('#{{ params.entity_choice_id }}')
                 .on('fieldsloaderupdate', function (e, fields) {
-                    $conditionsBuilder.conditionsGroup('setValue', []);
-                    $compareFieldsCriteria
+                    $conditions.conditionBuilder('setValue', []);
+                    $conditionFieldCriteria
                         .data('fields', fields)
                         .data('entity', $(e.target).val())
                         .toggleClass('disabled', _.isEmpty(fields));
                 });
 
-            $conditionsBuilder
-                .conditionsGroup({
-                    criteriaListSelector: '#filter-criteria-list'
-                });
+            $conditions.conditionBuilder({
+                criteriaListSelector: '#filter-criteria-list'
+            });
         });
     </script>
 {% endmacro %}

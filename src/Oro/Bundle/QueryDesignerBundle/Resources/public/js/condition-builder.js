@@ -1,21 +1,21 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './compare-field'], function ($, _) {
+define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './condition-filed'], function ($, _) {
     'use strict';
 
     /**
      * Conditions group widget
      */
-    $.widget('oroquerydesigner.conditionsGroup', {
+    $.widget('oroquerydesigner.conditionBuilder', {
         options: {
             sortable: {
                 // see jquery-ui sortable's options
                 containment: '#container',
                 placeholder: 'sortable-placeholder',
                 items: '>[data-criteria]',
-                connectWith: 'ul.conditions-group'
+                connectWith: 'ul.condition-group'
             },
-            conditionsGroup: {
+            conditionGroup: {
                 items: '>.condition[data-criteria]',
                 cursorAt: "10 10",
                 cancel: 'a, input, .btn, select'
@@ -29,11 +29,11 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             sourceValueSelector: '',
             helperClass: 'ui-grabbing',
             conditionHTML: '<li class="condition controls" />',
-            compareFieldsHTML: '<div class="field-filter" />',
-            conditionsGroupHTML: '<ul class="conditions-group" />',
+            conditionFieldHTML: '<div class="condition-field" />',
+            conditionGroupHTML: '<ul class="condition-group" />',
             validation: {
-                'compare-fields': {NotBlank: {message: 'This condition should not be blank.'}},
-                'conditions-group': {NotBlank: {message: 'This group should not be blank.'}}
+                'condition-filed': {NotBlank: {message: 'This condition should not be blank.'}},
+                'condition-group': {NotBlank: {message: 'This group should not be blank.'}}
             }
         },
 
@@ -51,10 +51,10 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
 
         _prepareOptions: function () {
             var opts = this.options;
-            opts.conditionsGroup = $.extend({}, opts.sortable, opts.conditionsGroup);
-            opts.conditionsGroup.appendTo = opts.criteriaListSelector;
-            opts.conditionsGroup.helper = $.proxy(this._createHelper, this);
-            opts.conditionsGroup.update = $.proxy(this._onUpdate, this);
+            opts.conditionGroup = $.extend({}, opts.sortable, opts.conditionGroup);
+            opts.conditionGroup.appendTo = opts.criteriaListSelector;
+            opts.conditionGroup.helper = $.proxy(this._createHelper, this);
+            opts.conditionGroup.update = $.proxy(this._onUpdate, this);
             opts.criteriaList = $.extend({}, opts.sortable, opts.criteriaList);
             opts.criteriaList.start = $.proxy(this._onCriteriaGrab, this);
             opts.criteriaList.stop = $.proxy(this._onCriteriaDrop, this);
@@ -81,20 +81,20 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             if (!$root.is(sortableConnectWith)) {
                 $root = $root.find(sortableConnectWith);
                 if (!$root.length) {
-                    $root = $(this.options.conditionsGroupHTML).appendTo(this.element);
+                    $root = $(this.options.conditionGroupHTML).appendTo(this.element);
                 }
             }
 
             $content = this._createConditionContent($root, this._getSourceValue());
-            this._initConditionsGroup($content);
+            this._initconditionGroup($content);
             $root.on('changed', $.proxy(this._onChanged, this));
 
             this.$rootCondition = $root;
         },
 
-        _initConditionsGroup: function ($group) {
+        _initconditionGroup: function ($group) {
             // make the group sortable
-            $group.sortable(this.options.conditionsGroup);
+            $group.sortable(this.options.conditionGroup);
             // on change update group's value
             $group.on('changed', function () {
                 var values = [];
@@ -136,19 +136,19 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             var $content, $condition, $criteria, options, rule;
             if (!criteria) {
                 // if criteria is not passed, define it from value
-                criteria = $.isArray(value) ? 'conditions-group' : 'compare-fields';
+                criteria = $.isArray(value) ? 'condition-group' : 'condition-filed';
             }
             $criteria = this._getCriteriaOrigin(criteria);
             options = _.omit($criteria.data(), ['clone', 'sortableItem', 'criteria']);
 
             switch (criteria) {
-            case 'compare-fields':
-                $content = this._createConditionContent(this.options.compareFieldsHTML, value || {});
-                $content.compareField(options);
+            case 'condition-filed':
+                $content = this._createConditionContent(this.options.conditionFieldHTML, value || {});
+                $content.conditionFiled(options);
                 break;
-            case 'conditions-group':
-                $content = this._createConditionContent(this.options.conditionsGroupHTML, value || []);
-                this._initConditionsGroup($content);
+            case 'condition-group':
+                $content = this._createConditionContent(this.options.conditionGroupHTML, value || []);
+                this._initconditionGroup($content);
                 break;
             }
 
@@ -217,7 +217,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
 
         _updateOperators: function () {
             var self = this,
-                options = this.options.conditionsGroup,
+                options = this.options.conditionGroup,
                 $conditions = this.element.find(options.connectWith + options.items);
             // remove operators for first items in groups
             $conditions.filter(':first-child')

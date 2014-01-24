@@ -5,7 +5,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
     ], function ($, _, __, mapFilterModuleName, util, EntityFieldUtil, EntityFieldView) {
     'use strict';
 
-    $.widget('oroquerydesigner.compareField', {
+    $.widget('oroquerydesigner.conditionFiled', {
         options: {
             util: {}
         },
@@ -29,7 +29,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
     /**
      * Compare field widget
      */
-    $.widget('oroquerydesigner.compareField', $.oroquerydesigner.compareField, {
+    $.widget('oroquerydesigner.conditionFiled', $.oroquerydesigner.conditionFiled, {
         options: {
             fields: [],
             filterMetadataSelector: '',

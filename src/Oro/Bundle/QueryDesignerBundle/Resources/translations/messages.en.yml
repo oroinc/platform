@@ -7,10 +7,6 @@ oro:
                 function:       Function
                 sorting:        Sorting
                 actions:        Actions
-            filter:
-                index:          "#"
-                filter:         Filter
-                actions:        Actions
             action:
                 move_column:    Move column
                 update_column:  Update column
@@ -34,3 +30,8 @@ oro:
             sorting_asc:        Asc
             sorting_desc:       Desc
             condition:          Condition
+        condition_builder:
+            criteria:
+                conditions_field: Compare Fields
+                conditions_group: Conditions Group
+

@@ -43,12 +43,12 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
 
             // initialize views
             this.initColumnsView();
-            this.$conditionBuilder = $(this.options.conditionBuilderSelector);
+            this.$conditions = $(this.options.conditionBuilderSelector);
         },
 
         isEmpty: function () {
             return this.columnsView.getCollection().isEmpty() &&
-                _.isEmpty(this.$conditionBuilder.conditionsGroup('getValue'));
+                _.isEmpty(this.$conditions.conditionBuilder('getValue'));
         },
 
         changeEntity: function (entityName, columns) {
@@ -65,7 +65,7 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
                 _.each(columns, function (value) {
                     delete value.id;
                 });
-                var filters = this.$conditionBuilder.conditionsGroup('getValue');
+                var filters = this.$conditions.conditionBuilder('getValue');
                 var groupingColumns = [];
                 _.each(this.columnsView.getGroupingColumns(), function (name) {
                     groupingColumns.push({
@@ -100,9 +100,9 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
             }
             this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
             this.listenTo(this.columnsView, 'grouping:change', _.bind(this.updateStorage, this));
-            this.$conditionBuilder.on('changed', _.bind(this.updateStorage, this));
+            this.$conditions.on('changed', _.bind(this.updateStorage, this));
             if (!_.isEmpty(data.filters)) {
-                this.$conditionBuilder.conditionsGroup('setValue', data.filters);
+                this.$conditions.conditionBuilder('setValue', data.filters);
             }
 
             return this;

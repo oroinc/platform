@@ -1,6 +1,6 @@
 @import "../../../oroui/css/less/mixins";
 
-.conditions-group {
+.condition-group {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -39,7 +39,7 @@
         }
       }
     }
-    .field-filter {
+    .condition-field {
       border: 1px solid #e1e1e1;
       .border-radius(4px);
       padding: @horizontalPadding * .5 @verticalPadding * .8;
@@ -48,14 +48,14 @@
         margin-bottom: 0;
       }
     }
-    & > .conditions-group {
+    & > .condition-group {
       border-left: 3px solid #efefef;
       padding-left: @verticalPadding * .8;
     }
     & > .close {
       margin-right: 3px;
     }
-    &[data-criteria=conditions-group] {
+    &[data-criteria=condition-group] {
       & > .close {
         background-color: white;
         color: #ccc;
@@ -116,7 +116,7 @@
     }
   }
 }
-.field-filter {
+.condition-field {
   .select2-container,
   .select2-choice,
   .select2-chosen {
