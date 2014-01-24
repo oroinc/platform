@@ -123,7 +123,7 @@
 
     {{ QD.query_designer_column_chain_template('report-column-chain-template') }}
 
-    {% set entityFieldsRoutParams = {
+    {% set entityFieldsRouteParams = {
         'with-relations': 1,
         'with-entity-details': 1,
         'deep-level': 2
@@ -164,7 +164,7 @@
                 $entityChoice
                     .fieldsLoader({
                         router: 'oro_api_get_entity_fields',
-                        routingParams: {{ entityFieldsRoutParams|json_encode|raw }},
+                        routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
                         confirm: confirm,
                         requireConfirm: function () {
                             return !designer.isEmpty();
@@ -179,7 +179,7 @@
                 {% if not form.entity.vars.value is empty %}
                 {% set fieldsData = render(path('oro_api_get_entity_fields', {
                         'entityName': form.entity.vars.value|replace({'\\': '_'})
-                    }|merge(entityFieldsRoutParams))) %};
+                    }|merge(entityFieldsRouteParams))) %};
                 $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
                 {% endif %}
 
