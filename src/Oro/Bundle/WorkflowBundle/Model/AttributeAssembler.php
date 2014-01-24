@@ -17,24 +17,21 @@ class AttributeAssembler extends AbstractAssembler
      */
     public function assemble(WorkflowDefinition $definition, array $configuration)
     {
-        $attributes = new ArrayCollection();
-        foreach ($configuration as $name => $options) {
-            $attribute = $this->assembleAttribute($name, $options);
-            $attributes->set($name, $attribute);
-        }
-
-        // add entity attribute
         $entityAttributeName = $definition->getEntityAttributeName();
-        if (!$attributes->containsKey($entityAttributeName)) {
-            $options = array(
+        if (!array_key_exists($entityAttributeName, $configuration)) {
+            $configuration[$entityAttributeName] = array(
                 'label' => $entityAttributeName,
                 'type' => 'entity',
                 'options' => array(
                     'class' => $definition->getRelatedEntity(),
                 ),
             );
-            $attribute = $this->assembleAttribute($entityAttributeName, $options);
-            $attributes->set($entityAttributeName, $attribute);
+        }
+
+        $attributes = new ArrayCollection();
+        foreach ($configuration as $name => $options) {
+            $attribute = $this->assembleAttribute($name, $options);
+            $attributes->set($name, $attribute);
         }
 
         return $attributes;
