@@ -613,6 +613,10 @@ class ConfigManager
                 $defaultValues = $metadata->defaultValues[$scope];
             }
             // combine them with default values from config file
+            $defaultValues = array_merge(
+                $provider->getPropertyConfig()->getDefaultValues(),
+                $defaultValues
+            );
 
             $translatable = $provider->getPropertyConfig()
                 ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
