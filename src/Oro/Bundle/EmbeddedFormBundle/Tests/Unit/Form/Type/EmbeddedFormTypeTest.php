@@ -28,7 +28,7 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('formType', 'text')
+            ->with('formType', 'oro_available_embedded_forms')
             ->will($this->returnSelf());
         $builder->expects($this->at(2))
             ->method('add')
