@@ -67,7 +67,6 @@ class UpdateCommand extends InitCommand
         $this->info = $output->getVerbosity() > 1 ? true : false;
         $force      = $input->getOption('force');
         $filter     = $input->getOption('filter');
-        $commands   = [];
 
         $output->writeln($this->getDescription());
 
