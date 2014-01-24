@@ -67,6 +67,7 @@ class UpdateCommand extends InitCommand
         $this->info = $output->getVerbosity() > 1 ? true : false;
         $force      = $input->getOption('force');
         $filter     = $input->getOption('filter');
+        $commands   = [];
 
         $output->writeln($this->getDescription());
 
@@ -175,9 +176,8 @@ class UpdateCommand extends InitCommand
             $this->checkExtend($className);
         }
 
-        $this->needDbUpdate = true;
-
         if (!$this->configManager->hasConfig($className)) {
+            $this->needDbUpdate = true;
             /**
              * create NEW entity model
              */
@@ -231,6 +231,8 @@ class UpdateCommand extends InitCommand
                     $config = $configProvider->getConfig($className, $fieldName);
                     $config->set('state', ExtendManager::STATE_NEW);
                     $config->set('is_extend', $isExtend);
+
+                    $this->needDbUpdate = true;
                 } elseif ($force) {
                     /**
                      * update EXISTING entity field model on --force
