@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Oro\Bundle\InstallerBundle\CommandExecutor;
-use Oro\Bundle\InstallerBundle\ScriptManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\ScriptExecutor;
+use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -268,7 +270,7 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:search:create-index')
+            ->runCommand(AddFulltextIndexesCommand::COMMAND_NAME)
             ->runCommand('oro:navigation:init')
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
