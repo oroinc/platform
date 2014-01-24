@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 class EmbedFormController extends Controller
 {
     /**
-     * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="\d+"})
+     * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="[-\d\w]+"})
      * @Template
      */
     public function formAction(EmbeddedFormEntity $formEntity, Request $request)
@@ -41,7 +41,7 @@ class EmbedFormController extends Controller
     }
 
     /**
-     * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="\d+"})
+     * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
      * @Template
      */
     public function formSuccessAction($id)

@@ -43,7 +43,7 @@ datagrid:
                 rowAction: true
             delete:
                 type: delete
-                label: Update
+                label: Delete
                 icon: trash
                 link: delete_link
             code:
