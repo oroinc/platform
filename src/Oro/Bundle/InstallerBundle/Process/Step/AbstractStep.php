@@ -5,7 +5,6 @@ namespace Oro\Bundle\InstallerBundle\Process\Step;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\StreamOutput;
 
 use Sylius\Bundle\FlowBundle\Process\Step\ControllerStep;
@@ -30,10 +29,10 @@ abstract class AbstractStep extends ControllerStep
      */
     protected function handleAjaxAction($command, $params = array())
     {
-        $this->runCommand($command, $params);
+        $exitCode = $this->runCommand($command, $params);
 
         return $this->getRequest()->isXmlHttpRequest()
-            ? new JsonResponse(array('result' => true))
+            ? new JsonResponse(array('result' => true, 'exitCode' => $exitCode))
             : $this->redirect(
                 $this->generateUrl(
                     'sylius_flow_display',
@@ -48,16 +47,16 @@ abstract class AbstractStep extends ControllerStep
     /**
      * Execute Symfony2 command
      *
-     * @param  string            $command Command name (for example, "cache:clear")
-     * @param  array             $params  [optional] Additional command parameters, like "--force" etc
-     * @return AbstractStep
+     * @param  string $command Command name (for example, "cache:clear")
+     * @param  array  $params  [optional] Additional command parameters, like "--force" etc
+     * @return int an executed command exit code
      * @throws \Exception
      * @throws \RuntimeException
      */
     protected function runCommand($command, $params = array())
     {
-        $application = $this->getApplication();
-        $output = $this->getOutput();
+        $application     = $this->getApplication();
+        $output          = $this->getOutput();
         $commandExecutor = new CommandExecutor(
             $application->getKernel()->getEnvironment(),
             $output,
@@ -67,14 +66,15 @@ abstract class AbstractStep extends ControllerStep
         $output->writeln('');
         $output->writeln(sprintf('[%s] Launching "%s" command', date('Y-m-d H:i:s'), $command));
 
-        $mem  = (int) memory_get_usage() / (1024 * 1024);
+        $mem  = (int)memory_get_usage() / (1024 * 1024);
         $time = time();
 
-        $failEx = null;
+        $result = null;
         try {
             $commandExecutor->runCommand($command, $params);
+            $result = $commandExecutor->getLastCommandExitCode();
         } catch (\RuntimeException $ex) {
-            $failEx = $ex;
+            $result = $ex;
         }
 
         $output->writeln('');
@@ -83,17 +83,17 @@ abstract class AbstractStep extends ControllerStep
                 'Command "%s" executed in %u second(s), memory usage: %.2fMb',
                 $command,
                 time() - $time,
-                (int) memory_get_usage() / (1024 * 1024) - $mem
+                (int)memory_get_usage() / (1024 * 1024) - $mem
             )
         );
         $output->writeln('');
 
         // check for any error
-        if ($failEx) {
-            throw $failEx;
+        if ($result instanceof \RuntimeException) {
+            throw $result;
         }
 
-        return $this;
+        return $result;
     }
 
     /**

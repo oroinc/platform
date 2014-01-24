@@ -35,7 +35,7 @@ class InstallationStep extends AbstractStep
             case 'translation':
                 return $this->handleAjaxAction('oro:translation:dump');
             case 'requirejs':
-                return $this->handleAjaxAction('oro:requirejs:build');
+                return $this->handleAjaxAction('oro:requirejs:build', array('--ignore-errors' => true));
             case 'finish':
                 $this->get('event_dispatcher')->dispatch(InstallerEvents::FINISH);
                 // everything was fine - update installed flag in parameters.yml
