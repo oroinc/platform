@@ -1,7 +1,5 @@
 {% extends 'OroEmbeddedFormBundle::base.html.twig' %}
 
 {% block page %}
-    <h3>Form submitted successfully!</h3>
-
-    <a href="{{ path('oro_embedded_form_submit', {'id': id}) }}">Back</a>
+    {{ entity.successMessage|default('Form has been submitted'|trans)|raw }}
 {% endblock %}

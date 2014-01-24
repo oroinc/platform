@@ -58,6 +58,13 @@ class EmbeddedForm
     protected $formType;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="success_message", type="string", length=255)
+     */
+    protected $successMessage;
+
+    /**
      * @return int
      */
     public function getId()
@@ -128,5 +135,22 @@ class EmbeddedForm
     {
         return $this->title;
     }
+
+    /**
+     * @param string $successMessage
+     */
+    public function setSuccessMessage($successMessage)
+    {
+        $this->successMessage = $successMessage;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSuccessMessage()
+    {
+        return $this->successMessage;
+    }
+
 
 }

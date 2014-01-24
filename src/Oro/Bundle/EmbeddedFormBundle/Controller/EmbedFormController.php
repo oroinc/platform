@@ -44,10 +44,10 @@ class EmbedFormController extends Controller
      * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
      * @Template
      */
-    public function formSuccessAction($id)
+    public function formSuccessAction(EmbeddedForm $formEntity)
     {
         return [
-            'id' => $id
+            'entity' => $formEntity
         ];
     }
 } 

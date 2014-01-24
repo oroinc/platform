@@ -28,7 +28,7 @@ class EmbeddedFormType extends AbstractType
                 'property' => 'name'
             ])
             ->add('css', 'textarea')
-        ;
+            ->add('successMessage', 'textarea');
     }
 
     /**
