@@ -38,13 +38,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
                 'entity_attribute',
                 WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE
             );
+            $stepsDisplayOrdered = $this->getConfigurationOption(
+                $workflowConfiguration,
+                'steps_display_ordered',
+                false
+            );
 
             $workflowDefinition = new WorkflowDefinition();
             $workflowDefinition
                 ->setName($workflowName)
                 ->setLabel($workflowConfiguration['label'])
                 ->setRelatedEntity($workflowConfiguration['entity'])
-                ->setStepsDisplayOrdered($workflowConfiguration['steps_display_ordered'])
+                ->setStepsDisplayOrdered($stepsDisplayOrdered)
                 ->setEnabled($enabled)
                 ->setEntityAttributeName($entityAttributeName)
                 ->setConfiguration($workflowConfiguration);
