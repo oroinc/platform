@@ -37,7 +37,7 @@ class EmbeddedFormType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity'
-        ]);
+                'data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm'
+            ]);
     }
 }

@@ -9,7 +9,7 @@ datagrid:
                     - embedded_form.formType
                     - channel.name as channelName
                 from:
-                    - { table: Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity, alias: embedded_form }
+                    - { table: Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm, alias: embedded_form }
                 join:
                     left:
                         - { join: embedded_form.channel, alias: channel }

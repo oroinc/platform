@@ -1,17 +1,17 @@
 <?php
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity;
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
-class EmbeddedFormEntityTest extends \PHPUnit_Framework_TestCase
+class EmbeddedFormTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @test
      */
     public function shouldBeConstructed()
     {
-        new EmbeddedFormEntity();
+        new EmbeddedForm();
     }
 
     /**
@@ -25,7 +25,7 @@ class EmbeddedFormEntityTest extends \PHPUnit_Framework_TestCase
         $css = uniqid('styles');
         $title = uniqid('title');
 
-        $formEntity = new EmbeddedFormEntity();
+        $formEntity = new EmbeddedForm();
         $formEntity->setChannel($channel);
         $formEntity->setFormType($formType);
         $formEntity->setCss($css);

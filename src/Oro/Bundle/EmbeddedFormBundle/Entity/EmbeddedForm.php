@@ -12,7 +12,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
  * @ORM\Entity
  * @ORM\Table(name="oro_embedded_form")
  */
-class EmbeddedFormEntity
+class EmbeddedForm
 {
     /**
      * @var integer

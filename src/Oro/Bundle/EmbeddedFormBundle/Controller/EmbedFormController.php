@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity;
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use OroCRM\Bundle\ContactUsBundle\Entity\ContactRequest;
 use OroCRM\Bundle\ContactUsBundle\Form\Type\ContactRequestType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -19,7 +19,7 @@ class EmbedFormController extends Controller
      * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="[-\d\w]+"})
      * @Template
      */
-    public function formAction(EmbeddedFormEntity $formEntity, Request $request)
+    public function formAction(EmbeddedForm $formEntity, Request $request)
     {
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');

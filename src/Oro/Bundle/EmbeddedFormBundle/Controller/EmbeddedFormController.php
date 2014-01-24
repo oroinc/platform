@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use FOS\Rest\Util\Codes;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity;
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -38,7 +38,7 @@ class EmbeddedFormController extends Controller
     /**
      * @Route("delete/{id}", name="oro_embedded_form_delete", requirements={"id"="[-\d\w]+"})
      */
-    public function deleteAction(EmbeddedFormEntity $entity)
+    public function deleteAction(EmbeddedForm $entity)
     {
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
@@ -53,7 +53,7 @@ class EmbeddedFormController extends Controller
      * @Route("update/{id}", name="oro_embedded_form_update", requirements={"id"="[-\d\w]+"})
      * @Template()
      */
-    public function updateAction(EmbeddedFormEntity $entity)
+    public function updateAction(EmbeddedForm $entity)
     {
         return $this->update($entity);
     }
@@ -62,17 +62,17 @@ class EmbeddedFormController extends Controller
      * @Route("view/{id}", name="oro_embedded_form_view", requirements={"id"="[-\d\w]+"})
      * @Template()
      */
-    public function viewAction(EmbeddedFormEntity $entity)
+    public function viewAction(EmbeddedForm $entity)
     {
         return [
             'entity' => $entity
         ];
     }
 
-    protected function update(EmbeddedFormEntity $entity = null)
+    protected function update(EmbeddedForm $entity = null)
     {
         if (!$entity) {
-            $entity = new EmbeddedFormEntity();
+            $entity = new EmbeddedForm();
         }
 
         $form = $this->createForm(new EmbeddedFormType(), $entity);

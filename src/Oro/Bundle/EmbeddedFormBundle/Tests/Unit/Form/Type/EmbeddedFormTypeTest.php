@@ -55,7 +55,7 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('\Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedFormEntity']);
+            ->with(['data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm']);
 
         $formType = new EmbeddedFormType();
         $formType->setDefaultOptions($resolver);
