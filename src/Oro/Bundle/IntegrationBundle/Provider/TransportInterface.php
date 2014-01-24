@@ -12,12 +12,12 @@ interface TransportInterface
     public function init(Transport $transportEntity);
 
     /**
-     * @param string $action
-     * @param array  $params
+     * @param string       $action
+     * @param object|array $params
      *
      * @return mixed
      */
-    public function call($action, array $params = []);
+    public function call($action, $params = []);
 
     /**
      * Returns label for UI

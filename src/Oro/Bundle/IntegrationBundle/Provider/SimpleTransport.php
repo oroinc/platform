@@ -35,11 +35,11 @@ class SimpleTransport implements TransportInterface
 
     /**
      * @param string $action
-     * @param array  $params
+     * @param mixed  $params
      *
      * @return mixed
      */
-    public function call($action, array $params = [])
+    public function call($action, $params = [])
     {
         return [];
     }
