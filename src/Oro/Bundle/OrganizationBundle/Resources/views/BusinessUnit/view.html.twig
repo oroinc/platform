@@ -18,7 +18,8 @@
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-business_unit',
             'dataId': entity.id,
-            'entity_label': 'oro.organization.businessunit.entity_label'|trans
+            'entity_label': 'oro.organization.businessunit.entity_label'|trans,
+            'disabled': not allow_delete
         }) }}
     {% endif %}
 {% endblock navButtons %}

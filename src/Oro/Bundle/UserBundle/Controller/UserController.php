@@ -162,21 +162,32 @@ class UserController extends Controller
         }
 
         return array(
-            'form' => $this->get('oro_user.form.user')->createView(),
+            'form'          => $this->get('oro_user.form.user')->createView(),
             'businessUnits' => $this->getBusinessUnitManager()->getBusinessUnitsTree($entity),
-            'editRoute' => $updateRoute
+            'editRoute'     => $updateRoute,
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete an owner and related entities or reassign related entities to another owner before
+            'allow_delete' =>
+                $this->getUser()->getId() !== $entity->getId() &&
+                $entity->getId() &&
+                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
     }
 
     /**
-     * @param User $user
+     * @param User $entity
      * @param string $editRoute
      * @return array
      */
-    protected function view(User $user, $editRoute = '')
+    protected function view(User $entity, $editRoute = '')
     {
         $output = array(
-            'entity'   => $user
+            'entity' => $entity,
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete an owner and related entities or reassign related entities to another owner before
+            'allow_delete' =>
+                $this->getUser()->getId() !== $entity->getId() &&
+                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
 
         if ($editRoute) {

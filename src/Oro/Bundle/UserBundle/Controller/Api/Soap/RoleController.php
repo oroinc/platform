@@ -119,4 +119,12 @@ class RoleController extends SoapController
     {
         return $this->container->get('oro_user.form.handler.role.api');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->container->get('oro_user.role.handler.delete');
+    }
 }

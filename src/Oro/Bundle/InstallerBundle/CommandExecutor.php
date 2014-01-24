@@ -26,6 +26,11 @@ class CommandExecutor
     protected $application;
 
     /**
+     * @var int
+     */
+    protected $lastCommandExitCode;
+
+    /**
      * Constructor
      *
      * @param string|null     $env
@@ -106,24 +111,37 @@ class CommandExecutor
                     $output->write($data);
                 }
             );
-            $ret = $process->getExitCode();
+            $this->lastCommandExitCode = $process->getExitCode();
         } else {
             $this->application->setAutoExit(false);
-            $ret = $this->application->run(new ArrayInput($params), $this->output);
+            $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
         }
 
-        if (0 !== $ret) {
+        if (0 !== $this->lastCommandExitCode) {
             if ($ignoreErrors) {
                 $this->output->writeln(
-                    sprintf('<error>The command terminated with an error code: %u.</error>', $ret)
+                    sprintf(
+                        '<error>The command terminated with an exit code: %u.</error>',
+                        $this->lastCommandExitCode
+                    )
                 );
             } else {
                 throw new \RuntimeException(
-                    sprintf('The command terminated with an error status: %u.', $ret)
+                    sprintf('The command terminated with an exit code: %u.', $this->lastCommandExitCode)
                 );
             }
         }
 
         return $this;
+    }
+
+    /**
+     * Gets an exit code of last executed command
+     *
+     * @return int
+     */
+    public function getLastCommandExitCode()
+    {
+        return $this->lastCommandExitCode;
     }
 }

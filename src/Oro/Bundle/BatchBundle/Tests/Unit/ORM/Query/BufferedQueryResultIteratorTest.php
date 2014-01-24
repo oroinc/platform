@@ -6,11 +6,8 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Doctrine\ORM\Query;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverMock;
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
-use Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
@@ -45,11 +42,11 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ['a0' => '2'],
         ];
 
-        $this->getConnection()->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->buildCountStatement(count($records))
+                    $this->createCountStatementMock(count($records))
                 )
             );
 
@@ -70,12 +67,12 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ['a0' => '3'],
         ];
 
-        $this->getConnection()->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->buildCountStatement(count($records)),
-                    $this->buildFetchStatement([$records[0], $records[1], $records[2]])
+                    $this->createCountStatementMock(count($records)),
+                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]])
                 )
             );
 
@@ -104,13 +101,13 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ['a0' => '3'],
         ];
 
-        $this->getConnection()->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->buildCountStatement(count($records)),
-                    $this->buildFetchStatement([$records[0], $records[1]]),
-                    $this->buildFetchStatement([$records[2]])
+                    $this->createCountStatementMock(count($records)),
+                    $this->createFetchStatementMock([$records[0], $records[1]]),
+                    $this->createFetchStatementMock([$records[2]])
                 )
             );
 
@@ -139,13 +136,13 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ['a0' => '4'],
         ];
 
-        $this->getConnection()->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->buildCountStatement(count($records)),
-                    $this->buildFetchStatement([$records[0], $records[1], $records[2]]),
-                    $this->buildFetchStatement([$records[3]])
+                    $this->createCountStatementMock(count($records)),
+                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+                    $this->createFetchStatementMock([$records[3]])
                 )
             );
 
@@ -174,13 +171,13 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ['a0' => '3'],
         ];
 
-        $this->getConnection()->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->buildCountStatement(count($records)),
-                    $this->buildFetchStatement([$records[0], $records[1]]),
-                    $this->buildFetchStatement([$records[2]])
+                    $this->createCountStatementMock(count($records)),
+                    $this->createFetchStatementMock([$records[0], $records[1]]),
+                    $this->createFetchStatementMock([$records[2]])
                 )
             );
 
@@ -210,13 +207,13 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ['a0' => '3'],
         ];
 
-        $this->getConnection()->expects($this->any())
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
             ->method('query')
             ->will(
                 $this->onConsecutiveCalls(
-                    $this->buildCountStatement(count($records)),
-                    $this->buildFetchStatement([$records[0], $records[1]]),
-                    $this->buildFetchStatement([$records[2]])
+                    $this->createCountStatementMock(count($records)),
+                    $this->createFetchStatementMock([$records[0], $records[1]]),
+                    $this->createFetchStatementMock([$records[2]])
                 )
             );
 
@@ -235,37 +232,5 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             $count++;
         }
         $this->assertEquals(count($records), $count);
-    }
-
-    protected function getConnection()
-    {
-        $conn = $this->getMock('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverConnectionMock');
-        /** @var DriverMock $driver */
-        $driver = $this->em->getConnection()->getDriver();
-        $driver->setDriverConnection($conn);
-
-        return $conn;
-    }
-
-    protected function buildCountStatement($count)
-    {
-        $countStatement = $this->getMock('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
-        $countStatement->expects($this->once())->method('fetchColumn')
-            ->will($this->returnValue($count));
-
-        return $countStatement;
-    }
-
-    protected function buildFetchStatement($records)
-    {
-        $statement = $this->getMock('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
-        $statement->expects($this->exactly(count($records) + 1))->method('fetch')
-            ->will(
-                new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls(
-                    array_merge($records, [false])
-                )
-            );
-
-        return $statement;
     }
 }

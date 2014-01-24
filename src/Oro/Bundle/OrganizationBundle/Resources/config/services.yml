@@ -17,6 +17,8 @@ parameters:
     oro_organization.business_unit.listener.class:                      Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.twig.business_units.class:                         Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension
     oro_organization.provider.business_units.class:                     Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
+    oro_organization.owner_deletion_manager.class:                      Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager
+    oro_organization.owner_assignment_checker.default.class:            Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentChecker
 
 services:
     oro_organization.form.business_unit:
@@ -159,3 +161,16 @@ services:
         class: %oro_organization.provider.business_units.class%
         arguments:
           - @doctrine.orm.entity_manager
+
+    oro_organization.owner_deletion_manager:
+        class: %oro_organization.owner_deletion_manager.class%
+        arguments:
+            - @oro_organization.owner_assignment_checker.default
+            - @oro_entity_config.provider.ownership
+            - @oro_security.owner.ownership_metadata_provider
+            - @doctrine.orm.entity_manager
+            - @oro_security.acl.object_id_accessor
+
+    oro_organization.owner_assignment_checker.default:
+        class: %oro_organization.owner_assignment_checker.default.class%
+        public: false

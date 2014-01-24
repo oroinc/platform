@@ -1,10 +1,23 @@
 parameters:
     oro_soap.loader.class:            Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
+    oro_soap.handler.delete.class:    Oro\Bundle\SoapBundle\Handler\DeleteHandler
 
 services:
     oro_soap.loader:
-        class:                        %oro_soap.loader.class%
-        arguments:                    ["@file_locator", "@besimple.soap.definition.loader.annot_class"]
-        public:                       false
+        class: %oro_soap.loader.class%
+        public: false
+        arguments:
+            - @file_locator
+            - @besimple.soap.definition.loader.annot_class
         tags:
             - { name: besimple.soap.definition.loader }
+
+    oro_soap.handler.delete.abstract:
+        abstract: true
+        calls:
+            - [setSecurityFacade, [@oro_security.security_facade]]
+            - [setOwnerDeletionManager, [@oro_organization.owner_deletion_manager]]
+
+    oro_soap.handler.delete:
+        class: %oro_soap.handler.delete.class%
+        parent: oro_soap.handler.delete.abstract

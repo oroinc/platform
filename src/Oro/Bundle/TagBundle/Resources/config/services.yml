@@ -22,6 +22,8 @@ parameters:
     oro_tag.twig.tag.extension.class: Oro\Bundle\TagBundle\Twig\TagExtension
     oro_tag.event_listener.search_results_grid_listener.class: Oro\Bundle\TagBundle\EventListener\TagSearchResultsGridListener
 
+    oro_tag.owner_assignment_checker.tag.class: Oro\Bundle\TagBundle\Ownership\TagOwnerAssignmentChecker
+
 services:
     oro_tag.tag.manager:
         class: %oro_tag.tag.manager.class%
@@ -140,3 +142,8 @@ services:
           - @oro_datagrid.datagrid.request_params
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.tag-results-grid, method: onBuildAfter }
+
+    oro_tag.owner_assignment_checker.tag:
+        class: %oro_tag.owner_assignment_checker.tag.class%
+        tags:
+            - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\TagBundle\Entity\Tag }

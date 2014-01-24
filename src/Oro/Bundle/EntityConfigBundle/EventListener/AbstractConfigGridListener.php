@@ -210,23 +210,12 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
 
             foreach ($gridActions as $config) {
                 $configItem = array(
-                    'label' => ucfirst($config['name']),
-                    'icon'  => isset($config['icon']) ? $config['icon'] : 'question-sign',
-                    'link'  => strtolower($config['name']) . '_link'
+                    'label'        => ucfirst($config['name']),
+                    'icon'         => isset($config['icon']) ? $config['icon'] : 'question-sign',
+                    'link'         => strtolower($config['name']) . '_link',
+                    'type'         => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,
+                    'confirmation' => isset($config['confirmation']) ? $config['confirmation'] : false
                 );
-
-                if (isset($config['type'])) {
-                    switch ($config['type']) {
-                        case 'redirect':
-                            $configItem['type'] = self::TYPE_NAVIGATE;
-                            break;
-                        default:
-                            $configItem['type'] = $config['type'];
-                            break;
-                    }
-                } else {
-                    $configItem['type'] = self::TYPE_NAVIGATE;
-                }
 
                 $actions = array_merge($actions, [strtolower($config['name']) => $configItem]);
             }

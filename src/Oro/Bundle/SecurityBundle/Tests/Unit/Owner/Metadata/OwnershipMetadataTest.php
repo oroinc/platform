@@ -44,6 +44,7 @@ class OwnershipMetadataTest extends \PHPUnit_Framework_TestCase
     public function testOrganizationOwnership()
     {
         $metadata = new OwnershipMetadata('ORGANIZATION', 'org', 'org_id');
+        $this->assertEquals(OwnershipMetadata::OWNER_TYPE_ORGANIZATION, $metadata->getOwnerType());
         $this->assertTrue($metadata->hasOwner());
         $this->assertTrue($metadata->isOrganizationOwned());
         $this->assertFalse($metadata->isBusinessUnitOwned());
@@ -55,6 +56,7 @@ class OwnershipMetadataTest extends \PHPUnit_Framework_TestCase
     public function testBusinessUnitOwnership()
     {
         $metadata = new OwnershipMetadata('BUSINESS_UNIT', 'bu', 'bu_id');
+        $this->assertEquals(OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT, $metadata->getOwnerType());
         $this->assertTrue($metadata->hasOwner());
         $this->assertFalse($metadata->isOrganizationOwned());
         $this->assertTrue($metadata->isBusinessUnitOwned());
@@ -66,6 +68,7 @@ class OwnershipMetadataTest extends \PHPUnit_Framework_TestCase
     public function testUserOwnership()
     {
         $metadata = new OwnershipMetadata('USER', 'usr', 'user_id');
+        $this->assertEquals(OwnershipMetadata::OWNER_TYPE_USER, $metadata->getOwnerType());
         $this->assertTrue($metadata->hasOwner());
         $this->assertFalse($metadata->isOrganizationOwned());
         $this->assertFalse($metadata->isBusinessUnitOwned());
