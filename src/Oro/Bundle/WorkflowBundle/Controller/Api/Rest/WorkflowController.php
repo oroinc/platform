@@ -52,10 +52,9 @@ class WorkflowController extends FOSRestController
             /** @var WorkflowManager $workflowManager */
             $workflowManager = $this->get('oro_workflow.manager');
 
-            $entityClass = $this->getRequest()->get('entityClass');
             $entityId = $this->getRequest()->get('entityId');
-            if (!$entityClass || !$entityId) {
-                throw new BadRequestHttpException('Entity class and identifier are required');
+            if (!$entityId) {
+                throw new BadRequestHttpException('Entity class is required');
             }
 
             $data = $this->getRequest()->get('data');
@@ -72,9 +71,11 @@ class WorkflowController extends FOSRestController
                 $dataArray = $data->getValues();
             }
 
+            $workflow = $workflowManager->getWorkflow($workflowName);
+            $entityClass = $workflow->getDefinition()->getRelatedEntity();
             $entity = $this->getEntityReference($entityClass, $entityId);
 
-            $workflowItem = $workflowManager->startWorkflow($workflowName, $entity, $transitionName, $dataArray);
+            $workflowItem = $workflowManager->startWorkflow($workflow, $entity, $transitionName, $dataArray);
         } catch (HttpException $e) {
             return $this->handleError($e->getMessage(), $e->getStatusCode());
         } catch (WorkflowNotFoundException $e) {
