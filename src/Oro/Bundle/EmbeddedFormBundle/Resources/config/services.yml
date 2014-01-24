@@ -1,6 +1,7 @@
 parameters:
     oro.embedded_form.form_type.available_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
     oro_embedded_form.manager.class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
+    oro_embedded_form.back_link.twig.extension.class: Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
 
 services:
     oro_embedded_form.form_type.available_embedded_form:
@@ -15,3 +16,12 @@ services:
         arguments:
             - @service_container
             - @form.factory
+
+    oro_embedded_form.back_link.twig.extension:
+        class: %oro_embedded_form.back_link.twig.extension.class%
+        arguments:
+            - @router
+            - @translator
+        tags:
+            - { name: twig.extension }
+

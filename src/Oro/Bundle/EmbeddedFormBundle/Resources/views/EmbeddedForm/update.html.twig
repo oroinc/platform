@@ -53,13 +53,13 @@
     form_row(form.css),
     form_row(form.successMessage)
     ]
-            }
+    }
         ]
     }] %}
 
     {% set data = {
     'formErrors': form_errors(form)? form_errors(form) : null,
-    'dataBlocks': dataBlocks,
+    'dataBlocks': dataBlocks
     } %}
     {{ parent() }}
 {% endblock content_data %}

@@ -32,10 +32,14 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $builder->expects($this->at(2))
             ->method('add')
-            ->with('channel', 'entity', [
+            ->with(
+                'channel',
+                'entity',
+                [
                     'class' => 'OroIntegrationBundle:Channel',
                     'property' => 'name'
-                ])
+                ]
+            )
             ->will($this->returnSelf());
         $builder->expects($this->at(3))
             ->method('add')

@@ -23,12 +23,16 @@ class EmbeddedFormType extends AbstractType
         $builder
             ->add('title', 'text')
             ->add('formType', 'oro_available_embedded_forms')
-            ->add('channel', 'entity', [
-                'class' => 'OroIntegrationBundle:Channel',
-                'property' => 'name'
-            ])
+            ->add(
+                'channel',
+                'entity',
+                [
+                    'class' => 'OroIntegrationBundle:Channel',
+                    'property' => 'name'
+                ]
+            )
             ->add('css', 'textarea')
-            ->add('successMessage', 'textarea');
+            ->add('successMessage', 'textarea', ['tooltip' => 'oro.embedded_form.successMessage.tooltip']);
     }
 
     /**
@@ -36,8 +40,10 @@ class EmbeddedFormType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
                 'data_class' => 'Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm'
-            ]);
+            ]
+        );
     }
 }

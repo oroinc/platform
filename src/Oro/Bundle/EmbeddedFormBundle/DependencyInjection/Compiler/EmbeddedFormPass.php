@@ -21,7 +21,7 @@ class EmbeddedFormPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds('oro_embedded_form') as $id => $attributes) {
             foreach ($attributes as $eachTag) {
                 $type = isset($eachTag['type']) ? $eachTag['type'] : $id;
-                $label = isset($eachTag['label'])? $eachTag['label'] : $type;
+                $label = isset($eachTag['label']) ? $eachTag['label'] : $type;
                 $embeddedFormManager->addMethodCall('addFormType', [$type, $label]);
             }
         }

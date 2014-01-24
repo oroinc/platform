@@ -59,7 +59,7 @@ class EmbeddedFormManager
      */
     public function addFormType($type, $label = null)
     {
-        $this->formTypes[$type] = $label?:$type;
+        $this->formTypes[$type] = $label ? : $type;
     }
 
     /**

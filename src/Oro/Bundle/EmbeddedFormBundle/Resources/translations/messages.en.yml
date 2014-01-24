@@ -11,5 +11,12 @@ oro:
             label:  Channel
         css:
             label: CSS
+        successMessage:
+            label: Success message
+            default: Form has been submitted successfully
+            tooltip: Will appear instead of form after form is successfully submitted.<br />Use <strong>{back_link}</strong> placeholder to add back link to message.
 
         get_code: Get code
+
+        back_link_text: Back
+

@@ -27,9 +27,11 @@ class AvailableEmbeddedFormType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults([
+        $resolver->setDefaults(
+            [
                 'choices' => $this->manager->getAll()
-        ]);
+            ]
+        );
     }
 
     /**
