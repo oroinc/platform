@@ -130,10 +130,23 @@ class WorkflowStep
     }
 
     /**
-     * @return WorkflowStep
+     * @return WorkflowDefinition
      */
     public function getDefinition()
     {
         return $this->definition;
+    }
+
+    /**
+     * @param WorkflowStep $workflowStep
+     * @return WorkflowStep
+     */
+    public function import(WorkflowStep $workflowStep)
+    {
+        $this->setName($workflowStep->getName())
+            ->setLabel($workflowStep->getLabel())
+            ->setStepOrder($workflowStep->getStepOrder());
+
+        return $this;
     }
 }
