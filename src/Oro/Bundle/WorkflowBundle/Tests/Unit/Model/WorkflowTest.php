@@ -43,7 +43,8 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'name' => array('name', 'test'),
-            'label' => array('label', 'test')
+            'label' => array('label', 'test'),
+            'definition' => array('definition', $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'))
         );
     }
 
