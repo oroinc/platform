@@ -53,22 +53,24 @@ class WorkflowTransitionRecordTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetStepFromName()
     {
-        $this->markTestSkipped('BAP-2901');
-        $this->assertNull($this->transitionRecord->getStepFromName());
+        $this->assertNull($this->transitionRecord->getStepFrom());
 
-        $value = 'step_from_name';
-        $this->assertEquals($this->transitionRecord, $this->transitionRecord->setStepFromName($value));
-        $this->assertEquals($value, $this->transitionRecord->getStepFromName());
+        $value = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->assertEquals($this->transitionRecord, $this->transitionRecord->setStepFrom($value));
+        $this->assertEquals($value, $this->transitionRecord->getStepFrom());
     }
 
     public function testGetSetStepToName()
     {
-        $this->markTestSkipped('BAP-2901');
-        $this->assertNull($this->transitionRecord->getStepToName());
+        $this->assertNull($this->transitionRecord->getStepTo());
 
-        $value = 'step_to_name';
-        $this->assertEquals($this->transitionRecord, $this->transitionRecord->setStepToName($value));
-        $this->assertEquals($value, $this->transitionRecord->getStepToName());
+        $value = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->assertEquals($this->transitionRecord, $this->transitionRecord->setStepTo($value));
+        $this->assertEquals($value, $this->transitionRecord->getStepTo());
     }
 
     public function testGetTransitionDateAndPrePersist()

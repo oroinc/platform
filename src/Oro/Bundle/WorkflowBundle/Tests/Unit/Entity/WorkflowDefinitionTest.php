@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinitionEntity;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,11 +48,12 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testStartStep()
     {
-        $this->markTestSkipped('BAP-2901');
         $this->assertNull($this->workflowDefinition->getStartStep());
-        $value = 'step_one';
-        $this->workflowDefinition->setStartStep($value);
-        $this->assertEquals($value, $this->workflowDefinition->getStartStep());
+        $startStep = new WorkflowStep();
+        $startStep->setName('start_step');
+        $this->workflowDefinition->setSteps(array($startStep));
+        $this->workflowDefinition->setStartStep($startStep);
+        $this->assertEquals($startStep, $this->workflowDefinition->getStartStep());
     }
 
     public function testConfiguration()
@@ -65,22 +66,22 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 
     public function testImport()
     {
-        $this->markTestSkipped('BAP-2901');
+        $startStep = new WorkflowStep();
+        $startStep->setName('start');
         $expectedData = array(
             'name' => 'test_name',
             'label' => 'test_label',
             'enabled' => false,
-            'start_step' => 'test_step',
+            'steps' => new ArrayCollection(array($startStep)),
+            'start_step' => $startStep,
             'configuration' => array('test', 'configuration'),
-            'entities' => array(
-                array('class' => 'TestClass')
-            )
         );
 
         $this->assertNotEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
 
         $newDefinition = new WorkflowDefinition();
         $newDefinition->setName($expectedData['name'])
+            ->setSteps($expectedData['steps'])
             ->setLabel($expectedData['label'])
             ->setStartStep($expectedData['start_step'])
             ->setConfiguration($expectedData['configuration']);
@@ -99,6 +100,7 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
             'enabled' => $definition->isEnabled(),
+            'steps' => $definition->getSteps(),
             'start_step' => $definition->getStartStep(),
             'configuration' => $definition->getConfiguration(),
         );
