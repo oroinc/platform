@@ -9,7 +9,6 @@ use JMS\JobQueueBundle\Entity\Job;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
@@ -71,6 +70,9 @@ class SyncCommand extends ContainerAwareCommand implements CronCommandInterface
         $logger     = new OutputLogger($output);
         $processor  = $this->getService(self::SYNC_PROCESSOR);
         $processor->getLoggerStrategy()->setLogger($logger);
+
+        $this->getContainer()->get('doctrine.orm.entity_manager')
+            ->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->isJobRunning($channelId)) {
             $logger->warning('Job already running. Terminating....');

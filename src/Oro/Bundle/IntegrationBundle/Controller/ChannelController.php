@@ -73,7 +73,7 @@ class ChannelController extends Controller
      */
     public function scheduleAction(Channel $channel)
     {
-        $job = new Job(SyncCommand::COMMAND_NAME, ['--channel-id=' . $channel->getId(), '-v']);
+        $job = new Job(SyncCommand::COMMAND_NAME, ['--channel-id=' . $channel->getId(), '-v', '--env=prod']);
 
         $error = false;
         try {
