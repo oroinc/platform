@@ -1,70 +1,48 @@
-{% macro query_designer_filter_list(attr) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-filters-grid-container')|trim}) %}
-    <div{{ UI.attributes(attr) }}>
-        <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
-            <thead>
-            <tr>
-                <th class="index-column"><span>{{ 'oro.query_designer.datagrid.filter.index'|trans }}</span></th>
-                <th class="string-column"><span>{{ 'oro.query_designer.datagrid.filter.filter'|trans }}</span></th>
-                <th class="action-column"><span>{{ 'oro.query_designer.datagrid.filter.actions'|trans }}</span></th>
-            </tr>
-            </thead>
-            <tbody class="item-container">
-            </tbody>
-        </table>
+{% macro query_designer_conditions_builder(params) %}
+    {% set select2Options = {
+        placeholder: 'oro.entity.form.choose_entity_field'|trans
+    } %}
+    {% set util2Options = {
+        fieldsLabel: 'oro.entity.form.entity_fields'|trans,
+        relatedLabel: 'oro.entity.form.entity_related'|trans
+    } %}
+    <div class="row-fluid">
+        <div class="span3 filter-criteria">
+            <h4>Filter Criteria</h4>
+            <ul class="criteria-list" id="filter-criteria-list">
+                <li class="option" data-criteria="compare-fields"
+                    data-select2="{{ select2Options|json_encode }}"
+                    data-util="{{ util2Options|json_encode }}"
+                    data-filter-metadata-selector="#{{ params.filters_metadata_holder_id }}">
+                    Compare Fields
+                </li>
+                <li class="option" data-criteria="conditions-group">
+                    Conditions Group
+                </li>
+            </ul>
+        </div>
+        <div class="span9" id="{{ params.id }}"></div>
     </div>
-{% endmacro %}
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'oroquerydesigner/js/conditions-group'], function ($, _) {
+            var $compareFieldsCriteria = $('#filter-criteria-list').find('[data-criteria=compare-fields]'),
+                $conditionsBuilder = $('#{{ params.id }}');
 
-{% macro query_designer_filter_template(id) %}
-    <script type="text/html" id="{{ id }}">
-        <tr data-id="<%= id %>">
-            <td class="index-cell"><%= index %></td>
-            <td class="string-cell"><%= filter %></td>
-            <td class="action-cell">
-                <a href="javascript: void(0);" class="action no-hash edit-button"
-                   title="{{ 'oro.query_designer.datagrid.action.update_filter'|trans }}"
-                ><i class="icon-edit hide-text"></i></a>
-                <a href="javascript: void(0);" class="action no-hash delete-button"
-                   data-message="{{ 'oro.query_designer.datagrid.action.delete_filter_confirmation'|trans }}"
-                   title="{{ 'oro.query_designer.datagrid.action.delete_filter'|trans }}"
-                ><i class="icon-trash hide-text"></i></a>
-            </td>
-        </tr>
+            $('#{{ params.entity_choice_id }}')
+                .on('fieldsloaderupdate', function (e, fields) {
+                    $conditionsBuilder.conditionsGroup('setValue', []);
+                    $compareFieldsCriteria
+                        .data('fields', fields)
+                        .data('entity', $(e.target).val())
+                        .toggleClass('disabled', _.isEmpty(fields));
+                });
+
+            $conditionsBuilder
+                .conditionsGroup({
+                    criteriaListSelector: '#filter-criteria-list'
+                });
+        });
     </script>
-{% endmacro %}
-
-{% macro query_designer_filter_form(form, attr) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim}) %}
-    <div{{ UI.attributes(attr) }}>
-        {{ form_row(form.columnName, {
-            'label': 'oro.query_designer.form.column'|trans,
-            'attr': {
-                'data-purpose': 'column-selector'
-            }
-        }) }}
-        {{ form_row(form.criterion, {
-            'label': 'oro.query_designer.form.condition'|trans,
-            'attr': {
-                'data-purpose': 'criterion-selector'
-            }
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash cancel-button',
-            'label' : 'oro.query_designer.form.action.cancel'|trans
-        }) }}
-        {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash btn-success save-button',
-            'label' : 'oro.query_designer.form.action.save'|trans
-        }) }}
-        {{ UI.clientButton({
-            'aCss': 'no-hash btn-primary add-button',
-            'label' : 'oro.query_designer.form.action.add'|trans
-        }) }}
-    </div>
 {% endmacro %}
 
 {% macro query_designer_column_list(attr) %}

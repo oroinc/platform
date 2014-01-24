@@ -76,7 +76,7 @@
             <% if (showLabel) { %><%= label %>: <% } %>
             <select>
                 <% _.each(options, function (option) { %>
-                <option value="<%= option.value %>"<% if (option.value == emptyValue.type) { %> selected="selected"<% } %>>
+                <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>>
                     <%= option.label %>
                 </option>
                 <% }); %>
@@ -86,11 +86,13 @@
     </div>
 </script>
 <script type="text/template" id="multiselect-filter-template">
-    <div class="btn filter-select filter-criteria-selector">
-        <% if (showLabel) { %><%= label %>: <% } %>
-        <select multiple>
-            <% _.each(options, function (option) { %><option value="<%= option.value %>"><%= option.label %></option><% }); %>
-            </select>
-        </div>
-    <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
+    <div class="btn-group filter-item oro-drop">
+        <div class="btn filter-select filter-criteria-selector">
+            <% if (showLabel) { %><%= label %>: <% } %>
+            <select multiple>
+                <% _.each(options, function (option) { %><option value="<%= option.value %>"><%= option.label %></option><% }); %>
+                </select>
+            </div>
+        <% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>
+    </div>
 </script>

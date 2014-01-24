@@ -148,7 +148,7 @@ function ($, _, __, AbstractFilter, MultiselectDecorator) {
                     placeholder: this.placeholder,
                     nullLink: this.nullLink,
                     canDisable: this.canDisable,
-                    emptyValue: this.emptyValue
+                    selected: _.extend({}, this.emptyValue, this.value)
                 })
             ));
 

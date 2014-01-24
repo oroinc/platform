@@ -46,95 +46,6 @@
     {% endif %}
 {% endblock pageHeader %}
 
-{% macro segmentation_group(filterFields) %}
-    {% set segmentationDesignerValue = [
-        {
-            "columnName": "name",
-            "criterion": {
-                "filter": "string",
-                "data": {
-                    "value": "asd",
-                    "type": "1"
-                }
-            }
-        },
-        "AND",
-        [
-            {
-                "columnName": "defaultContact,OroCRM\\Bundle\\ContactBundle\\Entity\\Contact::birthday",
-                "criterion": {
-                    "filter": "datetime",
-                    "data": {
-                        "type": "1",
-                        "value": {
-                            "start": "2014-01-16 sd 12:00 AM",
-                            "end": "2014-01-21 00:00"
-                        }
-                    }
-                }
-            },
-            "OR",
-            {
-                "columnName": "contacts,OroCRM\\Bundle\\ContactBundle\\Entity\\Contact::birthday",
-                "criterion": {
-                    "filter": "datetime",
-                    "data": {
-                        "type": "3",
-                        "value": {
-                            "start": "2014-01-08 00:00",
-                            "end": ""
-                        }
-                    }
-                }
-            }
-        ]
-    ] %}
-    <div class="row-fluid">
-        <div class="span3 filter-criteria">
-            <h4>Filter Criteria</h4>
-            <ul class="criteria-list" id="filter-criteria-list">
-                <li class="option" data-criteria="compare-fields">
-                    Compare Fields
-                </li>
-                <li class="option" data-criteria="conditions-group">
-                    Conditions Group
-                </li>
-            </ul>
-        </div>
-        <div class="span9" id="segmentation-conditions"></div>
-        <input type="hidden" id="segmentation-conditions-value" va1lue="{{ segmentationDesignerValue|json_encode }}" >
-    </div>
-    <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/loading-mask', 'oroquerydesigner/js/conditions-group'
-        ], function ($, _, LoadingMask) {
-            var //loadingMask = new LoadingMask(),
-                $entityChoice = $('#oro_report_form_entity'),
-                $compareFieldsCriteria = $('#filter-criteria-list').find('[data-criteria=compare-fields]');
-
-            function updateCompareFieldsCriteria() {
-                var fields = $entityChoice.data('fields');
-                $compareFieldsCriteria
-                        .data('fields', fields)
-                        .toggleClass('disabled', _.isEmpty(fields));
-            }
-
-//            $('#report-designer').append(loadingMask.render().$el);
-            $entityChoice
-//                .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
-//                .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask))
-                .on('fieldsloadersuccess', updateCompareFieldsCriteria);
-
-            updateCompareFieldsCriteria();
-
-            $('#segmentation-conditions')
-                .conditionsGroup({
-                    criteriaListSelector: '#filter-criteria-list',
-                    valueSourceSelector: '#segmentation-conditions-value'
-                });
-        });
-    </script>
-{% endmacro %}
-
 {% block content_data %}
     {% set id = 'report-profile' %}
     {% set ownerDataBlock = {
@@ -192,10 +103,11 @@
                 'title': 'oro.report.form.filters'|trans,
                 'spanClass': 'report-filters responsive-cell',
                 'data': [
-                    QD.query_designer_filter_form(form.filter, {'id': 'report-filter-form'}),
-                    QD.query_designer_filter_list(),
-                    QD.query_designer_filter_template('report-filter-row'),
-                    _self.segmentation_group(form.filter.columnName)
+                    QD.query_designer_conditions_builder({
+                        'id': 'report-condition-builder',
+                        'entity_choice_id': 'oro_report_form_entity',
+                        'filters_metadata_holder_id': 'report-designer'
+                    })
                 ]
             },
         ]
@@ -211,83 +123,67 @@
 
     {{ QD.query_designer_column_chain_template('report-column-chain-template') }}
 
+    {% set entityFieldsRoutParams = {
+        'with-relations': 1,
+        'with-entity-details': 1,
+        'deep-level': 2
+    } %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/translator', 'routing', 'oro/query-designer', 'oro/delete-confirmation'],
-        function($, _, __, routing, QueryDesigner, DeleteConfirmation) {
+        require(['jquery', 'underscore', 'oro/translator', 'oro/loading-mask', 'routing',
+            'oro/query-designer', 'oro/delete-confirmation', 'oroentity/js/fields-loader'],
+        function($, _, __, LoadingMask, routing, QueryDesigner, DeleteConfirmation) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
-                var entityChoice = $('#oro_report_form_entity');
-                var filtersInput = $('#segmentation-conditions-value');
-
-                var findEntity = function (entityName) {
-                    return _.findWhere(entities, {name: entityName});
-                };
-
-                var options = {
-                    el: '.report-designer',
-                    getLoadColumnsUrl: function (entityName) {
-                        return routing.generate('oro_api_get_entity_fields', {
-                            'entityName': entityName,
-                            'with-relations': 1,
-                            'with-entity-details': 1,
-                            'deep-level': 2
-                        });
-                    },
+                var $entityChoice = $('#oro_report_form_entity');
+                var loadingMask = new LoadingMask();
+                var designer = new QueryDesigner({
+                    el: '#report-designer',
                     storageElementSelector: '#oro_report_form_definition',
                     columnChainTemplateSelector: '#report-column-chain-template',
                     fieldsLabel: {{ 'oro.entity.form.entity_fields'|trans|json_encode|raw }},
                     relatedLabel: {{ 'oro.entity.form.entity_related'|trans|json_encode|raw }},
-                    findEntity: findEntity,
+                    findEntity:  function (entityName) {
+                        return _.findWhere(entities, {name: entityName});
+                    },
                     columnsOptions: {
                         el: '.report-columns',
                         groupingFormSelector: '#report-grouping-form',
                         itemTemplateSelector: '#report-column-row',
                         itemFormSelector: '#report-column-form'
                     },
-                    filtersOptions: {
-                        el: '.report-filters',
-                        itemTemplateSelector: '#report-filter-row',
-                        itemFormSelector: '#report-filter-form'
-                    }
-                };
-                var designer = new QueryDesigner(options);
-                {% if not form.entity.vars.value is empty %}
-                    designer.changeEntity(
-                        {{ form.entity.vars.value|json_encode|raw }},
-                        {{ render(path('oro_api_get_entity_fields', {
-                            'entityName': form.entity.vars.value|replace({'\\': '_'}),
-                            'with-relations': true,
-                            'with-entity-details': true,
-                            'deep-level': 2
-                        })) }}
-                    );
-                {% endif %}
-                designer.render();
-
-                entityChoice.on('change', function (e) {
-                    if (!_.isUndefined(e.removed)) {
-                        var prevVal = _.isNull(e.removed) ? '' : (e.removed.id || '');
-                        var newVal = e.val;
-                        if (!designer.isEmpty() || !_.isEmpty(filtersInput.val())) {
-                            var confirm = new DeleteConfirmation({
-                                title: __('Change Entity Confirmation'),
-                                okText: __('Yes, I Agree'),
-                                content: __('Are you sure you want to change entity?')
-                            });
-                            confirm.on('ok', function () {
-                                designer.changeEntity(newVal);
-                                $('#segmentation-conditions').trigger('reset');
-                            });
-                            confirm.on('cancel', function () {
-                                entityChoice.val(prevVal);
-                                entityChoice.trigger('change');
-                            });
-                            confirm.open();
-                        } else {
-                            designer.changeEntity(newVal);
-                        }
-                    }
+                    conditionBuilderSelector: '#report-condition-builder'
                 });
+                var confirm = new DeleteConfirmation({
+                    title: __('Change Entity Confirmation'),
+                    okText: __('Yes, I Agree'),
+                    content: __('Are you sure you want to change entity?')
+                });
+
+                $('#report-designer').append(loadingMask.render().$el);
+
+                $entityChoice
+                    .fieldsLoader({
+                        router: 'oro_api_get_entity_fields',
+                        routingParams: {{ entityFieldsRoutParams|json_encode|raw }},
+                        confirm: confirm,
+                        requireConfirm: function () {
+                            return !designer.isEmpty();
+                        }
+                    })
+                    .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
+                    .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask))
+                    .on('fieldsloaderupdate', function (e, fields) {
+                        designer.changeEntity($entityChoice.val(), fields);
+                    });
+
+                {% if not form.entity.vars.value is empty %}
+                {% set fieldsData = render(path('oro_api_get_entity_fields', {
+                        'entityName': form.entity.vars.value|replace({'\\': '_'})
+                    }|merge(entityFieldsRoutParams))) %};
+                $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
+                {% endif %}
+
+                designer.render();
             });
         });
     </script>

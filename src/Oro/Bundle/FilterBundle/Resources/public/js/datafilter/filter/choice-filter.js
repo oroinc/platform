@@ -78,19 +78,20 @@ function($, _, __, app, TextFilter) {
          * @inheritDoc
          */
         render: function () {
-            var selectedChoice = this.emptyValue.type;
+            var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
                 var foundChoice = _.find(this.choices, function(choice) {
-                        return (choice.value == selectedChoice);
+                        return (choice.value == value.type);
                     });
                 selectedChoiceLabel = foundChoice.label;
             }
             var $filter = $(this.template({
                 name: this.name,
                 choices: this.choices,
-                selectedChoice: selectedChoice,
-                selectedChoiceLabel: selectedChoiceLabel
+                selectedChoice: value.type,
+                selectedChoiceLabel: selectedChoiceLabel,
+                value: value.value
             }));
             this._wrap($filter);
             return this;
@@ -182,7 +183,7 @@ function($, _, __, app, TextFilter) {
             });
             $(e.currentTarget).parent().addClass('active');
             var parentDiv = $(e.currentTarget).parent().parent().parent();
-            parentDiv.find('.name_input').val($(e.currentTarget).attr('data-value'));
+            parentDiv.find('.name_input').val($(e.currentTarget).attr('data-value')).trigger('change');
             var choiceName = $(e.currentTarget).html();
             choiceName += '<span class="caret"></span>';
             parentDiv.find('.dropdown-toggle').html(choiceName);

@@ -26,7 +26,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             },
             operations: ['AND', 'OR'],
             criteriaListSelector: '#filter-criteria-list',
-            valueSourceSelector: '',
+            sourceValueSelector: '',
             helperClass: 'ui-grabbing',
             conditionHTML: '<li class="condition controls" />',
             compareFieldsHTML: '<div class="field-filter" />',
@@ -43,8 +43,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
             this._initConditionBuilder();
             this._updateOperators();
             this._on({
-                closed: this._onConditionClose,
-                reset: this._onReset
+                closed: this._onConditionClose
             });
             this.element
                 .on('change', '.operator', $.proxy(this._onChangeOperator, this));
@@ -62,12 +61,13 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
         },
 
         getValue: function () {
-            var value = $(this.options.valueSourceSelector).val();
-            return value ? JSON.parse(value) : [];
+            return this.$rootCondition ? this.$rootCondition.data('value') : [];
         },
 
         setValue: function (value) {
-            $(this.options.valueSourceSelector).val(JSON.stringify(value));
+            value = value || [];
+            this._createConditionContent(this.$rootCondition.empty(), value);
+            this._setSourceValue(value);
         },
 
         _initCriteriaList: function () {
@@ -85,7 +85,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
                 }
             }
 
-            $content = this._createConditionContent($root, this.getValue());
+            $content = this._createConditionContent($root, this._getSourceValue());
             this._initConditionsGroup($content);
             $root.on('changed', $.proxy(this._onChanged, this));
 
@@ -262,11 +262,21 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './comp
         },
 
         _onChanged: function () {
-            this.setValue(this.$rootCondition.data('value'));
+            this._setSourceValue(this.$rootCondition.data('value'));
         },
 
-        _onReset: function () {
-            this.$rootCondition.empty().trigger('changed');
+        _setSourceValue: function (value) {
+            if (this.options.sourceValueSelector) {
+                $(this.options.sourceValueSelector).val(JSON.stringify(value));
+            }
+        },
+
+        _getSourceValue: function () {
+            var value;
+            if (this.options.sourceValueSelector) {
+                value = $(this.options.sourceValueSelector).val();
+            }
+            return value ? JSON.parse(value) : [];
         }
     });
 });

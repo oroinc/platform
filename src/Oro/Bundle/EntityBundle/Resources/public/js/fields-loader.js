@@ -1,6 +1,7 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], function ($, routing, __, messenger) {
+define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'oro/app', 'jquery-ui'
+    ], function ($, routing, __, messenger, app) {
     'use strict';
 
     /**
@@ -8,25 +9,39 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
      */
     $.widget('oroentity.fieldsLoader', {
         options: {
-            routing: {
-                'with-relations': true,
-                'with-entity-details': true,
+            router: 'oro_api_get_entity_fields',
+            routingParams: {
+                'with-relations': 1,
+                'with-entity-details': 1,
                 'deep-level': 1
-            }
+            },
+            // supports 'oro/modal' confirmation dialog
+            confirm: null,
+            requireConfirm: function () { return true; }
         },
 
         _create: function () {
-            var data = this.element.data('fields') || [];
-            this.element.data('fields', this._convertFields(null, data));
+            this.setFieldsData(this.element.data('fields') || []);
 
             this._on({
-                change: this.loadFields
+                change: this._onChange
             });
         },
 
         generateURL: function (entityName) {
-            var opts = $.extend({}, this.options.routing, {entityName: entityName.replace(/\\/g, "_")});
-            return routing.generate('oro_api_get_entity_fields', opts);
+            var opts = $.extend({}, this.options.routingParams, {entityName: entityName.replace(/\\/g, "_")});
+            return routing.generate(this.options.router, opts);
+        },
+
+        _onChange: function (e) {
+            var oldVal, confirm = this.options.confirm;
+            if (confirm && this.options.requireConfirm()) {
+                // @todo support also other kind of inputs than select2
+                oldVal = (e.removed && e.removed.id) || null;
+                this._confirm(confirm, e.val, oldVal);
+            } else {
+                this.loadFields();
+            }
         },
 
         loadFields: function () {
@@ -40,37 +55,55 @@ define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'jquery-ui'], fu
             });
         },
 
-        _onLoaded: function (data) {
-            this.element.data('fields', this._convertFields(null, data));
-            this._trigger('success');
+        setFieldsData: function (data) {
+            var fields = this._convertFields(data);
+            this.element.data('fields', fields);
+            this._trigger('update', null, [fields]);
         },
 
-        _onError: function () {
-            var msg = __('Sorry, unexpected error was occurred');
+        _confirm: function (confirm, newVal, oldVal) {
+            var $el = this.element,
+                load = $.proxy(this.loadFields, this),
+                revert = function () { $el.val(oldVal); };
+            confirm.on('ok', load);
+            confirm.on('cancel', revert);
+            confirm.once('hidden', function () {
+                confirm.off('ok', load);
+                confirm.off('cancel', revert);
+            });
+            confirm.open();
+        },
+
+        _onLoaded: function (data) {
+            this.setFieldsData(data);
+        },
+
+        _onError: function (jqXHR) {
+            var err = jqXHR.responseJSON,
+                msg = __('Sorry, unexpected error was occurred');
+            if (app.debug) {
+                if (err.message) {
+                    msg += ': ' + err.message;
+                } else if (err.errors && $.isArray(err.errors)) {
+                    msg += ': ' + err.errors.join();
+                } else if ($.type(err) === 'string') {
+                    msg += ': ' + err;
+                }
+            }
             messenger.notificationFlashMessage('error', msg);
         },
 
-        _convertFields: function (parent, data) {
-            var self = this;
-
-            var fields = data.map(function (field) {
-                if (!field.related_entity_fields) {
-                    return {
-                        id: parent ? (parent.name + ',' + parent.related_entity_name + '::' + field.name) : field.name,
-                        text: field.label,
-                        value: field.name,
-                        type: field.type,
-                        label: field.label
-                    };
-                }
-
-                return {
-                    text: field.label,
-                    children: self._convertFields(field, field.related_entity_fields)
-                };
-            });
-
-            return fields;
+        /**
+         * Converts data in proper array of fields hierarchy
+         *
+         * @param {Array} data
+         * @param {Object?} parent
+         * @returns {Array}
+         * @private
+         */
+        _convertFields: function (data, parent) {
+            // @todo data converter from 'entity-field-*-util' should be implemented here
+            return data;
         }
     });
 });

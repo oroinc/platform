@@ -1,49 +1,75 @@
 /*global define*/
 /*jslint nomen: true*/
 define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name', 'oro/query-designer/util',
-    'jquery-ui', 'jquery.select2'], function ($, _, __, mapFilterModuleName, util) {
+    'oro/entity-field-select-util', 'oro/entity-field-view', 'jquery-ui', 'jquery.select2'
+    ], function ($, _, __, mapFilterModuleName, util, EntityFieldUtil, EntityFieldView) {
     'use strict';
+
+    $.widget('oroquerydesigner.compareField', {
+        options: {
+            util: {}
+        },
+
+        _create: function () {
+            var entityFieldUtil = new EntityFieldUtil(this.$select);
+            $.extend(entityFieldUtil, this.options.util);
+
+            this.options.fields = entityFieldUtil._convertData(this.options.fields, this.options.entity, null);
+
+            this.$select
+                .data('entity', this.options.entity)
+                .data('data', this.options.fields);
+
+            this._getFieldApplicableConditions = function (fieldId) {
+                return EntityFieldView.prototype.getFieldApplicableConditions.call(entityFieldUtil, fieldId);
+            };
+        }
+    });
 
     /**
      * Compare field widget
      */
-    $.widget('oro.compareField', {
+    $.widget('oroquerydesigner.compareField', $.oroquerydesigner.compareField, {
         options: {
             fields: [],
-            filterMetadataSelector: '#report-designer',
-            fieldDropdownWidth: '250px'
-        },
-
-        _create: function() {
-            var self = this;
-
-            self.template = _.template('<div class="compare-field"><input class="select compare-field" /><div class="active-filter" /></div>');
-            self.element.append(self.template(this.options));
-
-            var $select = self.$select = self.element.find('input.select');
-            $select.select2({
+            filterMetadataSelector: '',
+            select2: {
                 collapsibleResults: true,
-                data: this.options.fields,
                 dropdownAutoWidth: true
-            });
-            $select.change(function (e) {
-                if (e.added) {
-                    var conditions = self._getFieldApplicableConditions(e.added);
-                    var filterIndex = self._getActiveFilterName(conditions);
-                    self._render(filterIndex);
-                }
-            });
-
-            var data = this.element.data('value');
-            if (data && data.columnName) {
-                $select.select2('val', data.columnName, true);
-            } else {
-                $select.select2('val', this.options.fields[0].id, true);
             }
         },
 
-        _render: function (filterIndex) {
-            var self = this;
+        _create: function () {
+            var data = this.element.data('value');
+
+            this.template = _.template('<input class="select" /><span class="active-filter" />');
+            this.element.append(this.template(this.options));
+            this.$select = this.element.find('input.select');
+
+            this._super();
+
+            this.$select.select2($.extend({
+                data: this.options.fields
+            }, this.options.select2));
+
+            if (data && data.columnName) {
+                this.$select.select2('val', data.columnName, true);
+                this._renderFilter(data.columnName);
+            }
+
+            this.$select.change(_.bind(function (e) {
+                if (e.added) {
+                    // reset current value on field change
+                    this.element.data('value', {});
+                    this._renderFilter(e.added.id);
+                }
+            }, this));
+        },
+
+        _renderFilter: function (fieldId) {
+            var self = this,
+                conditions = self._getFieldApplicableConditions(fieldId),
+                filterIndex = self._getActiveFilterName(conditions);
             self._createFilter(filterIndex, function () {
                 self._appendFilter();
                 self._onUpdate();
@@ -60,31 +86,6 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             });
 
             return _.extend({ filters: [] }, metadata);
-        },
-
-        _getFieldApplicableConditions: function (item) {
-            var result = {
-                parent_entity: null,
-                entity: this.options.entityName,
-                field: item.value
-            };
-
-            var chain = result.field.split(',');
-
-            if (_.size(chain) > 1) {
-                var field = _.last(chain).split('::');
-                result.parent_entity = result.entity;
-                result.entity = _.first(field);
-                result.field = _.last(field);
-                if (_.size(chain) > 2) {
-                    var parentField = chain[_.size(chain) - 2].split('::');
-                    result.parent_entity = _.first(parentField);
-                }
-            }
-
-            _.extend(result, _.pick(item, ['type', 'identifier']));
-
-            return result;
         },
 
         _getActiveFilterName: function (criteria) {
@@ -142,19 +143,17 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
         },
 
         _appendFilter: function () {
+            var value = this.element.data('value');
+            if (value && value.criterion) {
+                this.filter.value = value.criterion.data;
+            }
             this.filter.render();
 
             var $filter = this.element.find('.active-filter').empty().append(this.filter.$el);
 
             var apply = this.filter.apply.bind(this.filter);
             $filter.on('change', apply);
-            $filter.find('.choice_value').on('click', apply);
             this.filter.on('update', this._onUpdate.bind(this));
-
-            var value = this.element.data('value');
-            if (value && value.criterion) {
-                this.filter.setValue(value.criterion.data);
-            }
         },
 
         _onUpdate: function () {

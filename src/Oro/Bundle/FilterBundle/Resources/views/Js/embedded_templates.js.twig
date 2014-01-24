@@ -1,62 +1,51 @@
 <script type="text/template" id="none-filter-template-embedded">
 </script>
 <script type="text/template" id="text-filter-template-embedded">
-    <div>
-        <div>
-            <input type="text" name="value" value=""/>
-        </div>
-    </div>
+    <input type="text" name="value" value=""/>
 </script>
 <script type="text/template" id="choice-filter-template-embedded">
-    <div class="filter-item-simple">
-        <div class="choicefilter">
-            <span>field value </span>
-            <div class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <%= selectedChoiceLabel %>
-                </a>
-                <ul class="dropdown-menu">
-                    <% _.each(choices, function (option) { %>
-                        <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                            <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
-                        </li>
-                    <% }); %>
-                </ul>
-            </div>
-            <input type="text" name="value" value="">
-            <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>"/>
-        </div>
+    <span> field value </span>
+    <div class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:
+        <ul class="dropdown-menu">
+            <% _.each(choices, function (option) { %>
+                <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                    <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
+                </li>
+            <% }); %>
+        </ul>
+        <input type="text" name="value" value="<%- value %>">
+        <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%- selectedChoice %>"/>
     </div>
 </script>
 <script type="text/template" id="date-filter-template-embedded">
-    <div class="filter-item-simple">
-        <div class="choicefilter">
-            <span>field value </span>
-            <div class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    <%= selectedChoiceLabel %>
-                </a>
-                <ul class="dropdown-menu">
-                    <% _.each(choices, function (option) { %>
-                        <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                            <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
-                        </li>
-                    <% }); %>
-                </ul>
-            </div>
-            <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
-            <span class="filter-separator">-</span>
-            <input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">
-        </div>
+    <span> field value </span>
+    <div class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:
+        <ul class="dropdown-menu">
+            <% _.each(choices, function (option) { %>
+                <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+                    <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
+                </li>
+            <% }); %>
+        </ul>
+        <select name="<%= name %>" class="filter-select-oro name_input" style="display:none">
+            <% _.each(choices, function (option) { %>
+            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
+            <% }); %>
+        </select>
     </div>
+    <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="from">
+    <span class="filter-separator">-</span>
+    <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="to">
 </script>
 <script type="text/template" id="select-filter-template-embedded">
-    <div class="filter-item filter-item-simple">
-        <span>field value is </span>
+    <div class="filter-item">
+        <span> field value is </span>
         <div class="filter-select filter-criteria-selector">
             <select>
                 <% _.each(options, function (option) { %>
-                <option value="<%= option.value %>"<% if (option.value == emptyValue.type) { %> selected="selected"<% } %>>
+                <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>>
                 <%= option.label %>
                 </option>
                 <% }); %>
