@@ -115,7 +115,6 @@ class UpdateCommand extends InitCommand
                 'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
                 'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
                 'searchIndex'  => new Process($console . ' oro:search:create-index --env ' . $env),
-                'dumpEntities' => new Process($console . ' oro:entity-extend:dump --env ' . $env),
             ];
 
             // put system in maintenance mode
