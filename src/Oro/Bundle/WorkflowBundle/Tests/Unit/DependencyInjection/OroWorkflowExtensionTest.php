@@ -16,7 +16,6 @@ class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         'oro_workflow.condition_factory',
         'oro_workflow.action_factory',
         'oro_workflow.configuration.provider.workflow_config',
-        'oro_workflow.form.type.step',
     );
 
     /**
@@ -27,7 +26,6 @@ class OroWorkflowExtensionTest extends \PHPUnit_Framework_TestCase
         'oro_workflow.condition_factory.class',
         'oro_workflow.action_factory.class',
         'oro_workflow.configuration.provider.workflow_config.class',
-        'oro_workflow.form.type.step.class',
     );
 
     public function testLoad()
