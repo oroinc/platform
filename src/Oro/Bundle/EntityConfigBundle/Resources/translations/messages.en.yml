@@ -11,6 +11,7 @@ oro:
             config_entity:
                 message:
                     saved: "Entity saved"
+                    update: "Schema updated"
             config_field:
                 message:
                     saved: "Field saved"

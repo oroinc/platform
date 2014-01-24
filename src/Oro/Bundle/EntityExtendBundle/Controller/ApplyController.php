@@ -77,7 +77,7 @@ class ApplyController extends Controller
         if ($exitCode === 0) {
             $flashBag->add(
                 'success',
-                $this->get('translator')->trans('oro.extend.controller.schema.update.message')
+                $this->get('translator')->trans('oro.entity_config.controller.config_entity.message.update')
             );
         }
 
