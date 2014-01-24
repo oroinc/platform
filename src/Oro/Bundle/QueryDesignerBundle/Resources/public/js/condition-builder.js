@@ -86,13 +86,13 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
             }
 
             $content = this._createConditionContent($root, this._getSourceValue());
-            this._initconditionGroup($content);
+            this._initConditionGroup($content);
             $root.on('changed', $.proxy(this._onChanged, this));
 
             this.$rootCondition = $root;
         },
 
-        _initconditionGroup: function ($group) {
+        _initConditionGroup: function ($group) {
             // make the group sortable
             $group.sortable(this.options.conditionGroup);
             // on change update group's value
@@ -148,7 +148,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
                 break;
             case 'condition-group':
                 $content = this._createConditionContent(this.options.conditionGroupHTML, value || []);
-                this._initconditionGroup($content);
+                this._initConditionGroup($content);
                 break;
             }
 
