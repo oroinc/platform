@@ -138,35 +138,4 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
         $attributeName = self::ATTRIBUTE_NAME;
         $this->assertEquals($user, $context->$attributeName);
     }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Can't extract active user
-     */
-    public function testExecuteExceptionNoToken()
-    {
-        $this->action->initialize(array(new PropertyPath(self::ATTRIBUTE_NAME)));
-        $this->action->execute(new ItemStub());
-    }
-
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Can't extract active user
-     */
-    public function testExecuteExceptionNoUser()
-    {
-        $token = $this->getMockBuilder('Symfony\Component\Security\Core\Authentication\Token\TokenInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $token->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue(null));
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $this->action->initialize(array(new PropertyPath(self::ATTRIBUTE_NAME)));
-        $this->action->execute(new ItemStub());
-    }
 }
