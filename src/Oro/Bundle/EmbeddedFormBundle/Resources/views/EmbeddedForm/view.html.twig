@@ -1,6 +1,16 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as ui %}
 
 {% block navButtons %}
+    {{ UI.deleteButton({
+        'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
+        'dataRedirect': path('oro_embedded_form_list'),
+        'aCss': 'no-hash remove-button',
+        'id': 'btn-remove-embedded-form',
+        'entity_label': 'oro.embedded_form.entity.label'|trans,
+    }) }}
+    {{ UI.buttonSeparator() }}
+    {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Update'|trans, 'label' : 'Update'|trans}) }}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
 {% endblock %}
 
@@ -19,6 +29,19 @@
 
     {% block stats %}
     {% endblock stats %}
+
+    {% set embeddedFormDetails %}
+        <div class="widget-content">
+            <div class="row-fluid form-horizontal">
+                <div class="responsive-block">
+                    {{ ui.renderProperty('oro.embedded_form.title.label'|trans, entity.title) }}
+                    {{ ui.renderProperty('oro.embedded_form.form_type.label'|trans, entity.formType) }}
+                    {{ ui.renderProperty('oro.embedded_form.channel.label'|trans, entity.channel.name) }}
+                    {{ ui.renderProperty('oro.embedded_form.css.label'|trans, entity.css) }}
+                </div>
+            </div>
+        </div>
+    {% endset %}
 
     {% set getCodeSection %}
         <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
@@ -42,10 +65,14 @@
         'title': 'General'|trans,
         'class': 'active',
         'subblocks': [
-        {
-            'title': 'Code'|trans,
-            'data': [getCodeSection]
-        }
+            {
+                'title': 'Details'|trans,
+                'data': [embeddedFormDetails]
+            },
+            {
+                'title': 'Code'|trans,
+                'data': [getCodeSection]
+            }
         ]
     }] %}
     {% set data = {

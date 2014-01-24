@@ -59,10 +59,10 @@ class EmbeddedFormController extends Controller
     }
 
     /**
-     * @Route("code/{id}", name="oro_embedded_form_code", requirements={"id"="[-\d\w]+"})
+     * @Route("view/{id}", name="oro_embedded_form_view", requirements={"id"="[-\d\w]+"})
      * @Template()
      */
-    public function codeAction(EmbeddedFormEntity $entity)
+    public function viewAction(EmbeddedFormEntity $entity)
     {
         return [
             'entity' => $entity

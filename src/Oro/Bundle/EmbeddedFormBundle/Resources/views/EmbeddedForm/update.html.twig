@@ -18,6 +18,7 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
+    {{ UI.button({'path' : path('oro_embedded_form_view', {'id': entity.id}), 'title' : 'oro.embedded_form.get_code'|trans, 'label' : 'oro.embedded_form.get_code'|trans}) }}
     {{ UI.saveAndStayButton() }}
     {{ UI.saveAndCloseButton() }}
 {% endblock %}

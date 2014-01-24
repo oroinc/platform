@@ -15,11 +15,11 @@ datagrid:
                         - { join: embedded_form.channel, alias: channel }
         columns:
             title:
-                label: oro.embedded_form.title
+                label: oro.embedded_form.title.label
             formType:
-                label: oro.embedded_form.form_type
+                label: oro.embedded_form.form_type.label
             channelName:
-                label: oro.embedded_form.channel_name
+                label: oro.embedded_form.channel.label
         properties:
             id: ~
             update_link:
@@ -30,24 +30,24 @@ datagrid:
                 type:       url
                 route:      oro_embedded_form_delete
                 params:     [ id ]
-            code_link:
+            view_link:
                 type:       url
-                route:      oro_embedded_form_code
+                route:      oro_embedded_form_view
                 params:     [ id ]
         actions:
             view:
                 type: navigate
+                label: View
+                icon: user
+                link: view_link
+                rowAction: true
+            update:
+                type: navigate
                 label: Update
                 icon: edit
                 link: update_link
-                rowAction: true
             delete:
                 type: delete
                 label: Delete
                 icon: trash
                 link: delete_link
-            code:
-                type: navigate
-                label: oro.embedded_form.datagrid.get-code
-                icon: code
-                link: code_link

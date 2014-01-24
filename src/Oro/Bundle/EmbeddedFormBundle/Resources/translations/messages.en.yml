@@ -3,6 +3,13 @@ oro:
         entity:
             label: Embedded Form
             plural_label: Embedded Forms
-        title: Title
-        form_type: Form Type
-        channel_name: Channel Name
+        title:
+            label: Title
+        form_type:
+            label: Form Type
+        channel:
+            label:  Channel
+        css:
+            label: CSS
+
+        get_code: Get code
