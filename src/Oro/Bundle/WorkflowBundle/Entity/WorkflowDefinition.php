@@ -322,6 +322,8 @@ class WorkflowDefinition
         if (!$this->hasStepByName($stepName)) {
             $step->setDefinition($this);
             $this->steps->add($step);
+        } else {
+            $this->getStepByName($stepName)->import($step);
         }
 
         return $this;
