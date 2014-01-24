@@ -16,4 +16,3 @@ config:
         'oro/query-designer/grouping/view': 'bundles/oroquerydesigner/js/query-designer/grouping/view.js'
 
         'oroquerydesigner/js/conditions-group': 'bundles/oroquerydesigner/js/conditions-group.js'
-        'oroquerydesigner/js/compare-field': 'bundles/oroquerydesigner/js/compare-field.js'
