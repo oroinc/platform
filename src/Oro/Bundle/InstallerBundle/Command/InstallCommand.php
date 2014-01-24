@@ -151,17 +151,6 @@ class InstallCommand extends ContainerAwareCommand
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
 
-        $user = $container->get('oro_user.manager')->createUser();
-        $role = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroUserBundle:Role')
-            ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
-
-        $businessUnit = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(array('name' => 'Main'));
-
         /** @var ConfigManager $configManager */
         $configManager       = $this->getContainer()->get('oro_config.global');
         $defaultCompanyName  = $configManager->get('oro_ui.application_name');
@@ -222,6 +211,16 @@ class InstallCommand extends ContainerAwareCommand
             ? strtolower($options['sample-data']) == 'y'
             : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
 
+        // create an administrator
+        $user = $container->get('oro_user.manager')->createUser();
+        $role = $container
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository('OroUserBundle:Role')
+            ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
+        $businessUnit = $container
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->findOneBy(array('name' => 'Main'));
         $user
             ->setUsername($userName)
             ->setEmail($userEmail)
@@ -276,7 +275,7 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('assets:install')
             ->runCommand('assetic:dump')
             ->runCommand('oro:translation:dump')
-            ->runCommand('oro:requirejs:build');
+            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
 
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
