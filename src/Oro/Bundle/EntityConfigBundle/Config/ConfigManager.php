@@ -232,7 +232,8 @@ class ConfigManager
     /**
      * @param string $scope
      * @param string $className
-     * @param bool   $withHidden
+     * @param bool   $withHidden Set true if you need all configurable entities,
+     *                           including entities marked as mode="hidden"
      * @return array
      */
     public function getIds($scope, $className = null, $withHidden = false)
@@ -621,8 +622,7 @@ class ConfigManager
             $hasChanges = false;
             $config     = $provider->getConfig($className);
             foreach ($defaultValues as $code => $value) {
-                $valueHasChanges = $config->has($code) && $config->get($code) != $value;
-                if (!$config->has($code) || $valueHasChanges || $force) {
+                if (!$config->has($code) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }
@@ -706,8 +706,7 @@ class ConfigManager
             $hasChanges = false;
             $config     = $provider->getConfig($className, $fieldName);
             foreach ($defaultValues as $code => $value) {
-                $valueHasChanges = $config->has($code) && $config->get($code) != $value;
-                if (!$config->has($code) || $valueHasChanges || $force) {
+                if (!$config->has($code) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }

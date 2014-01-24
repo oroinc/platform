@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Fixtture\Entity;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit as ParentBU;
 
