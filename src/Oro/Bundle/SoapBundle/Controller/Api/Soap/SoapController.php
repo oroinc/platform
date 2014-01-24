@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 abstract class SoapController extends SoapGetController implements
     FormAwareInterface,
@@ -41,7 +42,13 @@ abstract class SoapController extends SoapGetController implements
      */
     public function handleDeleteRequest($id)
     {
-        $this->getDeleteHandler()->handleDelete($id, $this->getManager());
+        try {
+            $this->getDeleteHandler()->handleDelete($id, $this->getManager());
+        } catch (EntityNotFoundException $notFoundEx) {
+            throw new \SoapFault('NOT_FOUND', sprintf('Record with ID "%s" can not be found', $id));
+        } catch (ForbiddenException $forbiddenEx) {
+            throw new \SoapFault('FORBIDDEN', $forbiddenEx->getMessage());
+        }
 
         return true;
     }
