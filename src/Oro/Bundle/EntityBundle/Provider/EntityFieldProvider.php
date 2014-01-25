@@ -49,27 +49,34 @@ class EntityFieldProvider
     /**
      * Constructor
      *
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $extendConfigProvider
+     * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
-     * @param ManagerRegistry $doctrine
-     * @param EntityProvider $entityProvider
-     * @param Translator $translator
+     * @param ManagerRegistry     $doctrine
+     * @param Translator          $translator
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
         ManagerRegistry $doctrine,
-        EntityProvider $entityProvider,
         Translator $translator
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
         $this->entityClassResolver  = $entityClassResolver;
         $this->doctrine             = $doctrine;
-        $this->entityProvider       = $entityProvider;
         $this->translator           = $translator;
+    }
+
+    /**
+     * Sets entity provider
+     *
+     * @param EntityProvider $entityProvider
+     */
+    public function setEntityProvider(EntityProvider $entityProvider)
+    {
+        $this->entityProvider = $entityProvider;
     }
 
     /**
@@ -132,10 +139,10 @@ class EntityFieldProvider
     /**
      * Adds entity fields to $result
      *
-     * @param array $result
-     * @param string $className
+     * @param array         $result
+     * @param string        $className
      * @param EntityManager $em
-     * @param bool $translate
+     * @param bool          $translate
      */
     protected function addFields(array &$result, $className, EntityManager $em, $translate)
     {
@@ -163,16 +170,16 @@ class EntityFieldProvider
     /**
      * Adds a field to $result
      *
-     * @param array $result
+     * @param array  $result
      * @param string $name
      * @param string $type
      * @param string $label
-     * @param bool $isIdentifier
-     * @param bool $translate
+     * @param bool   $isIdentifier
+     * @param bool   $translate
      */
     protected function addField(array &$result, $name, $type, $label, $isIdentifier, $translate)
     {
-         $field = array(
+        $field = array(
             'name'  => $name,
             'type'  => $type,
             'label' => $translate ? $this->translator->trans($label) : $label
@@ -219,15 +226,15 @@ class EntityFieldProvider
 
                     $targetFieldName = $metadata->getAssociationMappedByTargetField($associationName);
                     $targetMetadata  = $em->getClassMetadata($targetClassName);
-                    $fieldLabel = $this->getFieldLabel(
+                    $fieldLabel      = $this->getFieldLabel(
                         $className,
                         $this->getFieldNameToTranslate($className, $associationName)
                     );
-                    $relationData = array(
-                        'name' => $associationName,
-                        'type' => $targetMetadata->getTypeOfField($targetFieldName),
-                        'label' => $fieldLabel,
-                        'relation_type' => $this->getRelationType($className, $associationName),
+                    $relationData    = array(
+                        'name'                => $associationName,
+                        'type'                => $targetMetadata->getTypeOfField($targetFieldName),
+                        'label'               => $fieldLabel,
+                        'relation_type'       => $this->getRelationType($className, $associationName),
                         'related_entity_name' => $targetClassName
                     );
                     $this->addRelation(
@@ -382,6 +389,7 @@ class EntityFieldProvider
         if ($this->entityConfigProvider->hasConfig($className, $fieldName)) {
             /** @var FieldConfigId $configId */
             $configId = $this->entityConfigProvider->getConfig($className, $fieldName)->getId();
+
             return $configId->getFieldType();
         }
 

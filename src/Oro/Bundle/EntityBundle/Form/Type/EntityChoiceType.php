@@ -53,7 +53,7 @@ class EntityChoiceType extends AbstractType
             array(
                 'choices'     => $choices,
                 'empty_value' => '',
-                'show_plural' => true,
+                'show_plural' => false,
                 'configs'     => $defaultConfigs
             )
         );
