@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\DataFixtures\Demo\Migrations\ORM\v1_0;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
@@ -17,7 +16,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class LoadEmails extends AbstractFixture implements ContainerAwareInterface, OrderedFixtureInterface
+class LoadEmails extends AbstractFixture implements ContainerAwareInterface
 {
     /** @var ContainerInterface */
     private $container;
@@ -76,13 +75,5 @@ class LoadEmails extends AbstractFixture implements ContainerAwareInterface, Ord
         $manager->persist($email);
 
         $manager->flush();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getOrder()
-    {
-        return 120;
     }
 }

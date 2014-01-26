@@ -6,11 +6,10 @@ use Symfony\Component\Finder\Finder;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
-abstract class AbstractEmailFixture extends AbstractFixture implements OrderedFixtureInterface
+abstract class AbstractEmailFixture extends AbstractFixture
 {
     /**
      * {@inheritDoc}
@@ -69,12 +68,4 @@ abstract class AbstractEmailFixture extends AbstractFixture implements OrderedFi
      * @return string
      */
     abstract public function getEmailsDir();
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getOrder()
-    {
-        return 120;
-    }
 }
