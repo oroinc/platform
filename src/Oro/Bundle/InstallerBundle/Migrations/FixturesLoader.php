@@ -7,21 +7,31 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\Common\DataFixtures\FixtureInterface;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Doctrine\Common\DataFixtures\Loader;
 
 use Oro\Bundle\InstallerBundle\Entity\BundleVersion;
 use Oro\Bundle\InstallerBundle\Migrations\UpdateBundleVersionFixture;
 
-class FixturesLoader extends ContainerAwareLoader
+class FixturesLoader extends Loader
 {
     const FIXTURES_PATH           = 'DataFixtures/Migrations/ORM';
     const DEMO_DATA_FIXTURES_PATH = 'DataFixtures/Demo/Migrations/ORM';
+
+    const FILE_EXTENSION = '.php';
 
     /**
      * @var EntityManager
      */
     protected $em;
+
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
 
     /**
      * @var KernelInterface
@@ -38,6 +48,8 @@ class FixturesLoader extends ContainerAwareLoader
      */
     protected $bundleDataVersions = [];
 
+    protected $bundleFixtureDirs = [];
+
     /**
      * @var bool
      */
@@ -46,13 +58,13 @@ class FixturesLoader extends ContainerAwareLoader
     /**
      * @param EntityManager $em
      * @param KernelInterface $kernel
+     * @param ContainerInterface $container
      */
     public function __construct(EntityManager $em, KernelInterface $kernel, ContainerInterface $container)
     {
-        $this->em     = $em;
-        $this->kernel = $kernel;
-
-        parent::__construct($container);
+        $this->em        = $em;
+        $this->kernel    = $kernel;
+        $this->container = $container;
     }
 
     /**
@@ -69,13 +81,38 @@ class FixturesLoader extends ContainerAwareLoader
     public function getFixtures()
     {
         if (empty($this->fixturesDirs)) {
-            $this->getFixturePath();
+            $this->setFixturePath();
         }
-
-        foreach ($this->fixturesDirs as $fixtureDir) {
-            $this->loadFromDirectory($fixtureDir);
+        $bundlesFixtures = [];
+        foreach ($this->bundleFixtureDirs as $bundleName => $fixtureDirs) {
+            $fixtures           = [];
+            $parentBundlesArray = [];
+            foreach ($fixtureDirs as $fixtureDir) {
+                list($fixture, $parentBundles) = $this->loadFromBundleDirectory($bundleName, $fixtureDir);
+                $fixtures           = array_merge($fixtures, $fixture);
+                $parentBundlesArray = array_merge($parentBundlesArray, $parentBundles);
+            }
+            $bundleInfo                   = new \stdClass();
+            $bundleInfo->bundleName       = $bundleName;
+            $bundleInfo->fixtures         = $fixtures;
+            $bundleInfo->parentBundles    = $parentBundlesArray;
+            $bundleInfo->iterator         = 0;
+            $bundlesFixtures[$bundleName] = $bundleInfo;
         }
-
+        foreach ($bundlesFixtures as &$bundleInfo) {
+            if (!empty($bundleInfo->parentBundles)) {
+                foreach ($bundleInfo->parentBundles as $parentBundle) {
+                    $bundleInfo->iterator--;
+                    $bundlesFixtures[$parentBundle]->iterator++;
+                }
+            }
+        }
+        usort($bundlesFixtures, [$this, 'sortFixturesStd']);
+        foreach ($bundlesFixtures as $bundleInfo) {
+            foreach ($bundleInfo->fixtures as $fixture) {
+                $this->addFixture($fixture->fixture);
+            }
+        }
         // add update bundle data version fixture
         if (!empty($this->bundleDataVersions)) {
             $updateFixture = new UpdateBundleVersionFixture();
@@ -88,19 +125,97 @@ class FixturesLoader extends ContainerAwareLoader
     }
 
     /**
-     * Get list of fixtures paths to run
-     *
-     * @return array
-     *   [
-     *     [ list of sorted paths ]
-     *     [ new bundles data versions. key - bundle name, value - new data version]
-     *   ]
+     * @param string $bundleName
+     * @param string $dir
+     * @return array Array of loaded fixture object instances
+     * @throws \InvalidArgumentException
      */
-    public function getFixturePath()
+    public function loadFromBundleDirectory($bundleName, $dir)
+    {
+        if (!is_dir($dir)) {
+            throw new \InvalidArgumentException(sprintf('"%s" does not exist', $dir));
+        }
+
+        $fixtures      = array();
+        $includedFiles = array();
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($iterator as $file) {
+            if (($fileName = $file->getBasename(self::FILE_EXTENSION)) == $file->getBasename()) {
+                continue;
+            }
+            $sourceFile = realpath($file->getPathName());
+            require_once $sourceFile;
+            $includedFiles[] = $sourceFile;
+        }
+
+        $declared = get_declared_classes();
+
+        foreach ($declared as $className) {
+            $reflClass  = new \ReflectionClass($className);
+            $sourceFile = $reflClass->getFileName();
+            if (in_array($sourceFile, $includedFiles) && !$this->isTransient($className)) {
+                $fixture           = new \stdClass();
+                $fixture->fixture  = new $className;
+                $fixture->iterator = 0;
+                $fixtures[]        = $fixture;
+            }
+        }
+
+        $parentBundles = [];
+        $this->processDependency($fixtures, $parentBundles, $bundleName);
+
+        usort($fixtures, [$this, 'sortFixturesStd']);
+
+        return [$fixtures, $parentBundles];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addFixture(FixtureInterface $fixture)
+    {
+        if ($fixture instanceof ContainerAwareInterface) {
+            $fixture->setContainer($this->container);
+        }
+
+        $reflection = new \ReflectionObject($this);
+        $parent     = $reflection->getParentClass();
+
+        $fixtureClass = get_class($fixture);
+
+        $fixturesReflection = $parent->getProperty('fixtures');
+        $fixturesReflection->setAccessible(true);
+        $fixtures = $fixturesReflection->getValue($this);
+
+        if (!isset($fixtures[$fixtureClass])) {
+            if ($fixture instanceof OrderedFixtureInterface) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Versioned fixtures does not support OrderedFixtureInterface. Please fix %s fixture.',
+                        get_class($fixture)
+                    )
+                );
+            }
+
+            $fixtures[$fixtureClass] = $fixture;
+        }
+
+        $fixturesReflection->setValue($this, $fixtures);
+    }
+
+    /**
+     * Set list of fixtures paths to run
+     */
+    public function setFixturePath()
     {
         $repo               = $this->em->getRepository('OroInstallerBundle:BundleVersion');
-        $fixtureDirs        = [];
         $bundleDataVersions = [];
+        $bundleFixtureDirs  = [];
         $bundles            = $this->kernel->getBundles();
         foreach ($bundles as $bundleName => $bundle) {
             $bundlePath         = $bundle->getPath();
@@ -121,18 +236,17 @@ class FixturesLoader extends ContainerAwareLoader
                         /** @var BundleVersion $versionData */
                         $versionData = $repo->findOneBy(['bundleName' => $bundleName]);
                         if ($versionData) {
-                            $bundleDataVersion = $this->getVersionInfo(
-                                $this->loadDemoData
+                            $version           = $this->loadDemoData
                                 ? $versionData->getDemoDataVersion()
-                                : $versionData->getDataVersion()
-                            );
+                                : $versionData->getDataVersion();
+                            $bundleDataVersion = $this->getVersionInfo($version);
                         } else {
                             $bundleDataVersion = false;
                         }
                     }
 
-                    $relativePathVersion   = $directory->getRelativePathname();
-                    $fixtureVersion = $this->getVersionInfo($relativePathVersion);
+                    $relativePathVersion = $directory->getRelativePathname();
+                    $fixtureVersion      = $this->getVersionInfo($relativePathVersion);
                     if (!is_array($bundleDataVersion)
                         || $this->compareVersions($bundleDataVersion, $fixtureVersion) > 0
                     ) {
@@ -143,22 +257,17 @@ class FixturesLoader extends ContainerAwareLoader
                 //dir doesn't exists
             }
 
-            if (!empty($bundleDirFixtures)) {
-                usort($bundleDirFixtures, array($this, 'sortFixtures'));
-                foreach ($bundleDirFixtures as $relativePathFixture) {
-                    $fixtureDirs[] = $bundleFixturesPath . DIRECTORY_SEPARATOR . $relativePathFixture;
-                }
-                $bundleDataVersions[$bundleName] = array_pop($bundleDirFixtures);
-            }
+            $this->setSortedFixtures(
+                $bundleDirFixtures,
+                $bundleName,
+                $bundleFixturesPath,
+                $bundleDataVersions,
+                $bundleFixtureDirs
+            );
         }
 
-        $this->fixturesDirs       = $fixtureDirs;
         $this->bundleDataVersions = $bundleDataVersions;
-
-        return [
-            $fixtureDirs,
-            $bundleDataVersions
-        ];
+        $this->bundleFixtureDirs  = $bundleFixtureDirs;
     }
 
     /**
@@ -215,5 +324,90 @@ class FixturesLoader extends ContainerAwareLoader
         preg_match_all('/\d+/', $pathString, $matches);
 
         return isset($matches[0]) ? $matches[0] : [];
+    }
+
+    protected function sortFixturesStd($a, $b)
+    {
+        if ($a->iterator > $b->iterator) {
+            return -1;
+        }
+        if ($a->iterator < $b->iterator) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @param string $className
+     * @return bool|string
+     */
+    protected function getBundleNameForClass($className)
+    {
+        $bundleClass = substr($className, 0, strrpos($className, 'Bundle\\') + 6);
+        foreach ($this->kernel->getBundles() as $bundle) {
+            if (get_class($bundle) == $bundleClass . '\\' . $bundle->getName()) {
+
+                return $bundle->getName();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $fixtures
+     * @param $parentBundles
+     * @param $bundleName
+     */
+    protected function processDependency(&$fixtures, &$parentBundles, $bundleName)
+    {
+        foreach ($fixtures as &$fixtureData) {
+            if ($fixtureData->fixture instanceof DependentFixtureInterface) {
+                foreach ($fixtureData->fixture->getDependencies() as $dependency) {
+                    $bundle = $this->getBundleNameForClass($dependency);
+                    if ($bundle == $bundleName) {
+                        foreach ($fixtures as &$bundleFixture) {
+                            if (get_class($bundleFixture->fixture) == $dependency) {
+                                $bundleFixture->iterator++;
+                            }
+                        }
+                        $fixtureData->iterator--;
+                    } else {
+                        $parentBundles[] = $bundle;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @param $bundleDirFixtures
+     * @param $bundleName
+     * @param $bundleFixturesPath
+     * @param $bundleDataVersions
+     * @param $bundleFixtureDirs
+     * @return array
+     */
+    protected function setSortedFixtures(
+        $bundleDirFixtures,
+        $bundleName,
+        $bundleFixturesPath,
+        &$bundleDataVersions,
+        &$bundleFixtureDirs
+    ) {
+        if (!empty($bundleDirFixtures)) {
+            usort($bundleDirFixtures, [$this, 'sortFixtures']);
+            foreach ($bundleDirFixtures as $relativePathFixture) {
+                if (!isset($bundleFixtureDirs[$bundleName])) {
+                    $bundleFixtureDirs[$bundleName] = [];
+                }
+                $bundleFixtureDirs[$bundleName][$relativePathFixture] =
+                    $bundleFixturesPath . DIRECTORY_SEPARATOR . $relativePathFixture;
+            }
+            $bundleDataVersions[$bundleName] = array_pop($bundleDirFixtures);
+        }
+
+        return [$bundleDataVersions, $bundleFixtureDirs];
     }
 }
