@@ -638,14 +638,14 @@ class ConfigManager
             }
             if ($hasChanges) {
                 $provider->persist($config);
+            }
 
-                if (in_array($scope, UpdateEntityConfigModelEvent::$scopes)) {
-                    if ($entityModel = $this->getConfigEntityModel($className)) {
-                        $this->eventDispatcher->dispatch(
-                            Events::UPDATE_ENTITY_CONFIG_MODEL,
-                            new UpdateEntityConfigModelEvent($entityModel, $this)
-                        );
-                    }
+            if (in_array($scope, UpdateEntityConfigModelEvent::$scopes)) {
+                if ($entityModel = $this->getConfigEntityModel($className)) {
+                    $this->eventDispatcher->dispatch(
+                        Events::UPDATE_ENTITY_CONFIG_MODEL,
+                        new UpdateEntityConfigModelEvent($entityModel, $this)
+                    );
                 }
             }
         }
