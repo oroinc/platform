@@ -214,7 +214,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     'icon'         => isset($config['icon']) ? $config['icon'] : 'question-sign',
                     'link'         => strtolower($config['name']) . '_link',
                     'type'         => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,
-                    'confirmation' => isset($config['confirmation']) ? $config['confirmation'] : false
+                    //'confirmation' => isset($config['confirmation']) ? $config['confirmation'] : false
                 );
 
                 $actions = array_merge($actions, [strtolower($config['name']) => $configItem]);
