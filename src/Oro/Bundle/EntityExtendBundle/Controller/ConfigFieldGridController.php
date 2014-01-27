@@ -193,7 +193,7 @@ class ConfigFieldGridController extends Controller
                 $configManager->persist($extendEntityConfig);
                 $configManager->flush();
 
-                return $this->get('oro_ui.router')->actionRedirect(
+                return $this->get('oro_ui.router')->redirectAfterSave(
                     ['route' => 'oro_entityconfig_field_update', 'parameters' => ['id' => $newFieldModel->getId()]],
                     ['route' => 'oro_entityconfig_view', 'parameters' => ['id' => $entity->getId()]]
                 );

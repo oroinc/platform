@@ -101,17 +101,10 @@ class ReportController extends Controller
                 $this->get('translator')->trans('Report saved')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
-                array(
-                    'route'      => 'oro_report_update',
-                    'parameters' => array('id' => $entity->getId()),
-                ),
-                array(
-                    'route'      => 'oro_report_index',
-                    // @todo: WILL BE IMPLEMENTER LATER
-                    //'route'      => 'oro_report_view',
-                    'parameters' => array()
-                )
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                ['route' => 'oro_report_update', 'parameters' => ['id' => $entity->getId()]],
+                ['route' => 'oro_report_index'],
+                $entity
             );
         }
 

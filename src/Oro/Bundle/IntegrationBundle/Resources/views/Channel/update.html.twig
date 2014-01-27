@@ -10,7 +10,7 @@
 {% endif %}
 
 {% block navButtons %}
-    {% if entity.id and resource_granted('oro_integration_channel_delete') %}
+    {% if entity.id and resource_granted('oro_integration_channel_delete', entity) %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_channel', {'id': entity.id}),
             'dataRedirect': path('oro_integration_channel_index'),
@@ -31,7 +31,9 @@
             'label' : 'Schedule sync'
         }) }}
     {% endif %}
-    {{ UI.saveAndStayButton('oro_integration_channel_update') }}
+    {% if form.vars.value.id or resource_granted('oro_integration_channel_update') %}
+        {{ UI.saveAndStayButton() }}
+    {% endif %}
     {{ UI.buttonType({'type': 'button', 'class': 'btn-success', 'label': 'Save and Close', 'action': 'save'}) }}
 {% endblock navButtons %}
 

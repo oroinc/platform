@@ -36,7 +36,7 @@
 {% endblock %}
 
 {% block navButtons %}
-    {% if form.vars.value.id and resource_granted('oro_user_user_delete') and  form.vars.value.id!=app.user.id %}
+    {% if form.vars.value.id and resource_granted('oro_user_user_delete', form.vars.value) and form.vars.value.id != app.user.id %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_user', {'id': form.vars.value.id}),
             'dataRedirect': path('oro_user_index'),
@@ -49,7 +49,9 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.button({'path' : path('oro_user_index'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
-    {{ UI.saveAndStayButton('oro_user_user_update') }}
+    {% if form.vars.value.id or resource_granted('oro_user_user_update') %}
+        {{ UI.saveAndStayButton() }}
+    {% endif %}
     {{ UI.saveAndCloseButton() }}
 {% endblock navButtons %}
 

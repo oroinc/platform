@@ -152,12 +152,10 @@ class UserController extends Controller
                     'parameters' => array('id' => $entity->getId())
                 );
             }
-            return $this->get('oro_ui.router')->actionRedirect(
-                array(
-                    'route' => 'oro_user_update',
-                    'parameters' => array('id' => $entity->getId()),
-                ),
-                $closeButtonRoute
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                ['route' => 'oro_user_update', 'parameters' => ['id' => $entity->getId()]],
+                $closeButtonRoute,
+                $entity
             );
         }
 

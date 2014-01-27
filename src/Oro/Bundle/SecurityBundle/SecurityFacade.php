@@ -43,10 +43,10 @@ class SecurityFacade
         ObjectIdentityFactory $objectIdentityFactory,
         LoggerInterface $logger
     ) {
-        $this->securityContext = $securityContext;
-        $this->annotationProvider = $annotationProvider;
+        $this->securityContext       = $securityContext;
+        $this->annotationProvider    = $annotationProvider;
         $this->objectIdentityFactory = $objectIdentityFactory;
-        $this->logger = $logger;
+        $this->logger                = $logger;
     }
 
     /**
@@ -110,27 +110,42 @@ class SecurityFacade
      *
      * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id
      *                                    or something else, it depends on registered security voters
-     * @param  mixed $object A domain object, object identity or object identity descriptor (id:type)
+     * @param  mixed          $object     A domain object, object identity or object identity descriptor (id:type)
      * @return bool
      */
     public function isGranted($attributes, $object = null)
     {
-        if ($object === null
-            && is_string($attributes)
-            && $annotation = $this->annotationProvider->findAnnotationById($attributes)
-        ) {
-            $this->logger->debug(sprintf('Check an access using "%s" ACL annotation.', $annotation->getId()));
-            $isGranted = $this->securityContext->isGranted(
-                $annotation->getPermission(),
-                $this->objectIdentityFactory->get($annotation)
-            );
-        } elseif (is_string($object)) {
-            $isGranted = $this->securityContext->isGranted(
-                $attributes,
-                $this->objectIdentityFactory->get($object)
-            );
+        $isGranted = false;
+
+        if ($object === null) {
+            if (is_string($attributes)
+                && $annotation = $this->annotationProvider->findAnnotationById($attributes)
+            ) {
+                $this->logger->debug(
+                    sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
+                );
+                $isGranted = $this->securityContext->isGranted(
+                    $annotation->getPermission(),
+                    $this->objectIdentityFactory->get($annotation)
+                );
+            }
         } else {
-            $isGranted = $this->securityContext->isGranted($attributes, $object);
+            if (is_string($attributes)
+                && $annotation = $this->annotationProvider->findAnnotationById($attributes)
+            ) {
+                $this->logger->debug(
+                    sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
+                );
+                $attributes = $annotation->getPermission();
+            }
+            if (is_string($object)) {
+                $isGranted = $this->securityContext->isGranted(
+                    $attributes,
+                    $this->objectIdentityFactory->get($object)
+                );
+            } else {
+                $isGranted = $this->securityContext->isGranted($attributes, $object);
+            }
         }
 
         return $isGranted;
