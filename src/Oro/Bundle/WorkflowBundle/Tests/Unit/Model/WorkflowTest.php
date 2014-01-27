@@ -240,7 +240,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $isTransitionStart,
         $hasCurrentStep,
         $stepAllowTransition,
-        $isTransitionGranted,
         $fireExceptions = true
     ) {
         $workflowStep = new WorkflowStep();
@@ -275,16 +274,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->with($workflowItem, $errors)
             ->will($this->returnValue($transitionAllowed));
 
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->setMethods(array('isGranted'))
-            ->getMock();
-        $securityFacade->expects($this->any())
-            ->method('isGranted')
-            ->with('EDIT', $entity)
-            ->will($this->returnValue($isTransitionGranted));
-
-        $workflow = $this->createWorkflow('test_workflow', null, $securityFacade);
+        $workflow = $this->createWorkflow('test_workflow', null);
         if ($transitionExist) {
             $workflow->getTransitionManager()->setTransitions(array($transition));
         }
@@ -316,7 +306,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => true,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
             ),
             'allowed_transition' => array(
                 'expectedResult' => true,
@@ -325,16 +314,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
-            ),
-            'not_granted_transition' => array(
-                'expectedResult' => false,
-                'transitionExist' => true,
-                'transitionAllowed' => true,
-                'isTransitionStart' => false,
-                'hasCurrentStep' => true,
-                'stepAllowTransition' => true,
-                'isTransitionGranted' => false,
             ),
             'not_allowed_start_transition' => array(
                 'expectedResult' => false,
@@ -343,7 +322,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
             ),
             'allowed_start_transition' => array(
                 'expectedResult' => true,
@@ -352,7 +330,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => true,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
             ),
             'unknown_transition_fire_exception' => array(
                 'expectedException' => InvalidTransitionException::unknownTransition('test_transition'),
@@ -361,7 +338,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
             ),
             'unknown_transition_no_exception' => array(
                 'expectedResult' => false,
@@ -370,7 +346,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
                 'fireException' => false
             ),
             'not_start_transition_fire_exception' => array(
@@ -383,7 +358,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => false,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
             ),
             'not_start_transition_no_exception' => array(
                 'expectedResult' => false,
@@ -392,7 +366,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => false,
                 'stepAllowTransition' => true,
-                'isTransitionGranted' => true,
                 'fireException' => false
             ),
             'step_not_allow_transition_fire_exception' => array(
@@ -406,7 +379,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => false,
-                'isTransitionGranted' => true,
             ),
             'step_not_allow_transition_no_exception' => array(
                 'expectedResult' => false,
@@ -415,7 +387,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 'isTransitionStart' => false,
                 'hasCurrentStep' => true,
                 'stepAllowTransition' => false,
-                'isTransitionGranted' => true,
                 'fireException' => false
             ),
         );
@@ -755,14 +726,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('extractTransition')
             ->with($transition)
             ->will($this->returnValue($transition));
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->setMethods(array('isGranted'))
-            ->getMock();
-        $securityFacade->expects($this->any())
-            ->method('isGranted')
-            ->will($this->returnValue(true));
-        $workflow = $this->createWorkflow(null, null, $securityFacade, null, $transitionManager);
+        $workflow = $this->createWorkflow(null, null, null, $transitionManager);
 
         $this->assertTrue($workflow->isTransitionAvailable($workflowItem, $transition, $errors));
     }
@@ -789,19 +753,11 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
             ->method('extractTransition')
             ->with($transition)
             ->will($this->returnValue($transition));
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->setMethods(array('isGranted'))
-            ->getMock();
-        $securityFacade->expects($this->any())
-            ->method('isGranted')
-            ->will($this->returnValue(true));
-
         $entity = new \DateTime();
         $entityAttribute = new Attribute();
         $entityAttribute->setName('entity');
 
-        $workflow = $this->createWorkflow(null, null, $securityFacade, null, $transitionManager);
+        $workflow = $this->createWorkflow(null, null, null, $transitionManager);
         $workflow->setDefinition($workflowDefinition);
         $workflow->getAttributeManager()->setAttributes(array($entityAttribute));
         $workflow->getAttributeManager()->setEntityAttributeName($entityAttribute->getName());
@@ -940,7 +896,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $workflowName
      * @param EntityConnector $entityConnector
-     * @param SecurityFacade $securityFacade
      * @param AttributeManager $attributeManager
      * @param TransitionManager $transitionManager
      * @return Workflow
@@ -948,7 +903,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
     protected function createWorkflow(
         $workflowName = null,
         $entityConnector = null,
-        $securityFacade = null,
         $attributeManager = null,
         $transitionManager = null
     ) {
@@ -958,12 +912,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         }
 
-        if (!$securityFacade) {
-            $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-                ->disableOriginalConstructor()
-                ->getMock();
-        }
-        $workflow = new Workflow($entityConnector, $securityFacade, null, $attributeManager, $transitionManager);
+        $workflow = new Workflow($entityConnector, null, $attributeManager, $transitionManager);
         $workflow->setName($workflowName);
         return $workflow;
     }
@@ -992,7 +941,7 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $attributeManager->expects($this->once())
             ->method('getAttributes')
             ->will($this->returnValue($attributes));
-        $workflow = $this->createWorkflow(null, null, null, $attributeManager);
+        $workflow = $this->createWorkflow(null, null, $attributeManager);
         $expected = array('name' => 'path');
         $this->assertEquals($expected, $workflow->getAttributesMapping());
     }

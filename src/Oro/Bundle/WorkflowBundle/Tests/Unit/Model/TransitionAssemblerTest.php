@@ -173,17 +173,30 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         );
 
         $expectedCondition = null;
+        $expectedPreCondition = $this->createCondition();
         $expectedAction = null;
-        $conditionFactoryCallCount = 0;
-        if (array_key_exists('pre_conditions', $transitionDefinition)) {
-            $conditionFactoryCallCount++;
+        $defaultAclPrecondition = array('@acl_granted' => array('parameters' => array('EDIT', '$.entity')));
+        if (isset($transitionDefinition['pre_conditions'])) {
+            $preConditions = array(
+                '@and' => array(
+                    $defaultAclPrecondition,
+                    $transitionDefinition['pre_conditions']
+                )
+            );
+        } else {
+            $preConditions = $defaultAclPrecondition;
         }
+
+        $this->conditionFactory->expects($this->at(0))
+            ->method('create')
+            ->with(
+                ConfigurableCondition::ALIAS,
+                $preConditions
+            )
+            ->will($this->returnValue($expectedPreCondition));
         if (array_key_exists('conditions', $transitionDefinition)) {
-            $conditionFactoryCallCount++;
-        }
-        if ($conditionFactoryCallCount) {
             $expectedCondition = $this->createCondition();
-            $this->conditionFactory->expects($this->exactly($conditionFactoryCallCount))
+            $this->conditionFactory->expects($this->at(1))
                 ->method('create')
                 ->with(
                     ConfigurableCondition::ALIAS,
@@ -243,15 +256,24 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         /** @var Transition $actualTransition */
         $actualTransition = $transitions->get('test');
-        $this->assertEquals('test', $actualTransition->getName());
-        $this->assertEquals($steps['step'], $actualTransition->getStepTo());
-        $this->assertEquals($configuration['label'], $actualTransition->getLabel());
-        $this->assertEquals($configuration['frontend_options'], $actualTransition->getFrontendOptions());
-        $this->assertEquals($configuration['is_start'], $actualTransition->isStart());
-        $this->assertEquals($configuration['form_type'], $actualTransition->getFormType());
-        $this->assertEquals($configuration['form_options'], $actualTransition->getFormOptions());
-        $this->assertEquals($expectedCondition, $actualTransition->getCondition());
-        $this->assertEquals($expectedAction, $actualTransition->getPostAction());
+        $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $this->assertEquals($configuration['label'], $actualTransition->getLabel(), 'Incorrect label');
+        $this->assertEquals(
+            $configuration['frontend_options'],
+            $actualTransition->getFrontendOptions(),
+            'Incorrect frontend_options'
+        );
+        $this->assertEquals($configuration['is_start'], $actualTransition->isStart(), 'Incorrect is_start');
+        $this->assertEquals($configuration['form_type'], $actualTransition->getFormType(), 'Incorrect form_type');
+        $this->assertEquals(
+            $configuration['form_options'],
+            $actualTransition->getFormOptions(),
+            'Incorrect form_options'
+        );
+        $this->assertEquals($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
+        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
+        $this->assertEquals($expectedAction, $actualTransition->getPostAction(), 'Incorrect post_action');
     }
 
     public function configurationDataProvider()

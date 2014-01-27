@@ -48,10 +48,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
-        return new Workflow($entityConnector, $securityFacade);
+        return new Workflow($entityConnector);
     }
 
     /**

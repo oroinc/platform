@@ -117,11 +117,11 @@ class TransitionAssembler extends AbstractAssembler
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
-            ->setAclResource($this->getOption($options, 'acl_resource', null))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
             ->setFrontendOptions($this->getOption($options, 'frontend_options', array()));
 
+        $definition['pre_conditions'] = $this->addAclPreConditions($options, $definition);
         if (!empty($definition['pre_conditions'])) {
             $condition = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $definition['pre_conditions']);
             $transition->setPreCondition($condition);
@@ -138,6 +138,41 @@ class TransitionAssembler extends AbstractAssembler
         }
 
         return $transition;
+    }
+
+    /**
+     * @param array $options
+     * @param array $definition
+     * @return array
+     */
+    protected function addAclPreConditions(array $options, array $definition)
+    {
+        $aclPreConditionDefinitionParameters = array($this->getOption($options, 'acl_resource', 'EDIT'));
+        if (!$this->getOption($options, 'acl_resource', null)) {
+            $aclPreConditionDefinitionParameters[] = '$.entity';
+        }
+
+        $aclPreConditionDefinition = array(
+            'parameters' => $aclPreConditionDefinitionParameters
+        );
+        $aclMessage = $this->getOption($options, 'acl_message', null);
+        if ($aclMessage) {
+            $aclPreConditionDefinition['message'] = $aclMessage;
+        }
+
+        $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
+        if (empty($definition['pre_conditions'])) {
+            $definition['pre_conditions'] = $aclPreCondition;
+        } else {
+            $definition['pre_conditions'] = array(
+                '@and' => array(
+                    $aclPreCondition,
+                    $definition['pre_conditions']
+                )
+            );
+        }
+
+        return $definition['pre_conditions'];
     }
 
     /**

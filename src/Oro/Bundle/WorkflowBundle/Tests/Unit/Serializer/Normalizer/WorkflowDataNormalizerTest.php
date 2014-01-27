@@ -52,13 +52,10 @@ class WorkflowDataNormalizerTest extends \PHPUnit_Framework_TestCase
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->workflow = $this->getMock(
             'Oro\Bundle\WorkflowBundle\Model\Workflow',
             array('getName'),
-            array($entityConnector, $securityFacade, null, $this->attributeManager, null)
+            array($entityConnector, null, $this->attributeManager, null)
         );
         $this->attribute = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Attribute');
         $this->normalizer = new WorkflowDataNormalizer();
