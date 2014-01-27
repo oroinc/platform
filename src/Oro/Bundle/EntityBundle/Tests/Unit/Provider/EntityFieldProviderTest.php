@@ -64,9 +64,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $this->extendConfigProvider,
             $this->entityClassResolver,
             $this->doctrine,
-            $entityProvider,
             $translator
         );
+        $this->provider->setEntityProvider($entityProvider);
     }
 
     public function testGetFieldsNoEntityConfig()
