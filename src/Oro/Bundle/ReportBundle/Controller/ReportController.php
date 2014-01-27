@@ -107,10 +107,8 @@ class ReportController extends Controller
                     'parameters' => array('id' => $entity->getId()),
                 ),
                 array(
-                    'route'      => 'oro_report_index',
-                    // @todo: WILL BE IMPLEMENTER LATER
-                    //'route'      => 'oro_report_view',
-                    'parameters' => array()
+                    'route'      => 'oro_report_view',
+                    'parameters' => array('id' => $entity->getId()),
                 )
             );
         }
