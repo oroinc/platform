@@ -156,7 +156,7 @@ class FixturesLoader extends Loader
     /**
      * @param string $bundleName
      * @param string $dir
-     * @return array Array of loaded fixture object instances
+     * @return array Array of loaded fixture object instances and Array with parent bundles from the dependencies
      * @throws \InvalidArgumentException
      */
     public function loadFromBundleDirectory($bundleName, $dir)
