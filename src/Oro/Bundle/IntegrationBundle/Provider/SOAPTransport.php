@@ -38,12 +38,12 @@ abstract class SOAPTransport implements TransportInterface
     /**
      * {@inheritdoc}
      */
-    public function call($action, array $params = [])
+    public function call($action, $params = [])
     {
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
-        $result = $this->client->__soapCall($action, $params);
+        $result = call_user_func_array([$this->client, $action], $params);
 
         return $result;
     }
