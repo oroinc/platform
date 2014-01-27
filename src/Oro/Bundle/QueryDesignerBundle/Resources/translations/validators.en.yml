@@ -1,6 +1,7 @@
-"Extra tokens in filter": Extra tokens in filter
-"You use not all filters": You use not all filters
-"You use extra filters": You use extra filters
-"Extra open parenthesis": Extra open parenthesis
-"Extra close parenthesis": Extra close parenthesis
-
+oro:
+    query_designer:
+        condition_builder:
+            condition_filed:
+                not_blank: "This condition should not be blank."
+            condition_group:
+                not_blank: "This group should not be blank."

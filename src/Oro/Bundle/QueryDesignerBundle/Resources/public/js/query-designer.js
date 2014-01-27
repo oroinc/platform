@@ -1,8 +1,8 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oro/loading-mask',
-    'oro/query-designer/column/view', 'oro/query-designer/filter/view'],
-function(_, Backbone, __, app, messenger, LoadingMask,
-         ColumnView, FilterView) {
+/*global define*/
+/*jslint nomen: true*/
+define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
+    'oro/query-designer/column/view', 'oroquerydesigner/js/condition-builder'
+    ], function (_, Backbone, __, app, messenger, ColumnView) {
     'use strict';
 
     var $ = Backbone.$;
@@ -16,9 +16,6 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         /** @property {Object} */
         options: {
             storageElementSelector: null,
-            getLoadColumnsUrl: function (entityName) {
-                return '';
-            },
             columnChainTemplateSelector: null,
             fieldsLabel: 'Fields',
             relatedLabel: 'Related',
@@ -31,76 +28,36 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 itemTemplateSelector: null,
                 itemFormSelector: null
             },
-            filtersOptions: {
-                collection: null,
-                itemTemplateSelector: null,
-                itemFormSelector: null
-            }
+            conditionBuilderSelector: ''
         },
-
-        /** @property {oro.LoadingMask} */
-        loadingMask: null,
 
         /** @property {oro.queryDesigner.column.View} */
         columnsView: null,
 
-        /** @property {oro.queryDesigner.filter.View} */
-        filtersView: null,
-
         /** @property {jQuery} */
         storageEl: null,
 
-        initialize: function() {
+        initialize: function () {
             if (this.options.storageElementSelector) {
                 this.storageEl = $(this.options.storageElementSelector);
             }
 
-            // initialize loading mask control
-            this.loadingMask = new LoadingMask();
-            this.$el.append(this.loadingMask.render().$el);
-
             // initialize views
             this.initColumnsView();
-            this.initFiltersView();
-
-            this.$el.closest('form').on('submit', _.bind(function (e) {
-                this.onPreSubmit();
-                return true;
-            }, this));
+            this.$conditions = $(this.options.conditionBuilderSelector);
         },
 
         isEmpty: function () {
-            return this.columnsView.getCollection().isEmpty()
-                && this.filtersView.getCollection().isEmpty();
+            return this.columnsView.getCollection().isEmpty() &&
+                _.isEmpty(this.$conditions.conditionBuilder('getValue'));
         },
 
         changeEntity: function (entityName, columns) {
-            if (_.isNull(entityName) || entityName == '') {
-                this.updateColumnSelectors(_.isNull(entityName) ? '' : entityName, []);
-            } else if (!_.isUndefined(columns) && !_.isNull(columns)) {
-                this.updateColumnSelectors(_.isNull(entityName) ? '' : entityName, columns);
-            } else {
-                var url = this.options.getLoadColumnsUrl(entityName.replace(/\\/g,"_"));
-                if (!_.isNull(url) && url != '') {
-                    this.disableViews();
-                    $.ajax({
-                        url: url,
-                        success: _.bind(function(data) {
-                            this.updateColumnSelectors(entityName, data);
-                            this.enableViews();
-                        }, this),
-                        error: _.bind(function (jqXHR) {
-                            this.showError(jqXHR.responseJSON);
-                            this.enableViews();
-                        }, this)
-                    });
-                }
-            }
+            this.updateColumnSelectors(entityName || '', columns || []);
         },
 
         updateColumnSelectors: function (entityName, data) {
             this.columnsView.changeEntity(entityName, data);
-            this.filtersView.changeEntity(entityName, data);
         },
 
         updateStorage: function () {
@@ -109,11 +66,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 _.each(columns, function (value) {
                     delete value.id;
                 });
-                var filters = this.filtersView.getCollection().toJSON();
-                _.each(filters, function (value) {
-                    delete value.id;
-                    delete value.index;
-                });
+                var filters = this.$conditions.conditionBuilder('getValue');
                 var groupingColumns = [];
                 _.each(this.columnsView.getGroupingColumns(), function (name) {
                     groupingColumns.push({
@@ -123,8 +76,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 var data = {
                     columns: columns,
                     grouping_columns: groupingColumns,
-                    filters: filters,
-                    filters_logic: this.filtersView.getFiltersLogic()
+                    filters: filters
                 };
                 this.storageEl.val(JSON.stringify(data));
             }
@@ -149,16 +101,10 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             }
             this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
             this.listenTo(this.columnsView, 'grouping:change', _.bind(this.updateStorage, this));
-
-            // render FiltersView
-            this.filtersView.render();
-            if (!_.isUndefined(data['filters']) && !_.isEmpty(data['filters'])) {
-                this.filtersView.getCollection().reset(data['filters']);
+            this.$conditions.on('changed', _.bind(this.updateStorage, this));
+            if (!_.isEmpty(data.filters)) {
+                this.$conditions.conditionBuilder('setValue', data.filters);
             }
-            if (!_.isUndefined(data['filters_logic']) && !_.isEmpty(data['filters_logic'])) {
-                this.filtersView.setFiltersLogic(data['filters_logic']);
-            }
-            this.listenTo(this.filtersView, 'collection:change', _.bind(this.updateStorage, this));
 
             return this;
         },
@@ -175,55 +121,6 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             );
             this.columnsView = new ColumnView(columnsOptions);
             delete this.options.columnsOptions;
-        },
-
-        initFiltersView: function () {
-            var filtersOptions = _.extend(
-                {
-                    columnChainTemplateSelector: this.options.columnChainTemplateSelector,
-                    fieldsLabel: this.options.fieldsLabel,
-                    relatedLabel: this.options.relatedLabel,
-                    findEntity: this.options.findEntity
-                },
-                this.options.filtersOptions
-            );
-            this.filtersView = new FilterView(filtersOptions);
-            delete this.options.filtersOptions;
-        },
-
-        onPreSubmit: function () {
-            if (this.storageEl && this.storageEl.val() != '') {
-                var data = JSON.parse(this.storageEl.val());
-                if (!_.isUndefined(data['filters_logic']) && data['filters_logic'] != this.filtersView.getFiltersLogic()) {
-                    data['filters_logic'] = this.filtersView.getFiltersLogic();
-                    this.storageEl.val(JSON.stringify(data));
-                }
-            }
-        },
-
-        enableViews: function () {
-            this.loadingMask.hide();
-        },
-
-        disableViews: function () {
-            this.loadingMask.show();
-        },
-
-        showError: function (err) {
-            if (!_.isUndefined(console)) {
-                console.error(_.isUndefined(err.stack) ? err : err.stack);
-            }
-            var msg = __('Sorry, unexpected error was occurred');
-            if (app.debug) {
-                if (!_.isUndefined(err.message)) {
-                    msg += ': ' + err.message;
-                } else if (!_.isUndefined(err.errors) && _.isArray(err.errors)) {
-                    msg += ': ' + err.errors.join();
-                } else if (_.isString(err)) {
-                    msg += ': ' + err;
-                }
-            }
-            messenger.notificationFlashMessage('error', msg);
         }
     });
 });

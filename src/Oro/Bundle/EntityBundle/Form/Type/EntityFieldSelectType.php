@@ -172,8 +172,7 @@ class EntityFieldSelectType extends AbstractType
      */
     protected function convertData(array &$fields, $entityName, $parentFieldId)
     {
-        $resultFields    = [];
-        $resultRelations = [];
+        $result    = [];
         foreach ($fields as $field) {
             $fieldId = null !== $parentFieldId
                 ? sprintf('%s+%s::%s', $parentFieldId, $entityName, $field['name'])
@@ -189,7 +188,7 @@ class EntityFieldSelectType extends AbstractType
 
             if (!isset($field['related_entity_name'])) {
                 $fieldData['id'] = $fieldId;
-                $resultFields[]  = $fieldData;
+                $result[]  = $fieldData;
             } else {
                 if (isset($field['related_entity_fields'])) {
                     $fieldData['children'] = $this->convertData(
@@ -198,24 +197,7 @@ class EntityFieldSelectType extends AbstractType
                         $fieldId
                     );
                 }
-                $resultRelations[] = $fieldData;
-            }
-        }
-
-        $result = [];
-        if (!empty($resultFields)) {
-            if (null === $parentFieldId && empty($resultRelations)) {
-                $result = $resultFields;
-            } else {
-                $result[] = [
-                    'text'     => $this->translator->trans('oro.entity.form.entity_fields'),
-                    'children' => $resultFields
-                ];
-            }
-        }
-        if (!empty($resultRelations)) {
-            foreach ($resultRelations as $resultRelation) {
-                $result[] = $resultRelation;
+                $result[] = $fieldData;
             }
         }
 
