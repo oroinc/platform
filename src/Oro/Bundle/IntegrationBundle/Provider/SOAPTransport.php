@@ -43,7 +43,7 @@ abstract class SOAPTransport implements TransportInterface
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
-        $result = $this->client->{$action}($params);
+        $result = call_user_func_array([$this->client, $action], $params);
 
         return $result;
     }
