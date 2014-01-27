@@ -16,10 +16,14 @@ use Doctrine\Common\DataFixtures\Loader;
 use Oro\Bundle\InstallerBundle\Entity\BundleVersion;
 use Oro\Bundle\InstallerBundle\Migrations\UpdateBundleVersionFixture;
 
+/**
+ * Class FixturesLoader
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class FixturesLoader extends Loader
 {
-    const FIXTURES_PATH           = 'DataFixtures/Migrations/ORM';
-    const DEMO_DATA_FIXTURES_PATH = 'DataFixtures/Demo/Migrations/ORM';
+    const FIXTURES_PATH           = 'Migrations/DataFixtures/ORM';
+    const DEMO_DATA_FIXTURES_PATH = 'Migrations/DataFixtures/Demo/ORM';
 
     const FILE_EXTENSION = '.php';
 
