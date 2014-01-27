@@ -302,7 +302,7 @@ class Transition
     {
         if ($this->isAllowed($workflowItem)) {
             $stepTo = $this->getStepTo();
-            $workflowItem->setCurrentStep($stepTo->getEntity());
+            $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
             if ($stepTo->isFinal() || !$stepTo->hasAllowedTransitions()) {
                 $workflowItem->setClosed(true);
             }

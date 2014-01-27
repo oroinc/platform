@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class Workflow
 {
@@ -320,6 +321,7 @@ class Workflow
             ->set($entityAttributeName, $entity)
             ->setFieldsMapping($this->getAttributesMapping())
             ->add($data);
+        $workflowItem->setDefinition($this->getDefinition());
 
         return $workflowItem;
     }
@@ -346,12 +348,20 @@ class Workflow
      * @param WorkflowItem $workflowItem
      * @param Transition $transition
      * @return WorkflowTransitionRecord
+     * @throws WorkflowException
      */
     protected function createTransitionRecord(WorkflowItem $workflowItem, Transition $transition)
     {
         $transitionName = $transition->getName();
         $stepFrom = $workflowItem->getCurrentStep();
-        $stepTo = $transition->getStepTo()->getEntity();
+
+        $stepName = $transition->getStepTo()->getName();
+        $stepTo = $this->getDefinition()->getStepByName($stepName);
+        if (!$stepTo) {
+            throw new WorkflowException(
+                sprintf('Workflow "%s" does not have step entity "%s"', $this->getName(), $stepName)
+            );
+        }
 
         $transitionRecord = new WorkflowTransitionRecord();
         $transitionRecord

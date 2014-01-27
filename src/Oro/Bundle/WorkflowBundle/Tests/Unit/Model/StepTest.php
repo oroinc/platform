@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\Step;
@@ -41,7 +42,6 @@ class StepTest extends \PHPUnit_Framework_TestCase
             'order' => array('order', 1),
             'allowedTransitions' => array('allowedTransitions', array('one', 'two')),
             'label' => array('label', 'Value'),
-            'entity' => array('entity', $entity)
         );
     }
 

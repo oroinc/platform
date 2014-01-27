@@ -15,28 +15,9 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected $assembler;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $container;
-
     protected function setUp()
     {
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
-            ->getMock();
-
-        $this->assembler = new StepAssembler($this->container);
-    }
-
-    protected function getWorkflowDefinitionMock()
-    {
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('test_workflow'));
-        return $definition;
+        $this->assembler = new StepAssembler();
     }
 
     /**
@@ -46,7 +27,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function testAssembleRequiredOptionException($configuration)
     {
-        $this->assembler->assemble($this->getWorkflowDefinitionMock(), $configuration, null);
+        $this->assembler->assemble($configuration, null);
     }
 
     public function invalidOptionsDataProvider()
@@ -67,46 +48,11 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function assertEntityStepCalls($stepName = 'entity_step')
-    {
-        $stepEntity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $stepEntity->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($stepName));
-        $stepEntities = array($stepEntity);
-
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository->expects($this->once())
-            ->method('findBy')
-            ->will($this->returnValue($stepEntities));
-
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with('OroWorkflowBundle:WorkflowStep')
-            ->will($this->returnValue($repository));
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('doctrine.orm.default_entity_manager')
-            ->will($this->returnValue($em));
-
-        return $stepEntity;
-    }
-
     /**
      * @dataProvider configurationDataProvider
      */
     public function testAssemble($configuration, $attributes, Step $expectedStep)
     {
-        $stepEntity = $this->assertEntityStepCalls($expectedStep->getName());
-        $expectedStep->setEntity($stepEntity);
         $configurationPass = $this->getMockBuilder(
             'Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface'
         )->getMockForAbstractClass();
@@ -137,7 +83,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
             $expectedAttributes[$attribute->getName()] = $attribute;
         }
 
-        $steps = $this->assembler->assemble($this->getWorkflowDefinitionMock(), $configuration, $attributes);
+        $steps = $this->assembler->assemble($configuration, $attributes);
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $steps);
         $this->assertCount(1, $steps);
         $this->assertTrue($steps->containsKey($expectedStep->getName()));

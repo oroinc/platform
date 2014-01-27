@@ -18,16 +18,41 @@ abstract class AbstractConfigurationProvider
     protected $kernelBundles = array();
 
     /**
-     * @var array
-     */
-    protected $usedDirectories = null;
-
-    /**
      * @param array $kernelBundles
      */
     public function __construct(array $kernelBundles)
     {
         $this->kernelBundles = $kernelBundles;
+    }
+
+    /**
+     * @param array $directoriesWhiteList
+     * @return Finder
+     */
+    protected function getConfigFinder(array $directoriesWhiteList = array())
+    {
+        $configDirectories = $this->getConfigDirectories($directoriesWhiteList);
+
+        // prepare finder
+        $finder = new Finder();
+        $finder->in($configDirectories)->name($this->getConfigFilePattern());
+
+        if ($directoriesWhiteList) {
+            $finder->filter(
+                function ($file) use ($directoriesWhiteList) {
+                    foreach ($directoriesWhiteList as $allowedDirectory) {
+                        if ($allowedDirectory &&
+                            strpos($file, realpath($allowedDirectory) . DIRECTORY_SEPARATOR) === 0
+                        ) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            );
+        }
+
+        return $finder;
     }
 
     /**
@@ -47,61 +72,6 @@ abstract class AbstractConfigurationProvider
         }
 
         return $configDirectories;
-    }
-
-    /**
-     * @return Finder
-     */
-    protected function getConfigFinder()
-    {
-        $configDirectories = $this->getConfigDirectories();
-
-        // prepare finder
-        $finder = new Finder();
-        $finder->in($configDirectories)->name($this->getConfigFilePattern());
-
-        return $finder;
-    }
-
-    /**
-     * @param array $directories
-     */
-    protected function setUsedDirectories(array $directories = null)
-    {
-        if ($directories) {
-            foreach ($directories as $key => $directory) {
-                if (is_dir($directory) && is_readable($directory)) {
-                    $directories[$key] = rtrim(realpath($directory), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-                } else {
-                    unset($directories[$key]);
-                }
-            }
-        }
-
-        $this->usedDirectories = $directories;
-    }
-
-    /**
-     * @param string $fileName
-     * @return bool
-     */
-    protected function isFileAllowed($fileName)
-    {
-        if (!is_file($fileName) || !is_readable($fileName)) {
-            return false;
-        }
-
-        if (null === $this->usedDirectories) {
-            return true;
-        }
-
-        foreach ($this->usedDirectories as $usedDirectory) {
-            if (strpos($fileName, $usedDirectory) === 0) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

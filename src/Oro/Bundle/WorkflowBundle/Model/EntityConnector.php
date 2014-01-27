@@ -15,19 +15,6 @@ class EntityConnector
     const PROPERTY_WORKFLOW_STEP = 'workflowStep';
 
     /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
      * @param object $entity
      * @param WorkflowItem $workflowItem
      */

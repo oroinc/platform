@@ -27,11 +27,6 @@ class Step
     protected $isFinal = false;
 
     /**
-     * @var WorkflowStep
-     */
-    protected $entity;
-
-    /**
      * @var string[]
      */
     protected $allowedTransitions = array();
@@ -189,23 +184,5 @@ class Step
     public function getLabel()
     {
         return $this->label;
-    }
-
-    /**
-     * @param WorkflowStep $entity
-     * @return Step
-     */
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-        return $this;
-    }
-
-    /**
-     * @return WorkflowStep
-     */
-    public function getEntity()
-    {
-        return $this->entity;
     }
 }

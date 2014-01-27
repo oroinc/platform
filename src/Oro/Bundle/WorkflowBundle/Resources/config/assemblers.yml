@@ -35,8 +35,6 @@ services:
 
     oro_workflow.step_assembler:
         class: %oro_workflow.step_assembler.class%
-        arguments:
-            - @service_container
 
     oro_workflow.transition_assembler:
         class: %oro_workflow.transition_assembler.class%

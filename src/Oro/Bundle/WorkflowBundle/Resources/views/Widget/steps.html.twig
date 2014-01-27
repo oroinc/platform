@@ -1,14 +1,14 @@
 {% if has_workflow_item(entity) or has_workflow_start_step(entity) %}
     <div class="workflow-steps-container">
     {{
-    oro_widget_render({
-        'widgetType': 'block',
-        'url': path('oro_workflow_widget_steps', {
-            entityClass: oro_class_name(entity),
-            entityId: entity.id
-        }),
-        'alias': 'workflow_steps'
-    })
+        oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_workflow_widget_steps', {
+                entityClass: oro_class_name(entity),
+                entityId: entity.id
+            }),
+            'alias': 'workflow_steps'
+        })
     }}
     </div>
 {% endif %}

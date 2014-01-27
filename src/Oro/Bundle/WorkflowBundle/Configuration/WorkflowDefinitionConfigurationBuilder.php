@@ -25,7 +25,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
      * @param array $configurationData
      * @return WorkflowDefinition[]
      */
-    public function buildFromConfiguration($configurationData)
+    public function buildFromConfiguration(array $configurationData)
     {
         $workflowDefinitions = array();
         foreach ($configurationData as $workflowName => $workflowConfiguration) {

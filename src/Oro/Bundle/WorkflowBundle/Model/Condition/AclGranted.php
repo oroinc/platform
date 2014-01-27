@@ -56,7 +56,7 @@ class AclGranted extends AbstractCondition
      * Nothing to initialize
      *
      * @param array $options
-     * @return True
+     * @return ConditionInterface
      * @throws ConditionException If options passed
      */
     public function initialize(array $options)
