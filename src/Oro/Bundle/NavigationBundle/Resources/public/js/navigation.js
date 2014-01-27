@@ -689,6 +689,8 @@ define(function (require) {
                     if (data.redirect !== undefined && data.redirect) {
                         this.processRedirect(data);
                     } else {
+                        this.removeErrorClass();
+
                         if (!options.fromCache && !options.skipCache) {
                             this.savePageToCache(data);
                         }
@@ -783,23 +785,13 @@ define(function (require) {
          * @param {String} errorThrown
          */
         processError: function(XMLHttpRequest, textStatus, errorThrown) {
-            var message403 = 'You do not have permission to this action';
             if (app.debug) {
-                if (XMLHttpRequest.status == 403) {
-                    messenger.notificationMessage('error', __(message403));
-                    this.loadingMask.hide();
-                } else {
-                    document.body.innerHTML = XMLHttpRequest.responseText;
-                }
                 this.updateDebugToolbar(XMLHttpRequest);
-            } else {
-                var message = 'Sorry, page was not loaded correctly';
-                if (XMLHttpRequest.status == 403) {
-                    message = message403;
-                }
-                messenger.notificationMessage('error', __(message));
-                this.loadingMask.hide();
             }
+
+            this.handleResponse(XMLHttpRequest.responseText);
+            this.addErrorClass();
+            this.loadingMask.hide();
         },
 
         /**
@@ -1073,6 +1065,26 @@ define(function (require) {
          */
         back: function() {
             window.history.back();
+            return true;
+        },
+
+        /**
+         * Adds error class to body
+         *
+         * @return {Boolean}
+         */
+        addErrorClass: function() {
+            $('body').addClass('error-page');
+            return true;
+        },
+
+        /**
+         * Removes error class from body
+         *
+         * @return {Boolean}
+         */
+        removeErrorClass: function() {
+            $('body').removeClass('error-page');
             return true;
         }
     });
