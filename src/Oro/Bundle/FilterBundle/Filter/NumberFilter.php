@@ -82,6 +82,8 @@ class NumberFilter extends AbstractFilter
                 return $ds->expr()->lte($fieldName, $parameterName, true);
             case NumberFilterType::TYPE_LESS_THAN:
                 return $ds->expr()->lt($fieldName, $parameterName, true);
+            case NumberFilterType::TYPE_NOT_EQUAL:
+                return $ds->expr()->neq($fieldName, $parameterName, true);
             default:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
         }
@@ -94,7 +96,7 @@ class NumberFilter extends AbstractFilter
     {
         $metadata = parent::getMetadata();
 
-        $formView = $this->getForm()->createView();
+        $formView                     = $this->getForm()->createView();
         $metadata['formatterOptions'] = $formView->vars['formatter_options'];
 
         return $metadata;

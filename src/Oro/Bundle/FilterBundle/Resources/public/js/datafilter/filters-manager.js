@@ -1,7 +1,7 @@
 /*jshint devel: true, multistr: true*/
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/multiselect-decorator', 'oro/app'],
-function($, _, Backbone, mediator, MultiselectDecorator, app) {
+define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/multiselect-decorator', 'oro/app', 'oro/datafilter-wrapper'],
+function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
     'use strict';
 
     /**
@@ -82,7 +82,11 @@ function($, _, Backbone, mediator, MultiselectDecorator, app) {
                 this.filters = options.filters;
             }
 
-            _.each(this.filters, function(filter) {
+            _.each(this.filters, function (filter) {
+                if (filter.wrappable) {
+                    _.extend(filter, filterWrapper);
+                }
+
                 this.listenTo(filter, "update", this._onFilterUpdated);
                 this.listenTo(filter, "disable", this._onFilterDisabled);
             }, this);

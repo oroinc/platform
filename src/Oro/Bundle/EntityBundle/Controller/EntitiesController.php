@@ -163,6 +163,10 @@ class EntitiesController extends Controller
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $record = $em->getRepository($extendEntityName)->find($id);
 
+        if (!$record) {
+            throw $this->createNotFoundException();
+        }
+
         return [
             'parent'        => $entity_id,
             'entity'        => $record,

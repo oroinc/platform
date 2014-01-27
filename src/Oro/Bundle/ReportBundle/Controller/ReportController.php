@@ -103,7 +103,7 @@ class ReportController extends Controller
 
             return $this->get('oro_ui.router')->redirectAfterSave(
                 ['route' => 'oro_report_update', 'parameters' => ['id' => $entity->getId()]],
-                ['route' => 'oro_report_index'],
+                ['route' => 'oro_report_view', 'parameters' => ['id' => $entity->getId()]],
                 $entity
             );
         }

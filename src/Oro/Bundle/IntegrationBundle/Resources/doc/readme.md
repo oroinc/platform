@@ -15,7 +15,7 @@ General purpose is to allow developers to create integration bundles and provide
 **Channel** - and instance of configured channel type with enabled connectors. Attributes: name, settings.
 
 Responsibility of channel is to split on groups transport/connectors by third party application type.
-To define you own channel type developer should create class that will implement `Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface` and register it as service with `oro_integration.channel` tag that will contains `type` key, it's should be unique.
+To define you own channel type developer should create class that will implement `Oro\Bundle\IntegrationBundle\Provider\ChannelInterface` and register it as service with `oro_integration.channel` tag that will contains `type` key, it's should be unique.
 
 ####Example:
 ``` yaml
