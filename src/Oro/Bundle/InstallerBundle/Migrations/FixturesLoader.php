@@ -59,6 +59,16 @@ class FixturesLoader extends Loader
     protected $loadDemoData = false;
 
     /**
+     * @var array
+     */
+    protected $excludeBundles = [];
+
+    /**
+     * @var array
+     */
+    protected $bundles = [];
+
+    /**
      * @param EntityManager $em
      * @param KernelInterface $kernel
      * @param ContainerInterface $container
@@ -68,6 +78,22 @@ class FixturesLoader extends Loader
         $this->em        = $em;
         $this->kernel    = $kernel;
         $this->container = $container;
+    }
+
+    /**
+     * @param array $bundles
+     */
+    public function setBundles($bundles)
+    {
+        $this->bundles = $bundles;
+    }
+
+    /**
+     * @param array $excludeBundles
+     */
+    public function setExcludeBundles($excludeBundles)
+    {
+        $this->excludeBundles = $excludeBundles;
     }
 
     /**
@@ -220,7 +246,7 @@ class FixturesLoader extends Loader
         $repo               = $this->em->getRepository('OroInstallerBundle:BundleVersion');
         $bundleDataVersions = [];
         $bundleFixtureDirs  = [];
-        $bundles            = $this->kernel->getBundles();
+        $bundles            = $this->getBundleList();
         foreach ($bundles as $bundleName => $bundle) {
             $bundlePath         = $bundle->getPath();
             $bundleFixturesPath = str_replace(
@@ -272,7 +298,36 @@ class FixturesLoader extends Loader
         $this->bundleFixtureDirs  = $bundleFixtureDirs;
     }
 
-    protected function sortFixturesStd($a, $b)
+    /**
+     * @return BundleInterface[]
+     */
+    protected function getBundleList()
+    {
+        $bundles = $this->kernel->getBundles();
+        if (!empty($this->bundles)) {
+            $includedBundles = [];
+            foreach ($this->bundles as $bundleName) {
+                if (isset($bundles[$bundleName])) {
+                    $includedBundles[$bundleName] = $bundles[$bundleName];
+                }
+            }
+            $bundles = $includedBundles;
+        }
+        if (!empty($this->excludeBundles)) {
+            foreach ($this->excludeBundles as $excludeBundle) {
+                unset($bundles[$excludeBundle]);
+            }
+        }
+
+        return $bundles;
+    }
+
+    /**
+     * @param \stdClass $a
+     * @param \stdClass $b
+     * @return int
+     */
+    protected function sortFixturesStd(\stdClass $a, \stdClass $b)
     {
         if ($a->iterator > $b->iterator) {
             return -1;
@@ -305,6 +360,7 @@ class FixturesLoader extends Loader
      * @param $fixtures
      * @param $parentBundles
      * @param $bundleName
+     * @throws \InvalidArgumentException
      */
     protected function processDependency(&$fixtures, &$parentBundles, $bundleName)
     {
@@ -320,6 +376,26 @@ class FixturesLoader extends Loader
                         }
                         $fixtureData->iterator--;
                     } else {
+                        //check dependency in include bundles
+                        if (!empty($this->bundles) && !in_array($bundle, $this->bundles)) {
+                            throw new \InvalidArgumentException(
+                                sprintf(
+                                    '%s bundle was not added to bundle list, but it uses as dependency in %s fixture',
+                                    $bundle,
+                                    get_class($fixtureData->fixture)
+                                )
+                            );
+                        }
+                        //check bundles in exclude bundles
+                        if (in_array($bundle, $this->excludeBundles)) {
+                            throw new \InvalidArgumentException(
+                                sprintf(
+                                    '%s bundle was excluded, but it uses as dependency in %s fixture',
+                                    $bundle,
+                                    get_class($fixtureData->fixture)
+                                )
+                            );
+                        }
                         $parentBundles[] = $bundle;
                     }
                 }
@@ -358,8 +434,8 @@ class FixturesLoader extends Loader
     /**
      * Usort callback sorter for directories
      *
-     * @param array $a
-     * @param array $b
+     * @param string $a
+     * @param string $b
      * @return int
      */
     protected function sortFixtures($a, $b)

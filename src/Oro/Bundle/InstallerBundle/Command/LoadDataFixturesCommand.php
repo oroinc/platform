@@ -18,7 +18,19 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
         $this->setName('oro:installer:fixtures:load')
             ->setDescription('Load versioned data fixtures. By default will load main data fixtures')
             ->addOption('load-demo', null, InputOption::VALUE_OPTIONAL, 'True if need to load demo data', 'false')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show list of fixtures without apply');
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show list of fixtures without apply')
+            ->addOption(
+                'bundles',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Bundles list to load data from'
+            )
+            ->addOption(
+                'exclude',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Exclude bundles list '
+            );
     }
 
     /**
@@ -26,9 +38,17 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container   = $this->getContainer();
-        $loader = $container->get('oro_installer.fixtures.loader');
+        $container = $this->getContainer();
+        $loader    = $container->get('oro_installer.fixtures.loader');
         $loader->isLoadDemoData($input->getOption('load-demo') == 'false' ? false : true);
+        $bundles = $input->getOption('bundles');
+        if (!empty($bundles)) {
+            $loader->setBundles($bundles);
+        }
+        $excludeBundles = $input->getOption('exclude');
+        if (!empty($excludeBundles)) {
+            $loader->setExcludeBundles($excludeBundles);
+        }
         $fixtures = $loader->getFixtures();
         if ($input->getOption('dry-run')) {
             $this->outputFixtures($input, $output, $fixtures);
