@@ -92,15 +92,15 @@ class WidgetController extends Controller
      */
     public function startTransitionFormAction($transitionName, $workflowName)
     {
-        $entityClass = $this->getRequest()->get('entityClass');
         $entityId = $this->getRequest()->get('entityId');
-        if (!$entityClass || !$entityId) {
-            throw new BadRequestHttpException('Entity class and identifier are required');
+        if (!$entityId) {
+            throw new BadRequestHttpException('Entity identifier is required');
         }
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowName);
+        $entityClass = $workflow->getDefinition()->getRelatedEntity();
 
         $entity = $this->getEntityReference($entityClass, $entityId);
 
@@ -222,7 +222,6 @@ class WidgetController extends Controller
         }
 
         return array(
-            'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'transitionsData' => $transitionsData
         );

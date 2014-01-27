@@ -178,7 +178,6 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->defaultNull()
                     ->end()
                     ->scalarNode('transition_definition')
-                        ->isRequired()
                         ->cannotBeEmpty()
                     ->end()
                     ->arrayNode('frontend_options')
@@ -206,8 +205,6 @@ class WorkflowConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root(self::NODE_TRANSITION_DEFINITIONS);
         $rootNode
-            ->isRequired()
-            ->requiresAtLeastOneElement()
             ->prototype('array')
                 ->children()
                     ->arrayNode('pre_conditions')

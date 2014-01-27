@@ -20,8 +20,7 @@
                         {
                             workflowName: data.workflow.name,
                             transitionName: data.transition.name,
-                            entityClass: entity_class,
-                            entityId: entity_id,
+                            entityId: entity_id
                         })
                     }) %}
                 {% endif %}
@@ -31,9 +30,8 @@
                     'oro_workflow_api_rest_workflow_start',
                     {
                         workflowName: data.workflow.name,
-                        entityClass: entity_class,
-                        entityId: entity_id,
-                        transitionName: data.transition.name
+                        transitionName: data.transition.name,
+                        entityId: entity_id
                     })
                 }) %}
             {% endif %}

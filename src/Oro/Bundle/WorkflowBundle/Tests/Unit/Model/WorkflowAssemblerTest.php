@@ -328,6 +328,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => $label,
                     'step_to' => $stepName,
                     'is_start' => true,
+                    'is_hidden' => true,
                     'transition_definition' => '__start___definition'
                 )
             );
@@ -467,20 +468,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             WorkflowConfiguration::NODE_STEPS => array('step_one' => $this->stepConfiguration),
             WorkflowConfiguration::NODE_TRANSITIONS => array(),
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array($this->transitionDefinition)
-        );
-        $this->assembleWorkflow($configuration);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
-     * @expectedExceptionMessage Option "transition_definitions" is required
-     */
-    public function testAssembleNoTransitionDefinitionsConfigurationException()
-    {
-        $configuration = array(
-            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
-            WorkflowConfiguration::NODE_TRANSITIONS => array('test_transition' => $this->transitionConfiguration),
-            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array()
         );
         $this->assembleWorkflow($configuration);
     }
