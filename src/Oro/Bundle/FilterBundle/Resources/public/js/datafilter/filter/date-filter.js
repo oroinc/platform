@@ -12,31 +12,11 @@ function($, _, __, ChoiceFilter, localeSettings) {
      */
     return ChoiceFilter.extend({
         /**
-         * Template for filter criteria
+         * Template selector for filter criteria
          *
-         * @property {function(Object, ?Object=): String}
+         * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div>' +
-                '<div class="horizontal clearfix">' +
-                    '<select name="<%= name %>" class="filter-select-oro">' +
-                        '<% _.each(choices, function (option) { %>' +
-                            '<option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>' +
-                        '<% }); %>' +
-                    '</select>' +
-                '</div>' +
-                '<div>' +
-                    '<input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">' +
-                    '<span class="filter-separator">-</span>' +
-                    '<input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">' +
-                '</div>' +
-                '<div class="oro-action">' +
-                    '<div class="btn-group">' +
-                        '<button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>' +
-                    '</div>' +
-                '</div>' +
-            '</div>'
-        ),
+        templateSelector: '#date-filter-template',
 
         /**
          * Selectors for filter data
@@ -129,32 +109,50 @@ function($, _, __, ChoiceFilter, localeSettings) {
             ChoiceFilter.prototype.initialize.apply(this, arguments);
         },
 
-        changeFilterType: function (e) {
+        onChangeFilterType: function (e) {
             var select = this.$el.find(e.currentTarget);
-            var selectedValue = select.val();
+            var selectedValue = select.val() || select.data('value');
 
+            this.changeFilterType(selectedValue);
+        },
+
+        changeFilterType: function (type) {
+            type = parseInt(type, 10);
             this.$el.find('.filter-separator').show().end().find('input').show();
-            if (this.typeValues.moreThan == parseInt(selectedValue)) {
-                this.$el.find('.filter-separator').hide().end().find(this.criteriaValueSelectors.value.end).hide();
-            } else if (this.typeValues.lessThan == parseInt(selectedValue)) {
-                this.$el.find('.filter-separator').hide().end().find(this.criteriaValueSelectors.value.start).hide();
+            if (this.typeValues.moreThan === type) {
+                this.$el.find('.filter-separator').hide();
+                this.$el.find(this.criteriaValueSelectors.value.end).val('').hide();
+            } else if (this.typeValues.lessThan === type) {
+                this.$el.find('.filter-separator').hide();
+                this.$el.find(this.criteriaValueSelectors.value.start).val('').hide();
             }
         },
 
         /**
          * @inheritDoc
          */
-        _renderCriteria: function(el) {
-            $(el).append(
-                this.popupCriteriaTemplate({
-                    name: this.name,
-                    choices: this.choices,
-                    selectedChoice: this.emptyValue.type,
-                    inputClass: this.inputClass
-                })
-            );
+        render: function () {
+            var value = _.extend({}, this.emptyValue, this.value);
+            var selectedChoiceLabel = '';
+            if (!_.isEmpty(this.choices)) {
+                var foundChoice = _.find(this.choices, function(choice) {
+                    return (choice.value == value.type);
+                });
+                selectedChoiceLabel = foundChoice.label;
+            }
+            var $filter = $(this.template({
+                name: this.name,
+                choices: this.choices,
+                selectedChoice: value.type,
+                selectedChoiceLabel: selectedChoiceLabel,
+                inputClass: this.inputClass,
+                value: this._formatDisplayValue(value)
+            }));
+            this._wrap($filter);
 
-            $(el).find('select:first').bind('change', _.bind(this.changeFilterType, this));
+            this.changeFilterType(value.type);
+
+            $filter.find('select:first').bind('change', _.bind(this.onChangeFilterType, this));
 
             _.each(this.criteriaValueSelectors.value, function(actualSelector, name) {
                 this.dateWidgets[name] = this._initializeDateWidget(actualSelector);
@@ -319,20 +317,6 @@ function($, _, __, ChoiceFilter, localeSettings) {
          */
         _hideCriteria: function() {
             ChoiceFilter.prototype._hideCriteria.apply(this, arguments);
-        },
-
-        /**
-         * @inheritDoc
-         */
-        _triggerUpdate: function(newValue, oldValue) {
-            newValue = newValue.value;
-            oldValue = oldValue.value;
-
-            if ((newValue && (newValue.start || newValue.end)) ||
-                (oldValue && (oldValue.start || oldValue.end))
-            ) {
-                this.trigger('update');
-            }
         }
     });
 });
