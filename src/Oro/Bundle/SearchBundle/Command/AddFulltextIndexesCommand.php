@@ -11,12 +11,14 @@ use Symfony\Component\Console\Helper\HelperInterface;
 
 class AddFulltextIndexesCommand extends ContainerAwareCommand
 {
+    const COMMAND_NAME = 'oro:search:create-index';
+
     /**
      * Console command configuration
      */
     public function configure()
     {
-        $this->setName('oro:search:create-index');
+        $this->setName(self::COMMAND_NAME);
         $this->setDescription('Creates fulltext index for search_index_text table');
     }
 
