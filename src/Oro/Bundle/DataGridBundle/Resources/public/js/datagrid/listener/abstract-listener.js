@@ -47,7 +47,7 @@ define(['underscore', 'jquery', 'backbone'], function (_, $, Backbone) {
          * Set datagrid instance
          */
         setDatagridAndSubscribe: function () {
-            this.$gridContainer.on('datagrid:change:' + this.gridName, this._onModelEdited.bind(this));
+            this.$gridContainer.on('datagrid:change:' + this.gridName, _.bind(this._onModelEdited, this));
         },
 
         /**
