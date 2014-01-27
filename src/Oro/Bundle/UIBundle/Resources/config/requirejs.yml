@@ -74,7 +74,7 @@ config:
         'json': 'bundles/oroui/lib/json2.js'
         'base64': 'bundles/oroui/lib/base64.js'
         'jquery': 'bundles/oroui/lib/jquery-1.10.2.js'
-        'jquery-ui': 'bundles/oroui/lib/jquery-ui.min.js'
+        'jquery-ui': 'bundles/oroui/lib/jquery-ui.js'
         'jquery-ui-timepicker': 'bundles/oroui/lib/jquery-ui-timepicker-addon.js'
         'jquery-outer-html': 'bundles/oroui/lib/outerHTML-2.1.0-min.js'
         'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.min.js'
