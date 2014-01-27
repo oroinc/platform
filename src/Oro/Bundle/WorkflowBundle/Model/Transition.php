@@ -52,11 +52,6 @@ class Transition
     protected $hidden = false;
 
     /**
-     * @var string
-     */
-    protected $aclResource;
-
-    /**
      * @var array
      */
     protected $frontendOptions = array();
@@ -211,24 +206,6 @@ class Transition
     public function getStepTo()
     {
         return $this->stepTo;
-    }
-
-    /**
-     * @param string $aclResource
-     * @return Transition
-     */
-    public function setAclResource($aclResource)
-    {
-        $this->aclResource = $aclResource;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAclResource()
-    {
-        return $this->aclResource;
     }
 
     /**
