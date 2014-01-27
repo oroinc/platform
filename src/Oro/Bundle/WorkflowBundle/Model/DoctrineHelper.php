@@ -74,13 +74,14 @@ class DoctrineHelper
      * @return EntityManager
      * @throws NotManageableEntityException
      */
-    protected function getEntityManager($entityOrClass)
+    public function getEntityManager($entityOrClass)
     {
         if (is_object($entityOrClass)) {
             $entityClass = $this->getEntityClass($entityOrClass);
         } else {
             $entityClass = $entityOrClass;
         }
+
         $entityManager = $this->registry->getManagerForClass($entityClass);
         if (!$entityManager) {
             throw new NotManageableEntityException($entityClass);

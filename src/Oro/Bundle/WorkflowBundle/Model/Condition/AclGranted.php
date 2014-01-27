@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Exception\ConditionException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 
 class AclGranted extends AbstractCondition
 {
@@ -19,6 +20,11 @@ class AclGranted extends AbstractCondition
     protected $securityFacade;
 
     /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    /**
      * @var mixed
      */
     protected $attributes;
@@ -26,16 +32,21 @@ class AclGranted extends AbstractCondition
     /**
      * @var object
      */
-    protected $object;
+    protected $objectOrClass;
 
     /**
      * @param ContextAccessor $contextAccessor
      * @param SecurityFacade $securityFacade
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ContextAccessor $contextAccessor, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        ContextAccessor $contextAccessor,
+        SecurityFacade $securityFacade,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->contextAccessor = $contextAccessor;
         $this->securityFacade = $securityFacade;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -46,10 +57,17 @@ class AclGranted extends AbstractCondition
      */
     protected function isConditionAllowed($context)
     {
-        return $this->securityFacade->isGranted(
-            $this->contextAccessor->getValue($context, $this->attributes),
-            $this->contextAccessor->getValue($context, $this->object)
-        );
+        $attributes = $this->contextAccessor->getValue($context, $this->attributes);
+        $objectOrClass = $this->contextAccessor->getValue($context, $this->objectOrClass);
+
+        if (is_object($objectOrClass)) {
+            $unitOfWork = $this->doctrineHelper->getEntityManager($objectOrClass)->getUnitOfWork();
+            if (!$unitOfWork->isInIdentityMap($objectOrClass) || $unitOfWork->isScheduledForInsert($objectOrClass)) {
+                $objectOrClass = 'Entity:' . $this->doctrineHelper->getEntityClass($objectOrClass);
+            }
+        }
+
+        return $this->securityFacade->isGranted($attributes, $objectOrClass);
     }
 
     /**
@@ -71,8 +89,8 @@ class AclGranted extends AbstractCondition
         }
 
         if ($options) {
-            $this->object = array_shift($options);
-            if (!$this->object) {
+            $this->objectOrClass = array_shift($options);
+            if (!$this->objectOrClass) {
                 throw new ConditionException('ACL object can not be empty');
             }
         }
