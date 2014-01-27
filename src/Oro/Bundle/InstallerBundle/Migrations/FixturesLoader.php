@@ -141,8 +141,8 @@ class FixturesLoader extends Loader
             }
         }
         usort($bundlesFixtures, [$this, 'sortFixturesStd']);
-        foreach ($bundlesFixtures as $bundleInfo) {
-            foreach ($bundleInfo->fixtures as $fixture) {
+        for ($i = 0; $i < count($bundlesFixtures); $i++) {
+            foreach ($bundlesFixtures[$i]->fixtures as $fixture) {
                 $this->addFixture($fixture->fixture);
             }
         }
