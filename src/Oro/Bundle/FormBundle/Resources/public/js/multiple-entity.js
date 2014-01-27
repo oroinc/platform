@@ -46,11 +46,26 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
             this.render();
         },
 
-        handleRemove: function(item) {
+        handleRemove: function (item) {
+            var itemId = item && item.get('id');
+            if (!itemId) {
+                return;
+            }
+
+            var addedElVal = this.$addedEl.val();
+            var added = (addedElVal && addedElVal.split(',')) || [];
+
             var removedElVal = this.$removedEl.val();
-            var removed = removedElVal ? this.$removedEl.val().split(',') : [];
-            if (item.get('id') && removed.indexOf(item.get('id')) === -1) {
-                removed.push(item.get('id'));
+            var removed = (removedElVal && removedElVal.split(',')) || [];
+
+            if (_.contains(added, itemId)) {
+                added = _.without(added, itemId);
+                this.$addedEl.val(added.join(','));
+                return;
+            }
+
+            if (!_.contains(added, itemId)) {
+                removed.push(itemId);
                 this.$removedEl.val(removed.join(','));
             }
         },
