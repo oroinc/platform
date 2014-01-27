@@ -20,6 +20,38 @@ datagrid:
                 label: oro.embedded_form.form_type.label
             channelName:
                 label: oro.embedded_form.channel.label
+
+        sorters:
+            columns:
+                title:
+                    data_name: embedded_form.title
+                formType:
+                    data_name: embedded_form.formType
+                channelName:
+                    data_name: channel.name
+            default:
+                title: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+
+        filters:
+            columns:
+                title:
+                    type:      string
+                    data_name: embedded_form.title
+                formType:
+                    type: choice
+                    data_name: embedded_form.formType
+                    options:
+                        field_options:
+                          choices: @oro_embedded_form.manager->getAll
+                channel:
+                    type: entity
+                    data_name: channel
+                    label: oro.embedded_form.channel.label
+                    options:
+                        field_options:
+                          class: OroIntegrationBundle:Channel
+                          property: name
+
         properties:
             id: ~
             update_link:
