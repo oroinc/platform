@@ -63,6 +63,15 @@ class EmbeddedFormManager
     }
 
     /**
+     * @param string $type
+     * @return string|null
+     */
+    public function getLabelByType($type)
+    {
+        return isset($this->formTypes[$type]) ? $this->formTypes[$type] : null;
+    }
+
+    /**
      * @return array
      */
     public function getAll()

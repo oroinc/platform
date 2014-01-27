@@ -18,6 +18,7 @@ datagrid:
                 label: oro.embedded_form.title.label
             formType:
                 label: oro.embedded_form.form_type.label
+                type: embedded_form_type
             channelName:
                 label: oro.embedded_form.channel.label
 
@@ -25,8 +26,6 @@ datagrid:
             columns:
                 title:
                     data_name: embedded_form.title
-                formType:
-                    data_name: embedded_form.formType
                 channelName:
                     data_name: channel.name
             default:
