@@ -79,7 +79,10 @@ class Manager
     {
         $result = $this->config['dashboards'][$name]['widgets'];
         foreach (array_keys($result) as $widgetName) {
-            $widget = array_merge_recursive($result[$widgetName], $this->config['widgets'][$widgetName]);
+            $widget = $result[$widgetName];
+            if (isset($this->config['widgets'][$widgetName])) {
+                $widget = array_merge_recursive($widget, $this->config['widgets'][$widgetName]);
+            }
             if (!isset($widget['acl']) || $this->securityFacade->isGranted($widget['acl'])) {
                 unset($widget['acl']);
                 unset($widget['items']);

@@ -6,19 +6,6 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
 class EmailTemplatesGridHelper
 {
-    /** @var array */
-    protected $entityNameChoices;
-
-    public function __construct($entitiesConfig = [])
-    {
-        $this->entityNameChoices = array_map(
-            function ($value) {
-                return isset($value['name']) ? $value['name'] : '';
-            },
-            $entitiesConfig
-        );
-    }
-
     /**
      * Returns callback for configuration of grid/actions visibility per row
      *
@@ -31,16 +18,6 @@ class EmailTemplatesGridHelper
                 return array('delete' => false);
             }
         };
-    }
-
-    /**
-     * Returns choice list for entityName filter
-     *
-     * @return array
-     */
-    public function getEntityNameChoices()
-    {
-        return $this->entityNameChoices;
     }
 
     /**

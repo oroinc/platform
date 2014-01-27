@@ -1,45 +1,4 @@
-{% block oro_combobox_dataconfig_entity_field %}
-    var EntityFieldUtil = function ($el) {
-        this.$el = $el;
-        this.findEntity = function (entity) {
-            return {name: entity, label: entity, plural_label: entity, icon: null};
-        },
-        this.splitValue = function (value) {
-            var result = [];
-            var chain = value.split(',');
-            if (_.size(chain) > 1) {
-                result.push({
-                    entity: this.findEntity(this.$el.data('entity')),
-                    label: this.getFieldGroupLabel(value)
-                });
-                var lastValue = chain[0];
-                _.each(_.rest(chain), _.bind(function (item) {
-                    lastValue += ',' + item;
-                    result.push({
-                        entity: this.findEntity(item.split('::')[0]),
-                        label: this.getFieldLabel(lastValue)
-                    });
-                }, this));
-            } else if (chain[0] != '') {
-                result.push({
-                    entity: this.findEntity(this.$el.data('entity')),
-                    label: this.getFieldLabel(chain[0])
-                });
-            }
-            return result;
-        },
-        this.getFieldLabel = function (value) {
-            return this.$el
-                .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
-                .data('label');
-        },
-        this.getFieldGroupLabel = function (value) {
-            return this.$el
-                .find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]')
-                .parent()
-                .attr('label');
-        }
-    };
+{% block oro_combobox_dataconfig_entity_field_base %}
     $field.data('entity-field-util', new EntityFieldUtil($field));
 
     {% if configs.entities is defined %}
@@ -48,12 +7,29 @@
         return _.findWhere(entities, {name: entity});
     };
     {% endif %}
+
     var formatContext = {
-        splitValue: function (value) {
-            return $field.data('entity-field-util').splitValue(value);
+        getFieldData: function (fieldId) {
+            return $field.data('entity-field-util').getFieldData(fieldId);
+        },
+        splitFieldId: function (fieldId) {
+            return $field.data('entity-field-util').splitFieldId(fieldId);
         }
     };
     select2Config.formatContext = function () {
         return formatContext;
     };
+{% endblock %}
+
+{% block oro_combobox_dataconfig_entity_field_choice %}
+    {{ block('oro_combobox_dataconfig_entity_field_base') }}
+{% endblock %}
+
+{% block oro_combobox_dataconfig_entity_field_select %}
+    {{ block('oro_combobox_dataconfig_entity_field_base') }}
+
+    select2Config.collapsibleResults = true;
+    select2Config.data = function () {
+        return {more: false, results: $field.data('entity-field-util')._getData() };
+    }
 {% endblock %}

@@ -34,6 +34,7 @@ class EntityTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Field saved')
             ->updateSchema()
+            ->assertMessage('Schema updated')
             ->close();
 
         return $entityName;
@@ -62,7 +63,8 @@ class EntityTest extends Selenium2TestCase
             ->proceed()
             ->save()
             ->assertMessage('Field saved')
-            ->updateSchema();
+            ->updateSchema()
+            ->assertMessage('Schema updated');
 
         return $newEntityName;
     }
@@ -94,10 +96,11 @@ class EntityTest extends Selenium2TestCase
         $login = $this->login();
         $entityExist = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             //->filterBy('Label', $entityName)
-            ->deleteEntity(array($entityName), 'Remove')
+            ->deleteEntity(array($entityName), 'Remove', false)
             ->assertMessage('Item was removed')
             ->open(array($entityName))
             ->updateSchema()
+            ->assertMessage('Schema updated')
             ->close()
             ->entityExists(array($entityName));
 

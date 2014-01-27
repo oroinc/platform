@@ -23,6 +23,7 @@ config:
         'oro/datagrid/abstract-action': 'bundles/orodatagrid/js/datagrid/action/abstract-action.js'
         'oro/datagrid/delete-action': 'bundles/orodatagrid/js/datagrid/action/delete-action.js'
         'oro/datagrid/ajax-action': 'bundles/orodatagrid/js/datagrid/action/ajax-action.js'
+        'oro/datagrid/ajaxdelete-action': 'bundles/orodatagrid/js/datagrid/action/ajaxdelete-action.js'
         'oro/datagrid/mass-action': 'bundles/orodatagrid/js/datagrid/action/mass-action.js'
         'oro/datagrid/delete-mass-action': 'bundles/orodatagrid/js/datagrid/action/delete-mass-action.js'
         'oro/datagrid/model-action': 'bundles/orodatagrid/js/datagrid/action/model-action.js'
@@ -49,6 +50,12 @@ config:
         'oro/datagrid/header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/header-cell.js'
         'oro/datagrid/select-all-header-cell': 'bundles/orodatagrid/js/datagrid/header-cell/select-all-header-cell.js'
         'oro/datagrid/header': 'bundles/orodatagrid/js/datagrid/header.js'
+
+        'oro/datagrid/totals-builder': 'bundles/orodatagrid/js/totals-builder.js'
+        'oro/datagrid/footer': 'bundles/orodatagrid/js/datagrid/footer.js'
+        'oro/datagrid/footer-row': 'bundles/orodatagrid/js/datagrid/footer/footer-row.js'
+        'oro/datagrid/footer-cell': 'bundles/orodatagrid/js/datagrid/footer/footer-cell.js'
+
         'oro/datagrid/abstract-listener': 'bundles/orodatagrid/js/datagrid/listener/abstract-listener.js'
         'oro/datagrid/column-form-listener': 'bundles/orodatagrid/js/datagrid/listener/column-form-listener.js'
         'oro/datagrid/callback-listener': 'bundles/orodatagrid/js/datagrid/listener/callback-listener.js'

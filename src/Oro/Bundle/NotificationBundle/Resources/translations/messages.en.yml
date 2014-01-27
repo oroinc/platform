@@ -9,6 +9,9 @@ oro:
             entity_post_persist: "Entity create"
             entity_post_remove:  "Entity remove"
 
+        form:
+            choose_event: "Choose an event..."
+
         datagrid:
             action:
                 update: "Update"

@@ -128,21 +128,20 @@ define(['jquery', 'underscore'], function ($, _) {
                     return (toNumber(value1) == toNumber(value2));
                 }
                 return ((value1 || '') == (value2 || ''));
-
             } else if (_.isObject(value1)) {
                 var valueKeys = _.keys(value1);
 
                 if (_.isObject(value2)) {
                     valueKeys = _.unique(valueKeys.concat(_.keys(value2)));
-                }
-
-                for (var index in valueKeys) {
-                    var key = valueKeys[index];
-                    if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
-                        return false;
+                    for (var index in valueKeys) {
+                        var key = valueKeys[index];
+                        if (!_.has(value2, key) || !this.isEqualsLoosely(value1[key], value2[key])) {
+                            return false;
+                        }
                     }
+                    return true;
                 }
-                return true;
+                return false;
             } else {
                 return value1 == value2;
             }
