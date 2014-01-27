@@ -7,6 +7,7 @@ use Doctrine\Common\Inflector\Inflector;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use FOS\Rest\Util\Codes;
@@ -162,6 +163,10 @@ class EntitiesController extends Controller
         $em = $this->getDoctrine()->getManager();
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $record = $em->getRepository($extendEntityName)->find($id);
+
+        if (!$record) {
+            throw $this->createNotFoundException();
+        }
 
         return [
             'parent'        => $entity_id,
