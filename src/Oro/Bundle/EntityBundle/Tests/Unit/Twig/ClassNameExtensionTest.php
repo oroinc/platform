@@ -1,39 +1,26 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Twig;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\WorkflowBundle\Twig\ClassNameExtension;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Twig\Stub\Entity;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Twig\Stub\__CG__\EntityProxy;
+use Oro\Bundle\EntityBundle\Twig\ClassNameExtension;
+use Oro\Bundle\EntityBundle\Tests\Unit\Twig\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\Twig\Stub\__CG__\ItemStubProxy;
 
 class ClassNameExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_CLASS = '\stdClass';
-
     /**
      * @var ClassNameExtension
      */
     protected $twigExtension;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $doctrineHelper;
-
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getEntityClass'))
-            ->getMock();
-
-        $this->twigExtension = new ClassNameExtension($this->doctrineHelper);
+        $this->twigExtension = new ClassNameExtension();
     }
 
     protected function tearDown()
     {
         unset($this->twigExtension);
-        unset($this->doctrineHelper);
     }
 
     public function testGetFunctions()
@@ -55,16 +42,6 @@ class ClassNameExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClassName($expectedClass, $object)
     {
-        if (is_object($object)) {
-            $this->doctrineHelper->expects($this->once())
-                ->method('getEntityClass')
-                ->with($object)
-                ->will($this->returnValue(self::TEST_CLASS));
-        } else {
-            $this->doctrineHelper->expects($this->never())
-                ->method('getEntityClass');
-        }
-
         $this->assertEquals($expectedClass, $this->twigExtension->getClassName($object));
     }
 
@@ -76,8 +53,12 @@ class ClassNameExtensionTest extends \PHPUnit_Framework_TestCase
                 'object'        => 'string',
             ),
             'object' => array(
-                'expectedClass' => self::TEST_CLASS,
-                'object'        => new \stdClass(),
+                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Twig\Stub\ItemStub',
+                'object'        => new ItemStub(),
+            ),
+            'proxy' => array(
+                'expectedClass' => 'ItemStubProxy',
+                'object'        => new ItemStubProxy(),
             ),
         );
     }

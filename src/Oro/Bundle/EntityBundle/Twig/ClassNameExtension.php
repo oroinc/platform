@@ -1,25 +1,12 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Twig;
+namespace Oro\Bundle\EntityBundle\Twig;
 
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 class ClassNameExtension extends \Twig_Extension
 {
     const NAME = 'oro_class_name';
-
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
 
     /**
      * {@inheritdoc}
@@ -43,7 +30,7 @@ class ClassNameExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->doctrineHelper->getEntityClass($object);
+        return ClassUtils::getRealClass($object);
     }
 
     /**
