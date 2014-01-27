@@ -32,7 +32,6 @@ abstract class SOAPTransport implements TransportInterface
 
         $isDebug      = $this->settings->get('debug', false);
         $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
-
     }
 
     /**
@@ -43,7 +42,7 @@ abstract class SOAPTransport implements TransportInterface
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
-        $result = call_user_func_array([$this->client, $action], $params);
+        $result = $this->client->__soapCall($action, $params);
 
         return $result;
     }
