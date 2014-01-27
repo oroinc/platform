@@ -12,7 +12,6 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
-use Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -270,7 +269,6 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand(AddFulltextIndexesCommand::COMMAND_NAME)
             ->runCommand('oro:navigation:init')
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
