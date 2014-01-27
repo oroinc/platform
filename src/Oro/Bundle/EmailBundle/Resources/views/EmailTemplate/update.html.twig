@@ -41,7 +41,6 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
 
-    {% set cancelButton = UI.button({'path' : path('oro_email_emailtemplate_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) %}
     {% if form.vars.value.isSystem == false %}
         {% if form.vars.value.id and resource_granted('oro_email_emailtemplate_delete', form.vars.value) %}
             {{ UI.deleteButton({
@@ -57,7 +56,7 @@
     {% if form.vars.value.isEditable %}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {{ cancelButton  }}
+    {{ UI.cancelButton(path('oro_email_emailtemplate_index')) }}
     {% if form.vars.value.isEditable %}
         {% if form.vars.value.id or resource_granted('oro_email_emailtemplate_update') %}
             {{ UI.saveAndStayButton() }}

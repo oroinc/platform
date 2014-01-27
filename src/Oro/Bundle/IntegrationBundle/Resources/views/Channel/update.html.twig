@@ -22,7 +22,7 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
 
-    {{ UI.button({'path' : path('oro_integration_channel_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
+    {{ UI.cancelButton(path('oro_integration_channel_index')) }}
     {% if entity.id %}
         {{ UI.clientButton({
             'dataUrl': path('oro_integration_channel_schedule', { 'id': entity.id }) ,
@@ -34,7 +34,7 @@
     {% if form.vars.value.id or resource_granted('oro_integration_channel_update') %}
         {{ UI.saveAndStayButton() }}
     {% endif %}
-    {{ UI.buttonType({'type': 'button', 'class': 'btn-success', 'label': 'Save and Close', 'action': 'save'}) }}
+    {{ UI.saveAndCloseButton() }}
 {% endblock navButtons %}
 
 {% block pageHeader %}

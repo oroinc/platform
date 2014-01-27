@@ -30,7 +30,7 @@
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
-    {{ UI.button({'path' : path('oro_notification_emailnotification_index'), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
+    {{ UI.cancelButton(path('oro_notification_emailnotification_index')) }}
     {% if form.vars.value.id or resource_granted('oro_notification_emailnotification_update') %}
         {{ UI.saveAndStayButton() }}
     {% endif %}

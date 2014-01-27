@@ -110,6 +110,16 @@
 {% endmacro %}
 
 {#
+    Create 'Cancel' button
+    Parameters
+        'path' - button url
+        'label' - button label | 'Cancel' by default
+#}
+{% macro cancelButton(path, label = 'Cancel') %}
+    {{ _self.button({'path' : path, 'title' : label, 'label' : label}) }}
+{% endmacro %}
+
+{#
     Create 'Edit' button
     Parameters - array:
         [
