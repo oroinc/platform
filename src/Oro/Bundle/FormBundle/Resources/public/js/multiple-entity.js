@@ -33,7 +33,7 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
         initialize: function() {
             this.template = _.template(this.options.template)
             this.listenTo(this.getCollection(), 'add', this.addEntity);
-            this.listenTo(this.getCollection(), 'reset', this.addAll);
+            this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);
             this.listenTo(this.getCollection(), 'remove', this.removeDefault);
 
             this.$addedEl = $(this.options.addedElement);
@@ -42,6 +42,9 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
                 this.listenTo(this.getCollection(), 'defaultChange', this.updateDefault);
                 this.$defaultEl = this.$el.closest('form').find('[name$="[' + this.options.defaultElement + ']"]');
             }
+            this.initialCollectionItems = [];
+            this.addedCollectionItems = [];
+            this.removedCollectionItems = [];
 
             this.render();
         },
@@ -53,21 +56,23 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
             }
 
             var addedElVal = this.$addedEl.val();
-            var added = (addedElVal && addedElVal.split(',')) || [];
-
             var removedElVal = this.$removedEl.val();
+
+            var added = (addedElVal && addedElVal.split(',')) || [];
             var removed = (removedElVal && removedElVal.split(',')) || [];
 
             if (_.contains(added, itemId)) {
                 added = _.without(added, itemId);
-                this.$addedEl.val(added.join(','));
-                return;
+            }
+            if (!_.contains(removed, itemId)) {
+                removed.push(itemId);
             }
 
-            if (!_.contains(added, itemId)) {
-                removed.push(itemId);
-                this.$removedEl.val(removed.join(','));
-            }
+            this.addedCollectionItems = added;
+            this.removedCollectionItems = removed;
+
+            this.$addedEl.val(added.join(','));
+            this.$removedEl.val(removed.join(','));
         },
 
         removeDefault: function(item) {
@@ -84,12 +89,39 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
             return this.options.collection;
         },
 
-        addAll: function(items) {
+        _onCollectionReset: function (items) {
             this._resortCollection();
             this.$entitiesContainer.empty();
             items.each(function(item) {
                 this.addEntity(item);
             }, this);
+
+            this.initialCollectionItems = this.getCollection().map(function (model) {
+                return model.get('id');
+            });
+            this.addedCollectionItems = [];
+            this.removedCollectionItems = [];
+        },
+
+        _isInitialCollectionItem: function (itemId) {
+            var isInitial = !!_.find(this.initialCollectionItems, function (id) {
+                return String(id) === String(itemId);
+            });
+            return isInitial;
+        },
+
+        _isAddedCollectionItem: function (itemId) {
+            var isAdded = !!_.find(this.addedCollectionItems, function (id) {
+                return String(id) === String(itemId);
+            });
+            return isAdded;
+        },
+
+        _isRemovedCollectionItem: function (itemId) {
+            var isRemoved = !!_.find(this.removedCollectionItems, function (id) {
+                return String(id) === String(itemId);
+            });
+            return isRemoved;
         },
 
         _resortCollection: function() {
@@ -142,12 +174,31 @@ function(_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
             }
         },
 
-        processSelectedEntities: function(added, addedModels, removed) {
-            var intersection = _.intersection(added, removed);
-            var addedNormalized = _.difference(added, intersection);
-            var removedNormalized = _.difference(removed, intersection);
-            this.$addedEl.val(addedNormalized.join(','));
-            this.$removedEl.val(removedNormalized.join(','));
+        processSelectedEntities: function (added, addedModels, removed) {
+            var self = this;
+
+            _.intersection(added, removed).forEach(function (itemId) {
+                if (self._isInitialCollectionItem(itemId)) {
+                    added = _.without(added, itemId);
+                    removed = _.without(removed, itemId);
+                    return;
+                }
+
+                if (self._isAddedCollectionItem(itemId)) {
+                    added = _.without(added, itemId);
+                    return;
+                }
+
+                if (self._isRemovedCollectionItem(itemId)) {
+                    removed = _.without(removed, itemId);
+                }
+            });
+
+            this.addedCollectionItems = added;
+            this.removedCollectionItems = removed;
+
+            this.$addedEl.val(added.join(','));
+            this.$removedEl.val(removed.join(','));
 
             _.each(addedModels, _.bind(function(model) {
                 this.getCollection().add(model);
