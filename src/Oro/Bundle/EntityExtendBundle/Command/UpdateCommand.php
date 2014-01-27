@@ -163,6 +163,8 @@ class UpdateCommand extends InitCommand
      * @param OutputInterface $output
      * @param bool            $force         Flag to update existing entity model
      *
+     * @throws \InvalidArgumentException
+     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function parseEntity($className, $entityOptions, $output, $force)
