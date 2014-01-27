@@ -20,8 +20,6 @@ class InstallationStep extends AbstractStep
         switch ($action) {
             case 'fixtures':
                 return $this->handleAjaxAction('oro:demo:fixtures:load');
-            case 'search':
-                return $this->handleAjaxAction('oro:search:create-index');
             case 'navigation':
                 return $this->handleAjaxAction('oro:navigation:init');
             case 'js-routing':

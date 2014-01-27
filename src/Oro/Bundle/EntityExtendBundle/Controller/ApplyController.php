@@ -51,7 +51,6 @@ class ApplyController extends Controller
         $commands = array(
             'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
             'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
-            'searchIndex'  => new Process($console . ' oro:search:create-index --env ' . $env),
         );
 
         // put system in maintenance mode
