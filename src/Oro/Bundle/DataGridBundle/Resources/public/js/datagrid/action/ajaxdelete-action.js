@@ -1,5 +1,6 @@
-/* global define */
-define(['oro/datagrid/model-action', 'oro/translator'], function (ModelAction, __) {
+/*global define*/
+define(['oro/datagrid/model-action', 'oro/delete-confirmation', 'oro/translator'
+    ], function (ModelAction, DeleteConfirmation, __) {
     'use strict';
 
     /**
@@ -11,6 +12,9 @@ define(['oro/datagrid/model-action', 'oro/translator'], function (ModelAction, _
      */
     return ModelAction.extend({
         confirmation: true,
+
+        /** @property {Function} */
+        confirmModalConstructor: DeleteConfirmation,
 
         defaultMessages: {
             confirm_title: __('Remove confirmation'),
