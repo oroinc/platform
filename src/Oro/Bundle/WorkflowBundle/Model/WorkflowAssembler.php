@@ -71,8 +71,7 @@ class WorkflowAssembler extends AbstractAssembler
             $configuration,
             array(
                 WorkflowConfiguration::NODE_STEPS,
-                WorkflowConfiguration::NODE_TRANSITIONS,
-                WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS
+                WorkflowConfiguration::NODE_TRANSITIONS
             )
         );
 
@@ -151,6 +150,7 @@ class WorkflowAssembler extends AbstractAssembler
                     'label' => $workflowDefinition->getLabel(),
                     'step_to' => $workflowDefinition->getStartStep()->getName(),
                     'is_start' => true,
+                    'is_hidden' => true,
                     'transition_definition' => $startTransitionDefinitionName
                 );
         }
