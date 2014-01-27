@@ -48,6 +48,9 @@ class FixturesLoader extends Loader
      */
     protected $bundleDataVersions = [];
 
+    /**
+     * @var array
+     */
     protected $bundleFixtureDirs = [];
 
     /**
@@ -196,7 +199,8 @@ class FixturesLoader extends Loader
             if ($fixture instanceof OrderedFixtureInterface) {
                 throw new \InvalidArgumentException(
                     sprintf(
-                        'Versioned fixtures does not support OrderedFixtureInterface. Please fix %s fixture.',
+                        'Versioned fixtures does not support OrderedFixtureInterface.
+                        Use DependentFixtureInterface for ordering. Please fix %s fixture.',
                         get_class($fixture)
                     )
                 );
@@ -236,21 +240,19 @@ class FixturesLoader extends Loader
                         /** @var BundleVersion $versionData */
                         $versionData = $repo->findOneBy(['bundleName' => $bundleName]);
                         if ($versionData) {
-                            $version           = $this->loadDemoData
+                            $bundleDataVersion = $this->loadDemoData
                                 ? $versionData->getDemoDataVersion()
                                 : $versionData->getDataVersion();
-                            $bundleDataVersion = $this->getVersionInfo($version);
                         } else {
                             $bundleDataVersion = false;
                         }
                     }
 
-                    $relativePathVersion = $directory->getRelativePathname();
-                    $fixtureVersion      = $this->getVersionInfo($relativePathVersion);
-                    if (!is_array($bundleDataVersion)
-                        || $this->compareVersions($bundleDataVersion, $fixtureVersion) > 0
+                    $fixtureVersion = $directory->getRelativePathname();
+                    if (!$bundleDataVersion
+                        || version_compare($fixtureVersion, $bundleDataVersion) > 0
                     ) {
-                        $bundleDirFixtures[] = $relativePathVersion;
+                        $bundleDirFixtures[] = $fixtureVersion;
                     }
                 }
             } catch (\Exception $e) {
@@ -268,62 +270,6 @@ class FixturesLoader extends Loader
 
         $this->bundleDataVersions = $bundleDataVersions;
         $this->bundleFixtureDirs  = $bundleFixtureDirs;
-    }
-
-    /**
-     * Usort callback sorter for directories
-     *
-     * @param array $a
-     * @param array $b
-     * @return int
-     */
-    protected function sortFixtures($a, $b)
-    {
-        return $this->compareVersions($this->getVersionInfo($b), $this->getVersionInfo($a));
-    }
-
-    /**
-     * Compare two version strings
-     *
-     * @param $masterVersion
-     * @param $comparedVersion
-     * @return int returns -1 if left version is higher, 1 if right version is higher, 0 if versions is the same
-     */
-    protected function compareVersions($masterVersion, $comparedVersion)
-    {
-        $masterVersionPart   = (int)array_shift($masterVersion);
-        $comparedVersionPart = (int)array_shift($comparedVersion);
-        if ($masterVersionPart > $comparedVersionPart) {
-            return -1;
-        } elseif ($masterVersionPart < $comparedVersionPart) {
-            return 1;
-        } else {
-            if (empty($masterVersion) && empty($comparedVersion)) {
-                return 0;
-            }
-            if (empty($masterVersion)) {
-                return 1;
-            }
-            if (empty($comparedVersion)) {
-                return -1;
-            }
-
-            return $this->compareVersions($masterVersion, $comparedVersion);
-        }
-    }
-
-    /**
-     * Get array with version parts
-     *
-     * @param string $pathString
-     * @return array
-     */
-    protected function getVersionInfo($pathString)
-    {
-        $matches = [];
-        preg_match_all('/\d+/', $pathString, $matches);
-
-        return isset($matches[0]) ? $matches[0] : [];
     }
 
     protected function sortFixturesStd($a, $b)
@@ -407,7 +353,17 @@ class FixturesLoader extends Loader
             }
             $bundleDataVersions[$bundleName] = array_pop($bundleDirFixtures);
         }
+    }
 
-        return [$bundleDataVersions, $bundleFixtureDirs];
+    /**
+     * Usort callback sorter for directories
+     *
+     * @param array $a
+     * @param array $b
+     * @return int
+     */
+    protected function sortFixtures($a, $b)
+    {
+        return version_compare($a, $b);
     }
 }

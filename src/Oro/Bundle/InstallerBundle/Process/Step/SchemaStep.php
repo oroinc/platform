@@ -35,7 +35,7 @@ class SchemaStep extends AbstractStep
                 return $this->handleAjaxAction('doctrine:schema:update', array('--force' => true));
             case 'fixtures':
                 return $this->handleAjaxAction(
-                    'oro:data:fixtures:load',
+                    'oro:installer:fixtures:load',
                     array('--no-interaction' => true)
                 );
             case 'workflows':

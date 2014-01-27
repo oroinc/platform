@@ -140,7 +140,7 @@ class InstallCommand extends ContainerAwareCommand
                 array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
             )
             ->runCommand(
-                'oro:data:fixtures:load',
+                'oro:installer:fixtures:load',
                 array('--process-isolation' => true, '--no-interaction' => true)
             )
             ->runCommand(
@@ -246,7 +246,7 @@ class InstallCommand extends ContainerAwareCommand
         // load demo fixtures
         if ($demo) {
             $commandExecutor->runCommand(
-                'oro:data:fixtures:load',
+                'oro:installer:fixtures:load',
                 array('--process-isolation' => true, '--process-timeout' => 300, '--load-demo' => 'true')
             );
         }
