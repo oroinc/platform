@@ -3,9 +3,11 @@
 namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand;
-use Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand;
+
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\ArrayInput;
+
+use Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand;
 
 class UpdateSchemaDoctrineListener
 {
@@ -20,7 +22,7 @@ class UpdateSchemaDoctrineListener
             $input  = $event->getInput();
 
             if ($input->getOption('force')) {
-                $application = $command->getApplication();
+                $application  = $command->getApplication();
                 $indexInput   = new ArrayInput(['']);
                 $indexCommand = $application->find(
                     AddFulltextIndexesCommand::COMMAND_NAME

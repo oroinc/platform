@@ -4,9 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Console\Tester\CommandTester;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -40,7 +38,7 @@ class UpdateSchemaListenerTest extends WebTestCase
             $options
         );
 
-        $input = new ArrayInput($arguments);
+        $input  = new ArrayInput($arguments);
         $output = new StreamOutput(fopen('php://memory', 'w', false));
 
         $exitCode = $this->application->run($input, $output);
