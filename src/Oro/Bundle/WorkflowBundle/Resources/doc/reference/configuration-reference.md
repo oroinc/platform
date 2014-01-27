@@ -48,16 +48,15 @@ src/Acme/DemoWorkflowBundle/Resources/config/workflow.yml.
 Configuration Loading
 =====================
 
-To load configuration execute a command
+To load configuration execute a command:
 
 ```
-php app/console doctrine:fixtures:load --app/console doctrine:fixtures:load --append --fixtures=/path/to/bundles/WorkflowBundle/DataFixture
+php app/console oro:workflow:definitions:load
 ```
+Command has two options: "directories" that allows user to specify which directories will be used to find definitions,
+and "workflows" that define names of definitions required to load.
 
-This command will save configuration from all workflow.yml files of loaded bundles into WorkflowDefinition entities.
-It can be used in both cases when you want to load a new workflow or update existed one.
-
-**Warning** *--append* options is crucial, if you skip it your database will be purged.
+**Important**
 
 Workflow configuration cannot be merged, it means that you cannot override workflow that is defined in other bundle.
 If you will declare a workflow and another bundle will declare it's own workflow with the same name the command will
@@ -76,12 +75,15 @@ Single workflow configuration has next properties:
 * **label**
     *string*
     This value will be shown in the UI
+* **entity**
+    *string*
+    Class name of workflow related entity. **Important:** Entity must have fields to contain workflow item and step.
 * **enabled**
     *boolean (true - default)*
     If not enabled, operations with workflow will be be restricted.
-* **type**
-    *string ("wizard", "entity" - default)*
-    type of workflow.
+* **entity_attribute**
+    *string*
+    Name of the attribute used to store related entity
 * **start_step**
     *string*
     The name of start step. It's optional if Workflow has start transition, otherwise start_step is required.
@@ -100,6 +102,7 @@ Example
 workflows:                        # Root elements
     phone_call:                   # A unique name of workflow
         label: Demo Call Workflow # This will be shown in UI
+        entity: My\Custom\Entity  # Workflow will be used for this entity
         enabled: true             # If not enabled, operations with workflow will be restricted.
         start_step: start_call    # name of start step
         attributes:               # configuration for Attributes
@@ -146,6 +149,9 @@ Single attribute can be described with next configuration:
 * **label**
     *string*
     Label can be shown in the UI
+* **property_path
+    *string*
+    Used to work with attribute value by reference and specifies path to data storage
 * **options**
     Options of this attribute. Currently next options are supported
     * **class**
@@ -181,34 +187,31 @@ workflows:
     phone_call:
         # ...
         attributes:
-            phone_call:                  # unique attribute name
-                label: Phone Call        # attribute label
-                type: entity             # attribute type
+            phone_call:
+                label: Phone Call
+                type: entity
                 options:
-                    class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall # entity class
-                    managed_entity: true # this is a managed entity, so on page of PhoneCall user will be able to start this workflow
-                    multiple: true       # many instances of workflow can be started for PhoneCall
-                    bind: true           # all instances of workflow items can be found by PhoneCall instance
+                    class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
             call_timeout:
                 type: integer
                 label: 'Call Timeout'
+                property_path: phone_call.timeout
             call_successfull:
                 type: boolean
                 label: 'Call Successful'
+                property_path: phone_call.successful
             conversation_successful:
                 type: boolean
                 label: 'Conversation Successful'
+                property_path: phone_call.conversation.successful
             conversation_comment:
                 type: string
                 label: 'Conversation Comment'
+                property_path: phone_call.conversation.comment
             conversation_result:
                 type: string
                 label: 'Conversation Result'
-            conversation:
-                type: entity
-                label: 'Conversation'
-                options:
-                    class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
+                property_path: phone_call.conversation.result
 ```
 
 Steps configuration
@@ -228,21 +231,12 @@ Summarizing all above, step has next configuration:
 * **label**
     *string*
     Label of step, can be shown in UI if Workflow has type wizard
-* **template**
-    *string*
-    A custom Twig template that is used to render Worklflow in step in wizard page.
-    By default template OroWorkflowBundle:WorkflowStep:edit.html.twig is used.
 * **order**
     *integer*
     This value is used in wizard page to sort steps in UI.
 * **is_final**
     *boolean*
     If true than workflow instance will be automatically closed after transition to this step will be performed.
-* **form_type**
-    *string (oro_workflow_step - default)*
-    A form type that will be used to render form of step.
-* **form_options**
-    These options will be passed to form type of step, they can contain options for form types of attributes.
 * **view_attributes**
     List of attributes that will be shown when step is selected on Workflow wizard UI. Custom path could be specified
     instead of name of attribute. Each view attribute could have "view_type" option which is used to find Twig block
@@ -260,44 +254,16 @@ workflows:
         steps:
             start_call:
                 label: 'Start Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig' # custom template that will be rendered on wizard page for this step
-                allowed_transitions:           # list of allowed transitions from this step
+                allowed_transitions: # list of allowed transitions from this step
                     - connected
                     - not_answered
-                form_type: oro_workflow_step   # used by default
-                form_options:                  # options will be passed to step form type
-                    attribute_fields:
-                        call_timeout:          # must be a name of attribute that is configured in workflow
-                            form_type: integer # this is a name of form type that will be added to step form to represent value of attribute
-                            options:           # any options that should be applied to form type that represents attribute's value
-                                required: true
-                view_attributes:
-                    - { path: $phone_call.number, label: "Phone number" } # render number property of phone_call attribute
-            start_conversation:
+             start_conversation:
                 label: 'Call Phone Conversation'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 allowed_transitions:
                     - end_conversation
-                form_options:
-                    attribute_fields:
-                        conversation_result:
-                            form_type: text
-                        conversation_comment:
-                            form_type: text
-                        conversation_successful:
-                            form_type: choice
-                            options:
-                                choices: {1: 'Yes', 0: 'No'}
-                                required: true
-                                multiple: false
-                view_attributes:
-                    - call_timeout # render call_timeout attribute
             end_call:
                 label: 'End Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 is_final: true
-                view_attributes:
-                    - { attribute: conversation_result, view_type: custom } # render conversation_result attribute using custom block
 ```
 
 Transitions Configuration
@@ -537,57 +503,28 @@ Configuration
 workflows:
     phone_call:
         label: 'Demo Call Workflow'
-        enabled: true
-        type: wizard
+		entity: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
+		enabled: true
         start_step: start_call
         steps:
             start_call:
                 label: 'Start Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 allowed_transitions:
                     - connected
                     - not_answered
-                form_options:
-                    attribute_fields:
-                        call_timeout:
-                            form_type: integer
-                            options:
-                                required: true
-                view_attributes:
-                    - { path: $phone_call.number, label: "Phone number" } # render number property of phone_call attribute
             start_conversation:
                 label: 'Call Phone Conversation'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 allowed_transitions:
                     - end_conversation
-                form_options:
-                    attribute_fields:
-                        conversation_result:
-                            form_type: text
-                        conversation_comment:
-                            form_type: text
-                        conversation_successful:
-                            form_type: choice
-                            options:
-                                choices: {1: 'Yes', 0: 'No'}
-                                required: true
-                                multiple: false
-                view_attributes:
-                    - call_timeout # render call_timeout attribute
             end_call:
                 label: 'End Phone Call'
-                template: 'AcmeDemoWorkflowBundle:Workflow:phoneCall.html.twig'
                 is_final: true
-                view_attributes:
-                    - { attribute: conversation_result, view_type: custom } # render conversation_result attribute using custom block
         attributes:
             phone_call:
                 label: Phone Call
                 type: entity
                 options:
                     class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneCall
-                    managed_entity: true
-                    multiple: true
             call_timeout:
                 type: integer
                 label: 'Call Timeout'
@@ -613,15 +550,6 @@ workflows:
                 label: 'Connected'
                 step_to: start_conversation
                 transition_definition: connected_definition
-                frontend_options:
-                    icon: 'icon-ok'                         # add icon to transition button with class "icon-ok"
-                    class: 'btn-primary'                    # add css class "btn-primary" to transition button
-                form_options:
-                    attribute_fields:                       # fields of form that will be shown when transition button is clicked
-                        call_timeout:
-                            form_type: integer
-                            options:
-                                required: false
             not_answered:
                 label: "Not answered"
                 step_to: end_call
@@ -637,9 +565,8 @@ workflows:
                     @not_blank: [$call_timeout]
                 # Set call_successfull = true
                 post_actions:
-                    - @assign_value: [$call_successfull, true]
-                init_actions:
-                    - @increment_value: [$call_attempt]
+                    - @assign_value:
+                        parameters: [$call_successfull, true]
             not_answered_definition: # Callee did not answer
                 # Make sure that caller waited at least 60 seconds
                 conditions: # call_timeout not empty and >= 60
@@ -648,7 +575,8 @@ workflows:
                         - @ge: [$call_timeout, 60]
                 # Set call_successfull = false
                 post_actions:
-                    - @assign_value: [$call_successfull, false]
+                    - @assign_value:
+                        parameters: [$call_successfull, false]
             end_conversation_definition:
                 conditions:
                     # Check required properties are set
@@ -660,13 +588,14 @@ workflows:
                 # Pass data from workflow to conversation
                 post_actions:
                     - @create_entity: # create PhoneConversation
-                        class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
-                        attribute: $conversation
-                        data:
-                            result: $conversation_result
-                            comment: $conversation_comment
-                            successful: $conversation_successful
-                            call: $phone_call
+                        parameters:
+                            class: Acme\Bundle\DemoWorkflowBundle\Entity\PhoneConversation
+                            attribute: $conversation
+                            data:
+                                result: $conversation_result
+                                comment: $conversation_comment
+                                successful: $conversation_successful
+                                call: $phone_call
 ```
 
 PhoneCall Entity
