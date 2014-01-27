@@ -32,8 +32,12 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
             conditionFieldHTML: '<div class="condition-field" />',
             conditionGroupHTML: '<ul class="condition-group" />',
             validation: {
-                'condition-filed': {NotBlank: {message: 'This condition should not be blank.'}},
-                'condition-group': {NotBlank: {message: 'This group should not be blank.'}}
+                'condition-filed': {
+                    NotBlank: {message: 'oro.query_designer.condition_builder.condition_filed.not_blank'}
+                },
+                'condition-group': {
+                    NotBlank: {message: 'oro.query_designer.condition_builder.condition_group.not_blank'}
+                }
             }
         },
 
