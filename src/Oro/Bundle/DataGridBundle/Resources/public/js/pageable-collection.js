@@ -232,7 +232,8 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @return {Object}
          */
         parse: function(resp, options) {
-            this.state.totalRecords = resp.options.totalRecords;
+            resp.options = resp.options || {};
+            this.state.totalRecords = resp.options.totalRecords || 0;
             this.state = this._checkState(this.state);
             return resp.data;
         },
@@ -244,7 +245,7 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @param options
          */
         reset: function(models, options) {
-            this.trigger('beforeReset', this, options);
+            this.trigger('beforeReset', this, models, options);
             BackbonePageableCollection.prototype.reset.apply(this, arguments);
         },
 

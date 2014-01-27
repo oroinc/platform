@@ -114,7 +114,6 @@ class UpdateCommand extends InitCommand
             $commands = [
                 'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
                 'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
-                'searchIndex'  => new Process($console . ' oro:search:create-index --env ' . $env),
             ];
 
             // put system in maintenance mode
@@ -205,43 +204,45 @@ class UpdateCommand extends InitCommand
             $this->setDefaultConfig($entityOptions, $className);
         }
 
-        foreach ($entityOptions['fields'] as $fieldName => $fieldConfig) {
-            $fieldExistingConfig = $this->configManager->hasConfig($className, $fieldName);
+        if (isset($entityOptions['fields'])) {
+            foreach ($entityOptions['fields'] as $fieldName => $fieldConfig) {
+                $fieldExistingConfig = $this->configManager->hasConfig($className, $fieldName);
 
-            if ($this->info) {
-                $output->writeln(
-                    '-- -- field: <info>' . $fieldName . '</info> (<comment>'
-                    . ((bool)$fieldExistingConfig ? 'EXISTS' : 'NEW')
-                    . '</comment>)'
-                );
-            }
+                if ($this->info) {
+                    $output->writeln(
+                        '-- -- field: <info>' . $fieldName . '</info> (<comment>'
+                        . ((bool)$fieldExistingConfig ? 'EXISTS' : 'NEW')
+                        . '</comment>)'
+                    );
+                }
 
-            list($mode, $owner, $isExtend) = $this->parseFieldConfig($fieldConfig);
+                list($mode, $owner, $isExtend) = $this->parseFieldConfig($fieldConfig);
 
-            $config = false;
-            if (!(bool)$fieldExistingConfig) {
-                /**
-                 * create NEW entity field model
-                 */
-                $extendManager->createField($className, $fieldName, $fieldConfig, $owner, $mode);
-                $this->setDefaultConfig($entityOptions, $className, $fieldName);
+                $config = false;
+                if (!(bool)$fieldExistingConfig) {
+                    /**
+                     * create NEW entity field model
+                     */
+                    $extendManager->createField($className, $fieldName, $fieldConfig, $owner, $mode);
+                    $this->setDefaultConfig($entityOptions, $className, $fieldName);
 
-                $config = $configProvider->getConfig($className, $fieldName);
-                $config->set('state', ExtendManager::STATE_NEW);
-                $config->set('is_extend', $isExtend);
+                    $config = $configProvider->getConfig($className, $fieldName);
+                    $config->set('state', ExtendManager::STATE_NEW);
+                    $config->set('is_extend', $isExtend);
 
-                $this->needDbUpdate = true;
-            } elseif ($force) {
-                /**
-                 * update EXISTING entity field model on --force
-                 */
-                $this->setDefaultConfig($entityOptions, $className, $fieldName);
+                    $this->needDbUpdate = true;
+                } elseif ($force) {
+                    /**
+                     * update EXISTING entity field model on --force
+                     */
+                    $this->setDefaultConfig($entityOptions, $className, $fieldName);
 
-                $config = $configProvider->getConfig($className, $fieldName);
-            }
+                    $config = $configProvider->getConfig($className, $fieldName);
+                }
 
-            if ($config) {
-                $this->configManager->persist($config);
+                if ($config) {
+                    $this->configManager->persist($config);
+                }
             }
         }
     }

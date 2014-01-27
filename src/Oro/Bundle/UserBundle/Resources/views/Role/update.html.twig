@@ -25,7 +25,8 @@
                 'aCss': 'no-hash remove-button',
                 'dataId': entityId,
                 'id': 'btn-remove-role',
-                'entity_label': 'oro.user.role.entity_label'|trans
+                'entity_label': 'oro.user.role.entity_label'|trans,
+                'disabled': not allow_delete
             })
         }}
         {{ UI.buttonSeparator() }}

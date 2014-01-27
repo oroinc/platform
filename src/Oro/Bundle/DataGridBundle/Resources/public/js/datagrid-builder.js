@@ -19,6 +19,7 @@ define(function (require) {
 
     var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
         gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
+        collectionOptions = {},
 
         helpers = {
             cellType: function (type) {
@@ -94,7 +95,8 @@ define(function (require) {
                 } else {
                     // otherwise, create collection from metadata
                     options = methods.combineCollectionOptions.call(this);
-                    collection = new PageableCollection(this.$el.data('data'), options);
+                    collection = new PageableCollection([], options);
+                    collectionOptions = _.extend({}, options);
                 }
 
                 // create grid
@@ -118,6 +120,8 @@ define(function (require) {
              */
             afterBuild: function () {
                 mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
+                this.grid.collection.reset(this.$el.data('data'), collectionOptions);
+                this.grid.collection.reset(this.$el.data('data'), collectionOptions);
             },
 
             /**

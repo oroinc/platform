@@ -200,15 +200,10 @@ class RoleController extends RestController implements ClassResourceInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    protected function handleDelete($entity, ObjectManager $em)
+    protected function getDeleteHandler()
     {
-        parent::handleDelete($entity, $em);
-        /** @var \Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager $aclSidManager */
-        $aclSidManager = $this->get('oro_security.acl.sid_manager');
-        if ($aclSidManager->isAclEnabled()) {
-            $aclSidManager->deleteSid($aclSidManager->getSid($entity));
-        }
+        return $this->get('oro_user.role.handler.delete');
     }
 }

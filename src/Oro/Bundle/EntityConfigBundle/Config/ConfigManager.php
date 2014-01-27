@@ -35,6 +35,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\UpdateEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
@@ -232,7 +233,8 @@ class ConfigManager
     /**
      * @param string $scope
      * @param string $className
-     * @param bool   $withHidden
+     * @param bool   $withHidden Set true if you need all configurable entities,
+     *                           including entities marked as mode="hidden"
      * @return array
      */
     public function getIds($scope, $className = null, $withHidden = false)
@@ -558,12 +560,12 @@ class ConfigManager
     {
         if (!$entityModel = $this->modelManager->findModel($className)) {
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
+            $metadata    = $this->getEntityMetadata($className);
 
             foreach ($this->getProviders() as $provider) {
                 $translatable = $provider->getPropertyConfig()
                     ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
 
-                $metadata      = $this->getEntityMetadata($className);
                 $defaultValues = [];
                 if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
                     $defaultValues = $metadata->defaultValues[$provider->getScope()];
@@ -617,18 +619,35 @@ class ConfigManager
                 $defaultValues
             );
 
+            $translatable = $provider->getPropertyConfig()
+                ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
+
+            foreach ($translatable as $code) {
+                if (!in_array($code, $defaultValues)) {
+                    $defaultValues[$code] = ConfigHelper::getTranslationKey($className, null, $code);
+                }
+            }
+
             // set missing values with default ones
             $hasChanges = false;
             $config     = $provider->getConfig($className);
             foreach ($defaultValues as $code => $value) {
-                $valueHasChanges = $config->has($code) && $config->get($code) != $value;
-                if (!$config->has($code) || $valueHasChanges || $force) {
+                if (!$config->has($code) || !$config->is($code, $value) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }
             }
             if ($hasChanges) {
                 $provider->persist($config);
+
+                if (in_array($scope, UpdateEntityConfigModelEvent::$scopes)) {
+                    if ($entityModel = $this->getConfigEntityModel($className)) {
+                        $this->eventDispatcher->dispatch(
+                            Events::UPDATE_ENTITY_CONFIG_MODEL,
+                            new UpdateEntityConfigModelEvent($entityModel, $this)
+                        );
+                    }
+                }
             }
         }
     }
@@ -644,11 +663,11 @@ class ConfigManager
     {
         if (!$fieldModel = $this->modelManager->findModel($className, $fieldName)) {
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
+            $metadata   = $this->getFieldMetadata($className, $fieldName);
 
             foreach ($this->getProviders() as $provider) {
                 $translatable  = $provider->getPropertyConfig()->getTranslatableValues();
                 $defaultValues = [];
-                $metadata      = $this->getFieldMetadata($className, $fieldName);
                 if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
                     $defaultValues = $metadata->defaultValues[$provider->getScope()];
                 }
@@ -706,8 +725,7 @@ class ConfigManager
             $hasChanges = false;
             $config     = $provider->getConfig($className, $fieldName);
             foreach ($defaultValues as $code => $value) {
-                $valueHasChanges = $config->has($code) && $config->get($code) != $value;
-                if (!$config->has($code) || $valueHasChanges || $force) {
+                if (!$config->has($code) || !$config->is($code, $value) || $force) {
                     $config->set($code, $value);
                     $hasChanges = true;
                 }

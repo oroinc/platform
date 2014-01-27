@@ -10,6 +10,7 @@ parameters:
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
     oro_calendar.format_converter.date_time.full_calendar.class: Oro\Bundle\CalendarBundle\Converter\FullCalendarDateTimeFormatConverter
+    oro_calendar.owner_assignment_checker.calendar.class:        Oro\Bundle\CalendarBundle\Ownership\CalendarOwnerAssignmentChecker
 
 services:
     oro_calendar.reminders_sender:
@@ -63,3 +64,8 @@ services:
             - @oro_locale.formatter.date_time
         tags:
             - { name: oro_locale.format_converter.date_time, alias: fullcalendar }
+
+    oro_calendar.owner_assignment_checker.calendar:
+        class: %oro_calendar.owner_assignment_checker.calendar.class%
+        tags:
+            - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\CalendarBundle\Entity\Calendar }

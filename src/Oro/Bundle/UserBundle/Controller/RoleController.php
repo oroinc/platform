@@ -97,6 +97,13 @@ class RoleController extends Controller
         return array(
             'form'     => $aclRoleHandler->createView(),
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete a role and un-assign it from all users or reassign users to another role before
+            'allow_delete' =>
+                $entity->getId() &&
+                !$this->get('doctrine.orm.entity_manager')
+                    ->getRepository('OroUserBundle:Role')
+                    ->hasAssignedUsers($entity)
         );
     }
 }
