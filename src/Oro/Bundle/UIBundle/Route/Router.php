@@ -28,6 +28,13 @@ class Router
      */
     protected $securityFacade;
 
+    /**
+     * Constructor
+     *
+     * @param Request        $request
+     * @param SymfonyRouter  $router
+     * @param SecurityFacade $securityFacade
+     */
     public function __construct(Request $request, SymfonyRouter $router, SecurityFacade $securityFacade)
     {
         $this->request        = $request;
@@ -78,7 +85,7 @@ class Router
      * @param array  $saveAndStayRoute  A route data for "Save and Stay" button
      * @param array  $saveAndCloseRoute A route data for "Save and Close" button
      * @param object $entity            An entity was saved. Specify this parameter only if an entity
-     *                                  is ACL controlled and you want to redirect to "Save and Close" route when
+     *                                  is ACL protected and you want to redirect to "Save and Close" route when
      *                                  a new entity is created and an user have no permissions to edit this entity.
      *                                  Please note that if this parameter is not specified, an user clicks
      *                                  "Save and Stay" and he/she does not have permissions to edit an entity

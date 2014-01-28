@@ -115,12 +115,8 @@ class SecurityFacade
      */
     public function isGranted($attributes, $object = null)
     {
-        $isGranted = false;
-
-        if ($object === null) {
-            if (is_string($attributes)
-                && $annotation = $this->annotationProvider->findAnnotationById($attributes)
-            ) {
+        if (is_string($attributes) && $annotation = $this->annotationProvider->findAnnotationById($attributes)) {
+            if ($object === null) {
                 $this->logger->debug(
                     sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
                 );
@@ -128,24 +124,22 @@ class SecurityFacade
                     $annotation->getPermission(),
                     $this->objectIdentityFactory->get($annotation)
                 );
-            }
-        } else {
-            if (is_string($attributes)
-                && $annotation = $this->annotationProvider->findAnnotationById($attributes)
-            ) {
+            } else {
                 $this->logger->debug(
                     sprintf('Check object based an access using "%s" ACL annotation.', $annotation->getId())
                 );
-                $attributes = $annotation->getPermission();
-            }
-            if (is_string($object)) {
                 $isGranted = $this->securityContext->isGranted(
-                    $attributes,
-                    $this->objectIdentityFactory->get($object)
+                    $annotation->getPermission(),
+                    $object
                 );
-            } else {
-                $isGranted = $this->securityContext->isGranted($attributes, $object);
             }
+        } elseif (is_string($object)) {
+            $isGranted = $this->securityContext->isGranted(
+                $attributes,
+                $this->objectIdentityFactory->get($object)
+            );
+        } else {
+            $isGranted = $this->securityContext->isGranted($attributes, $object);
         }
 
         return $isGranted;
