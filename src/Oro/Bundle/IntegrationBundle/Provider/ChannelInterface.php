@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-interface ChannelTypeInterface
+interface ChannelInterface
 {
     /**
      * Returns label for UI
