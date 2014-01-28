@@ -75,7 +75,11 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
         },
 
         _initCriteriaList: function () {
-            $(this.options.criteriaListSelector).sortable(this.options.criteriaList);
+            $(this.options.criteriaListSelector)
+                .sortable(this.options.criteriaList)
+                .on('mousedown', function () {
+                    $(':focus').blur();
+                });
         },
 
         _initConditionBuilder: function () {
