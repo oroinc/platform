@@ -37,6 +37,7 @@ class EmbedFormController extends Controller
 
         return [
             'form' => $form->createView(),
+            'formEntity' => $formEntity
         ];
     }
 

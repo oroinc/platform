@@ -1,5 +1,14 @@
 {% extends 'OroEmbeddedFormBundle::base.html.twig' %}
 
+{% block stylesheet %}
+    {{ parent() }}
+
+    <style type="text/css">
+        {{ formEntity.css|raw }}
+    </style>
+
+{% endblock %}
+
 {% block page %}
     <h3>Form</h3>
     {{ form(form, {'attr': {'id': form.vars.name, 'novalidate': 'novalidate' }}) }}
