@@ -123,5 +123,6 @@ services:
         arguments:
             - @oro_workflow.context_accessor
             - @oro_security.security_facade
+            - @oro_workflow.doctrine_helper
         tags:
             - { name: oro_workflow.condition, alias: acl_granted }
