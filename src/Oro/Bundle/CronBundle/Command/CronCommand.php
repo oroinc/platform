@@ -53,6 +53,12 @@ class CronCommand extends ContainerAwareCommand
             $output->writeln('');
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
 
+            if (!$command->getDefaultDefinition()) {
+                $output->writeln(sprintf('<comment>no cron definition found, check command %s</comment>', $name));
+
+                continue;
+            }
+
             $dbCommand = array_filter(
                 $dbCommands,
                 function ($element) use ($name) {
@@ -84,16 +90,9 @@ class CronCommand extends ContainerAwareCommand
 
             $dbCommand = current($dbCommand);
 
-            if (!$dbCommand->getDefinition()) {
-                $output->writeln('<comment>no cron definition found, check db record</comment>');
-
-                continue;
-            }
-
-            if ($dbCommand->getDefinition() != $command->getDefaultDefinition()) {
-                $dbCommand->setDefinition($command->getDefaultDefinition());
-
-                $em->persist($dbCommand);
+            $commandDefaultDefinition = $command->getDefaultDefinition();
+            if ($dbCommand->getDefinition() != $commandDefaultDefinition) {
+                $dbCommand->setDefinition($commandDefaultDefinition);
             }
 
             $cron = \Cron\CronExpression::factory($dbCommand->getDefinition());
