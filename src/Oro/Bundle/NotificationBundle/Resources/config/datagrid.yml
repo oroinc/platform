@@ -84,7 +84,7 @@ datagrid:
             delete:
                 type: delete
                 label: Delete
-                acl_resource: oro_notification_emailnotification_remove
+                acl_resource: oro_notification_emailnotification_delete
                 icon: trash
                 link: delete_link
 
