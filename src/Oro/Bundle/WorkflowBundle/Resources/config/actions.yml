@@ -12,7 +12,6 @@ parameters:
     oro_workflow.action.start_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow
     oro_workflow.action.close_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\CloseWorkflow
     oro_workflow.action.redirect.class: Oro\Bundle\WorkflowBundle\Model\Action\Redirect
-    oro_workflow.action.redirect_to_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\RedirectToWorkflow
     oro_workflow.action.format_string.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatString
     oro_workflow.action.assign_active_user.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
     oro_workflow.action.format_name.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatName
@@ -103,13 +102,6 @@ services:
             - 'result.redirectUrl'
         tags:
             - { name: oro_workflow.action, alias: redirect }
-
-    oro_workflow.action.redirect_to_workflow:
-        class: %oro_workflow.action.redirect_to_workflow.class%
-        arguments:
-            - @oro_workflow.action.redirect
-        tags:
-            - { name: oro_workflow.action, alias: redirect_to_workflow }
 
     oro_workflow.action.format_string:
         class: %oro_workflow.action.format_string.class%

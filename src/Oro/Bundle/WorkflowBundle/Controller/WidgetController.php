@@ -5,6 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -26,63 +28,53 @@ use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
 class WidgetController extends Controller
 {
     /**
-     * @Route("/step/edit/item/{workflowItemId}", name="oro_workflow_widget_step_form")
-     * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
+     * @Route("/steps/{entityClass}/{entityId}", name="oro_workflow_widget_steps")
      * @Template
      * @AclAncestor("oro_workflow")
      */
-    public function stepFormAction(WorkflowItem $workflowItem)
+    public function stepsAction($entityClass, $entityId)
     {
-        $this->get('oro_workflow.http.workflow_item_validator')->validate($workflowItem);
-
-        $showStepName = $this->getRequest()->get('stepName', $workflowItem->getCurrentStepName());
+        /** @var EntityConnector $entityConnector */
+        $entityConnector = $this->get('oro_workflow.entity_connector');
+        $entity = $this->getEntityReference($entityClass, $entityId);
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $workflow = $workflowManager->getWorkflow($workflowItem);
-        $workflowData = $workflowItem->getData();
-        $displayStep = $workflow->getStepManager()->getStep($showStepName);
-        if (!$displayStep) {
-            throw new BadRequestHttpException(sprintf('There is no step "%s"', $showStepName));
-        }
-        $currentStep = $workflow->getStepManager()->getStep($workflowItem->getCurrentStepName());
-        if (!$currentStep) {
-            throw new BadRequestHttpException(sprintf('There is no step "%s"', $workflowItem->getCurrentStepName()));
-        }
+        $workflowItem = $entityConnector->getWorkflowItem($entity);
+        $currentStep = $entityConnector->getWorkflowStep($entity);
+        $steps = array();
+        if ($workflowItem) {
+            $workflow = $workflowManager->getWorkflow($workflowItem);
 
-        $stepForm = $this->createForm(
-            $displayStep->getFormType(),
-            $workflowData,
-            array_merge(
-                $displayStep->getFormOptions(),
-                array(
-                    'step_name' => $showStepName,
-                    'workflow_item' => $workflowItem,
-                )
-            )
-        );
+            $workflowDefinition = $workflow->getDefinition();
+            if (!$workflowDefinition->isStepsDisplayOrdered()) {
+                $steps = $workflow->getPassedStepsByWorkflowItem($workflowItem);
+            }
 
-        $saved = false;
-        if ($this->getRequest()->isMethod('POST')) {
-            $stepForm->submit($this->getRequest());
+            if (!$currentStep) {
+                $currentStepName = $workflowItem->getCurrentStep()->getName();
+                $currentStep = $workflow->getStepManager()->getStep($currentStepName);
+            }
+        } else {
+            $workflow = $workflowManager->getApplicableWorkflow($entity);
+            $workflowDefinition = $workflow->getDefinition();
+            if (!$currentStep && $workflowDefinition->getStartStep()) {
+                $currentStep = $workflow->getStepManager()
+                    ->getStep($workflowDefinition->getStartStep()->getName());
 
-            if ($stepForm->isValid()) {
-                $workflowItem->setUpdated();
-                $workflow->bindEntities($workflowItem);
-                $this->getEntityManager()->flush();
-
-                $saved = true;
+                if (!$workflowDefinition->isStepsDisplayOrdered()) {
+                    $steps = array($currentStep);
+                }
             }
         }
 
+        if ($workflowDefinition->isStepsDisplayOrdered()) {
+            $steps = $workflow->getStepManager()->getOrderedSteps();
+        }
+
         return array(
-            'saved' => $saved,
-            'workflow' => $workflow,
-            'steps' => $workflow->getPassedStepsByWorkflowItem($workflowItem),
-            'displayStep' => $displayStep,
+            'steps' => $steps,
             'currentStep' => $currentStep,
-            'form' => $stepForm->createView(),
-            'workflowItem' => $workflowItem,
         );
     }
 
@@ -96,22 +88,23 @@ class WidgetController extends Controller
      * @param string $transitionName
      * @param string $workflowName
      * @return array
+     * @throws BadRequestHttpException
      */
     public function startTransitionFormAction($transitionName, $workflowName)
     {
+        $entityId = $this->getRequest()->get('entityId');
+        if (!$entityId) {
+            throw new BadRequestHttpException('Entity identifier is required');
+        }
+
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowName);
+        $entityClass = $workflow->getDefinition()->getRelatedEntity();
 
-        $initData = array();
-        $entityClass = $this->getRequest()->get('entityClass');
-        $entityId = $this->getRequest()->get('entityId');
-        if ($entityClass && $entityId) {
-            $entity = $this->getEntityReference($entityClass, $entityId);
-            $initData = $workflowManager->getWorkflowData($workflow, $entity, $initData);
-        }
+        $entity = $this->getEntityReference($entityClass, $entityId);
 
-        $workflowItem = $workflow->createWorkflowItem($initData);
+        $workflowItem = $workflow->createWorkflowItem($entity);
         $transition = $workflow->getTransitionManager()->extractTransition($transitionName);
         $transitionForm = $this->getTransitionForm($workflowItem, $transition);
 
@@ -124,7 +117,14 @@ class WidgetController extends Controller
                 /** @var WorkflowAwareSerializer $serializer */
                 $serializer = $this->get('oro_workflow.serializer.data.serializer');
                 $serializer->setWorkflowName($workflow->getName());
-                $data = $serializer->serialize($workflowItem->getData(), 'json');
+
+                // Create new WorkflowData instance with all data required to start.
+                // Original WorkflowData can not be used, as some attributes may be set by reference
+                // So, serialized data will not contain all required data.
+                $formOptions = $transition->getFormOptions();
+                $attributes = array_keys($formOptions['attribute_fields']);
+                $dataArray = $workflowItem->getData()->getValues() + $workflowItem->getData()->getValues($attributes);
+                $data = $serializer->serialize(new WorkflowData($dataArray), 'json');
 
                 $saved = true;
             }
@@ -153,8 +153,6 @@ class WidgetController extends Controller
      */
     public function transitionFormAction($transitionName, WorkflowItem $workflowItem)
     {
-        $this->get('oro_workflow.http.workflow_item_validator')->validate($workflowItem);
-
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowItem);
@@ -168,7 +166,6 @@ class WidgetController extends Controller
 
             if ($transitionForm->isValid()) {
                 $workflowItem->setUpdated();
-                $workflow->bindEntities($workflowItem);
                 $this->getEntityManager()->flush();
 
                 $saved = true;
@@ -206,91 +203,27 @@ class WidgetController extends Controller
     }
 
     /**
-     * @Route("/buttons/entity/{entityClass}/{entityId}", name="oro_workflow_widget_buttons_entity")
+     * @Route("/buttons/{entityClass}/{entityId}", name="oro_workflow_widget_buttons")
      * @Template
      * @AclAncestor("oro_workflow")
      */
-    public function entityButtonsAction($entityClass, $entityId)
+    public function buttonsAction($entityClass, $entityId)
     {
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-
         $entity = $this->getEntityReference($entityClass, $entityId);
-        $workflowName = $this->getRequest()->get('workflowName');
 
-        $transitionsData = array();
-
-        $existingWorkflowItems = $workflowManager->getWorkflowItemsByEntity($entity, $workflowName);
-        $newWorkflows = $workflowManager->getApplicableWorkflows($entity, $existingWorkflowItems, $workflowName);
-
-        /** @var Workflow $workflow */
-        foreach ($newWorkflows as $workflow) {
-            $transitionsData += $this->getAvailableStartTransitionsData($workflow, $entity);
-        }
-
-        /** @var WorkflowItem $workflowItem */
-        foreach ($existingWorkflowItems as $workflowItem) {
-            $transitionsData += $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+        $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+        if ($workflowItem) {
+            $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
+        } else {
+            $workflow = $workflowManager->getApplicableWorkflow($entity);
+            $transitionsData = $this->getAvailableStartTransitionsData($workflow, $entity);
         }
 
         return array(
-            'entity_class' => $entityClass,
             'entity_id' => $entityId,
             'transitionsData' => $transitionsData
-        );
-    }
-
-
-    /**
-     * @Route("/buttons/wizard/{workflowItemId}", name="oro_workflow_widget_buttons_wizard")
-     * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
-     * @Template
-     * @AclAncestor("oro_workflow")
-     */
-    public function wizardButtonsAction(WorkflowItem $workflowItem)
-    {
-        $this->get('oro_workflow.http.workflow_item_validator')->validate($workflowItem);
-
-        $transitionsData = array();
-        if (!$workflowItem->isClosed()) {
-            $transitionsData = $this->getAvailableTransitionsDataByWorkflowItem($workflowItem);
-        }
-
-        return array(
-            'transitionsData' => $transitionsData,
-            'redirectToWorkflow' => $this->getRequest()->get('redirectToWorkflow', false)
-        );
-    }
-
-    /**
-     * @Route("/workflow_items/{entityClass}/{entityId}", name="oro_workflow_widget_workflow_items")
-     * @Template
-     * @AclAncestor("oro_workflow")
-     */
-    public function workflowItemsAction($entityClass, $entityId)
-    {
-        $entity = $this->getEntityReference($entityClass, $entityId);
-        $workflowType = $this->getRequest()->get('workflowType', Workflow::TYPE_WIZARD);
-
-        /** @var WorkflowManager $workflowManager */
-        $workflowManager = $this->get('oro_workflow.manager');
-        $workflowItems = $workflowManager->getWorkflowItemsByEntity($entity, null, $workflowType);
-
-        $workflowItemsData = array();
-        /** @var WorkflowItem $workflowItem */
-        foreach ($workflowItems as $workflowItem) {
-            $workflow = $workflowManager->getWorkflow($workflowItem);
-            $workflowItemsData[] = array(
-                'workflow' => $workflowManager->getWorkflow($workflowItem),
-                'workflowItem' => $workflowItem,
-                'currentStep' => $workflow->getStepManager()->getStep($workflowItem->getCurrentStepName()),
-            );
-        }
-
-        return array(
-            'entity_class' => $entityClass,
-            'entity_id' => $entityId,
-            'workflows_items_data' => $workflowItemsData
         );
     }
 
@@ -342,7 +275,8 @@ class WidgetController extends Controller
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {
                 $errors = new ArrayCollection();
-                $isAllowed = $workflowManager->isStartTransitionAvailable($workflow, $transition, $entity, $errors);
+                $isAllowed = $workflowManager
+                    ->isStartTransitionAvailable($workflow, $transition, $entity, array(), $errors);
                 if ($isAllowed || !$transition->isUnavailableHidden()) {
                     $transitionsData[] = array(
                         'workflow' => $workflowManager->getWorkflow($workflow),

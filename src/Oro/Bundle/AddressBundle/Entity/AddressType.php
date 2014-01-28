@@ -13,7 +13,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity
  * @ORM\Table(name="oro_address_type")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\AddressTypeTranslation")
- * @Config()
  */
 class AddressType implements Translatable
 {

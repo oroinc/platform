@@ -8,9 +8,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
-use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class WorkflowConfiguration implements ConfigurationInterface
 {
@@ -19,9 +17,9 @@ class WorkflowConfiguration implements ConfigurationInterface
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
 
+    const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
+
     /**
-     * Processes and validates configuration
-     *
      * @param array $configs
      * @return array
      */
@@ -57,16 +55,21 @@ class WorkflowConfiguration implements ConfigurationInterface
                 ->isRequired()
                 ->cannotBeEmpty()
             ->end()
-            ->enumNode('type')
+            ->scalarNode('entity')
+                ->isRequired()
                 ->cannotBeEmpty()
-                ->defaultValue(Workflow::TYPE_ENTITY)
-                ->values(array(Workflow::TYPE_ENTITY, Workflow::TYPE_WIZARD))
             ->end()
             ->booleanNode('enabled')
                 ->defaultTrue()
             ->end()
             ->scalarNode('start_step')
                 ->defaultNull()
+            ->end()
+            ->scalarNode('entity_attribute')
+                ->defaultValue(self::DEFAULT_ENTITY_ATTRIBUTE)
+            ->end()
+            ->booleanNode('steps_display_ordered')
+                ->defaultFalse()
             ->end()
             ->append($this->getStepsNode())
             ->append($this->getAttributesNode())
@@ -92,79 +95,15 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->isRequired()
                         ->cannotBeEmpty()
                     ->end()
-                    ->scalarNode('template')
-                        ->defaultNull()
-                    ->end()
                     ->integerNode('order')
                         ->defaultValue(0)
                     ->end()
                     ->booleanNode('is_final')
                         ->defaultFalse()
                     ->end()
-                    ->scalarNode('form_type')
-                        ->defaultValue(WorkflowStepType::NAME)
-                    ->end()
-                    ->arrayNode('form_options')
-                        ->prototype('variable')
-                        ->end()
-                        /** Cannot add specific nodes in form_options, because it can contain any value*/
-                        /*->children()
-                            ->arrayNode('attribute_fields')
-                                ->prototype('variable')
-                                ->prototype('array')
-                                    ->children()
-                                        ->scalarNode('label')
-                                            ->defaultNull()
-                                        ->end()
-                                        ->scalarNode('form_type')
-                                            ->isRequired()
-                                            ->cannotBeEmpty()
-                                        ->end()
-                                        ->arrayNode('options')
-                                            ->prototype('variable')
-                                            ->end()
-                                        ->end()
-                                    ->end()
-                                ->end()
-                            ->end()
-                        ->end()*/
-                    ->end()
                     ->arrayNode('allowed_transitions')
                         ->prototype('scalar')
                         ->end()
-                    ->end()
-                    ->arrayNode('view_attributes')
-                        ->prototype('variable')
-                            ->beforeNormalization()
-                                ->always(
-                                    function ($value) {
-                                        if (!is_array($value)) {
-                                            $value = array('attribute' => $value);
-                                        }
-                                        return $value;
-                                    }
-                                )
-                            ->end()
-                            ->validate()
-                                ->always(
-                                    function ($value) {
-                                        if (!isset($value['attribute']) && !isset($value['path'])) {
-                                            throw new \Exception('"attribute" or "path" is required option.');
-                                        }
-                                        if (!isset($value['attribute']) && !isset($value['label'])) {
-                                            throw new \Exception('"label" is required when "attribute" is empty.');
-                                        }
-                                        foreach (array('path', 'attribute', 'label', 'default') as $option) {
-                                            if (isset($value[$option]) && !is_string($value[$option])) {
-                                                throw new \Exception(sprintf('Option "%s" must be a string.', $option));
-                                            }
-                                        }
-                                        return $value;
-                                    }
-                                )
-                            ->end()
-                        ->end()
-                        /** Cannot add specific nodes in form_options, because it can contain any value*/
                     ->end()
                 ->end()
             ->end();
@@ -189,6 +128,9 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->scalarNode('type')
                         ->isRequired()
                         ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode('property_path')
+                        ->defaultNull()
                     ->end()
                     ->arrayNode('options')
                         ->prototype('variable')
@@ -229,10 +171,16 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->booleanNode('is_unavailable_hidden')
                         ->defaultFalse()
                     ->end()
+                    ->scalarNode('acl_resource')
+                        ->defaultNull()
+                    ->end()
+                    ->scalarNode('acl_message')
+                        ->defaultNull()
+                    ->end()
                     ->scalarNode('message')
+                        ->defaultNull()
                     ->end()
                     ->scalarNode('transition_definition')
-                        ->isRequired()
                         ->cannotBeEmpty()
                     ->end()
                     ->arrayNode('frontend_options')
@@ -260,8 +208,6 @@ class WorkflowConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root(self::NODE_TRANSITION_DEFINITIONS);
         $rootNode
-            ->isRequired()
-            ->requiresAtLeastOneElement()
             ->prototype('array')
                 ->children()
                     ->arrayNode('pre_conditions')

@@ -22,12 +22,12 @@ class UpdateSchemaDoctrineListener
             $input  = $event->getInput();
 
             if ($input->getOption('force')) {
-                $application  = $command->getApplication();
-                $indexInput   = new ArrayInput(['']);
-                $indexCommand = $application->find(
-                    AddFulltextIndexesCommand::COMMAND_NAME
-                );
-                $returnCode   = $indexCommand->run($indexInput, $output);
+                $application = $command->getApplication();
+                $arguments   = [
+                    'command' => AddFulltextIndexesCommand::COMMAND_NAME
+                ];
+                $indexInput  = new ArrayInput($arguments);
+                $returnCode  = $application->run($indexInput, $output);
 
                 if ($returnCode == 0) {
                     $output->writeln('Schema update and create index completed');

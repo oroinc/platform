@@ -6,36 +6,17 @@ use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 return array(
     'first_workflow' => array(
         'label' => 'First Workflow',
+        'entity' => 'First\Entity',
         'enabled' => true,
         'start_step' => 'first_step',
+        'entity_attribute' => 'my_entity',
+        'steps_display_ordered' => true,
         'steps' => array(
             'first_step' => array(
                 'label' => 'First Step',
-                'template' => 'My:Custom:template.html.twig',
                 'order' => 1,
                 'is_final' => true,
-                'form_type' => WorkflowStepType::NAME,
-                'form_options' => array(
-                    'attribute_fields' => array(
-                        'first_attribute' => array(
-                            'label' => 'First Attribute',
-                            'form_type' => 'text',
-                            'options' => array(
-                                'required' => 1
-                            )
-                        )
-                    )
-                ),
                 'allowed_transitions' => array('first_transition'),
-                'view_attributes' => array(
-                    array(
-                        'attribute' => 'first_attribute',
-                        'view_type' => 'custom_view_type',
-                        'default' => 'Default value'
-                    ),
-                    array('path' => '$first_attribute.name', 'label' => 'Custom label'),
-                    array('attribute' => 'first_attribute'),
-                ),
             )
         ),
         'attributes' => array(
@@ -44,7 +25,14 @@ return array(
                 'type' => 'object',
                 'options' => array(
                     'class' => 'DateTime'
-                )
+                ),
+                'property_path' => null
+            ),
+            'second_attribute' => array(
+                'label' => 'Second Attribute',
+                'type' => 'string',
+                'property_path' => 'first_attribute.test',
+                'options' => array()
             )
         ),
         'transitions' => array(
@@ -54,6 +42,8 @@ return array(
                 'is_start' => true,
                 'is_hidden' => true,
                 'is_unavailable_hidden' => true,
+                'acl_resource' => 'some_acl',
+                'acl_message' => 'Test ACL message',
                 'message' => 'Test message',
                 'transition_definition' => 'first_transition_definition',
                 'frontend_options' => array(
@@ -63,8 +53,8 @@ return array(
                 'form_options' => array(
                     'attribute_fields' => array(
                         'first_attribute' => array(
-                            'label' => 'First Attribute',
                             'form_type' => 'text',
+                            'label' => 'First Attribute',
                             'options' => array(
                                 'required' => 1
                             )
@@ -101,22 +91,20 @@ return array(
                 )
             )
         ),
-        'type' => 'entity'
     ),
     'second_workflow' => array(
         'label' => 'Second Workflow',
+        'entity' => 'Second\Entity',
         'enabled' => false,
         'start_step' => 'second_step',
+        'entity_attribute' => 'entity',
+        'steps_display_ordered' => false,
         'steps' => array(
             'second_step' => array(
                 'label' => 'Second Step',
-                'template' => null,
                 'order' => 1,
                 'is_final' => false,
-                'form_type' => 'custom_workflow_step',
                 'allowed_transitions' => array(),
-                'form_options' => array(),
-                'view_attributes' => array(),
             )
         ),
         'attributes' => array(),
@@ -127,6 +115,9 @@ return array(
                 'is_start' => false,
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
+                'acl_resource' => null,
+                'acl_message' => null,
+                'message' => null,
                 'transition_definition' => 'second_transition_definition',
                 'frontend_options' => array(
                     'icon' => 'bar'
@@ -142,6 +133,5 @@ return array(
                 'post_actions' => array()
             )
         ),
-        'type' => 'wizard'
     )
 );

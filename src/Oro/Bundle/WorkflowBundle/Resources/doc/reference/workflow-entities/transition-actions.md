@@ -12,7 +12,6 @@ Table of Contents
  - [Start Workflow](#start-workflow)
  - [Close Workflow](#close-workflow)
  - [Redirect](#redirect)
- - [Redirect To Workflow](#redirect-to-workflow)
  - [Tree Executor](#tree-executor)
  - [Configurable](#configurable)
 
@@ -329,29 +328,6 @@ OR
     parameters:
         route: some_route_name
         route_parameters: {id: $some_entity.id}
-```
-
-Redirect To Workflow
---------------------
-
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\RedirectToWorkflow
-
-**Alias:** redirect_to_workflow
-
-**Description:** Redirects to another workflow item.
-
-**Parameters:**
- - workflow_item \ 0 - path where instance of Workflow Item is located
-
-**Configuration Example**
-```
-- @redirect_to_workflow:
-    parameters:
-        workflow_item: $.result.workflowItem
-
-OR
-
-- @redirect_to_workflow: [$.result.workflowItem]
 ```
 
 Tree Executor
