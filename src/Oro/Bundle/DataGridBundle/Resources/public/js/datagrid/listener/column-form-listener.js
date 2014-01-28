@@ -38,8 +38,8 @@ function($, _, __, mediator, Modal, AbstractListener) {
         setDatagridAndSubscribe: function () {
             AbstractListener.prototype.setDatagridAndSubscribe.apply(this, arguments);
 
-            this.$gridContainer.on('preExecute:refresh:' + this.gridName, this._onExecuteRefreshAction.bind(this));
-            this.$gridContainer.on('preExecute:reset:' + this.gridName, this._onExecuteResetAction.bind(this));
+            this.$gridContainer.on('preExecute:refresh:' + this.gridName, _.bind(this._onExecuteRefreshAction, this));
+            this.$gridContainer.on('preExecute:reset:' + this.gridName, _.bind(this._onExecuteResetAction, this));
 
             this._clearState();
             this._restoreState();

@@ -1,5 +1,7 @@
+/*jshint browser:true*/
+/*jslint browser:true*/
 /*global define*/
-define(['jquery', 'jquery.select2'], function($) {
+define(['jquery', 'jquery.select2'], function ($) {
     'use strict';
 
     /**
@@ -15,11 +17,13 @@ define(['jquery', 'jquery.select2'], function($) {
         /*jshint validthis:true */
         var populate, data, result, children,
             opts = this.opts,
-            id = opts.id;
+            id = opts.id,
+            parent = container.parent();
 
         populate = function (results, container, depth) {
-            var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted, subId;
+            var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted, subId, parent;
             results = opts.sortResults(results, container, query);
+            parent = container.parent();
 
             for (i = 0, l = results.length; i < l; i = i + 1) {
                 result = results[i];
@@ -50,14 +54,13 @@ define(['jquery', 'jquery.select2'], function($) {
 
                 if (compound) {
                     container.addClass('accordion');
-                    subId = container.attr('id') + '_' + depth + '_' + i;
+                    subId = parent.attr('id') + '_' + depth + '_' + i;
 
                     innerContainer = $('<ul></ul>')
-                        .addClass('select2-result-sub');
+                        .addClass('select2-result-sub')
+                        .wrap('<div class="accordion-body collapse" id="' + subId + '" />');
                     populate(result.children, innerContainer, depth + 1);
-                    innerContainer = innerContainer
-                        .wrap('<div class="accordion-body collapse" id="' + subId + '" />')
-                        .parent();
+                    innerContainer = innerContainer.parent();
 
                     node.addClass('accordion-group')
                         .append(innerContainer);
@@ -71,7 +74,7 @@ define(['jquery', 'jquery.select2'], function($) {
                     label = label.addClass('accordion-toggle')
                         .attr('data-toggle', 'collapse')
                         .attr('data-target', '#' + subId)
-                        .attr('data-parent', '#' + container.attr('id'))
+                        .attr('data-parent', '#' + parent.attr('id'))
                         .wrap('<div class="accordion-heading"/>')
                         .parent();
                 }
@@ -81,7 +84,7 @@ define(['jquery', 'jquery.select2'], function($) {
             }
         };
 
-        container.attr('id', container.attr('id') || ('select2container_' + Date.now()));
+        parent.attr('id', parent.attr('id') || ('select2container_' + Date.now()));
         container.on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
             var $this = $(this),
                 target = $this.attr('data-target'),
@@ -96,10 +99,10 @@ define(['jquery', 'jquery.select2'], function($) {
     (function (prototype) {
         var prepareOpts = prototype.prepareOpts;
         prototype.prepareOpts = function (options) {
-            if (options.collapsibleResults || options.is_group_collapsible) {
+            if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
             }
             return prepareOpts.call(this, options);
         };
-    } (window.Select2['class'].abstract.prototype));
+    }(window.Select2['class'].abstract.prototype));
 });

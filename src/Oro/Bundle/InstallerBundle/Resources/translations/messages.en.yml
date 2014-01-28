@@ -66,7 +66,6 @@ process:
         installation:
             header:        Installation
             fixtures:      Load sample data
-            search:        Create search index
             navigation:    Init navigation
             js-routing:    Dump JS routing
             localization:  Dump localization

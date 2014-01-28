@@ -152,9 +152,9 @@ class OroJquerySelect2HiddenType extends AbstractType
                         }
                     }
 
-                    if (empty($result['route_name']) && empty($result['ajax']['url'])) {
+                    if (empty($result['route_name'])) {
                         throw new InvalidConfigurationException(
-                            'Either option "configs.route_name" or "configs.ajax.url" must be set.'
+                            'Option "configs.route_name" must be set.'
                         );
                     }
 
@@ -200,7 +200,7 @@ class OroJquerySelect2HiddenType extends AbstractType
             }
 
             $vars['attr'] = array(
-                'data-entities' => json_encode($result)
+                'data-selected-data' => json_encode($result)
             );
         }
 

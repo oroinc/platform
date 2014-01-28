@@ -1,141 +1,227 @@
 oro_icon_select:
-    glass:        icon-glass
-    music:        icon-music
-    search:       icon-search
-    envelope:     icon-envelope
-    heart:        icon-heart
-    star:         icon-star
-    star empty:   icon-star-empty
-    user:         icon-user
-    film:         icon-film
-    th large:     icon-th-large
-    th:           icon-th
-    th list:      icon-th-list
-    ok:           icon-ok
-    remove:       icon-remove
-    zoom in:      icon-zoom-in
-    zoom out:     icon-zoom-out
-    off:          icon-off
-    signal:       icon-signal
-    cog:          icon-cog
-    trash:        icon-trash
-    home:         icon-home
-    file:         icon-file
-    time:         icon-time
-    road:         icon-road
-    download alt: icon-download-alt
-    download:     icon-download
-    upload:       icon-upload
-    inbox:        icon-inbox
-    play circle:  icon-play-circle
-    repeat:       icon-repeat
-    refresh:      icon-refresh
-    list alt:     icon-list-alt
-    lock:         icon-lock
-    flag:         icon-flag
-    headphones:   icon-headphones
-    volume-off:   icon-volume-off
-    volume-down:  icon-volume-down
-    volume-up:    icon-volume-up
-    qrcode:       icon-qrcode
-    barcode:      icon-barcode
-    tag:          icon-tag
-    tags:         icon-tags
-    book:         icon-book
-    bookmark:     icon-bookmark
-    print:        icon-print
-    camera:       icon-camera
-    font:         icon-font
-    bold:         icon-bold
-    italic:       icon-italic
-    text height:  icon-text-height
-    text width:   icon-text-width
-    align left:   icon-align-left
-    align center: icon-align-center
-    align right:  icon-align-right
-    align justify: icon-align-justify
-    list:         icon-list
-    indent left:  icon-indent-left
-    indent right: icon-indent-right
-    facetime video: icon-facetime-video
-    picture:      icon-picture
-    pencil:       icon-pencil
-    map marker:   icon-map-marker
-    adjust:       icon-adjust
-    tint:         icon-tint
-    edit:         icon-edit
-    share:        icon-share
-    check:        icon-check
-    move:         icon-move
-    step backward: icon-step-backward
-    fast backward: icon-fast-backward
-    backward:     icon-backward
-    play:         icon-play
-    pause:        icon-pause
-    stop:         icon-stop
-    forward:      icon-forward
-    fast forward: icon-fast-forward
-    step forward: icon-step-forward
-    eject:        icon-eject
-    chevron left: icon-chevron-left
-    chevron right: icon-chevron-right
-    plus sign:    icon-plus-sign
-    minus sign:   icon-minus-sign
-    remove sign:  icon-remove-sign
-    ok sign:      icon-ok-sign
-    question sign: icon-question-sign
-    info sign:    icon-info-sign
-    screenshot:   icon-screenshot
-    remove circle: icon-remove-circle
-    ok circle:    icon-ok-circle
-    ban circle:   icon-ban-circle
-    arrow left:   icon-arrow-left
-    arrow right:  icon-arrow-right
-    arrow up:     icon-arrow-up
-    arrow down:   icon-arrow-down
-    share alt:    icon-share-alt
-    resize full:  icon-resize-full
-    resize small: icon-resize-small
-    plus:         icon-plus
-    minus:        icon-minus
-    asterisk:     icon-asterisk
-    exclamation sign: icon-exclamation-sign
-    gift:         icon-gift
-    leaf:         icon-leaf
-    fire:         icon-fire
-    eye open:     icon-eye-open
-    eye close:    icon-eye-close
-    warning sign: icon-warning-sign
-    plane:        icon-plane
-    calendar:     icon-calendar
-    random:       icon-random
-    comment:      icon-comment
-    magnet:       icon-magnet
-    chevron up:   icon-chevron-up
-    chevron down: icon-chevron-down
-    retweet:      icon-retweet
-    shopping cart: icon-shopping-cart
-    folder close: icon-folder-close
-    folder open:  icon-folder-open
-    resize vertical: icon-resize-vertical
-    resize horizontal: icon-resize-horizontal
-    hdd:          icon-hdd
-    bullhorn:     icon-bullhorn
-    bell:         icon-bell
-    certificate:  icon-certificate
-    thumbs up:    icon-thumbs-up
-    thumbs down:  icon-thumbs-down
-    hand right:   icon-hand-right
-    hand left:    icon-hand-left
-    hand up:      icon-hand-up
-    hand down:    icon-hand-down
-    circle arrow right: icon-circle-arrow-right
-    circle arrow left: icon-circle-arrow-left
-    circle arrow up: icon-circle-arrow-up
-    circle arrow down: icon-circle-arrow-down
-    globe:        icon-globe
-    wrench:       icon-wrench
-    tasks:        icon-tasks
-    filter:       icon-filter
-    briefcase:    icon-briefcase
-    fullscreen:   icon-fullscreen
+    adjust:                 icon-adjust
+    anchor:                 icon-anchor
+    archive:                icon-archive
+    asterisk:               icon-asterisk
+    ban circle:             icon-ban-circle
+    bar chart:              icon-bar-chart
+    barcode:                icon-barcode
+    beaker:                 icon-beaker
+    beer:                   icon-beer
+    bell:                   icon-bell
+    bell alt:               icon-bell-alt
+    bolt:                   icon-bolt
+    book:                   icon-book
+    bookmark:               icon-bookmark
+    bookmark empty:         icon-bookmark-empty
+    briefcase:              icon-briefcase
+    bug:                    icon-bug
+    building:               icon-building
+    bullhorn:               icon-bullhorn
+    bullseye:               icon-bullseye
+    calendar:               icon-calendar
+    calendar empty:         icon-calendar-empty
+    camera:                 icon-camera
+    camera retro:           icon-camera-retro
+    certificate:            icon-certificate
+    check:                  icon-check
+    check empty:            icon-check-empty
+    check minus:            icon-check-minus
+    check sign:             icon-check-sign
+    circle:                 icon-circle
+    circle blank:           icon-circle-blank
+    cloud:                  icon-cloud
+    cloud download:         icon-cloud-download
+    cloud upload:           icon-cloud-upload
+    code:                   icon-code
+    code fork:              icon-code-fork
+    coffee:                 icon-coffee
+    cog:                    icon-cog
+    cogs:                   icon-cogs
+    collapse:               icon-collapse
+    collapse alt:           icon-collapse-alt
+    collapse top:           icon-collapse-top
+    comment:                icon-comment
+    comment alt:            icon-comment-alt
+    comments:               icon-comments
+    comments alt:           icon-comments-alt
+    compass:                icon-compass
+    credit card:            icon-credit-card
+    crop:                   icon-crop
+    dashboard:              icon-dashboard
+    desktop:                icon-desktop
+    download:               icon-download
+    download alt:           icon-download-alt
+    edit:                   icon-edit
+    edit sign:              icon-edit-sign
+    ellipsis horizontal:    icon-ellipsis-horizontal
+    ellipsis vertical:      icon-ellipsis-vertical
+    envelope:               icon-envelope
+    envelope alt:           icon-envelope-alt
+    eraser:                 icon-eraser
+    exchange:               icon-exchange
+    exclamation:            icon-exclamation
+    exclamation sign:       icon-exclamation-sign
+    expand:                 icon-expand
+    expand alt:             icon-expand-alt
+    external link:          icon-external-link
+    external link sign:     icon-external-link-sign
+    eye close:              icon-eye-close
+    eye open:               icon-eye-open
+    facetime video:         icon-facetime-video
+    female:                 icon-female
+    fighter jet:            icon-fighter-jet
+    film:                   icon-film
+    filter:                 icon-filter
+    fire:                   icon-fire
+    fire extinguisher:      icon-fire-extinguisher
+    flag:                   icon-flag
+    flag alt:               icon-flag-alt
+    flag checkered:         icon-flag-checkered
+    folder close:           icon-folder-close
+    folder close alt:       icon-folder-close-alt
+    folder open:            icon-folder-open
+    folder open alt:        icon-folder-open-alt
+    food:                   icon-food
+    frown:                  icon-frown
+    gamepad:                icon-gamepad
+    gear:                   icon-gear
+    gears:                  icon-gears
+    gift:                   icon-gift
+    glass:                  icon-glass
+    globe:                  icon-globe
+    group:                  icon-group
+    hdd:                    icon-hdd
+    headphones:             icon-headphones
+    heart:                  icon-heart
+    heart empty:            icon-heart-empty
+    home:                   icon-home
+    inbox:                  icon-inbox
+    info:                   icon-info
+    info sign:              icon-info-sign
+    key:                    icon-key
+    keyboard:               icon-keyboard
+    laptop:                 icon-laptop
+    leaf:                   icon-leaf
+    legal:                  icon-legal
+    lemon:                  icon-lemon
+    level down:             icon-level-down
+    level up:               icon-level-up
+    lightbulb:              icon-lightbulb
+    location arrow:         icon-location-arrow
+    lock:                   icon-lock
+    magic:                  icon-magic
+    magnet:                 icon-magnet
+    mail forward:           icon-mail-forward
+    mail reply:             icon-mail-reply
+    mail reply all:         icon-mail-reply-all
+    male:                   icon-male
+    map marker:             icon-map-marker
+    meh:                    icon-meh
+    microphone:             icon-microphone
+    microphone off:         icon-microphone-off
+    minus:                  icon-minus
+    minus sign:             icon-minus-sign
+    minus sign alt:         icon-minus-sign-alt
+    mobile phone:           icon-mobile-phone
+    money:                  icon-money
+    moon:                   icon-moon
+    move:                   icon-move
+    music:                  icon-music
+    off:                    icon-off
+    ok:                     icon-ok
+    ok circle:              icon-ok-circle
+    ok sign:                icon-ok-sign
+    pencil:                 icon-pencil
+    phone:                  icon-phone
+    phone sign:             icon-phone-sign
+    picture:                icon-picture
+    plane:                  icon-plane
+    plus:                   icon-plus
+    plus sign:              icon-plus-sign
+    plus sign alt:          icon-plus-sign-alt
+    power off:              icon-power-off
+    print:                  icon-print
+    pushpin:                icon-pushpin
+    puzzle piece:           icon-puzzle-piece
+    qrcode:                 icon-qrcode
+    question:               icon-question
+    question sign:          icon-question-sign
+    quote left:             icon-quote-left
+    quote right:            icon-quote-right
+    random:                 icon-random
+    refresh:                icon-refresh
+    remove:                 icon-remove
+    remove circle:          icon-remove-circle
+    remove sign:            icon-remove-sign
+    reorder:                icon-reorder
+    reply:                  icon-reply
+    reply all:              icon-reply-all
+    resize horizontal:      icon-resize-horizontal
+    resize vertical:        icon-resize-vertical
+    retweet:                icon-retweet
+    road:                   icon-road
+    rocket:                 icon-rocket
+    rss:                    icon-rss
+    rss sign:               icon-rss-sign
+    screenshot:             icon-screenshot
+    search:                 icon-search
+    share:                  icon-share
+    share alt:              icon-share-alt
+    share sign:             icon-share-sign
+    shield:                 icon-shield
+    shopping cart:          icon-shopping-cart
+    sign blank:             icon-sign-blank
+    signal:                 icon-signal
+    signin:                 icon-signin
+    signout:                icon-signout
+    sitemap:                icon-sitemap
+    smile:                  icon-smile
+    sort:                   icon-sort
+    sort by alphabet:       icon-sort-by-alphabet
+    sort by alphabet alt:   icon-sort-by-alphabet-alt
+    sort by attributes:     icon-sort-by-attributes
+    sort by attributes alt: icon-sort-by-attributes-alt
+    sort by order:          icon-sort-by-order
+    sort by order alt:      icon-sort-by-order-alt
+    sort down:              icon-sort-down
+    sort up:                icon-sort-up
+    spinner:                icon-spinner
+    star:                   icon-star
+    star empty:             icon-star-empty
+    star half:              icon-star-half
+    star half empty:        icon-star-half-empty
+    star half full:         icon-star-half-full
+    subscript:              icon-subscript
+    suitcase:               icon-suitcase
+    sun:                    icon-sun
+    superscript:            icon-superscript
+    tablet:                 icon-tablet
+    tag:                    icon-tag
+    tags:                   icon-tags
+    tasks:                  icon-tasks
+    terminal:               icon-terminal
+    thumbs down:            icon-thumbs-down
+    thumbs down alt:        icon-thumbs-down-alt
+    thumbs up:              icon-thumbs-up
+    thumbs up alt:          icon-thumbs-up-alt
+    ticket:                 icon-ticket
+    time:                   icon-time
+    tint:                   icon-tint
+    trash:                  icon-trash
+    trophy:                 icon-trophy
+    truck:                  icon-truck
+    umbrella:               icon-umbrella
+    unchecked:              icon-unchecked
+    unlock:                 icon-unlock
+    unlock alt:             icon-unlock-alt
+    upload:                 icon-upload
+    upload alt:             icon-upload-alt
+    user:                   icon-user
+    volume down:            icon-volume-down
+    volume off:             icon-volume-off
+    volume up:              icon-volume-up
+    warning sign:           icon-warning-sign
+    wrench:                 icon-wrench
+    zoom in:                icon-zoom-in
+    zoom out:               icon-zoom-out

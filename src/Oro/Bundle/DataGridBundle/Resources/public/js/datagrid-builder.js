@@ -14,17 +14,12 @@ define(function (require) {
     var Grid = require('oro/datagrid/grid');
     var GridRouter = require('oro/datagrid/router');
     var GridViewsView = require('oro/datagrid/grid-views/view');
+    var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
+    var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
 
     var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
         gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
-        cellModuleName = 'oro/datagrid/{{type}}-cell',
-        actionModuleName = 'oro/datagrid/{{type}}-action',
-        cellTypes = {
-            integer:   'number',
-            decimal:   'number',
-            percent:   'number',
-            currency:  'number'
-        },
+        collectionOptions = {},
 
         helpers = {
             cellType: function (type) {
@@ -69,22 +64,21 @@ define(function (require) {
              */
             collectModules: function () {
                 var modules = this.modules,
-                    metadata = this.metadata,
-                    moduleName = function (template, type) {
-                        return template.replace('{{type}}', type);
-                    };
+                    metadata = this.metadata;
                 // cells
                 _.each(metadata.columns, function (column) {
                     var type = column.type;
-                    modules[helpers.cellType(type)] = moduleName(cellModuleName, cellTypes[type] || type);
+                    modules[helpers.cellType(type)] = mapCellModuleName(type);
                 });
                 // row actions
                 _.each(_.values(metadata.rowActions), function (action) {
-                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
+                    var type = action.frontend_type;
+                    modules[helpers.actionType(type)] = mapActionModuleName(type);
                 });
                 // mass actions
                 _.each(_.values(metadata.massActions), function (action) {
-                    modules[helpers.actionType(action.frontend_type)] = moduleName(actionModuleName, action.frontend_type);
+                    var type = action.frontend_type;
+                    modules[helpers.actionType(type)] = mapActionModuleName(type);
                 });
             },
 
@@ -101,7 +95,8 @@ define(function (require) {
                 } else {
                     // otherwise, create collection from metadata
                     options = methods.combineCollectionOptions.call(this);
-                    collection = new PageableCollection(this.$el.data('data'), options);
+                    collection = new PageableCollection([], options);
+                    collectionOptions = _.extend({}, options);
                 }
 
                 // create grid
@@ -125,6 +120,8 @@ define(function (require) {
              */
             afterBuild: function () {
                 mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
+                this.grid.collection.reset(this.$el.data('data'), collectionOptions);
+                this.grid.collection.reset(this.$el.data('data'), collectionOptions);
             },
 
             /**

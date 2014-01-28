@@ -33,7 +33,8 @@
             'aCss': 'no-hash remove-button',
             'dataId': entityId,
             'id': 'btn-remove-business_unit',
-            'entity_label': 'oro.organization.businessunit.entity_label'|trans
+            'entity_label': 'oro.organization.businessunit.entity_label'|trans,
+            'disabled': not allow_delete
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}

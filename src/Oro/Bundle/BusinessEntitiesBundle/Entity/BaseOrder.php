@@ -530,7 +530,7 @@ class BaseOrder
     }
 
     /**
-     * @return BaseOrderItem[]
+     * @return BaseOrderItem[]|ArrayCollection
      */
     public function getItems()
     {

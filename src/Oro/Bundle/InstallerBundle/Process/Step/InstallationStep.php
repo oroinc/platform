@@ -20,8 +20,6 @@ class InstallationStep extends AbstractStep
         switch ($action) {
             case 'fixtures':
                 return $this->handleAjaxAction('oro:demo:fixtures:load');
-            case 'search':
-                return $this->handleAjaxAction('oro:search:create-index');
             case 'navigation':
                 return $this->handleAjaxAction('oro:navigation:init');
             case 'js-routing':
@@ -35,7 +33,7 @@ class InstallationStep extends AbstractStep
             case 'translation':
                 return $this->handleAjaxAction('oro:translation:dump');
             case 'requirejs':
-                return $this->handleAjaxAction('oro:requirejs:build');
+                return $this->handleAjaxAction('oro:requirejs:build', array('--ignore-errors' => true));
             case 'finish':
                 $this->get('event_dispatcher')->dispatch(InstallerEvents::FINISH);
                 // everything was fine - update installed flag in parameters.yml
