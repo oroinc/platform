@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Reference;
  * automapped folder.
  *
  * @author David Buchmann <david@liip.ch>
+ *
+ * TODO: Remove this class from EntityBundle after updating to the next stable Doctrine revision
+ * TODO: https://magecore.atlassian.net/browse/BAP-2999
  */
 class DoctrineOrmMappingsPass extends RegisterMappingsPass
 {
