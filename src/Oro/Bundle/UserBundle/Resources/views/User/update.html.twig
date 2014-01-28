@@ -36,7 +36,7 @@
 {% endblock %}
 
 {% block navButtons %}
-    {% if form.vars.value.id and resource_granted('oro_user_user_delete', form.vars.value) and form.vars.value.id != app.user.id %}
+    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) and form.vars.value.id != app.user.id %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_user', {'id': form.vars.value.id}),
             'dataRedirect': path('oro_user_index'),
