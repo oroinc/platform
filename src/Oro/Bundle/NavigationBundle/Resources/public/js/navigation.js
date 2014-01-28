@@ -944,12 +944,12 @@ define(function (require) {
                 this.method = $form.attr('method') || "get";
 
                 if (url) {
-                    $form.data('sent', true);
                     var formStartSettings = {
                         form_validate: true
                     };
                     mediator.trigger('hash_navigation_request:form-start', $form.get(0), formStartSettings);
                     if (formStartSettings.form_validate) {
+                        $form.data('sent', true);
                         var data = $form.serialize();
                         if (this.method === 'get') {
                             if (data) {
