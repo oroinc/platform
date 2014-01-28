@@ -75,7 +75,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
         $output->writeln(
             sprintf(
                 'List of %s fixtures data ...',
-                $input->getOption('load-demo') == 'false' ? 'main' : 'demo'
+                $input->getOption('fixtures-type')
             )
         );
         foreach ($fixtures as $fixture) {
@@ -95,7 +95,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
         $output->writeln(
             sprintf(
                 'Loading %s fixtures data ...',
-                $input->getOption('load-demo') == 'false' ? 'main' : 'demo'
+                $input->getOption('fixtures-type')
             )
         );
 
