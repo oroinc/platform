@@ -5,15 +5,22 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
+
 class AttributeManager
 {
     /**
-     * @var Collection
+     * @var string
+     */
+    protected $entityAttributeName;
+
+    /**
+     * @var Attribute[]|Collection
      */
     protected $attributes;
 
     /**
-     * @param Collection $attributes
+     * @param Attribute[]|Collection $attributes
      */
     public function __construct(Collection $attributes = null)
     {
@@ -21,7 +28,26 @@ class AttributeManager
     }
 
     /**
-     * @return Collection
+     * @param string $entityAttributeName
+     * @return AttributeManager
+     */
+    public function setEntityAttributeName($entityAttributeName)
+    {
+        $this->entityAttributeName = $entityAttributeName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityAttributeName()
+    {
+        return $this->entityAttributeName;
+    }
+
+    /**
+     * @return Attribute[]|Collection
      */
     public function getAttributes()
     {
@@ -30,7 +56,7 @@ class AttributeManager
 
     /**
      * @param Attribute[]|Collection $attributes
-     * @return Workflow
+     * @return AttributeManager
      */
     public function setAttributes($attributes)
     {
@@ -58,47 +84,15 @@ class AttributeManager
     }
 
     /**
-     * Get attributes with option "managed_entity"
-     *
-     * @return Collection|Attribute[]
+     * @return Attribute
+     * @throws UnknownAttributeException
      */
-    public function getManagedEntityAttributes()
+    public function getEntityAttribute()
     {
-        return $this->getAttributes()->filter(
-            function (Attribute $attribute) {
-                return $attribute->getType() == 'entity' && $attribute->getOption('managed_entity');
-            }
-        );
-    }
-
-    /**
-     * Get list of attributes that require binding
-     *
-     * @return Collection|Attribute[]
-     */
-    public function getBindEntityAttributes()
-    {
-        return $this->getAttributes()->filter(
-            function (Attribute $attribute) {
-                return $attribute->getType() == 'entity' && $attribute->getOption('bind');
-            }
-        );
-    }
-
-    /**
-     * Get list of attributes names that require binding
-     *
-     * @return array
-     */
-    public function getBindEntityAttributeNames()
-    {
-        $result = array();
-
-        /** @var Attribute $attribute  */
-        foreach ($this->getBindEntityAttributes() as $attribute) {
-            $result[] = $attribute->getName();
+        if (!$this->attributes->containsKey($this->entityAttributeName)) {
+            throw new UnknownAttributeException('There is no entity attribute');
         }
 
-        return $result;
+        return $this->attributes->get($this->entityAttributeName);
     }
 }

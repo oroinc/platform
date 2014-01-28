@@ -48,6 +48,9 @@ class BusinessUnitController extends Controller
     {
         return array(
             'entity' => $entity,
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete an owner and related entities or reassign related entities to another owner before
+            'allow_delete' => !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
     }
 
@@ -108,7 +111,12 @@ class BusinessUnitController extends Controller
         }
 
         return array(
-            'form'     => $this->get('oro_organization.form.business_unit')->createView(),
+            'form' => $this->get('oro_organization.form.business_unit')->createView(),
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete an owner and related entities or reassign related entities to another owner before
+            'allow_delete' =>
+                $entity->getId() &&
+                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
     }
 

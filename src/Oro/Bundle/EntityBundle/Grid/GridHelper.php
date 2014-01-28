@@ -38,7 +38,7 @@ class GridHelper
         if (!$this->entityNames) {
             $this->entityNames = [];
             foreach ($this->entityProvider->getEntities() as $entity) {
-                $this->entityNames[$entity['name']] = $entity['plural_label'];
+                $this->entityNames[$entity['name']] = $entity['label'];
             }
         }
 

@@ -49,9 +49,10 @@ class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::PRE_PERSIST_CONFIG      => 'persistConfig',
-            Events::NEW_ENTITY_CONFIG_MODEL => 'newEntity',
-            Events::NEW_FIELD_CONFIG_MODEL  => 'newField',
+            Events::PRE_PERSIST_CONFIG         => 'persistConfig',
+            Events::NEW_ENTITY_CONFIG_MODEL    => 'newEntity',
+            Events::UPDATE_ENTITY_CONFIG_MODEL => 'newEntity',
+            Events::NEW_FIELD_CONFIG_MODEL     => 'newField',
         ];
     }
 

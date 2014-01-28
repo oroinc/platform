@@ -1,0 +1,49 @@
+{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+
+{% set blockId = 'entity-transitions-container-' ~ random() %}
+<div class="widget-content" id="{{ blockId }}">
+    <div class="btn-group">
+        {% for data in transitionsData %}
+            {# Show button for start or transit workflow #}
+            {% set transitionData = {
+                'enabled': data.isAllowed,
+                'transition-label': data.transition.label|trans,
+                'message': data.transition.message|trans,
+                'transition-condition-messages': data.errors
+            } %}
+
+            {% if data.workflowItem is not defined %}
+                {% set data = data|merge({'workflowItem': null}) %}
+                {% if data.transition.hasForm() %}
+                    {% set transitionData = transitionData|merge({'dialog-url': path(
+                        'oro_workflow_widget_start_transition_form',
+                        {
+                            workflowName: data.workflow.name,
+                            transitionName: data.transition.name,
+                            entityId: entity_id
+                        })
+                    }) %}
+                {% endif %}
+
+                {# New workflow #}
+                {% set transitionData = transitionData|merge({'transition-url': path(
+                    'oro_workflow_api_rest_workflow_start',
+                    {
+                        workflowName: data.workflow.name,
+                        transitionName: data.transition.name,
+                        entityId: entity_id
+                    })
+                }) %}
+            {% endif %}
+
+            {{ workflowMacros.renderTransitionButton(
+                data.workflow,
+                data.transition,
+                data.workflowItem,
+                transitionData
+            ) }}
+        {% endfor %}
+    </div>
+
+    {{ workflowMacros.renderTransitionsJs(transitionsData, blockId) }}
+</div>

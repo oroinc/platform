@@ -74,6 +74,11 @@ class Channel
      */
     protected $statuses;
 
+    public function __construct()
+    {
+        $this->statuses = new ArrayCollection();
+    }
+
     /**
      * @return integer
      */

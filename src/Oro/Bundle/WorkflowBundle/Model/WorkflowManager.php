@@ -6,9 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
@@ -82,36 +80,40 @@ class WorkflowManager
     /**
      * @param string|Transition $transition
      * @param string|Workflow $workflow
-     * @param object|null $entity
+     * @param object $entity
+     * @param array $data
      * @param Collection $errors
      * @return bool
      */
-    public function isStartTransitionAvailable($workflow, $transition, $entity = null, Collection $errors = null)
-    {
+    public function isStartTransitionAvailable(
+        $workflow,
+        $transition,
+        $entity,
+        array $data = array(),
+        Collection $errors = null
+    ) {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($workflow, $entity);
 
-        return $workflow->isStartTransitionAvailable($transition, $initData, $errors);
+        return $workflow->isStartTransitionAvailable($transition, $entity, $data, $errors);
     }
 
     /**
      * @param string $workflow
-     * @param object|null $entity
+     * @param object $entity
      * @param string|Transition|null $transition
      * @param array $data
      * @return WorkflowItem
      * @throws \Exception
      */
-    public function startWorkflow($workflow, $entity = null, $transition = null, array $data = array())
+    public function startWorkflow($workflow, $entity, $transition = null, array $data = array())
     {
         $workflow = $this->getWorkflow($workflow);
-        $initData = $this->getWorkflowData($workflow, $entity, $data);
 
         /** @var EntityManager $em */
         $em = $this->registry->getManager();
         $em->beginTransaction();
         try {
-            $workflowItem = $workflow->start($initData, $transition);
+            $workflowItem = $workflow->start($entity, $data, $transition);
             $em->persist($workflowItem);
             $em->flush();
             $em->commit();
@@ -149,57 +151,29 @@ class WorkflowManager
 
     /**
      * @param object $entity
-     * @param WorkflowItem[]|Collection $workflowItems
-     * @param string|null $workflowName
-     * @return Workflow[]
+     * @return Workflow
      */
-    public function getApplicableWorkflows($entity, $workflowItems = null, $workflowName = null)
+    public function getApplicableWorkflow($entity)
     {
-        if (null === $workflowItems) {
-            $workflowItems = $this->getWorkflowItemsByEntity($entity, $workflowName);
-        }
+        return $this->getApplicableWorkflowByEntityClass(
+            $this->doctrineHelper->getEntityClass($entity)
+        );
+    }
 
-        $usedWorkflows = array();
-        foreach ($workflowItems as $workflowItem) {
-            $usedWorkflows[] = $workflowItem->getWorkflowName();
-        }
-
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-        if ($workflowName) {
-            try {
-                $allowedWorkflows = array($this->workflowRegistry->getWorkflow($workflowName));
-            } catch (WorkflowNotFoundException $e) {
-                $allowedWorkflows = array();
-            }
-        } else {
-            $allowedWorkflows = $this->workflowRegistry->getWorkflowsByEntityClass($entityClass);
-        }
-
-        $applicableWorkflows = array();
-        foreach ($allowedWorkflows as $workflow) {
-            if ($workflow->isEnabled()) {
-                $managedEntityAttribute = $this->getManagedEntityAttributeByEntity($workflow, $entity);
-                if ($managedEntityAttribute) {
-                    $isMultiple = $managedEntityAttribute->getOption('multiple') == true;
-
-                    // if workflow allows multiple workflow items or there is no workflow item for current class
-                    if ($isMultiple || !in_array($workflow->getName(), $usedWorkflows)) {
-                        $applicableWorkflows[$workflow->getName()] = $workflow;
-                    }
-                }
-            }
-        }
-
-        return $applicableWorkflows;
+    /**
+     * @param string $entityClass
+     * @return null|Workflow
+     */
+    public function getApplicableWorkflowByEntityClass($entityClass)
+    {
+        return $this->workflowRegistry->getWorkflowByEntityClass($entityClass);
     }
 
     /**
      * @param object $entity
-     * @param string|null $workflowName
-     * @param string|null $workflowType
-     * @return WorkflowItem[]
+     * @return WorkflowItem|null
      */
-    public function getWorkflowItemsByEntity($entity, $workflowName = null, $workflowType = null)
+    public function getWorkflowItemByEntity($entity)
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($entity);
@@ -207,81 +181,7 @@ class WorkflowManager
         /** @var WorkflowItemRepository $workflowItemsRepository */
         $workflowItemsRepository = $this->registry->getRepository('OroWorkflowBundle:WorkflowItem');
 
-        return $workflowItemsRepository->findByEntityMetadata(
-            $entityClass,
-            $entityIdentifier,
-            $workflowName,
-            $workflowType
-        );
-    }
-
-    /**
-     * @param WorkflowItem $workflowItem
-     * @return bool
-     */
-    public function isAllManagedEntitiesSpecified(WorkflowItem $workflowItem)
-    {
-        $workflow = $this->getWorkflow($workflowItem);
-
-        foreach ($workflow->getAttributeManager()->getManagedEntityAttributes() as $attribute) {
-            $attributeName = $attribute->getName();
-            if (!$workflowItem->getData()->get($attributeName)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param object $entity
-     * @param array $data
-     * @return array
-     * @throws UnknownAttributeException
-     */
-    public function getWorkflowData(Workflow $workflow, $entity = null, array $data = array())
-    {
-        // try to find appropriate entity
-        if ($entity) {
-            $entityAttributeName = null;
-            $managedEntityAttribute = $this->getManagedEntityAttributeByEntity($workflow, $entity);
-            if ($managedEntityAttribute) {
-                $entityAttributeName = $managedEntityAttribute->getName();
-            }
-
-            if (!$entityAttributeName) {
-                throw new UnknownAttributeException(
-                    sprintf(
-                        'Can\'t find attribute for managed entity in workflow "%s"',
-                        $workflow->getName()
-                    )
-                );
-            }
-
-            $data[$entityAttributeName] = $entity;
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param Workflow $workflow
-     * @param object $entity
-     * @return null|Attribute
-     */
-    protected function getManagedEntityAttributeByEntity(Workflow $workflow, $entity)
-    {
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
-
-        /** @var Attribute $attribute */
-        foreach ($workflow->getAttributeManager()->getManagedEntityAttributes() as $attribute) {
-            if ($attribute->getOption('class') == $entityClass) {
-                return $attribute;
-            }
-        }
-
-        return null;
+        return $workflowItemsRepository->findByEntityMetadata($entityClass, $entityIdentifier);
     }
 
     /**

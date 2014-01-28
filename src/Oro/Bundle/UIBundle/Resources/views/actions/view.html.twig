@@ -5,6 +5,7 @@
 {% block content %}
 <div class="layout-content">
     <div class="container-fluid page-title">
+        {% placeholder page_title_before with {entity: entity} %}
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="span9">
@@ -88,7 +89,9 @@
                 </div>
             </div>
         </div>
+        {% placeholder page_title_after with {entity: entity} %}
     </div>
+
     <div class="layout-content scrollable-container">
         {% block content_data %}
             {{ UI.scrollData(id, data) }}

@@ -18,16 +18,16 @@ class EmailNotificationEntityProvider extends EntityProvider
     /**
      * Constructor
      *
-     * @param EntityManager       $em
      * @param ConfigProvider      $entityConfigProvider
      * @param EntityClassResolver $entityClassResolver
      * @param Translator          $translator
+     * @param EntityManager       $em
      */
     public function __construct(
-        EntityManager $em,
         ConfigProvider $entityConfigProvider,
         EntityClassResolver $entityClassResolver,
-        Translator $translator
+        Translator $translator,
+        EntityManager $em
     ) {
         parent::__construct($entityConfigProvider, $entityClassResolver, $translator);
         $this->em = $em;

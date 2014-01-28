@@ -1,4 +1,4 @@
-{% block oro_combobox_dataconfig_entity_field_choice %}
+{% block oro_combobox_dataconfig_entity_field_base %}
     $field.data('entity-field-util', new EntityFieldUtil($field));
 
     {% if configs.entities is defined %}
@@ -7,18 +7,6 @@
         return _.findWhere(entities, {name: entity});
     };
     {% endif %}
-    var formatContext = {
-        getFieldData: function (fieldId) {
-            return $field.data('entity-field-util').getFieldData(fieldId);
-        }
-    };
-    select2Config.formatContext = function () {
-        return formatContext;
-    };
-{% endblock %}
-
-{% block oro_combobox_dataconfig_entity_field_select %}
-    {{ block('oro_combobox_dataconfig_entity_field_choice') }}
 
     var formatContext = {
         getFieldData: function (fieldId) {
@@ -31,6 +19,14 @@
     select2Config.formatContext = function () {
         return formatContext;
     };
+{% endblock %}
+
+{% block oro_combobox_dataconfig_entity_field_choice %}
+    {{ block('oro_combobox_dataconfig_entity_field_base') }}
+{% endblock %}
+
+{% block oro_combobox_dataconfig_entity_field_select %}
+    {{ block('oro_combobox_dataconfig_entity_field_base') }}
 
     select2Config.collapsibleResults = true;
     select2Config.data = function () {

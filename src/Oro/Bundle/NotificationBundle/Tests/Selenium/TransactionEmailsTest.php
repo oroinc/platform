@@ -22,7 +22,7 @@ class TransactionEmailsTest extends Selenium2TestCase
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
             ->add()
             ->assertTitle('Add Notification Rule - Notifications - Emails - System')
-            ->setEntityName('Users')
+            ->setEntityName('User')
             ->setEvent('Entity create')
             ->setTemplate('user')
             ->setUser('admin')

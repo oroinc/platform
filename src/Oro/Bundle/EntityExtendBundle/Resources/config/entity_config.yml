@@ -6,7 +6,7 @@ oro_entity_config:
                 -
                     name:                   'Remove'
                     route:                  'oro_entityextend_entity_remove'
-                    type:                   'ajax'
+                    type:                   'ajaxdelete'
                     icon:                   'trash'
                     filter:                 { owner: 'Custom', state: ['New', 'Requires update', 'Active']}
                     args:                   ['id']

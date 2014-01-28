@@ -5,6 +5,8 @@ namespace Oro\Bundle\FlexibleEntityBundle\Tests\Performance;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ORM\Tools\SchemaTool;
 
+use Oro\Bundle\SearchBundle\Command\AddFulltextIndexesCommand;
+
 class PerformanceTest extends WebTestCase
 {
 
@@ -47,7 +49,7 @@ class PerformanceTest extends WebTestCase
 
         $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
         $application->setAutoExit(false);
-        $options = array('command' => 'oro:search:create-index');
+        $options = array('command' => AddFulltextIndexesCommand::COMMAND_NAME);
         $options['--env'] = "test";
         $application->run(new \Symfony\Component\Console\Input\ArrayInput($options));
 

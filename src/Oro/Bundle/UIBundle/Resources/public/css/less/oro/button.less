@@ -1,10 +1,24 @@
 // Bootstrap - Buttons
 .btn-group {
-  > .btn {
+  & > .btn,
+    .btn.disabled,
+    .btn[disabled],
+    .btn.disabled:active,
+    .btn[disabled]:active {
     font-size:@baseFontSize;
+  }
+  & > .btn-small {
+    font-size: @fontSizeSmall;
+  }
+  & > .btn-mini {
+    font-size: @fontSizeMini;
   }
 }
 .btn,
+.btn.disabled,
+.btn[disabled],
+.btn.disabled:active,
+.btn[disabled]:active,
 .ui-datepicker .ui-datepicker-buttonpane button {
   .border-radius(@baseBtnBorderRadius);
   padding: 0 12px;
@@ -16,6 +30,7 @@
   display: inline-block;
   #gradient > .vertical(#fdfdfd, #efefef);
   color: #666;
+  box-shadow: none;
 }
 .btn:hover,
 .btn:focus {

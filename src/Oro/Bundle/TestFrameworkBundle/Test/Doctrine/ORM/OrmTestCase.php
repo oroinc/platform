@@ -8,9 +8,11 @@ use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Annotations\CachedReader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
+use Doctrine\DBAL\Driver\Connection;
 
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\DriverMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 
 /**
@@ -95,6 +97,68 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
         }
 
         return EntityManagerMock::create($conn, $config, $eventManager);
+    }
+
+    /**
+     * Changes a connection object for the given entity manager
+     *
+     * @param Connection        $connection
+     * @param EntityManagerMock $em
+     */
+    protected function setDriverConnection(Connection $connection, EntityManagerMock $em)
+    {
+        /** @var DriverMock $driver */
+        $driver = $em->getConnection()->getDriver();
+        $driver->setDriverConnection($connection);
+    }
+
+    /**
+     * Creates a mock for a statement which handles fetching the given records
+     *
+     * @param array $records
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createFetchStatementMock(array $records)
+    {
+        $statement = $this->getMock('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
+        $statement->expects($this->exactly(count($records) + 1))
+            ->method('fetch')
+            ->will(
+                new \PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls(
+                    array_merge($records, [false])
+                )
+            );
+
+        return $statement;
+    }
+
+    /**
+     * Creates a mock for 'Doctrine\DBAL\Driver\Connection' and sets it to the given entity manager
+     *
+     * @param EntityManagerMock $em
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getDriverConnectionMock(EntityManagerMock $em)
+    {
+        $conn = $this->getMock('\Doctrine\DBAL\Driver\Connection');
+        $this->setDriverConnection($conn, $em);
+
+        return $conn;
+    }
+
+    /**
+     * Creates a mock for a statement which handles counting a number of records
+     *
+     * @param int $numberOfRecords
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createCountStatementMock($numberOfRecords)
+    {
+        $countStatement = $this->getMock('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
+        $countStatement->expects($this->once())->method('fetchColumn')
+            ->will($this->returnValue($numberOfRecords));
+
+        return $countStatement;
     }
 
     private static function getSharedMetadataCacheImpl()

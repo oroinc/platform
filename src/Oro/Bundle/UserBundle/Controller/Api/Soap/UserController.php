@@ -66,13 +66,7 @@ class UserController extends SoapController
      */
     public function deleteAction($id)
     {
-        $securityToken = $this->container->get('security.context')->getToken();
-        $user = $securityToken ? $securityToken->getUser() : null;
-        if (is_object($user) && $user->getId() != $id) {
-            return $this->handleDeleteRequest($id);
-        } else {
-            throw new \SoapFault('BAD_REQUEST', 'Self delete forbidden');
-        }
+        return $this->handleDeleteRequest($id);
     }
 
     /**
@@ -168,5 +162,13 @@ class UserController extends SoapController
     public function getFormHandler()
     {
         return $this->container->get('oro_user.form.handler.user.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->container->get('oro_user.handler.delete');
     }
 }

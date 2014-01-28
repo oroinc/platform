@@ -1,9 +1,16 @@
 placeholders:
     view_navButtons_before:
-        label: Entity Workflow Buttons
+        label: Workflow Buttons
         items:
-            workflow_buttons_entity:
+            workflow_buttons:
+                order: 100
+    page_title_before:
+        label: Workflow Steps
+        items:
+            workflow_steps:
                 order: 100
 items:
-   workflow_buttons_entity:
-        template: OroWorkflowBundle:Widget:entityButtons.html.twig
+    workflow_buttons:
+        template: OroWorkflowBundle:Widget:buttons.html.twig
+    workflow_steps:
+        template: OroWorkflowBundle:Widget:steps.html.twig

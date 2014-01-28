@@ -76,6 +76,7 @@ class ControllersTest extends WebTestCase
         $id = $result['id'];
         $this->client->request('GET', $this->client->generate('oro_report_view', array('id' => $id)));
         $result = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
 
         $result = ToolsAPI::getEntityGrid(
             $this->client,
@@ -133,10 +134,60 @@ class ControllersTest extends WebTestCase
         $result = ToolsAPI::jsonToArray($result->getContent());
         $data = $result['data'];
         $options = $result['options'];
-        $this->verifyReport($reportResult, $data, $options['totalRecords']);
+        $this->verifyReport($reportResult, $data, (int)$options['totalRecords']);
     }
 
     /**
+     * @param array $report
+     * @param array $reportResult
+     *
+     * @depends testView
+     * @dataProvider requestsApi()
+     */
+    public function testExport($report, $reportResult)
+    {
+        $result = ToolsAPI::getEntityGrid(
+            $this->client,
+            'reports-grid',
+            array(
+                'reports-grid[_filter][name][value]' => $report['oro_report_form[name]'] . '_updated',
+            )
+        );
+
+        ToolsAPI::assertJsonResponse($result, 200);
+
+        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = reset($result['data']);
+        $id = $result['id'];
+
+        //capture output content
+        ob_start();
+        $this->client->request(
+            'GET',
+            $this->client->generate(
+                'oro_datagrid_export_action',
+                array('gridName' =>"oro_report_table_{$id}", "format" => 'csv')
+            )
+        );
+        $content = ob_get_contents();
+        // Clean the output buffer and end it
+        ob_end_clean();
+
+        $result = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($result, 200, 'text/csv; charset=UTF-8');
+
+        //file to array
+        $content = str_getcsv($content, "\n", '"', '"');
+        //remove headers
+        unset($content[0]);
+        $content = array_values($content);
+        //row to array
+        foreach ($content as &$row) {
+            $row = str_getcsv($row, ',', '"', '"');
+        }
+        $this->verifyReport($reportResult, $content, count($content));
+    }
+        /**
      * @param array $report
      * @depends testView
      * @dataProvider requestsApi()

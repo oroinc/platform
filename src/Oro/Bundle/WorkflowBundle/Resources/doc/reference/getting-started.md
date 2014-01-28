@@ -16,26 +16,26 @@ What is Workflow?
 
 Workflow is a complex solution that allows user to perform set of actions with predefined conditions - each next action
 depends on previous. Also Workflow can be described as some kind of wizard that helps user to perform complex actions.
-Usually Workflow is used to manage some specific entity and to create additional related entities.
+Usually Workflow is used to manage some specific entity and to create additional entities.
 
 Main Entities
 =============
 
 Workflow consists of several related entities.
 
-* **Step** - entity that shows current state of Workflow. It can have form, attributes to display, allowed transitions
-that will be rendered as a buttons when step is displayed, name, label and template and some other additional
-parameters.
+* **Step** - entity that shows current status of Workflow. Before rendering each transitions checked
+is it allowed for current Workflow Item. Contains name, label and list of allowed transitions.
 
-* **Attribute** - entity that represent a value in Workflow Item. Attribute consists of name, label, attribute type
-(string, object, entity etc.) and additional options depending on type (for example "class" when type is "object").
+* **Attribute** - entity that represent one value in Workflow Item, used to render field value on a step form.
+Attribute knows about its type (string, object, entity etc.) and additional options.
+Contains name and label as additional parameters.
 
 * **Transition** - action that change current step of Workflow Item (i.e. moves it from one step to another). Transition
 is allowed if it's Conditions are satisfied. Before Transition performed Init Actions are executed and after
 transition performed - Post Actions are executed. Transition can be used as a start transition - it means that this
 transition will start Workflow and create new instance of Workflow Item. Transition optionally could have a form. In
 this case this form will be showed to user when Transition button is clicked. Transition contains name, label and some
-additional options.
+additional options. Optionally can contain form with list of attributes.
 
 * **Condition** - defines whether specific Transition is allowed with specified input data. Conditions can be nested.
 
@@ -121,35 +121,17 @@ new user.
 workflows:
     create_user:                             # name of the workflow
         label: 'Create User Workflow'        # workflow label
+        entity: Acme\Bundle\DemoBundle\Entity\UserManager    # workflow related entity
         start_step: create_user_form         # step that will be shown first
         enabled: true                        # is this workflow enabled, default true
-        type: wizard                         # type of workflow (entity|wizard), default entity
         steps:                               # list of all existing steps in workflow
             user_form:                       # step where user should fill form with personal information
                 label: 'Enter User Data'                               # step label
-                template: AcmeDemoBundle:User:userForm.html.twig       # step template, default is OroWorkflowBundle:WorkflowStep:edit
-                form_options:                # options of form type for rendering attributes
-                    attribute_fields:
-                        username:            # field for username attribute
-                            form_type: text
-                            options:         # options of form type
-                                required: true
-                                max_length: 20
-                        age:                 # field for age attribute
-                            form_type: integer
-                            options:
-                                required: true
-                        email:               # field for email attribute
-                            form_type: email
-                            options:
-                                required: false
-                                label: User Email # custom label, override attribute label
                 allowed_transitions:         # list of allowed transition from this step
                     - create_user            # user can be created from this step
             user_summary:                    # step where user can review entered data
-                label: 'User Summary'                                  # step label
-                template: AcmeDemoBundle:User:userSummary.html.twig    # custom step template
-                is_final: true                                         # this step is final
+                label: 'User Summary'        # step label
+                is_final: true               # this step is final
         attributes:                          # list of all existing attributes in workflow
             username:                        # username attribute
                 label: 'Username'            # attribute label
@@ -165,7 +147,6 @@ workflows:
                 label: 'User'
                 options:                     # attribute options
                     class: Acme\Bundle\DemoBundle\Entity\User    # entity class name
-                    bind: true               # make possible to find bound Workflow Items by entity
         transitions:                         # list of all existing transitions in workflow
             create_user:                     # transition from step "user_form" to "user_summary"
                 label: 'Create User'                             # transition label
