@@ -151,9 +151,8 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
 
             var $filter = this.element.find('.active-filter').empty().append(this.filter.$el);
 
-            var apply = this.filter.apply.bind(this.filter);
-            $filter.on('change', apply);
-            this.filter.on('update', this._onUpdate.bind(this));
+            $filter.on('change', _.bind(this.filter.apply, this.filter));
+            this.filter.on('update', _.bind(this._onUpdate, this));
         },
 
         _onUpdate: function () {
