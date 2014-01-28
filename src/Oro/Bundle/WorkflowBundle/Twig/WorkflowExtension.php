@@ -2,21 +2,20 @@
 
 namespace Oro\Bundle\WorkflowBundle\Twig;
 
-use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowExtension extends \Twig_Extension
 {
     const NAME = 'oro_workflow';
 
     /**
-     * @var WorkflowRegistry
+     * @var WorkflowManager
      */
-    protected $workflowRegistry;
+    protected $workflowManager;
 
-    public function __construct(WorkflowRegistry $workflowRegistry)
+    public function __construct(WorkflowManager $workflowManager)
     {
-        $this->workflowRegistry = $workflowRegistry;
+        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -25,19 +24,52 @@ class WorkflowExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('has_workflows', array($this, 'hasWorkflows')),
+            new \Twig_SimpleFunction('has_workflow', array($this, 'hasWorkflow')),
+            new \Twig_SimpleFunction('has_workflow_start_step', array($this, 'hasWorkflowStartStep')),
+            new \Twig_SimpleFunction('has_workflow_item', array($this, 'hasWorkflowItem')),
         );
     }
 
     /**
      * Check for workflow instances
      *
-     * @param string $entityClass
+     * @param object $entity
      * @return bool
      */
-    public function hasWorkflows($entityClass)
+    public function hasWorkflow($entity)
     {
-        return count($this->workflowRegistry->getWorkflowsByEntityClass($entityClass)) > 0;
+        if (!$entity) {
+            return false;
+        }
+
+        return $this->workflowManager->getApplicableWorkflow($entity) !== null;
+    }
+
+    /**
+     * Check that entity has workflow item.
+     *
+     * @param object $entity
+     * @return bool
+     */
+    public function hasWorkflowItem($entity)
+    {
+        return $this->workflowManager->getWorkflowItemByEntity($entity) !== null;
+    }
+
+    /**
+     * Check that workflow has start step
+     *
+     * @param object $entity
+     * @return bool
+     */
+    public function hasWorkflowStartStep($entity)
+    {
+        $workflow = $this->workflowManager->getApplicableWorkflow($entity);
+        if ($workflow) {
+            return $workflow->getDefinition()->getStartStep() !== null;
+        }
+
+        return false;
     }
 
     /**

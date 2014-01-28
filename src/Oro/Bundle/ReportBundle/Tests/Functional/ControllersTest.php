@@ -134,7 +134,7 @@ class ControllersTest extends WebTestCase
         $result = ToolsAPI::jsonToArray($result->getContent());
         $data = $result['data'];
         $options = $result['options'];
-        $this->verifyReport($reportResult, $data, $options['totalRecords']);
+        $this->verifyReport($reportResult, $data, (int)$options['totalRecords']);
     }
 
     /**

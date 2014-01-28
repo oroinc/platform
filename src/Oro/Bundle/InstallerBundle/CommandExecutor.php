@@ -92,12 +92,12 @@ class CommandExecutor
             foreach ($params as $param => $val) {
                 if ($param && '-' === $param[0]) {
                     if ($val === true) {
-                        $pb->add($param);
+                        $this->addParameter($pb, $param);
                     } else {
-                        $pb->add($param . '=' . $val);
+                        $this->addParameter($pb, $param, $val);
                     }
                 } else {
-                    $pb->add($val);
+                    $this->addParameter($pb, $val);
                 }
             }
 
@@ -143,5 +143,31 @@ class CommandExecutor
     public function getLastCommandExitCode()
     {
         return $this->lastCommandExitCode;
+    }
+
+    /**
+     * @param ProcessBuilder $processBuilder
+     * @param string $name
+     * @param array|string|null $value
+     */
+    protected function addParameter(ProcessBuilder $processBuilder, $name, $value = null)
+    {
+        $parameters = array();
+
+        if (null !== $value) {
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    $parameters[] = sprintf('%s=%s', $name, $item);
+                }
+            } else {
+                $parameters[] = sprintf('%s=%s', $name, $value);
+            }
+        } else {
+            $parameters[] = $name;
+        }
+
+        foreach ($parameters as $parameter) {
+            $processBuilder->add($parameter);
+        }
     }
 }
