@@ -87,7 +87,7 @@ class EmbeddedFormController extends Controller
 
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.embedded_form.controller.embedded_form.saved.message')
+                $this->get('translator')->trans('oro.embedded_form.controller.saved_message')
             );
 
             return $this->get('oro_ui.router')->actionRedirect(
@@ -96,7 +96,8 @@ class EmbeddedFormController extends Controller
                     'parameters' => array('id' => $entity->getId()),
                 ),
                 array(
-                    'route' => 'oro_embedded_form_list'
+                    'route' => 'oro_embedded_form_view',
+                    'parameters' => array('id' => $entity->getId()),
                 )
             );
 

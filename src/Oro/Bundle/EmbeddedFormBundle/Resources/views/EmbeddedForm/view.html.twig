@@ -30,21 +30,30 @@
     {% block stats %}
     {% endblock stats %}
 
-    {% set embeddedFormDetails %}
-        <div class="widget-content">
+    {% set formDetails %}
+    <div class="widget-content">
             <div class="row-fluid form-horizontal">
                 <div class="responsive-block">
                     {{ ui.renderProperty('oro.embedded_form.title.label'|trans, entity.title) }}
                     {{ ui.renderProperty('oro.embedded_form.form_type.label'|trans, entity.formType) }}
                     {{ ui.renderProperty('oro.embedded_form.channel.label'|trans, entity.channel.name) }}
-                    {{ ui.renderProperty('oro.embedded_form.css.label'|trans, entity.css) }}
+                    {{ ui.renderProperty('oro.embedded_form.css.label'|trans, entity.css|nl2br) }}
                 </div>
             </div>
         </div>
     {% endset %}
+    {% set formPreview %}
+    <div class="widget-content">
+        <iframe
+            src="{{ url('oro_embedded_form_submit', {'id': entity.id}) }}"
+            width="450"
+            height="800"
+            frameborder="0"></iframe>
+    </div>
+    {% endset %}
 
-    {% set getCodeSection %}
-        <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
+    {% set getCode %}
+    <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
 <div id="embedded-form-container-{{ entity.id }}"></div>
 <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
 <script type="text/javascript">
@@ -67,12 +76,20 @@
         'subblocks': [
             {
                 'title': 'Details'|trans,
-                'data': [embeddedFormDetails]
-            },
+    'data': [formDetails]
+    },
             {
-                'title': 'Code'|trans,
-                'data': [getCodeSection]
-            }
+    'title': 'Form Preview'|trans,
+    'data': [formPreview]
+    }
+    ]
+    },{
+    'title': 'Get a code'|trans,
+    'subblocks': [
+    {
+    'title': 'Code'|trans,
+    'data': [getCode]
+    }
         ]
     }] %}
     {% set data = {

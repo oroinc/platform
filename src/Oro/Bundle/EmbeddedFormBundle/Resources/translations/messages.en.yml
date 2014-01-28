@@ -20,3 +20,5 @@ oro:
 
         back_link_text: Back
 
+        controller:
+            saved_message: Form has been saved successfully
