@@ -56,7 +56,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     {
         return [
             'otherCommand'             => [
-                'commandName'      => 'Oro\Bundle\SearchBundle\Command\ReindexCommand',
+                'commandName'      => 'Doctrine\Bundle\DoctrineBundle\Command\Proxy\InfoDoctrineCommand',
                 'options'          => [],
                 'method'           => 'assertNotContains',
                 'expectedExitCode' => 0
