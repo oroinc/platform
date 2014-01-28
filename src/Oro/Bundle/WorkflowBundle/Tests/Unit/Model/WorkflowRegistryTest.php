@@ -112,7 +112,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflowRegistry->getWorkflow($workflowName);
     }
 
-    public function testGetWorkflowsByEntityClass()
+    public function testGetWorkflowByEntityClass()
     {
         $entityClass = '\stdClass';
         $workflowName = 'test_workflow';
@@ -127,13 +127,25 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflowDefinitionRepository->expects($this->once())
             ->method('findByEntityClass')
             ->with($entityClass)
-            ->will($this->returnValue(array($workflowDefinition)));
+            ->will($this->returnValue($workflowDefinition));
         $managerRegistry = $this->createManagerRegistryMock($workflowDefinitionRepository);
         $workflowAssembler = $this->createWorkflowAssemblerMock($workflowDefinition, $workflow);
 
         $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler);
-        $expectedWorkflows = array($workflowName => $workflow);
-        $actualWorkflows = $workflowRegistry->getWorkflowsByEntityClass($entityClass);
-        $this->assertEquals($expectedWorkflows, $actualWorkflows);
+        $this->assertEquals($workflow, $workflowRegistry->getWorkflowByEntityClass($entityClass));
+    }
+
+    public function testGetWorkflowByEntityClassNoWorkflow()
+    {
+        $entityClass = '\stdClass';
+        $workflowDefinitionRepository = $this->createWorkflowDefinitionRepositoryMock();
+        $workflowDefinitionRepository->expects($this->once())
+            ->method('findByEntityClass')
+            ->with($entityClass);
+
+        $managerRegistry = $this->createManagerRegistryMock($workflowDefinitionRepository);
+        $workflowAssembler = $this->createWorkflowAssemblerMock();
+        $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler);
+        $this->assertNull($workflowRegistry->getWorkflowByEntityClass($entityClass));
     }
 }
