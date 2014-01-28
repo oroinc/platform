@@ -6,9 +6,14 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData;
 
 class LoadRolesData extends AbstractFixture
 {
+    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_USER = 'ROLE_USER';
+    const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
+    const ROLE_MANAGER = 'ROLE_MANAGER';
 
     /**
      * Load roles
@@ -17,32 +22,29 @@ class LoadRolesData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $roleAnonymous = new Role('IS_AUTHENTICATED_ANONYMOUSLY');
+        $roleAnonymous = new Role(self::ROLE_ANONYMOUS);
         $roleAnonymous->setLabel('Anonymous');
-        $this->addReference('anon_role', $roleAnonymous);
 
-        $roleUser = new Role('ROLE_USER');
+        $roleUser = new Role(self::ROLE_USER);
         $roleUser->setLabel('User');
-        $this->addReference('user_role', $roleUser);
 
-        $roleSAdmin = new Role('ROLE_ADMINISTRATOR');
+        $roleSAdmin = new Role(self::ROLE_ADMINISTRATOR);
         $roleSAdmin->setLabel('Administrator');
-        $this->addReference('admin_role', $roleSAdmin);
 
-        $roleManager = new Role('ROLE_MANAGER');
+        $roleManager = new Role(self::ROLE_MANAGER);
         $roleManager->setLabel('Manager');
-        $this->addReference('manager_role', $roleManager);
-        if ($this->hasReference('default_business_unit')) {
-            $defaultBusinessUnit = $manager
-                ->getRepository('OroOrganizationBundle:BusinessUnit')
-                ->findOneBy(['name' => 'Main']);
-            if ($defaultBusinessUnit) {
-                $roleAnonymous->setOwner($defaultBusinessUnit);
-                $roleUser->setOwner($defaultBusinessUnit);
-                $roleSAdmin->setOwner($defaultBusinessUnit);
-                $roleManager->setOwner($defaultBusinessUnit);
-            }
+
+        $defaultBusinessUnit = $manager
+            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->findOneBy(['name' => LoadBusinessUnitData::MAIN_BUSINESS_UNIT]);
+
+        if ($defaultBusinessUnit) {
+            $roleAnonymous->setOwner($defaultBusinessUnit);
+            $roleUser->setOwner($defaultBusinessUnit);
+            $roleSAdmin->setOwner($defaultBusinessUnit);
+            $roleManager->setOwner($defaultBusinessUnit);
         }
+
         $manager->persist($roleAnonymous);
         $manager->persist($roleUser);
         $manager->persist($roleSAdmin);

@@ -9,16 +9,16 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class LoadOrganizationData extends AbstractFixture
 {
+    const MAIN_ORGANIZATION = 'default';
+
     public function load(ObjectManager $manager)
     {
         $defaultOrganization = new Organization();
 
         $defaultOrganization
-            ->setName('default')
+            ->setName(self::MAIN_ORGANIZATION)
             ->setCurrency('USD')
             ->setPrecision('000 000.00');
-
-        $this->addReference('default_organization', $defaultOrganization);
 
         $manager->persist($defaultOrganization);
         $manager->flush();

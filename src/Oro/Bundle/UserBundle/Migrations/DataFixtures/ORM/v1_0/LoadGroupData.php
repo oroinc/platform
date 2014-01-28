@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData;
 
 class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
 {
@@ -22,19 +23,15 @@ class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
         /**
          * addRole was commented due a ticket BAP-1675
          */
-        $defaultBusinessUnit = null;
-        if ($this->hasReference('default_business_unit')) {
-            $defaultBusinessUnit = $manager
-                ->getRepository('OroOrganizationBundle:BusinessUnit')
-                ->findOneBy(['name' => 'Main']);
-        }
+        $defaultBusinessUnit = $manager
+            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->findOneBy(['name' => LoadBusinessUnitData::MAIN_BUSINESS_UNIT]);
         $administrators = new Group('Administrators');
         //$administrators->addRole($this->getReference('administrator_role'));
         if ($defaultBusinessUnit) {
             $administrators->setOwner($defaultBusinessUnit);
         }
         $manager->persist($administrators);
-        $this->setReference('oro_group_administrators', $administrators);
 
         $sales= new Group('Sales');
         //$sales->addRole($this->getReference('manager_role'));
@@ -42,7 +39,6 @@ class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
             $sales->setOwner($defaultBusinessUnit);
         }
         $manager->persist($sales);
-        $this->setReference('oro_group_sales', $sales);
 
         $marketing= new Group('Marketing');
         //$marketing->addRole($this->getReference('manager_role'));
@@ -50,7 +46,6 @@ class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
             $marketing->setOwner($defaultBusinessUnit);
         }
         $manager->persist($marketing);
-        $this->setReference('oro_group_marketing', $marketing);
 
         $manager->flush();
     }

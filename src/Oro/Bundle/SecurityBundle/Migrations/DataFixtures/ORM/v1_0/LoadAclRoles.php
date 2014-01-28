@@ -10,6 +10,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0\LoadRolesData;
 
 class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
@@ -62,7 +63,7 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
 
     protected function loadSuperAdminRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getRole('ROLE_ADMINISTRATOR'));
+        $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_ADMINISTRATOR));
 
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
@@ -106,7 +107,7 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
 
     protected function loadManagerRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getRole('ROLE_MANAGER'));
+        $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_MANAGER));
 
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());
@@ -135,7 +136,7 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
 
     protected function loadUserRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getRole('ROLE_USER'));
+        $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_USER));
 
         foreach ($manager->getAllExtensions() as $extension) {
             $rootOid = $manager->getRootOid($extension->getExtensionKey());

@@ -7,7 +7,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0\LoadRolesData;
 
 class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
@@ -58,7 +60,7 @@ class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterfac
 
     protected function updateUserRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getRole('ROLE_USER'));
+        $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_USER));
 
         // deny to view other user's calendar
         $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarConnection');
@@ -82,7 +84,7 @@ class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterfac
 
     protected function updateManagerRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getRole('ROLE_MANAGER'));
+        $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_MANAGER));
 
         // grant to view other user's calendar for the same business unit
         $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarConnection');

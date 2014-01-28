@@ -9,6 +9,8 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 class LoadBusinessUnitData extends AbstractFixture implements DependentFixtureInterface
 {
+    const MAIN_BUSINESS_UNIT = 'Main';
+
     /**
      * {@inheritdoc}
      */
@@ -22,9 +24,11 @@ class LoadBusinessUnitData extends AbstractFixture implements DependentFixtureIn
         $defaultBusinessUnit = new BusinessUnit();
 
         $defaultBusinessUnit
-            ->setName('Main')
+            ->setName(self::MAIN_BUSINESS_UNIT)
             ->setOrganization(
-                $manager->getRepository('OroOrganizationBundle:Organization')->findOneBy(['name' => 'default'])
+                $manager->getRepository('OroOrganizationBundle:Organization')->findOneBy(
+                    ['name' => LoadOrganizationData::MAIN_ORGANIZATION]
+                )
             );
 
         $this->addReference('default_business_unit', $defaultBusinessUnit);

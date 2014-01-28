@@ -16,20 +16,26 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:installer:fixtures:load')
-            ->setDescription('Load versioned data fixtures. By default will load main data fixtures')
-            ->addOption('load-demo', null, InputOption::VALUE_OPTIONAL, 'True if need to load demo data', 'false')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show list of fixtures without apply')
+            ->setDescription('Load versioned data fixtures.')
+            ->addOption(
+                'fixtures-type',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Select fixtures type to be loaded (main or demo). By default - main',
+                'main'
+            )
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs list of fixtures without apply them')
             ->addOption(
                 'bundles',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'Bundles list to load data from'
+                'A list of bundle names to load data from'
             )
             ->addOption(
                 'exclude',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'Exclude bundles list '
+                'A list of bundle names which fixtures should be skipped'
             );
     }
 
@@ -40,7 +46,7 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
         $loader    = $container->get('oro_installer.fixtures.loader');
-        $loader->isLoadDemoData($input->getOption('load-demo') == 'false' ? false : true);
+        $loader->isLoadDemoData($input->getOption('fixtures-type') == 'demo' ? true : false);
         $bundles = $input->getOption('bundles');
         if (!empty($bundles)) {
             $loader->setBundles($bundles);
