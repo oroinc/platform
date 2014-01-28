@@ -13,6 +13,6 @@ class LoadEmailTemplates extends AbstractEmailFixture
      */
     public function getEmailsDir()
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . '../data/emails';
+        return __DIR__ . DIRECTORY_SEPARATOR . 'data/emails';
     }
 }
