@@ -8,7 +8,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_report_type")
- * @Config()
  */
 class ReportType
 {

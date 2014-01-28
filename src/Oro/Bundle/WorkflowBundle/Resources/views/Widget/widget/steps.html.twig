@@ -1,0 +1,18 @@
+<div class="widget-content">
+    {% set stepsCount = steps|length %}
+    {% set minStepsCount = 1 %}
+    {% if stepsCount > minStepsCount %}
+        <ul class="workflow-step-list nav {% if stepsCount == 1 %}single-step{% endif %}">
+            {% set isProcessed = true %}
+            {% for step in steps %}
+                {% set isCurrent = currentStep and step.name == currentStep.name %}
+                <li class="{% if isCurrent %}current{% elseif isProcessed %}processed{% endif %}">
+                    {{ step.label|trans }}
+                </li>
+                {% if isCurrent %}
+                    {% set isProcessed = false %}
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>

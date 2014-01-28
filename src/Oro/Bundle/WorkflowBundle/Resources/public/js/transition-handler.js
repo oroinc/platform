@@ -31,22 +31,6 @@ function($, _, routing, messenger, __, Navigation, Modal) {
                         doRedirect(response.workflowItem.result.redirectUrl);
                     }
                 });
-                /** Handle redirect-to-workflow element data parameter */
-                element.one('transitions_success', function(e, response) {
-                    var workflowItemId = null;
-                    if (response.workflowItem && response.workflowItem.id) {
-                        workflowItemId = response.workflowItem.id;
-                    }
-                    var needRedirect = element.data('redirect-to-workflow');
-                    if (needRedirect && workflowItemId) {
-                        e.stopImmediatePropagation();
-                        var redirectUrl = routing.generate(
-                            'oro_workflow_step_edit',
-                            {id: workflowItemId}
-                        );
-                        doRedirect(redirectUrl);
-                    }
-                });
                 /** By default reload page */
                 element.one('transitions_success', doReload);
                 element.trigger('transitions_success', [response]);
