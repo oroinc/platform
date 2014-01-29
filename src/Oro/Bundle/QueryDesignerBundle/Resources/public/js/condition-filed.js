@@ -11,10 +11,20 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
         },
 
         _create: function () {
-            var entityFieldUtil = new EntityFieldUtil(this.$select);
+            var entityFieldUtil = new EntityFieldUtil(this.$select),
+                select2Options = this.options.select2;
             $.extend(entityFieldUtil, this.options.util);
 
             this.options.fields = entityFieldUtil._convertData(this.options.fields, this.options.entity, null);
+
+            if (select2Options.formatSelectionTemplate) {
+                (function () {
+                    var template = _.template(select2Options.formatSelectionTemplate);
+                    select2Options.formatSelection = function (item) {
+                        return item.id ? template(entityFieldUtil.splitFieldId(item.id)) : '';
+                    }
+                } ());
+            }
 
             this.$select
                 .data('entity', this.options.entity)
@@ -58,6 +68,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             }
 
             this.$select.change(_.bind(function (e) {
+                $(':focus').blur();
                 if (e.added) {
                     // reset current value on field change
                     this.element.data('value', {});
