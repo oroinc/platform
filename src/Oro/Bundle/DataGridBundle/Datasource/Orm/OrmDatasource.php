@@ -46,7 +46,18 @@ class OrmDatasource implements DatasourceInterface
             $method = $config['repository_method'];
             $repository = $this->em->getRepository($entity);
             if (method_exists($repository, $method)) {
-                $this->qb = $repository->$method();
+                $qb = $repository->$method();
+                if ($qb instanceof QueryBuilder) {
+                    $this->qb = $qb;
+                } else {
+                    throw new \Exception(
+                        sprintf('%s::%s() must return an instance of Docrine\Orm\QueryBuilder, %s given',
+                            get_class($repository),
+                            $method,
+                            is_object($qb) ? get_class($qb) : gettype($qb)
+                        )
+                    );
+                }
             } else {
                 throw new \Exception(sprintf('%s has no method %s', get_class($repository), $method));
             }
