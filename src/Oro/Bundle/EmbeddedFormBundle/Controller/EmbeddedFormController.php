@@ -5,21 +5,24 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use FOS\Rest\Util\Codes;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 class EmbeddedFormController extends Controller
 {
     /**
      * @Route(name="oro_embedded_form_list")
      * @Template()
+     * @AclAncestor("oro_embedded_form_view")
      */
     public function indexAction()
     {
@@ -29,6 +32,12 @@ class EmbeddedFormController extends Controller
     /**
      * @Route("create", name="oro_embedded_form_create")
      * @Template("OroEmbeddedFormBundle:EmbeddedForm:update.html.twig")
+     * @Acl(
+     *      id="oro_embedded_form_create",
+     *      type="entity",
+     *      permission="CREATE",
+     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     * )
      */
     public function createAction()
     {
@@ -37,6 +46,12 @@ class EmbeddedFormController extends Controller
 
     /**
      * @Route("delete/{id}", name="oro_embedded_form_delete", requirements={"id"="[-\d\w]+"})
+     * @Acl(
+     *      id="oro_embedded_form_delete",
+     *      type="entity",
+     *      permission="DELETE",
+     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     * )
      */
     public function deleteAction(EmbeddedForm $entity)
     {
@@ -52,6 +67,12 @@ class EmbeddedFormController extends Controller
     /**
      * @Route("update/{id}", name="oro_embedded_form_update", requirements={"id"="[-\d\w]+"})
      * @Template()
+     * @Acl(
+     *      id="oro_embedded_form_edit",
+     *      type="entity",
+     *      permission="EDIT",
+     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     * )
      */
     public function updateAction(EmbeddedForm $entity)
     {
@@ -61,6 +82,12 @@ class EmbeddedFormController extends Controller
     /**
      * @Route("view/{id}", name="oro_embedded_form_view", requirements={"id"="[-\d\w]+"})
      * @Template()
+     * @Acl(
+     *      id="oro_embedded_form_view",
+     *      type="entity",
+     *      permission="VIEW",
+     *      class="OroEmbeddedFormBundle:EmbeddedForm"
+     * )
      */
     public function viewAction(EmbeddedForm $entity)
     {
@@ -69,6 +96,10 @@ class EmbeddedFormController extends Controller
         ];
     }
 
+    /**
+     * @param EmbeddedForm $entity
+     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
     protected function update(EmbeddedForm $entity = null)
     {
         if (!$entity) {

@@ -2,15 +2,20 @@
 {% import 'OroUIBundle::macros.html.twig' as ui %}
 
 {% block navButtons %}
-    {{ UI.deleteButton({
-        'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
-        'dataRedirect': path('oro_embedded_form_list'),
-        'aCss': 'no-hash remove-button',
-        'id': 'btn-remove-embedded-form',
-        'entity_label': 'oro.embedded_form.entity.label'|trans,
-    }) }}
-    {{ UI.buttonSeparator() }}
-    {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Update'|trans, 'label' : 'Update'|trans}) }}
+    {% if resource_granted('oro_embedded_form_delete') %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
+            'dataRedirect': path('oro_embedded_form_list'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-embedded-form',
+            'entity_label': 'oro.embedded_form.entity.label'|trans,
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+
+    {% if resource_granted('oro_embedded_form_delete') %}
+        {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Update'|trans, 'label' : 'Update'|trans}) }}
+    {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
 {% endblock %}
 
