@@ -16,7 +16,7 @@ class RestAddressTypeApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient();
+        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
     }
 
     /**

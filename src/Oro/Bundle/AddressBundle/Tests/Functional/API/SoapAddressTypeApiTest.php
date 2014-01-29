@@ -16,7 +16,7 @@ class SoapAddressTypeApiTest extends WebTestCase
 
     public function setUp()
     {
-        $this->client = static::createClient();
+        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
         $this->client->soap(
             "http://localhost/api/soap",
             array(

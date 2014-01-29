@@ -84,14 +84,16 @@ class Client extends BaseClient
             $uri = self::LOCAL_URL . $uri;
         }
 
-        // set nonce uniq for each requst
-        $this->setServerParameters(
-            ToolsAPI::generateWsseHeader(
-                ToolsAPI::USER_NAME,
-                ToolsAPI::USER_PASSWORD,
-                uniqid()
-            )
-        );
+        if (!empty($this->server['HTTP_X-WSSE'])) {
+            // set nonce uniq for each requst
+            $this->setServerParameters(
+                ToolsAPI::generateWsseHeader(
+                    ToolsAPI::USER_NAME,
+                    ToolsAPI::USER_PASSWORD,
+                    uniqid()
+                )
+            );
+        }
 
         return parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
