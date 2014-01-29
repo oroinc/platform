@@ -17,7 +17,7 @@ class UpdateSchemaListenerTest extends WebTestCase
 
     public function setUp()
     {
-        $client            = static::createClient();
+        static::createClient();
         $this->application = new Application(self::$kernel);
         $this->application->setAutoExit(false);
     }
@@ -27,8 +27,6 @@ class UpdateSchemaListenerTest extends WebTestCase
      */
     public function testCommand($commandName, $options, $method, $expectedExitCode)
     {
-        $this->markTestSkipped("Test skipped");
-
         $command = new $commandName();
         $this->application->add($command);
 

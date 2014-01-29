@@ -85,14 +85,10 @@ class GroupController extends Controller
 
             if (!$this->getRequest()->get('_widgetContainer')) {
 
-                return $this->get('oro_ui.router')->actionRedirect(
-                    array(
-                        'route' => 'oro_user_group_update',
-                        'parameters' => array('id' => $entity->getId()),
-                    ),
-                    array(
-                        'route' => 'oro_user_group_index',
-                    )
+                return $this->get('oro_ui.router')->redirectAfterSave(
+                    ['route' => 'oro_user_group_update', 'parameters' => ['id' => $entity->getId()]],
+                    ['route' => 'oro_user_group_index'],
+                    $entity
                 );
             }
         }

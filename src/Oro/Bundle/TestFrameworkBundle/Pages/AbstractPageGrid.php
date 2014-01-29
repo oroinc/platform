@@ -205,7 +205,7 @@ abstract class AbstractPageGrid extends AbstractPage
             $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '{$actionName}')]")
         )->click();
         if ($confirmation) {
-            $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
+            $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[contains(., 'Yes')]")->click();
         }
 
         $this->waitPageToLoad();

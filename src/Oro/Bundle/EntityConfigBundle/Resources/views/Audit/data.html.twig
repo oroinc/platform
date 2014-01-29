@@ -1,6 +1,7 @@
 <ul>
 {% for val in value %}
     {% set items = config_manager.getProvider(val.scope).getPropertyConfig().getItems(is_entity ? 'entity' : 'type') %}
+    {% set translatable = config_manager.getProvider(val.scope).getPropertyConfig().getTranslatableValues(is_entity ? 'entity' : 'field') %}
 
     {% if (is_entity and val.fieldName() == null) or (is_entity == false and val.fieldName() == field_name) %}
         {% for key, data in val.diff %}
@@ -11,9 +12,14 @@
             {% else %}
                 {% set label = key|capitalize|replace('_',' ') %}
             {% endif %}
+
+            {% if ('.entity_'~key not in data[1]|trans) %}
             <li>
-                <b>{{ label }}</b>: <s>{{ data[0]|default('N/A') }}</s> {{ data[1] }}
+                {% set old = key in translatable ? data[0]|default('N/A')|trans : data[0] %}
+                {% set new = key in translatable ? data[1]|trans : data[1] %}
+                <b>{{ label }}</b>: <s>{{ old }}</s> {{ new }}
             </li>
+            {% endif %}
         {% endfor %}
     {% endif %}
 {% endfor %}

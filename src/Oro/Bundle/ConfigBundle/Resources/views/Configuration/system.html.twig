@@ -9,11 +9,8 @@
 {% set pageTitle = 'Configuration' %}
 
 {% block content %}
-    {% set saveButton = UI.saveAndStayButton('', 'Save Settings'|trans) %}
-    {% set restoreButton = UI.buttonType({
-        type: 'reset',
-        label: 'Restore Defaults'|trans
-    }) %}
+    {% set saveButton = UI.saveAndCloseButton('Save Settings') %}
+    {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Defaults' }) %}
     {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
     <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post" data-collect="true">
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}

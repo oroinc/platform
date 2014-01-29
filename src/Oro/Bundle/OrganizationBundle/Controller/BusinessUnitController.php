@@ -98,15 +98,10 @@ class BusinessUnitController extends Controller
                 $this->get('translator')->trans('oro.business_unit.controller.message.saved')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
-                array(
-                    'route' => 'oro_business_unit_update',
-                    'parameters' => array('id' => $entity->getId()),
-                ),
-                array(
-                    'route' => 'oro_business_unit_view',
-                    'parameters' => array('id' => $entity->getId())
-                )
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                ['route' => 'oro_business_unit_update', 'parameters' => ['id' => $entity->getId()]],
+                ['route' => 'oro_business_unit_view', 'parameters' => ['id' => $entity->getId()]],
+                $entity
             );
         }
 
