@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\InstallerBundle\Migrations;
 
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\DataFixtures\FixtureInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\InstallerBundle\Entity\BundleVersion;
 use Oro\Bundle\InstallerBundle\Migrations\UpdateBundleVersionFixture;
@@ -270,12 +272,11 @@ class FixturesLoader extends Loader
                     if ($bundleDataVersion === null) {
                         /** @var BundleVersion $versionData */
                         $versionData = $repo->findOneBy(['bundleName' => $bundleName]);
+                        $bundleDataVersion = false;
                         if ($versionData) {
                             $bundleDataVersion = $this->loadDemoData
                                 ? $versionData->getDemoDataVersion()
                                 : $versionData->getDataVersion();
-                        } else {
-                            $bundleDataVersion = false;
                         }
                     }
 
