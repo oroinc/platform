@@ -3,15 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
-use Oro\Bundle\TestFrameworkBundle\Test\SoapClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\TerminableInterface;
+
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
 
 class Client extends BaseClient
 {
-
     const LOCAL_URL = 'http://localhost';
 
     /** @var  SoapClient */
@@ -84,6 +83,16 @@ class Client extends BaseClient
         if (strpos($uri, 'http://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }
+
+        // set nonce uniq for each requst
+        $this->setServerParameters(
+            ToolsAPI::generateWsseHeader(
+                ToolsAPI::USER_NAME,
+                ToolsAPI::USER_PASSWORD,
+                uniqid()
+            )
+        );
+
         return parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
