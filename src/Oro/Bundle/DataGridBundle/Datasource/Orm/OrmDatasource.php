@@ -37,10 +37,35 @@ class OrmDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
-        $queryConfig = array_intersect_key($config, array_flip(['query']));
+        if (isset($config['query'])) {
+            $queryConfig = array_intersect_key($config, array_flip(['query']));
+            $converter = new YamlConverter();
+            $this->qb  = $converter->parse($queryConfig, $this->em->createQueryBuilder());
 
-        $converter = new YamlConverter();
-        $this->qb  = $converter->parse($queryConfig, $this->em->createQueryBuilder());
+        } elseif (isset($config['entity']) and isset($config['repository_method'])) {
+            $entity = $config['entity'];
+            $method = $config['repository_method'];
+            $repository = $this->em->getRepository($entity);
+            if (method_exists($repository, $method)) {
+                $qb = $repository->$method();
+                if ($qb instanceof QueryBuilder) {
+                    $this->qb = $qb;
+                } else {
+                    throw new \Exception(
+                        sprintf('%s::%s() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
+                            get_class($repository),
+                            $method,
+                            is_object($qb) ? get_class($qb) : gettype($qb)
+                        )
+                    );
+                }
+            } else {
+                throw new \Exception(sprintf('%s has no method %s', get_class($repository), $method));
+            }
+
+        } else {
+            throw new \Exception(get_class($this).' expects to be configured with query or repository method');
+        }
 
         $grid->setDatasource(clone $this);
     }
