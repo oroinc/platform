@@ -6,11 +6,21 @@ namespace Oro\Bundle\EmbeddedFormBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_embedded_form")
+ * @Config(
+ *  routeName="oro_embedded_form_list",
+ *  defaultValues={
+ *      "security"={
+ *          "type"="ACL",
+ *          "group_name"=""
+ *      }
+ *  }
+ * )
  */
 class EmbeddedForm
 {
@@ -151,6 +161,4 @@ class EmbeddedForm
     {
         return $this->successMessage;
     }
-
-
 }

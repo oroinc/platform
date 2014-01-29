@@ -1,8 +1,8 @@
 oro_menu_config:
     items:
         embedded_forms:
-            label: 'Embedded Forms'
-            route: 'oro_embedded_form_list'
+            label: Embedded Forms
+            route: oro_embedded_form_list
 
     tree:
         application_menu:
