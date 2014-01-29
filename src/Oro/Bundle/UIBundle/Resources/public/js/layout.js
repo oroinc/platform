@@ -11,8 +11,6 @@ define(function (require) {
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
 
-    var documentTitle = '';
-
     var layout = {};
 
     layout.init = function (container) {
@@ -62,16 +60,6 @@ define(function (require) {
         setTimeout(function () {
             scrollspy.top();
         }, 500);
-    };
-
-    layout.setDocumentTitle = function (title) {
-        documentTitle = title;
-    };
-
-    layout.initDocumentTitle = function () {
-        if (documentTitle) {
-            document.title = documentTitle;
-        }
     };
 
     layout.hideProgressBar = function () {
