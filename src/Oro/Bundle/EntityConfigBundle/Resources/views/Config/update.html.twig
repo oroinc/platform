@@ -7,6 +7,7 @@
 {% set audit_entity_class = entity.classname|replace('\\', '_') %}
 {% set audit_title = entity_config.get('label')|default('N/A')|trans %}
 {% set audit_path = 'oro_entityconfig_audit' %}
+{% set audit_entity_id = entity.id %}
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}

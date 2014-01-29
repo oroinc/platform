@@ -379,8 +379,30 @@ class ConfigManager
 
     public function flush()
     {
-        $models = [];
+        $models = $this->prepareFlush();
 
+        if ($this->cache) {
+            $this->cache->removeAllConfigurable();
+        }
+
+        $this->auditManager->log();
+
+        foreach ($models as $model) {
+            $this->getEntityManager()->persist($model);
+        }
+
+        $this->getEntityManager()->flush();
+
+        $this->persistConfigs   = [];
+        $this->configChangeSets = [];
+    }
+
+    /**
+     * @param array $models
+     * @return array
+     */
+    protected function prepareFlush($models = [])
+    {
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
 
@@ -399,7 +421,6 @@ class ConfigManager
                 $model->setOptions($config->get('set_options'));
             }
 
-            //TODO::refactoring
             $serializableValues = $this->getProvider($config->getId()->getScope())
                 ->getPropertyConfig()
                 ->getSerializableValues($config->getId());
@@ -410,20 +431,11 @@ class ConfigManager
             }
         }
 
-        if ($this->cache) {
-            $this->cache->removeAllConfigurable();
+        if (count($this->persistConfigs) != count($this->configChangeSets)) {
+            $models = $this->prepareFlush($models);
         }
 
-        $this->auditManager->log();
-
-        foreach ($models as $model) {
-            $this->getEntityManager()->persist($model);
-        }
-
-        $this->getEntityManager()->flush();
-
-        $this->persistConfigs   = [];
-        $this->configChangeSets = [];
+        return $models;
     }
 
 

@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\InstallerBundle\Migrations;
 
-use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Doctrine\ORM\EntityManager;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Doctrine\Common\DataFixtures\FixtureInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\InstallerBundle\Entity\BundleVersion;
 use Oro\Bundle\InstallerBundle\Migrations\UpdateBundleVersionFixture;
@@ -188,13 +190,14 @@ class FixturesLoader extends Loader
 
         $declared = get_declared_classes();
 
+        $i = 0;
         foreach ($declared as $className) {
             $reflClass  = new \ReflectionClass($className);
             $sourceFile = $reflClass->getFileName();
             if (in_array($sourceFile, $includedFiles) && !$this->isTransient($className)) {
                 $fixture           = new \stdClass();
                 $fixture->fixture  = new $className;
-                $fixture->iterator = 0;
+                $fixture->iterator = $i++;
                 $fixtures[]        = $fixture;
             }
         }
@@ -202,7 +205,7 @@ class FixturesLoader extends Loader
         $parentBundles = [];
         $this->processDependency($fixtures, $parentBundles, $bundleName);
 
-        usort($fixtures, [$this, 'sortFixturesStd']);
+        usort($fixtures, [$this, 'sortFixturesStdInverse']);
 
         return [$fixtures, $parentBundles];
     }
@@ -269,12 +272,11 @@ class FixturesLoader extends Loader
                     if ($bundleDataVersion === null) {
                         /** @var BundleVersion $versionData */
                         $versionData = $repo->findOneBy(['bundleName' => $bundleName]);
+                        $bundleDataVersion = false;
                         if ($versionData) {
                             $bundleDataVersion = $this->loadDemoData
                                 ? $versionData->getDemoDataVersion()
                                 : $versionData->getDataVersion();
-                        } else {
-                            $bundleDataVersion = false;
                         }
                     }
 
@@ -344,6 +346,23 @@ class FixturesLoader extends Loader
     }
 
     /**
+     * @param \stdClass $a
+     * @param \stdClass $b
+     * @return int
+     */
+    protected function sortFixturesStdInverse(\stdClass $a, \stdClass $b)
+    {
+        if ($a->iterator > $b->iterator) {
+            return 1;
+        }
+        if ($a->iterator < $b->iterator) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    /**
      * @param string $className
      * @return bool|string
      */
@@ -373,12 +392,18 @@ class FixturesLoader extends Loader
                 foreach ($fixtureData->fixture->getDependencies() as $dependency) {
                     $bundle = $this->getBundleNameForClass($dependency);
                     if ($bundle == $bundleName) {
-                        foreach ($fixtures as &$bundleFixture) {
-                            if (get_class($bundleFixture->fixture) == $dependency) {
-                                if (($fixtureData->iterator + 1) > $bundleFixture->iterator) {
-                                    $bundleFixture->iterator = $fixtureData->iterator + 1;
-                                }
+                        $parentFixture = array_filter(
+                            $fixtures,
+                            function ($item) use ($dependency) {
+                                return  get_class($item->fixture) == $dependency;
                             }
+                        );
+                        $key = array_keys($parentFixture)[0];
+
+                        if ($fixtureData->iterator < $fixtures[$key]->iterator) {
+                            $tempIterator = $fixtureData->iterator;
+                            $fixtureData->iterator = $fixtures[$key]->iterator;
+                            $fixtures[$key]->iterator = $tempIterator;
                         }
                     } else {
                         //check dependency in include bundles
