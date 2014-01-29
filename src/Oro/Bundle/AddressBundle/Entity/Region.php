@@ -28,6 +28,18 @@ class Region implements Translatable
     const SEPARATOR = '-';
 
     /**
+     * Get combined region code.
+     *
+     * @param string $country Country ISO2 code
+     * @param string $region Region ISO2 code
+     * @return string
+     */
+    public static function getRegionCombinedCode($country, $region)
+    {
+        return $country . self::SEPARATOR . $region;
+    }
+
+    /**
      * @var string
      *
      * @ORM\Id
