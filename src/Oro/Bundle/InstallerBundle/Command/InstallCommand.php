@@ -66,7 +66,18 @@ class InstallCommand extends ContainerAwareCommand
             ->finalStep($commandExecutor, $input, $output);
 
         $output->writeln('');
-        $output->writeln('<info>Oro Application has been successfully installed.</info>');
+        $output->writeln(
+            sprintf(
+                '<info>Oro Application has been successfully installed in <comment>%s</comment> mode.</info>',
+                $input->getOption('env')
+            )
+        );
+        if ('prod' != $input->getOption('env')) {
+            $output->writeln(
+                '<info>To run application in <comment>prod</comment> mode, ' .
+                'please run <comment>cache:clear</comment> command with <comment>--env prod</comment> parameter</info>'
+            );
+        }
     }
 
     /**
