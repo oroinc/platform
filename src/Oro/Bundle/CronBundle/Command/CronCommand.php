@@ -33,7 +33,7 @@ class CronCommand extends ContainerAwareCommand
         $commands   = $this->getApplication()->all('oro:cron');
         $em         = $this->getContainer()->get('doctrine.orm.entity_manager');
         $daemon     = $this->getContainer()->get('oro_cron.job_daemon');
-        $dbCommands = $em->getRepository('OroCronBundle:Schedule')->findAll();
+        $schedules  = $em->getRepository('OroCronBundle:Schedule')->findAll();
 
         // check if daemon is running
         if (!$daemon->getPid()) {
@@ -50,29 +50,33 @@ class CronCommand extends ContainerAwareCommand
         }
 
         foreach ($commands as $name => $command) {
-            $output->writeln('');
             $output->write(sprintf('Processing command "<info>%s</info>": ', $name));
 
-            $dbCommand = array_filter(
-                $dbCommands,
+            if (!$command instanceof CronCommandInterface) {
+                $output->writeln(
+                    '<error>Unable to setup, command must be instance of CronCommandInterface</error>'
+                );
+
+                continue;
+            }
+
+            if (!$command->getDefaultDefinition()) {
+                $output->writeln('<error>no cron definition found, check command</error>');
+
+                continue;
+            }
+
+            $schedule = array_filter(
+                $schedules,
                 function ($element) use ($name) {
                     return $element->getCommand() == $name;
                 }
             );
 
-            if (empty($dbCommand)) {
+            if (empty($schedule)) {
                 $output->writeln('<comment>new command found, setting up schedule..</comment>');
 
-                if (!$command instanceof CronCommandInterface) {
-                    $output->writeln(
-                        '<error>Unable to setup, command must be instance of CronCommandInterface</error>'
-                    );
-
-                    continue;
-                }
-
                 $schedule = new Schedule();
-
                 $schedule
                     ->setCommand($name)
                     ->setDefinition($command->getDefaultDefinition());
@@ -82,15 +86,14 @@ class CronCommand extends ContainerAwareCommand
                 continue;
             }
 
-            $dbCommand = current($dbCommand);
+            $schedule = current($schedule);
 
-            if (!$dbCommand->getDefinition()) {
-                $output->writeln('<comment>no cron definition found, check db record</comment>');
-
-                continue;
+            $defaultDefinition = $command->getDefaultDefinition();
+            if ($schedule->getDefinition() != $defaultDefinition) {
+                $schedule->setDefinition($defaultDefinition);
             }
 
-            $cron = \Cron\CronExpression::factory($dbCommand->getDefinition());
+            $cron = \Cron\CronExpression::factory($schedule->getDefinition());
 
             /**
              * @todo Add "Oro timezone" setting as parameter to isDue method

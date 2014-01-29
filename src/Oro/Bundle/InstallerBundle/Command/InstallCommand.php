@@ -66,7 +66,18 @@ class InstallCommand extends ContainerAwareCommand
             ->finalStep($commandExecutor, $input, $output);
 
         $output->writeln('');
-        $output->writeln('<info>Oro Application has been successfully installed.</info>');
+        $output->writeln(
+            sprintf(
+                '<info>Oro Application has been successfully installed in <comment>%s</comment> mode.</info>',
+                $input->getOption('env')
+            )
+        );
+        if ('prod' != $input->getOption('env')) {
+            $output->writeln(
+                '<info>To run application in <comment>prod</comment> mode, ' .
+                'please run <comment>cache:clear</comment> command with <comment>--env prod</comment> parameter</info>'
+            );
+        }
     }
 
     /**
@@ -127,7 +138,7 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
-                array('--force' => true, '--full-database' => true)
+                array('--force' => true, '--full-database' => true, '--process-isolation' => true)
             )
             ->runCommand('doctrine:schema:create')
             ->runCommand('oro:entity-config:init')
@@ -141,8 +152,8 @@ class InstallCommand extends ContainerAwareCommand
                 array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
             )
             ->runCommand(
-                'doctrine:fixtures:load',
-                array('--process-isolation' => true, '--no-interaction' => true, '--append' => true)
+                'oro:installer:fixtures:load',
+                array('--process-isolation' => true, '--no-interaction' => true)
             )
             ->runCommand(
                 'oro:workflow:definitions:load',
@@ -246,8 +257,8 @@ class InstallCommand extends ContainerAwareCommand
         // load demo fixtures
         if ($demo) {
             $commandExecutor->runCommand(
-                'oro:demo:fixtures:load',
-                array('--process-isolation' => true, '--process-timeout' => 300)
+                'oro:installer:fixtures:load',
+                array('--process-isolation' => true, '--process-timeout' => 300, '--fixtures-type' => 'demo')
             );
         }
 

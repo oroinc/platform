@@ -39,6 +39,9 @@ parameters:
     oro_email.emailtemplate.datagrid_view_list.class: Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesViewList
     oro_email.emailtemplate.datagrid_helper.class:    Oro\Bundle\EmailBundle\Datagrid\EmailTemplatesGridHelper
 
+    # Datagrid event listeners
+    oro_email.listener.datagrid.email.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\EmailListener
+
     #Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
 
@@ -229,3 +232,10 @@ services:
             - @oro_locale.formatter.name
         tags:
             - { name: oro_workflow.action, alias: send_email }
+
+    oro_email.listener.datagrid.email:
+        class: %oro_email.listener.datagrid.email.class%
+        arguments:
+            - @oro_email.datagrid_query_factory
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.email-grid, method: onBuildAfter }

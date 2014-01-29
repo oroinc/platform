@@ -142,7 +142,7 @@ datagrid:
             delete:
                 type:         delete
                 label:        oro.email.datagrid.emailtemplate.action.delete
-                acl_resource: oro_email_emailtemplate_remove
+                acl_resource: oro_email_emailtemplate_delete
                 icon:         trash
                 link:         delete_link
 

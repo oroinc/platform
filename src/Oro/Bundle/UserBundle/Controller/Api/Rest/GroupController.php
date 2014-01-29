@@ -118,7 +118,7 @@ class GroupController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @Acl(
-     *      id="oro_user_group_remove",
+     *      id="oro_user_group_delete",
      *      type="entity",
      *      class="OroUserBundle:Group",
      *      permission="DELETE"

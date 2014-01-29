@@ -7,6 +7,8 @@ change_password:
     flash:
         success: The password has been changed
 
+"Bad credentials": "Invalid user name or password."
+
 resetting:
     flash:
         success: The password has been successfully reset

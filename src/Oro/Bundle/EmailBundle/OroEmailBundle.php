@@ -8,10 +8,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
-use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 
 class OroEmailBundle extends Bundle
 {
