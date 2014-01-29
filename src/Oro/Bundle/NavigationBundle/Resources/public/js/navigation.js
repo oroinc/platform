@@ -1047,11 +1047,9 @@ define(function (require) {
                     this.loadPage();
                 } else {
                     window.location.hash = '#url=' + url;
-                    console.log(1, window.location.hash);
                 }
             } else {
                 window.location.href = url;
-                console.log(2, window.location.href);
             }
         },
 
