@@ -2,6 +2,7 @@ parameters:
     oro.embedded_form.form_type.available_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
     oro_embedded_form.manager.class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
     oro_embedded_form.back_link.twig.extension.class: Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
+    oro_embedded_form.form_type.channel_aware_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\ChannelAwareFormType
 
 services:
     oro_embedded_form.form_type.available_embedded_form:
@@ -10,6 +11,11 @@ services:
             - @oro_embedded_form.manager
         tags:
             - { name: form.type, alias: oro_available_embedded_forms }
+
+    oro_embedded_form.form_type.channel_aware_form:
+        class: %oro_embedded_form.form_type.channel_aware_form.class%
+        tags:
+            - { name: form.type, alias: oro_channel_aware_form}
 
     oro_embedded_form.manager:
         class: %oro_embedded_form.manager.class%
