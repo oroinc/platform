@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 class WorkflowItemRepository extends EntityRepository
@@ -38,5 +38,33 @@ class WorkflowItemRepository extends EntityRepository
             ->setParameter('entityId', $entityIdentifier);
 
         return $qb;
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @return QueryBuilder
+     */
+    public function getByDefinitionQueryBuilder(WorkflowDefinition $definition)
+    {
+        return $this->createQueryBuilder('workflowItem')
+            ->select('workflowItem.id')
+            ->where('workflowItem.definition = :definition')
+            ->setParameter('definition', $definition);
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @return QueryBuilder
+     */
+    public function getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition $definition)
+    {
+        $queryBuilder = $this->getByDefinitionQueryBuilder($definition);
+
+        return $this->getEntityManager()->createQueryBuilder()
+            ->update($definition->getRelatedEntity(), 'entity')
+            ->set('entity.workflowStep', $definition->getStartStep()->getId())
+            ->where('entity.workflowStep IS NULL')
+            ->andWhere('entity.workflowItem IS NULL OR entity.workflowItem IN (' . $queryBuilder->getDQL() . ')')
+            ->setParameters($queryBuilder->getParameters());
     }
 }

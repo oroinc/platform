@@ -152,12 +152,12 @@ class InstallCommand extends ContainerAwareCommand
                 array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
             )
             ->runCommand(
-                'oro:installer:fixtures:load',
-                array('--process-isolation' => true, '--no-interaction' => true)
-            )
-            ->runCommand(
                 'oro:workflow:definitions:load',
                 array('--process-isolation' => true)
+            )
+            ->runCommand(
+                'oro:installer:fixtures:load',
+                array('--process-isolation' => true, '--no-interaction' => true)
             );
 
         $output->writeln('');
