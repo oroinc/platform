@@ -297,15 +297,15 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
     public function formatDurationDataProvider()
     {
         return array(
-            array(
+            'default' => array(
                 'expected' => '1:01:01',
                 'value' => 3661,
                 'attributes' => array(),
                 'textAttributes' => array(),
                 'symbols' => array(),
-                'locale' => 'en_US'
+                'locale' => 'en'
             ),
-            array(
+            'with_words' => array(
                 'expected' => '1 hour, 1 minute, 1 second',
                 'value' => 3661,
                 'attributes' => array(),
@@ -314,6 +314,24 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
                 ),
                 'symbols' => array(),
                 'locale' => 'en_US'
+            ),
+            'with_words' => array(
+                'expected' => '1 hour, 1 minute, 1 second',
+                'value' => 3661,
+                'attributes' => array(),
+                'textAttributes' => array(
+                    \NumberFormatter::DEFAULT_RULESET => "%with-words"
+                ),
+                'symbols' => array(),
+                'locale' => 'en_US'
+            ),
+            'fix_for_localization_problems' => array(
+                'expected' => '01:01:01',
+                'value' => 3661,
+                'attributes' => array(),
+                'textAttributes' => array(),
+                'symbols' => array(),
+                'locale' => 'ru'
             ),
         );
     }
