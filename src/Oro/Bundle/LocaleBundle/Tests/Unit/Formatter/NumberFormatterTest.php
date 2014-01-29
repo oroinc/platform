@@ -4,6 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class NumberFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
