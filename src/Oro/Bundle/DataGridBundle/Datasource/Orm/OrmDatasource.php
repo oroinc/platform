@@ -51,7 +51,7 @@ class OrmDatasource implements DatasourceInterface
                     $this->qb = $qb;
                 } else {
                     throw new \Exception(
-                        sprintf('%s::%s() must return an instance of Docrine\Orm\QueryBuilder, %s given',
+                        sprintf('%s::%s() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
                             get_class($repository),
                             $method,
                             is_object($qb) ? get_class($qb) : gettype($qb)
