@@ -13,6 +13,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  */
 class ControllersTest extends WebTestCase
 {
+    const DEFAULT_USER_CALENDAR_ID = 1;
+
     /**
      * @var Client
      */
@@ -23,11 +25,25 @@ class ControllersTest extends WebTestCase
         $this->client = static::createClient(array(), ToolsAPI::generateBasicHeader());
     }
 
-    public function testIndex()
+    public function testDefault()
     {
         $crawler = $this->client->request('GET', $this->client->generate('oro_calendar_view_default'));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertEquals('My Calendar - John Doe', $crawler->filter('#page-title')->html());
+        $this->assertEquals('My Calendar - John Doe', $crawler->filter('title')->html());
+    }
+
+    public function testView()
+    {
+        $crawler = $this->client->request(
+            'GET',
+            $this->client->generate(
+                'oro_calendar_view',
+                array('id' => self::DEFAULT_USER_CALENDAR_ID)
+            )
+        );
+        $result = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertEquals('John Doe - Calendars - John Doe', $crawler->filter('#page-title')->html());
     }
 }
