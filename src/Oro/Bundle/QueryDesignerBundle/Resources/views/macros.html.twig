@@ -2,10 +2,7 @@
     {% set select2Options = {
         placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
     } %}
-    {% set util2Options = {
-        fieldsLabel: 'oro.entity.form.entity_fields'|trans,
-        relatedLabel: 'oro.entity.form.entity_related'|trans
-    } %}
+    {% set utilOptions = {} %}
     <div class="condition-builder left-panel-container">
         <div class="panel-placeholder">
             <div>
@@ -15,7 +12,7 @@
                         <ul class="criteria-list" id="filter-criteria-list">
                             <li class="option" data-criteria="condition-filed"
                                 data-select2="{{ select2Options|json_encode }}"
-                                data-util="{{ util2Options|json_encode }}"
+                                data-util="{{ utilOptions|json_encode }}"
                                 data-filter-metadata-selector="#{{ params.filters_metadata_holder_id }}">
                                 {{ 'oro.query_designer.condition_builder.criteria.conditions_field'|trans }}
                             </li>
@@ -157,5 +154,5 @@
 {% endmacro %}
 
 {% macro query_designer_column_chain_template(id) %}
-    <script type="text/html" id="{{ id }}"><% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b>&nbsp;<% if (index < list.length - 1) { %>><% } %><% }) %></script>
+    <script type="text/html" id="{{ id }}"><% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b><% if (index < list.length - 1) { %>&nbsp;><% } %><% }) %></script>
 {% endmacro %}
