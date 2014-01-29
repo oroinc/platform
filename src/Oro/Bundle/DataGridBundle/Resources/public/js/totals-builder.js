@@ -4,8 +4,9 @@ define(['jquery', 'underscore', 'oro/tools', 'oro/mediator'],
 function($, _, tools,  mediator) {
     'use strict';
     var initialized = false,
-        initHandler = function (collection, $el) {
-            collection.on('beforeReset', function(collection, resp){
+        initHandler = function (collection, $el, resp) {
+            collection.state.totals = resp.options.totals;;
+            collection.on('beforeReset', function (collection, resp){
                 collection.state.totals = resp.options.totals;
             });
             initialized = true;

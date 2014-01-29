@@ -75,7 +75,7 @@ function(_, Backbone, Navigation, mediator) {
             } else {
                 url = 'g/' + encodedStateData;
             }
-            this.navigate(url, { replace: true });
+            this.navigate(url);
         },
 
         /**
