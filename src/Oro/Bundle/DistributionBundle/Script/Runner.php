@@ -153,7 +153,7 @@ class Runner
      */
     public function loadFixtures(array $packages)
     {
-        return $this->executeBatchCommand($packages, 'oro:installer:fixtures:load');
+        return $this->runCommand('oro:installer:fixtures:load');
     }
 
     /**

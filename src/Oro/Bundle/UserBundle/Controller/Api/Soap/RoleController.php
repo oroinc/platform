@@ -60,7 +60,7 @@ class RoleController extends SoapController
      * @Soap\Method("deleteRole")
      * @Soap\Param("id", phpType="int")
      * @Soap\Result(phpType="boolean")
-     * @AclAncestor("oro_user_role_remove")
+     * @AclAncestor("oro_user_role_delete")
      */
     public function deleteAction($id)
     {

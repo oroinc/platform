@@ -375,10 +375,11 @@ class FixturesLoader extends Loader
                     if ($bundle == $bundleName) {
                         foreach ($fixtures as &$bundleFixture) {
                             if (get_class($bundleFixture->fixture) == $dependency) {
-                                $bundleFixture->iterator++;
+                                if (($fixtureData->iterator + 1) > $bundleFixture->iterator) {
+                                    $bundleFixture->iterator = $fixtureData->iterator + 1;
+                                }
                             }
                         }
-                        $fixtureData->iterator--;
                     } else {
                         //check dependency in include bundles
                         if (!empty($this->bundles) && !in_array($bundle, $this->bundles)) {

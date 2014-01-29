@@ -267,7 +267,7 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($result);
     }
 
-    public function testIsGrantedWithAclAnnotationId()
+    public function testIsGrantedWithAclAnnotationIdAndNoObject()
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $annotation = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Annotation\Acl')
@@ -295,6 +295,35 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
 
         $result = $this->facade->isGranted('TestAnnotation');
+        $this->assertTrue($result);
+    }
+
+    public function testIsGrantedWithAclAnnotationIdAndWithObject()
+    {
+        $obj = new \stdClass();
+        $annotation = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Annotation\Acl')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $annotation->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue('method_annotation'));
+        $annotation->expects($this->once())
+            ->method('getPermission')
+            ->will($this->returnValue('TEST_PERMISSION'));
+        $this->objectIdentityFactory->expects($this->never())
+            ->method('get');
+        $this->annotationProvider->expects($this->at(0))
+            ->method('findAnnotationById')
+            ->with('TestAnnotation')
+            ->will($this->returnValue($annotation));
+        $this->logger->expects($this->once())
+            ->method('debug');
+        $this->securityContext->expects($this->once())
+            ->method('isGranted')
+            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($obj))
+            ->will($this->returnValue(true));
+
+        $result = $this->facade->isGranted('TestAnnotation', $obj);
         $this->assertTrue($result);
     }
 
@@ -330,8 +359,10 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $obj = 'Entity:SomeClass';
-        $this->annotationProvider->expects($this->never())
-            ->method('findAnnotationById');
+        $this->annotationProvider->expects($this->once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->will($this->returnValue(false));
         $this->objectIdentityFactory->expects($this->at(0))
             ->method('get')
             ->with($this->equalTo($obj))
@@ -348,8 +379,10 @@ class SecurityFacadeTest extends \PHPUnit_Framework_TestCase
     public function testIsGrantedWithObject()
     {
         $obj = new \stdClass();
-        $this->annotationProvider->expects($this->never())
-            ->method('findAnnotationById');
+        $this->annotationProvider->expects($this->once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->will($this->returnValue(false));
         $this->securityContext->expects($this->once())
             ->method('isGranted')
             ->with($this->equalTo('PERMISSION'), $this->equalTo($obj))

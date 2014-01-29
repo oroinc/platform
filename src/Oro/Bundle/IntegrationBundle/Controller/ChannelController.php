@@ -102,9 +102,10 @@ class ChannelController extends Controller
                 $this->get('translator')->trans('oro.integration.controller.channel.message.saved')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
+            return $this->get('oro_ui.router')->redirectAfterSave(
                 ['route' => 'oro_integration_channel_update', 'parameters' => ['id' => $channel->getId()]],
-                ['route' => 'oro_integration_channel_index']
+                ['route' => 'oro_integration_channel_index'],
+                $channel
             );
         }
         $form = $this->getForm();
