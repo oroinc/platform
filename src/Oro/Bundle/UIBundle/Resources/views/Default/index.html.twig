@@ -4,7 +4,6 @@
     <head>
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
-            <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
             <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
             {% block head_style %}
                 {% if oro_theme_icon() %}
@@ -19,7 +18,10 @@
                 {% endblock %}
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
                 <script type="text/javascript">
-                    require(['oro/init-layout', 'oro/init-user', 'oro/widget-manager', 'jquery.uniform']);
+                    require(['oro/layout', 'oro/init-layout', 'oro/init-user', 'oro/widget-manager',
+                            'jquery.uniform'], function (layout) {
+                        layout.setDocumentTitle('{{ oro_title_render() }}');
+                    });
                 {% if isMobileVersion() %}
                     require(['oro/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
