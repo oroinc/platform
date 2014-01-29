@@ -30,7 +30,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->client->generate('oro_calendar_view_default'));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertEquals('My Calendar - John Doe', $crawler->filter('title')->html());
+        $this->assertEquals('My Calendar - John Doe', $crawler->filter('#page-title')->html());
     }
 
     public function testView()

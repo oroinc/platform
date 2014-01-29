@@ -32,7 +32,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->client->generate('oro_report_index'));
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
-        $this->assertEquals('Manage Custom Reports - Reports', $crawler->filter('title')->html());
+        $this->assertEquals('Manage Custom Reports - Reports', $crawler->filter('#page-title')->html());
     }
 
     /**
