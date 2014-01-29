@@ -218,7 +218,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $workflowItem->expects($this->never())
-            ->method('setCurrentStepName');
+            ->method('setCurrentStep');
 
         $preCondition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface');
         $preCondition->expects($this->any())
@@ -260,12 +260,30 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransit($isFinal, $hasAllowedTransition)
     {
+        $currentStepEntity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $step = $this->getStepMock('currentStep', $isFinal, $hasAllowedTransition, $currentStepEntity);
+
+        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflowDefinition->expects($this->once())
+            ->method('getStepByName')
+            ->with($step->getName())
+            ->will($this->returnValue($currentStepEntity));
+
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
             ->getMock();
         $workflowItem->expects($this->once())
-            ->method('setCurrentStepName')
-            ->with('currentStep');
+            ->method('getDefinition')
+            ->will($this->returnValue($workflowDefinition));
+        $workflowItem->expects($this->once())
+            ->method('setCurrentStep')
+            ->with($currentStepEntity);
+
         if ($isFinal || !$hasAllowedTransition) {
             $workflowItem->expects($this->once())
                 ->method('setClosed')
@@ -292,8 +310,6 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->with($workflowItem);
 
-        $step = $this->getStepMock('currentStep', $isFinal, $hasAllowedTransition);
-
         $obj = new Transition();
         $obj->setPreCondition($preCondition);
         $obj->setCondition($condition);
@@ -314,7 +330,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function getStepMock($name, $isFinal = false, $hasAllowedTransitions = true)
+    protected function getStepMock($name, $isFinal = false, $hasAllowedTransitions = true, $stepEntity = null)
     {
         $step = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Step')
             ->disableOriginalConstructor()
@@ -328,6 +344,9 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $step->expects($this->any())
             ->method('hasAllowedTransitions')
             ->will($this->returnValue($hasAllowedTransitions));
+        $step->expects($this->any())
+            ->method('getEntity')
+            ->will($this->returnValue($stepEntity));
         return $step;
     }
 

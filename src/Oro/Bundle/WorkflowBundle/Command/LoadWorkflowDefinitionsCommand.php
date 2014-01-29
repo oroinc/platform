@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Oro\Bundle\WorkflowBundle\Configuration\ConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Configuration\ConfigurationWorkflowDefinitionBuilder;
+
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
@@ -20,11 +22,18 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:workflow:definitions:load')
-            ->setDescription('Load workflow definitions from specified package(s) to your database.')
-            ->addArgument(
-                'package',
-                InputArgument::IS_ARRAY,
-                'Package directories'
+            ->setDescription('Load workflow definitions from configuration files to the database')
+            ->addOption(
+                'directories',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Directories used to find configuration files'
+            )
+            ->addOption(
+                'workflows',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Names of the workflow definitions that should be loaded'
             );
     }
 
@@ -33,55 +42,50 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // prepare directories of specified packages
-        $packageDirectories = $input->getArgument('package');
-        foreach ($packageDirectories as $key => $packageDir) {
-            $packageDirectories[$key] = realpath($packageDir) . DIRECTORY_SEPARATOR;
-        }
+        $usedDirectories = $input->getOption('directories');
+        $usedDirectories = $usedDirectories ?: null;
 
-        // a function which allows filter workflow definitions by the given packages
-        $filterByPackage = function ($path) use (&$packageDirectories) {
-            if (empty($packageDirectories)) {
-                return true;
-            }
+        $usedWorkflows = $input->getOption('workflows');
+        $usedWorkflows = $usedWorkflows ?: null;
 
-            foreach ($packageDirectories as $packageDir) {
-                if (stripos($path, $packageDir) === 0) {
-                    return true;
+        $container = $this->getContainer();
+
+        /** @var WorkflowConfigurationProvider $configurationProvider */
+        $configurationProvider = $container->get('oro_workflow.configuration.provider.workflow_config');
+        $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration(
+            $usedDirectories,
+            $usedWorkflows
+        );
+
+        if ($workflowConfiguration) {
+            $output->writeln('Loading workflow definitions...');
+
+            /** @var EntityManager $manager */
+            $manager = $container->get('doctrine.orm.default_entity_manager');
+
+            /** @var WorkflowDefinitionConfigurationBuilder $configurationBuilder */
+            $configurationBuilder = $container->get('oro_workflow.configuration.builder.workflow_definition');
+            $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
+
+            /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
+            $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
+            foreach ($workflowDefinitions as $workflowDefinition) {
+                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));
+
+                /** @var WorkflowDefinition $existingWorkflowDefinition */
+                $existingWorkflowDefinition = $workflowDefinitionRepository->find($workflowDefinition->getName());
+
+                // workflow definition should be overridden if workflow definition with such name already exists
+                if ($existingWorkflowDefinition) {
+                    $existingWorkflowDefinition->import($workflowDefinition);
+                } else {
+                    $manager->persist($workflowDefinition);
                 }
             }
 
-            return false;
-        };
-
-        $output->writeln('Loading workflow definitions ...');
-
-        /** @var ConfigurationProvider $configurationProvider */
-        $configurationProvider = $this->getContainer()->get('oro_workflow.configuration.config_provider');
-        /** @var ConfigurationWorkflowDefinitionBuilder $configurationBuilder */
-        $configurationBuilder = $this->getContainer()->get('oro_workflow.configuration.builder.workflow_definition');
-        /** @var EntityManager $manager */
-        $manager = $this->getContainer()->get('doctrine.orm.default_entity_manager');
-
-        $workflowConfiguration = $configurationProvider->getWorkflowDefinitionConfiguration($filterByPackage);
-        $workflowDefinitions = $configurationBuilder->buildFromConfiguration($workflowConfiguration);
-
-        /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
-        $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
-        foreach ($workflowDefinitions as $workflowDefinition) {
-            $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));
-
-            /** @var WorkflowDefinition $existingWorkflowDefinition */
-            $existingWorkflowDefinition = $workflowDefinitionRepository->find($workflowDefinition->getName());
-
-            // workflow definition should be overridden if workflow definition with such name already exists
-            if ($existingWorkflowDefinition) {
-                $existingWorkflowDefinition->import($workflowDefinition);
-            } else {
-                $manager->persist($workflowDefinition);
-            }
+            $manager->flush();
+        } else {
+            $output->writeln('No workflow definitions found.');
         }
-
-        $manager->flush();
     }
 }

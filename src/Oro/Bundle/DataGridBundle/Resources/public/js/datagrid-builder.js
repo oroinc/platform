@@ -121,7 +121,6 @@ define(function (require) {
             afterBuild: function () {
                 mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
                 this.grid.collection.reset(this.$el.data('data'), collectionOptions);
-                this.grid.collection.reset(this.$el.data('data'), collectionOptions);
             },
 
             /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Validator\Constraints;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
@@ -40,9 +41,11 @@ class TransitionIsAllowedValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('getWorkflowName')
             ->will($this->returnValue($workflowName));
 
+        $currentStep = new WorkflowStep();
+        $currentStep->setName('test_step');
         $workflowItem->expects($this->any())
-            ->method('getCurrentStepName')
-            ->will($this->returnValue('test_step'));
+            ->method('getCurrentStep')
+            ->will($this->returnValue($currentStep));
 
         $transitionName = 'test_transition';
         $constraint = new TransitionIsAllowed($workflowItem, $transitionName);

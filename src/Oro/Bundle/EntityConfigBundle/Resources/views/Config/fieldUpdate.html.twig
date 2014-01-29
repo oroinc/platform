@@ -13,8 +13,7 @@
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
-        {{ UI.button({'path' : path('oro_entityconfig_view', {id: field.entity.id}), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
-
+        {{ UI.cancelButton(path('oro_entityconfig_view', {id: field.entity.id})) }}
         {{ UI.saveAndStayButton() }}
         {{ UI.saveAndCloseButton() }}
     {% endif %}

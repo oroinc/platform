@@ -118,7 +118,7 @@ class RoleController extends RestController implements ClassResourceInterface
      *      }
      * )
      * @Acl(
-     *      id="oro_user_role_remove",
+     *      id="oro_user_role_delete",
      *      type="entity",
      *      class="OroUserBundle:Role",
      *      permission="DELETE"

@@ -46,6 +46,7 @@ class ReplacePropertyPath implements ConfigurationPassInterface
     protected function isStringPropertyPath($path)
     {
         return is_string($path)
+            && strpos($path, '$') === 0
             && preg_match('/^\$\.?[a-zA-Z_\x7f-\xff][\.a-zA-Z0-9_\x7f-\xff\[\]]*$/', $path);
     }
 

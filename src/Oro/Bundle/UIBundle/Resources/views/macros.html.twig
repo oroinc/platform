@@ -110,6 +110,16 @@
 {% endmacro %}
 
 {#
+    Create 'Cancel' button
+    Parameters
+        'path' - button url
+        'label' - button label | 'Cancel' by default
+#}
+{% macro cancelButton(path, label = 'Cancel') %}
+    {{ _self.button({'path' : path, 'title' : label, 'label' : label}) }}
+{% endmacro %}
+
+{#
     Create 'Edit' button
     Parameters - array:
         [
@@ -277,10 +287,8 @@
     {{ _self.buttonType({'type': 'submit', 'class': 'btn-success', 'label': label}) }}
 {% endmacro %}
 
-{% macro saveAndStayButton(acl = '', label = 'Save') %}
-    {% if acl is empty or resource_granted(acl) %}
+{% macro saveAndStayButton(label = 'Save') %}
     {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
-    {% endif %}
 {% endmacro %}
 
 {#

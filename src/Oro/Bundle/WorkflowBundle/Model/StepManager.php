@@ -52,7 +52,7 @@ class StepManager
     }
 
     /**
-     * @return Collection
+     * @return Collection|Step[]
      */
     public function getSteps()
     {

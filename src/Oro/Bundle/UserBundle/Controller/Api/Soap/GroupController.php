@@ -58,7 +58,7 @@ class GroupController extends SoapController
      * @Soap\Method("deleteGroup")
      * @Soap\Param("id", phpType="int")
      * @Soap\Result(phpType="boolean")
-     * @AclAncestor("oro_user_group_remove")
+     * @AclAncestor("oro_user_group_delete")
      */
     public function deleteAction($id)
     {
