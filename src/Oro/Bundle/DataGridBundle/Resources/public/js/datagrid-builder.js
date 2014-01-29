@@ -95,7 +95,7 @@ define(function (require) {
                 } else {
                     // otherwise, create collection from metadata
                     options = methods.combineCollectionOptions.call(this);
-                    collection = new PageableCollection([], options);
+                    collection = new PageableCollection(this.$el.data('data'), options);
                     collectionOptions = _.extend({}, options);
                 }
 
@@ -119,8 +119,7 @@ define(function (require) {
              * After build
              */
             afterBuild: function () {
-                mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
-                this.grid.collection.reset(this.$el.data('data'), collectionOptions);
+                mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el, this.$el.data('data'));
             },
 
             /**
