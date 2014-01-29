@@ -104,7 +104,7 @@ class AddressNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     protected function createRegion($code, Country $country)
     {
-        $result = new Region($country->getIso2Code() . '.' . $code);
+        $result = new Region($country->getIso2Code() . Region::SEPARATOR . $code);
         $result->setCode($code);
         return $result;
     }

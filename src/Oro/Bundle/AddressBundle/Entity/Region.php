@@ -25,6 +25,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Region implements Translatable
 {
+    const SEPARATOR = '-';
+
     /**
      * @var string
      *
