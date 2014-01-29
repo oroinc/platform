@@ -45,25 +45,40 @@
     {% set id = 'embedded-form' %}
 
     {% set dataBlocks = [{
-        'title': 'General'|trans,
-        'class': 'active',
-        'subblocks': [
-            {
-            'title': 'Embedded Form'|trans,
-                'data': [
-                    form_row(form.title),
-                    form_row(form.formType),
-                    form_row(form.channel),
+    'title': 'General'|trans,
+    'class': 'active',
+    'subblocks': [
+    {
+    'title': 'Embedded Form'|trans,
+    'data': [
+    form_row(form.title),
+    form_row(form.formType),
+    form_row(form.channel),
     form_row(form.css, {'attr':{'class': 'span12' }}),
     form_row(form.successMessage)
     ]
     }
-        ]
+    ]
     }] %}
 
     {% set data = {
     'formErrors': form_errors(form)? form_errors(form) : null,
     'dataBlocks': dataBlocks
     } %}
+
+    <script type="text/javascript">
+        require(['oro/embedded/watcher'],
+            function (EmbeddedFormWatcher) {
+                var forceDataLoading = !'{{ form.formType.vars.value }}';
+                new EmbeddedFormWatcher({
+                    formTypeFieldId: '{{ form.formType.vars.id }}',
+                    cssFieldId: '{{ form.css.vars.id }}',
+                    successMessageFieldId: '{{ form.successMessage.vars.id }}',
+                    defaultCss: '{{ defaultCss|escape('js') }}',
+                    defaultSuccessMessage: '{{ defaultSuccessMessage|raw }}'
+                }).startWatching(forceDataLoading);
+            });
+    </script>
+
     {{ parent() }}
 {% endblock content_data %}

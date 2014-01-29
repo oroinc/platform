@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use FOS\Rest\Util\Codes;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -47,6 +48,22 @@ class EmbeddedFormController extends Controller
         $em->flush();
 
         return new JsonResponse('', Codes::HTTP_OK);
+    }
+
+    /**
+     * @Route("default-data/{formType}", name="oro_embedded_form_default_data")
+     */
+    public function defaultDataAction($formType)
+    {
+        /** @var EmbeddedFormManager $formManager */
+        $formManager = $this->get('oro_embedded_form.manager');
+        $css = $formManager->getDefaultCssByType($formType);
+        $successMessage = $formManager->getDefaultSuccessMessageByType($formType);
+
+        return new JsonResponse([
+            'css' => $css,
+            'successMessage' => $successMessage
+        ], Codes::HTTP_OK);
     }
 
     /**
@@ -103,9 +120,12 @@ class EmbeddedFormController extends Controller
 
         }
 
-
+        /** @var EmbeddedFormManager $formManager */
+        $formManager = $this->get('oro_embedded_form.manager');
         return array(
             'entity' => $entity,
+            'defaultCss' => $formManager->getDefaultCssByType($entity->getFormType()),
+            'defaultSuccessMessage' => $formManager->getDefaultSuccessMessageByType($entity->getFormType()),
             'form' => $form->createView()
         );
     }

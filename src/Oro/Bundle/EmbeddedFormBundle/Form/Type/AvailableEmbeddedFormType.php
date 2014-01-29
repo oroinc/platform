@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class AvailableEmbeddedFormType extends AbstractType
 {
     /**
-     * @var \Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
+     * @var EmbeddedFormManager
      */
     protected $manager;
 
@@ -23,7 +23,7 @@ class AvailableEmbeddedFormType extends AbstractType
     }
 
     /**
-     * {@inhertidoc}
+     * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {

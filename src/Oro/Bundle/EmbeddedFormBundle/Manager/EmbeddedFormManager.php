@@ -3,18 +3,21 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
 
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 
 class EmbeddedFormManager
 {
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     * @var ContainerInterface
      */
     protected $container;
 
     /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
+     * @var FormFactoryInterface
      */
     protected $formFactory;
 
@@ -25,6 +28,7 @@ class EmbeddedFormManager
 
     /**
      * @param ContainerInterface $container
+     * @param FormFactoryInterface $formFactory
      */
     public function __construct(ContainerInterface $container, FormFactoryInterface $formFactory)
     {
@@ -36,19 +40,12 @@ class EmbeddedFormManager
      * @param $type
      * @param null $data
      * @param array $options
-     * @return \Symfony\Component\Form\FormInterface
+     * @return FormInterface
      */
     public function createForm($type, $data = null, $options = [])
     {
         $options = array_replace($options, ['channel_form_type' => 'oro_entity_identifier']);
-
-        if ($this->container->has($type)) {
-            return $this->formFactory->create($this->container->get($type), $data, $options);
-        }
-
-        if (class_exists($type)) {
-            return $this->formFactory->create(new $type, $data, $options);
-        }
+        $type = $this->getTypeInstance($type) ? : $type;
 
         return $this->formFactory->create($type, $data, $options);
     }
@@ -77,5 +74,52 @@ class EmbeddedFormManager
     public function getAll()
     {
         return $this->formTypes;
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     */
+    public function getDefaultCssByType($type)
+    {
+        $typeInstance = $this->getTypeInstance($type);
+
+        if ($typeInstance instanceof EmbeddedFormInterface) {
+            return $typeInstance->getDefaultCss();
+        }
+
+        return '';
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     */
+    public function getDefaultSuccessMessageByType($type)
+    {
+        $typeInstance = $this->getTypeInstance($type);
+
+        if ($typeInstance instanceof EmbeddedFormInterface) {
+            return $typeInstance->getDefaultSuccessMessage();
+        }
+
+        return '';
+    }
+
+    /**
+     * @param $type
+     * @return EmbeddedFormInterface|AbstractType
+     */
+    protected function getTypeInstance($type)
+    {
+        $typeInstance = null;
+        if ($this->container->has($type)) {
+            $typeInstance = $this->container->get($type);
+            return $typeInstance;
+        } elseif (class_exists($type)) {
+            $typeInstance = new $type();
+            return $typeInstance;
+        }
+        return $typeInstance;
     }
 }
