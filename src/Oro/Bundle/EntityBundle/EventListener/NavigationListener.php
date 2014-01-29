@@ -74,7 +74,9 @@ class NavigationListener
                     )
                 ) {
                     $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
-                    if (!$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())) {
+                    if (!$this->securityFacade->hasLoggedUser() ||
+                        !$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())
+                    ) {
                         continue;
                     }
 
