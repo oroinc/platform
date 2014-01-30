@@ -12,7 +12,7 @@ class RelatedEntityTest extends Selenium2TestCase
     public function testCreateRelatedEntity()
     {
         $entitydata = array(
-            'entityName' => 'OneToMany'.mt_rand(),
+            'entityName' => 'onetomany'.mt_rand(),
             'stringField' => 'string_field',
             'relationField' => 'one_to_many_field'
         );
