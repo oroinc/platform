@@ -42,7 +42,17 @@
                     {{ ui.renderProperty('oro.embedded_form.title.label'|trans, entity.title) }}
                     {{ ui.renderProperty('oro.embedded_form.form_type.label'|trans, entity.formType) }}
                     {{ ui.renderProperty('oro.embedded_form.channel.label'|trans, entity.channel.name) }}
-                    {{ ui.renderProperty('oro.embedded_form.css.label'|trans, entity.css|nl2br) }}
+
+                    {# to display css in a div with vertical scroll #}
+                    <div class="control-group">
+                        <label class="control-label">{{ 'oro.embedded_form.css.label'|trans }}</label>
+
+                        <div class="controls" style="overflow-y: scroll; height: 180px;">
+                            {{ entity.css|nl2br }}
+                        </div>
+                    </div>
+
+                    {{ ui.renderProperty('oro.embedded_form.successMessage.label'|trans, entity.successMessage|escape) }}
                 </div>
             </div>
         </div>
