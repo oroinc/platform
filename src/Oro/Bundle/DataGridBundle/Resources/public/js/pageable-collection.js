@@ -111,6 +111,10 @@ function(_, Backbone, BackbonePageableCollection, app) {
             this.on('remove', this.onRemove, this);
 
             BackbonePageableCollection.prototype.initialize.apply(this, arguments);
+
+            if (models.options) {
+                this.state.totals = models.options.totals;
+            }
         },
 
         /**
