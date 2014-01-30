@@ -22,6 +22,9 @@ class ConfigManager
      */
     protected $om;
 
+    /**
+     * @var EventDispatcher
+     */
     protected $eventDispatcher;
 
     /**

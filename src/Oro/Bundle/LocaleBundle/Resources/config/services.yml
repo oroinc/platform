@@ -125,7 +125,7 @@ services:
 
     oro_locale.language_listener:
         class: %oro_locale.language_listener.class%
-        argument:
+        arguments:
            - @oro_translation.downloadable_translation.metadata.cache
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
