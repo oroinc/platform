@@ -28,7 +28,7 @@ class EntityTest extends Selenium2TestCase
             ->save()
             ->assertMessage('Entity saved')
             ->createField()
-            ->setFieldName('Test_field')
+            ->setFieldName('test_field')
             ->setType('String')
             ->proceed()
             ->save()
@@ -58,7 +58,7 @@ class EntityTest extends Selenium2TestCase
             ->assertMessage('Entity saved')
             ->assertTitle($newEntityName .' - Entities - System')
             ->createField()
-            ->setFieldName('Test_field2')
+            ->setFieldName('test_field2')
             ->setType('Integer')
             ->proceed()
             ->save()
@@ -83,8 +83,8 @@ class EntityTest extends Selenium2TestCase
             ->open()
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
-            ->checkEntityField('Test_field')
-            ->checkEntityField('Test_field2');
+            ->checkEntityField('test_field')
+            ->checkEntityField('test_field2');
     }
 
     /**

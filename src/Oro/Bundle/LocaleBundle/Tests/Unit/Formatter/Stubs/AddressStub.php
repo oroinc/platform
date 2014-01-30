@@ -8,6 +8,21 @@ use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 class AddressStub implements AddressInterface, FullNameInterface
 {
     /**
+     * @var string
+     */
+    protected $regionCode;
+
+    /**
+     * @param string $code
+     * @return AddressStub
+     */
+    public function setRegionCode($code)
+    {
+        $this->regionCode = $code;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getFirstName()
@@ -94,7 +109,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      */
     public function getRegionCode()
     {
-        return 'NY';
+        return $this->regionCode;
     }
 
     /**
