@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
-class OrmTranslationMetadataCacheTest extends \PHPUnit_Framework_TestCase
+class DynamicTranslationMetadataCacheTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var OrmTranslationMetadataCache */
+    /** @var DynamicTranslationMetadataCache */
     protected $metadataCache;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -17,7 +17,7 @@ class OrmTranslationMetadataCacheTest extends \PHPUnit_Framework_TestCase
         $this->cacheImpl = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->setMethods(['fetch', 'save'])
             ->getMockForAbstractClass();
-        $this->metadataCache = new OrmTranslationMetadataCache($this->cacheImpl);
+        $this->metadataCache = new DynamicTranslationMetadataCache($this->cacheImpl);
     }
 
     public function testTimestamp()

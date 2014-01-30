@@ -17,8 +17,10 @@ class OrmTranslationResourceTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->locale = 'uk';
-        $this->metaCache = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache')
+        $this->locale    = 'uk';
+        $this->metaCache = $this->getMockBuilder(
+            'Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 

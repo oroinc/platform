@@ -3,24 +3,15 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 
-class OrmTranslationResource implements ResourceInterface, DynamicResourceInterface
+class DownloadableTranslationResource implements ResourceInterface, DynamicResourceInterface
 {
-    /**
-     * @var string
-     */
-    protected $locale;
-
-    /**
-     * @var DynamicTranslationMetadataCache
-     */
-    protected $metadataCache;
+    const RESOURCE_PREFIX = 'downloadable_';
 
     /**
      * Constructor
      *
-     * @param string                      $locale
+     * @param string                          $locale
      * @param DynamicTranslationMetadataCache $metadataCache
      */
     public function __construct(
@@ -46,7 +37,7 @@ class OrmTranslationResource implements ResourceInterface, DynamicResourceInterf
      */
     public function getResource()
     {
-        return Translation::ENTITY_NAME . $this->locale;
+        return self::RESOURCE_PREFIX . $this->locale;
     }
 
     /**
@@ -54,6 +45,6 @@ class OrmTranslationResource implements ResourceInterface, DynamicResourceInterf
      */
     public function __toString()
     {
-        return Translation::ENTITY_NAME . $this->locale;
+        return self::RESOURCE_PREFIX . $this->locale;
     }
 }
