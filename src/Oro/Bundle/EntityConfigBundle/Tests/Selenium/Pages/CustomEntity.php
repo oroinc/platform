@@ -85,8 +85,9 @@ class CustomEntity extends AbstractPageEntity
 
     public function setStringField($fieldname, $value)
     {
+        $label = ucfirst($fieldname);
         $field = $this->test->byXpath(
-            "//div[@class='control-group']/label[normalize-space(text()) = '{$fieldname}']" .
+            "//div[@class='control-group']/label[normalize-space(text()) = '{$label}']" .
             "/following-sibling::div/input"
         );
         $field->clear();
