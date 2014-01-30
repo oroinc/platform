@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
 
+use Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormTypeInterface;
 use Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -104,6 +105,22 @@ class EmbeddedFormManager
         }
 
         return '';
+    }
+
+    /**
+     * @param string $type
+     * @return string
+     */
+    public function getCustomFormLayoutByFormType($type)
+    {
+        $typeInstance = $this->getTypeInstance($type);
+
+        if ($typeInstance instanceof CustomLayoutFormTypeInterface) {
+            return $typeInstance->geFormLayout();
+        }
+
+        return '';
+
     }
 
     /**

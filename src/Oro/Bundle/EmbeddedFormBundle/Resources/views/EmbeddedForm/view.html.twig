@@ -61,7 +61,7 @@
     <div class="widget-content">
         <iframe
             src="{{ url('oro_embedded_form_submit', {'id': entity.id}) }}"
-            width="450"
+            width="640"
             height="800"
             frameborder="0"></iframe>
     </div>
@@ -76,8 +76,8 @@
         container: 'embedded-form-container-{{ entity.id }}',
         iframe: {
             src: "{{ url('oro_embedded_form_submit', {'id': entity.id}) }}",
-            width: 450,
-            height: 600,
+            width: 640,
+            height: 800,
             frameBorder: 0
         }
     });

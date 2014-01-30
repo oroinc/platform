@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use OroCRM\Bundle\ContactUsBundle\Entity\ContactRequest;
 use OroCRM\Bundle\ContactUsBundle\Form\Type\ContactRequestType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -23,8 +24,10 @@ class EmbedFormController extends Controller
     {
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
+        /** @var EmbeddedFormManager $formManager */
+        $formManager = $this->get('oro_embedded_form.manager');
 
-        $form = $this->get('oro_embedded_form.manager')->createForm($formEntity->getFormType());
+        $form = $formManager->createForm($formEntity->getFormType());
         $form->handleRequest($request);
         if ($form->isValid()) {
             $entity = $form->getData();
@@ -37,7 +40,8 @@ class EmbedFormController extends Controller
 
         return [
             'form' => $form->createView(),
-            'formEntity' => $formEntity
+            'formEntity' => $formEntity,
+            'customFormLayout' => $formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
         ];
     }
 

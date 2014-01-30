@@ -10,6 +10,5 @@
 {% endblock %}
 
 {% block page %}
-    <h3>Form</h3>
-    {{ form(form, {'attr': {'id': form.vars.name, 'novalidate': 'novalidate' }}) }}
+    {% include [customFormLayout, 'OroEmbeddedFormBundle:EmbedForm:formLayout.html.twig'] with {'form': form} %}
 {% endblock %}
