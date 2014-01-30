@@ -3,6 +3,7 @@ parameters:
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
     oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
     oro_translation.database_translation.loader.class:          Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
+    oro_translation.downloadable_translation.loader.class:      Oro\Bundle\TranslationBundle\Translation\DownloadableFakeLoader
     oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
     oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
@@ -91,6 +92,13 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: translation.loader, alias: oro_database_translation }
+
+    oro_translation.downloadable_translation.loader:
+        class: %oro_translation.downloadable_translation.loader.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: translation.loader, alias: oro_downloadable_translation }
 
     oro_translation.cache:
           parent: oro.cache.abstract
