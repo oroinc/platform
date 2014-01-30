@@ -5,7 +5,7 @@ function($, _, tools,  mediator) {
     'use strict';
     var initialized = false,
         initHandler = function (collection, $el) {
-            collection.on('beforeReset', function(collection, resp){
+            collection.on('beforeReset', function (collection, resp){
                 collection.state.totals = resp.options.totals;
             });
             initialized = true;
