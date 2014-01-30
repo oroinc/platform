@@ -51,7 +51,6 @@ class ApplyController extends Controller
         $commands = array(
             'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
             'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
-            'searchIndex'  => new Process($console . ' oro:search:create-index --env ' . $env),
         );
 
         // put system in maintenance mode
@@ -64,9 +63,21 @@ class ApplyController extends Controller
             $this->get('oro_platform.maintenance')
         );
 
+        $exitCode = 0;
         foreach ($commands as $command) {
             /** @var $command Process */
-            $command->run();
+            $code = $command->run();
+            if ($code !== 0) {
+                $exitCode = $code;
+            }
+        }
+
+        $flashBag = $this->get('session')->getFlashBag();
+        if ($exitCode === 0) {
+            $flashBag->add(
+                'success',
+                $this->get('translator')->trans('oro.entity_config.controller.config_entity.message.update')
+            );
         }
 
         /**

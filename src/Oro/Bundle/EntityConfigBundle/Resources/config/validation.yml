@@ -3,39 +3,30 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
             - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: [fieldName, entity]
         properties:
             fieldName:
-                - NotBlank:     ~
-                - Regex:         "/^[a-z]+[a-z0-9_]*$/i"
+                - NotBlank:  ~
+                - Regex:
+                    pattern: "/^[a-z]+[a-z0-9_]*$/"
+                    message: Value is not valid. You can use only lower alphabetic symbols, underscore and numbers
+                - Regex:
+                    pattern: "/^id$/i"
+                    match:   false
+                    message: Value is not valid. You cann't use 'id' as field name
                 - Length:
-                    min:        2
-                    max:        50
+                    min:     2
+                    max:     50
             type:
-                - NotBlank:     ~
-#                - Choice:
-#                    choices:
-#                        - string
-#                        - integer
-#                        - smallint
-#                        - bigint
-#                        - boolean
-#                        - decimal
-#                        - date
-#                        - text
-#                        - float
-#                        - oneToMany
-#                        - manyToOne
-#                        - manyToMany
-#                    message:  Choose a valid Data Type.
+                - NotBlank:  ~
 
 Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel:
         constraints:
             - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: [className]
         properties:
             className:
-                - NotBlank:     ~
+                - NotBlank:  ~
                 - Regex:
                     pattern: "/^[a-z]+[a-z0-9]*$/i"
-                    message: Value is not valid. Yoy can use only alphabetical symbols and numbers
+                    message: Value is not valid. You can use only lower alphabetic symbols, underscore and numbers
                 - Length:
-                    min:        5
-                    max:        50
+                    min:     5
+                    max:     50
 

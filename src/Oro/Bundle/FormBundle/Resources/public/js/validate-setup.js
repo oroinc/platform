@@ -165,7 +165,7 @@ function($, _, __, tools) {
         unhighlight: function(element) {
             var $el = $(element);
             $el.closest('.error').removeClass('error')
-                .closest('.control').removeClass('validation-error');
+                .closest('.controls').removeClass('validation-error');
             $el.closest('.control-group').find('label').removeClass('validation-error');
         },
         // ignore all invisible elements except input type=hidden

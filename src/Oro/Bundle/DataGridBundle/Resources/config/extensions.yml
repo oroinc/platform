@@ -8,6 +8,7 @@ parameters:
     oro_datagrid.extension.mass_action.class:      Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionExtension
     oro_datagrid.extension.views.class:            Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension
     oro_datagrid.extension.export.class:           Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension
+    oro_datagrid.extension.totals.class:           Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension
 
 services:
     oro_datagrid.extension.formatter:
@@ -71,5 +72,15 @@ services:
         class: %oro_datagrid.extension.export.class%
         arguments:
             - @translator
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.totals:
+        class: %oro_datagrid.extension.totals.class%
+        arguments:
+            - @translator
+            - @oro_locale.formatter.number
+            - @oro_locale.formatter.date_time
+            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: oro_datagrid.extension }

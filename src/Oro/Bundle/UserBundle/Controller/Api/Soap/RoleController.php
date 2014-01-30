@@ -60,7 +60,7 @@ class RoleController extends SoapController
      * @Soap\Method("deleteRole")
      * @Soap\Param("id", phpType="int")
      * @Soap\Result(phpType="boolean")
-     * @AclAncestor("oro_user_role_remove")
+     * @AclAncestor("oro_user_role_delete")
      */
     public function deleteAction($id)
     {
@@ -118,5 +118,13 @@ class RoleController extends SoapController
     public function getFormHandler()
     {
         return $this->container->get('oro_user.form.handler.role.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->container->get('oro_user.role.handler.delete');
     }
 }

@@ -114,7 +114,7 @@ class LoginFormTest extends Selenium2TestCase
         $actualResult = $this->byXPath("//div[contains(@class,'alert')]/div")->text();
 
         $this->assertEquals('Login', $this->title());
-        $this->assertEquals("Bad credentials", $actualResult);
+        $this->assertEquals("Invalid user name or password.", $actualResult);
     }
 
     /**

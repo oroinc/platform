@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\Step;
@@ -33,14 +34,14 @@ class StepTest extends \PHPUnit_Framework_TestCase
 
     public function propertiesDataProvider()
     {
+        $entity = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep')
+            ->disableOriginalConstructor()
+            ->getMock();
         return array(
             'name' => array('name', 'test'),
             'order' => array('order', 1),
-            'template' => array('template', 'test'),
             'allowedTransitions' => array('allowedTransitions', array('one', 'two')),
             'label' => array('label', 'Value'),
-            'form_type' => array('formType', 'custom_workflow_step'),
-            'form_options' => array('formOptions', array('one', 'two')),
         );
     }
 
@@ -83,16 +84,5 @@ class StepTest extends \PHPUnit_Framework_TestCase
         // Check isAllowed
         $this->assertTrue($this->step->isAllowedTransition('test'), 'Expected transition not allowed');
         $this->assertFalse($this->step->isAllowedTransition('test2'), 'Unexpected transition allowed');
-    }
-
-    public function testSetGetViewAttributes()
-    {
-        $viewAttributes = array(
-            array('attribute' => 'foo'),
-            array('attribute' => 'bar')
-        );
-        $this->step->setViewAttributes($viewAttributes);
-
-        $this->assertEquals($viewAttributes, $this->step->getViewAttributes());
     }
 }

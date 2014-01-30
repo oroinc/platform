@@ -42,7 +42,7 @@ class EntityReader extends IteratorBasedReader
             $this->setSourceQueryBuilder($context->getOption('queryBuilder'));
         } elseif ($context->hasOption('query')) {
             $this->setSourceQuery($context->getOption('query'));
-        } elseif (!$this->sourceIterator) {
+        } elseif (!$this->getSourceIterator()) {
             throw new InvalidConfigurationException(
                 'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
             );
@@ -54,7 +54,7 @@ class EntityReader extends IteratorBasedReader
      */
     public function setSourceQueryBuilder(QueryBuilder $queryBuilder)
     {
-        $this->sourceIterator = new BufferedQueryResultIterator($queryBuilder);
+        $this->setSourceIterator(new BufferedQueryResultIterator($queryBuilder));
     }
 
     /**
@@ -62,7 +62,7 @@ class EntityReader extends IteratorBasedReader
      */
     public function setSourceQuery(Query $query)
     {
-        $this->sourceIterator = new BufferedQueryResultIterator($query);
+        $this->setSourceIterator(new BufferedQueryResultIterator($query));
     }
 
     /**

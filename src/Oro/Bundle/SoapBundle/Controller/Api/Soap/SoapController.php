@@ -4,11 +4,14 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
 use Doctrine\Common\Collections\Collection;
 
+use Doctrine\ORM\EntityNotFoundException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 abstract class SoapController extends SoapGetController implements
     FormAwareInterface,
@@ -39,11 +42,13 @@ abstract class SoapController extends SoapGetController implements
      */
     public function handleDeleteRequest($id)
     {
-        $entity = $this->getEntity($id);
-
-        $em = $this->getManager()->getObjectManager();
-        $em->remove($entity);
-        $em->flush();
+        try {
+            $this->getDeleteHandler()->handleDelete($id, $this->getManager());
+        } catch (EntityNotFoundException $notFoundEx) {
+            throw new \SoapFault('NOT_FOUND', sprintf('Record with ID "%s" can not be found', $id));
+        } catch (ForbiddenException $forbiddenEx) {
+            throw new \SoapFault('FORBIDDEN', $forbiddenEx->getMessage());
+        }
 
         return true;
     }
@@ -115,6 +120,16 @@ abstract class SoapController extends SoapGetController implements
     protected function fixFormData(array &$data, $entity)
     {
         return false;
+    }
+
+    /**
+     * Gets an object responsible to delete an entity.
+     *
+     * @return DeleteHandler
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->container->get('oro_soap.handler.delete');
     }
 
     /**

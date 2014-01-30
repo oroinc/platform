@@ -58,7 +58,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $iterator->expects($this->at(10))->method('valid')->will($this->returnValue(false));
         $iterator->expects($this->at(11))->method('valid')->will($this->returnValue(false));
 
-        $this->reader->setSourceIterator($iterator);
+        $this->reader->setSomeSourceIterator($iterator);
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
         $context->expects($this->exactly(3))->method('incrementReadOffset');
@@ -84,7 +84,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
         $iterator = new \ArrayIterator(array($fooEntity, $barEntity, $bazEntity));
 
-        $this->reader->setSourceIterator($iterator);
+        $this->reader->setSomeSourceIterator($iterator);
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
         $context->expects($this->exactly(3))->method('incrementReadOffset');

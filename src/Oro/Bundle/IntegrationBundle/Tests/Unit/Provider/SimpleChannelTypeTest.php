@@ -24,7 +24,7 @@ class SimpleChannelTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testTransport()
     {
-        $this->assertInstanceOf('Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface', $this->channelType);
+        $this->assertInstanceOf('Oro\Bundle\IntegrationBundle\Provider\ChannelInterface', $this->channelType);
         $this->assertNotEmpty($this->channelType->getLabel());
     }
 }

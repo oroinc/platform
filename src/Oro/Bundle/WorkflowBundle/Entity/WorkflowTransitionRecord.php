@@ -5,8 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * WorkflowTransitionRecord
- *
  * @ORM\Table(name="oro_workflow_transition_log")
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
@@ -36,18 +34,20 @@ class WorkflowTransitionRecord
     protected $transitionName;
 
     /**
-     * @var string
+     * @var WorkflowStep
      *
-     * @ORM\Column(name="step_from", type="string", length=255, nullable=true)
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="step_from_id", referencedColumnName="id")
      */
-    protected $stepFromName;
+    protected $stepFrom;
 
     /**
-     * @var string
+     * @var WorkflowStep
      *
-     * @ORM\Column(name="step_to", type="string", length=255)
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="step_to_id", referencedColumnName="id")
      */
-    protected $stepToName;
+    protected $stepTo;
 
     /**
      * @var \DateTime
@@ -65,39 +65,39 @@ class WorkflowTransitionRecord
     }
 
     /**
-     * @param string $stepFromName
+     * @param WorkflowStep $stepFrom
      * @return WorkflowTransitionRecord
      */
-    public function setStepFromName($stepFromName)
+    public function setStepFrom($stepFrom)
     {
-        $this->stepFromName = $stepFromName;
+        $this->stepFrom = $stepFrom;
         return $this;
     }
 
     /**
-     * @return string
+     * @return WorkflowStep
      */
-    public function getStepFromName()
+    public function getStepFrom()
     {
-        return $this->stepFromName;
+        return $this->stepFrom;
     }
 
     /**
-     * @param string $stepToName
+     * @param WorkflowStep $stepTo
      * @return WorkflowTransitionRecord
      */
-    public function setStepToName($stepToName)
+    public function setStepTo($stepTo)
     {
-        $this->stepToName = $stepToName;
+        $this->stepTo = $stepTo;
         return $this;
     }
 
     /**
-     * @return string
+     * @return WorkflowStep
      */
-    public function getStepToName()
+    public function getStepTo()
     {
-        return $this->stepToName;
+        return $this->stepTo;
     }
 
     /**

@@ -4,123 +4,67 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 class WorkflowItemRepository extends EntityRepository
 {
     /**
-     * Get workflow items associated with entity.
+     * Get workflow item associated with entity.
      *
      * @param string $entityClass
-     * @param string|array $entityIdentifier
-     * @param string|null $workflowName
-     * @param string|null $workflowType
-     * @return array
+     * @param int $entityIdentifier
+     * @return WorkflowItem|null
      */
-    public function findByEntityMetadata($entityClass, $entityIdentifier, $workflowName = null, $workflowType = null)
+    public function findByEntityMetadata($entityClass, $entityIdentifier)
     {
-        $entityIdentifierString = WorkflowBindEntity::convertIdentifiersToString($entityIdentifier);
-
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('wi')
-            ->from('OroWorkflowBundle:WorkflowItem', 'wi')
-            ->innerJoin('wi.bindEntities', 'wbe')
-            ->where('wbe.entityClass = :entityClass')
-            ->andWhere('wbe.entityId = :entityId')
-            ->setParameter('entityClass', $entityClass)
-            ->setParameter('entityId', $entityIdentifierString);
-
-        if ($workflowName) {
-            $qb->andWhere('wi.workflowName = :workflowName')
-                ->setParameter('workflowName', $workflowName);
-        }
-
-        if ($workflowType) {
-            $qb->innerJoin('wi.definition', 'wd')
-                ->andWhere('wd.type = :workflowType')
-                ->setParameter('workflowType', $workflowType);
-        }
-
-        return $qb->getQuery()->getResult();
+        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier);
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
-     * Get data for funnel chart
-     *
-     * @param $entityClass
-     * @param $fieldName
-     * @param array $visibleSteps
-     * @param AclHelper $aclHelper
-     * @param \DateTime $dateStart
-     * @param \DateTime $dateEnd
-     * @return array
+     * @param string $entityClass
+     * @param int $entityIdentifier
+     * @return QueryBuilder
      */
-    public function getFunnelChartData(
-        $entityClass,
-        $fieldName,
-        $visibleSteps = [],
-        AclHelper $aclHelper = null,
-        \DateTime $dateStart = null,
-        \DateTime $dateEnd = null
-    ) {
-        $resultData = [];
-        $definition = $this->getEntityManager()
-            ->getRepository('OroWorkflowBundle:WorkflowDefinition')
-            ->findByEntityClass($entityClass);
+    protected function getWorkflowQueryBuilder($entityClass, $entityIdentifier)
+    {
+        $qb = $this->createQueryBuilder('wi')
+            ->innerJoin('wi.definition', 'wd')
+            ->where('wd.relatedEntity = :entityClass')
+            ->andWhere('wi.entityId = :entityId')
+            ->setParameter('entityClass', $entityClass)
+            ->setParameter('entityId', $entityIdentifier);
 
-        if (isset($definition[0])) {
-            $workFlow = $definition[0];
-            $qb = $this->getEntityManager()->createQueryBuilder();
-            $qb->select('wi.currentStepName', 'SUM(opp.' . $fieldName .') as budget')
-                ->from($entityClass, 'opp')
-                ->join(
-                    'OroWorkflowBundle:WorkflowBindEntity',
-                    'wbe',
-                    'WITH',
-                    'wbe.entityId = opp.id and wbe.entityClass = :entityClass'
-                )
-                ->join('wbe.workflowItem', 'wi')
-                ->andWhere('wi.workflowName = :workFlowName')
-                ->setParameter('entityClass', $entityClass)
-                ->setParameter('workFlowName', $workFlow->getName())
-                ->groupBy('wi.currentStepName');
+        return $qb;
+    }
 
-            if ($dateStart && $dateEnd) {
-                $qb->andWhere($qb->expr()->between('opp.createdAt', ':dateFrom', ':dateTo'))
-                    ->setParameter('dateFrom', $dateStart)
-                    ->setParameter('dateTo', $dateEnd);
-            }
+    /**
+     * @param WorkflowDefinition $definition
+     * @return QueryBuilder
+     */
+    public function getByDefinitionQueryBuilder(WorkflowDefinition $definition)
+    {
+        return $this->createQueryBuilder('workflowItem')
+            ->select('workflowItem.id')
+            ->where('workflowItem.definition = :definition')
+            ->setParameter('definition', $definition);
+    }
 
-            if ($aclHelper) {
-                $query = $aclHelper->apply($qb);
-            } else {
-                $query = $qb->getQuery();
-            }
-            $data = $query->getArrayResult();
+    /**
+     * @param WorkflowDefinition $definition
+     * @return QueryBuilder
+     */
+    public function getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition $definition)
+    {
+        $queryBuilder = $this->getByDefinitionQueryBuilder($definition);
 
-            if (!empty($data) || !empty($visibleSteps)) {
-                if (!empty($visibleSteps)) {
-                    $steps = $visibleSteps;
-                } else {
-                    $steps = array_keys($workFlow->getConfiguration()['steps']);
-                }
-                foreach ($steps as $stepName) {
-                    $stepLabel = $workFlow->getConfiguration()['steps'][$stepName]['label'];
-                    foreach ($data as $dataValue) {
-                        if ($dataValue['currentStepName'] == $stepName) {
-                            $resultData[$stepLabel] = (double)$dataValue['budget'];
-                        }
-                    }
-
-                    if (!isset($resultData[$stepLabel] )) {
-                        $resultData[$stepLabel] = 0;
-                    }
-                }
-            }
-        }
-
-        return $resultData;
+        return $this->getEntityManager()->createQueryBuilder()
+            ->update($definition->getRelatedEntity(), 'entity')
+            ->set('entity.workflowStep', $definition->getStartStep()->getId())
+            ->where('entity.workflowStep IS NULL')
+            ->andWhere('entity.workflowItem IS NULL OR entity.workflowItem IN (' . $queryBuilder->getDQL() . ')')
+            ->setParameters($queryBuilder->getParameters());
     }
 }

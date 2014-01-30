@@ -2,20 +2,41 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Oro\Bundle\IntegrationBundle\Entity\Transport;
 
-interface TransportInterface extends TransportTypeInterface
+interface TransportInterface
 {
     /**
-     * @param ParameterBag $settings
-     * @return mixed
+     * @param Transport $transportEntity
      */
-    public function init(ParameterBag $settings);
+    public function init(Transport $transportEntity);
 
     /**
-     * @param string $action
-     * @param array $params
+     * @param string       $action
+     * @param object|array $params
+     *
      * @return mixed
      */
-    public function call($action, array $params = []);
+    public function call($action, $params = []);
+
+    /**
+     * Returns label for UI
+     *
+     * @return string
+     */
+    public function getLabel();
+
+    /**
+     * Returns form type name needed to setup transport
+     *
+     * @return string
+     */
+    public function getSettingsFormType();
+
+    /**
+     * Returns entity name needed to store transport settings
+     *
+     * @return string
+     */
+    public function getSettingsEntityFQCN();
 }

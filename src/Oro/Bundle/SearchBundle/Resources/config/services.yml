@@ -11,6 +11,7 @@ parameters:
     oro_search.extension.formatter.property.search_result_property.class: Oro\Bundle\SearchBundle\Extension\SearchResultProperty
     oro_search.extension.search_results.class:          Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
 
+    oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
     oro_search.event_listener.search_results_grid_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchResultsGridListener
     oro_search.datasource.search.class:                 Oro\Bundle\SearchBundle\Extension\SearchDatasource
 
@@ -90,15 +91,13 @@ services:
         class: %oro_search.event_listener.search_results_grid_listener.class%
         arguments:
           - @oro_datagrid.datagrid.request_params
-          - @oro_search.index
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.search-grid, method: onBuildAfter }
 
     oro_search.datasource.search:
         class: %oro_search.datasource.search.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_security.acl_helper
+            - @oro_search.index
         tags:
             - { name: oro_datagrid.datasource, type: search }
 
@@ -112,3 +111,8 @@ services:
             - @oro_datagrid.datagrid.request_params
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_search.event_listener.update_schema_listener:
+        class: %oro_search.event_listener.update_schema_listener.class%
+        tags:
+          - { name: kernel.event_listener, event: console.terminate }

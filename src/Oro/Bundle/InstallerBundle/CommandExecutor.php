@@ -26,6 +26,11 @@ class CommandExecutor
     protected $application;
 
     /**
+     * @var int
+     */
+    protected $lastCommandExitCode;
+
+    /**
      * Constructor
      *
      * @param string|null     $env
@@ -87,12 +92,12 @@ class CommandExecutor
             foreach ($params as $param => $val) {
                 if ($param && '-' === $param[0]) {
                     if ($val === true) {
-                        $pb->add($param);
+                        $this->addParameter($pb, $param);
                     } else {
-                        $pb->add($param . '=' . $val);
+                        $this->addParameter($pb, $param, $val);
                     }
                 } else {
-                    $pb->add($val);
+                    $this->addParameter($pb, $val);
                 }
             }
 
@@ -106,24 +111,63 @@ class CommandExecutor
                     $output->write($data);
                 }
             );
-            $ret = $process->getExitCode();
+            $this->lastCommandExitCode = $process->getExitCode();
         } else {
             $this->application->setAutoExit(false);
-            $ret = $this->application->run(new ArrayInput($params), $this->output);
+            $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
         }
 
-        if (0 !== $ret) {
+        if (0 !== $this->lastCommandExitCode) {
             if ($ignoreErrors) {
                 $this->output->writeln(
-                    sprintf('<error>The command terminated with an error code: %u.</error>', $ret)
+                    sprintf(
+                        '<error>The command terminated with an exit code: %u.</error>',
+                        $this->lastCommandExitCode
+                    )
                 );
             } else {
                 throw new \RuntimeException(
-                    sprintf('The command terminated with an error status: %u.', $ret)
+                    sprintf('The command terminated with an exit code: %u.', $this->lastCommandExitCode)
                 );
             }
         }
 
         return $this;
+    }
+
+    /**
+     * Gets an exit code of last executed command
+     *
+     * @return int
+     */
+    public function getLastCommandExitCode()
+    {
+        return $this->lastCommandExitCode;
+    }
+
+    /**
+     * @param ProcessBuilder $processBuilder
+     * @param string $name
+     * @param array|string|null $value
+     */
+    protected function addParameter(ProcessBuilder $processBuilder, $name, $value = null)
+    {
+        $parameters = array();
+
+        if (null !== $value) {
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    $parameters[] = sprintf('%s=%s', $name, $item);
+                }
+            } else {
+                $parameters[] = sprintf('%s=%s', $name, $value);
+            }
+        } else {
+            $parameters[] = $name;
+        }
+
+        foreach ($parameters as $parameter) {
+            $processBuilder->add($parameter);
+        }
     }
 }

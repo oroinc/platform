@@ -114,7 +114,6 @@ class UpdateCommand extends InitCommand
             $commands = [
                 'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
                 'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
-                'searchIndex'  => new Process($console . ' oro:search:create-index --env ' . $env),
             ];
 
             // put system in maintenance mode
@@ -163,6 +162,8 @@ class UpdateCommand extends InitCommand
      * @param OutputInterface $output
      * @param bool            $force         Flag to update existing entity model
      *
+     * @throws \InvalidArgumentException
+     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function parseEntity($className, $entityOptions, $output, $force)
@@ -184,25 +185,27 @@ class UpdateCommand extends InitCommand
             $this->setDefaultConfig($entityOptions, $className);
 
             $entityConfig = $configProvider->getConfig($className);
-            $entityConfig->set(
-                'owner',
-                isset($entityOptions['owner']) ? $entityOptions['owner'] : ExtendManager::OWNER_SYSTEM
-            );
 
-            if (isset($entityOptions['owner']) && $entityOptions['owner'] == ExtendManager::OWNER_CUSTOM) {
+            list($mode, $owner, $isExtend) = $this->parseConfig($entityOptions);
+            $entityConfig
+                ->set('owner', $owner)
+                ->set('is_extend', $isExtend);
+
+            if ($owner == ExtendManager::OWNER_CUSTOM) {
                 $securityConfig = $this->configManager->getProvider('security')->getConfig($className);
                 $securityConfig->set('type', EntitySecurityMetadataProvider::ACL_SECURITY_TYPE);
             }
-
-            $entityConfig->set(
-                'is_extend',
-                isset($entityOptions['is_extend']) ? $entityOptions['is_extend'] : false
-            );
         } elseif ($force) {
             /**
              * update EXISTING entity model on --force
              */
             $this->setDefaultConfig($entityOptions, $className);
+        }
+
+        if (!isset($entityOptions['fields'])) {
+            throw new \InvalidArgumentException(
+                sprintf('Fields are not defined for "%s".', $className)
+            );
         }
 
         foreach ($entityOptions['fields'] as $fieldName => $fieldConfig) {
@@ -216,7 +219,7 @@ class UpdateCommand extends InitCommand
                 );
             }
 
-            list($mode, $owner, $isExtend) = $this->parseFieldConfig($fieldConfig);
+            list($mode, $owner, $isExtend) = $this->parseConfig($fieldConfig);
 
             $config = false;
             if (!(bool)$fieldExistingConfig) {
@@ -247,15 +250,15 @@ class UpdateCommand extends InitCommand
     }
 
     /**
-     * @param array $fieldConfig
+     * @param array $config
      * @return array
      */
-    protected function parseFieldConfig($fieldConfig)
+    protected function parseConfig($config)
     {
         return [
-            isset($fieldConfig['mode']) ? $fieldConfig['mode'] : ConfigModelManager::MODE_DEFAULT,
-            isset($fieldConfig['owner']) ? $fieldConfig['owner'] : ExtendManager::OWNER_SYSTEM,
-            isset($fieldConfig['is_extend']) ? $fieldConfig['is_extend'] : false,
+            isset($config['mode']) ? $config['mode'] : ConfigModelManager::MODE_DEFAULT,
+            isset($config['owner']) ? $config['owner'] : ExtendManager::OWNER_SYSTEM,
+            isset($config['is_extend']) ? $config['is_extend'] : false,
         ];
     }
 

@@ -159,8 +159,7 @@ function(_) {
         },
 
         _convertData: function (fields, entityName, parentFieldId) {
-            var resultFields = [];
-            var resultRelations = [];
+            var result = [];
             _.each(fields, _.bind(function (field) {
                 var fieldId = (null !== parentFieldId)
                     ? parentFieldId + '+' + entityName + '::' + field.name
@@ -168,14 +167,14 @@ function(_) {
                 if (_.isUndefined(field['related_entity_name'])) {
                     if (_.isUndefined(this.exclude)
                         || !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
-                        resultFields.push(_.extend({
+                        result.push(_.extend({
                             id: fieldId,
                             text: field.label
                         }, _.omit(field, ['label'])));
                     }
                 } else {
                     if (!_.isUndefined(field['related_entity_fields'])) {
-                        resultRelations.push(_.extend({
+                        result.push(_.extend({
                             text: field.label,
                             children: this._convertData(
                                 field['related_entity_fields'],
@@ -184,29 +183,13 @@ function(_) {
                             )
                         }, _.omit(field, ['label', 'related_entity_fields'])));
                     } else {
-                        resultRelations.push(_.extend({
+                        result.push(_.extend({
                             text: field.label
                         }, _.omit(field, ['label'])));
                     }
                 }
             }, this));
 
-            var result = [];
-            if (!_.isEmpty(resultFields)) {
-                if (null === parentFieldId && _.isEmpty(resultRelations)) {
-                    result = resultFields;
-                } else {
-                    result.push({
-                        text: this.fieldsLabel,
-                        children: resultFields
-                    });
-                }
-            }
-            if (!_.isEmpty(resultRelations)) {
-                _.each(resultRelations, function (val) {
-                    result.push(val);
-                });
-            }
             return result;
         }
     };

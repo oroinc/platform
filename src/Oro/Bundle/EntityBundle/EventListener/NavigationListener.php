@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -18,11 +16,6 @@ class NavigationListener
      */
     protected $securityFacade;
 
-    /**
-     * @var EntityManager|null
-     */
-    protected $em = null;
-
     /** @var ConfigProvider $entityConfigProvider */
     protected $entityConfigProvider = null;
 
@@ -33,21 +26,18 @@ class NavigationListener
     protected $translator;
 
     /**
-     * @param SecurityFacade $securityFacade
-     * @param EntityManager  $entityManager
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $entityExtendProvider
-     * @param Translator     $translator
+     * @param SecurityFacade      $securityFacade
+     * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider      $entityExtendProvider
+     * @param Translator          $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
-        EntityManager $entityManager,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $entityExtendProvider,
         Translator $translator
     ) {
         $this->securityFacade       = $securityFacade;
-        $this->em                   = $entityManager;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->entityExtendProvider = $entityExtendProvider;
         $this->translator           = $translator;
@@ -74,7 +64,10 @@ class NavigationListener
                     )
                 ) {
                     $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
-                    if (!$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())) {
+                    if (!class_exists($config->getId()->getClassName()) ||
+                        !$this->securityFacade->hasLoggedUser() ||
+                        !$this->securityFacade->isGranted('VIEW', 'entity:' . $config->getId()->getClassName())
+                    ) {
                         continue;
                     }
 

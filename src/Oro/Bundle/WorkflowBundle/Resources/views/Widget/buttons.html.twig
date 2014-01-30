@@ -1,0 +1,12 @@
+{% if resource_granted('oro_workflow') and has_workflow(entity) %}
+    {{
+        oro_widget_render({
+            'widgetType': 'buttons',
+            'url': path('oro_workflow_widget_buttons', {
+                entityClass: oro_class_name(entity),
+                entityId: entity.id
+            }),
+            'alias': 'workflow_buttons'
+        })
+    }}
+{% endif %}
