@@ -13,8 +13,8 @@ class RelatedEntityTest extends Selenium2TestCase
     {
         $entitydata = array(
             'entityName' => 'OneToMany'.mt_rand(),
-            'stringField' => 'String_field',
-            'relationField' => 'One_to_many_field'
+            'stringField' => 'string_field',
+            'relationField' => 'one_to_many_field'
         );
 
         $login = $this->login();
