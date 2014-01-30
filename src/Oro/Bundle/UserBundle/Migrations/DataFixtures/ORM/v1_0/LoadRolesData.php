@@ -4,16 +4,25 @@ namespace Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData;
 
-class LoadRolesData extends AbstractFixture
+class LoadRolesData extends AbstractFixture implements DependentFixtureInterface
 {
     const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
     const ROLE_USER = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
     const ROLE_MANAGER = 'ROLE_MANAGER';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return ['Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData'];
+    }
 
     /**
      * Load roles
