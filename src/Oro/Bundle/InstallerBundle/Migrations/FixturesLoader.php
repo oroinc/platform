@@ -219,30 +219,17 @@ class FixturesLoader extends Loader
             $fixture->setContainer($this->container);
         }
 
-        $reflection = new \ReflectionObject($this);
-        $parent     = $reflection->getParentClass();
-
-        $fixtureClass = get_class($fixture);
-
-        $fixturesReflection = $parent->getProperty('fixtures');
-        $fixturesReflection->setAccessible(true);
-        $fixtures = $fixturesReflection->getValue($this);
-
-        if (!isset($fixtures[$fixtureClass])) {
-            if ($fixture instanceof OrderedFixtureInterface) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Versioned fixtures does not support OrderedFixtureInterface.
-                        Use DependentFixtureInterface for ordering. Please fix %s fixture.',
-                        get_class($fixture)
-                    )
-                );
-            }
-
-            $fixtures[$fixtureClass] = $fixture;
+        if ($fixture instanceof OrderedFixtureInterface) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Versioned fixtures does not support OrderedFixtureInterface.
+                    Use DependentFixtureInterface for ordering. Please fix %s fixture.',
+                    get_class($fixture)
+                )
+            );
         }
 
-        $fixturesReflection->setValue($this, $fixtures);
+        parent::addFixture($fixture);
     }
 
     /**
