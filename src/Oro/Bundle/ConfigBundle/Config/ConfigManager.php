@@ -113,7 +113,7 @@ class ConfigManager
             self::SECTION_VIEW_SEPARATOR,
             $name
         );
-        $this->changedSettings[$changeKey] = ['value' => $value];
+        $this->changedSettings[$changeKey] = ['value' => $value, 'use_parent_scope_value' => false];
     }
 
     /**
