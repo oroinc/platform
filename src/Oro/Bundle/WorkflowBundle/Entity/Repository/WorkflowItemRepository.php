@@ -4,44 +4,67 @@ namespace Oro\Bundle\WorkflowBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowBindEntity;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
 class WorkflowItemRepository extends EntityRepository
 {
     /**
-     * Get workflow items associated with entity.
+     * Get workflow item associated with entity.
      *
      * @param string $entityClass
-     * @param string|array $entityIdentifier
-     * @param string|null $workflowName
-     * @param string|null $workflowType
-     * @return array
+     * @param int $entityIdentifier
+     * @return WorkflowItem|null
      */
-    public function findByEntityMetadata($entityClass, $entityIdentifier, $workflowName = null, $workflowType = null)
+    public function findByEntityMetadata($entityClass, $entityIdentifier)
     {
-        $entityIdentifierString = WorkflowBindEntity::convertIdentifiersToString($entityIdentifier);
+        $qb = $this->getWorkflowQueryBuilder($entityClass, $entityIdentifier);
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 
-        $qb = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('wi')
-            ->from('OroWorkflowBundle:WorkflowItem', 'wi')
-            ->innerJoin('wi.bindEntities', 'wbe')
-            ->where('wbe.entityClass = :entityClass')
-            ->andWhere('wbe.entityId = :entityId')
+    /**
+     * @param string $entityClass
+     * @param int $entityIdentifier
+     * @return QueryBuilder
+     */
+    protected function getWorkflowQueryBuilder($entityClass, $entityIdentifier)
+    {
+        $qb = $this->createQueryBuilder('wi')
+            ->innerJoin('wi.definition', 'wd')
+            ->where('wd.relatedEntity = :entityClass')
+            ->andWhere('wi.entityId = :entityId')
             ->setParameter('entityClass', $entityClass)
-            ->setParameter('entityId', $entityIdentifierString);
+            ->setParameter('entityId', $entityIdentifier);
 
-        if ($workflowName) {
-            $qb->andWhere('wi.workflowName = :workflowName')
-                ->setParameter('workflowName', $workflowName);
-        }
+        return $qb;
+    }
 
-        if ($workflowType) {
-            $qb->innerJoin('wi.definition', 'wd')
-                ->andWhere('wd.type = :workflowType')
-                ->setParameter('workflowType', $workflowType);
-        }
+    /**
+     * @param WorkflowDefinition $definition
+     * @return QueryBuilder
+     */
+    public function getByDefinitionQueryBuilder(WorkflowDefinition $definition)
+    {
+        return $this->createQueryBuilder('workflowItem')
+            ->select('workflowItem.id')
+            ->where('workflowItem.definition = :definition')
+            ->setParameter('definition', $definition);
+    }
 
-        return $qb->getQuery()->getResult();
+    /**
+     * @param WorkflowDefinition $definition
+     * @return QueryBuilder
+     */
+    public function getEntityWorkflowStepUpgradeQueryBuilder(WorkflowDefinition $definition)
+    {
+        $queryBuilder = $this->getByDefinitionQueryBuilder($definition);
+
+        return $this->getEntityManager()->createQueryBuilder()
+            ->update($definition->getRelatedEntity(), 'entity')
+            ->set('entity.workflowStep', $definition->getStartStep()->getId())
+            ->where('entity.workflowStep IS NULL')
+            ->andWhere('entity.workflowItem IS NULL OR entity.workflowItem IN (' . $queryBuilder->getDQL() . ')')
+            ->setParameters($queryBuilder->getParameters());
     }
 }

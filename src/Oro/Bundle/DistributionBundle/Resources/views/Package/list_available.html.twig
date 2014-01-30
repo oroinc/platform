@@ -1,4 +1,4 @@
-{% extends 'OroDistributionBundle::base.html.twig' %}
+{% extends 'OroDistributionBundle::base_inner.html.twig' %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -72,9 +72,11 @@
                     {{ package.prettyVersion }}
                 </td>
                 <td>
-                    <a href="#" class="btn btn-success ajax install"
-                       data-action="install"
-                       data-params='{"packageName": "{{ package.prettyName }}"}'>Install</a>
+                    {% if notWritableSystemPaths|length == 0 %}
+                        <a href="#" class="btn btn-success ajax install"
+                           data-action="install"
+                           data-params='{"packageName": "{{ package.prettyName }}"}'>Install</a>
+                    {% endif %}
                 </td>
             </tr>
         {% else %}

@@ -68,6 +68,8 @@ datagrid:
                     data_name: ce.className
                 updated:
                     data_name: ce.updated
+            default:
+                name: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
         filters:
             columns:
                 name:

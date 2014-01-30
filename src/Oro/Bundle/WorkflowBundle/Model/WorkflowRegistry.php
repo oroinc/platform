@@ -73,21 +73,21 @@ class WorkflowRegistry
     }
 
     /**
-     * Get list of Workflows that are applicable to entity class
+     * Get Workflow that is applicable to entity class
      *
      * @param string $entityClass
-     * @return Workflow[]
+     * @return Workflow|null
      */
-    public function getWorkflowsByEntityClass($entityClass)
+    public function getWorkflowByEntityClass($entityClass)
     {
-        $result = array();
-        $workflowDefinitions = $this->getWorkflowDefinitionRepository()->findByEntityClass($entityClass);
+        $definition = $this->getWorkflowDefinitionRepository()
+            ->findByEntityClass($entityClass);
 
-        foreach ($workflowDefinitions as $workflowDefinition) {
-            $result[$workflowDefinition->getName()] = $this->getAssembledWorkflow($workflowDefinition);
+        if ($definition) {
+            return $this->getAssembledWorkflow($definition);
         }
 
-        return $result;
+        return null;
     }
 
     /**

@@ -15,7 +15,7 @@ services:
     oro_ui.router:
         class: %oro_ui.router.class%
         scope: request
-        arguments: [@request, @router]
+        arguments: [@request, @router, @oro_security.security_facade]
 
     oro_ui.twig.ceil_extension:
         class: %oro_ui.twig.ceil.class%

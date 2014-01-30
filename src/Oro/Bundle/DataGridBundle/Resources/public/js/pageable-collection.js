@@ -111,6 +111,10 @@ function(_, Backbone, BackbonePageableCollection, app) {
             this.on('remove', this.onRemove, this);
 
             BackbonePageableCollection.prototype.initialize.apply(this, arguments);
+
+            if (models.options) {
+                this.state.totals = models.options.totals;
+            }
         },
 
         /**
@@ -232,7 +236,8 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @return {Object}
          */
         parse: function(resp, options) {
-            this.state.totalRecords = resp.options.totalRecords;
+            resp.options = resp.options || {};
+            this.state.totalRecords = resp.options.totalRecords || 0;
             this.state = this._checkState(this.state);
             return resp.data;
         },
@@ -244,7 +249,7 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @param options
          */
         reset: function(models, options) {
-            this.trigger('beforeReset', this, options);
+            this.trigger('beforeReset', this, models, options);
             BackbonePageableCollection.prototype.reset.apply(this, arguments);
         },
 
@@ -338,6 +343,19 @@ function(_, Backbone, BackbonePageableCollection, app) {
                 throw new TypeError("`" + name + "` must be a finite integer");
             }
             return val;
+        },
+
+        /**
+         * Returns an array contains the current state of a grid
+         *
+         * @returns {Array}
+         */
+        getFetchData: function () {
+            var state = this._checkState(this.state);
+            var data = {};
+            data = this.processQueryParams(data, state);
+            data = this.processFiltersParams(data, state);
+            return data;
         },
 
         /**

@@ -156,15 +156,33 @@ class Client extends BaseClient
     }
 
     /**
-     * @param $folder
+     * @param string $folder
+     * @param array $filter
      */
-    public function appendFixtures($folder)
+    public function appendFixtures($folder, $filter = null)
     {
         $loader = new \Doctrine\Common\DataFixtures\Loader;
-        $fixtures = $loader->loadFromDirectory($folder);
+        $loader->loadFromDirectory($folder);
+        $fixtures = $loader->getFixtures();
 
+        //filter fixtures by className
+        if (!is_null($filter)) {
+            $fixturesCount = count($fixtures);
+            for ($i = 0; $i < $fixturesCount; $i++) {
+                $fixture = $fixtures[$i];
+                foreach ($filter as $flt) {
+                    if (!strpos(get_class($fixture), $flt)) {
+                        unset($fixtures[$i]);
+                    }
+                }
+            }
+        }
+
+        //init fixture container
         foreach ($fixtures as $fixture) {
-            $fixture->setContainer($this->getContainer());
+            if (method_exists($fixture, 'setContainer')) {
+                $fixture->setContainer($this->getContainer());
+            }
         }
 
         $purger = new \Doctrine\Common\DataFixtures\Purger\ORMPurger(
@@ -174,7 +192,7 @@ class Client extends BaseClient
             $this->getContainer()->get('doctrine.orm.entity_manager'),
             $purger
         );
-        $executor->execute($loader->getFixtures(), true);
+        $executor->execute($fixtures, true);
     }
 
     public function startTransaction()

@@ -21,6 +21,10 @@ services:
             - @oro_datagrid.datagrid.builder
             - @oro_datagrid.datagrid.request_params
 
+    oro_datagrid.datagrid.manager.link:
+        tags:
+            - { name: oro_service_link,  service: oro_datagrid.datagrid.manager }
+
     oro_datagrid.datagrid.builder:
         class: %oro_datagrid.datagrid.builder.class%
         arguments:

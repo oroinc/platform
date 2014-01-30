@@ -121,8 +121,8 @@
     {% endif %}
 
     <script type="text/javascript">
-        require(['jquery', 'oro/widget-manager', 'oro/messenger'],
-        function($, WidgetManager, Messanger) {
+        require(['jquery', 'oro/translator', 'oro/widget-manager', 'oro/messenger'],
+        function($, __, WidgetManager, Messanger) {
             var container = $('#import-validation');
             var toggleErrors = function(e) {
                 e.preventDefault();
@@ -161,7 +161,7 @@
                             widget.trigger('importComplete', data);
                             var message = data.message;
                             if (!data.success && data.errorsUrl) {
-                                var link = '<a target="_blank" href="' + data.errorsUrl + '">{{ 'Download error log'|trans}}</a>';
+                                var link = '<a target="_blank" href="' + data.errorsUrl + '">' + __('Download error log') + '</a>';
                                 message += ' ' + link;
                             }
                             Messanger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);

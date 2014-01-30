@@ -10,21 +10,10 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
-class EntityReader extends AbstractReader
+class EntityReader extends IteratorBasedReader
 {
-    /**
-     * @var \Iterator
-     */
-    protected $sourceIterator;
-
-    /**
-     * @var bool
-     */
-    protected $rewound = false;
-
     /**
      * @var ManagerRegistry
      */
@@ -42,41 +31,6 @@ class EntityReader extends AbstractReader
     }
 
     /**
-     * @return object|null
-     */
-    public function read()
-    {
-        $iterator = $this->getSourceIterator();
-        if (!$this->rewound) {
-            $iterator->rewind();
-            $this->rewound = true;
-        }
-
-        $result = null;
-        if ($iterator->valid()) {
-            $result = $iterator->current();
-            $context = $this->getContext();
-            $context->incrementReadOffset();
-            $context->incrementReadCount();
-            $iterator->next();
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return \Iterator
-     * @throws LogicException
-     */
-    protected function getSourceIterator()
-    {
-        if (null === $this->sourceIterator) {
-            throw new LogicException('Reader must be configured with source');
-        }
-        return $this->sourceIterator;
-    }
-
-    /**
      * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
@@ -88,7 +42,7 @@ class EntityReader extends AbstractReader
             $this->setSourceQueryBuilder($context->getOption('queryBuilder'));
         } elseif ($context->hasOption('query')) {
             $this->setSourceQuery($context->getOption('query'));
-        } elseif (!$this->sourceIterator) {
+        } elseif (!$this->getSourceIterator()) {
             throw new InvalidConfigurationException(
                 'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
             );
@@ -100,7 +54,7 @@ class EntityReader extends AbstractReader
      */
     public function setSourceQueryBuilder(QueryBuilder $queryBuilder)
     {
-        $this->sourceIterator = new BufferedQueryResultIterator($queryBuilder);
+        $this->setSourceIterator(new BufferedQueryResultIterator($queryBuilder));
     }
 
     /**
@@ -108,7 +62,7 @@ class EntityReader extends AbstractReader
      */
     public function setSourceQuery(Query $query)
     {
-        $this->sourceIterator = new BufferedQueryResultIterator($query);
+        $this->setSourceIterator(new BufferedQueryResultIterator($query));
     }
 
     /**
@@ -127,13 +81,5 @@ class EntityReader extends AbstractReader
         }
 
         $this->setSourceQueryBuilder($qb);
-    }
-
-    /**
-     * @param \Iterator $sourceIterator
-     */
-    public function setSourceIterator(\Iterator $sourceIterator)
-    {
-        $this->sourceIterator = $sourceIterator;
     }
 }

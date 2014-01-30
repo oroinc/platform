@@ -26,5 +26,23 @@ class OroTranslationExtension extends Extension
             ->replaceArgument(3, $config['js_translation']);
 
         $container->setParameter('oro_translation.js_translation.domains', $config['js_translation']['domains']);
+
+        if (!empty($config['api'])) {
+            foreach ($config['api'] as $serviceId => $params) {
+                foreach ($params as $key => $value) {
+                    $container->setParameter(
+                        sprintf('oro_translation.api.%s.%s', $serviceId, $key),
+                        $value
+                    );
+                }
+            }
+        }
+
+        $serviceId = sprintf('oro_translation.uploader.%s_adapter', $config['default_api_adapter']);
+        if ($container->has($serviceId)) {
+            $container->setAlias('oro_translation.uploader.default_adapter', $serviceId);
+        }
+
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }

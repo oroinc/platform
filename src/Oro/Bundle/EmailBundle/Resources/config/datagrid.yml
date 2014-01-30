@@ -65,10 +65,12 @@ datagrid:
 
         columns:
             entityName:
-                type:           twig
-                frontend_type:  html
                 label:          oro.email.emailtemplate.entity_name.label
-                template:       OroNotificationBundle:EmailNotification:Datagrid/Property/entityName.html.twig
+                type:           twig
+                template:       OroEntityBundle:Datagrid:Property/entity.html.twig
+                frontend_type:  html
+                context:
+                    entity_provider: @oro_entity.entity_provider
             name:
                 label:          oro.email.emailtemplate.name.label
             type:
@@ -76,9 +78,8 @@ datagrid:
                 label:          oro.email.emailtemplate.type.label
                 choices:        @oro_email.emailtemplate.datagrid_helper->getTypeChoices
             isSystem:
-                frontend_type:  select
+                frontend_type:  boolean
                 label:          oro.email.emailtemplate.is_system.label
-                choices:        @oro_email.emailtemplate.datagrid_helper->getSystemChoices
         properties:
             id: ~
             update_link:
@@ -100,10 +101,10 @@ datagrid:
                     type:      choice
                     data_name: t.entityName
                     options:
-                        translation_domain: config
+                        is_translated_choices: true
                         field_options:
                             multiple:       true
-                            choices:        @oro_email.emailtemplate.datagrid_helper->getEntityNameChoices
+                            choices:        @oro_entity.datagrid_helper->getEntityNames
                 name:
                     type:      string
                     data_name: t.name
@@ -141,7 +142,7 @@ datagrid:
             delete:
                 type:         delete
                 label:        oro.email.datagrid.emailtemplate.action.delete
-                acl_resource: oro_email_emailtemplate_remove
+                acl_resource: oro_email_emailtemplate_delete
                 icon:         trash
                 link:         delete_link
 

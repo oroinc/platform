@@ -1,10 +1,15 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
 define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'oro/loading-mask',
-    'oro/datagrid/header', 'oro/datagrid/body', 'oro/datagrid/toolbar', 'oro/datagrid/action-column',
-    'oro/datagrid/select-row-cell', 'oro/datagrid/select-all-header-cell',
-    'oro/datagrid/refresh-collection-action', 'oro/datagrid/reset-collection-action'],
-    function ($, _, Backgrid, __, mediator, LoadingMask, GridHeader, GridBody, Toolbar, ActionColumn, SelectRowCell, SelectAllHeaderCell, RefreshCollectionAction, ResetCollectionAction) {
+    'oro/datagrid/header', 'oro/datagrid/body', 'oro/datagrid/footer', 'oro/datagrid/toolbar',
+    'oro/datagrid/action-column', 'oro/datagrid/select-row-cell', 'oro/datagrid/select-all-header-cell',
+    'oro/datagrid/refresh-collection-action', 'oro/datagrid/reset-collection-action',
+    'oro/datagrid/export-action'],
+    function ($, _, Backgrid, __, mediator, LoadingMask,
+              GridHeader, GridBody, GridFooter, Toolbar, ActionColumn,
+              SelectRowCell, SelectAllHeaderCell,
+              RefreshCollectionAction, ResetCollectionAction,
+              ExportAction) {
         'use strict';
 
         /**
@@ -60,6 +65,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             /** @property {oro.datagrid.Body} */
             body: GridBody,
 
+            /** @property {oro.datagrid.Footer} */
+            footer: GridFooter,
+
             /** @property {oro.datagrid.Toolbar} */
             toolbar: Toolbar,
 
@@ -94,6 +102,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              * @param {String} [options.rowClickActionClass] CSS class for row with click action
              * @param {String} [options.rowClassName] CSS class for row
              * @param {Object} [options.toolbarOptions] Options for toolbar
+             * @param {Object} [options.exportOptions] Options for export
              * @param {Array<oro.datagrid.AbstractAction>} [options.rowActions] Array of row actions prototypes
              * @param {Array<oro.datagrid.AbstractAction>} [options.massActions] Array of mass actions prototypes
              * @param {oro.datagrid.AbstractAction} [options.rowClickAction] Prototype for action that handles row click
@@ -120,6 +129,8 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 _.extend(this, this.defaults, options);
                 this.toolbarOptions = {};
                 _.extend(this.toolbarOptions, this.defaults.toolbarOptions, options.toolbarOptions);
+                this.exportOptions = {};
+                _.extend(this.exportOptions, options.exportOptions);
 
                 this.collection.multipleSorting = this.multipleSorting;
 
@@ -228,9 +239,10 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              */
             _createToolbar: function (toolbarOptions) {
                 return new this.toolbar(_.extend({}, toolbarOptions, {
-                    collection:  this.collection,
-                    actions:     this._getToolbarActions(),
-                    massActions: this._getToolbarMassActions()
+                    collection:   this.collection,
+                    actions:      this._getToolbarActions(),
+                    extraActions: this._getToolbarExtraActions(),
+                    massActions:  this._getToolbarMassActions()
                 }));
             },
 
@@ -247,6 +259,20 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 }
                 if (this.toolbarOptions.addResetAction) {
                     result.push(this.getResetAction());
+                }
+                return result;
+            },
+
+            /**
+             * Get actions of toolbar
+             *
+             * @return {Array}
+             * @private
+             */
+            _getToolbarExtraActions: function () {
+                var result = [];
+                if (!_.isEmpty(this.exportOptions)) {
+                    result.push(this.getExportAction());
                 }
                 return result;
             },
@@ -342,6 +368,37 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             },
 
             /**
+             * Get action that exports grid's data
+             *
+             * @return oro.datagrid.ExportAction
+             */
+            getExportAction: function () {
+                var grid = this;
+
+                if (!grid.exportAction) {
+                    var links = [];
+                    _.each(this.exportOptions, function (val, key) {
+                        links.push({key: key, label: val.label, attributes: {'class': 'no-hash', 'download': null}});
+                    });
+                    grid.exportAction = new ExportAction({
+                        datagrid: grid,
+                        launcherOptions: {
+                            label: 'Export',
+                            className: 'btn',
+                            iconClassName: 'icon-download-alt',
+                            links: links
+                        }
+                    });
+
+                    grid.exportAction.on('preExecute', function (action, options) {
+                        grid.$el.trigger('preExecute:export:' + grid.name, [action, options]);
+                    });
+                }
+
+                return grid.exportAction;
+            },
+
+            /**
              * Listen to events of collection
              *
              * @private
@@ -432,6 +489,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.renderGrid();
                 this.renderNoDataBlock();
                 this.renderLoadingMask();
+                this.collection.on('reset', _.bind(function() {
+                    this._updateNoDataBlock();
+                }, this));
 
                 /**
                  * Backbone event. Fired when the grid has been successfully rendered.
@@ -504,8 +564,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.requestsCount -= 1;
                 if (this.requestsCount === 0) {
                     this.hideLoading();
-                    // render block instead of update in order to change message depending on filter state
-                    this.renderNoDataBlock();
+
                     /**
                      * Backbone event. Fired when data for grid has been successfully rendered.
                      * @event grid_load:complete

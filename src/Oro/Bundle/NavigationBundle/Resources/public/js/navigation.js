@@ -429,62 +429,64 @@ define(function (require) {
          * Ajax call for loading page content
          */
         loadPage: function() {
-            if (this.url) {
-                this.beforeRequest();
-                var cacheData;
-                if (cacheData = this.getCachedData()) {
-                    widgetManager.resetWidgets();
-                    this.tempCache = cacheData;
-                    this.handleResponse(cacheData, {fromCache: true});
-                    this.afterRequest();
-                } else {
-                    var pageUrl = this.baseUrl + this.url;
-                    var stringState = [];
-                    this.skipGridStateChange = false;
-                    if (this.encodedStateData) {
-                        var state = PageableCollection.prototype.decodeStateData(this.encodedStateData);
-                        var collection = new PageableCollection({}, {inputName: state.gridName});
-
-                        stringState = collection.processQueryParams({}, state);
-                        stringState = collection.processFiltersParams(stringState, state);
-
-                        mediator.once(
-                            "datagrid_filters:rendered",
-                            function (collection) {
-                                collection.trigger('updateState', collection);
-                            },
-                            this
-                        );
-
-                        this.skipGridStateChange = true;
-                    }
-
-                    var useCache = this.useCache;
-                    $.ajax({
-                        url: pageUrl,
-                        headers: this.headerObject,
-                        data: stringState,
-                        beforeSend: function( xhr ) {
-                            $.isActive(false);
-                            //remove standard ajax header because we already have a custom header sent
-                            xhr.setRequestHeader('X-Requested-With', {toString: function(){ return ''; }});
-                        },
-
-                        error: _.bind(this.processError, this),
-
-                        success: _.bind(function (data, textStatus, jqXHR) {
-                            if (!cacheData) {
-                                this.handleResponse(data);
-                                this.updateDebugToolbar(jqXHR);
-                                this.afterRequest();
-                            }
-                            if (useCache) {
-                                contentManager.addPage(this.getHashUrl(), this.tempCache);
-                            }
-                        }, this)
-                    });
-                }
+            if (!this.url) {
+                return;
             }
+
+            this.beforeRequest();
+
+            var cacheData = this.getCachedData();
+            if (cacheData) {
+                widgetManager.resetWidgets();
+                this.tempCache = cacheData;
+                this.handleResponse(cacheData, {fromCache: true});
+                this.afterRequest();
+                return;
+            }
+
+            var pageUrl = this.baseUrl + this.url;
+            var stringState = [];
+            this.skipGridStateChange = false;
+            if (this.encodedStateData) {
+                var state = PageableCollection.prototype.decodeStateData(this.encodedStateData);
+                var collection = new PageableCollection({}, {inputName: state.gridName});
+
+                stringState = collection.processQueryParams({}, state);
+                stringState = collection.processFiltersParams(stringState, state);
+
+                mediator.once(
+                    "datagrid_filters:rendered",
+                    function (collection) {
+                        collection.trigger('updateState', collection);
+                    },
+                    this
+                );
+
+                this.skipGridStateChange = true;
+            }
+
+            var useCache = this.useCache;
+            $.ajax({
+                url: pageUrl,
+                headers: this.headerObject,
+                data: stringState,
+                beforeSend: function( xhr ) {
+                    $.isActive(false);
+                    //remove standard ajax header because we already have a custom header sent
+                    xhr.setRequestHeader('X-Requested-With', {toString: function(){ return ''; }});
+                },
+
+                error: _.bind(this.processError, this),
+
+                success: _.bind(function (data, textStatus, jqXHR) {
+                    this.handleResponse(data);
+                    this.updateDebugToolbar(jqXHR);
+                    this.afterRequest();
+                    if (useCache) {
+                        contentManager.addPage(this.getHashUrl(), this.tempCache);
+                    }
+                }, this)
+            });
         },
 
         /**
@@ -689,6 +691,8 @@ define(function (require) {
                     if (data.redirect !== undefined && data.redirect) {
                         this.processRedirect(data);
                     } else {
+                        this.removeErrorClass();
+
                         if (!options.fromCache && !options.skipCache) {
                             this.savePageToCache(data);
                         }
@@ -783,23 +787,13 @@ define(function (require) {
          * @param {String} errorThrown
          */
         processError: function(XMLHttpRequest, textStatus, errorThrown) {
-            var message403 = 'You do not have permission to this action';
             if (app.debug) {
-                if (XMLHttpRequest.status == 403) {
-                    messenger.notificationMessage('error', __(message403));
-                    this.loadingMask.hide();
-                } else {
-                    document.body.innerHTML = XMLHttpRequest.responseText;
-                }
                 this.updateDebugToolbar(XMLHttpRequest);
-            } else {
-                var message = 'Sorry, page was not loaded correctly';
-                if (XMLHttpRequest.status == 403) {
-                    message = message403;
-                }
-                messenger.notificationMessage('error', __(message));
-                this.loadingMask.hide();
             }
+
+            this.handleResponse(XMLHttpRequest.responseText);
+            this.addErrorClass();
+            this.loadingMask.hide();
         },
 
         /**
@@ -952,12 +946,12 @@ define(function (require) {
                 this.method = $form.attr('method') || "get";
 
                 if (url) {
-                    $form.data('sent', true);
                     var formStartSettings = {
                         form_validate: true
                     };
                     mediator.trigger('hash_navigation_request:form-start', $form.get(0), formStartSettings);
                     if (formStartSettings.form_validate) {
+                        $form.data('sent', true);
                         var data = $form.serialize();
                         if (this.method === 'get') {
                             if (data) {
@@ -1073,6 +1067,26 @@ define(function (require) {
          */
         back: function() {
             window.history.back();
+            return true;
+        },
+
+        /**
+         * Adds error class to body
+         *
+         * @return {Boolean}
+         */
+        addErrorClass: function() {
+            $('body').addClass('error-page');
+            return true;
+        },
+
+        /**
+         * Removes error class from body
+         *
+         * @return {Boolean}
+         */
+        removeErrorClass: function() {
+            $('body').removeClass('error-page');
             return true;
         }
     });

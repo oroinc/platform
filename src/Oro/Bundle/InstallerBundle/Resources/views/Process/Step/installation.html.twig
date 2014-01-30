@@ -1,7 +1,7 @@
 {% extends 'OroInstallerBundle::layout.html.twig' %}
 {% use 'OroInstallerBundle::progress.html.twig' %}
 
-{% set step, platformSteps = 'administration', ['search', 'navigation', 'js-routing', 'localization', 'assets', 'assetic', 'translation', 'requirejs'] %}
+{% set step, platformSteps = 'administration', ['navigation', 'js-routing', 'localization', 'assets', 'assetic', 'translation', 'requirejs'] %}
 
 {% if loadFixtures %}
     {% set platformSteps = ['fixtures']|merge(platformSteps) %}
@@ -58,7 +58,7 @@
 
     <div class="button-set">
         <div class="pull-right">
-            <a href="{{ path('sylius_flow_display', { scenarioAlias: 'oro_installer', stepName: 'setup' }) }}" class="button back"><span>{{ 'process.button.back'|trans }}</span></a>
+            <a href="{{ path('sylius_flow_display', { scenarioAlias: 'oro_installer', stepName: 'configure' }) }}" class="button back disabled"><span>{{ 'process.button.back'|trans }}</span></a>
             <a href="javascript: void(0)" class="button next primary disabled">
                 <span>{{ 'process.button.next'|trans }}</span>
             </a>

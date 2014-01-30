@@ -13,7 +13,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/index/{name}",
      *      name="oro_dashboard_index",
-     *      requirements={"name"="[\w_-]*"},
+     *      requirements={"name"="[\w-]*"},
      *      defaults={"name" = ""}
      * )
      */
@@ -50,7 +50,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_widget",
-     *      requirements={"widget"="[\w_-]+", "bundle"="\w+", "name"="[\w_-]+"}
+     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
      * )
      */
     public function widgetAction($widget, $bundle, $name)
@@ -65,7 +65,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/itemized_widget/{widget}/{bundle}/{name}",
      *      name="oro_dashboard_itemized_widget",
-     *      requirements={"widget"="[\w_-]+", "bundle"="\w+", "name"="[\w_-]+"}
+     *      requirements={"widget"="[\w-]+", "bundle"="\w+", "name"="[\w-]+"}
      * )
      */
     public function itemizedWidgetAction($widget, $bundle, $name)

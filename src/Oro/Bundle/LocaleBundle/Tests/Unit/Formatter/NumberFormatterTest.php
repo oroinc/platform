@@ -4,6 +4,9 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class NumberFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -248,7 +251,7 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array(
-                'expected' => '123,457%',
+                'expected' => '123,456.789%',
                 'value' => 1234.56789,
                 'attributes' => array(),
                 'textAttributes' => array(),
@@ -297,15 +300,15 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
     public function formatDurationDataProvider()
     {
         return array(
-            array(
+            'default' => array(
                 'expected' => '1:01:01',
                 'value' => 3661,
                 'attributes' => array(),
                 'textAttributes' => array(),
                 'symbols' => array(),
-                'locale' => 'en_US'
+                'locale' => 'en'
             ),
-            array(
+            'with_words' => array(
                 'expected' => '1 hour, 1 minute, 1 second',
                 'value' => 3661,
                 'attributes' => array(),
@@ -314,6 +317,24 @@ class NumberFormatterTest extends \PHPUnit_Framework_TestCase
                 ),
                 'symbols' => array(),
                 'locale' => 'en_US'
+            ),
+            'with_words' => array(
+                'expected' => '1 hour, 1 minute, 1 second',
+                'value' => 3661,
+                'attributes' => array(),
+                'textAttributes' => array(
+                    \NumberFormatter::DEFAULT_RULESET => "%with-words"
+                ),
+                'symbols' => array(),
+                'locale' => 'en_US'
+            ),
+            'fix_for_localization_problems' => array(
+                'expected' => '01:01:01',
+                'value' => 3661,
+                'attributes' => array(),
+                'textAttributes' => array(),
+                'symbols' => array(),
+                'locale' => 'ru'
             ),
         );
     }

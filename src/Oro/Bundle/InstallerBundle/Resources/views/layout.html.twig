@@ -24,7 +24,8 @@
         });
 
         function ajaxQueue(actions, url) {
-            var finRes = true;
+            var finRes  = true,
+                aborted = false;
 
             $.each(actions, function(i) {
                 var stepCon = $('#step-' + this);
@@ -39,27 +40,50 @@
 
                 $.ajaxQueue({
                     url: '?action=' + this,
+                    beforeSend: function (jqXHR) {
+                        if (!finRes) {
+                            aborted = true;
+                            jqXHR.abort();
+                        }
+                    }
                 }).done(function(data) {
-                    var curRes = typeof data.result != 'undefined' && data.result;
+                    var curRes = typeof data.result != 'undefined' && data.result,
+                        exitCode = typeof data.exitCode != 'undefined' ? data.exitCode : 0,
                         finRes = finRes || curRes;
 
                     stepCon
                         .removeClass('icon-wait')
-                        .addClass('icon-' + (curRes ? 'yes' : 'no'))
+                        .addClass('icon-' + (curRes ? (exitCode == 0 ? 'yes' : 'warning') : 'no'))
                         .closest('tr')
-                            .find('td:last').text(curRes ? '{{ 'passed'|trans }}' : '{{ 'failed'|trans }}').end()
+                            .find('td:last').text(
+                                curRes
+                                    ? (exitCode == 0 ? '{{ 'passed'|trans }}' : '{{ 'skipped'|trans }}')
+                                    : '{{ 'failed'|trans }}'
+                            ).end()
                         .closest('tr').next()
                             .find('td:last').text('{{ 'progress'|trans }}').end()
                             .find('span').addClass('icon-wait');
 
                     if (i == actions.length - 1 && finRes) {
+                        $('a.back').removeClass('disabled');
                         $('a.primary').removeClass('disabled').attr('href', url);
                     }
                 }).fail(function() {
-                    stepCon
-                        .removeClass('icon-wait')
-                        .addClass('icon-no')
-                        .closest('tr').find('td:last').text('{{ 'failed'|trans }}');
+                    if (aborted) {
+                        stepCon
+                            .removeClass('icon-wait')
+                            .addClass('icon-warning')
+                            .closest('tr').find('td:last').text('{{ 'skipped'|trans }}');
+                    } else {
+                        finRes = false;
+                        stepCon
+                            .removeClass('icon-wait')
+                            .addClass('icon-no')
+                            .closest('tr').find('td:last').text('{{ 'failed'|trans }}');
+                    }
+                    if (i == actions.length - 1) {
+                        $('a.back').removeClass('disabled');
+                    }
                 });
             });
         }

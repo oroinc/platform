@@ -9,9 +9,9 @@ use Oro\Bundle\UserBundle\Entity\Role;
 class RoleRepository extends EntityRepository
 {
     /**
-     * Get user query builder
+     * Returns a query builder which can be used to get a list of users assigned to the given role
      *
-     * @param  Role         $role
+     * @param  Role $role
      * @return QueryBuilder
      */
     public function getUserQueryBuilder(Role $role)
@@ -22,5 +22,22 @@ class RoleRepository extends EntityRepository
             ->join('u.roles', 'role')
             ->where('role = :role')
             ->setParameter('role', $role);
+    }
+
+    /**
+     * Checks if there are at least one user assigned to the given role
+     *
+     * @param Role $role
+     * @return bool
+     */
+    public function hasAssignedUsers(Role $role)
+    {
+        $findResult = $this->getUserQueryBuilder($role)
+            ->select('role.id')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getArrayResult();
+
+        return !empty($findResult);
     }
 }

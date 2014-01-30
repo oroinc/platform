@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Oro\Bundle\InstallerBundle\CommandExecutor;
-use Oro\Bundle\InstallerBundle\ScriptManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Output\OutputInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
+use Oro\Bundle\InstallerBundle\ScriptExecutor;
+use Oro\Bundle\InstallerBundle\ScriptManager;
 
 class InstallCommand extends ContainerAwareCommand
 {
@@ -65,7 +66,18 @@ class InstallCommand extends ContainerAwareCommand
             ->finalStep($commandExecutor, $input, $output);
 
         $output->writeln('');
-        $output->writeln('<info>Oro Application has been successfully installed.</info>');
+        $output->writeln(
+            sprintf(
+                '<info>Oro Application has been successfully installed in <comment>%s</comment> mode.</info>',
+                $input->getOption('env')
+            )
+        );
+        if ('prod' != $input->getOption('env')) {
+            $output->writeln(
+                '<info>To run application in <comment>prod</comment> mode, ' .
+                'please run <comment>cache:clear</comment> command with <comment>--env prod</comment> parameter</info>'
+            );
+        }
     }
 
     /**
@@ -140,27 +152,16 @@ class InstallCommand extends ContainerAwareCommand
                 array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
             )
             ->runCommand(
-                'doctrine:fixtures:load',
-                array('--process-isolation' => true, '--no-interaction' => true, '--append' => true)
-            )
-            ->runCommand(
                 'oro:workflow:definitions:load',
                 array('--process-isolation' => true)
+            )
+            ->runCommand(
+                'oro:installer:fixtures:load',
+                array('--process-isolation' => true, '--no-interaction' => true)
             );
 
         $output->writeln('');
         $output->writeln('<info>Administration setup.</info>');
-
-        $user = $container->get('oro_user.manager')->createUser();
-        $role = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroUserBundle:Role')
-            ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
-
-        $businessUnit = $container
-            ->get('doctrine.orm.entity_manager')
-            ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(array('name' => 'Main'));
 
         /** @var ConfigManager $configManager */
         $configManager       = $this->getContainer()->get('oro_config.global');
@@ -218,6 +219,20 @@ class InstallCommand extends ContainerAwareCommand
                 $this->buildQuestion('Password'),
                 $passValidator
             );
+        $demo = isset($options['sample-data'])
+            ? strtolower($options['sample-data']) == 'y'
+            : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
+
+        // create an administrator
+        $user = $container->get('oro_user.manager')->createUser();
+        $role = $container
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository('OroUserBundle:Role')
+            ->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
+        $businessUnit = $container
+            ->get('doctrine.orm.entity_manager')
+            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->findOneBy(array('name' => 'Main'));
         $user
             ->setUsername($userName)
             ->setEmail($userEmail)
@@ -228,7 +243,6 @@ class InstallCommand extends ContainerAwareCommand
             ->addRole($role)
             ->setOwner($businessUnit)
             ->addBusinessUnit($businessUnit);
-
         $container->get('oro_user.manager')->updateUser($user);
 
         // update company name and title if specified
@@ -240,15 +254,11 @@ class InstallCommand extends ContainerAwareCommand
         }
         $configManager->flush();
 
-        $demo = isset($options['sample-data'])
-            ? strtolower($options['sample-data']) == 'y'
-            : $dialog->askConfirmation($output, '<question>Load sample data (y/n)?</question> ', false);
-
         // load demo fixtures
         if ($demo) {
             $commandExecutor->runCommand(
-                'oro:demo:fixtures:load',
-                array('--process-isolation' => true, '--process-timeout' => 300)
+                'oro:installer:fixtures:load',
+                array('--process-isolation' => true, '--process-timeout' => 300, '--fixtures-type' => 'demo')
             );
         }
 
@@ -270,14 +280,13 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
-            ->runCommand('oro:search:create-index')
             ->runCommand('oro:navigation:init')
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
             ->runCommand('assets:install')
             ->runCommand('assetic:dump')
             ->runCommand('oro:translation:dump')
-            ->runCommand('oro:requirejs:build');
+            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
 
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
@@ -285,7 +294,7 @@ class InstallCommand extends ContainerAwareCommand
         $this->updateInstalledFlag(date('c'));
 
         // clear the cache set installed flag in DI container
-        $commandExecutor->runCommand('cache:clear');
+        $commandExecutor->runCommand('cache:clear', array('--process-isolation' => true, '--process-timeout' => 300));
 
         $output->writeln('');
 

@@ -2,6 +2,7 @@ parameters:
     oro_entity.form.type.custom_entity.class:                  Oro\Bundle\EntityBundle\Form\Type\CustomEntityType
     oro_entity.form.type.entity_choice.class:                  Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType
     oro_entity.form.type.entity_field_choice.class:            Oro\Bundle\EntityBundle\Form\Type\EntityFieldChoiceType
+    oro_entity.form.type.entity_field_select.class:            Oro\Bundle\EntityBundle\Form\Type\EntityFieldSelectType
     oro_entity.form.type.option_select.class:                  Oro\Bundle\EntityBundle\Form\Type\OptionSelectType
     oro_entity.form.type.entity_select.class:                  Oro\Bundle\EntityBundle\Form\Type\EntitySelectType
     oro_entity.form.handler.entity_select.class:               Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler
@@ -30,6 +31,15 @@ services:
             - @translator
         tags:
             - { name: form.type, alias: oro_entity_field_choice }
+
+    oro_entity.form.type.entity_field_select:
+        class: %oro_entity.form.type.entity_field_select.class%
+        arguments:
+            - @oro_entity.entity_provider
+            - @oro_entity.entity_field_provider
+            - @translator
+        tags:
+            - { name: form.type, alias: oro_entity_field_select }
 
     oro_entity.form.type.option_select:
         class:                                                %oro_entity.form.type.option_select.class%

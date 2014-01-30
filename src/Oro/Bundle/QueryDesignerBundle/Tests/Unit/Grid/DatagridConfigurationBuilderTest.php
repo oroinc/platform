@@ -5,6 +5,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
 
 class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
 {
@@ -155,7 +156,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
-                ['name' => 'rc1,' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
+                ['name' => 'rc1+' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
             ],
             'filters' => []
         ];
@@ -199,7 +200,7 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     ],
                     'column_aliases' => [
                         'column1'                   => 'c1',
-                        'rc1,' . $en1 . '::column2' => 'c2',
+                        'rc1+' . $en1 . '::column2' => 'c2',
                     ],
                 ],
             ],
@@ -231,12 +232,12 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         $en         = 'Acme\Entity\TestEntity';
         $en1        = 'Acme\Entity\TestEntity1';
         $definition = [
-            'columns'       => [
+            'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
             ],
-            'filters'       => [
+            'filters' => [
                 [
-                    'columnName' => 'rc1,' . $en1 . '::column2',
+                    'columnName' => 'rc1+' . $en1 . '::column2',
                     'criterion'  => [
                         'filter' => 'string',
                         'data'   => [
@@ -246,7 +247,6 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     ]
                 ],
             ],
-            'filters_logic' => '1'
         ];
         $doctrine   = $this->getDoctrine(
             [
@@ -427,14 +427,14 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         $en2        = 'Acme\Entity\TestEntity2';
         $en3        = 'Acme\Entity\TestEntity3';
         $definition = [
-            'columns'       => [
+            'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => 'DESC'],
-                ['name' => 'rc1,' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
-                ['name' => 'rc2,' . $en2 . '::column3', 'label' => 'lbl3', 'sorting' => 'ASC'],
+                ['name' => 'rc1+' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
+                ['name' => 'rc2+' . $en2 . '::column3', 'label' => 'lbl3', 'sorting' => 'ASC'],
             ],
-            'filters'       => [
+            'filters' => [
                 [
-                    'columnName' => 'rc1,' . $en1 . '::column2',
+                    'columnName' => 'rc1+' . $en1 . '::column2',
                     'criterion'  => [
                         'filter' => 'string',
                         'data'   => [
@@ -443,28 +443,31 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                         ]
                     ]
                 ],
+                'OR',
                 [
-                    'columnName' => 'rc1,' . $en1 . '::rc4,' . $en3 . '::column5',
-                    'criterion'  => [
-                        'filter' => 'string',
-                        'data'   => [
-                            'type'  => '1',
-                            'value' => 'test'
+                    [
+                        'columnName' => 'rc1+' . $en1 . '::rc4+' . $en3 . '::column5',
+                        'criterion'  => [
+                            'filter' => 'string',
+                            'data'   => [
+                                'type'  => '1',
+                                'value' => 'test'
+                            ]
                         ]
-                    ]
-                ],
-                [
-                    'columnName' => 'rc1,' . $en1 . '::rc4,' . $en3 . '::column6',
-                    'criterion'  => [
-                        'filter' => 'string',
-                        'data'   => [
-                            'type'  => '1',
-                            'value' => 'test'
+                    ],
+                    'and',
+                    [
+                        'columnName' => 'rc1+' . $en1 . '::rc4+' . $en3 . '::column6',
+                        'criterion'  => [
+                            'filter' => 'string',
+                            'data'   => [
+                                'type'  => '1',
+                                'value' => 'test'
+                            ]
                         ]
-                    ]
+                    ],
                 ],
             ],
-            'filters_logic' => ' 1  OR  ( 2 And ( ( 3 or 1 ) oR 2) ) '
         ];
         $doctrine   = $this->getDoctrine(
             [
@@ -511,13 +514,13 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                     'table_aliases'  => [
                         ''                              => 't1',
                         $en . '::rc1'                   => 't2',
-                        $en . '::rc1,' . $en1 . '::rc4' => 't3',
+                        $en . '::rc1+' . $en1 . '::rc4' => 't3',
                         $en . '::rc2'                   => 't4',
                     ],
                     'column_aliases' => [
                         'column1'                   => 'c1',
-                        'rc1,' . $en1 . '::column2' => 'c2',
-                        'rc2,' . $en2 . '::column3' => 'c3',
+                        'rc1+' . $en1 . '::column2' => 'c2',
+                        'rc2+' . $en2 . '::column3' => 'c3',
                     ],
                     'filters'        => [
                         [
@@ -541,36 +544,13 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
                             ],
                             'AND',
                             [
-                                [
-                                    [
-                                        'column'     => 't3.column6',
-                                        'filter'     => 'string',
-                                        'filterData' => [
-                                            'type'  => '1',
-                                            'value' => 'test'
-                                        ]
-                                    ],
-                                    'OR',
-                                    [
-                                        'column'      => 't2.column2',
-                                        'filter'      => 'string',
-                                        'filterData'  => [
-                                            'type'  => '1',
-                                            'value' => 'test'
-                                        ],
-                                        'columnAlias' => 'c2'
-                                    ],
-                                ],
-                                'OR',
-                                [
-                                    'column'     => 't3.column5',
-                                    'filter'     => 'string',
-                                    'filterData' => [
-                                        'type'  => '1',
-                                        'value' => 'test'
-                                    ]
+                                'column'     => 't3.column6',
+                                'filter'     => 'string',
+                                'filterData' => [
+                                    'type'  => '1',
+                                    'value' => 'test'
                                 ]
-                            ]
+                            ],
                         ]
                     ]
                 ],
@@ -602,5 +582,133 @@ class DatagridConfigurationBuilderTest extends OrmQueryConverterTest
         ];
 
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @dataProvider invalidFiltersStructureProvider
+     */
+    public function testInvalidFiltersStructure($expectedExceptionMessage, $filters)
+    {
+        $gridName   = 'test_grid';
+        $en         = 'Acme\Entity\TestEntity';
+        $definition = [
+            'columns' => [
+                ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
+            ],
+            'filters' => $filters,
+        ];
+        $doctrine   = $this->getDoctrine(
+            [
+                $en => [
+                    'column1' => 'string',
+                ],
+            ]
+        );
+
+        $model = new QueryDesignerModel();
+        $model->setEntity($en);
+        $model->setDefinition(json_encode($definition));
+
+        try {
+            $builder = new DatagridConfigurationBuilder($gridName, $model, $this->getFunctionProvider(), $doctrine);
+            $builder->getConfiguration()->toArray();
+            $this->fail('Expected "Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException" exception.');
+        } catch (InvalidFiltersException $ex) {
+            if (false === strpos($ex->getMessage(), $expectedExceptionMessage)) {
+                $this->fail(
+                    sprintf(
+                        'Expected exception message "%s", but given "%s".',
+                        $expectedExceptionMessage,
+                        $ex->getMessage()
+                    )
+                );
+            }
+        }
+    }
+
+    public function invalidFiltersStructureProvider()
+    {
+        return [
+            [
+                'Invalid filters structure; unexpected "OR" operator.',
+                [
+                    'OR'
+                ]
+            ],
+            [
+                'Invalid filters structure; a filter is unexpected here.',
+                [
+                    [
+                        'columnName' => 'column1',
+                        'criterion'  => [
+                            'filter' => "string",
+                            'data'   => [
+                                'value' => '1',
+                                'type'  => 1,
+                            ]
+                        ],
+                    ],
+                    [
+                        'columnName' => 'column1',
+                        'criterion'  => [
+                            'filter' => "string",
+                            'data'   => [
+                                'value' => '2',
+                                'type'  => 1,
+                            ]
+                        ],
+                    ],
+                ]
+            ],
+            [
+                'Invalid filters structure; unexpected "OR" operator.',
+                [
+                    'OR',
+                    [
+                        'columnName' => 'column1',
+                        'criterion'  => [
+                            'filter' => "string",
+                            'data'   => [
+                                'value' => '1',
+                                'type'  => 1,
+                            ]
+                        ],
+                    ],
+                ]
+            ],
+            [
+                'Invalid filters structure; unexpected end of group.',
+                [
+                    [
+                        'columnName' => 'column1',
+                        'criterion'  => [
+                            'filter' => "string",
+                            'data'   => [
+                                'value' => '1',
+                                'type'  => 1,
+                            ]
+                        ],
+                    ],
+                    'OR',
+                ]
+            ],
+            [
+                'Invalid filters structure; a group must not be empty.',
+                [
+                    [
+                        'columnName' => 'column1',
+                        'criterion'  => [
+                            'filter' => "string",
+                            'data'   => [
+                                'value' => '1',
+                                'type'  => 1,
+                            ]
+                        ],
+                    ],
+                    'OR',
+                    []
+                ]
+            ],
+        ];
     }
 }

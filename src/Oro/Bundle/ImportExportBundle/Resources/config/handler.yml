@@ -1,0 +1,23 @@
+parameters:
+    oro_importexport.handler.import.class:        Oro\Bundle\ImportExportBundle\Handler\ImportHandler
+    oro_importexport.handler.export.class:        Oro\Bundle\ImportExportBundle\Handler\ExportHandler
+
+services:
+    oro_importexport.handler.import:
+        class: %oro_importexport.handler.import.class%
+        arguments:
+            - @oro_importexport.job_executor
+            - @oro_importexport.processor.registry
+            - @oro_importexport.file.file_system_operator
+            - @session
+            - @router
+            - @translator
+
+    oro_importexport.handler.export:
+        class: %oro_importexport.handler.export.class%
+        arguments:
+            - @oro_importexport.job_executor
+            - @oro_importexport.processor.registry
+            - @oro_importexport.file.file_system_operator
+            - @oro_importexport.file.mime_type_guesser
+            - @router

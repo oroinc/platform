@@ -378,7 +378,7 @@ class BaseOrder
     }
 
     /**
-     * @param float $shippingAmount
+     * @param $shippingAmount
      *
      * @return $this
      */
@@ -410,7 +410,7 @@ class BaseOrder
     }
 
     /**
-     * @param float $shippingMethod
+     * @param string $shippingMethod
      *
      * @return $this
      */
@@ -422,7 +422,7 @@ class BaseOrder
     }
 
     /**
-     * @return float
+     * @return string
      */
     public function getShippingMethod()
     {
@@ -530,7 +530,7 @@ class BaseOrder
     }
 
     /**
-     * @return BaseOrderItem[]
+     * @return BaseOrderItem[]|ArrayCollection
      */
     public function getItems()
     {

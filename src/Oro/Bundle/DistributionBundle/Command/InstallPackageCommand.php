@@ -44,37 +44,47 @@ class InstallPackageCommand extends ContainerAwareCommand
             );
         }
 
+        /** @var DialogHelper $dialog */
+        $dialog = $this->getHelperSet()->get('dialog');
+        $loadDemoData = $dialog->askConfirmation(
+            $output,
+            'Do you want to load demo data? (yes/no, default - no) ',
+            false
+        );
+
         if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName, $packageVersion)) {
             $requirementsString = array_reduce(
                 $requirements,
                 function ($result, PackageRequirement $requirement) {
-                    $result .= PHP_EOL . $requirement->getName();
+                    $result .= PHP_EOL . ' - ' . $requirement->getName();
+                    if ($requirement->isInstalled()) {
+                        $result .= ' [installed]';
+                    }
 
                     return $result;
                 },
                 ''
             );
-            $output->writeln(sprintf("Package requires:%s", $requirementsString));
+            $output->writeln(sprintf("%s requires:%s", $packageName, $requirementsString));
 
-            /** @var DialogHelper $dialog */
-            $dialog = $this->getHelperSet()->get('dialog');
-            /** @var DialogHelper $dialog */
-            if (!$dialog->askConfirmation($output, 'Do you want to install all them? (yes/no) ')) {
+            if (!$dialog->askConfirmation($output, 'All missing packages will be installed. Continue? (yes/no) ')) {
                 return $output->writeln('<comment>Process aborted</comment>');
             }
         }
 
         try {
-            $manager->install($packageName, $packageVersion);
+            $manager->install($packageName, $packageVersion, $loadDemoData);
         } catch (\Exception $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
             if ($verbose && $e instanceof VerboseException) {
                 $output->writeln(sprintf('<comment>%s</comment>', $e->getVerboseMessage()));
             }
+
             return 1;
         }
 
         $output->writeln(sprintf('%s has been installed!', $packageName));
+
         return 0;
     }
 }

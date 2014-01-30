@@ -6,8 +6,8 @@
 {% set formAction = path('oro_entityextend_field_create', {id: entity_id}) %}
 
 {% block navButtons %}
-    {{ UI.button({'path' : path('oro_entityconfig_view', {'id':entity_id}), 'title' : 'Cancel', 'label' : 'Cancel'}) }}
-    {{ UI.buttonType({'type': 'submit', 'class': 'btn-success', 'label': 'Continue'}) }}
+    {{ UI.cancelButton(path('oro_entityconfig_view', {'id':entity_id})) }}
+    {{ UI.saveAndCloseButton('Continue') }}
 {% endblock navButtons %}
 
 {% block pageHeader %}
