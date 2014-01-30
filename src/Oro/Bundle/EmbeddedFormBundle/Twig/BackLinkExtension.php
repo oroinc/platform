@@ -52,10 +52,16 @@ class BackLinkExtension extends \Twig_Extension
      */
     public function backLinkFilter($string, $id)
     {
+        $backLinkRegexp = '/{back_link(?:\|([^}]+))?}/';
+        preg_match($backLinkRegexp, $string, $matches);
+        list($placeholder, $linkText) = array_pad($matches, 2, '');
+        if (!$linkText) {
+            $linkText = 'oro.embedded_form.back_link_default_text';
+        }
+        $translatedLinkText = $this->translator->trans($linkText);
         $url = $this->router->generate('oro_embedded_form_submit', ['id' => $id]);
-        $linkText = $this->translator->trans('oro.embedded_form.back_link_text');
-        $link = sprintf('<a href="%s">%s</a>', $url, $linkText);
+        $link = sprintf('<a href="%s">%s</a>', $url, $translatedLinkText);
 
-        return str_replace('{back_link}', $link, $string);
+        return str_replace($placeholder, $link, $string);
     }
 }

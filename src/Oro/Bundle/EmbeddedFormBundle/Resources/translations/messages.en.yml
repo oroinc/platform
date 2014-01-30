@@ -14,11 +14,11 @@ oro:
         successMessage:
             label: Success message
             default: Form has been submitted successfully
-            tooltip: Will appear instead of form after form is successfully submitted.<br />Use <strong>{back_link}</strong> placeholder to add back link to message.
+            tooltip: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
 
         get_code: Get code
 
-        back_link_text: Back
+        back_link_default_text: Back
 
         controller:
             saved_message: Form has been saved successfully
