@@ -38,10 +38,10 @@ class LanguageListener
                     $changed[] = $lang;
                 }
             }
-        }
 
-        foreach ($changed as $lang) {
-            $this->metadataCache->updateTimestamp($lang);
+            foreach ($changed as $lang) {
+                $this->metadataCache->updateTimestamp($lang);
+            }
         }
     }
 }
