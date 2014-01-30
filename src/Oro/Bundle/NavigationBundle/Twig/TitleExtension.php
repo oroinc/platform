@@ -137,7 +137,7 @@ class TitleExtension extends \Twig_Extension
             $result = array();
             foreach (array_reverse($this->templateFileTitleDataStack) as $templateOptions) {
                 foreach ($templateOptions as $options) {
-                    $result = array_merge($result, $options);
+                    $result = array_replace_recursive($result, $options);
                 }
             }
         }

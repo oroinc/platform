@@ -91,15 +91,13 @@ services:
         class: %oro_search.event_listener.search_results_grid_listener.class%
         arguments:
           - @oro_datagrid.datagrid.request_params
-          - @oro_search.index
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.after.search-grid, method: onBuildAfter }
 
     oro_search.datasource.search:
         class: %oro_search.datasource.search.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_security.acl_helper
+            - @oro_search.index
         tags:
             - { name: oro_datagrid.datasource, type: search }
 
