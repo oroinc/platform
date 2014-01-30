@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Symfony\Component\Form\FormEvent;
@@ -39,19 +39,19 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected $em;
 
     /**
-     * @var OrmTranslationMetadataCache
+     * @var DynamicTranslationMetadataCache
      */
     protected $dbTranslationMetadataCache;
 
     /**
      * @param ConfigManager               $configManager
      * @param Translator                  $translator
-     * @param OrmTranslationMetadataCache $dbTranslationMetadataCache
+     * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
         ConfigManager $configManager,
         Translator $translator,
-        OrmTranslationMetadataCache $dbTranslationMetadataCache
+        DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
         $this->configManager              = $configManager;
         $this->translator                 = $translator;
