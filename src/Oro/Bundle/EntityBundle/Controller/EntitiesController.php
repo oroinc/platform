@@ -163,6 +163,10 @@ class EntitiesController extends Controller
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
         $record = $em->getRepository($extendEntityName)->find($id);
 
+        if (!$record) {
+            throw $this->createNotFoundException();
+        }
+
         return [
             'parent'        => $entity_id,
             'entity'        => $record,
@@ -226,21 +230,9 @@ class EntitiesController extends Controller
                     $this->get('translator')->trans('oro.entity.controller.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->actionRedirect(
-                    [
-                        'route'      => 'oro_entity_update',
-                        'parameters' => [
-                            'entity_id' => $entity_id,
-                            'id'        => $id
-                        ],
-                    ],
-                    [
-                        'route'      => 'oro_entity_view',
-                        'parameters' => [
-                            'entity_id' => $entity_id,
-                            'id'        => $id
-                        ]
-                    ]
+                return $this->get('oro_ui.router')->redirectAfterSave(
+                    ['route' => 'oro_entity_update', 'parameters' => ['entity_id' => $entity_id, 'id'=> $id]],
+                    ['route' => 'oro_entity_view', 'parameters' => ['entity_id' => $entity_id, 'id' => $id]]
                 );
             }
         }

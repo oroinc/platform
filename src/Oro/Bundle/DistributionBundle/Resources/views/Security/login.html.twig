@@ -1,30 +1,42 @@
-{% extends 'OroDistributionBundle::base.html.twig' %}
-
-{% block stylesheet %}
-    {{ parent() }}
-    <style type="text/css">
-        .wrapper {
-            width: 400px;
-        }
-
-
-    </style>
-{% endblock %}
-
-{% block title %}Sign In{% endblock %}
+{% extends 'OroDistributionBundle::base_login.html.twig' %}
 
 {% block body %}
-    {% if error %}
-        <div class="alert alert-error">{{ error.message }}</div>
-    {% endif %}
-
-    <form action="{{ path('oro_distribution_security_login_check') }}" method="post">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="_username" value="{{ last_username }}" />
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="_password" />
-
-        <button type="submit" class="btn btn-success">login</button>
+    <form action="{{ path('oro_distribution_security_login_check') }}" method="post" class="form-signin">
+        <div class="title-box">
+            <h1 class="oro-title logo-image" title="ORO Business Application Platform">
+                ORO
+            </h1>
+            <span class="divider-vertical"></span>
+            <h2 class="title">Login</h2>
+        </div>
+        <fieldset>
+            {% if error %}
+                <div class="alert alert-error">
+                    <div>{{ error.message|trans }}</div>
+                </div>
+            {% endif %}
+            {%- set usernameLabel = 'Username'|trans %}
+            {%- set passwordLabel = 'Password'|trans %}
+            {%- set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
+            <div class="input-prepend">
+                {% if showLabels %}
+                    <span class="add-on">{{ usernameLabel }}</span>
+                {% endif %}
+                <input type="text" id="prependedInput" class="span2" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
+            </div>
+            <div class="input-prepend">
+                {% if showLabels %}
+                    <span class="add-on">{{ passwordLabel }}</span>
+                {% endif %}
+                <input type="password" id="prependedInput2" class="span2" name="_password" required="required" placeholder="{{ 'Password'|trans }}" autocomplete="off" />
+            </div>
+            <label class="checkbox oro-remember-me">
+                <input type="checkbox" id="remember_me" name="_remember_me" value="on" /> {{ 'Remember me on this computer'|trans }}
+            </label>
+            <div class="control-group form-row">
+                <button type="submit" class="btn btn-large  btn-primary pull-right" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
+            </div>
+        </fieldset>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token("authenticate") }}" />
     </form>
-{% endblock %}
+{% endblock body %}

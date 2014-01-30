@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
-use Oro\Bundle\ConfigBundle\Provider\FormProvider;
+use Oro\Bundle\ConfigBundle\Provider\Provider;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 
 class SystemConfigurationPass implements CompilerPassInterface
@@ -19,7 +20,7 @@ class SystemConfigurationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $config    = array();
-        $processor = new ProcessorDecorator();
+        $processor = new ProcessorDecorator(new Processor());
 
         foreach ($container->getParameter('kernel.bundles') as $bundle) {
             $reflection = new \ReflectionClass($bundle);
@@ -30,7 +31,7 @@ class SystemConfigurationPass implements CompilerPassInterface
             }
         }
 
-        $taggedServices = $container->findTaggedServiceIds(FormProvider::TAG_NAME);
+        $taggedServices = $container->findTaggedServiceIds(Provider::TAG_NAME);
         if ($taggedServices) {
             $config = $processor->process($config);
 

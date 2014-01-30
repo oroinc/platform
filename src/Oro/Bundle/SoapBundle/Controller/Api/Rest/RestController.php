@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityNotFoundException;
 
 use FOS\Rest\Util\Codes;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\SoapBundle\Controller\Api\FormAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\FormHandlerAwareInterface;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 abstract class RestController extends RestGetController implements
     FormAwareInterface,
@@ -50,7 +52,7 @@ abstract class RestController extends RestGetController implements
         $isProcessed = $this->processForm($entity);
 
         if ($isProcessed) {
-            $entityClass = ClassUtils::getRealClass(get_class($entity));
+            $entityClass = ClassUtils::getRealClass($entity);
             $classMetadata = $this->getManager()->getObjectManager()->getClassMetadata($entityClass);
             $view = $this->view($classMetadata->getIdentifierValues($entity), Codes::HTTP_CREATED);
         } else {
@@ -68,18 +70,15 @@ abstract class RestController extends RestGetController implements
      */
     public function handleDeleteRequest($id)
     {
-        $entity = $this->getManager()->find($id);
-        if (!$entity) {
+        try {
+            $this->getDeleteHandler()->handleDelete($id, $this->getManager());
+        } catch (EntityNotFoundException $notFoundEx) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        } catch (ForbiddenException $forbiddenEx) {
+            return $this->handleView(
+                $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN)
+            );
         }
-
-        if (!$this->get('oro_security.security_facade')->isGranted('DELETE', $entity)) {
-            return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
-        }
-
-        $em = $this->getManager()->getObjectManager();
-        $this->handleDelete($entity, $em);
-        $em->flush();
 
         return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
     }
@@ -144,13 +143,12 @@ abstract class RestController extends RestGetController implements
     }
 
     /**
-     * Handle delete entity object.
+     * Gets an object responsible to delete an entity.
      *
-     * @param object        $entity
-     * @param ObjectManager $em
+     * @return DeleteHandler
      */
-    protected function handleDelete($entity, ObjectManager $em)
+    protected function getDeleteHandler()
     {
-        $em->remove($entity);
+        return $this->get('oro_soap.handler.delete');
     }
 }

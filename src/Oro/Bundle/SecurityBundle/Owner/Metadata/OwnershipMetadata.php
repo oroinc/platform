@@ -68,6 +68,16 @@ class OwnershipMetadata implements \Serializable
     }
 
     /**
+     * Gets an owner type for an entity is represented this metadata object
+     *
+     * @return int Can be a value of one of OwnershipMetadata::OWNER_TYPE_* constants
+     */
+    public function getOwnerType()
+    {
+        return $this->ownerType;
+    }
+
+    /**
      * Indicates whether the entity has an owner
      *
      * @return bool

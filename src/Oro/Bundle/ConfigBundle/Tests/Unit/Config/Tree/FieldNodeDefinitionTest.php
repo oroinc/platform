@@ -59,31 +59,6 @@ class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('newValue', $options['another_opt']);
     }
 
-    public function testToFormFieldOptions()
-    {
-        $node = new FieldNodeDefinition(self::TEST_NAME, $this->testDefinition);
-
-        $result = $node->toFormFieldOptions();
-
-        $this->assertArrayHasKey('target_field', $result);
-        $this->assertEquals($node, $result['target_field']);
-        $this->assertArrayNotHasKey('some_opt', $result);
-
-        $options = array(
-            'label'    => 'someLabel',
-            'required' => true,
-            'block'    => 'some_block',
-            'subblock' => 'some_subblock'
-        );
-        $node->setOptions($options);
-
-        $result = $node->toFormFieldOptions();
-        foreach ($options as $optionName => $value) {
-            $this->assertArrayHasKey($optionName, $result);
-            $this->assertEquals($value, $result[$optionName]);
-        }
-    }
-
     public function testPrepareDefinition()
     {
         $node = new FieldNodeDefinition(self::TEST_NAME, array());

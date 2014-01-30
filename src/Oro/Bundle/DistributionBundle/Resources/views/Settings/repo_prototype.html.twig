@@ -1,0 +1,9 @@
+<div class="field">
+    {{ form_widget(repo.type) }}
+    {{ form_widget(repo.url, {'attr': {'class': 'selector', 'placeholder': 'URL'}}) }}
+
+    <a href="#" onclick="javascript:$(this).parent('div').remove();" class="delete-action" title="Delete">
+        <i class="icon-trash hide-text">Delete</i>
+    </a>
+    {{ form_errors(repo.url) }}
+</div>

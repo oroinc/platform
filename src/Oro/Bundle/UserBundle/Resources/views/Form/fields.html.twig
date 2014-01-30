@@ -5,12 +5,6 @@
 {% endblock %}
 
 {% block oro_combobox_dataconfig_acl_user_autocomplete %}
-    {% set url = '' %}
-    {% if configs.ajax.url is defined and configs.ajax.url%}
-    {% set url = configs.ajax.url %}
-    {% elseif configs.route_name is defined and configs.route_name %}
-        {% set url = path(configs.route_name) %}
-    {% endif %}
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
         'data': function (query, page) {

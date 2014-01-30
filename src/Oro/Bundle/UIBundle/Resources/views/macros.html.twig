@@ -110,6 +110,16 @@
 {% endmacro %}
 
 {#
+    Create 'Cancel' button
+    Parameters
+        'path' - button url
+        'label' - button label | 'Cancel' by default
+#}
+{% macro cancelButton(path, label = 'Cancel') %}
+    {{ _self.button({'path' : path, 'title' : label, 'label' : label}) }}
+{% endmacro %}
+
+{#
     Create 'Edit' button
     Parameters - array:
         [
@@ -178,11 +188,12 @@
             'title' - button title | 'Delete' by default
             'label' - button label | 'Delete' by default
             'entity_label' - if specified will be added for title, label and messages| 'item' by default
+            'disabled' - if true this control is rendered as disabled
         ]
 #}
 {% macro deleteButton(parameters) %}
     <div class="pull-left btn-group icons-holder">
-        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined ? parameters.aCss : '' }}{{ parameters.disabled is defined and parameters.disabled ? ' disabled' : ''}}"
             {% if (parameters.id is defined) %}
                 id="{{ parameters.id }}"
             {% endif %}
@@ -276,10 +287,8 @@
     {{ _self.buttonType({'type': 'submit', 'class': 'btn-success', 'label': label}) }}
 {% endmacro %}
 
-{% macro saveAndStayButton(acl = '', label = 'Save') %}
-    {% if acl is empty or resource_granted(acl) %}
+{% macro saveAndStayButton(label = 'Save') %}
     {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
-    {% endif %}
 {% endmacro %}
 
 {#

@@ -21,10 +21,18 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     protected $serializer;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineHelper;
+
     protected function setUp()
     {
         $this->serializer = $this->getMock('Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer');
-        $this->subscriber = new WorkflowDataSerializeSubscriber($this->serializer);
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->subscriber = new WorkflowDataSerializeSubscriber($this->serializer, $this->doctrineHelper);
     }
 
     public function testGetSubscribedEvents()
@@ -41,7 +49,14 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $definition->expects($this->once())
+            ->method('getRelatedEntity')
+            ->will($this->returnValue('\stdClass'));
         $entity = new WorkflowItem();
+        $entity->setDefinition($definition);
 
         $args = new LifecycleEventArgs($entity, $em);
 
@@ -68,7 +83,15 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnFlush()
     {
+        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $definition->expects($this->any())
+            ->method('getEntityAttributeName')
+            ->will($this->returnValue('entity'));
+
         $entity1 = new WorkflowItem();
+        $entity1->setDefinition($definition);
         $entity1->setWorkflowName('workflow_1');
         $entity1->setSerializedData('_old_serialized_data');
         $data1 = new WorkflowData();
@@ -76,6 +99,7 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $entity1->setData($data1);
 
         $entity2 = new WorkflowItem();
+        $entity2->setDefinition($definition);
         $entity2->setWorkflowName('workflow_2');
         $data2 = new WorkflowData();
         $data2->bar = 'bar';
@@ -84,12 +108,14 @@ class WorkflowDataSerializeSubscriberTest extends \PHPUnit_Framework_TestCase
         $entity3 = new \stdClass();
 
         $entity4 = new WorkflowItem();
+        $entity4->setDefinition($definition);
         $entity4->setWorkflowName('workflow_4');
         $data4 = new WorkflowData();
         $data4->foo = 'baz';
         $entity4->setData($data4);
 
         $entity5 = new WorkflowItem();
+        $entity5->setDefinition($definition);
         $data5 = new WorkflowData(); // Leave this data not modified
         $entity5->setData($data5);
 

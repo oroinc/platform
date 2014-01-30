@@ -3,6 +3,7 @@ parameters:
     oro_form.type.datetime.class:                                Oro\Bundle\FormBundle\Form\Type\OroDateTimeType
     oro_form.type.time_interval.class:                           Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType
     oro_form.type.money.class:                                   Oro\Bundle\FormBundle\Form\Type\OroMoneyType
+    oro_form.type.percent.class:                                 Oro\Bundle\FormBundle\Form\Type\OroPercentType
     oro_form.type.entity_identifier.class:                       Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType
     oro_form.type.jqueryselect2_hidden.class:                    Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType
     oro_form.type.icon.class:                                    Oro\Bundle\FormBundle\Form\Type\OroIconType
@@ -43,6 +44,11 @@ services:
             - @oro_locale.formatter.number
         tags:
             - { name: form.type, alias: oro_money }
+
+    oro_form.type.percent:
+        class: %oro_form.type.percent.class%
+        tags:
+            - { name: form.type, alias: oro_percent }
 
     oro_form.type.icon:
         class: %oro_form.type.icon.class%

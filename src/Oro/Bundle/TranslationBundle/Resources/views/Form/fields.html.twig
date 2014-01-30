@@ -1,5 +1,33 @@
-{% block genemu_jqueryselect2_translatable_entity_widget %}
-    {% spaceless %}
-        {{ block('genemu_jqueryselect2_entity_widget') }}
-    {% endspaceless %}
+{#
+    This form field are rendered on System configuration form
+#}
+{% block oro_translation_available_translations_widget %}
+    {{ form_widget(form) }}
+    <div class="available-translation-widget-container">
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path('oro_translation_available_translations'),
+            'alias': 'oro_translation_available_translations'
+        }) }}
+    </div>
+    <p class="available-translation-widget-note">
+        <sup>1&nbsp;</sup>{% trans %}Translation coverage indicator relates to translation package volume. Some bundles may still not be translated.{% endtrans %}
+    </p>
+    <script type="text/javascript">
+        require(['jquery', 'oro/translation/translation/config-action', 'oro/widget-manager'],
+        function ($, ActionPerformer, widgetManager) {
+            $('.available-translation-widget-container')
+                .parents('.controls.control-subgroup')
+                .removeClass('controls')
+                .removeClass('control-subgroup')
+                .end()
+                .parents('.control-group')
+                .addClass('available-translation-widget-control-group')
+            ;
+
+            widgetManager.getWidgetInstanceByAlias('oro_translation_available_translations', function (widget) {
+                new ActionPerformer({el: {{ ('#' ~ form.vars.id)|json_encode|raw }}});
+            });
+        });
+    </script>
 {% endblock %}

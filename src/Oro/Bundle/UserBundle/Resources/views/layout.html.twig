@@ -11,9 +11,9 @@
 
     {% placeholder head_style %}
 
-    {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: false} %}
+    {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
     <script type="text/javascript">
-        require(['jquery', 'bootstrap', 'oro/init-layout', 'orouser/js/init-signin'],
+        require(['jquery', 'oro/init-layout', 'orouser/js/init-signin'],
         function($) {
             $(function() {
                 // emulates 'document ready state' for selenium tests

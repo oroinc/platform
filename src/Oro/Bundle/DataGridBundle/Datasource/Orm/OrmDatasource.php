@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -36,10 +37,36 @@ class OrmDatasource implements DatasourceInterface
      */
     public function process(DatagridInterface $grid, array $config)
     {
-        $queryConfig = array_intersect_key($config, array_flip(['query']));
+        if (isset($config['query'])) {
+            $queryConfig = array_intersect_key($config, array_flip(['query']));
+            $converter = new YamlConverter();
+            $this->qb  = $converter->parse($queryConfig, $this->em->createQueryBuilder());
 
-        $converter = new YamlConverter();
-        $this->qb  = $converter->parse($queryConfig, $this->em->createQueryBuilder());
+        } elseif (isset($config['entity']) and isset($config['repository_method'])) {
+            $entity = $config['entity'];
+            $method = $config['repository_method'];
+            $repository = $this->em->getRepository($entity);
+            if (method_exists($repository, $method)) {
+                $qb = $repository->$method();
+                if ($qb instanceof QueryBuilder) {
+                    $this->qb = $qb;
+                } else {
+                    throw new \Exception(
+                        sprintf(
+                            '%s::%s() must return an instance of Doctrine\ORM\QueryBuilder, %s given',
+                            get_class($repository),
+                            $method,
+                            is_object($qb) ? get_class($qb) : gettype($qb)
+                        )
+                    );
+                }
+            } else {
+                throw new \Exception(sprintf('%s has no method %s', get_class($repository), $method));
+            }
+
+        } else {
+            throw new \Exception(get_class($this).' expects to be configured with query or repository method');
+        }
 
         $grid->setDatasource(clone $this);
     }
@@ -49,15 +76,23 @@ class OrmDatasource implements DatasourceInterface
      */
     public function getResults()
     {
-        $query = $this->aclHelper->apply($this->qb->getQuery());
-
-        $results = $query->execute();
+        $results = $this->getResultQuery()->execute();
         $rows    = [];
         foreach ($results as $result) {
             $rows[] = new ResultRecord($result);
         }
 
         return $rows;
+    }
+
+    /**
+     * Returns query is used to retrieve grid data
+     *
+     * @return Query
+     */
+    public function getResultQuery()
+    {
+        return $this->aclHelper->apply($this->qb->getQuery());
     }
 
     /**

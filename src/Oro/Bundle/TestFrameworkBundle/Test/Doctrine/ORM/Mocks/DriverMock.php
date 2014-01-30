@@ -11,9 +11,11 @@ class DriverMock implements \Doctrine\DBAL\Driver
 
     private $schemaManagerMock;
 
+    private $driverConnectionMock;
+
     public function connect(array $params, $username = null, $password = null, array $driverOptions = array())
     {
-        return new DriverConnectionMock();
+        return $this->getDriverConnection();
     }
 
     /**
@@ -62,6 +64,20 @@ class DriverMock implements \Doctrine\DBAL\Driver
     public function setSchemaManager(\Doctrine\DBAL\Schema\AbstractSchemaManager $sm)
     {
         $this->schemaManagerMock = $sm;
+    }
+
+    public function getDriverConnection()
+    {
+        if ($this->driverConnectionMock == null) {
+            return new DriverConnectionMock();
+        } else {
+            return $this->driverConnectionMock;
+        }
+    }
+
+    public function setDriverConnection(\Doctrine\DBAL\Driver\Connection $dc)
+    {
+        $this->driverConnectionMock = $dc;
     }
 
     public function getName()

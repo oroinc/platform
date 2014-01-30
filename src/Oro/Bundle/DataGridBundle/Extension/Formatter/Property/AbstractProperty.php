@@ -213,6 +213,9 @@ abstract class AbstractProperty implements PropertyInterface
             case self::TYPE_PERCENT:
                 $metadata = ['style' => 'percent'];
                 break;
+            case self::TYPE_CURRENCY:
+                $metadata = ['style' => 'currency'];
+                break;
             case self::TYPE_BOOLEAN:
                 $metadata = ['width' => 10];
                 break;

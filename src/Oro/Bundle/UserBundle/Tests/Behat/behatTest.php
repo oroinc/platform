@@ -10,7 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
  */
 class BehatTest extends BehatTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         static::createClient();
     }

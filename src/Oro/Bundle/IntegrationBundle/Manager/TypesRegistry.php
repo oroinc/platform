@@ -6,13 +6,13 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
-use Oro\Bundle\IntegrationBundle\Provider\ChannelTypeInterface;
-use Oro\Bundle\IntegrationBundle\Provider\ConnectorTypeInterface;
-use Oro\Bundle\IntegrationBundle\Provider\TransportTypeInterface;
+use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
 class TypesRegistry
 {
-    /** @var ArrayCollection|ChannelTypeInterface[] */
+    /** @var ArrayCollection|ChannelInterface[] */
     protected $channelTypes = [];
 
     /** @var array|ArrayCollection[] */
@@ -29,13 +29,13 @@ class TypesRegistry
     /**
      * Set registered types
      *
-     * @param string               $typeName
-     * @param ChannelTypeInterface $type
+     * @param string           $typeName
+     * @param ChannelInterface $type
      *
      * @throws \LogicException
      * @return $this
      */
-    public function addChannelType($typeName, ChannelTypeInterface $type)
+    public function addChannelType($typeName, ChannelInterface $type)
     {
         if (!$this->channelTypes->containsKey($typeName)) {
             $this->channelTypes->set($typeName, $type);
@@ -49,7 +49,7 @@ class TypesRegistry
     /**
      * Return registered types
      *
-     * @return ArrayCollection|ChannelTypeInterface[]
+     * @return ArrayCollection|ChannelInterface[]
      */
     public function getRegisteredChannelTypes()
     {
@@ -66,7 +66,7 @@ class TypesRegistry
         $registry = $this;
         $types    = $registry->getRegisteredChannelTypes();
         $types    = $types->partition(
-            function ($key, ChannelTypeInterface $type) use ($registry) {
+            function ($key, ChannelInterface $type) use ($registry) {
                 return !$registry->getRegisteredTransportTypes($key)->isEmpty();
             }
         );
@@ -75,7 +75,7 @@ class TypesRegistry
         $types  = $types[0];
         $keys   = $types->getKeys();
         $values = $types->map(
-            function (ChannelTypeInterface $type) {
+            function (ChannelInterface $type) {
                 return $type->getLabel();
             }
         )->toArray();
@@ -86,14 +86,14 @@ class TypesRegistry
     /**
      * Register transport for channel type
      *
-     * @param string                 $typeName
-     * @param string                 $channelTypeName
-     * @param TransportTypeInterface $type
+     * @param string             $typeName
+     * @param string             $channelTypeName
+     * @param TransportInterface $type
      *
      * @return $this
      * @throws \LogicException
      */
-    public function addTransportType($typeName, $channelTypeName, TransportTypeInterface $type)
+    public function addTransportType($typeName, $channelTypeName, TransportInterface $type)
     {
         if (!isset($this->transportTypes[$channelTypeName])) {
             $this->transportTypes[$channelTypeName] = new ArrayCollection();
@@ -118,7 +118,7 @@ class TypesRegistry
      * @param string $channelType
      * @param string $transportType
      *
-     * @return TransportTypeInterface
+     * @return TransportInterface
      * @throws \LogicException
      */
     public function getTransportType($channelType, $transportType)
@@ -166,7 +166,7 @@ class TypesRegistry
         $types  = $this->getRegisteredTransportTypes($channelType);
         $keys   = $types->getKeys();
         $values = $types->map(
-            function (TransportTypeInterface $type) {
+            function (TransportInterface $type) {
                 return $type->getLabel();
             }
         )->toArray();
@@ -180,13 +180,13 @@ class TypesRegistry
      * @param bool      $typeNameOnly
      *
      * @throws \LogicException
-     * @return string|TransportTypeInterface
+     * @return string|TransportInterface
      */
     public function getTransportTypeBySettingEntity(Transport $transportEntity, $channelType, $typeNameOnly = false)
     {
         $class = ClassUtils::getClass($transportEntity);
         $types = $this->getRegisteredTransportTypes($channelType)->filter(
-            function (TransportTypeInterface $transport) use ($transportEntity, $class) {
+            function (TransportInterface $transport) use ($transportEntity, $class) {
                 return $transport->getSettingsEntityFQCN() === $class;
             }
         );
@@ -206,14 +206,14 @@ class TypesRegistry
     /**
      * Register connector for channel type
      *
-     * @param string                 $typeName
-     * @param string                 $channelTypeName
-     * @param ConnectorTypeInterface $type
+     * @param string             $typeName
+     * @param string             $channelTypeName
+     * @param ConnectorInterface $type
      *
      * @throws \LogicException
      * @return $this
      */
-    public function addConnectorType($typeName, $channelTypeName, ConnectorTypeInterface $type)
+    public function addConnectorType($typeName, $channelTypeName, ConnectorInterface $type)
     {
         if (!isset($this->connectorTypes[$channelTypeName])) {
             $this->connectorTypes[$channelTypeName] = new ArrayCollection();
@@ -238,7 +238,7 @@ class TypesRegistry
      * @param string $channelType
      * @param string $type
      *
-     * @return ConnectorTypeInterface
+     * @return ConnectorInterface
      * @throws \LogicException
      */
     public function getConnectorType($channelType, $type)
@@ -292,7 +292,7 @@ class TypesRegistry
         $types  = $this->getRegisteredConnectorsTypes($channelType, $filterClosure);
         $keys   = $types->getKeys();
         $values = $types->map(
-            function (ConnectorTypeInterface $type) {
+            function (ConnectorInterface $type) {
                 return $type->getLabel();
             }
         )->toArray();

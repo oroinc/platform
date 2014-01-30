@@ -48,6 +48,9 @@ class BusinessUnitController extends Controller
     {
         return array(
             'entity' => $entity,
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete an owner and related entities or reassign related entities to another owner before
+            'allow_delete' => !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
     }
 
@@ -95,20 +98,20 @@ class BusinessUnitController extends Controller
                 $this->get('translator')->trans('oro.business_unit.controller.message.saved')
             );
 
-            return $this->get('oro_ui.router')->actionRedirect(
-                array(
-                    'route' => 'oro_business_unit_update',
-                    'parameters' => array('id' => $entity->getId()),
-                ),
-                array(
-                    'route' => 'oro_business_unit_view',
-                    'parameters' => array('id' => $entity->getId())
-                )
+            return $this->get('oro_ui.router')->redirectAfterSave(
+                ['route' => 'oro_business_unit_update', 'parameters' => ['id' => $entity->getId()]],
+                ['route' => 'oro_business_unit_view', 'parameters' => ['id' => $entity->getId()]],
+                $entity
             );
         }
 
         return array(
-            'form'     => $this->get('oro_organization.form.business_unit')->createView(),
+            'form' => $this->get('oro_organization.form.business_unit')->createView(),
+            // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
+            // completely delete an owner and related entities or reassign related entities to another owner before
+            'allow_delete' =>
+                $entity->getId() &&
+                !$this->get('oro_organization.owner_deletion_manager')->hasAssignments($entity)
         );
     }
 

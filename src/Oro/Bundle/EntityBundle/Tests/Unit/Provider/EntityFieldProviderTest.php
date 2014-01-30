@@ -14,6 +14,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     private $entityConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $extendConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $entityClassResolver;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -25,6 +28,9 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityClassResolver  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
@@ -55,11 +61,12 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->provider = new EntityFieldProvider(
             $this->entityConfigProvider,
+            $this->extendConfigProvider,
             $this->entityClassResolver,
             $this->doctrine,
-            $entityProvider,
             $translator
         );
+        $this->provider->setEntityProvider($entityProvider);
     }
 
     public function testGetFieldsNoEntityConfig()
@@ -527,16 +534,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $this->entityConfigProvider->expects($this->any())
-            ->method('getIds')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use (&$config) {
-                        return $this->getEntityIds($className, $config);
-                    }
-                )
-            );
-
     }
 
     /**

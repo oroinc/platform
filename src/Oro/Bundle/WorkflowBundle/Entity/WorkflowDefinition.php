@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+
 /**
- * Definition of Workflow
- *
  * @ORM\Table(
  *      name="oro_workflow_definition", indexes={
  *          @ORM\Index(name="oro_workflow_definition_enabled_idx", columns={"enabled"})
@@ -37,9 +37,22 @@ class WorkflowDefinition
     /**
      * @var string
      *
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(name="related_entity", type="string", length=255, unique=true)
      */
-    protected $type;
+    protected $relatedEntity;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="entity_attribute_name", type="string", length=255)
+     */
+    protected $entityAttributeName;
+
+    /**
+     * @var bool
+     * @ORM\Column(name="steps_display_ordered", type="boolean")
+     */
+    protected $stepsDisplayOrdered = false;
 
     /**
      * @var boolean
@@ -49,13 +62,6 @@ class WorkflowDefinition
     protected $enabled;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="start_step", type="string", length=255, nullable=true)
-     */
-    protected $startStep;
-
-    /**
      * @var array
      *
      * @ORM\Column(name="configuration", type="array")
@@ -63,16 +69,24 @@ class WorkflowDefinition
     protected $configuration;
 
     /**
-     * @var Collection
+     * @var WorkflowStep[]|Collection
      *
      * @ORM\OneToMany(
-     *      targetEntity="WorkflowDefinitionEntity",
-     *      mappedBy="workflowDefinition",
+     *      targetEntity="WorkflowStep",
+     *      mappedBy="definition",
      *      orphanRemoval=true,
      *      cascade={"all"}
      * )
      */
-    protected $workflowDefinitionEntities;
+    protected $steps;
+
+    /**
+     * @var WorkflowStep
+     *
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="start_step_id", referencedColumnName="id")
+     */
+    protected $startStep;
 
     /**
      * Constructor
@@ -81,7 +95,7 @@ class WorkflowDefinition
     {
         $this->enabled = false;
         $this->configuration = array();
-        $this->workflowDefinitionEntities = new ArrayCollection();
+        $this->steps = new ArrayCollection();
     }
 
     /**
@@ -131,26 +145,41 @@ class WorkflowDefinition
     }
 
     /**
-     * Get label
-     *
-     * @return string
+     * @param string $relatedEntity
+     * @return WorkflowDefinition
      */
-    public function getType()
+    public function setRelatedEntity($relatedEntity)
     {
-        return $this->type;
+        $this->relatedEntity = $relatedEntity;
+
+        return $this;
     }
 
     /**
-     * Set type
-     *
-     * @param string $type
+     * @return string
+     */
+    public function getRelatedEntity()
+    {
+        return $this->relatedEntity;
+    }
+
+    /**
+     * @param string $entityAttributeName
      * @return WorkflowDefinition
      */
-    public function setType($type)
+    public function setEntityAttributeName($entityAttributeName)
     {
-        $this->type = $type;
+        $this->entityAttributeName = $entityAttributeName;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityAttributeName()
+    {
+        return $this->entityAttributeName;
     }
 
     /**
@@ -177,6 +206,25 @@ class WorkflowDefinition
     }
 
     /**
+     * @return boolean
+     */
+    public function isStepsDisplayOrdered()
+    {
+        return $this->stepsDisplayOrdered;
+    }
+
+    /**
+     * @param boolean $stepsDisplayOrdered
+     * @return WorkflowDefinition
+     */
+    public function setStepsDisplayOrdered($stepsDisplayOrdered)
+    {
+        $this->stepsDisplayOrdered = $stepsDisplayOrdered;
+
+        return $this;
+    }
+
+    /**
      * Set configuration
      *
      * @param array $configuration
@@ -200,18 +248,31 @@ class WorkflowDefinition
     }
 
     /**
-     * @param string $startStep
+     * @param WorkflowStep $startStep
      * @return WorkflowDefinition
+     * @throws WorkflowException
      */
     public function setStartStep($startStep)
     {
-        $this->startStep = $startStep;
+        if (null !== $startStep) {
+            $stepName = $startStep->getName();
+
+            if (!$this->hasStepByName($stepName)) {
+                throw new WorkflowException(
+                    sprintf('Workflow "%s" does not contain step "%s"', $this->getName(), $stepName)
+                );
+            }
+
+            $this->startStep = $this->getStepByName($stepName);
+        } else {
+            $this->startStep = null;
+        }
 
         return $this;
     }
 
     /**
-     * @return string
+     * @return WorkflowStep
      */
     public function getStartStep()
     {
@@ -219,54 +280,110 @@ class WorkflowDefinition
     }
 
     /**
-     * @param Collection|WorkflowDefinitionEntity[] $definitionEntities
+     * @return WorkflowStep[]
+     */
+    public function getSteps()
+    {
+        return $this->steps;
+    }
+
+    /**
+     * @param WorkflowStep[]|Collection $steps
      * @return WorkflowDefinition
      */
-    public function setWorkflowDefinitionEntities($definitionEntities)
+    public function setSteps($steps)
     {
-        /** @var WorkflowDefinitionEntity $entity */
-        $newEntities = array();
-        foreach ($definitionEntities as $entity) {
-            $newEntities[$entity->getClassName()] = $entity;
+        $newStepNames = array();
+        foreach ($steps as $step) {
+            $newStepNames[] = $step->getName();
         }
 
-        foreach ($this->workflowDefinitionEntities as $entity) {
-            if (array_key_exists($entity->getClassName(), $newEntities)) {
-                unset($newEntities[$entity->getClassName()]);
-            } else {
-                $this->workflowDefinitionEntities->removeElement($entity);
+        foreach ($this->steps as $step) {
+            if (!in_array($step->getName(), $newStepNames)) {
+                $this->removeStep($step);
             }
         }
 
-        foreach ($newEntities as $entity) {
-            $entity->setWorkflowDefinition($this);
-            $this->workflowDefinitionEntities->add($entity);
+        foreach ($steps as $step) {
+            $this->addStep($step);
         }
 
         return $this;
     }
 
     /**
-     * @return Collection|WorkflowDefinitionEntity[]
+     * @param WorkflowStep $step
+     * @return WorkflowItem
      */
-    public function getWorkflowDefinitionEntities()
+    public function addStep(WorkflowStep $step)
     {
-        return $this->workflowDefinitionEntities;
+        $stepName = $step->getName();
+
+        if (!$this->hasStepByName($stepName)) {
+            $step->setDefinition($this);
+            $this->steps->add($step);
+        } else {
+            $this->getStepByName($stepName)->import($step);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowStep $step
+     * @return WorkflowItem
+     */
+    public function removeStep(WorkflowStep $step)
+    {
+        $stepName = $step->getName();
+
+        if ($this->hasStepByName($stepName)) {
+            $step = $this->getStepByName($stepName);
+            $this->steps->removeElement($step);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $stepName
+     * @return bool
+     */
+    public function hasStepByName($stepName)
+    {
+        return $this->getStepByName($stepName) !== null;
+    }
+
+    /**
+     * @param string $stepName
+     * @return null|WorkflowStep
+     */
+    public function getStepByName($stepName)
+    {
+        foreach ($this->steps as $step) {
+            if ($step->getName() == $stepName) {
+                return $step;
+            }
+        }
+
+        return null;
     }
 
     /**
      * @param WorkflowDefinition $definition
-     * @return $this
+     * @return WorkflowDefinition
      */
     public function import(WorkflowDefinition $definition)
     {
+        // enabled flag should not be imported
         $this->setName($definition->getName())
-            ->setType($definition->getType())
             ->setLabel($definition->getLabel())
-            ->setEnabled($definition->isEnabled())
+            ->setRelatedEntity($definition->getRelatedEntity())
+            ->setEntityAttributeName($definition->getEntityAttributeName())
             ->setConfiguration($definition->getConfiguration())
+            ->setSteps($definition->getSteps())
             ->setStartStep($definition->getStartStep())
-            ->setWorkflowDefinitionEntities($definition->getWorkflowDefinitionEntities());
+            ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered());
 
         return $this;
     }

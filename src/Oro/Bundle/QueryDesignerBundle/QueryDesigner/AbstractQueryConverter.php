@@ -4,7 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
-use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFilterLogicException;
 
 /**
  * Provides a core functionality to convert a query definition created by the query designer to another format.
@@ -90,10 +89,10 @@ abstract class AbstractQueryConverter
     public function ensureTableJoined($joinId)
     {
         $joinIds = [];
-        foreach (explode(',', $joinId) as $item) {
+        foreach (explode('+', $joinId) as $item) {
             $joinIds[] = empty($joinIds)
                 ? $item
-                : sprintf('%s,%s', $joinIds[count($joinIds) - 1], $item);
+                : sprintf('%s+%s', $joinIds[count($joinIds) - 1], $item);
         }
         $this->addTableAliasesForJoinIdentifiers($joinIds);
 
@@ -147,7 +146,7 @@ abstract class AbstractQueryConverter
             throw new \LogicException('Cannot get parent join identifier for root table.');
         }
 
-        $lastDelimiter = strrpos($joinId, ',');
+        $lastDelimiter = strrpos($joinId, '+');
         if (false === $lastDelimiter) {
             return '';
         }
@@ -206,9 +205,7 @@ abstract class AbstractQueryConverter
     {
         $this->addTableAliasesForJoinIdentifiers(['']);
         if (isset($this->definition['filters'])) {
-            foreach ($this->definition['filters'] as $filter) {
-                $this->addTableAliasesForJoinIdentifiers($this->getJoinIdentifiers($filter['columnName']));
-            }
+            $this->addTableAliasesForFilters($this->definition['filters']);
         }
         foreach ($this->definition['columns'] as $column) {
             $this->addTableAliasesForJoinIdentifiers($this->getJoinIdentifiers($column['name']));
@@ -348,106 +345,57 @@ abstract class AbstractQueryConverter
     protected function addWhereStatement()
     {
         if (isset($this->definition['filters']) && !empty($this->definition['filters'])) {
-            $groupCounter = 1;
-            $this->beginWhereGroup();
-            $tokens = [];
-            preg_match_all(
-                '/\d+|AND|OR|\(|\)/i',
-                $this->definition['filters_logic'],
-                $tokens,
-                PREG_SET_ORDER | PREG_OFFSET_CAPTURE
-            );
-            $lastTokenType   = 0; // 1 - operator, 2 - filter, 3 - (, 4 - )
-            $maxFilterNumber = count($this->definition['filters']);
-            foreach ($tokens as $token) {
-                if ($token[0][0] === '(') {
-                    $this->processOpenParenthesis($groupCounter, $lastTokenType, $token);
-                } elseif ($token[0][0] === ')') {
-                    $this->processCloseParenthesis($groupCounter, $lastTokenType, $token);
-                } elseif (false !== filter_var($token[0][0], FILTER_VALIDATE_INT)) {
-                    $this->processFilter($lastTokenType, $token, $maxFilterNumber);
-                } else {
-                    $this->processOperator($lastTokenType, $token);
-                }
-            }
-            $this->endWhereGroup();
-            $groupCounter--;
-            if ($groupCounter > 0) {
-                $this->throwInvalidFilterLogicException('expecting ")" at the end');
-            }
+            $this->processFilters($this->definition['filters'], new FiltersParserContext());
         }
     }
 
     /**
-     * @param int   $groupCounter
-     * @param int   $lastTokenType
-     * @param array $token
+     * @param array                $filters
+     * @param FiltersParserContext $context
      */
-    protected function processOpenParenthesis(&$groupCounter, &$lastTokenType, &$token)
+    protected function processFilters(array $filters, FiltersParserContext $context)
     {
-        if ($lastTokenType !== 0 && $lastTokenType !== 1 && $lastTokenType !== 3) {
-            $this->throwInvalidFilterLogicException(
-                sprintf('unexpected "(" at position %d', $token[0][1] + 1)
-            );
-        }
+        $context->checkBeginGroup();
         $this->beginWhereGroup();
-        $groupCounter++;
-        $lastTokenType = 3;
-    }
 
-    /**
-     * @param int   $groupCounter
-     * @param int   $lastTokenType
-     * @param array $token
-     */
-    protected function processCloseParenthesis(&$groupCounter, &$lastTokenType, &$token)
-    {
-        if ($groupCounter <= 1 ||
-            ($lastTokenType !== 0 && $lastTokenType !== 2 && $lastTokenType !== 4)
-        ) {
-            $this->throwInvalidFilterLogicException(
-                sprintf('unexpected ")" at position %d', $token[0][1] + 1)
-            );
+        $context->setLastTokenType(FiltersParserContext::BEGIN_GROUP_TOKEN);
+        foreach ($filters as $token) {
+            if (is_string($token)) {
+                $context->checkOperator($token);
+                $this->processOperator($token);
+                $context->setLastTokenType(FiltersParserContext::OPERATOR_TOKEN);
+            } elseif (is_array($token) && isset($token['columnName'])) {
+                $context->checkFilter($token);
+                $this->processFilter($token);
+                $context->setLastTokenType(FiltersParserContext::FILTER_TOKEN);
+            } else {
+                if (empty($token)) {
+                    $context->throwInvalidFiltersException('a group must not be empty');
+                }
+                $this->processFilters($token, $context);
+            }
+            $context->setLastToken($token);
         }
+
+        $context->checkEndGroup();
         $this->endWhereGroup();
-        $groupCounter--;
-        $lastTokenType = 4;
+
+        $context->setLastTokenType(FiltersParserContext::END_GROUP_TOKEN);
     }
 
     /**
-     * @param int   $lastTokenType
-     * @param array $token
+     * @param string $operator
      */
-    protected function processOperator(&$lastTokenType, &$token)
+    protected function processOperator($operator)
     {
-        if ($lastTokenType !== 2 && $lastTokenType !== 4) {
-            $this->throwInvalidFilterLogicException(
-                sprintf('unexpected "%s" operator at position %d', $token[0][0], $token[0][1] + 1)
-            );
-        }
-        $this->addWhereOperator(strtoupper($token[0][0]));
-        $lastTokenType = 1;
+        $this->addWhereOperator(strtoupper($operator));
     }
 
     /**
-     * @param int   $lastTokenType
-     * @param array $token
-     * @param int   $maxFilterNumber
+     * @param array $filter
      */
-    protected function processFilter(&$lastTokenType, &$token, $maxFilterNumber)
+    protected function processFilter($filter)
     {
-        if ($lastTokenType !== 0 && $lastTokenType !== 1 && $lastTokenType !== 3) {
-            $this->throwInvalidFilterLogicException(
-                sprintf('unexpected filter "%s" at position %d', $token[0][0], $token[0][1] + 1)
-            );
-        }
-        $filterNumber = intval($token[0][0]);
-        if ($filterNumber < 1 || $filterNumber > $maxFilterNumber) {
-            $this->throwInvalidFilterLogicException(
-                sprintf('unknown filter number "%s" at position %d', $token[0][0], $token[0][1] + 1)
-            );
-        }
-        $filter         = $this->definition['filters'][$filterNumber - 1];
         $columnName     = $filter['columnName'];
         $fieldName      = $this->getFieldName($columnName);
         $columnAliasKey = $this->buildColumnAliasKey($columnName);
@@ -459,20 +407,6 @@ abstract class AbstractQueryConverter
             $columnAlias,
             $filter['criterion']['filter'],
             $filter['criterion']['data']
-        );
-        $lastTokenType = 2;
-    }
-
-    /**
-     * Raises InvalidFilterLogicException
-     *
-     * @param $msg
-     * @throws InvalidFilterLogicException
-     */
-    protected function throwInvalidFilterLogicException($msg)
-    {
-        throw new InvalidFilterLogicException(
-            sprintf('Syntax error in "%s", %s.', $this->definition['filters_logic'], $msg)
         );
     }
 
@@ -573,6 +507,24 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * Generates and saves table aliases for the given filters
+     *
+     * @param array $filters
+     */
+    protected function addTableAliasesForFilters(array $filters)
+    {
+        foreach ($filters as $item) {
+            if (is_array($item)) {
+                if (isset($item['columnName'])) {
+                    $this->addTableAliasesForJoinIdentifiers($this->getJoinIdentifiers($item['columnName']));
+                } else {
+                    $this->addTableAliasesForFilters($item);
+                }
+            }
+        }
+    }
+
+    /**
      * Builds a join identifier for the given column
      *
      * @param string $columnName
@@ -580,17 +532,17 @@ abstract class AbstractQueryConverter
      */
     protected function getJoinIdentifiers($columnName)
     {
-        $lastDelimiter = strrpos($columnName, ',');
+        $lastDelimiter = strrpos($columnName, '+');
         if (false === $lastDelimiter) {
             return [''];
         }
 
         $result = [];
-        $items  = explode(',', sprintf('%s::%s', $this->entity, substr($columnName, 0, $lastDelimiter)));
+        $items  = explode('+', sprintf('%s::%s', $this->entity, substr($columnName, 0, $lastDelimiter)));
         foreach ($items as $item) {
             $result[] = empty($result)
                 ? $item
-                : sprintf('%s,%s', $result[count($result) - 1], $item);
+                : sprintf('%s+%s', $result[count($result) - 1], $item);
         }
 
         return $result;
@@ -618,7 +570,7 @@ abstract class AbstractQueryConverter
         if (false === $lastDelimiter) {
             return $this->entity;
         }
-        $lastItemDelimiter = strrpos($columnNameOrJoinId, ',');
+        $lastItemDelimiter = strrpos($columnNameOrJoinId, '+');
         if (false === $lastItemDelimiter) {
             return substr($columnNameOrJoinId, 0, $lastDelimiter);
         }
@@ -696,7 +648,7 @@ abstract class AbstractQueryConverter
     protected function prepareFunctionExpression($functionExpr, $tableAlias, $fieldName, $columnName, $columnAlias)
     {
         if (is_string($functionExpr) && strpos($functionExpr, '@') === 0) {
-            $className = substr($functionExpr, 1);
+            $className    = substr($functionExpr, 1);
             $functionExpr = new $className();
         }
         if ($functionExpr instanceof FunctionInterface) {

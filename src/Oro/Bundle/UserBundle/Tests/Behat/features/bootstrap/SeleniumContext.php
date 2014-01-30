@@ -3,10 +3,10 @@
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Event\ScenarioEvent;
 use Oro\Bundle\TestFrameworkBundle\Test\BehatSeleniumContext;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Login;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Navigation;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\User;
-use Oro\Bundle\TestFrameworkBundle\Pages\Objects\Users;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Login;
+use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\User;
+use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users;
 
 class SeleniumContext extends BehatSeleniumContext
 {
@@ -14,7 +14,7 @@ class SeleniumContext extends BehatSeleniumContext
     /**
      * @BeforeScenario
      */
-    public function setup(ScenarioEvent $event)
+    public function initial(ScenarioEvent $event)
     {
         $this->setHost(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
         $this->setPort(intval(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT));
@@ -24,7 +24,7 @@ class SeleniumContext extends BehatSeleniumContext
     }
 
     /** @AfterScenario */
-    public function teardown(ScenarioEvent $event)
+    public function finalization(ScenarioEvent $event)
     {
         $this->cookie()->clear();
     }
@@ -47,11 +47,9 @@ class SeleniumContext extends BehatSeleniumContext
     public function iOpenDialog($dialog)
     {
         $createUser = new Navigation($this);
-        $createUser->tab('System')
-            ->menu('Users')
-            ->openUsers(false)
+        $createUser->openUsers('Oro\Bundle\UserBundle')
             ->add()
-            ->assertTitle('Create User - Users - System');
+            ->assertTitle('Create User - Users - Users Management - System');
     }
 
     /**
@@ -109,8 +107,7 @@ class SeleniumContext extends BehatSeleniumContext
     public function iPress($button)
     {
         $user = new User($this, false);
-        $user->save()
-            ->close();
+        $user->save();
     }
 
     /**
@@ -118,8 +115,9 @@ class SeleniumContext extends BehatSeleniumContext
      */
     public function iShouldSee($message)
     {
-        $users = new Users($this, false);
+        $users = new User($this, false);
         $users->assertMessage($message)
-            ->assertTitle('Users - System');
+            ->toGrid()
+            ->assertTitle('Users - Users Management - System');
     }
 }
