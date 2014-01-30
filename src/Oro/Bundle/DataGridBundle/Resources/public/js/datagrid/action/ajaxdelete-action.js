@@ -17,7 +17,7 @@ define(['oro/datagrid/model-action', 'oro/delete-confirmation', 'oro/translator'
         confirmModalConstructor: DeleteConfirmation,
 
         defaultMessages: {
-            confirm_title: __('Remove confirmation'),
+            confirm_title: __('Delete confirmation'),
             confirm_content: __('Are you sure you want to remove this item?'),
             confirm_ok: __('Yes'),
             success: __('Removed.'),
