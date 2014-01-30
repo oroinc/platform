@@ -3,6 +3,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ChannelAwareFormType extends AbstractType
 {
@@ -27,5 +28,14 @@ class ChannelAwareFormType extends AbstractType
                 'property' => 'name',
             ]
         );
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(['channel_form_type' => 'entity']);
     }
 }
