@@ -6,7 +6,8 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\DownloadableTranslationResource;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class RequestListener
 {
@@ -16,9 +17,14 @@ class RequestListener
     protected $translator;
 
     /**
-     * @var OrmTranslationMetadataCache
+     * @var DynamicTranslationMetadataCache
      */
     protected $databaseTranslationMetadataCache;
+
+    /**
+     * @var DynamicTranslationMetadataCache
+     */
+    protected $downloadTranslationMetadataCache;
 
     /**
      * @var string[]
@@ -28,13 +34,18 @@ class RequestListener
     /**
      * Constructor
      *
-     * @param Translator    $translator
-     * @param OrmTranslationMetadataCache $databaseTranslationMetadataCache
+     * @param Translator                      $translator
+     * @param DynamicTranslationMetadataCache $databaseTranslationMetadataCache
+     * @param DynamicTranslationMetadataCache $downloadTranslationMetadataCache
      */
-    public function __construct(Translator $translator, OrmTranslationMetadataCache $databaseTranslationMetadataCache)
-    {
+    public function __construct(
+        Translator $translator,
+        DynamicTranslationMetadataCache $databaseTranslationMetadataCache,
+        DynamicTranslationMetadataCache $downloadTranslationMetadataCache
+    ) {
         $this->translator                       = $translator;
         $this->databaseTranslationMetadataCache = $databaseTranslationMetadataCache;
+        $this->downloadTranslationMetadataCache = $downloadTranslationMetadataCache;
         $this->registeredTranslationResources   = [];
     }
 
@@ -52,6 +63,12 @@ class RequestListener
                 $this->translator->addResource(
                     'oro_database_translation',
                     new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
+                    $locale,
+                    'messages'
+                );
+                $this->translator->addResource(
+                    'oro_database_translation',
+                    new DownloadableTranslationResource($locale, $this->downloadTranslationMetadataCache),
                     $locale,
                     'messages'
                 );

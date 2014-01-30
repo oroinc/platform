@@ -22,20 +22,18 @@ services:
     oro_config.user:
         class:                        %oro_config.user.class%
         arguments:
+           - @event_dispatcher
            - @doctrine.orm.entity_manager
            - @oro_config.config_definition_bag
         calls:
              - [setSecurity, ["@security.context"]]
-        tags:
-            -  { name: oro_config.manager }
 
     oro_config.global:
         class:                        %oro_config.global.class%
         arguments:
+           - @event_dispatcher
            - @doctrine.orm.entity_manager
            - @oro_config.config_definition_bag
-        tags:
-            -  { name: oro_config.manager }
 
     oro_config.twig.config_extension:
         class:                        %oro_config.twig_extension.class%
