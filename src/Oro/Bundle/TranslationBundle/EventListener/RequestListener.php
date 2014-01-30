@@ -67,7 +67,7 @@ class RequestListener
                     'messages'
                 );
                 $this->translator->addResource(
-                    'php',
+                    'oro_downloadable_translation',
                     new DownloadableTranslationResource($locale, $this->downloadTranslationMetadataCache),
                     $locale
                 );
