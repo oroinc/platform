@@ -38,12 +38,14 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             ->runCommand('cache:clear')
             ->runCommand('oro:entity-config:update')
             ->runCommand('oro:entity-extend:update')
+            ->runCommand('oro:workflow:definitions:load')
+            ->runCommand('oro:installer:fixtures:load')
             ->runCommand('oro:navigation:init')
             ->runCommand('assets:install')
             ->runCommand('assetic:dump')
             ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
             ->runCommand('oro:localization:dump')
             ->runCommand('oro:translation:dump')
-            ->runCommand('oro:requirejs:build');
+            ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
     }
 }

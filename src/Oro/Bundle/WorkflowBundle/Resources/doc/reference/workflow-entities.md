@@ -64,7 +64,6 @@ for specified WorkflowItem;
 for specified WorkflowItem;
 * **start(data, Transition)** - returns new instance of Workflow Item and processes it's start transition;
 * **getTransitionsByWorkflowItem(WorkflowItem)** - returns a list of allowed transitions;
-* **getManagedEntityAttributes()** - gets list of Attributes of managed entities;
 * **createWorkflowItem(array data)** - create WorkflowItem instance and initialize it with passed data.
 * **getStepManager()** - get instance of embedded Step Manager;
 * **getAttributeManager()** - get instance of embedded Attribute Manager;
@@ -271,10 +270,6 @@ temporary storage of result of last applied transition actions as instance of Wo
 list of related entities as list of WorkflowBindEntity entities, log of all applied transitions as list of
 WorkflowTransitionRecord entities.
 
-**Methods:**
-* **addBindEntity(WorkflowBindEntity)** - adds new instance of related entity;
-* **removeBindEntity(WorkflowBindEntity)** - removes existing related entity.
-
 Workflow Item Repository
 ------------------------
 **Class:**
@@ -319,7 +314,6 @@ and workflow data as array;
 * **getApplicableWorkflows(entity, workflowItems, workflowName)** - returns list of workflows that can be started
 for specified entity;
 * **getWorkflowItemsByEntity(entity, workflowName, workflowType)** - get list of all workflow items by input entity;
-* **isAllManagedEntitiesSpecified(WorkflowItem)** - returns "false" if some of required managed entities
 are not specified;
 * **getWorkflowData(Workflow, entity, data)** - get array filled with calculated workflow data based on
 input entity and data;
@@ -375,11 +369,6 @@ Oro\Bundle\WorkflowBundle\Model\AttributeManager
 AttributeManager is a container for attributes, is provides getters, setters
 and list of additional functions applicable to attributes.
 
-**Methods:**
-* **getManagedEntityAttributes()** - git list of attributes that contain managed entities;
-* **getBindEntityAttributes()** - git list of attributes that should be bound;
-* **getBindEntityAttributeNames()** - git list of the names of attributes that should be bound.
-
 Context Accessor
 ----------------
 **Class:**
@@ -389,19 +378,6 @@ Oro\Bundle\WorkflowBundle\Model\ContextAccessor
 Context is used in action and conditions and thereby it's usually an instance of Workflow Item.
 This class is a simple helper that encapsulates logic of accessing properties of context using
 Symfony\Component\PropertyAccess\PropertyAccessor.
-
-Entity Binder
--------------
-**Class:**
-Oro\Bundle\WorkflowBundle\Model\EntityBinder
-
-**Description:**
-Ensures that all values of bind attributes of WorkflowItem are actually persisted or removed (if values was unset).
-This class delegates operations with Doctrine classes to special helper - a class
-Oro\Bundle\WorkflowBundle\Model\DoctrineHelper.
-
-**Methods:**
-* **bindEntities(WorkflowItem)** - bind all corresponding attribute values.
 
 Workflow Configuration
 ----------------------

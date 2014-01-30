@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Twig;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AuditableExtension extends \Twig_Extension
@@ -42,11 +43,19 @@ class AuditableExtension extends \Twig_Extension
      */
     public function isAuditable($entity)
     {
-        if (!is_object($entity)) {
+        if (is_array($entity)) {
             return false;
         }
 
-        $className = ClassUtils::getClass($entity);
+        if (!is_object($entity)) {
+            $className = str_replace('_', '\\', $entity);
+        } else {
+            $className = ClassUtils::getClass($entity);
+        }
+
+        if ($entity instanceof EntityConfigModel) {
+            $className = $entity->getClassName();
+        }
 
         return $this->auditConfigProvider->hasConfig($className)
             && $this->auditConfigProvider->getConfig($className)->is('auditable');

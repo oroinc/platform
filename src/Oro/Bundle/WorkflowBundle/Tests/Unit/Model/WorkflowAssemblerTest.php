@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -23,7 +24,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         'name' => 'test_name',
         'label' => 'Test Label',
         'enabled' => true,
-        'type' => Workflow::TYPE_ENTITY,
     );
 
     protected $stepConfiguration = array(
@@ -45,7 +45,10 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createWorkflow()
     {
-        return new Workflow();
+        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return new Workflow($entityConnector);
     }
 
     /**
@@ -59,7 +62,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setName($this->workflowParameters['name'])
             ->setLabel($this->workflowParameters['label'])
             ->setEnabled($this->workflowParameters['enabled'])
-            ->setType($this->workflowParameters['type'])
             ->setConfiguration($configuration);
 
         return $workflowDefinition;
@@ -105,13 +107,18 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param WorkflowDefinition $definition
      * @param array $configuration
      * @param Collection $attributes
      * @param boolean $expectations
      * @return AttributeAssembler
      */
-    protected function createAttributeAssemblerMock(array $configuration, $attributes, $expectations = true)
-    {
+    protected function createAttributeAssemblerMock(
+        WorkflowDefinition $definition,
+        array $configuration,
+        $attributes,
+        $expectations = true
+    ) {
         $attributeAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeAssembler')
             ->disableOriginalConstructor()
             ->setMethods(array('assemble'))
@@ -122,7 +129,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
                 : array();
             $attributeAssembler->expects($this->once())
                 ->method('assemble')
-                ->with($expectedAttributeConfiguration)
+                ->with($definition, $expectedAttributeConfiguration)
                 ->will($this->returnValue($attributes));
         }
 
@@ -136,8 +143,12 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
      * @param boolean $expectations
      * @return StepAssembler
      */
-    protected function createStepAssemblerMock(array $configuration, $attributes, $steps, $expectations = true)
-    {
+    protected function createStepAssemblerMock(
+        array $configuration,
+        $attributes,
+        $steps,
+        $expectations = true
+    ) {
         $stepAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\StepAssembler')
             ->disableOriginalConstructor()
             ->setMethods(array('assemble'))
@@ -217,32 +228,35 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $configuration
-     * @param string $startStepName
+     * @param WorkflowStep $startStep
      * @param array $expectedTransitions
      * @param array $expectedDefinitions
      * @dataProvider assembleDataProvider
      */
-    public function testAssemble(array $configuration, $startStepName, $expectedTransitions, $expectedDefinitions)
+    public function testAssemble(array $configuration, $startStep, $expectedTransitions, $expectedDefinitions)
     {
         // source data
         $workflow = $this->createWorkflow();
         $workflowDefinition = $this->createWorkflowDefinition($configuration);
+        if ($startStep) {
+            $workflowDefinition->addStep($startStep);
+        }
         $attributes = new ArrayCollection(array('test' => $this->getAttributeMock()));
         $steps = new ArrayCollection(array('test_start_step' => $this->getStepMock()));
 
         $transitions = array('test_transition' => $this->getTransitionMock(false));
-        if (!$startStepName) {
+        if (!$startStep) {
             $transitions['test_start_transition'] = $this->getTransitionMock(true);
         } else {
             $transitions['__start__'] = $this->getTransitionMock(true);
-            $workflowDefinition->setStartStep($startStepName);
+            $workflowDefinition->setStartStep($startStep);
         }
         $transitions = new ArrayCollection($transitions);
 
         // mocks
         $container = $this->createContainerMock($workflow);
         $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
-        $attributeAssembler = $this->createAttributeAssemblerMock($configuration, $attributes);
+        $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock(
             $configuration,
@@ -309,6 +323,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => $label,
                     'step_to' => $stepName,
                     'is_start' => true,
+                    'is_hidden' => true,
                     'transition_definition' => '__start___definition'
                 )
             );
@@ -317,35 +332,43 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         return array(
             'full configuration with start' => array(
                 'configuration' => $fullConfig,
-                'startStepName' => 'test_start_step',
+                'startStep' => $this->getStepEntity('test_start_step'),
                 'expectedTransitions' => $transitions + $getDefaultTransition('test_start_step'),
                 'expectedDefinitions' => $this->transitionDefinition + array('__start___definition' => array())
             ),
             'minimal configuration with start' => array(
                 'configuration' => $minimalConfig,
-                'startStepName' => 'test_start_step',
+                'startStep' => $this->getStepEntity('test_start_step'),
                 'expectedTransitions' => $transitions + $getDefaultTransition('test_start_step'),
                 'expectedDefinitions' => $this->transitionDefinition + array('__start___definition' => array())
             ),
             'full configuration without start' => array(
                 'configuration' => $fullConfig,
-                'startStepName' => null,
+                'startStep' => null,
                 'expectedTransitions' => $transitions,
                 'expectedDefinitions' => array()
             ),
             'minimal configuration without start' => array(
                 'configuration' => $minimalConfig,
-                'startStepName' => null,
+                'startStep' => null,
                 'expectedTransitions' => $transitions,
                 'expectedDefinitions' => array()
             ),
             'full configuration with start custom config' => array(
                 'configuration' => $fullConfigWithCustomStart,
-                'startStepName' => 'test_start_step',
+                'startStep' => $this->getStepEntity('test_start_step'),
                 'expectedTransitions' => $transitions + $customStartTransition,
                 'expectedDefinitions' => $this->transitionDefinition + $customStartDefinition
             ),
         );
+    }
+
+    protected function getStepEntity($name)
+    {
+        $step = new WorkflowStep();
+        $step->setName($name);
+
+        return $step;
     }
 
     /**
@@ -372,54 +395,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         // mocks
         $container = $this->createContainerMock($workflow);
         $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
-        $attributeAssembler = $this->createAttributeAssemblerMock($configuration, $attributes);
-        $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
-        $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
-
-        // test
-        $workflowAssembler = new WorkflowAssembler(
-            $container,
-            $configurationTree,
-            $attributeAssembler,
-            $stepAssembler,
-            $transitionAssembler
-        );
-        $workflowAssembler->assemble($workflowDefinition);
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
-     * @expectedExceptionMessage Workflow "test_name" has type "entity" and cannot support form options in step "test_step"
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAssembleEntityWorkflowStepFormOptionsException()
-    {
-        $configuration = array(
-            'type' => 'entity',
-            WorkflowConfiguration::NODE_ATTRIBUTES => array('attributes_configuration'),
-            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
-            WorkflowConfiguration::NODE_TRANSITIONS => $this->transitionConfiguration,
-            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => $this->transitionDefinition
-        );
-
-        $stepMock = $this->getStepMock();
-        $stepMock->expects($this->once())->method('getName')->will($this->returnValue('test_step'));
-        $stepMock->expects($this->once())->method('getFormOptions')->will($this->returnValue(array('foo' => 'bar')));
-
-        // source data
-        $workflow = $this->createWorkflow();
-        $workflowDefinition = $this->createWorkflowDefinition($configuration);
-        $workflowDefinition->setType(Workflow::TYPE_ENTITY);
-        $attributes = new ArrayCollection(array('test' => $this->getAttributeMock()));
-        $steps = new ArrayCollection(array('test_start_step' => $stepMock));
-
-        $transitions = array('test_transition' => $this->getTransitionMock(true));
-
-        // mocks
-        $container = $this->createContainerMock($workflow);
-        $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
-        $attributeAssembler = $this->createAttributeAssemblerMock($configuration, $attributes);
+        $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
 
@@ -447,7 +423,8 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $container = $this->createContainerMock($workflow, false);
         $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
-        $attributeAssembler = $this->createAttributeAssemblerMock($configuration, $attributes, false);
+        $attributeAssembler = $this
+            ->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes, false);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps, false);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions, false);
 
@@ -485,20 +462,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             WorkflowConfiguration::NODE_STEPS => array('step_one' => $this->stepConfiguration),
             WorkflowConfiguration::NODE_TRANSITIONS => array(),
             WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array($this->transitionDefinition)
-        );
-        $this->assembleWorkflow($configuration);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
-     * @expectedExceptionMessage Option "transition_definitions" is required
-     */
-    public function testAssembleNoTransitionDefinitionsConfigurationException()
-    {
-        $configuration = array(
-            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
-            WorkflowConfiguration::NODE_TRANSITIONS => array('test_transition' => $this->transitionConfiguration),
-            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => array()
         );
         $this->assembleWorkflow($configuration);
     }

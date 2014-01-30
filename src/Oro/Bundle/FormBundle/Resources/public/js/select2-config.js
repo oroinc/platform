@@ -86,6 +86,11 @@ function($, _) {
 
         format: function(jsTemplate) {
             var self = this;
+            // pre-compile template if it exists
+            if (jsTemplate) {
+                jsTemplate = _.template(jsTemplate);
+            }
+
             return function (object, container, query) {
                 if ($.isEmptyObject(object)) {
                     return undefined;
@@ -102,8 +107,7 @@ function($, _) {
                     if (self.config.formatContext !== undefined) {
                         object.context = self.config.formatContext();
                     }
-                    var tpl = _.template(jsTemplate);
-                    result = tpl(object);
+                    result = jsTemplate(object);
                 } else {
                     result = highlight(self.getTitle(object, self.config.properties));
                 }

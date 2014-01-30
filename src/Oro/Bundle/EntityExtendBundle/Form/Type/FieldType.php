@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -34,9 +35,15 @@ class FieldType extends AbstractType
      */
     protected $configManager;
 
-    public function __construct(ConfigManager $configManager)
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    public function __construct(ConfigManager $configManager, Translator $translator)
     {
         $this->configManager = $configManager;
+        $this->translator    = $translator;
     }
 
     /**
@@ -78,7 +85,12 @@ class FieldType extends AbstractType
                 $fieldLabel  = $entityProvider->getConfigById($targetFieldId)->get('label');
 
                 $key         = $relationKey . '||' . ($fieldId ? $fieldId->getFieldName() : '');
-                $types[$key] = 'Relation (' . $entityLabel . ') ' . $fieldLabel;
+                $types[$key] = sprintf(
+                    '%s (%s) %s',
+                    $this->translator->trans('Relation'),
+                    $this->translator->trans($entityLabel),
+                    $this->translator->trans($fieldLabel)
+                );
             }
 
             $this->types = array_merge($this->types, $types);

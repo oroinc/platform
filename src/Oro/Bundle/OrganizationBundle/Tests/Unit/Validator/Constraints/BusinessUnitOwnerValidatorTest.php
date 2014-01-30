@@ -4,7 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Validator\Constrains;
 
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwnerValidator;
 use Oro\Bundle\OrganizationBundle\Validator\Constraints\BusinessUnitOwner;
-use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixtture\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
 
 class BusinessUnitOwnerValidatorTest extends \PHPUnit_Framework_TestCase
 {

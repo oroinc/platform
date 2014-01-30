@@ -12,7 +12,7 @@ use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 
-class SyncProcessor implements SyncProcessorInterface
+class SyncProcessor
 {
     const DEFAULT_BATCH_SIZE = 15;
 
@@ -55,7 +55,7 @@ class SyncProcessor implements SyncProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(Channel $channel, $isValidationOnly = false)
+    public function process(Channel $channel)
     {
         /** @var Channel $channel */
         $connectors = $channel->getConnectors();
@@ -67,8 +67,6 @@ class SyncProcessor implements SyncProcessorInterface
                  * Clone object here because it will be modified and changes should not be shared between
                  */
                 $realConnector = clone $this->registry->getConnectorType($channel->getType(), $connector);
-                $realTransport = clone $this->registry
-                    ->getTransportTypeBySettingEntity($channel->getTransport(), $channel->getType());
             } catch (\Exception $e) {
                 // log and continue
                 $this->logger->error($e->getMessage());
@@ -79,40 +77,38 @@ class SyncProcessor implements SyncProcessorInterface
                 $channel->addStatus($status);
                 continue;
             }
-            $mode    = $isValidationOnly ? ProcessorRegistry::TYPE_IMPORT_VALIDATION : ProcessorRegistry::TYPE_IMPORT;
-            $jobName = $realConnector->getImportJobName($isValidationOnly);
+            $jobName = $realConnector->getImportJobName();
 
             $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
                 ProcessorRegistry::TYPE_IMPORT,
                 $realConnector->getImportEntityFQCN()
             );
             $configuration    = [
-                $mode => [
-                    'processorAlias'    => reset($processorAliases),
-                    'entityName'        => $realConnector->getImportEntityFQCN(),
-                    'channel'           => $channel->getId(),
-                    'transport'         => $realTransport,
-                    'transportSettings' => $channel->getTransport()->getSettingsBag(),
-                    // batch size should be configured in batch_jobs.yml configuration
-                    // 'batchSize'         => self::DEFAULT_BATCH_SIZE
+                ProcessorRegistry::TYPE_IMPORT => [
+                    'processorAlias' => reset($processorAliases),
+                    'entityName'     => $realConnector->getImportEntityFQCN(),
+                    'channel'        => $channel->getId()
                 ],
             ];
-            $this->processImport($connector, $mode, $jobName, $configuration, $channel);
+            $this->processImport($connector, $jobName, $configuration, $channel);
         }
     }
 
     /**
-     * @param string  $mode
+     * Get logger strategy
+     *
+     * @return LoggerStrategy
+     */
+    public function getLoggerStrategy()
+    {
+        return $this->logger;
+    }
+
+    /**
      * @param Channel $channel
      */
-    protected function saveChannel($mode, Channel $channel)
+    protected function saveChannel(Channel $channel)
     {
-        if ($mode != ProcessorRegistry::TYPE_IMPORT) {
-            return;
-        }
-
-        // merge to uow due to object has changed hash after serialization/deserialization in job context
-        // {@link} http://doctrine-orm.readthedocs.org/en/2.0.x/reference/working-with-objects.html#merging-entities
         if ($this->em->isOpen()) {
             $channel = $this->em->merge($channel);
             $this->em->persist($channel);
@@ -122,14 +118,13 @@ class SyncProcessor implements SyncProcessorInterface
 
     /**
      * @param string  $connector
-     * @param string  $mode import or validation (dry run, readonly)
      * @param string  $jobName
      * @param array   $configuration
      * @param Channel $channel
      */
-    public function processImport($connector, $mode, $jobName, $configuration, Channel $channel)
+    protected function processImport($connector, $jobName, $configuration, Channel $channel)
     {
-        $jobResult = $this->jobExecutor->executeJob($mode, $jobName, $configuration);
+        $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
 
         /** @var ContextInterface $contexts */
         $context = $jobResult->getContext();
@@ -184,6 +179,6 @@ class SyncProcessor implements SyncProcessorInterface
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
         }
         $channel->addStatus($status);
-        $this->saveChannel($mode, $channel);
+        $this->saveChannel($channel);
     }
 }

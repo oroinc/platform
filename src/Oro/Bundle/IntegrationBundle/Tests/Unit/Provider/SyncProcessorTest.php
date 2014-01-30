@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 
 class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,7 +58,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
      * Return mocked sync processor
      *
      * @param array $mockedMethods
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|SyncProcessor
      */
     protected function getSyncProcessor($mockedMethods = [])
     {
@@ -87,7 +88,6 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 
         $processor = $this->getSyncProcessor(['processImport']);
 
-        $this->assertInstanceOf('Oro\Bundle\IntegrationBundle\Provider\SyncProcessorInterface', $processor);
-        $processor->process($this->channel, true);
+        $processor->process($this->channel);
     }
 }

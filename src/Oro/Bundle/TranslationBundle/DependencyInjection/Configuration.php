@@ -47,7 +47,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('oro_service')
                             ->addDefaultsIfNotSet()
                             ->children()
-                                ->scalarNode('endpoint')->defaultValue('http://proxy.dev/api')->end()
+                                ->scalarNode('endpoint')->defaultValue('http://translations.orocrm.com/api')->end()
                                 ->scalarNode('key')->defaultValue('')->end()
                             ->end()
                         ->end()

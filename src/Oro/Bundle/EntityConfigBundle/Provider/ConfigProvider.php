@@ -99,11 +99,7 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Determines if this provider has configuration data for the given class or field.
-     *
-     * @param string      $className
-     * @param string|null $fieldName
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasConfig($className, $fieldName = null)
     {

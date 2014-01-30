@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class DoctrineHelper
 {
@@ -35,10 +36,25 @@ class DoctrineHelper
     public function getEntityIdentifier($entity)
     {
         $entityManager = $this->getEntityManager($entity);
-        $metadata = $entityManager->getClassMetadata(get_class($entity));
+        $metadata = $entityManager->getClassMetadata(ClassUtils::getClass($entity));
         $identifier = $metadata->getIdentifierValues($entity);
 
         return $identifier;
+    }
+
+    /**
+     * @param object $entity
+     * @return integer
+     * @throws WorkflowException
+     */
+    public function getSingleEntityIdentifier($entity)
+    {
+        $entityIdentifier = $this->getEntityIdentifier($entity);
+        if (count($entityIdentifier) != 1) {
+            throw new WorkflowException('Can\'t get single identifier for the entity');
+        }
+
+        return current($entityIdentifier);
     }
 
     /**
@@ -58,13 +74,14 @@ class DoctrineHelper
      * @return EntityManager
      * @throws NotManageableEntityException
      */
-    protected function getEntityManager($entityOrClass)
+    public function getEntityManager($entityOrClass)
     {
         if (is_object($entityOrClass)) {
             $entityClass = $this->getEntityClass($entityOrClass);
         } else {
             $entityClass = $entityOrClass;
         }
+
         $entityManager = $this->registry->getManagerForClass($entityClass);
         if (!$entityManager) {
             throw new NotManageableEntityException($entityClass);

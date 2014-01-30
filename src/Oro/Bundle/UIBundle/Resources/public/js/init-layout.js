@@ -193,7 +193,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             if (!content) {
                 content = $('.scrollable-container').filter(':parents(.ui-widget)');
                 if (!app.isMobile()) {
-                    content.css('overflow', 'auto');
+                    content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
                 } else {
                     content.css('overflow', 'hidden');
                     content.last().css('overflow-y', 'auto');
@@ -292,50 +292,52 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
      * ============================================================ */
     $(function () {
         $(document).on('click', '.remove-button', function (e) {
-            var confirm,
-                el = $(this),
-                message = el.data('message');
+            var el = $(this);
+            if (!(el.is('[disabled]') || el.hasClass('disabled'))) {
+                var confirm,
+                    message = el.data('message');
 
-            confirm = new DeleteConfirmation({
-                content: message
-            });
-
-            confirm.on('ok', function () {
-                var navigation = Navigation.getInstance();
-                if (navigation) {
-                    navigation.loadingMask.show();
-                }
-
-                $.ajax({
-                    url: el.data('url'),
-                    type: 'DELETE',
-                    success: function (data) {
-                        el.trigger('removesuccess');
-                        messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
-                        if (el.data('redirect')) {
-                            $.isActive(true);
-                            if (navigation) {
-                                navigation.setLocation(el.data('redirect'));
-                            } else {
-                                window.location.href = el.data('redirect');
-                            }
-                        } else if (navigation) {
-                            navigation.loadingMask.hide();
-                        }
-                    },
-                    error: function () {
-                        if (navigation) {
-                            navigation.loadingMask.hide();
-                        }
-
-                        messenger.notificationMessage(
-                            'error',
-                            el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')
-                        );
-                    }
+                confirm = new DeleteConfirmation({
+                    content: message
                 });
-            });
-            confirm.open();
+
+                confirm.on('ok', function () {
+                    var navigation = Navigation.getInstance();
+                    if (navigation) {
+                        navigation.loadingMask.show();
+                    }
+
+                    $.ajax({
+                        url: el.data('url'),
+                        type: 'DELETE',
+                        success: function (data) {
+                            el.trigger('removesuccess');
+                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
+                            if (el.data('redirect')) {
+                                $.isActive(true);
+                                if (navigation) {
+                                    navigation.setLocation(el.data('redirect'));
+                                } else {
+                                    window.location.href = el.data('redirect');
+                                }
+                            } else if (navigation) {
+                                navigation.loadingMask.hide();
+                            }
+                        },
+                        error: function () {
+                            if (navigation) {
+                                navigation.loadingMask.hide();
+                            }
+
+                            messenger.notificationMessage(
+                                'error',
+                                el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')
+                            );
+                        }
+                    });
+                });
+                confirm.open();
+            }
 
             return false;
         });

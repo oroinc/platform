@@ -147,7 +147,7 @@ class SoapUsersTest extends WebTestCase
 
     /**
      * @expectedException \SoapFault
-     * @expectedExceptionMessage Self delete forbidden
+     * @expectedExceptionMessage An operation is forbidden. Reason: self delete
      */
     public function testSelfDeleteUser()
     {

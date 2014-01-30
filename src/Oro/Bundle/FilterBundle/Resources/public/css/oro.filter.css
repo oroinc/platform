@@ -173,3 +173,11 @@
 .ui-multiselect.select-filter-widget {
     width: auto !important;
 }
+
+.filter-item-simple .choicefilter > .dropdown,
+.filter-item-simple .filter-select {
+    display: inline-block;
+}
+.filter-item-simple .caret {
+    display: none;
+}

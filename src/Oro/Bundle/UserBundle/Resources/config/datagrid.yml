@@ -169,7 +169,7 @@ datagrid:
                 label:         Delete
                 link:          delete_link
                 icon:          trash
-                acl_resource:  oro_user_group_remove
+                acl_resource:  oro_user_group_delete
 
         sorters:
             columns:
@@ -231,7 +231,7 @@ datagrid:
                 label:         Delete
                 link:          delete_link
                 icon:          trash
-                acl_resource:  oro_user_role_remove
+                acl_resource:  oro_user_role_delete
 
         sorters:
             columns:

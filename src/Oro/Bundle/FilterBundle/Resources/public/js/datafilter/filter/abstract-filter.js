@@ -12,18 +12,28 @@ function($, _, Backbone, app) {
      */
     return Backbone.View.extend({
         /**
-         * Filter container tag
+         * Template for filter criteria
          *
-         * @property {String}
+         * @property
          */
-        tagName: 'div',
+        template: '',
 
         /**
-         * Filter container class name
+         * Template selector for filter criteria
+         * (should be defined for descendant filter)
          *
-         * @property {String}
+         * @property
          */
-        className: 'btn-group filter-item oro-drop',
+        templateSelector: '',
+
+        /**
+         * Filter decoration theme, empty string means default theme.
+         * Gets appended to base templateSelector property
+         *
+         * @property
+         */
+        templateTheme: '',
+
 
         /**
          * Is filter can be disabled
@@ -95,19 +105,12 @@ function($, _, Backbone, app) {
          * @param {Boolean} [options.enabled]
          */
         initialize: function(options) {
-            options = options || {};
-            if (_.has(options, 'enabled')) {
-                this.enabled = options.enabled;
-            }
-            if (_.has(options, 'canDisable')) {
-                this.canDisable = options.canDisable;
-            }
-            if (_.has(options, 'placeholder')) {
-                this.placeholder = options.placeholder;
-            }
-            if (_.has(options, 'showLabel')) {
-                this.showLabel = options.showLabel;
-            }
+            options = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
+                'templateSelector', 'templateTheme');
+            _.extend(this, options);
+
+            this._defineTemplate();
+
             this.defaultEnabled = this.enabled;
 
             // init empty value object if it was not initialized so far
@@ -408,6 +411,28 @@ function($, _, Backbone, app) {
                 e.preventDefault();
                 e.stopPropagation();
             }
+        },
+
+        /**
+         * Apply changes manually
+         *
+         * @public
+         */
+        apply: function () {
+            this.setValue(this._formatRawValue(this._readDOMValue()));
+        },
+
+        /**
+         * Defines which template to use
+         *
+         * @private
+         */
+        _defineTemplate: function () {
+            var theme = this.templateTheme,
+                selector = this.templateSelector,
+                src = theme && $(selector + '-' + theme).text() || $(selector).text();
+
+            this.template = _.template(src);
         }
     });
 });
