@@ -290,9 +290,9 @@ class ConfigManager
             );
             $settings[$child->getName()] = $this->get($key, false, true);
 
-            $settings[$child->getName()]['use_parent_scope_value'] = !isset($settings[$child->getName(
-            )]['use_parent_scope_value']) ?
-                true : $settings[$child->getName()]['use_parent_scope_value'];
+            $settings[$child->getName()]['use_parent_scope_value']
+                = !isset($settings[$child->getName()]['use_parent_scope_value'])
+                ? true : $settings[$child->getName()]['use_parent_scope_value'];
 
         }
 
