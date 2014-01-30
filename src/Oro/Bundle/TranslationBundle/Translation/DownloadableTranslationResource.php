@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Symfony\Component\Config\Resource\ResourceInterface;

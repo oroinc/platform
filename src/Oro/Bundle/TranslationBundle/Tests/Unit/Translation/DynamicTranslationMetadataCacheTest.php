@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
-class OrmTranslationMetadataCacheTest extends \PHPUnit_Framework_TestCase
+class DynamicTranslationMetadataCacheTest extends \PHPUnit_Framework_TestCase
 {
     /** @var DynamicTranslationMetadataCache */
     protected $metadataCache;
