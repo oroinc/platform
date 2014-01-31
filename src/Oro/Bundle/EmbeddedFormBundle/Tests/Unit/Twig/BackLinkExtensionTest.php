@@ -132,6 +132,4 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
 
         return new BackLinkExtension($router, $translator);
     }
-
-
 }

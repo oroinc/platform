@@ -24,18 +24,20 @@ class EmbeddedFormTest extends \PHPUnit_Framework_TestCase
         $formType = uniqid('AnyFormType');
         $css = uniqid('styles');
         $title = uniqid('title');
+        $successMessage = uniqid('success message');
 
         $formEntity = new EmbeddedForm();
         $formEntity->setChannel($channel);
         $formEntity->setFormType($formType);
         $formEntity->setCss($css);
         $formEntity->setTitle($title);
+        $formEntity->setSuccessMessage($successMessage);
 
         $this->assertSame($channel, $formEntity->getChannel());
         $this->assertEquals($formType, $formEntity->getFormType());
         $this->assertEquals($css, $formEntity->getCss());
         $this->assertEquals($title, $formEntity->getTitle());
-
+        $this->assertEquals($successMessage, $formEntity->getSuccessMessage());
     }
 
 }

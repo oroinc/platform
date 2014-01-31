@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Grid\Formatter;
 
 
-use Oro\Bundle\EmbeddedFormBundle\Grid\Formatter\EmbeddedFormTypeProperty;
+use Oro\Bundle\EmbeddedFormBundle\DataGrid\Formatter\EmbeddedFormTypeProperty;
 
 class EmbeddedFormTypePropertyTest extends \PHPUnit_Framework_TestCase
 {
