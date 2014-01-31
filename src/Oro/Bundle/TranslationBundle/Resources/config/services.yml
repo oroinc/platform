@@ -3,7 +3,8 @@ parameters:
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
     oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
     oro_translation.database_translation.loader.class:          Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
-    oro_translation.database_translation.metadata.cache.class:  Oro\Bundle\TranslationBundle\Translation\OrmTranslationMetadataCache
+    oro_translation.downloadable_translation.loader.class:      Oro\Bundle\TranslationBundle\Translation\DownloadableFakeLoader
+    oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
     oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
     oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
@@ -64,9 +65,14 @@ services:
             - %oro_translation.api.oro_service.key%
 
     oro_translation.database_translation.metadata.cache:
-        class: %oro_translation.database_translation.metadata.cache.class%
+        class: %oro_translation.dynamic_translation.metadata.cache.class%
         arguments:
             - @oro_translation.database_translation.metadata.cache_impl
+
+    oro_translation.downloadable_translation.metadata.cache:
+        class: %oro_translation.dynamic_translation.metadata.cache.class%
+        arguments:
+            - @oro_translation.downloadable_translation.metadata.cache_impl
 
     oro_translation.database_translation.metadata.cache_impl:
         public: false
@@ -74,12 +80,25 @@ services:
         calls:
             - [ setNamespace, [ "oro_database_translation_metadata.cache" ] ]
 
+    oro_translation.downloadable_translation.metadata.cache_impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ "oro_downloadable_translation_metadata.cache" ] ]
+
     oro_translation.database_translation.loader:
         class: %oro_translation.database_translation.loader.class%
         arguments:
             - @doctrine.orm.entity_manager
         tags:
             - { name: translation.loader, alias: oro_database_translation }
+
+    oro_translation.downloadable_translation.loader:
+        class: %oro_translation.downloadable_translation.loader.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: translation.loader, alias: oro_downloadable_translation }
 
     oro_translation.cache:
           parent: oro.cache.abstract
@@ -91,6 +110,7 @@ services:
         arguments:
             - @translator
             - @oro_translation.database_translation.metadata.cache
+            - @oro_translation.downloadable_translation.metadata.cache
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
 

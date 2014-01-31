@@ -161,6 +161,16 @@ class Runner
      *
      * @return string
      */
+    public function updateWorkflow(array $packages)
+    {
+        return $this->runCommand('oro:workflow:definitions:load');
+    }
+
+    /**
+     * @param PackageInterface[] $packages
+     *
+     * @return string
+     */
     public function loadDemoData(array $packages)
     {
         return $this->executeBatchCommand($packages, 'oro:package:demo:load');

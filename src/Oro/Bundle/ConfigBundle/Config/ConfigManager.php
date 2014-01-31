@@ -5,20 +5,27 @@ namespace Oro\Bundle\ConfigBundle\Config;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
+use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigManager
 {
     const SECTION_VIEW_SEPARATOR  = '___';
     const SECTION_MODEL_SEPARATOR = '.';
-    const SCOPE_NAME = 'app';
+    const SCOPE_NAME              = 'app';
 
     /**
      * @var ObjectManager
      */
     protected $om;
+
+    /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
 
     /**
      * Settings array, initiated with global application settings
@@ -39,32 +46,38 @@ class ConfigManager
 
     /**
      *
-     * @param ObjectManager       $om
+     * @param EventDispatcher              $eventDispatcher
+     * @param ObjectManager                $om
      * @param ConfigDefinitionImmutableBag $configDefinition
      */
-    public function __construct(ObjectManager $om, ConfigDefinitionImmutableBag $configDefinition)
-    {
-        $this->om       = $om;
-        $this->settings = $configDefinition->all();
+    public function __construct(
+        EventDispatcher $eventDispatcher,
+        ObjectManager $om,
+        ConfigDefinitionImmutableBag $configDefinition
+    ) {
+        $this->eventDispatcher = $eventDispatcher;
+        $this->om              = $om;
+        $this->settings        = $configDefinition->all();
     }
 
     /**
      * Get setting value
      *
      * @param  string $name Setting name, for example "oro_user.level"
-     * @param bool $default
-     * @param bool $full
+     * @param bool    $default
+     * @param bool    $full
+     *
      * @return array|string
      */
     public function get($name, $default = false, $full = false)
     {
-        $entity = $this->getScopedEntityName();
+        $entity   = $this->getScopedEntityName();
         $entityId = $this->getScopeId();
         $this->loadStoredSettings($entity, $entityId);
 
-        $name = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $name    = explode(self::SECTION_MODEL_SEPARATOR, $name);
         $section = $name[0];
-        $key = $name[1];
+        $key     = $name[1];
 
         if ($default) {
             $settings = $this->settings;
@@ -79,30 +92,28 @@ class ConfigManager
         } else {
             $setting = $settings[$section][$key];
 
-            return is_array($setting) && !$full ? $setting['value'] : $setting;
+            return is_array($setting) && isset($setting['value']) && !$full ? $setting['value'] : $setting;
         }
     }
 
     /**
      * Set setting value. To save changes in a database you need to call flush method
      *
-     * @param string $name Setting name, for example "oro_user.level"
-     * @param mixed $value Setting value
+     * @param string $name  Setting name, for example "oro_user.level"
+     * @param mixed  $value Setting value
      */
     public function set($name, $value)
     {
-        $entity = $this->getScopedEntityName();
+        $entity   = $this->getScopedEntityName();
         $entityId = $this->getScopeId();
         $this->loadStoredSettings($entity, $entityId);
 
-        $pair = explode(self::SECTION_MODEL_SEPARATOR, $name);
-        $section = $pair[0];
-        $key = $pair[1];
-
-        $this->storedSettings[$entity][$entityId][$section][$key] = $value;
-
-        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
-        $this->changedSettings[$changeKey] = ['value' => $value];
+        $changeKey                         = str_replace(
+            self::SECTION_MODEL_SEPARATOR,
+            self::SECTION_VIEW_SEPARATOR,
+            $name
+        );
+        $this->changedSettings[$changeKey] = ['value' => $value, 'use_parent_scope_value' => false];
     }
 
     /**
@@ -112,17 +123,21 @@ class ConfigManager
      */
     public function reset($name)
     {
-        $entity = $this->getScopedEntityName();
+        $entity   = $this->getScopedEntityName();
         $entityId = $this->getScopeId();
         $this->loadStoredSettings($entity, $entityId);
 
-        $pair = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $pair    = explode(self::SECTION_MODEL_SEPARATOR, $name);
         $section = $pair[0];
-        $key = $pair[1];
+        $key     = $pair[1];
 
         unset($this->storedSettings[$entity][$entityId][$section][$key]);
 
-        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
+        $changeKey                         = str_replace(
+            self::SECTION_MODEL_SEPARATOR,
+            self::SECTION_VIEW_SEPARATOR,
+            $name
+        );
         $this->changedSettings[$changeKey] = ['use_parent_scope_value' => true];
     }
 
@@ -155,7 +170,7 @@ class ConfigManager
         }
 
         foreach ($updated as $newItemKey => $newItemValue) {
-            $newItemKey = explode(self::SECTION_VIEW_SEPARATOR, $newItemKey);
+            $newItemKey   = explode(self::SECTION_VIEW_SEPARATOR, $newItemKey);
             $newItemValue = is_array($newItemValue) ? $newItemValue['value'] : $newItemValue;
 
             /** @var ConfigValue $value */
@@ -168,6 +183,9 @@ class ConfigManager
         $this->om->persist($config);
         $this->om->flush();
 
+        $event = new ConfigUpdateEvent($this, $updated, $removed);
+        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
+
         $this->reload();
     }
 
@@ -176,6 +194,7 @@ class ConfigManager
      * Does not modify anything, so even if you call flush after calculating you will not persist any changes
      *
      * @param $newSettings
+     *
      * @return array
      */
     public function calculateChangeSet($newSettings)
@@ -199,13 +218,13 @@ class ConfigManager
                 $updated[$key] = $value;
             }
 
-            $valueDefined = isset($currentValue['use_parent_scope_value'])
+            $valueDefined      = isset($currentValue['use_parent_scope_value'])
                 && $currentValue['use_parent_scope_value'] == false;
             $valueStillDefined = isset($value['use_parent_scope_value'])
                 && $value['use_parent_scope_value'] == false;
 
             if ($valueDefined && !$valueStillDefined) {
-                $key = explode(self::SECTION_VIEW_SEPARATOR, $key);
+                $key       = explode(self::SECTION_VIEW_SEPARATOR, $key);
                 $removed[] = array($key[0], $key[1]);
             }
         }
@@ -235,7 +254,7 @@ class ConfigManager
             $appConfig = $this->om
                 ->getRepository('OroConfigBundle:Config')
                 ->loadSettings(static::SCOPE_NAME, 0);
-            $config = array_merge($appConfig, $config);
+            $config    = array_merge($appConfig, $config);
         }
 
         $this->storedSettings[$entity][$entityId] = $config;
@@ -264,16 +283,16 @@ class ConfigManager
         $settings = array();
 
         foreach ($form as $child) {
-            $key = str_replace(
+            $key                         = str_replace(
                 self::SECTION_VIEW_SEPARATOR,
                 self::SECTION_MODEL_SEPARATOR,
                 $child->getName()
             );
             $settings[$child->getName()] = $this->get($key, false, true);
 
-            $settings[$child->getName()]['use_parent_scope_value'] =
-                !isset($settings[$child->getName()]['use_parent_scope_value']) ?
-                    true : $settings[$child->getName()]['use_parent_scope_value'];
+            $settings[$child->getName()]['use_parent_scope_value']
+                = !isset($settings[$child->getName()]['use_parent_scope_value'])
+                ? true : $settings[$child->getName()]['use_parent_scope_value'];
 
         }
 

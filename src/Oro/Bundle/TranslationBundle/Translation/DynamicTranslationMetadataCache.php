@@ -4,7 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\Common\Cache\CacheProvider;
 
-class OrmTranslationMetadataCache
+class DynamicTranslationMetadataCache
 {
     /**
      * @var array
