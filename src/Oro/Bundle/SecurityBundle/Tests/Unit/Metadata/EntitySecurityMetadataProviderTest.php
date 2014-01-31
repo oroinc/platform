@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider as Provider;
 
@@ -16,8 +19,16 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $extendConfigProvider;
+
     /** @var EntitySecurityMetadata */
     protected $entity;
+
+    /**
+     * @var Config
+     */
+    protected $config;
 
     protected function setUp()
     {
@@ -27,6 +38,11 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->config = new Config(new EntityConfigId('testClass', 'test'));
+        $this->config->set('state', ExtendManager::STATE_ACTIVE);
         $this->cache = $this->getMockForAbstractClass(
             'Doctrine\Common\Cache\CacheProvider',
             array(),
@@ -38,6 +54,10 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->entity = new EntitySecurityMetadata(Provider::ACL_SECURITY_TYPE, 'SomeClass', 'SomeGroup', 'SomeLabel');
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($this->config));
     }
 
     public function testIsProtectedEntity()
@@ -47,7 +67,12 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->with(Provider::ACL_SECURITY_TYPE)
             ->will($this->returnValue(array('SomeClass' => new EntitySecurityMetadata())));
 
-        $provider = new Provider($this->securityConfigProvider, $this->entityConfigProvider, $this->cache);
+        $provider = new Provider(
+            $this->securityConfigProvider,
+            $this->entityConfigProvider,
+            $this->extendConfigProvider,
+            $this->cache
+        );
 
         $this->assertTrue($provider->isProtectedEntity('SomeClass'));
         $this->assertFalse($provider->isProtectedEntity('UnknownClass'));
@@ -75,7 +100,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $securityConfigId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityConfigId->expects($this->once())
+        $securityConfigId->expects($this->exactly(2))
             ->method('getClassName')
             ->will($this->returnValue('SomeClass'));
 
@@ -89,11 +114,11 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $securityConfig->expects($this->any())
             ->method('getId')
             ->will($this->returnValue($securityConfigId));
-        $securityConfig->expects($this->at(2))
+        $securityConfig->expects($this->at(3))
             ->method('get')
             ->with('permissions')
             ->will($this->returnValue('All'));
-        $securityConfig->expects($this->at(3))
+        $securityConfig->expects($this->at(4))
             ->method('get')
             ->with('group_name')
             ->will($this->returnValue('SomeGroup'));
@@ -115,7 +140,12 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with(Provider::ACL_SECURITY_TYPE, array('SomeClass' => $this->entity));
 
-        $provider = new Provider($this->securityConfigProvider, $this->entityConfigProvider, $this->cache);
+        $provider = new Provider(
+            $this->securityConfigProvider,
+            $this->entityConfigProvider,
+            $this->extendConfigProvider,
+            $this->cache
+        );
 
         // call without cache
         $result = $provider->getEntities();
@@ -130,7 +160,12 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(serialize($result), serialize(array($this->entity)));
 
         // call with cache
-        $provider = new Provider($this->securityConfigProvider, $this->entityConfigProvider, $this->cache);
+        $provider = new Provider(
+            $this->securityConfigProvider,
+            $this->entityConfigProvider,
+            $this->extendConfigProvider,
+            $this->cache
+        );
         $result = $provider->getEntities();
         $this->assertCount(1, $result);
         $this->assertContains($this->entity, $result);
@@ -145,7 +180,12 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->cache->expects($this->once())
             ->method('deleteAll');
 
-        $provider = new Provider($this->securityConfigProvider, $this->entityConfigProvider, $this->cache);
+        $provider = new Provider(
+            $this->securityConfigProvider,
+            $this->entityConfigProvider,
+            $this->extendConfigProvider,
+            $this->cache
+        );
 
         $provider->clearCache('SomeType');
         $provider->clearCache();

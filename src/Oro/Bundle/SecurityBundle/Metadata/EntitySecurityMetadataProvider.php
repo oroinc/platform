@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 class EntitySecurityMetadataProvider
 {
@@ -18,6 +19,11 @@ class EntitySecurityMetadataProvider
      * @var ConfigProvider
      */
     protected $entityConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $extendConfigProvider;
 
     /**
      * @var CacheProvider
@@ -41,10 +47,12 @@ class EntitySecurityMetadataProvider
     public function __construct(
         ConfigProvider $securityConfigProvider,
         ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider,
         CacheProvider $cache = null
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->extendConfigProvider = $extendConfigProvider;
         $this->cache = $cache;
     }
 
@@ -150,7 +158,14 @@ class EntitySecurityMetadataProvider
             if (!$data) {
                 $securityConfigs = $this->securityConfigProvider->getConfigs();
                 foreach ($securityConfigs as $securityConfig) {
-                    if ($securityConfig->get('type') === $securityType) {
+                    if ($securityConfig->get('type') === $securityType
+                        && !in_array(
+                            $this->extendConfigProvider->getConfig(
+                                $securityConfig->getId()->getClassName()
+                            )->get('state'),
+                            [ExtendManager::STATE_NEW, ExtendManager::STATE_UPDATED]
+                        )
+                    ) {
                         $className = $securityConfig->getId()->getClassName();
                         $label = '';
                         if ($this->entityConfigProvider->hasConfig($className)) {
