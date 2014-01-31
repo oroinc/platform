@@ -54,7 +54,7 @@ class CreateDateTime extends AbstractAction
         }
 
         if (empty($options['timezone'])) {
-            $options['timezone'] = null;
+            $options['timezone'] = new \DateTimeZone('UTC');
         } elseif (is_string($options['timezone'])) {
             $options['timezone'] = new \DateTimeZone($options['timezone']);
         } elseif (!$options['timezone'] instanceof \DateTimeZone) {

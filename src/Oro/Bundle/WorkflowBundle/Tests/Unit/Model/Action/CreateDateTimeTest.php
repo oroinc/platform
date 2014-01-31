@@ -101,7 +101,7 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
                     'attribute' => new PropertyPath('test_attribute'),
                     'time'      => '2014-01-01 00:00:00',
                 ),
-                'expectedResult' => new \DateTime('2014-01-01 00:00:00')
+                'expectedResult' => new \DateTime('2014-01-01 00:00:00', new \DateTimeZone('UTC'))
             ),
             'with_time_and_timezone_string' => array(
                 'options' => array(
