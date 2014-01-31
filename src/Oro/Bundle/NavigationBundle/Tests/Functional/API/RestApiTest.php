@@ -55,7 +55,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_post_navigationitems', array('type' => $itemType)),
             self::$entities[$itemType],
             array(),
-            ToolsAPI::generateWsseHeader()
+            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
         );
 
         /** @var $result Response */
@@ -93,7 +93,7 @@ class RestApiTest extends WebTestCase
             ),
             $updatedPintab,
             array(),
-            ToolsAPI::generateWsseHeader()
+            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
         );
 
         /** @var $result Response */
@@ -121,7 +121,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_get_navigationitems', array('type' => $itemType)),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
         );
 
         /** @var $result Response */
@@ -151,7 +151,7 @@ class RestApiTest extends WebTestCase
             ),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
         );
 
         /** @var $result Response */
@@ -179,7 +179,7 @@ class RestApiTest extends WebTestCase
             ),
             self::$entities[$itemType],
             array(),
-            ToolsAPI::generateWsseHeader()
+            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
         );
 
         /** @var $result Response */
@@ -196,7 +196,7 @@ class RestApiTest extends WebTestCase
             ),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader()
+            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
         );
         /** @var $result Response */
         $result = $this->client->getResponse();
@@ -271,7 +271,7 @@ class RestApiTest extends WebTestCase
                 $url,
                 array(),
                 array(),
-                ToolsAPI::generateWsseHeader()
+                ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
             );
 
             /** @var $response Response */
