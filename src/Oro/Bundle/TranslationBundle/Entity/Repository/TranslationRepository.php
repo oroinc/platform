@@ -14,16 +14,18 @@ class TranslationRepository extends EntityRepository
      * @param string $key
      * @param string $locale
      * @param string $domain
+     * @param int    $scope
      *
      * @return Translation
      */
-    public function findValue($key, $locale, $domain = self::DEFAULT_DOMAIN)
+    public function findValue($key, $locale, $domain = self::DEFAULT_DOMAIN, $scope = Translation::SCOPE_SYSTEM)
     {
         return $this->findOneBy(
             [
-                'key'    => $key,
                 'locale' => $locale,
-                'domain' => $domain
+                'domain' => $domain,
+                'key'    => $key,
+                'scope'  => $scope
             ]
         );
     }

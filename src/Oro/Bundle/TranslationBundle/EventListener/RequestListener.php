@@ -6,7 +6,6 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
-use Oro\Bundle\TranslationBundle\Translation\DownloadableTranslationResource;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class RequestListener
@@ -22,11 +21,6 @@ class RequestListener
     protected $databaseTranslationMetadataCache;
 
     /**
-     * @var DynamicTranslationMetadataCache
-     */
-    protected $downloadTranslationMetadataCache;
-
-    /**
      * @var string[]
      */
     protected $registeredTranslationResources;
@@ -36,16 +30,13 @@ class RequestListener
      *
      * @param Translator                      $translator
      * @param DynamicTranslationMetadataCache $databaseTranslationMetadataCache
-     * @param DynamicTranslationMetadataCache $downloadTranslationMetadataCache
      */
     public function __construct(
         Translator $translator,
-        DynamicTranslationMetadataCache $databaseTranslationMetadataCache,
-        DynamicTranslationMetadataCache $downloadTranslationMetadataCache
+        DynamicTranslationMetadataCache $databaseTranslationMetadataCache
     ) {
         $this->translator                       = $translator;
         $this->databaseTranslationMetadataCache = $databaseTranslationMetadataCache;
-        $this->downloadTranslationMetadataCache = $downloadTranslationMetadataCache;
         $this->registeredTranslationResources   = [];
     }
 
@@ -65,11 +56,6 @@ class RequestListener
                     new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
                     $locale,
                     'messages'
-                );
-                $this->translator->addResource(
-                    'oro_downloadable_translation',
-                    new DownloadableTranslationResource($locale, $this->downloadTranslationMetadataCache),
-                    $locale
                 );
                 $this->registeredTranslationResources[$locale] = true;
             }

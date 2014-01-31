@@ -191,14 +191,20 @@ class ConfigSubscriber implements EventSubscriberInterface
         /** @var TranslationRepository $translationRepo */
         $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
         /** @var Translation $translationValue */
-        $translationValue = $translationRepo->findValue($key, $locale);
+        $translationValue = $translationRepo->findValue(
+            $key,
+            $locale,
+            TranslationRepository::DEFAULT_DOMAIN,
+            Translation::SCOPE_UI
+        );
         if (!$translationValue) {
             $translationValue = new Translation();
             $translationValue
                 ->setKey($key)
                 ->setValue($value)
                 ->setLocale($locale)
-                ->setDomain(TranslationRepository::DEFAULT_DOMAIN);
+                ->setDomain(TranslationRepository::DEFAULT_DOMAIN)
+                ->setScope(Translation::SCOPE_UI);
         } else {
             $translationValue->setValue($value);
         }
