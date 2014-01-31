@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmbeddedFormBundle\Grid\Formatter;
+namespace Oro\Bundle\EmbeddedFormBundle\DataGrid\Formatter;
 
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
