@@ -14,7 +14,7 @@
     {% endif %}
 
     {% if resource_granted('oro_embedded_form_delete') %}
-        {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Update'|trans, 'label' : 'Update'|trans}) }}
+        {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Edit'|trans, 'label' : 'Edit'|trans}) }}
     {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
 {% endblock %}
@@ -72,7 +72,7 @@
 <div id="embedded-form-container-{{ entity.id }}"></div>
 <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
 <script type="text/javascript">
-    new EmbedForm({
+    new ORO.EmbedForm({
         container: 'embedded-form-container-{{ entity.id }}',
         iframe: {
             src: "{{ url('oro_embedded_form_submit', {'id': entity.id}) }}",
@@ -99,7 +99,7 @@
     }
     ]
     },{
-    'title': 'Get a code'|trans,
+    'title': 'Get code'|trans,
     'subblocks': [
     {
     'title': 'Code'|trans,

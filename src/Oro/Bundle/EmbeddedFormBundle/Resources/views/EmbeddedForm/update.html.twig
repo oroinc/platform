@@ -7,20 +7,16 @@
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('oro_embedded_form_delete') %}
         {{ UI.deleteButton({
-            'dataUrl': path('oro_embedded_form_delete', {'id': form.vars.value.id}),
-            'dataRedirect': path('oro_embedded_form_list'),
-            'aCss': 'no-hash remove-button',
-            'id': 'btn-remove-embedded-form',
-            'dataId': form.vars.value.id,
-            'entity_label': 'oro.embedded_form.entity.label'|trans,
+        'dataUrl': path('oro_embedded_form_delete', {'id': form.vars.value.id}),
+        'dataRedirect': path('oro_embedded_form_list'),
+        'aCss': 'no-hash remove-button',
+        'id': 'btn-remove-embedded-form',
+        'dataId': form.vars.value.id,
+        'entity_label': 'oro.embedded_form.entity.label'|trans,
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
-
-    {% if form.vars.value.id and resource_granted('oro_embedded_form_view') %}
-        {{ UI.button({'path' : path('oro_embedded_form_view', {'id': entity.id}), 'title' : 'oro.embedded_form.get_code'|trans, 'label' : 'oro.embedded_form.get_code'|trans}) }}
-    {% endif %}
 
     {% if resource_granted('oro_embedded_form_edit') %}
         {{ UI.saveAndStayButton() }}
@@ -31,10 +27,10 @@
 {% block pageHeader %}
     {% if form.vars.value.id %}
         {% set breadcrumbs = {
-            'entity':      form.vars.value,
-            'indexPath':   path('oro_embedded_form_list'),
-            'indexLabel': 'oro.embedded_form.entity.plural_label'|trans,
-            'entityTitle': form.vars.value.title
+        'entity':      form.vars.value,
+        'indexPath':   path('oro_embedded_form_list'),
+        'indexLabel': 'oro.embedded_form.entity.plural_label'|trans,
+        'entityTitle': form.vars.value.title
         } %}
         {{ parent() }}
     {% else %}
@@ -63,8 +59,8 @@
     }] %}
 
     {% set data = {
-        'formErrors': form_errors(form) ? form_errors(form) : null,
-        'dataBlocks': dataBlocks
+    'formErrors': form_errors(form) ? form_errors(form) : null,
+    'dataBlocks': dataBlocks
     } %}
 
     <script type="text/javascript">
