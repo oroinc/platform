@@ -1,0 +1,24 @@
+oro:
+    embedded_form:
+        entity:
+            label: Embedded Form
+            plural_label: Embedded Forms
+        title:
+            label: Title
+        form_type:
+            label: Form Type
+        channel:
+            label:  Channel
+        css:
+            label: CSS
+        successMessage:
+            label: Success message
+            default: Form has been submitted successfully
+            tooltip: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
+
+        get_code: Get code
+
+        back_link_default_text: Back
+
+        controller:
+            saved_message: Form has been saved successfully

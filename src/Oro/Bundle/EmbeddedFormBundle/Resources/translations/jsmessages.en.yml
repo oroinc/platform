@@ -1,0 +1,5 @@
+embedded_form:
+    confirm_box:
+        title: "Change Form Type"
+        ok_text: "Yes, continue"
+        content: "Your changes will be lost."
