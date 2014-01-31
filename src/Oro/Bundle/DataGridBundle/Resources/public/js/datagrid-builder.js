@@ -119,7 +119,7 @@ define(function (require) {
              * After build
              */
             afterBuild: function () {
-                mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el, this.$el.data('data'));
+                mediator.trigger('datagrid_collection_set_after', this.grid.collection, this.$el);
             },
 
             /**

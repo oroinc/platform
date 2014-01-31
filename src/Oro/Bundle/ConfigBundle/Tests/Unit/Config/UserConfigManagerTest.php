@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 
 class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,6 +28,14 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
      * @var SecurityContextInterface
      */
     protected $security;
+
+    /**
+     * @var ObjectManager
+     */
+    protected $om;
+
+    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
+    protected $ed;
 
     /**
      * @var array
@@ -63,7 +74,8 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->object = new UserConfigManager($this->om, new ConfigDefinitionImmutableBag($this->settings));
+        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $this->object = new UserConfigManager($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings));
 
         $this->security   = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->group1     = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
@@ -97,7 +109,7 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->addGroup($this->group1)
             ->addGroup($this->group2);
 
-        $this->object = new UserConfigManager($this->om, new ConfigDefinitionImmutableBag($this->settings));
+        $this->object = new UserConfigManager($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings));
     }
 
     public function testSecurity()
@@ -105,7 +117,7 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\UserConfigManager',
             array('loadStoredSettings'),
-            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
+            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $object->expects($this->exactly(3))

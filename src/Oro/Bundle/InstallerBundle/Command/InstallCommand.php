@@ -138,7 +138,7 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
-                array('--force' => true, '--full-database' => true, '--process-isolation' => true)
+                array('--force' => true, '--full-database' => true)
             )
             ->runCommand('doctrine:schema:create')
             ->runCommand('oro:entity-config:init')

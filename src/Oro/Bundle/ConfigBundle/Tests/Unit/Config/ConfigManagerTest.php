@@ -9,6 +9,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
@@ -31,6 +32,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
      * @var ObjectManager
      */
     protected $om;
+
+    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
+    protected $ed;
 
     /**
      * @var array
@@ -73,7 +77,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->object = new ConfigManager($this->om, new ConfigDefinitionImmutableBag($this->settings));
+        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
+        $this->object = new ConfigManager($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings));
     }
 
     /**
@@ -113,7 +118,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
             array('loadStoredSettings'),
-            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
+            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $this->assertEquals($this->settings['oro_user']['greeting']['value'], $object->get('oro_user.greeting', true));
@@ -132,7 +137,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
             array('get'),
-            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
+            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $testSetting = array(
@@ -172,8 +177,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
-            array('calculateChangeSet', 'reload'),
-            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
+            array('calculateChangeSet', 'reload', 'get'),
+            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $changes = array(
@@ -226,6 +231,14 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('flush');
 
+        $object->expects($this->exactly(3))->method('get');
+
+        $this->ed->expects($this->once())->method('dispatch')
+            ->with(
+                $this->equalTo('oro_config.update_after'),
+                $this->isInstanceOf('Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent')
+            );
+
         $object->save($settings);
     }
 
@@ -243,7 +256,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $object = $this->getMock(
             'Oro\Bundle\ConfigBundle\Config\ConfigManager',
             array('get'),
-            array($this->om, new ConfigDefinitionImmutableBag($this->settings))
+            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
         );
 
         $currentValue = array(
