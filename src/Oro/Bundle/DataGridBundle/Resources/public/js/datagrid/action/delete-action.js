@@ -32,34 +32,18 @@ define(['underscore', 'oro/messenger', 'oro/translator', 'oro/delete-confirmatio
              * Confirm delete item
              */
             doDelete: function() {
-                var self = this;
                 this.model.destroy({
                     url: this.getLink(),
                     wait: true,
                     error: function() {
-                        self.getErrorDialog().open();
+                        var messageText = __('Cannot delete item.');
+                        messenger.notificationFlashMessage('error', messageText);
                     },
                     success: function() {
                         var messageText = __('Item deleted');
                         messenger.notificationFlashMessage('success', messageText);
                     }
                 });
-            },
-
-            /**
-             * Get view for error modal
-             *
-             * @return {oro.Modal}
-             */
-            getErrorDialog: function() {
-                if (!this.errorModal) {
-                    this.errorModal = new Modal({
-                        title: __('Delete Error'),
-                        content: __('Cannot delete item.'),
-                        cancelText: false
-                    });
-                }
-                return this.errorModal;
             }
         });
     });
