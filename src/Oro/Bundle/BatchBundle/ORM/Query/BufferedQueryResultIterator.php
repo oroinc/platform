@@ -23,7 +23,14 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      *
      * @var int
      */
-    private $requestedBufferSize = null;
+    private $requestedBufferSize = self::DEFAULT_BUFFER_SIZE;
+
+    /**
+     * The maximum number of results the original query object was set to retrieve
+     *
+     * @var int
+     */
+    private $queryMaxResults;
 
     /**
      * Defines the processing mode to be used during hydration / result set transformation
@@ -213,7 +220,10 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     public function count()
     {
         if (null === $this->totalCount) {
-            $this->totalCount = QueryCountCalculator::calculateCount($this->getQuery());
+            $query = $this->cloneQuery($this->getQuery());
+            // restore original max results
+            $query->setMaxResults($this->queryMaxResults);
+            $this->totalCount = QueryCountCalculator::calculateCount($query);
         }
 
         return $this->totalCount;
@@ -249,10 +259,9 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
             unset($this->source);
 
             // initialize cloned query
-            if (null !== $this->requestedBufferSize) {
+            $this->queryMaxResults = $this->query->getMaxResults();
+            if (!$this->queryMaxResults || $this->requestedBufferSize < $this->queryMaxResults) {
                 $this->query->setMaxResults($this->requestedBufferSize);
-            } elseif (!$this->query->getMaxResults()) {
-                $this->query->setMaxResults(static::DEFAULT_BUFFER_SIZE);
             }
             if (null !== $this->requestedHydrationMode) {
                 $this->query->setHydrationMode($this->requestedHydrationMode);
