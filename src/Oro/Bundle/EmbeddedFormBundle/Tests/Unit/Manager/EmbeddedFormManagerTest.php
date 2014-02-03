@@ -42,7 +42,8 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldAllowToAddFormType()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
-        $manager->addFormType($type=uniqid());
+        $type = uniqid();
+        $manager->addFormType($type);
     }
 
     /**
@@ -51,7 +52,9 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldAllowToAddFormTypeWithLabel()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
-        $manager->addFormType($type=uniqid(), $label = uniqid('label'));
+        $type = uniqid();
+        $label = uniqid('label');
+        $manager->addFormType($type, $label);
     }
 
     /**
@@ -60,7 +63,8 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnEmptyLabelForNotAddedType()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
-        $this->assertNull($manager->getLabelByType($type=uniqid()));
+        $type = uniqid();
+        $this->assertNull($manager->getLabelByType($type));
     }
 
     /**
@@ -69,7 +73,9 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnLabelForAddedType()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
-        $manager->addFormType($type=uniqid(), $label = uniqid('label'));
+        $type = uniqid();
+        $label = uniqid('label');
+        $manager->addFormType($type, $label);
         $this->assertEquals($label, $manager->getLabelByType($type));
     }
 
@@ -80,7 +86,8 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
     public function shouldReturnTypeAsLabelForAddedTypeWithoutLabel()
     {
         $manager = new EmbeddedFormManager($this->createContainerMock(), $this->createFormFactoryMock());
-        $manager->addFormType($type=uniqid());
+        $type = uniqid();
+        $manager->addFormType($type);
         $this->assertEquals($type, $manager->getLabelByType($type));
     }
 
@@ -213,4 +220,3 @@ class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase
         return $container;
     }
 }
- 

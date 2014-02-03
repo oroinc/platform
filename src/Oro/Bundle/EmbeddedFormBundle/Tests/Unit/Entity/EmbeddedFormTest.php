@@ -39,5 +39,4 @@ class EmbeddedFormTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($title, $formEntity->getTitle());
         $this->assertEquals($successMessage, $formEntity->getSuccessMessage());
     }
-
 }
