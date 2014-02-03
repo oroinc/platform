@@ -52,9 +52,10 @@ class CustomEntity extends AbstractPageEntity
      */
     public function addRelation($fieldName)
     {
+        $label = ucfirst($fieldName);
         $this->test->byXpath(
             "//div[@class='control-group']/label[normalize-space(text()) = " .
-            "'{$fieldName}']/following-sibling::div//button[@class='btn btn-medium add-btn']"
+            "'{$label}']/following-sibling::div//button[@class='btn btn-medium add-btn']"
         )->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -85,8 +86,9 @@ class CustomEntity extends AbstractPageEntity
 
     public function setStringField($fieldname, $value)
     {
+        $label = ucfirst($fieldname);
         $field = $this->test->byXpath(
-            "//div[@class='control-group']/label[normalize-space(text()) = '{$fieldname}']" .
+            "//div[@class='control-group']/label[normalize-space(text()) = '{$label}']" .
             "/following-sibling::div/input"
         );
         $field->clear();

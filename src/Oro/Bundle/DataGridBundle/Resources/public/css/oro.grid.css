@@ -12,7 +12,7 @@ table.grid tfoot th > a,
 table.grid tfoot th > span {
     text-transform: uppercase;
     color: #5e5e5e;
-    font-size: 11px;
+    font-size: 13px;
 }
 
 table.grid thead th span.caret {

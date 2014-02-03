@@ -138,7 +138,7 @@ class InstallCommand extends ContainerAwareCommand
             ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
-                array('--force' => true, '--full-database' => true, '--process-isolation' => true)
+                array('--force' => true, '--full-database' => true)
             )
             ->runCommand('doctrine:schema:create')
             ->runCommand('oro:entity-config:init')
@@ -152,12 +152,12 @@ class InstallCommand extends ContainerAwareCommand
                 array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
             )
             ->runCommand(
-                'oro:installer:fixtures:load',
-                array('--process-isolation' => true, '--no-interaction' => true)
-            )
-            ->runCommand(
                 'oro:workflow:definitions:load',
                 array('--process-isolation' => true)
+            )
+            ->runCommand(
+                'oro:installer:fixtures:load',
+                array('--process-isolation' => true, '--no-interaction' => true)
             );
 
         $output->writeln('');

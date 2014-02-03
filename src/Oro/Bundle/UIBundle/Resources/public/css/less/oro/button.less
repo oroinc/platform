@@ -203,3 +203,18 @@
     color:#fff;
   }
 }
+
+.btn.process{
+  position: relative;
+  &:after {
+    content: '';
+    background: transparent url('../../img/loader.gif') no-repeat center left;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-size: 12px 12px;
+    right: -20px;
+    top: 50%;
+    margin-top: -6px;
+  }
+}

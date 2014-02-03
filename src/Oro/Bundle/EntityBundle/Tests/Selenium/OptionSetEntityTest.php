@@ -13,9 +13,9 @@ class OptionSetEntityTest extends Selenium2TestCase
     {
         $this->markTestIncomplete('Due to BAP-2966');
         $entitydata = array(
-            'entityName' => 'OptionSet'.mt_rand(),
-            'stringField' => 'String_field',
-            'optionSetField' => 'Option_set'
+            'entityName' => 'optionset'.mt_rand(),
+            'stringField' => 'string_field',
+            'optionSetField' => 'option_set'
         );
 
         $options = array('1','2','3','4','5','6','7','8','9');

@@ -157,7 +157,7 @@ class NumberFormatter
     /**
      * Format duration
      *
-     * @param float $value
+     * @param float|\DateTime $value If value is a DateTime then it's timestamp will be used.
      * @param array $attributes Set of attributes of \NumberFormatter
      * @param array $textAttributes Set of text attributes of \NumberFormatter
      * @param array $symbols Set of symbols of \NumberFormatter
@@ -171,7 +171,57 @@ class NumberFormatter
         array $symbols = array(),
         $locale = null
     ) {
-        return $this->format($value, \NumberFormatter::DURATION, $attributes, $textAttributes, $symbols, $locale);
+        if ($value instanceof \DateTime) {
+            $value = $value->getTimestamp();
+        }
+
+        $value = abs($value);
+
+        $result = $this->format($value, \NumberFormatter::DURATION, $attributes, $textAttributes, $symbols, $locale);
+
+        // In case if the result is not a valid duration string, do default format
+        if (!$this->isDurationValid($result)) {
+            $result = $this->formatDefaultDuration($value);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Checks if duration is not valid.
+     *
+     * For some locales intl's Number formatter returns duration in format of simple numbers, for example for duration
+     * of 1 hour 1 minute and 1 second the result could be a string "3 661". This method checks such cases, because
+     * a valid localized duration string should be something like this "1:01:01" or "1 hour, 1 minute, 1 second"
+     * depending on attributes of formatting.
+     *
+     * @param string $value
+     * @return bool
+     */
+    protected function isDurationValid($value)
+    {
+        $stripChars = array(
+            ',',
+            '.',
+            ' ',
+            $this->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, \NumberFormatter::DEFAULT_STYLE),
+            $this->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, \NumberFormatter::DEFAULT_STYLE),
+        );
+        return !is_numeric(str_replace($stripChars, '', $value));
+    }
+
+    /**
+     * Format duration to H:i:s format
+     *
+     * @param float
+     * @return string
+     */
+    protected function formatDefaultDuration($value)
+    {
+        return
+            str_pad(floor($value / 3600), 2, '0', STR_PAD_LEFT) . ':' .
+            str_pad((floor($value / 60)) % 60, 2, '0', STR_PAD_LEFT) . ':' .
+            str_pad($value % 60, 2, '0', STR_PAD_LEFT);
     }
 
     /**
