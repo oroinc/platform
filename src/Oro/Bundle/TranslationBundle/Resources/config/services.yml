@@ -5,7 +5,6 @@ parameters:
     oro_translation.database_translation.persister.class:       Oro\Bundle\TranslationBundle\Translation\DatabasePersister
     oro_translation.database_translation.loader.class:          Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
     oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
-    oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
     oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
     oro_translation.statistic_provider.class:                   Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider
@@ -93,14 +92,6 @@ services:
           parent: oro.cache.abstract
           calls:
               - [setNamespace, ['oro_translation.cache']]
-
-    oro_translation.listener.request:
-        class: %oro_translation.listener.request.class%
-        arguments:
-            - @translator
-            - @oro_translation.database_translation.metadata.cache
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
 
     oro_translation.js_dumper:
         class: %oro_translation.js_dumper.class%

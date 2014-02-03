@@ -7,6 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 class Translator extends BaseTranslator
 {
     /**
+     * @var DynamicTranslationMetadataCache
+     */
+    protected $databaseTranslationMetadataCache;
+
+    /**
      * @var array
      */
     private $dynamicResources = [];
@@ -20,6 +25,7 @@ class Translator extends BaseTranslator
      *
      * @param array       $domains list of required domains, by default empty, means all domains
      * @param string|null $locale  locale of translations, by default is current locale
+     *
      * @return array
      */
     public function getTranslations(array $domains = array(), $locale = null)
@@ -61,9 +67,9 @@ class Translator extends BaseTranslator
     /**
      * Checks if the given message has a translation.
      *
-     * @param string $id         The message id (may also be an object that can be cast to string)
-     * @param string $domain     The domain for the message
-     * @param string $locale     The locale
+     * @param string $id     The message id (may also be an object that can be cast to string)
+     * @param string $domain The domain for the message
+     * @param string $locale The locale
      *
      * @return string The translated string
      */
@@ -82,7 +88,7 @@ class Translator extends BaseTranslator
         }
 
         $catalogue = $this->catalogues[$locale];
-        $result = $catalogue->defines($id, $domain);
+        $result    = $catalogue->defines($id, $domain);
         while (!$result && $catalogue = $catalogue->getFallbackCatalogue()) {
             $result = $catalogue->defines($id, $domain);
         }
@@ -111,6 +117,8 @@ class Translator extends BaseTranslator
      */
     protected function loadCatalogue($locale)
     {
+        $this->ensureDatabaseLoaderAdded($locale);
+
         // check if any dynamic resource is changed and update translation catalogue if needed
         if (!empty($this->dynamicResources)
             && isset($this->dynamicResources[$locale])
@@ -131,5 +139,41 @@ class Translator extends BaseTranslator
         }
 
         parent::loadCatalogue($locale);
+    }
+
+    /**
+     * Setter for inject dependency
+     *
+     * @param DynamicTranslationMetadataCache $cache
+     */
+    public function setDatabaseMetadataCache(DynamicTranslationMetadataCache $cache)
+    {
+        $this->databaseTranslationMetadataCache = $cache;
+    }
+
+    /**
+     * Ensure that database resource added
+     *
+     * @param string $locale
+     */
+    private function ensureDatabaseLoaderAdded($locale)
+    {
+        if (null !== $this->databaseTranslationMetadataCache) {
+            $resources        = !empty($this->dynamicResources[$locale]) ? $this->dynamicResources[$locale] : [];
+            $databaseResource = array_filter(
+                $resources,
+                function ($resource) {
+                    return $resource instanceof OrmTranslationResource;
+                }
+            );
+            if (!$databaseResource) {
+                $this->addResource(
+                    'oro_database_translation',
+                    new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
+                    $locale,
+                    'messages'
+                );
+            }
+        }
     }
 }
