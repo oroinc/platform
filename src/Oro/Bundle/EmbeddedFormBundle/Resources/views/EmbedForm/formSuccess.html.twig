@@ -1,0 +1,5 @@
+{% extends 'OroEmbeddedFormBundle::base.html.twig' %}
+
+{% block page %}
+    {{ entity.successMessage|default('oro.embedded_form.successMessage.default'|trans)|back_link(entity.id)|raw }}
+{% endblock %}

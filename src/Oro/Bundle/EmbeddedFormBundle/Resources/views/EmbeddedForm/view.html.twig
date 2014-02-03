@@ -1,0 +1,114 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as ui %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_embedded_form_delete') %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_embedded_form_delete', {'id': entity.id}),
+            'dataRedirect': path('oro_embedded_form_list'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-embedded-form',
+            'entity_label': 'oro.embedded_form.entity.label'|trans,
+        }) }}
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+
+    {% if resource_granted('oro_embedded_form_delete') %}
+        {{ UI.button({'path' : path('oro_embedded_form_update', {'id': entity.id}), 'title' : 'Edit'|trans, 'label' : 'Edit'|trans}) }}
+    {% endif %}
+    {{ UI.button({'path' : path('oro_embedded_form_list'), 'title' : 'Cancel'|trans, 'label' : 'Cancel'|trans}) }}
+{% endblock %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_embedded_form_list'),
+        'indexLabel': 'oro.embedded_form.entity.plural_label'|trans,
+        'entityTitle': entity.title
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'embedded-form-get-code' %}
+
+    {% block stats %}
+    {% endblock stats %}
+
+    {% set formDetails %}
+    <div class="widget-content">
+            <div class="row-fluid form-horizontal">
+                <div class="responsive-block">
+                    {{ ui.renderProperty('oro.embedded_form.title.label'|trans, entity.title) }}
+                    {{ ui.renderProperty('oro.embedded_form.form_type.label'|trans, entity.formType) }}
+                    {{ ui.renderProperty('oro.embedded_form.channel.label'|trans, entity.channel.name) }}
+
+                    {# to display css in a div with vertical scroll #}
+                    <div class="control-group">
+                        <label class="control-label">{{ 'oro.embedded_form.css.label'|trans }}</label>
+
+                        <div class="controls" style="overflow-y: scroll; height: 180px;">
+                            {{ entity.css|nl2br }}
+                        </div>
+                    </div>
+
+                    {{ ui.renderProperty('oro.embedded_form.successMessage.label'|trans, entity.successMessage|escape) }}
+                </div>
+            </div>
+        </div>
+    {% endset %}
+    {% set formPreview %}
+    <div class="widget-content">
+        <iframe
+            src="{{ url('oro_embedded_form_submit', {'id': entity.id}) }}"
+            width="640"
+            height="800"
+            frameborder="0"></iframe>
+    </div>
+    {% endset %}
+
+    {% set getCode %}
+    <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
+<div id="embedded-form-container-{{ entity.id }}"></div>
+<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
+<script type="text/javascript">
+    new ORO.EmbedForm({
+        container: 'embedded-form-container-{{ entity.id }}',
+        iframe: {
+            src: "{{ url('oro_embedded_form_submit', {'id': entity.id}) }}",
+            width: 640,
+            height: 800,
+            frameBorder: 0
+        }
+    });
+</script>
+        </textarea>
+    {% endset %}
+
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+                'title': 'Details'|trans,
+    'data': [formDetails]
+    },
+            {
+    'title': 'Form Preview'|trans,
+    'data': [formPreview]
+    }
+    ]
+    },{
+    'title': 'Get code'|trans,
+    'subblocks': [
+    {
+    'title': 'Code'|trans,
+    'data': [getCode]
+    }
+        ]
+    }] %}
+    {% set data = {
+        'dataBlocks': dataBlocks
+    } %}
+    {{ parent() }}
+{% endblock content_data %}
