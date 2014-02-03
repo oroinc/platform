@@ -9,45 +9,136 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class ConfigCacheTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCache()
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $cacheProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $modelCacheProvider;
+
+    public function setUp()
     {
-        $cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+        $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->disableOriginalConstructor()
             ->setMethods(array('fetch', 'save', 'delete', 'deleteAll'))
             ->getMockForAbstractClass();
 
-        $modelCacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+        $this->modelCacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->disableOriginalConstructor()
             ->setMethods(array('fetch', 'save', 'delete', 'deleteAll'))
             ->getMockForAbstractClass();
+    }
 
+    protected function tearDown()
+    {
+        unset($this->cacheProvider);
+        unset($this->modelCacheProvider);
+    }
+
+    public function testPutConfigInCache()
+    {
         $className   = 'testClass';
         $scope       = 'testScope';
         $configId    = new EntityConfigId($className, $scope);
         $config      = new Config($configId);
-        $configCache = new ConfigCache($cacheProvider, $modelCacheProvider);
+        $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
 
-        $cacheProvider->expects($this->once())->method('save')->will($this->returnValue(true));
+        $this->cacheProvider->expects($this->once())
+            ->method('save')
+            ->will($this->returnValue(true));
         $this->assertTrue($configCache->putConfigInCache($config));
+    }
 
-        $cacheProvider->expects($this->once())->method('delete')->will($this->returnValue(true));
+    public function testRemoveConfigFromCache()
+    {
+        $className   = 'testClass';
+        $scope       = 'testScope';
+        $configId    = new EntityConfigId($className, $scope);
+        $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
+
+        $this->cacheProvider->expects($this->once())
+            ->method('delete')
+            ->will($this->returnValue(true));
         $this->assertTrue($configCache->removeConfigFromCache($configId));
+    }
 
-        $cacheProvider->expects($this->once())->method('deleteAll')->will($this->returnValue(true));
+    public function testRemoveAll()
+    {
+        $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
+
+        $this->cacheProvider->expects($this->once())
+            ->method('deleteAll')
+            ->will($this->returnValue(true));
         $this->assertTrue($configCache->removeAll());
+    }
 
-        $cacheProvider->expects($this->once())->method('fetch')->will($this->returnValue($config));
+    public function testLoadConfigFromCache()
+    {
+        $className   = 'testClass';
+        $scope       = 'testScope';
+        $configId    = new EntityConfigId($className, $scope);
+        $config      = new Config($configId);
+        $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
+
+        $this->cacheProvider->expects($this->once())
+            ->method('fetch')
+            ->will($this->returnValue($config));
         $this->assertEquals($config, $configCache->loadConfigFromCache($configId));
+    }
 
-        $value = 'testValue';
+    /**
+     * @dataProvider setConfigurableProvider
+     */
+    public function testSetConfigurable($flag, $expectedCacheValue)
+    {
+        $className   = 'testClass';
+        $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
 
-        $modelCacheProvider->expects($this->once())->method('save')->will($this->returnValue(true));
-        $this->assertTrue($configCache->setConfigurable($value, $className));
+        $this->modelCacheProvider->expects($this->once())
+            ->method('save')
+            ->with($className, $this->identicalTo($expectedCacheValue))
+            ->will($this->returnValue(true));
+        $this->assertTrue($configCache->setConfigurable($flag, $className));
+    }
 
-        $modelCacheProvider->expects($this->once())->method('fetch')->will($this->returnValue($value));
-        $this->assertEquals($value, $configCache->getConfigurable($className));
+    public function setConfigurableProvider()
+    {
+        return [
+            [true, true],
+            [false, null],
+        ];
+    }
 
-        $modelCacheProvider->expects($this->once())->method('deleteAll')->will($this->returnValue(true));
+    /**
+     * @dataProvider getConfigurableProvider
+     */
+    public function testGetConfigurable($expectedFlag, $cachedValue)
+    {
+        $className   = 'testClass';
+        $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
+
+        $this->modelCacheProvider->expects($this->once())
+            ->method('fetch')
+            ->with($className)
+            ->will($this->returnValue($cachedValue));
+        $this->assertTrue($expectedFlag === $configCache->getConfigurable($className));
+    }
+
+    public function getConfigurableProvider()
+    {
+        return [
+            [true, true],
+            [null, false],
+            [false, null],
+        ];
+    }
+
+    public function testRemoveAllConfigurable()
+    {
+        $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
+
+        $this->modelCacheProvider->expects($this->once())
+            ->method('deleteAll')
+            ->will($this->returnValue(true));
         $this->assertTrue($configCache->removeAllConfigurable());
     }
 }

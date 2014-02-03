@@ -80,6 +80,10 @@ class EntityReader extends IteratorBasedReader
             $qb->leftJoin('o.' . $assocMapping['fieldName'], $alias);
         }
 
+        foreach ($metadata->getIdentifierFieldNames() as $fieldName) {
+            $qb->orderBy('o.' . $fieldName, 'ASC');
+        }
+
         $this->setSourceQueryBuilder($qb);
     }
 }
