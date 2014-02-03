@@ -144,8 +144,8 @@ class UserType extends AbstractType
                     }
 
                     return $user && $user->getId()
-                        ? array('User', 'Default')
-                        : array('Registration', 'User', 'Default');
+                        ? array('User', 'Roles')
+                        : array('Registration', 'User', 'Roles');
                 },
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'cascade_validation' => true
