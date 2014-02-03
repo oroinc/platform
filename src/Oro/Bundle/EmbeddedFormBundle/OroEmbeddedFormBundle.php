@@ -14,5 +14,4 @@ class OroEmbeddedFormBundle extends Bundle
 
         $container->addCompilerPass(new EmbeddedFormPass());
     }
-
 }
