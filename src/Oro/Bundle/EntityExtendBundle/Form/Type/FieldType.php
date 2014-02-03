@@ -24,10 +24,9 @@ class FieldType extends AbstractType
         'date'       => 'Date',
         'text'       => 'Text',
         'float'      => 'Float',
-        //TODO: BAP-3012
-        //'oneToMany'  => 'Relation one to many',
-        //'manyToOne'  => 'Relation many to one',
-        //'manyToMany' => 'Relation many to many',
+        'oneToMany'  => 'Relation one to many',
+        'manyToOne'  => 'Relation many to one',
+        'manyToMany' => 'Relation many to many',
         'optionSet'  => 'Option set'
     );
 

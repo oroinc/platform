@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-
 use Doctrine\ORM\EntityManager;
 use FOS\Rest\Util\Codes;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
@@ -159,5 +158,4 @@ class EmbeddedFormController extends Controller
             'form' => $form->createView()
         );
     }
-
-} 
+}

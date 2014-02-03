@@ -12,4 +12,4 @@ interface EmbeddedFormInterface
      * @return string
      */
     public function getDefaultSuccessMessage();
-} 
+}
