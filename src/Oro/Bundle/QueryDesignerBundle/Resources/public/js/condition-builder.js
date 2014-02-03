@@ -1,6 +1,6 @@
-/*global define*/
+/*global define, require*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './condition-filed'], function ($, _) {
+define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
     'use strict';
 
     /**
@@ -10,13 +10,11 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
         options: {
             sortable: {
                 // see jquery-ui sortable's options
-                containment: '#container',
                 placeholder: 'sortable-placeholder',
                 items: '>[data-criteria]',
-                connectWith: 'ul.condition-group'
+                connectWith: '[data-criteria=conditions-group]'
             },
-            conditionGroup: {
-                items: '>.condition[data-criteria]',
+            conditionsGroup: {
                 cursorAt: "10 10",
                 cancel: 'a, input, .btn, select'
             },
@@ -29,20 +27,36 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
             sourceValueSelector: '',
             helperClass: 'ui-grabbing',
             conditionHTML: '<li class="condition controls" />',
-            conditionFieldHTML: '<div class="condition-field" />',
-            conditionGroupHTML: '<ul class="condition-group" />',
+            conditionItemHTML: '<div class="condition-item" />',
+            conditionsGroupHTML: '<ul class="conditions-group" />',
             validation: {
-                'condition-filed': {
-                    NotBlank: {message: 'oro.query_designer.condition_builder.condition_filed.not_blank'}
+                'condition-item': {
+                    NotBlank: {message: 'oro.query_designer.condition_builder.condition_item.not_blank'}
                 },
-                'condition-group': {
-                    NotBlank: {message: 'oro.query_designer.condition_builder.condition_group.not_blank'}
+                'conditions-group': {
+                    NotBlank: {message: 'oro.query_designer.condition_builder.conditions_group.not_blank'}
                 }
             }
         },
 
         _create: function () {
+            var modules;
+            this.$criteriaList = $(this.options.criteriaListSelector);
             this._prepareOptions();
+
+            // if some criteria requires addition modules, load them before initialization
+            modules = this.$criteriaList.find('[data-module]').map(function () {
+                return $(this).data('module');
+            }).get();
+
+            if (modules.length) {
+                require(modules, $.proxy(this._initControl(), this));
+            } else {
+                this._initControl();
+            }
+        },
+
+        _initControl: function () {
             this._initCriteriaList();
             this._initConditionBuilder();
             this._updateOperators();
@@ -53,12 +67,17 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
                 .on('change', '.operator', $.proxy(this._onChangeOperator, this));
         },
 
+        _getCreateOptions: function () {
+            // makes a deep copy of default options
+            return $.extend(true, {}, this.options);
+        },
+
         _prepareOptions: function () {
             var opts = this.options;
-            opts.conditionGroup = $.extend({}, opts.sortable, opts.conditionGroup);
-            opts.conditionGroup.appendTo = opts.criteriaListSelector;
-            opts.conditionGroup.helper = $.proxy(this._createHelper, this);
-            opts.conditionGroup.update = $.proxy(this._onUpdate, this);
+            opts.conditionsGroup = $.extend({}, opts.sortable, opts.conditionsGroup);
+            opts.conditionsGroup.appendTo = opts.criteriaListSelector;
+            opts.conditionsGroup.helper = $.proxy(this._createHelper, this);
+            opts.conditionsGroup.update = $.proxy(this._onUpdate, this);
             opts.criteriaList = $.extend({}, opts.sortable, opts.criteriaList);
             opts.criteriaList.start = $.proxy(this._onCriteriaGrab, this);
             opts.criteriaList.stop = $.proxy(this._onCriteriaDrop, this);
@@ -75,7 +94,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
         },
 
         _initCriteriaList: function () {
-            $(this.options.criteriaListSelector)
+            this.$criteriaList
                 .sortable(this.options.criteriaList)
                 .on('mousedown', function () {
                     $(':focus').blur();
@@ -89,20 +108,21 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
             if (!$root.is(sortableConnectWith)) {
                 $root = $root.find(sortableConnectWith);
                 if (!$root.length) {
-                    $root = $(this.options.conditionGroupHTML).appendTo(this.element);
+                    $root = $(this.options.conditionsGroupHTML).appendTo(this.element);
                 }
             }
 
             $content = this._createConditionContent($root, this._getSourceValue());
-            this._initConditionGroup($content);
+            this._initConditionsGroup($content);
+
             $root.on('changed', $.proxy(this._onChanged, this));
 
             this.$rootCondition = $root;
         },
 
-        _initConditionGroup: function ($group) {
+        _initConditionsGroup: function ($group) {
             // make the group sortable
-            $group.sortable(this.options.conditionGroup);
+            $group.sortable(this.options.conditionsGroup);
             // on change update group's value
             $group.on('changed', function () {
                 var values = [];
@@ -112,11 +132,12 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
                     values.push(value);
                     if ($.type(value) !== 'string') {
                         // means, value is not an operator
-                        $el.parent().find('>input[name^=condition_group_]').prop('checked', !_.isEmpty(value));
+                        $el.parent().find('>input[name^=condition_item_]').prop('checked', !$.isEmptyObject(value));
                     }
                 });
                 $group.data('value', values);
             });
+            $group.attr('data-criteria', 'conditions-group');
         },
 
         _onCriteriaGrab: function (e, ui) {
@@ -136,28 +157,28 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
         },
 
         _getCriteriaOrigin: function (criteria) {
-            var $criteria = $(this.options.criteriaListSelector).find('[data-criteria="' + criteria + '"]');
+            var $criteria = this.$criteriaList.find('[data-criteria="' + criteria + '"]');
             return $criteria.data('origin') || $criteria;
         },
 
         _createCondition: function (criteria, value) {
-            var $content, $condition, $criteria, options, rule;
+            var $content, $condition, $criteria, $validationInput, widgetOptions, widgetName;
             if (!criteria) {
                 // if criteria is not passed, define it from value
-                criteria = $.isArray(value) ? 'condition-group' : 'condition-filed';
+                criteria = $.isArray(value) ? 'conditions-group' : (value.citeria || 'condition-item');
             }
-            $criteria = this._getCriteriaOrigin(criteria);
-            options = _.omit($criteria.data(), ['clone', 'sortableItem', 'criteria']);
 
-            switch (criteria) {
-            case 'condition-filed':
-                $content = this._createConditionContent(this.options.conditionFieldHTML, value || {});
-                $content.conditionFiled(options);
-                break;
-            case 'condition-group':
-                $content = this._createConditionContent(this.options.conditionGroupHTML, value || []);
-                this._initConditionGroup($content);
-                break;
+            if (criteria === 'conditions-group') {
+                $content = this._createConditionContent(this.options.conditionsGroupHTML, value || []);
+                this._initConditionsGroup($content);
+            } else {
+                $content = this._createConditionContent(this.options.conditionItemHTML, value || {});
+                $criteria = this._getCriteriaOrigin(criteria);
+                widgetOptions = $criteria.data('options') || {};
+                widgetName = $criteria.data('widget');
+                if ($.isFunction($content[widgetName])) {
+                    $content[widgetName](widgetOptions);
+                }
             }
 
             $condition = $(this.options.conditionHTML)
@@ -165,9 +186,9 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
                 .prepend($content)
                 .prepend('<a class="close" data-dismiss="alert" href="#">&times;</a>');
 
-            rule = this.options.validation[criteria];
-            if (rule) {
-                $condition.append(this._createValidationInput(rule, $content.data('value')));
+            $validationInput = this._createValidationInput(criteria, $content.data('value'));
+            if ($validationInput) {
+                $condition.append($validationInput);
             }
 
             return $condition;
@@ -198,11 +219,16 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
                 .data('value', value);
         },
 
-        _createValidationInput: function (rule, value) {
-            return $('<input class="select2-focusser select2-offscreen" type="checkbox"/>')
-                .prop('checked', !_.isEmpty(value))
-                .attr('name', 'condition_group_' + Date.now())
-                .data('validation', rule);
+        _createValidationInput: function (criteria, value) {
+            var $input, validation = this.options.validation,
+                rule = validation[criteria] || validation['condition-item'];
+            if (rule) {
+                $input = $('<input class="select2-focusser select2-offscreen" type="checkbox"/>')
+                    .prop('checked', !$.isEmptyObject(value))
+                    .attr('name', 'condition_item_' + Date.now())
+                    .data('validation', rule);
+            }
+            return $input;
         },
 
         _createHelper: function (e, $el) {
@@ -215,7 +241,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
         _onUpdate: function (e, ui) {
             var $condition;
             // new condition
-            if (ui.sender && ui.sender.is(this.options.criteriaListSelector)) {
+            if (ui.sender && ui.sender.is(this.$criteriaList)) {
                 $condition = this._createCondition(ui.item.data('criteria'));
                 $condition.insertBefore(ui.item);
                 $condition.trigger('changed');
@@ -225,7 +251,7 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
 
         _updateOperators: function () {
             var self = this,
-                options = this.options.conditionGroup,
+                options = this.options.conditionsGroup,
                 $conditions = this.element.find(options.connectWith + options.items);
             // remove operators for first items in groups
             $conditions.filter(':first-child')
@@ -263,10 +289,10 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
 
         _onConditionClose: function (e) {
             var $group = $(e.target).parent();
-            _.delay($.proxy(function () {
+            this._delay(function () {
                 this._updateOperators();
                 $group.trigger('changed');
-            }, this), 1);
+            }, 1);
         },
 
         _onChanged: function () {
@@ -287,4 +313,6 @@ define(['jquery', 'underscore', 'jquery-ui', 'oroui/js/dropdown-select', './cond
             return value ? JSON.parse(value) : [];
         }
     });
+
+    return $;
 });
