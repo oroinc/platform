@@ -3,6 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider;
+use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
+use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
 
 class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +18,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     protected $service;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $em;
+    protected $databasePersister;
 
     /** @var string */
     protected $className = 'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider';
@@ -25,11 +27,18 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
         $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
-        $this->em      = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+
+        $this->databasePersister = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DatabasePersister')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->service = new TranslationServiceProvider($this->adapter, $this->dumper, 'someTestRootDir', $this->em);
+        $this->service = new TranslationServiceProvider(
+            $this->adapter,
+            $this->dumper,
+            new TranslationLoader(),
+            $this->databasePersister,
+            'someTestRootDir'
+        );
     }
 
     public function tearDown()
@@ -61,7 +70,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['download', 'upload', 'cleanup'],
-            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
         );
 
         $dir = $this->getLangFixturesDir();
@@ -110,7 +119,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
         );
 
         $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -150,7 +159,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
         );
 
         $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
@@ -206,8 +215,8 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 
         $basePath = $target = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR
             . ltrim(uniqid(), DIRECTORY_SEPARATOR);
-        $target = $basePath . DIRECTORY_SEPARATOR . 'target';
-        $source = $basePath . DIRECTORY_SEPARATOR . 'source';
+        $target   = $basePath . DIRECTORY_SEPARATOR . 'target';
+        $source   = $basePath . DIRECTORY_SEPARATOR . 'source';
 
         $tmpDirName = $source . DIRECTORY_SEPARATOR . 'test' . DIRECTORY_SEPARATOR . 'test';
         mkdir($tmpDirName, 0777, true);
@@ -254,7 +263,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 
         $service = $this->getServiceMock(
             ['__construct'],
-            [$this->adapter, $this->dumper, 'someTestRootDir', $this->em]
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
         );
 
         $method = new \ReflectionMethod(

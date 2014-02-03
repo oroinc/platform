@@ -3,24 +3,36 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
 class DatabasePersister
 {
-    const BATCH_SIZE = 100;
+    /** @var int */
+    private $batchSize = 200;
 
     /** @var EntityManager */
     private $em;
+
+    /** @var TranslationRepository */
+    private $repository;
+
+    /** @var array */
+    private $toWrite = [];
 
     /**
      * @param EntityManager $em
      */
     public function __construct(EntityManager $em)
     {
-        $this->em = $em;
+        $this->em         = $em;
+        $this->repository = $em->getRepository(Translation::ENTITY_NAME);
     }
 
     /**
+     * Persists data into DB in single transaction
+     *
      * @param string $locale
      * @param array  $data translations strings, format same as MassageCatalog::all() returns
      *
@@ -28,47 +40,30 @@ class DatabasePersister
      */
     public function persist($locale, array $data)
     {
-        $repo = $this->em->getRepository(Translation::ENTITY_NAME);
-
-        $itemsToWrite = [];
-        $writeCount   = 0;
-
+        $writeCount = 0;
         try {
             $this->em->beginTransaction();
             foreach ($data as $domain => $domainData) {
-                $countPersisted = 0;
-
                 foreach ($domainData as $key => $translation) {
-                    $countPersisted++;
-
-                    $object = $repo->findValue($key, $locale, $domain);
-                    if (null === $object) {
-                        $object = new Translation();
-                        $object->setScope(Translation::SCOPE_SYSTEM);
-                        $object->setLocale($locale);
-                        $object->setDomain($domain);
-                        $object->setKey($key);
-                    }
-
-                    $object->setValue($translation);
-
                     $writeCount++;
-                    $itemsToWrite[] = $object;
-                    if (0 === $writeCount % self::BATCH_SIZE) {
-                        $this->write($itemsToWrite);
+                    $this->toWrite[] = $this->getTranslationObject($key, $locale, $domain, $translation);
+                    if (0 === $writeCount % $this->batchSize) {
+                        $this->write($this->toWrite);
 
-                        $itemsToWrite = [];
+                        $this->toWrite = [];
                     }
                 }
             }
 
-            if (count($itemsToWrite) > 0) {
-                $this->write($itemsToWrite);
+            if (count($this->toWrite) > 0) {
+                $this->write($this->toWrite);
             }
 
             $this->em->commit();
+            $this->em->clear();
         } catch (\Exception $exception) {
             $this->em->rollback();
+            $this->em->clear();
 
             throw $exception;
         }
@@ -85,6 +80,31 @@ class DatabasePersister
             $this->em->persist($item);
         }
         $this->em->flush();
-        $this->em->clear();
+    }
+
+    /**
+     * Find existing translation in database
+     *
+     * @param string $key
+     * @param string $locale
+     * @param string $domain
+     * @param string $value
+     *
+     * @return Translation
+     */
+    private function getTranslationObject($key, $locale, $domain, $value)
+    {
+        $object = $this->repository->findValue($key, $locale, $domain);
+        if (null === $object) {
+            $object = new Translation();
+            $object->setScope(Translation::SCOPE_SYSTEM);
+            $object->setLocale($locale);
+            $object->setDomain($domain);
+            $object->setKey($key);
+        }
+
+        $object->setValue($value);
+
+        return $object;
     }
 }

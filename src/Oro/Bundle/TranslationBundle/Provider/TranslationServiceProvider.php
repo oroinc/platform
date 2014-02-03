@@ -268,35 +268,19 @@ class TranslationServiceProvider
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
-        $fullCatalog = new MessageCatalogue($locale);
+        $catalog = new MessageCatalogue($locale);
         /** @var \SplFileInfo $fileInfo */
         foreach ($iterator as $fileInfo) {
-            if ($iterator->getDepth() < 1) {
+            if ($iterator->getDepth() < 1 || $fileInfo->isDir()) {
                 continue;
             }
-
-            if ($fileInfo->isDir()) {
-                continue;
-            }
-
-            // get locale from path, e.g. ../translations/messages.en.yml -> en
-            $locale = str_replace(
-                '-',
-                '_',
-                preg_replace('#' . $sourceDir . '[/|\\\]+([^/]+)[/|\\\]+.*#', '$1', $fileInfo->getPathname())
-            );
 
             // fix bad formatted yaml that may come from third-party service
             YamlFixer::fixStrings($fileInfo->getPathname());
-
-            $catalog = new MessageCatalogue($locale);
-            $this->translationLoader->loadMessages($fileInfo->getPath(), $catalog);
-            $fullCatalog->addCatalogue($catalog);
-
-            $appliedLocales[$locale] = $locale;
         }
 
-        $this->databasePersister->persist($locale, $fullCatalog->all());
+        $this->translationLoader->loadMessages($sourceDir, $catalog);
+        $this->databasePersister->persist($locale, $catalog->all());
     }
 
     /**

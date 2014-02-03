@@ -6,8 +6,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
- * @ORM\Table(name="oro_translation", uniqueConstraints={
- *      @ORM\UniqueConstraint(name="UNQ_MESSAGE_IDX", columns={"locale", "domain", "trans_key", "scope"})
+ * @ORM\Table(name="oro_translation", indexes={
+ *      @ORM\Index(name="MESSAGE_IDX", columns={"locale", "domain", "`key`", "scope"})
  * })
  */
 class Translation
@@ -25,7 +25,7 @@ class Translation
     protected $id;
 
     /**
-     * @ORM\Column(name="trans_key", type="string", length=255)
+     * @ORM\Column(name="`key`", type="string", length=500)
      */
     protected $key;
 
