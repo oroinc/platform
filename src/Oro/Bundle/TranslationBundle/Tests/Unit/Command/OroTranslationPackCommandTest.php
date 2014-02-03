@@ -118,8 +118,9 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $writerMock->expects($this->once())->method('writeTranslations')->will(
             $this->returnCallback(
                 function ($result, $format, $path) use ($phpUnit, $expectedFormat) {
+                    $separator = DIRECTORY_SEPARATOR;
                     $phpUnit->assertTrue(
-                        strpos($path['path'], 'language-pack/SomeProject/SomeBundle/translations') !== false
+                        strpos($path['path'], "language-pack/SomeProject{$separator}SomeBundle{$separator}translations") !== false
                     );
 
                     $phpUnit->assertEquals($format, $expectedFormat);

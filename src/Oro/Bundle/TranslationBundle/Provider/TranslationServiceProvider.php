@@ -267,8 +267,10 @@ class TranslationServiceProvider
             }
 
             // get target path form source by replacing $sourceDir part
+
+            $replaceSourceDirectoryPartPattern = '#(' . addslashes($sourceDir) . '[/|\\\]+[^/\\\]+[/|\\\]+)#';
             $target = $targetDir . preg_replace(
-                '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
+                $replaceSourceDirectoryPartPattern,
                 '',
                 $fileInfo->getPathname()
             );
@@ -285,7 +287,7 @@ class TranslationServiceProvider
             $appliedLocales[] = str_replace(
                 '-',
                 '_',
-                preg_replace('#' . $sourceDir . '[/|\\\]+([^/]+)[/|\\\]+.*#', '$1', $fileInfo->getPathname())
+                preg_replace('#' . addslashes($sourceDir) . '[/|\\\]+([^/]+)[/|\\\]+.*#', '$1', $fileInfo->getPathname())
             );
 
             rename($fileInfo->getPathname(), $target);
