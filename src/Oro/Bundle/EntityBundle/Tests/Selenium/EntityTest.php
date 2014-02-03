@@ -83,8 +83,8 @@ class EntityTest extends Selenium2TestCase
             ->open()
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
-            ->checkEntityField('test_field')
-            ->checkEntityField('test_field2');
+            ->checkEntityField('Test_field')
+            ->checkEntityField('Test_field2');
     }
 
     /**
