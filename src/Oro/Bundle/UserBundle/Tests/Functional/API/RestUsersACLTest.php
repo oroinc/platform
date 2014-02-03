@@ -50,7 +50,13 @@ class RestUsersACLTest extends WebTestCase
             )
         );
 
-        $this->client->request('POST', $this->client->generate('oro_api_post_user'), $request);
+        $this->client->request(
+            'POST',
+            $this->client->generate('oro_api_post_user'),
+            $request,
+            array(),
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);
     }
@@ -58,7 +64,13 @@ class RestUsersACLTest extends WebTestCase
     public function testGetUsers()
     {
         //get user id
-        $this->client->request('GET', $this->client->generate('oro_api_get_users'), array('limit' => 100));
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_users'),
+            array('limit' => 100),
+            array(),
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);
     }
@@ -68,7 +80,10 @@ class RestUsersACLTest extends WebTestCase
         //open user by id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_user', array('id' => self::DEFAULT_USER_ID))
+            $this->client->generate('oro_api_get_user', array('id' => self::DEFAULT_USER_ID)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);
@@ -90,7 +105,9 @@ class RestUsersACLTest extends WebTestCase
         $this->client->request(
             'PUT',
             $this->client->generate('oro_api_put_user', array('id' => self::DEFAULT_USER_ID)),
-            $request
+            $request,
+            array(),
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);
