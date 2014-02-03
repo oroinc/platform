@@ -311,7 +311,10 @@ class ConfigFieldGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $fieldConfig->set('state', ExtendManager::STATE_UPDATED);
+        $fieldConfig->set(
+            'state',
+            class_exists($field->getEntity()->getClassName()) ? ExtendManager::STATE_UPDATED : ExtendManager::STATE_NEW
+        );
 
         $configManager->persist($fieldConfig);
 

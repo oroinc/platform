@@ -163,7 +163,7 @@ class EntitySecurityMetadataProvider
                             $this->extendConfigProvider->getConfig(
                                 $securityConfig->getId()->getClassName()
                             )->get('state'),
-                            [ExtendManager::STATE_NEW, ExtendManager::STATE_UPDATED]
+                            ExtendManager::$nonShownEntitiesStates
                         )
                     ) {
                         $className = $securityConfig->getId()->getClassName();

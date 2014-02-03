@@ -16,6 +16,16 @@ class ExtendManager
     const OWNER_CUSTOM = 'Custom';
 
     /**
+     * List of states witch must not be shown
+     *
+     * @var array
+     */
+    static public $nonShownEntitiesStates = [
+        self::STATE_NEW,
+        self::STATE_DELETED
+    ];
+
+    /**
      * @var ConfigProvider
      */
     protected $configProvider;
