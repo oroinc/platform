@@ -80,6 +80,7 @@ services:
         class: %oro_translation.database_translation.persister.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_translation.database_translation.metadata.cache
 
     oro_translation.database_translation.loader:
         class: %oro_translation.database_translation.loader.class%

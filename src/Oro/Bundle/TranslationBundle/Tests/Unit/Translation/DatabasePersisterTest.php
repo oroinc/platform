@@ -16,6 +16,9 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $repo;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $metadataCache;
+
     /** @var array */
     protected $testData = [
         'messages'   => [
@@ -34,14 +37,20 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->em   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-        $this->repo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
+        $this->repo          = $this->getMockBuilder(
+            'Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository'
+        )
             ->disableOriginalConstructor()->getMock();
+        $this->metadataCache = $this
+            ->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
+            ->disableOriginalConstructor()->getMock();
+
 
         $this->em->expects($this->any())->method('getRepository')->with($this->equalTo(Translation::ENTITY_NAME))
             ->will($this->returnValue($this->repo));
-        $this->persister = new DatabasePersister($this->em);
+        $this->persister = new DatabasePersister($this->em, $this->metadataCache);
 
         // set batch size to 2
         $reflection = new \ReflectionProperty(get_class($this->persister), 'batchSize');
@@ -62,6 +71,8 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit');
         $this->em->expects($this->once())->method('clear');
         $this->em->expects($this->never())->method('rollback');
+
+        $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
 
         $this->persister->persist($this->testLocale, $this->testData);
     }
@@ -92,6 +103,8 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('clear');
         $this->em->expects($this->never())->method('rollback');
 
+        $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
+
         $this->persister->persist($this->testLocale, $this->testData);
 
         $this->assertSame($this->testData['validators']['key_1'], $existsTranslation->getValue());
@@ -110,6 +123,8 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
         $this->em->expects($this->once())->method('rollback');
         $this->em->expects($this->once())->method('clear');
+
+        $this->metadataCache->expects($this->never())->method('updateTimestamp');
 
         $this->persister->persist($this->testLocale, $this->testData);
     }

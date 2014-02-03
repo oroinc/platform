@@ -15,6 +15,9 @@ class DatabasePersister
     /** @var EntityManager */
     private $em;
 
+    /** @var DynamicTranslationMetadataCache */
+    private $metadataCache;
+
     /** @var TranslationRepository */
     private $repository;
 
@@ -22,12 +25,14 @@ class DatabasePersister
     private $toWrite = [];
 
     /**
-     * @param EntityManager $em
+     * @param EntityManager                   $em
+     * @param DynamicTranslationMetadataCache $metadataCache
      */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, DynamicTranslationMetadataCache $metadataCache)
     {
-        $this->em         = $em;
-        $this->repository = $em->getRepository(Translation::ENTITY_NAME);
+        $this->em            = $em;
+        $this->metadataCache = $metadataCache;
+        $this->repository    = $em->getRepository(Translation::ENTITY_NAME);
     }
 
     /**
@@ -61,12 +66,16 @@ class DatabasePersister
 
             $this->em->commit();
             $this->em->clear();
+
         } catch (\Exception $exception) {
             $this->em->rollback();
             $this->em->clear();
 
             throw $exception;
         }
+
+        // update timestamp in case when persist succeed
+        $this->metadataCache->updateTimestamp($locale);
     }
 
     /**
