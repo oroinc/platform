@@ -13,6 +13,8 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     private $blocks = array();
 
+    private $reportingLevel;
+
     private $testSubBlocksConfig = array(
         'common' => array(
             'title'    => 'Common Setting',
@@ -30,7 +32,12 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->reportingLevel = error_reporting(E_ALL);
         $this->formConfig = new FormConfig();
+    }
+
+    public function tearDown(){
+        error_reporting($this->reportingLevel);
     }
 
     public function testAddBlock()

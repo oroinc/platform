@@ -133,8 +133,9 @@ GRID;
         $grid->addRow(['1', '2', '3']);
         $grid->addRow(['1', '2', '3']);
         $grid->addRow(['1', '2', '3']);
-
-        $this->assertEquals(str_replace("\n", PHP_EOL, $expectedResult), $grid->render());
+        $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
+        $result = $grid->render();
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -154,7 +155,8 @@ GRID;
         $grid->addRow(['1', '2', '3']);
         $grid->addRow(['1', '2', '3']);
 
-        $this->assertEquals(str_replace("\n", PHP_EOL, $expectedResult), $grid->render());
+        $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
+        $this->assertEquals($expected, $grid->render());
     }
 
     /**
@@ -173,8 +175,8 @@ GRID;
         $grid->addRow(['1', '2', '3']);
         $grid->addRow(['1', '2', '3']);
         $grid->addRow(['10', '20', '300']);
-
-        $this->assertEquals(str_replace("\n", PHP_EOL, $expectedResult), $grid->render());
+        $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
+        $this->assertEquals($expected, $grid->render());
     }
 
     /**
@@ -193,7 +195,7 @@ GRID;
         $grid->addRow(['1']);
         $grid->addRow(['1']);
         $grid->addRow(['10']);
-
-        $this->assertEquals(str_replace("\n", PHP_EOL, $expectedResult), $grid->render());
+        $expected = preg_replace('/(\r\n)|\n/m', PHP_EOL, $expectedResult);
+        $this->assertEquals($expected, $grid->render());
     }
 }
