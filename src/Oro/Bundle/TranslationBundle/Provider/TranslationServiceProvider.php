@@ -267,8 +267,10 @@ class TranslationServiceProvider
             }
 
             // get target path form source by replacing $sourceDir part
-            $target = $targetDir . preg_replace(
-                '#(' . $sourceDir . '[/|\\\]+[^/\\\]+[/|\\\]+)#',
+
+            $replaceSourceDirectoryPartPattern = '#(' . addslashes($sourceDir) . '[/|\\\]+[^/\\\]+[/|\\\]+)#';
+            $target                            = $targetDir . preg_replace(
+                $replaceSourceDirectoryPartPattern,
                 '',
                 $fileInfo->getPathname()
             );
@@ -282,11 +284,12 @@ class TranslationServiceProvider
             }
 
             // get locale from path, e.g. ../translations/messages.en.yml -> en
-            $appliedLocales[] = str_replace(
-                '-',
-                '_',
-                preg_replace('#' . $sourceDir . '[/|\\\]+([^/]+)[/|\\\]+.*#', '$1', $fileInfo->getPathname())
+            $localeFromFileName = preg_replace(
+                '#' . addslashes($sourceDir) . '[/|\\\]+([^/]+)[/|\\\]+.*#',
+                '$1',
+                $fileInfo->getPathname()
             );
+            $appliedLocales[]   = str_replace('-', '_', $localeFromFileName);
 
             rename($fileInfo->getPathname(), $target);
 

@@ -118,9 +118,12 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $writerMock->expects($this->once())->method('writeTranslations')->will(
             $this->returnCallback(
                 function ($result, $format, $path) use ($phpUnit, $expectedFormat) {
-                    $phpUnit->assertTrue(
-                        strpos($path['path'], 'language-pack/SomeProject/SomeBundle/translations') !== false
+                    $separator = DIRECTORY_SEPARATOR;
+                    $result    = strpos(
+                        $path['path'],
+                        "language-pack/SomeProject{$separator}SomeBundle{$separator}translations"
                     );
+                    $phpUnit->assertTrue($result !== false);
 
                     $phpUnit->assertEquals($format, $expectedFormat);
                 }
@@ -167,7 +170,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $kernel = new TestKernel();
         $kernel->boot();
 
-        $projectId = 'someproject';
+        $projectId   = 'someproject';
         $adapterMock = $this->getNewMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter');
 
         $adapterMock->expects($this->any())
@@ -205,7 +208,7 @@ class OroTranslationPackCommandTest extends \PHPUnit_Framework_TestCase
         $command->setApplication($app);
 
         $tester = new CommandTester($command);
-        $input  = array('command' => $command->getName(), '--'.$commandName => true, 'project' => $projectId);
+        $input  = array('command' => $command->getName(), '--' . $commandName => true, 'project' => $projectId);
         if (!empty($args)) {
             $input = array_merge($input, $args);
         }
