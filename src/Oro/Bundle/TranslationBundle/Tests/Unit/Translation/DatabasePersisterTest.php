@@ -68,8 +68,8 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('beginTransaction');
         $this->em->expects($this->exactly(5))->method('persist');
         $this->em->expects($this->exactly(3))->method('flush');
+        $this->em->expects($this->exactly(3))->method('clear');
         $this->em->expects($this->once())->method('commit');
-        $this->em->expects($this->once())->method('clear');
         $this->em->expects($this->never())->method('rollback');
 
         $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
@@ -99,8 +99,8 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('beginTransaction');
         $this->em->expects($this->exactly(5))->method('persist');
         $this->em->expects($this->exactly(3))->method('flush');
+        $this->em->expects($this->exactly(3))->method('clear');
         $this->em->expects($this->once())->method('commit');
-        $this->em->expects($this->once())->method('clear');
         $this->em->expects($this->never())->method('rollback');
 
         $this->metadataCache->expects($this->once())->method('updateTimestamp')->with($this->testLocale);
@@ -120,9 +120,9 @@ class DatabasePersisterTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('beginTransaction');
         $this->em->expects($this->exactly(5))->method('persist');
         $this->em->expects($this->exactly(3))->method('flush');
+        $this->em->expects($this->exactly(3))->method('clear');
         $this->em->expects($this->once())->method('commit')->will($this->throwException($exception));
         $this->em->expects($this->once())->method('rollback');
-        $this->em->expects($this->once())->method('clear');
 
         $this->metadataCache->expects($this->never())->method('updateTimestamp');
 

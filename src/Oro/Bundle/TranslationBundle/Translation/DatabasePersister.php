@@ -65,11 +65,8 @@ class DatabasePersister
             }
 
             $this->em->commit();
-            $this->em->clear();
-
         } catch (\Exception $exception) {
             $this->em->rollback();
-            $this->em->clear();
 
             throw $exception;
         }
@@ -89,6 +86,7 @@ class DatabasePersister
             $this->em->persist($item);
         }
         $this->em->flush();
+        $this->em->clear();
     }
 
     /**
