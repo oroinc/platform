@@ -102,7 +102,7 @@ define(function (require) {
          * Cached jQuery objects by selectors from selectors property
          * @property {Object}
          */
-        selectorCached: {},
+        _selectorCached: {},
 
         /**
          * @property {oro.LoadingMask}
@@ -170,11 +170,6 @@ define(function (require) {
          * @param options
          */
         initialize: function (options) {
-            var selectors = this.selectorCached;
-            _.each(this.selectors, function (selector, name) {
-                selectors[name] = $(selector);
-            });
-
             if (!options.baseUrl || !options.headerId) {
                 throw new TypeError("'baseUrl' and 'headerId' are required");
             }
@@ -192,6 +187,21 @@ define(function (require) {
             contentManager.init(this.url, options.userName || false);
 
             Backbone.Router.prototype.initialize.apply(this, arguments);
+        },
+
+        /**
+         * Returns cached jQuery object by name
+         * @param name
+         * @returns {Object}
+         */
+        getCached$: function (name) {
+            var selectors = this._selectorCached;
+
+            if (!selectors[name]) {
+                selectors[name] = $(this.selectors[name]);
+            }
+
+            return selectors[name];
         },
 
         /**
@@ -303,7 +313,7 @@ define(function (require) {
              * Processing links in search result dropdown
              */
             mediator.bind("top_search_request:complete", function () {
-                this.processClicks($(this.selectorCached.searchDropdown).find(this.selectors.links));
+                this.processClicks($(this.getCached$('searchDropdown')).find(this.selectors.links));
             }, this);
 
             /**
@@ -346,14 +356,16 @@ define(function (require) {
             /**
              * Processing all links
              */
-            this.processClicks(this.selectorCached.links);
-            this.disableEmptyLinks(this.selectorCached.menu.find(this.selectors.scrollLinks));
+            $(_.bind(function () {
+                this.processClicks(this.getCached$('links'));
+                this.disableEmptyLinks(this.getCached$('menu').find(this.selectors.scrollLinks));
 
-            this.processForms(this.selectors.forms);
-            this.processAnchors(this.selectorCached.container.find(this.selectors.scrollLinks));
+                this.processForms(this.selectors.forms);
+                this.processAnchors(this.getCached$('container').find(this.selectors.scrollLinks));
 
-            this.loadingMask = new LoadingMask();
-            this.renderLoadingMask();
+                this.loadingMask = new LoadingMask();
+                this.renderLoadingMask();
+            }, this));
         },
 
         /**
@@ -528,7 +540,7 @@ define(function (require) {
                         var dtContainer = $('<div class="sf-toolbar" id="sfwdt' + debugBarToken + '" style="display: block;" data-sfurl="' + url + '"/>');
                         dtContainer.html(data);
                         var scrollable = $('.scrollable-container:last');
-                        var container = scrollable.length ? scrollable : this.selectorCached['container'];
+                        var container = scrollable.length ? scrollable : this.getCached$('container');
                         if (!container.closest('body').length) {
                             container = $(document.body);
                         }
@@ -600,7 +612,7 @@ define(function (require) {
          * @protected
          */
         renderLoadingMask: function() {
-            this.selectorCached.loadingMask.append(this.loadingMask.render().$el);
+            this.getCached$('loadingMask').append(this.loadingMask.render().$el);
             this.loadingMask.hide();
         },
 
@@ -698,25 +710,25 @@ define(function (require) {
                         }
                         this.clearContainer();
                         var content = data.content;
-                        this.selectorCached.container.html(content);
-                        this.selectorCached.menu.html(data.mainMenu);
-                        this.selectorCached.userMenu.html(data.userMenu);
-                        this.selectorCached.breadcrumb.html(data.breadcrumb);
+                        this.getCached$('container').html(content);
+                        this.getCached$('menu').html(data.mainMenu);
+                        this.getCached$('userMenu').html(data.userMenu);
+                        this.getCached$('breadcrumb').html(data.breadcrumb);
                         /**
                          * Collecting javascript from head and append them to content
                          */
                         if (data.scripts.length) {
-                            this.selectorCached.container.append(data.scripts);
+                            this.getCached$('container').append(data.scripts);
                         }
                         /**
                          * Setting page title
                          */
                         document.title = data.title;
-                        this.processClicks(this.selectorCached.menu.find(this.selectors.links));
-                        this.processClicks(this.selectorCached.userMenu.find(this.selectors.links));
-                        this.disableEmptyLinks(this.selectorCached.menu.find(this.selectors.scrollLinks));
-                        this.processClicks(this.selectorCached.container.find(this.selectors.links));
-                        this.processAnchors(this.selectorCached.container.find(this.selectors.scrollLinks));
+                        this.processClicks(this.getCached$('menu').find(this.selectors.links));
+                        this.processClicks(this.getCached$('userMenu').find(this.selectors.links));
+                        this.disableEmptyLinks(this.getCached$('menu').find(this.selectors.scrollLinks));
+                        this.processClicks(this.getCached$('container').find(this.selectors.links));
+                        this.processAnchors(this.getCached$('container').find(this.selectors.scrollLinks));
                         this.processPinButton(data);
                         this.restoreFormState(this.tempCache);
                         if (!options.fromCache) {
@@ -800,8 +812,8 @@ define(function (require) {
          * Hide active dropdowns
          */
         hideActiveDropdowns: function() {
-            this.selectorCached.searchDropdown.removeClass('header-search-focused');
-            this.selectorCached.menuDropdowns.removeClass('open');
+            this.getCached$('searchDropdown').removeClass('header-search-focused');
+            this.getCached$('menuDropdowns').removeClass('open');
         },
 
         /**
@@ -810,7 +822,7 @@ define(function (require) {
          * @param messages
          */
         addMessages: function(messages) {
-            this.selectorCached.flashMessages.find('.flash-messages-holder').empty();
+            this.getCached$('flashMessages').find('.flash-messages-holder').empty();
             _.each(messages, function (messages, type) {
                 _.each(messages, function (message) {
                     messenger.notificationFlashMessage(type, message);
@@ -825,18 +837,18 @@ define(function (require) {
          */
         processPinButton: function(data) {
             if (data.showPinButton) {
-                this.selectorCached.pinButtonsContainer.show();
+                this.getCached$('pinButtonsContainer').show();
                 /**
                  * Setting serialized titles for pinbar and favourites buttons
                  */
                 var titleSerialized = data.titleSerialized;
                 if (titleSerialized) {
                     titleSerialized = $.parseJSON(titleSerialized);
-                    this.selectorCached.pinButtonsContainer.find(this.selectors.pinButtons).data('title', titleSerialized);
+                    this.getCached$('pinButtonsContainer').find(this.selectors.pinButtons).data('title', titleSerialized);
                 }
-                this.selectorCached.pinButtonsContainer.find(this.selectors.pinButtons).data('title-rendered-short', data.titleShort);
+                this.getCached$('pinButtonsContainer').find(this.selectors.pinButtons).data('title-rendered-short', data.titleShort);
             } else {
-                this.selectorCached.pinButtonsContainer.hide();
+                this.getCached$('pinButtonsContainer').hide();
             }
         },
 
@@ -846,13 +858,13 @@ define(function (require) {
          * @param data
          */
         updateMenuTabs: function(data) {
-            this.selectorCached.historyTab.html(data.history);
-            this.selectorCached.mostViewedTab.html(data.mostviewed);
+            this.getCached$('historyTab').html(data.history);
+            this.getCached$('mostViewedTab').html(data.mostviewed);
             /**
              * Processing links for history and most viewed tabs
              */
-            this.processClicks(this.selectorCached.historyTab.find(this.selectors.links));
-            this.processClicks(this.selectorCached.mostViewedTab.find(this.selectors.links));
+            this.processClicks(this.getCached$('historyTab').find(this.selectors.links));
+            this.processClicks(this.getCached$('mostViewedTab').find(this.selectors.links));
         },
 
         /**

@@ -18,7 +18,7 @@ function ($, mediator, routing, ButtonsWidget) {
 
         // On form submit response check for errors
         mediator.once('hash_navigation_request:refresh', function (navigation) {
-            var content = $(navigation.selectorCached.container);
+            var content = $(navigation.getCached$('container'));
             var hasErrors = content.find('.alert-error, .validation-error').length > 0;
             if (!hasErrors) {
                 var idRegexp = /update\/(\d+).*/;
