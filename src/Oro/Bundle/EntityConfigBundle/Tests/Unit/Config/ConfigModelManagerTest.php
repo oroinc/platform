@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 use Doctrine\ORM\EntityManager;
@@ -107,7 +108,7 @@ class ConfigModelManagerTest extends OrmTestCase
 
     public function testFindModelIgnore()
     {
-        $this->assertFalse(
+        $this->assertNull(
             $this->configModelManager->findModel('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
         );
     }
@@ -120,8 +121,56 @@ class ConfigModelManagerTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $em->expects($this->any())->method('getRepository')
+        $em->expects($this->once())->method('getRepository')
             ->will($this->returnValue(new FoundEntityConfigRepository($em, $meta)));
+
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
+        $uow->expects($this->once())->method('getEntityState')
+            ->will($this->returnValue(UnitOfWork::STATE_MANAGED));
+
+        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $serviceLink->expects($this->any())->method('getService')->will($this->returnValue($em));
+
+        $configModelManager = new ConfigModelManager($serviceLink);
+
+        $this->assertEquals(
+            FoundEntityConfigRepository::getResultConfigEntity(),
+            $configModelManager->findModel(DemoEntity::ENTITY_NAME)
+        );
+
+        //test localCache
+        $this->assertEquals(
+            FoundEntityConfigRepository::getResultConfigEntity(),
+            $configModelManager->findModel(DemoEntity::ENTITY_NAME)
+        );
+    }
+
+    public function testFindModelEntityDetached()
+    {
+        $meta = $this->em->getClassMetadata(EntityConfigModel::ENTITY_NAME);
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $em->expects($this->exactly(2))->method('getRepository')
+            ->will($this->returnValue(new FoundEntityConfigRepository($em, $meta)));
+
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
+        $uow->expects($this->once())->method('getEntityState')
+            ->will($this->returnValue(UnitOfWork::STATE_DETACHED));
 
         $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
@@ -150,8 +199,17 @@ class ConfigModelManagerTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $em->expects($this->any())->method('getRepository')
+        $em->expects($this->once())->method('getRepository')
             ->will($this->returnValue(new FoundEntityConfigRepository($em, $meta)));
+
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
+        $uow->expects($this->once())->method('getEntityState')
+            ->will($this->returnValue(UnitOfWork::STATE_MANAGED));
 
         $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
@@ -163,6 +221,61 @@ class ConfigModelManagerTest extends OrmTestCase
         $this->assertEquals(
             FoundEntityConfigRepository::getResultConfigField(),
             $configModelManager->findModel(DemoEntity::ENTITY_NAME, 'test')
+        );
+
+        //test localCache
+        $this->assertEquals(
+            FoundEntityConfigRepository::getResultConfigField(),
+            $configModelManager->findModel(DemoEntity::ENTITY_NAME, 'test')
+        );
+
+        //test localCache for another field
+        $this->assertNull(
+            $configModelManager->findModel(DemoEntity::ENTITY_NAME, 'test1')
+        );
+    }
+
+    public function testFindModelFieldDetached()
+    {
+        $meta = $this->em->getClassMetadata(EntityConfigModel::ENTITY_NAME);
+
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $em->expects($this->exactly(2))->method('getRepository')
+            ->will($this->returnValue(new FoundEntityConfigRepository($em, $meta)));
+
+        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $em->expects($this->once())->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
+        $uow->expects($this->once())->method('getEntityState')
+            ->will($this->returnValue(UnitOfWork::STATE_DETACHED));
+
+        $serviceLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $serviceLink->expects($this->any())->method('getService')->will($this->returnValue($em));
+
+        $configModelManager = new ConfigModelManager($serviceLink);
+
+        $this->assertEquals(
+            FoundEntityConfigRepository::getResultConfigField(),
+            $configModelManager->findModel(DemoEntity::ENTITY_NAME, 'test')
+        );
+
+        //test localCache
+        $this->assertEquals(
+            FoundEntityConfigRepository::getResultConfigField(),
+            $configModelManager->findModel(DemoEntity::ENTITY_NAME, 'test')
+        );
+
+        //test localCache for another field
+        $this->assertNull(
+            $configModelManager->findModel(DemoEntity::ENTITY_NAME, 'test1')
         );
     }
 

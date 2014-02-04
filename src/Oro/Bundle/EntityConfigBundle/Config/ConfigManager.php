@@ -221,8 +221,8 @@ class ConfigManager
         }
 
         $result = $this->cache->getConfigurable($className, $fieldName);
-        if ($result === false) {
-            $result = (bool)$this->modelManager->findModel($className, $fieldName) ? : null;
+        if (null === $result) {
+            $result = (null !== $this->modelManager->findModel($className, $fieldName));
 
             $this->cache->setConfigurable($result, $className, $fieldName);
         }
@@ -542,9 +542,7 @@ class ConfigManager
      */
     public function getConfigEntityModel($className)
     {
-        return $this->hasConfigEntityModel($className)
-            ? $this->modelManager->findModel($className)
-            : null;
+        return $this->modelManager->findModel($className);
     }
 
     /**
@@ -556,9 +554,7 @@ class ConfigManager
      */
     public function getConfigFieldModel($className, $fieldName)
     {
-        return $this->hasConfigFieldModel($className, $fieldName)
-            ? $this->modelManager->findModel($className, $fieldName)
-            : null;
+        return $this->modelManager->findModel($className, $fieldName);
     }
 
     /**
@@ -570,7 +566,8 @@ class ConfigManager
      */
     public function createConfigEntityModel($className, $mode = ConfigModelManager::MODE_DEFAULT)
     {
-        if (!$entityModel = $this->modelManager->findModel($className)) {
+        $entityModel = $this->modelManager->findModel($className);
+        if (null === $entityModel) {
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
             $metadata    = $this->getEntityMetadata($className);
 
@@ -673,7 +670,8 @@ class ConfigManager
      */
     public function createConfigFieldModel($className, $fieldName, $fieldType, $mode = ConfigModelManager::MODE_DEFAULT)
     {
-        if (!$fieldModel = $this->modelManager->findModel($className, $fieldName)) {
+        $fieldModel = $this->modelManager->findModel($className, $fieldName);
+        if (null === $fieldModel) {
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
             $metadata   = $this->getFieldMetadata($className, $fieldName);
 
