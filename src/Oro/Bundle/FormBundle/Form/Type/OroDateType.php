@@ -22,7 +22,7 @@ class OroDateType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['placeholder'] = $options['placeholder'];
+        $view->vars['attr']['placeholder'] = $options['placeholder'];
     }
 
     /**
