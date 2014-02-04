@@ -42,6 +42,7 @@ class SoapAdvancedSearchApiTest extends WebTestCase
      */
     public function testApi($request, $response)
     {
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->advancedSearch($request['query']);
         $result = ToolsAPI::classToArray($result);
         $this->assertEquals($response['count'], $result['count']);

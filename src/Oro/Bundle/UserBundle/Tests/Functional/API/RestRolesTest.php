@@ -12,7 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  */
 class RestRolesTest extends WebTestCase
 {
-    /** @var Client  */
+    /** @var Client */
     protected $client;
 
     public function setUp()
@@ -25,8 +25,8 @@ class RestRolesTest extends WebTestCase
      */
     public function testCreateRole()
     {
-        $roleName = 'Role_'.mt_rand(100, 500);
-        $request = array(
+        $roleName = 'Role_' . mt_rand(100, 500);
+        $request  = array(
             "role" => array(
                 "label" => $roleName,
                 "owner" => "1"
@@ -41,13 +41,17 @@ class RestRolesTest extends WebTestCase
 
     /**
      * @depends testCreateRole
+     *
      * @param array $request
      */
     public function testGetRoleByName($request)
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_role_byname', array('name' => $request['role']['label']))
+            $this->client->generate('oro_api_get_role_byname', array('name' => $request['role']['label'])),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
@@ -55,12 +59,20 @@ class RestRolesTest extends WebTestCase
 
     /**
      * @depends testCreateRole
+     *
      * @param  array $request
+     *
      * @return int   $roleId
      */
     public function testGetRoleById($request)
     {
-        $this->client->request('GET', $this->client->generate('oro_api_get_roles'));
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_roles'),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         $result = json_decode($result->getContent(), true);
         foreach ($result as $role) {
@@ -69,7 +81,13 @@ class RestRolesTest extends WebTestCase
                 break;
             }
         }
-        $this->client->request('GET', $this->client->generate('oro_api_get_role', array('id' => $roleId)));
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_role', array('id' => $roleId)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 200);
 
@@ -79,16 +97,30 @@ class RestRolesTest extends WebTestCase
     /**
      * @depends testGetRoleById
      * @depends testCreateRole
-     * @param int   $roleId
+     *
+     * @param int $roleId
      * @param array $request
      */
     public function testUpdateRole($roleId, $request)
     {
         $request['role']['label'] .= '_Update';
-        $this->client->request('PUT', $this->client->generate('oro_api_put_role', array('id' => $roleId)), $request);
+        $this->client->request(
+            'PUT',
+            $this->client->generate('oro_api_put_role', array('id' => $roleId)),
+            $request,
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
-        $this->client->request('GET', $this->client->generate('oro_api_get_role', array('id' => $roleId)));
+
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_role', array('id' => $roleId)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         $result = json_decode($result->getContent(), true);
         $this->assertEquals($result['label'], $request['role']['label'], 'Role does not updated');
@@ -96,14 +128,28 @@ class RestRolesTest extends WebTestCase
 
     /**
      * @depends testGetRoleById
+     *
      * @param $roleId
      */
     public function testDeleteRole($roleId)
     {
-        $this->client->request('DELETE', $this->client->generate('oro_api_delete_role', array('id' => $roleId)));
+        $this->client->request(
+            'DELETE',
+            $this->client->generate('oro_api_delete_role', array('id' => $roleId)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
-        $this->client->request('GET', $this->client->generate('oro_api_get_role', array('id' => $roleId)));
+
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_role', array('id' => $roleId)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 404);
     }

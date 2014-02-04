@@ -55,7 +55,7 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_post_user'),
             $request,
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);
@@ -69,7 +69,7 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_get_users'),
             array('limit' => 100),
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);
@@ -83,7 +83,7 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_get_user', array('id' => self::DEFAULT_USER_ID)),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);
@@ -107,7 +107,7 @@ class RestUsersACLTest extends WebTestCase
             $this->client->generate('oro_api_put_user', array('id' => self::DEFAULT_USER_ID)),
             $request,
             array(),
-            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);

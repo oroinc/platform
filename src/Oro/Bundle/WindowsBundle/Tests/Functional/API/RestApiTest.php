@@ -42,7 +42,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_post_windows'),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -74,7 +74,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -101,7 +101,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_get_windows'),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -129,7 +129,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -153,7 +153,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_put_windows', array('windowId' => self::$entity['id'])),
             self::$entity,
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -167,7 +167,7 @@ class RestApiTest extends WebTestCase
             $this->client->generate('oro_api_delete_windows', array('windowId' => self::$entity['id'])),
             array(),
             array(),
-            ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -224,7 +224,7 @@ class RestApiTest extends WebTestCase
                 $url,
                 array(),
                 array(),
-                ToolsAPI::generateWsseHeader(ToolsAPI::USER_NAME, ToolsAPI::USER_PASSWORD, uniqid())
+                ToolsAPI::generateWsseHeader()
             );
 
             /** @var $response Response */
