@@ -14,8 +14,7 @@
     </div>
 
     <script type="text/javascript">
-        require(['jquery', 'flotr2'],
-        function($, Flotr){
+        require(['jquery', 'flotr2', 'oro/mediator'], function ($, Flotr, mediator) {
             $(function () {
                 var $widgetContent = $('#{{ widgetContentId }}');
                 var $chart = $('#{{ widgetId }}-chart');
@@ -118,7 +117,7 @@
                     );
                 };
 
-                $(function () {
+                mediator.on('page-rendered', function () {
                     setChartSize();
                     drawChart();
                     setChartContainerSize();
