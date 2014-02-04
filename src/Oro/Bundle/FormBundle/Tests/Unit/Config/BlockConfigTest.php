@@ -72,9 +72,11 @@ class BlockConfigTest extends \PHPUnit_Framework_TestCase
         $this->blockConfig = new BlockConfig($this->blockCode);
     }
 
-    public function tearDown(){
+    public function tearDown()
+    {
         error_reporting($this->reportingLevel);
     }
+
     public function testProperties()
     {
         /** test getCode */
