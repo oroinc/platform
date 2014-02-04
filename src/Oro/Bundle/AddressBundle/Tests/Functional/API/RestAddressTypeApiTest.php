@@ -26,7 +26,10 @@ class RestAddressTypeApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_addresstypes')
+            $this->client->generate('oro_api_get_addresstypes'),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -48,7 +51,10 @@ class RestAddressTypeApiTest extends WebTestCase
         foreach ($expected as $addrType) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_addresstype', array('name' => $addrType['name']))
+                $this->client->generate('oro_api_get_addresstype', array('name' => $addrType['name'])),
+                array(),
+                array(),
+                ToolsAPI::generateWsseHeader()
             );
             /** @var $result Response */
             $result = $this->client->getResponse();

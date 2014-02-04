@@ -24,8 +24,12 @@ class ToolsAPI
     public static function generateWsseHeader(
         $userName = self::USER_NAME,
         $userPassword = self::USER_PASSWORD,
-        $nonce = self::NONCE
+        $nonce = null
     ) {
+        if (null === $nonce) {
+            $nonce = uniqid();
+        }
+
         $created  = date('c');
         $digest   = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
         $wsseHeader = array(

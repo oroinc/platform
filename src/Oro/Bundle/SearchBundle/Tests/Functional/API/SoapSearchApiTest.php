@@ -56,6 +56,8 @@ class SoapSearchApiTest extends WebTestCase
         if (is_null($request['max_results'])) {
             $request['max_results'] = self::DEFAULT_VALUE;
         }
+
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->search(
             $request['search'],
             $request['offset'],

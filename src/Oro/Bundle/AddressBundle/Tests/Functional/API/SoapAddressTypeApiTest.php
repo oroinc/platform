@@ -31,6 +31,7 @@ class SoapAddressTypeApiTest extends WebTestCase
      */
     public function testGetAddressTypes()
     {
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->getAddressTypes();
         $result = ToolsAPI::classToArray($result);
         if (is_array(reset($result['item']))) {
@@ -50,6 +51,7 @@ class SoapAddressTypeApiTest extends WebTestCase
     public function testGetAddressType($expected)
     {
         foreach ($expected as $addrType) {
+            $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
             $result = $this->client->getSoap()->getAddressType($addrType['name']);
             $result = ToolsAPI::classToArray($result);
             $this->assertNotEmpty($result);
