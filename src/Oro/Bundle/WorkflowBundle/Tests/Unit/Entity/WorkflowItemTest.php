@@ -201,4 +201,38 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array($transitionRecord), $this->workflowItem->getTransitionRecords()->getValues());
         $this->assertEquals($this->workflowItem, $transitionRecord->getWorkflowItem());
     }
+
+    public function testEntity()
+    {
+        $entity = new \stdClass();
+        $this->assertSame($this->workflowItem, $this->workflowItem->setEntity($entity));
+        $this->assertEquals($entity, $this->workflowItem->getEntity());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow item entity can not be changed
+     */
+    public function testSetEntityException()
+    {
+        $this->workflowItem->setEntity(new \stdClass());
+        $this->workflowItem->setEntity(new \stdClass());
+    }
+
+    public function testEntityId()
+    {
+        $entityId = 1;
+        $this->assertSame($this->workflowItem, $this->workflowItem->setEntityId($entityId));
+        $this->assertEquals($entityId, $this->workflowItem->getEntityId());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow item entity ID can not be changed
+     */
+    public function testSetEntityIdException()
+    {
+        $this->workflowItem->setEntityId(1);
+        $this->workflowItem->setEntityId(2);
+    }
 }
