@@ -102,7 +102,9 @@ define(function (require) {
             try {
                 cb();
             } catch (ex) {
-                console.log(ex);
+                if (console && (typeof console.log === 'function')) {
+                    console.log(ex);
+                }
             }
         });
 
