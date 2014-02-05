@@ -477,6 +477,43 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $workflow->transit($workflowItem, 'transition');
     }
 
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow "test" does not have step entity "stepTwo"
+     */
+    public function testTransitException()
+    {
+        $workflowStepOne = new WorkflowStep();
+        $workflowStepOne->setName('stepOne');
+
+        $workflowDefinition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $workflowItem->expects($this->any())
+            ->method('getCurrentStep')
+            ->will($this->returnValue($workflowStepOne));
+
+        $stepOne = $this->getStepMock($workflowStepOne->getName());
+        $stepOne->expects($this->once())
+            ->method('isAllowedTransition')
+            ->with('transition')
+            ->will($this->returnValue(true));
+
+        $stepTwo = $this->getStepMock('stepTwo');
+
+        $transition = $this->getTransitionMock('transition', false, $stepTwo);
+
+        $workflow = $this->createWorkflow('test');
+        $workflow->setDefinition($workflowDefinition);
+        $workflow->getTransitionManager()->setTransitions(array($transition));
+        $workflow->getStepManager()->setSteps(array($stepOne));
+        $workflow->transit($workflowItem, 'transition');
+    }
+
     public function testSetAttributes()
     {
         $attributeOne = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
