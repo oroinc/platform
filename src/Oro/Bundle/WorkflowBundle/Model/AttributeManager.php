@@ -24,10 +24,12 @@ class AttributeManager
      */
     public function __construct(Collection $attributes = null)
     {
-        $this->attributes = $attributes ?: new ArrayCollection();
+        $this->setAttributes($attributes);
     }
 
     /**
+     * @todo cover with test BAP-3073
+     *
      * @param string $entityAttributeName
      * @return AttributeManager
      */
@@ -39,6 +41,8 @@ class AttributeManager
     }
 
     /**
+     * @todo cover with test BAP-3073
+     *
      * @return string
      */
     public function getEntityAttributeName()
@@ -47,6 +51,8 @@ class AttributeManager
     }
 
     /**
+     * @todo cover with test BAP-3073
+     *
      * @return Attribute[]|Collection
      */
     public function getAttributes()
@@ -60,21 +66,21 @@ class AttributeManager
      */
     public function setAttributes($attributes)
     {
-        if ($attributes instanceof Collection) {
-            $this->attributes = $attributes;
-        } else {
-            $data = array();
+        $data = array();
+        if ($attributes) {
             foreach ($attributes as $attribute) {
                 $data[$attribute->getName()] = $attribute;
             }
             unset($attributes);
-            $this->attributes = new ArrayCollection($data);
         }
+        $this->attributes = new ArrayCollection($data);
 
         return $this;
     }
 
     /**
+     * @todo cover with test BAP-3073
+     *
      * @param string $attributeName
      * @return Attribute
      */
@@ -84,6 +90,8 @@ class AttributeManager
     }
 
     /**
+     * @todo cover with test BAP-3073
+     *
      * @return Attribute
      * @throws UnknownAttributeException
      */

@@ -19,7 +19,7 @@ class TransitionManager
      */
     public function __construct(Collection $transitions = null)
     {
-        $this->transitions = $transitions ?: new ArrayCollection();
+        $this->setTransitions($transitions);
     }
 
     /**
@@ -45,16 +45,14 @@ class TransitionManager
      */
     public function setTransitions($transitions)
     {
-        if ($transitions instanceof Collection) {
-            $this->transitions = $transitions;
-        } else {
-            $data = array();
+        $data = array();
+        if ($transitions) {
             foreach ($transitions as $transition) {
                 $data[$transition->getName()] = $transition;
             }
             unset($transitions);
-            $this->transitions = new ArrayCollection($data);
         }
+        $this->transitions = new ArrayCollection($data);
 
         return $this;
     }
@@ -79,6 +77,8 @@ class TransitionManager
 
     /**
      * Receive transition by name or object
+     *
+     * @todo cover with test BAP-3073
      *
      * @param string|Transition $transition
      * @return Transition
