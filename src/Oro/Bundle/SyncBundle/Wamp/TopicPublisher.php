@@ -73,7 +73,8 @@ class TopicPublisher
      */
     public function check()
     {
-        return !is_null($this->getWs());
+        $ws = $this->getWs();
+        return !is_null($ws) && $ws !== false;
     }
 
     /**
