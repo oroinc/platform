@@ -16,7 +16,7 @@ Condition builder is a [jQuery-UI widget], responsible for rendering UI control 
 Where:
  - `array` is a **Conditions Group**;
  - `object` is a **Condition Item**;
- - `string` is an **Operator**;
+ - `string` is an **Operator**.
 
 ## Usage Example
 The widget requires predefined certain HTML structure. List of available condition criteria and container for building process:
@@ -100,7 +100,7 @@ Then value will have following structure:
  - `conditionHTML` - HTML for a condition element (default `'<li class="condition controls" />'`);
  - `conditionItemHTML` - HTML for a content of condition item (default `'<div class="condition-item" />'`);
  - `conditionsGroupHTML` - HTML for a content of conditions group (default `'<ul class="conditions-group" />'`);
- - `validation` - an object with validation rules. Where a key - criteria name, value - object with validation rules. See validation.
+ - `validation` - an object with validation rules. Where a key - criteria name, value - object with validation rules. See validation in OroFormBundle.
 
 ## Methods
 Beside standard public methods of [jQuery-UI widget], `conditionBuilder` has two additional methods:

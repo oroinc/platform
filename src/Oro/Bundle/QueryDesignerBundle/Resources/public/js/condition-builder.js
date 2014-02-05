@@ -4,7 +4,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
     'use strict';
 
     /**
-     * Conditions group widget
+     * Condition builder widget
      */
     $.widget('oroquerydesigner.conditionBuilder', {
         options: {
