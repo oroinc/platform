@@ -81,11 +81,11 @@ class TopicPublisher
      */
     protected function getWs()
     {
-        if (!$this->ws) {
+        if (null === $this->ws) {
             try {
                 $this->ws = new WebSocket($this->host, $this->port);
             } catch (\Exception $e) {
-                return null;
+                $this->ws = false;
             }
         }
 
