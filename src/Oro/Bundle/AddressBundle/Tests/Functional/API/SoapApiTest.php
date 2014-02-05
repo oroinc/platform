@@ -32,6 +32,7 @@ class SoapApiTest extends WebTestCase
      */
     public function testGetCountries()
     {
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->getCountries();
         $result = ToolsAPI::classToArray($result);
         return array_slice($result['item'], 0, 5);
@@ -43,7 +44,8 @@ class SoapApiTest extends WebTestCase
      */
     public function testGetCountry($countries)
     {
-        foreach ($countries as $country) {
+        foreach ($countries as $country)
+            $this->client->setServerParameters(ToolsAPI::generateWsseHeader());{
             $result = $this->client->getSoap()->getCountry($country['iso2Code']);
             $result = ToolsAPI::classToArray($result);
             $this->assertEquals($country, $result);
@@ -55,6 +57,7 @@ class SoapApiTest extends WebTestCase
      */
     public function testGetRegions()
     {
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->getRegions();
         $result = ToolsAPI::classToArray($result);
         return array_slice($result['item'], 0, 5);
@@ -67,6 +70,7 @@ class SoapApiTest extends WebTestCase
     public function testGetRegion($regions)
     {
         foreach ($regions as $region) {
+            $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
             $result = $this->client->getSoap()->getRegion($region['combinedCode']);
             $result = ToolsAPI::classToArray($result);
             $this->assertEquals($region, $result);
@@ -78,11 +82,13 @@ class SoapApiTest extends WebTestCase
      */
     public function testGetCountryRegion()
     {
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->getRegionByCountry('US');
         $result = ToolsAPI::classToArray($result);
 
         $region = current($result['item']);
 
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $expectedResult = $this->client->getSoap()->getRegion($region['combinedCode']);
         $expectedResult = ToolsAPI::classToArray($expectedResult);
         $this->assertEquals($expectedResult, $region);

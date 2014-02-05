@@ -46,6 +46,7 @@ class SoapApiTest extends WebTestCase
      */
     public function testCreate()
     {
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $id = $this->client->getSoap()->createBusinessUnit($this->fixtureData['business_unit']);
         $this->assertGreaterThan(0, $id);
 

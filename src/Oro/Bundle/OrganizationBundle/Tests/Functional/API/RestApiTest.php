@@ -70,7 +70,10 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunits')
+            $this->client->generate('oro_api_get_businessunits'),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -81,6 +84,7 @@ class RestApiTest extends WebTestCase
         $this->assertNotEmpty($responseData);
         $responseData = ToolsAPI::jsonToArray($responseData);
         $initialCount = $this->getCount();
+
         foreach ($responseData as $row) {
             if ($row['id'] == $id) {
                 $this->assertEquals($this->fixtureData['business_unit']['name'], $row['name']);
@@ -107,7 +111,10 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->client->generate('oro_api_get_businessunit', array('id' => $id)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -142,7 +149,9 @@ class RestApiTest extends WebTestCase
         $this->client->request(
             'PUT',
             $this->client->generate('oro_api_put_businessunit', array('id' => $id)),
-            $requestData
+            $requestData,
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         $result = $this->client->getResponse();
@@ -152,7 +161,10 @@ class RestApiTest extends WebTestCase
         // open address by id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->client->generate('oro_api_get_businessunit', array('id' => $id)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         $result = $this->client->getResponse();
@@ -160,7 +172,6 @@ class RestApiTest extends WebTestCase
 
         $result = ToolsAPI::jsonToArray($result->getContent());
         $this->assertEquals($requestData['business_unit']['name'], $result['name']);
-
     }
 
     /**
@@ -173,7 +184,10 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_businessunit', array('id' => $id))
+            $this->client->generate('oro_api_delete_businessunit', array('id' => $id)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -182,7 +196,10 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
+            $this->client->generate('oro_api_get_businessunit', array('id' => $id)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         $result = $this->client->getResponse();

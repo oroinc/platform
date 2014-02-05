@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages;
 
-use \Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\CustomEntity;
-
 /**
  * Class ConfigEntity
  *

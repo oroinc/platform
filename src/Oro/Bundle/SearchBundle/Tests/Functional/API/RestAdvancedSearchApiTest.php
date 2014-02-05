@@ -38,7 +38,9 @@ class RestAdvancedSearchApiTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->client->generate('oro_api_get_search_advanced'),
-            array('query' => $requestUrl)
+            array('query' => $requestUrl),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         $result = $this->client->getResponse();

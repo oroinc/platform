@@ -84,9 +84,15 @@ class CustomEntity extends AbstractPageEntity
         return $this;
     }
 
-    public function setStringField($fieldname, $value)
+    /**
+     * @param $fieldName
+     * @param $value
+     *
+     * @return $this
+     */
+    public function setStringField($fieldName, $value)
     {
-        $label = ucfirst($fieldname);
+        $label = ucfirst($fieldName);
         $field = $this->test->byXpath(
             "//div[@class='control-group']/label[normalize-space(text()) = '{$label}']" .
             "/following-sibling::div/input"
@@ -96,7 +102,11 @@ class CustomEntity extends AbstractPageEntity
         return $this;
     }
 
-
+    /**
+     * @param array $options
+     *
+     * @return $this
+     */
     public function addOptions($options = array())
     {
         // $flag used for counting adding new options to Option Set field
