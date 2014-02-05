@@ -4,6 +4,7 @@ define(function (require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
 
     var __ = require('oro/translator');
     var scrollspy = require('oro/scrollspy');
@@ -11,7 +12,6 @@ define(function (require) {
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
 
-    var pageRendered = false;
     var pageRenderedCbPool = [];
 
     var layout = {};
@@ -82,7 +82,7 @@ define(function (require) {
     };
 
     layout.onPageRendered = function (cb) {
-        if (pageRendered) {
+        if (document['page-rendered']) {
             setTimeout(cb, 0);
         } else {
             pageRenderedCbPool.push(cb);
@@ -90,12 +90,13 @@ define(function (require) {
     };
 
     layout.pageRendering = function () {
-        pageRendered = false;
+        document['page-rendered'] = false;
+
         pageRenderedCbPool = [];
     };
 
     layout.pageRendered = function () {
-        pageRendered = true;
+        document['page-rendered'] = true;
 
         _.each(pageRenderedCbPool, function (cb) {
             try {

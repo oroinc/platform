@@ -158,9 +158,6 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         });
 
         layout.pageRendered();
-
-        // emulates 'document ready state' for selenium tests
-        document['page-rendered'] = true;
     });
 
     mediator.bind('hash_navigation_request:before', function () {
@@ -256,12 +253,14 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 .appendTo($(document.body));
         }
 
-        var debugBar = $('.sf-toolbar');
-        if (debugBar.length) {
-            waitForDebugBar();
-        } else {
-            adjustHeight();
-        }
+        layout.onPageRendered(function () {
+            var debugBar = $('.sf-toolbar');
+            if (debugBar.length) {
+                waitForDebugBar();
+            } else {
+                adjustHeight();
+            }
+        });
 
         $(window).on('resize', adjustHeight);
 
