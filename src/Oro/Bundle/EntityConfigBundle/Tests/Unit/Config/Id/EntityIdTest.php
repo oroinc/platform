@@ -6,25 +6,31 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class EntityIdTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var EntityConfigId
-     */
-    protected $entityId;
-
-    public function setUp()
-    {
-        $this->entityId = new EntityConfigId('Test\Class', 'testScope');
-    }
-
     public function testGetConfig()
     {
-        $this->assertEquals('Test\Class', $this->entityId->getClassName());
-        $this->assertEquals('testScope', $this->entityId->getScope());
-        $this->assertEquals('entity_testScope_Test-Class', $this->entityId->toString());
+        $entityId = new EntityConfigId('Test\Class', 'testScope');
+
+        $this->assertEquals('Test\Class', $entityId->getClassName());
+        $this->assertEquals('testScope', $entityId->getScope());
+        $this->assertEquals('entity_testScope_Test-Class', $entityId->toString());
     }
 
     public function testSerialize()
     {
-        $this->assertEquals($this->entityId, unserialize(serialize($this->entityId)));
+        $entityId = new EntityConfigId('Test\Class', 'testScope');
+
+        $this->assertEquals($entityId, unserialize(serialize($entityId)));
+    }
+
+    public function testSetState()
+    {
+        $entityId = EntityConfigId::__set_state(
+            [
+                'className' => 'Test\Class',
+                'scope' => 'testScope',
+            ]
+        );
+        $this->assertEquals('Test\Class', $entityId->getClassName());
+        $this->assertEquals('testScope', $entityId->getScope());
     }
 }

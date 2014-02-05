@@ -6,30 +6,40 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class FieldIdTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var FieldConfigId
-     */
-    protected $fieldId;
-
-    public function setUp()
-    {
-        $this->fieldId = new FieldConfigId('Test\Class', 'testScope', 'testField', 'string');
-    }
-
     public function testGetConfig()
     {
-        $this->assertEquals('Test\Class', $this->fieldId->getClassName());
-        $this->assertEquals('testScope', $this->fieldId->getScope());
-        $this->assertEquals('testField', $this->fieldId->getFieldName());
-        $this->assertEquals('string', $this->fieldId->getFieldType());
-        $this->assertEquals('field_testScope_Test-Class_testField', $this->fieldId->toString());
+        $fieldId = new FieldConfigId('Test\Class', 'testScope', 'testField', 'string');
 
-        $this->fieldId->setFieldType('integer');
-        $this->assertEquals('integer', $this->fieldId->getFieldType());
+        $this->assertEquals('Test\Class', $fieldId->getClassName());
+        $this->assertEquals('testScope', $fieldId->getScope());
+        $this->assertEquals('testField', $fieldId->getFieldName());
+        $this->assertEquals('string', $fieldId->getFieldType());
+        $this->assertEquals('field_testScope_Test-Class_testField', $fieldId->toString());
+
+        $fieldId->setFieldType('integer');
+        $this->assertEquals('integer', $fieldId->getFieldType());
     }
 
     public function testSerialize()
     {
-        $this->assertEquals($this->fieldId, unserialize(serialize($this->fieldId)));
+        $fieldId = new FieldConfigId('Test\Class', 'testScope', 'testField', 'string');
+
+        $this->assertEquals($fieldId, unserialize(serialize($fieldId)));
+    }
+
+    public function testSetState()
+    {
+        $fieldId = FieldConfigId::__set_state(
+            [
+                'className' => 'Test\Class',
+                'scope' => 'testScope',
+                'fieldName' => 'testField',
+                'fieldType' => 'string',
+            ]
+        );
+        $this->assertEquals('Test\Class', $fieldId->getClassName());
+        $this->assertEquals('testScope', $fieldId->getScope());
+        $this->assertEquals('testField', $fieldId->getFieldName());
+        $this->assertEquals('string', $fieldId->getFieldType());
     }
 }
