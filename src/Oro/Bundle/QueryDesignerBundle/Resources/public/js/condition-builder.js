@@ -15,6 +15,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
                 connectWith: '[data-criteria=conditions-group]'
             },
             conditionsGroup: {
+                items: '>.condition[data-criteria]',
                 cursorAt: "10 10",
                 cancel: 'a, input, .btn, select'
             },
@@ -77,7 +78,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             opts.conditionsGroup = $.extend({}, opts.sortable, opts.conditionsGroup);
             opts.conditionsGroup.appendTo = opts.criteriaListSelector;
             opts.conditionsGroup.helper = $.proxy(this._createHelper, this);
-            opts.conditionsGroup.update = $.proxy(this._onUpdate, this);
+            opts.conditionsGroup.update = $.proxy(this._onHierarchyChange, this);
             opts.criteriaList = $.extend({}, opts.sortable, opts.criteriaList);
             opts.criteriaList.start = $.proxy(this._onCriteriaGrab, this);
             opts.criteriaList.stop = $.proxy(this._onCriteriaDrop, this);
@@ -123,20 +124,29 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
         _initConditionsGroup: function ($group) {
             // make the group sortable
             $group.sortable(this.options.conditionsGroup);
+
+            // handle condition-item value change
+            $group.on('changed', '>[data-criteria]>[data-value]:not(.operator)', function () {
+                var $content = $(this),
+                    $condition = $content.parent(),
+                    criteria = $condition.data('criteria'),
+                    hasValue = !$.isEmptyObject($content.data('value'));
+                // update validation checkbox if condition 'has/has not' value
+                $condition.find('>input[name^=condition_item_]').prop('checked', hasValue);
+                // if it's value of condition with not default criteria, mixin it's name into value
+                if (hasValue && $.inArray(criteria, ['conditions-group', 'condition-item']) === -1) {
+                    $.extend($content.data('value'), {criteria: criteria});
+                }
+            });
+
             // on change update group's value
             $group.on('changed', function () {
-                var values = [];
-                $group.find('>[data-criteria]>[data-value]').each(function () {
-                    var $el = $(this),
-                        value = $el.data('value');
-                    values.push(value);
-                    if ($.type(value) !== 'string') {
-                        // means, value is not an operator
-                        $el.parent().find('>input[name^=condition_item_]').prop('checked', !$.isEmptyObject(value));
-                    }
-                });
+                var values = $group.find('>[data-criteria]>[data-value]').map(function () {
+                    return $(this).data('value');
+                }).get();
                 $group.data('value', values);
             });
+
             $group.attr('data-criteria', 'conditions-group');
         },
 
@@ -165,7 +175,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             var $content, $condition, $criteria, $validationInput, widgetOptions, widgetName;
             if (!criteria) {
                 // if criteria is not passed, define it from value
-                criteria = $.isArray(value) ? 'conditions-group' : (value.citeria || 'condition-item');
+                criteria = $.isArray(value) ? 'conditions-group' : (value.criteria || 'condition-item');
             }
 
             if (criteria === 'conditions-group') {
@@ -238,7 +248,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
                 .addClass(this.options.helperClass);
         },
 
-        _onUpdate: function (e, ui) {
+        _onHierarchyChange: function (e, ui) {
             var $condition;
             // new condition
             if (ui.sender && ui.sender.is(this.$criteriaList)) {
