@@ -1,10 +1,16 @@
 @import "../../../oroui/css/less/mixins";
 
-.condition-group {
+.conditions-group {
   list-style: none;
   margin: 0;
   padding: 0;
   min-height: 30px;
+  &:before,
+  &:after {
+    content: '';
+    display: block;
+    height: 6px;
+  }
   .sortable-placeholder {
     background-color: #929faf;
     width: 100%;
@@ -39,23 +45,22 @@
         }
       }
     }
-    .condition-field {
+    .condition-item {
       border: 1px solid #e1e1e1;
       .border-radius(4px);
       padding: @horizontalPadding * .5 @verticalPadding * .8;
-      margin-bottom: @verticalPadding * .5;
       input[type=text] {
         margin-bottom: 0;
       }
     }
-    & > .condition-group {
+    & > .conditions-group {
       border-left: 3px solid #efefef;
       padding-left: @verticalPadding * .8;
     }
     & > .close {
       margin-right: 3px;
     }
-    &[data-criteria=condition-group] {
+    &[data-criteria=conditions-group] {
       & > .close {
         background-color: white;
         color: #ccc;
@@ -120,7 +125,7 @@
   }
 }
 
-.condition-field {
+.condition-item {
   .select2-container,
   .select2-choice,
   .select2-chosen {
@@ -182,7 +187,7 @@
   }
 }
 
-.left-panel-container{
+.condition-builder.left-panel-container{
   background-color: #eff2f5;
   border: 1px solid #c9c9c9;
   margin-bottom: @bottomPadding;

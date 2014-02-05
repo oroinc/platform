@@ -1,7 +1,7 @@
 oro:
     query_designer:
         condition_builder:
-            condition_filed:
+            condition_item:
                 not_blank: "This condition should not be blank."
-            condition_group:
+            conditions_group:
                 not_blank: "This group should not be blank."

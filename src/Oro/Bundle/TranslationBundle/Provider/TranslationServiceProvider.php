@@ -6,6 +6,10 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Bundle\FrameworkBundle\Translation\TranslationLoader;
+
+use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 
 class TranslationServiceProvider
 {
@@ -21,21 +25,33 @@ class TranslationServiceProvider
     /** @var NullLogger */
     protected $logger;
 
+    /** @var TranslationLoader */
+    protected $translationLoader;
+
+    /** @var DatabasePersister  */
+    protected $databasePersister;
+
     /** @var string */
     protected $rootDir;
 
     /**
      * @param AbstractAPIAdapter  $adapter
      * @param JsTranslationDumper $jsTranslationDumper
+     * @param TranslationLoader   $translationLoader
+     * @param DatabasePersister   $databasePersister
      * @param string              $rootDir
      */
     public function __construct(
         AbstractAPIAdapter $adapter,
         JsTranslationDumper $jsTranslationDumper,
+        TranslationLoader $translationLoader,
+        DatabasePersister $databasePersister,
         $rootDir
     ) {
         $this->adapter             = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
+        $this->translationLoader   = $translationLoader;
+        $this->databasePersister   = $databasePersister;
         $this->rootDir             = $rootDir;
 
         $this->setLogger(new NullLogger());
@@ -141,7 +157,6 @@ class TranslationServiceProvider
             throw $e;
         }
 
-        // TODO: consider move this in crowdin adapter or remove
         if ($locale == 'en') {
             // check and fix exported file names, replace $locale_XX locale in file names to $locale
             $this->renameFiles('.en_US.', '.en.', $targetDir);
@@ -152,15 +167,10 @@ class TranslationServiceProvider
         }
 
         if ($toApply && $isExtracted) {
-            $appliedLocales = $this->apply(
-                $this->rootDir . DIRECTORY_SEPARATOR . 'Resources' . DIRECTORY_SEPARATOR,
-                $targetDir
-            );
+            $this->apply($locale, $targetDir);
 
-            if ($appliedLocales) {
-                $this->cleanup($targetDir);
-                $this->jsTranslationDumper->dumpTranslations($appliedLocales);
-            }
+            $this->cleanup($targetDir);
+            $this->jsTranslationDumper->dumpTranslations([$locale]);
         }
 
         return $isExtracted && $isDownloaded;
@@ -248,56 +258,29 @@ class TranslationServiceProvider
      * Apply downloaded and extracted language packs to Symfony, in app/Resources dir
      * Returns applied locale codes
      *
-     * @param string $targetDir
+     * @param string $locale
      * @param string $sourceDir
-     *
-     * @return array
      */
-    protected function apply($targetDir, $sourceDir)
+    protected function apply($locale, $sourceDir)
     {
         $iterator = new \RecursiveIteratorIterator(
             new \RecursiveDirectoryIterator($sourceDir, \FilesystemIterator::SKIP_DOTS),
             \RecursiveIteratorIterator::SELF_FIRST
         );
 
-        $appliedLocales = [];
+        $catalog = new MessageCatalogue($locale);
+        /** @var \SplFileInfo $fileInfo */
         foreach ($iterator as $fileInfo) {
-            if ($iterator->getDepth() < 1) {
+            if ($iterator->getDepth() < 1 || $fileInfo->isDir()) {
                 continue;
             }
-
-            // get target path form source by replacing $sourceDir part
-
-            $replaceSourceDirectoryPartPattern = '#(' . addslashes($sourceDir) . '[/|\\\]+[^/\\\]+[/|\\\]+)#';
-            $target                            = $targetDir . preg_replace(
-                $replaceSourceDirectoryPartPattern,
-                '',
-                $fileInfo->getPathname()
-            );
-
-            if ($fileInfo->isDir() && !file_exists($target)) {
-                mkdir($target, 0777, true);
-            }
-
-            if ($fileInfo->isDir()) {
-                continue;
-            }
-
-            // get locale from path, e.g. ../translations/messages.en.yml -> en
-            $localeFromFileName = preg_replace(
-                '#' . addslashes($sourceDir) . '[/|\\\]+([^/]+)[/|\\\]+.*#',
-                '$1',
-                $fileInfo->getPathname()
-            );
-            $appliedLocales[]   = str_replace('-', '_', $localeFromFileName);
-
-            rename($fileInfo->getPathname(), $target);
 
             // fix bad formatted yaml that may come from third-party service
-            YamlFixer::fixStrings($target);
+            YamlFixer::fixStrings($fileInfo->getPathname());
         }
 
-        return array_combine($appliedLocales, $appliedLocales);
+        $this->translationLoader->loadMessages($sourceDir, $catalog);
+        $this->databasePersister->persist($locale, $catalog->all());
     }
 
     /**

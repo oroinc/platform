@@ -28,7 +28,10 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_countries')
+            $this->client->generate('oro_api_get_countries'),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
 
         /** @var $result Response */
@@ -47,7 +50,10 @@ class RestApiTest extends WebTestCase
         foreach ($countries as $country) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_country', array('id' => $country['iso2code']))
+                $this->client->generate('oro_api_get_country', array('id' => $country['iso2code'])),
+                array(),
+                array(),
+                ToolsAPI::generateWsseHeader()
             );
             /** @var $result Response */
             $result = $this->client->getResponse();
@@ -62,7 +68,9 @@ class RestApiTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->client->generate('oro_api_get_region'),
-            array('id' => 'US-LA')
+            array('id' => 'US-LA'),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
         /** @var $result Response */
         $result = $this->client->getResponse();
@@ -75,7 +83,10 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_country_get_regions', array('country' => 'US'))
+            $this->client->generate('oro_api_country_get_regions', array('country' => 'US')),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
         /** @var $result Response */
         $result = $this->client->getResponse();
@@ -85,7 +96,9 @@ class RestApiTest extends WebTestCase
             $this->client->request(
                 'GET',
                 $this->client->generate('oro_api_get_region'),
-                array('id' => $region['combinedCode'])
+                array('id' => $region['combinedCode']),
+                array(),
+                ToolsAPI::generateWsseHeader()
             );
             /** @var $result Response */
             $expectedResult = $this->client->getResponse();

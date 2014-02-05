@@ -34,7 +34,13 @@ class RestGroupsTest extends WebTestCase
             )
         );
 
-        $this->client->request('POST', $this->client->generate('oro_api_post_group'), $request);
+        $this->client->request(
+            'POST',
+            $this->client->generate('oro_api_post_group'),
+            $request,
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 201);
 
@@ -48,7 +54,13 @@ class RestGroupsTest extends WebTestCase
      */
     public function testGetGroups($request)
     {
-        $this->client->request('GET', $this->client->generate('oro_api_get_groups'));
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_groups'),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         $result = json_decode($result->getContent(), true);
         foreach ($result as $group) {
@@ -75,11 +87,20 @@ class RestGroupsTest extends WebTestCase
         $this->client->request(
             'PUT',
             $this->client->generate('oro_api_put_group', array('id' => $group['id'])),
-            $request
+            $request,
+            array(),
+            ToolsAPI::generateWsseHeader()
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
-        $this->client->request('GET', $this->client->generate('oro_api_get_group', array('id' => $group['id'])));
+
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_group', array('id' => $group['id'])),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         $result = json_decode($result->getContent(), true);
         $this->assertArrayHasKey('name', $result);
@@ -94,10 +115,23 @@ class RestGroupsTest extends WebTestCase
      */
     public function testDeleteGroup($group)
     {
-        $this->client->request('DELETE', $this->client->generate('oro_api_delete_group', array('id' => $group['id'])));
+        $this->client->request(
+            'DELETE',
+            $this->client->generate('oro_api_delete_group', array('id' => $group['id'])),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
-        $this->client->request('GET', $this->client->generate('oro_api_get_group', array('id' => $group['id'])));
+
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_group', array('id' => $group['id'])),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader()
+        );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 404);
     }

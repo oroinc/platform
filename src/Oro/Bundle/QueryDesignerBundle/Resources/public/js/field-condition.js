@@ -5,7 +5,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
     ], function ($, _, __, mapFilterModuleName, util, EntityFieldUtil, EntityFieldView) {
     'use strict';
 
-    $.widget('oroquerydesigner.conditionFiled', {
+    $.widget('oroquerydesigner.fieldCondition', {
         options: {
             util: {}
         },
@@ -22,8 +22,8 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
                     var template = _.template(select2Options.formatSelectionTemplate);
                     select2Options.formatSelection = function (item) {
                         return item.id ? template(entityFieldUtil.splitFieldId(item.id)) : '';
-                    }
-                } ());
+                    };
+                }());
             }
 
             this.$select
@@ -39,7 +39,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
     /**
      * Compare field widget
      */
-    $.widget('oroquerydesigner.conditionFiled', $.oroquerydesigner.conditionFiled, {
+    $.widget('oroquerydesigner.fieldCondition', $.oroquerydesigner.fieldCondition, {
         options: {
             fields: [],
             filterMetadataSelector: '',
