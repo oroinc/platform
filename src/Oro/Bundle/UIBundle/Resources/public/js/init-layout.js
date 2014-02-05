@@ -10,9 +10,6 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
      * from layout.js
      * ============================================================ */
     $(function () {
-        // emulates 'document ready state' for selenium tests
-        document['page-rendered'] = true;
-
         layout.init();
 
         /* hide progress bar on page ready in case we don't need hash navigation request*/
@@ -161,6 +158,9 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
         });
 
         layout.pageRendered();
+
+        // emulates 'document ready state' for selenium tests
+        document['page-rendered'] = true;
     });
 
     mediator.bind('hash_navigation_request:before', function () {

@@ -1,5 +1,5 @@
 /*global define*/
-/*jshint browser: true*/
+/*jshint browser: true, devel: true*/
 define(function (require) {
     'use strict';
 
@@ -106,7 +106,7 @@ define(function (require) {
         });
 
         pageRenderedCbPool = [];
-    }
+    };
 
     return layout;
 });
