@@ -1,18 +1,6 @@
 /*jshint browser: true*/
 /*jslint browser: true, nomen: true, vars: true*/
 /*global require*/
-
-require(['oro/mediator'], function (mediator) {
-    'use strict';
-    mediator.once('tab:changed', function () {
-        setTimeout(function () {
-            // emulates 'document ready state' for selenium tests
-            document['page-rendered'] = true;
-            mediator.trigger('page-rendered');
-        }, 50);
-    });
-});
-
 require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
     'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
     ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
@@ -22,6 +10,9 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
      * from layout.js
      * ============================================================ */
     $(function () {
+        // emulates 'document ready state' for selenium tests
+        document['page-rendered'] = true;
+
         layout.init();
 
         /* hide progress bar on page ready in case we don't need hash navigation request*/
@@ -168,14 +159,21 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
             $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         });
+
+        layout.pageRendered();
+    });
+
+    mediator.bind('hash_navigation_request:before', function () {
+        layout.pageRendering();
     });
 
     /**
      * Init page layout js and hide progress bar after hash navigation request is completed
      */
     mediator.bind("hash_navigation_request:complete", function () {
-        layout.hideProgressBar();
         layout.init();
+        layout.hideProgressBar();
+        layout.pageRendered();
     });
 
     /* ============================================================
@@ -258,14 +256,12 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 .appendTo($(document.body));
         }
 
-        mediator.once("page-rendered", function () {
-            var debugBar = $('.sf-toolbar');
-            if (debugBar.length) {
-                waitForDebugBar();
-            } else {
-                adjustHeight();
-            }
-        });
+        var debugBar = $('.sf-toolbar');
+        if (debugBar.length) {
+            waitForDebugBar();
+        } else {
+            adjustHeight();
+        }
 
         $(window).on('resize', adjustHeight);
 

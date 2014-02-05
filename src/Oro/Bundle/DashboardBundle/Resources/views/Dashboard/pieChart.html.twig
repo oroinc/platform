@@ -14,8 +14,8 @@
     </div>
 
     <script type="text/javascript">
-        require(['jquery', 'flotr2', 'oro/mediator'], function ($, Flotr, mediator) {
-            $(function () {
+        require(['jquery', 'flotr2', 'oro/layout'], function ($, Flotr, layout) {
+            layout.onPageRendered(function () {
                 var $widgetContent = $('#{{ widgetContentId }}');
                 var $chart = $('#{{ widgetId }}-chart');
                 var $chartLegend = $('#{{ widgetId }}-legend');
@@ -117,11 +117,9 @@
                     );
                 };
 
-                mediator.on('page-rendered', function () {
-                    setChartSize();
-                    drawChart();
-                    setChartContainerSize();
-                });
+                setChartSize();
+                drawChart();
+                setChartContainerSize();
 
                 $(window).resize(function () {
                     if (setChartSize()) {

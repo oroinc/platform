@@ -11,6 +11,9 @@ define(function (require) {
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
 
+    var pageRendered = false;
+    var pageRenderedCbPool = [];
+
     var layout = {};
 
     layout.init = function (container) {
@@ -57,9 +60,9 @@ define(function (require) {
                 }, 500);
             });
 
-        setTimeout(function () {
+        layout.onPageRendered(function () {
             scrollspy.top();
-        }, 500);
+        });
     };
 
     layout.hideProgressBar = function () {
@@ -77,6 +80,33 @@ define(function (require) {
             elements.trigger('uniformInit');
         }
     };
+
+    layout.onPageRendered = function (cb) {
+        if (pageRendered) {
+            setTimeout(cb, 0);
+        } else {
+            pageRenderedCbPool.push(cb);
+        }
+    };
+
+    layout.pageRendering = function () {
+        pageRendered = false;
+        pageRenderedCbPool = [];
+    };
+
+    layout.pageRendered = function () {
+        pageRendered = true;
+
+        _.each(pageRenderedCbPool, function (cb) {
+            try {
+                cb();
+            } catch (ex) {
+                console.log(ex);
+            }
+        });
+
+        pageRenderedCbPool = [];
+    }
 
     return layout;
 });
