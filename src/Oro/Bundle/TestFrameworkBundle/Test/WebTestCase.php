@@ -82,6 +82,8 @@ abstract class WebTestCase extends BaseWebTestCase
                     }
                 }
             }
+        } else {
+            self::$internalClient->setServerParameters($server);
         }
 
         return self::$internalClient;
