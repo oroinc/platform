@@ -70,10 +70,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunits'),
-            array(),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $this->client->generate('oro_api_get_businessunits')
         );
 
         /** @var $result Response */
@@ -111,10 +108,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id)),
-            array(),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
         );
 
         /** @var $result Response */
@@ -149,9 +143,7 @@ class RestApiTest extends WebTestCase
         $this->client->request(
             'PUT',
             $this->client->generate('oro_api_put_businessunit', array('id' => $id)),
-            $requestData,
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $requestData
         );
 
         $result = $this->client->getResponse();
@@ -161,10 +153,7 @@ class RestApiTest extends WebTestCase
         // open address by id
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id)),
-            array(),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
@@ -184,10 +173,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_businessunit', array('id' => $id)),
-            array(),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $this->client->generate('oro_api_delete_businessunit', array('id' => $id))
         );
 
         /** @var $result Response */
@@ -196,10 +182,7 @@ class RestApiTest extends WebTestCase
 
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_businessunit', array('id' => $id)),
-            array(),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $this->client->generate('oro_api_get_businessunit', array('id' => $id))
         );
 
         $result = $this->client->getResponse();
