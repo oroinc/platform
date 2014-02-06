@@ -28,7 +28,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
     {
         $this->target->setOptions(ActionConfiguration::create(array('class_name'=>1)));
         $options  = $this->target->getOptions();
-        $this->assertEquals($options['route'], 'oro_entity_merge_test');
+        $this->assertEquals($options['route'], 'oro_entity_merge');
     }
     public function testMergeMassActionSetOptionShouldAddDefaultIPropertyNameOptionIfItIsEmpty()
     {
