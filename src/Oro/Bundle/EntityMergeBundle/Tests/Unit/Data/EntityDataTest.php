@@ -34,8 +34,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'stdClass';
 
         $this->entityMetadata->expects($this->exactly(3))
-            ->method('get')
-            ->with('className')
+            ->method('getClassName')
             ->will($this->returnValue($entityClass));
 
         $entities = array(
@@ -53,8 +52,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'stdClass';
 
         $this->entityMetadata->expects($this->exactly(2))
-            ->method('get')
-            ->with('className')
+            ->method('getClassName')
             ->will($this->returnValue($entityClass));
 
         $fooEntity = $this->createTestEntity(1);
@@ -79,10 +77,8 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
     public function testAddEntityFailsWhenMetadataClassNameNotMatch()
     {
         $entityClass = 'SomeClass';
-
         $this->entityMetadata->expects($this->once())
-            ->method('get')
-            ->with('className')
+            ->method('getClassName')
             ->will($this->returnValue($entityClass));
 
         $entity = $this->createTestEntity(1);
@@ -95,8 +91,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $entityClass = 'stdClass';
 
         $this->entityMetadata->expects($this->exactly(1))
-            ->method('get')
-            ->with('className')
+            ->method('getClassName')
             ->will($this->returnValue($entityClass));
 
         $entity = $this->createTestEntity(1);

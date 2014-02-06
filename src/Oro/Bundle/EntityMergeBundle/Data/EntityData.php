@@ -111,7 +111,7 @@ class EntityData
      */
     protected function assertEntityClassMatch($entity)
     {
-        $entityClass = $this->getEntityClass();
+        $entityClass = $this->getMetadata()->getClassName();
         if (!$entity instanceof $entityClass) {
             throw new InvalidArgumentException(
                 sprintf(
@@ -121,17 +121,6 @@ class EntityData
                 )
             );
         }
-    }
-
-    /**
-     * Get entity class
-     *
-     * @return string
-     */
-    protected function getEntityClass()
-    {
-        // @todo Replace with some method or with required option
-        return $this->getMetadata()->get('className');
     }
 
     /**
