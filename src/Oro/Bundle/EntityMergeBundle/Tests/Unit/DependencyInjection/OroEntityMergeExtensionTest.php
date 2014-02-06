@@ -29,4 +29,64 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->extension->load(array(), $this->container);
     }
+
+    /**
+     * @dataProvider loadParameterDataProvider
+     */
+    public function testLoadParameters($parameter)
+    {
+        $this->extension->load(array(), $this->container);
+        $this->assertTrue($this->container->hasParameter($parameter));
+    }
+
+    public function loadParameterDataProvider()
+    {
+        return array(
+            'oro_entity_merge.metadata.merge_factory.class' => array('oro_entity_merge.metadata.merge_factory.class'),
+            'oro_entity_merge.extension.mass_action.type.merge.class' => array('oro_entity_merge.extension.mass_action.type.merge.class'),
+        );
+    }
+
+    /**
+     * @dataProvider loadServiceDataProvider
+     */
+    public function testLoadServices($service, $class, array $arguments, array $tags, $scope)
+    {
+        $this->extension->load(array(), $this->container);
+        $definition = $this->container->getDefinition($service);
+
+        $this->assertEquals($class, $definition->getClass());
+        $this->assertTrue($this->container->hasParameter(trim($class, '%')));
+
+        $this->assertEquals($arguments, $definition->getArguments());
+        $this->assertEquals($tags, $definition->getTags());
+        $this->assertEquals($scope, $definition->getScope());
+    }
+
+    public function loadServiceDataProvider()
+    {
+        return array(
+            'oro_entity_merge.metadata.merge_factory' => array(
+                'service' => 'oro_entity_merge.metadata.merge_factory',
+                'class' => '%oro_entity_merge.metadata.merge_factory.class%',
+                'arguments' => array(
+                    new Reference('oro_entity_config.provider.merge'),
+                    new Reference('doctrine.orm.entity_manager')
+                ),
+                'tags' => array(),
+                'scope' => 'container'
+            ),
+            'oro_entity_merge.extension.mass_action.type.merge' => array(
+                'service' => 'oro_entity_merge.extension.mass_action.type.merge',
+                'class' => '%oro_entity_merge.extension.mass_action.type.merge.class%',
+                'arguments' => array(),
+                'tags' => array(
+                    'oro_datagrid.extension.mass_action.type' => array(
+                        array('type' => 'merge')
+                    )
+                ),
+                'scope' => 'prototype'
+            ),
+        );
+    }
 }

@@ -5,10 +5,11 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 interface MetadataInterface
 {
     /**
-     * @param string $code
+     * @param  string $code
+     * @param  bool   $strict
      * @return mixed
      */
-    public function get($code);
+    public function get($code, $strict = false);
 
     /**
      * @param string $code
