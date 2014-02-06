@@ -43,7 +43,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
             $this->createTestEntity(3),
         );
 
-        $this->entityData->setEntities($entities);
+        $this->assertEquals($this->entityData, $this->entityData->setEntities($entities));
         $this->assertEquals($entities, $this->entityData->getEntities());
     }
 
@@ -58,7 +58,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $fooEntity = $this->createTestEntity(1);
         $barEntity = $this->createTestEntity(2);
 
-        $this->entityData->addEntity($fooEntity);
+        $this->assertEquals($this->entityData, $this->entityData->addEntity($fooEntity));
         $this->assertCount(1, $this->entityData->getEntities());
         $this->assertEquals(array($fooEntity), $this->entityData->getEntities());
 

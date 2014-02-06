@@ -74,6 +74,8 @@ class EntityData
             $this->assertEntityClassMatch($entity);
             $this->entities[] = $entity;
         }
+
+        return $this;
     }
 
     /**
@@ -90,6 +92,7 @@ class EntityData
                 return true;
             }
         }
+
         return false;
     }
 
