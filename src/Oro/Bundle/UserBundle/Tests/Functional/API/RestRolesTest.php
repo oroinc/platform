@@ -68,13 +68,18 @@ class RestRolesTest extends WebTestCase
             $this->client->generate('oro_api_get_roles')
         );
         $result = $this->client->getResponse();
-        $result = json_decode($result->getContent(), true);
-        foreach ($result as $role) {
-            if ($role['label'] == $request['role']['label']) {
-                $roleId = $role['id'];
-                break;
+        $result = ToolsApi::jsonToArray($result->getContent());
+
+        $role = array_filter(
+            $result,
+            function ($a) use ($request) {
+                return $a['label'] === $request['role']['label'];
             }
-        }
+        );
+        $this->assertNotEmpty($role, 'Created role is not in roles list');
+
+        $roleId = reset($role)['id'];
+
         $this->client->request(
             'GET',
             $this->client->generate('oro_api_get_role', array('id' => $roleId))
@@ -108,7 +113,7 @@ class RestRolesTest extends WebTestCase
             $this->client->generate('oro_api_get_role', array('id' => $roleId))
         );
         $result = $this->client->getResponse();
-        $result = json_decode($result->getContent(), true);
+        $result = ToolsApi::jsonToArray($result->getContent());
         $this->assertEquals($result['label'], $request['role']['label'], 'Role does not updated');
     }
 
