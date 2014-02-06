@@ -80,16 +80,16 @@ class SoapUsersTest extends WebTestCase
     {
         $users = $this->client->getSoap()->getUsers(1, 1000);
         $users = ToolsAPI::classToArray($users);
-        $result = false;
-        foreach ($users as $user) {
-            foreach ($user as $userDetails) {
-                $result = $userDetails['username'] == 'Updated_' . $request['username'];
-                if ($result) {
-                    break;
-                }
+
+        $user = array_filter(
+            $users['item'],
+            function ($a) use ($request) {
+                return $a['username'] === 'Updated_' . $request['username'];
             }
-        }
-        $this->assertTrue($result);
+        );
+
+        $this->assertNotEmpty($user, 'Updated user is not in users list');
+
     }
 
     public function testGetUserRoles()

@@ -57,16 +57,17 @@ class RestGroupsTest extends WebTestCase
             $this->client->generate('oro_api_get_groups')
         );
         $result = $this->client->getResponse();
-        $result = json_decode($result->getContent(), true);
-        foreach ($result as $group) {
-            if ($group['name'] == $request['group']['name']) {
-                $this->assertEquals($request['group']['name'], $group['name']);
-                break;
-            }
-        }
-        $this->assertNotEquals(0, $this->getCount(), 'Created group is not in groups list');
+        $result = ToolsApi::jsonToArray($result->getContent());
 
-        return $group;
+        $group = array_filter(
+            $result,
+            function ($a) use ($request) {
+                return $a['name'] === $request['group']['name'];
+            }
+        );
+        $this->assertNotEmpty($group, 'Created group is not in groups list');
+
+        return reset($group);
     }
 
     /**
@@ -92,7 +93,7 @@ class RestGroupsTest extends WebTestCase
             $this->client->generate('oro_api_get_group', array('id' => $group['id']))
         );
         $result = $this->client->getResponse();
-        $result = json_decode($result->getContent(), true);
+        $result = ToolsApi::jsonToArray($result->getContent());
         $this->assertArrayHasKey('name', $result);
         $this->assertEquals($result['name'], $request['group']['name'], 'Group does not updated');
 

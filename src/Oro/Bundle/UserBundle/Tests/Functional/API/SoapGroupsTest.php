@@ -61,12 +61,18 @@ class SoapGroupsTest extends WebTestCase
     {
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
-        foreach ($groups['item'] as $group) {
-            if ($group['name'] == $request['name']) {
-                $groupId = $group['id'];
-                break;
+
+        $group = array_filter(
+            $groups['item'],
+            function ($a) use ($request) {
+                return $a['name'] === $request['name'];
             }
-        }
+        );
+
+        $this->assertNotEmpty($group, 'Created group is not in groups list');
+
+        $groupId = reset($group)['id'];
+
         $request['name'] .= '_Updated';
 
         $result = $this->client->getSoap()->updateGroup($groupId, $request);
