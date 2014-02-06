@@ -43,9 +43,7 @@ class RestSearchApiTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->client->generate('oro_api_get_search'),
-            $request,
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $request
         );
 
         $result = $this->client->getResponse();
