@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
-class EntityMetadata extends Metadata implements MetadataInterface
+class EntityMetadata extends Metadata implements MetadataInterface, EntityMetadataInterface
 {
     /**
-     * @var Metadata[]
+     * @var CollectionMetadata[]|FieldMetadata[]
      */
     protected $fieldMetadata;
 
@@ -25,5 +25,14 @@ class EntityMetadata extends Metadata implements MetadataInterface
     public function getFieldMetadata()
     {
         return $this->fieldMetadata;
+    }
+
+    /**
+     * @return Metadata[]
+     */
+    public function getClassName()
+    {
+        return $this->has(DoctrineMetadata::OPTION_NAME) ?
+            $this->get(DoctrineMetadata::OPTION_NAME)->get('name') : false;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+
 class Metadata implements MetadataInterface
 {
     /**
@@ -20,10 +22,14 @@ class Metadata implements MetadataInterface
     /**
      * {inheritDoc}
      */
-    public function get($code)
+    public function get($code, $strict = false)
     {
         if (isset($this->options[$code])) {
             return $this->options[$code];
+        }
+
+        if ($strict) {
+            throw new InvalidArgumentException(sprintf('Option "%s" not exists', $code));
         }
 
         return null;

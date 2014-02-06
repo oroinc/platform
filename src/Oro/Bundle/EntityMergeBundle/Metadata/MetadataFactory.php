@@ -43,7 +43,8 @@ class MetadataFactory
         $fieldMetadata     = [];
         $mergeProvider     = $this->configManager->getProvider('merge');
         $entityMergeConfig = $mergeProvider->getConfig($className);
-        $doctrineMetadata  = $this->entityManager->getMetadataFactory()->getMetadataFor($className);
+        /* @var \Doctrine\ORM\Mapping\ClassMetadata $doctrineMetadata */
+        $doctrineMetadata = $this->entityManager->getMetadataFactory()->getMetadataFor($className);
 
         foreach ($mergeProvider->getConfigs($className) as $config) {
             /* @var \Oro\Bundle\EntityConfigBundle\Config\Config $config */
@@ -52,14 +53,21 @@ class MetadataFactory
 
             if ($options = $config->all()) {
                 if (in_array($fieldType, self::$relationFieldTypes)) {
-                    $fieldMetadata[] = new CollectionMetadata($options, $fieldName);
+                    $fieldDoctrineMetadata = new DoctrineMetadata($doctrineMetadata->associationMappings[$fieldName]);
+                    $mergeMetadata         = new CollectionMetadata($options);
                 } else {
-                    $fieldMetadata[] = new FieldMetadata($options, $fieldName);
+                    $fieldDoctrineMetadata = new DoctrineMetadata($doctrineMetadata->fieldMappings[$fieldName]);
+                    $mergeMetadata         = new FieldMetadata($options);
                 }
+
+                $mergeMetadata->set(DoctrineMetadata::OPTION_NAME, $fieldDoctrineMetadata);
+                $fieldMetadata[] = $mergeMetadata;
             }
         }
 
-        $metadata = new EntityMetadata($entityMergeConfig->all(), $fieldMetadata);
+        $entityDoctrineMetadata = new DoctrineMetadata((array)$doctrineMetadata);
+        $metadata               = new EntityMetadata($entityMergeConfig->all(), $fieldMetadata);
+        $metadata->set(DoctrineMetadata::OPTION_NAME, $entityDoctrineMetadata);
 
         return $metadata;
     }
