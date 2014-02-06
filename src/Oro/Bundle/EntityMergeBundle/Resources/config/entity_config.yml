@@ -11,18 +11,26 @@ oro_entity_config:
                 merge_cast_method: ~
                 # Twig template to render object as string
                 merge_template: ~
+                # Enable merge for this entity
+                merge_enable:
+                    options:
+                        is_bool: true
 
         # Attributes applicable on entity fields level
         field:
             items:
                 # Label of field that should be displayed for this field in merge UI, value will be translated
                 merge_label: ~
+                # Enable merge for this field
+                merge_enable:
+                    options:
+                        is_bool: true
                 # Option for sorting field on UI
                 merge_priority: ~
                 # Mode of merge supports next values: default, readonly, hidden
                 #   default  - field will be used during merged and user will be able to choose a value of this field from entities
                 #   readonly - user will not be able to choose a value and value will be used from master entity, but user will see entities values for this field
-                #   disabled - field is not used in merge, value will be used from master entity
+                #   hidden - field is not used in merge, value will be used from master entity
                 merge_mode: ~
                 # Options for rendering field value in the UI
                 #
@@ -38,7 +46,7 @@ oro_entity_config:
                 # For example there is a Call entity with field referenced to Account using ManyToOne unidirectional relation.
                 # As Account doesn't have access to collection of calls the only possible place to configure calls merging
                 # for account is this field in Call entity
-                merge_relation_expose:
+                merge_relation_enable:
                     options:
                         is_bool: true
                 # Same as merge_mode but used for relation entity
