@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  */
 class WidgetTest extends WebTestCase
 {
+    /** @var array  */
     protected $widget = array(
         'position' => 0,
         'widgetName' => "hello_world",
@@ -26,6 +27,7 @@ class WidgetTest extends WebTestCase
 
     public function setUp()
     {
+        // TODO: Implement position tests
         $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
     }
 
@@ -114,6 +116,42 @@ class WidgetTest extends WebTestCase
         $actualResult = ToolsAPI::jsonToArray($actualResult->getContent());
 
         $this->assertEquals($position, reset($actualResult));
+    }
+
+    /**
+     * @depends testPostWidget
+     * @dataProvider positionsPostProvider
+     */
+    public function testDelete($position)
+    {
+        // get sidebar widget id
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+        );
+
+        $actualResult = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($actualResult, 200);
+        $actualResult = ToolsAPI::jsonToArray($actualResult->getContent());
+        $position = array_merge(array('id' => reset($actualResult)['id']), $position);
+
+        // delete sidebar widget by id
+        $this->client->request(
+            'DELETE',
+            $this->client->generate('oro_api_delete_sidebarwidgets', array('widgetId' => $position['id']))
+        );
+        ToolsAPI::assertJsonResponse($this->client->getResponse(), 204);
+
+        // get sidebar widget
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_sidebarwidgets', array('placement' => $position['placement']))
+        );
+
+        $result = $this->client->getResponse();
+        ToolsAPI::assertJsonResponse($result, 200);
+        $this->assertEmpty(ToolsAPI::jsonToArray($result->getContent()));
+
     }
 
     public function positionsPostProvider()
