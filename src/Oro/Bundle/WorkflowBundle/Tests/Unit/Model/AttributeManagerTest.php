@@ -59,4 +59,33 @@ class AttributeManagerTest extends \PHPUnit_Framework_TestCase
         $attributeManager->setAttributes($attributes);
         $this->assertSame($attribute, $attributeManager->getAttribute('test'));
     }
+
+    public function testEntityAttribute()
+    {
+        $attributeManager = new AttributeManager();
+        $entityAttributeName = 'test';
+        $this->assertSame($attributeManager, $attributeManager->setEntityAttributeName($entityAttributeName));
+        $this->assertEquals($entityAttributeName, $attributeManager->getEntityAttributeName());
+
+        $attribute = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $attribute->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($entityAttributeName));
+        $attributeManager->setAttributes(new ArrayCollection(array($attribute)));
+        $this->assertSame($attribute, $attributeManager->getEntityAttribute());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException
+     * @expectedExceptionMessage There is no entity attribute
+     */
+    public function testEntityAttributeException()
+    {
+        $attributeManager = new AttributeManager();
+        $entityAttributeName = 'test';
+        $attributeManager->setEntityAttributeName($entityAttributeName);
+        $attributeManager->getEntityAttribute();
+    }
 }

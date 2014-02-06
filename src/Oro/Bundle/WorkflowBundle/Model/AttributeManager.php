@@ -28,8 +28,6 @@ class AttributeManager
     }
 
     /**
-     * @todo cover with test BAP-3073
-     *
      * @param string $entityAttributeName
      * @return AttributeManager
      */
@@ -41,8 +39,6 @@ class AttributeManager
     }
 
     /**
-     * @todo cover with test BAP-3073
-     *
      * @return string
      */
     public function getEntityAttributeName()
@@ -51,8 +47,6 @@ class AttributeManager
     }
 
     /**
-     * @todo cover with test BAP-3073
-     *
      * @return Attribute[]|Collection
      */
     public function getAttributes()
@@ -79,8 +73,6 @@ class AttributeManager
     }
 
     /**
-     * @todo cover with test BAP-3073
-     *
      * @param string $attributeName
      * @return Attribute
      */
@@ -90,8 +82,6 @@ class AttributeManager
     }
 
     /**
-     * @todo cover with test BAP-3073
-     *
      * @return Attribute
      * @throws UnknownAttributeException
      */

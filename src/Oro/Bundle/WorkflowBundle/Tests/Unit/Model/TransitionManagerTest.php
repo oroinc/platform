@@ -114,4 +114,49 @@ class TransitionManagerTest extends \PHPUnit_Framework_TestCase
         $transitionsManager->setTransitions($transitions);
         $this->assertEquals($expected, $transitionsManager->getStartTransitions());
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Expected transition argument type is string or Transition, but stdClass given
+     */
+    public function testExtractTransitionException()
+    {
+        $transition = new \stdClass();
+        $transitionsManager = new TransitionManager();
+        $transitionsManager->extractTransition($transition);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException
+     * @expectedExceptionMessage Transition "test" is not exist in workflow.
+     */
+    public function testExtractTransitionStringUnknown()
+    {
+        $transition = 'test';
+        $transitionsManager = new TransitionManager();
+        $transitionsManager->extractTransition($transition);
+    }
+
+    public function testExtractTransition()
+    {
+        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $transitionsManager = new TransitionManager();
+        $this->assertSame($transition, $transitionsManager->extractTransition($transition));
+    }
+
+    public function testExtractTransitionString()
+    {
+        $transitionName = 'test';
+        $transition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Transition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $transition->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($transitionName));
+        $transitionsManager = new TransitionManager(new ArrayCollection(array($transition)));
+
+        $this->assertSame($transition, $transitionsManager->extractTransition($transitionName));
+    }
 }

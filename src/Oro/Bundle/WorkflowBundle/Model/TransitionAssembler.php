@@ -156,7 +156,6 @@ class TransitionAssembler extends AbstractAssembler
             'parameters' => $aclPreConditionDefinitionParameters
         );
         $aclMessage = $this->getOption($options, 'acl_message', null);
-        // TODO: Cover with test BAP-3073
         if ($aclMessage) {
             $aclPreConditionDefinition['message'] = $aclMessage;
         }

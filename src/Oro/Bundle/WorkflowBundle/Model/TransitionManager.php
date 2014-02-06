@@ -78,8 +78,6 @@ class TransitionManager
     /**
      * Receive transition by name or object
      *
-     * @todo cover with test BAP-3073
-     *
      * @param string|Transition $transition
      * @return Transition
      * @throws InvalidTransitionException
