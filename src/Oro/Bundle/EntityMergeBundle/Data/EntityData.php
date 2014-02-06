@@ -1,9 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model;
+namespace Oro\Bundle\EntityMergeBundle\Data;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
-
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class EntityData
@@ -16,7 +15,7 @@ class EntityData
     /**
      * @var object[]
      */
-    protected $entities;
+    protected $entities = array();
 
     /**
      * @var object
@@ -72,6 +71,7 @@ class EntityData
     public function addEntity($entity)
     {
         if (!$this->hasEntity($entity)) {
+            $this->assertEntityClassMatch($entity);
             $this->entities[] = $entity;
         }
     }
@@ -104,10 +104,33 @@ class EntityData
     }
 
     /**
+     * Asserts that entity match class in metadata
+     *
+     * @param object $entity
+     * @throws InvalidArgumentException
+     */
+    protected function assertEntityClassMatch($entity)
+    {
+        $entityClass = $this->getEntityClass();
+        if (!$entity instanceof $entityClass) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    '$entity should be instance of %s, %s given.',
+                    $entityClass,
+                    is_object($entity) ? get_class($entity) : gettype($entity)
+                )
+            );
+        }
+    }
+
+    /**
+     * Get entity class
+     *
      * @return string
      */
     protected function getEntityClass()
     {
+        // @todo Replace with some method or with required option
         return $this->getMetadata()->get('className');
     }
 

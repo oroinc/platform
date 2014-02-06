@@ -1,8 +1,7 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model;
+namespace Oro\Bundle\EntityMergeBundle\Data;
 
 class FieldData
 {
-
 }
