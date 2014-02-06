@@ -27,4 +27,18 @@ class EntityMergeController extends Controller
     {
         return array();
     }
+
+    /**
+     * @Route("/test",name="oro_entity_merge_test")
+     * @Acl(
+     *      id="oro_entity_merge",
+     *      label="oro.entity_merge.action.merge",
+     *      type="action"
+     * )
+     * @Template()
+     */
+    public function testAction()
+    {
+        return array();
+    }
 }
