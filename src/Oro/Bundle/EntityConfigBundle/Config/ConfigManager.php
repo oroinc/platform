@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManager;
 use Metadata\MetadataFactory;
 
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -110,15 +109,13 @@ class ConfigManager
      * @param ServiceLink        $providerBagLink
      * @param ConfigModelManager $modelManager
      * @param AuditManager       $auditManager
-     * @param Container          $container
      */
     public function __construct(
         MetadataFactory $metadataFactory,
         EventDispatcher $eventDispatcher,
         ServiceLink $providerBagLink,
         ConfigModelManager $modelManager,
-        AuditManager $auditManager,
-        Container $container
+        AuditManager $auditManager
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->eventDispatcher = $eventDispatcher;
@@ -128,8 +125,6 @@ class ConfigManager
         $this->persistConfigs   = [];
         $this->originalConfigs  = [];
         $this->configChangeSets = [];
-
-        $this->container        = $container;
 
         $this->modelManager = $modelManager;
         $this->auditManager = $auditManager;
@@ -617,20 +612,22 @@ class ConfigManager
         $metadata = $this->getEntityMetadata($className);
         foreach ($this->getProviders() as $provider) {
             $scope = $provider->getScope();
+            $propertyConfig = $provider->getPropertyConfig();
+
             // try to get default values from annotation
             $defaultValues = [];
             if (isset($metadata->defaultValues[$scope])) {
                 $defaultValues = $metadata->defaultValues[$scope];
             }
+
             // combine them with default values from config file
             $defaultValues = array_merge(
-                $provider->getPropertyConfig()->getDefaultValues(),
+                $propertyConfig->getDefaultValues(),
                 $defaultValues
             );
 
-            $translatable = $provider->getPropertyConfig()
-                ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
-
+            // process translatable values
+            $translatable = $propertyConfig->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
             foreach ($translatable as $code) {
                 if (!in_array($code, $defaultValues)) {
                     $defaultValues[$code] = ConfigHelper::getTranslationKey($className, null, $code);
@@ -730,6 +727,8 @@ class ConfigManager
                 $provider->getPropertyConfig()->getDefaultValues(),
                 $defaultValues
             );
+
+            // TODO: add processing for translatable values
 
             // set missing values with default ones
             $hasChanges = false;
