@@ -101,6 +101,9 @@ define(['jquery', 'jquery.select2'], function ($) {
         prototype.prepareOpts = function (options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
+                options.matcher = function (term, text, option) {
+                    return !option.children && (text.toUpperCase().indexOf(term.toUpperCase()) >= 0);
+                };
             }
             return prepareOpts.call(this, options);
         };
