@@ -10,6 +10,6 @@ class FieldMetadata extends Metadata implements MetadataInterface, FieldMetadata
     public function getFieldName()
     {
         return $this->has(DoctrineMetadata::OPTION_NAME) ?
-            $this->get(DoctrineMetadata::OPTION_NAME)->get('fieldName') : false;
+            $this->get(DoctrineMetadata::OPTION_NAME)->get('fieldName') : null;
     }
 }

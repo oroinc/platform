@@ -14,8 +14,12 @@ class Metadata implements MetadataInterface
     /**
      * @param array $options
      */
-    public function __construct(array $options)
+    public function __construct($options = [])
     {
+        if (!is_array($options)) {
+            throw new InvalidArgumentException('Options argument should have array type');
+        }
+
         $this->options = $options;
     }
 
@@ -64,8 +68,10 @@ class Metadata implements MetadataInterface
      */
     public function all(\Closure $filter = null)
     {
-        return $filter
-            ? array_filter($this->values, $filter)
-            : $this->options;
+        if ($filter) {
+            return array_filter($this->options, $filter);
+        }
+
+        return $this->options;
     }
 }
