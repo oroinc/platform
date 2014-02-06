@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
-class CollectionMetadata extends Metadata implements MetadataInterface
+class CollectionMetadata extends Metadata implements MetadataInterface, FieldMetadataInterface
 {
     /**
      * {inheritDoc}
