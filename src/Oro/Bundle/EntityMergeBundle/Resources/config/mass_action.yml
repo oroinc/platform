@@ -1,0 +1,8 @@
+parameters:
+    oro_datagrid.extension.mass_action.type.merge.class:      Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassAction
+services:
+    oro_datagrid.extension.mass_action.type.merge:
+        class: %oro_datagrid.extension.mass_action.type.merge.class%
+        scope: prototype
+        tags:
+            - { name:  oro_datagrid.extension.mass_action.type, type: merge }
