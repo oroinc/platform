@@ -446,3 +446,18 @@
     });
 </script>
 {% endblock %}
+
+{% block oro_quarter_widget %}
+    {% spaceless %}
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-quarter' }) %}
+        {% set options = {'disabled': disabled, 'attr': {'style': 'width:50px'}} %}
+        <div {{ block('widget_container_attributes') }}>
+            {{ date_pattern|replace({
+                '{{ year }}': form_widget(form.year, options|merge({ 'attr' : { 'style': 'display:none' }})),
+                '{{ month }}': form_widget(form.month, options),
+                '{{ day }}': form_widget(form.day, options),
+            })|raw }}
+        </div>
+    {% endspaceless %}
+{% endblock %}
+

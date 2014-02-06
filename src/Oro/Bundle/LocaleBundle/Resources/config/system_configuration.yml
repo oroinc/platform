@@ -81,6 +81,16 @@ oro_system_configuration:
                 constraints:
                     - NotBlank: ~
 
+        oro_locale.quarter_start:
+            type: oro_quarter
+            priority: 30
+            options:
+                label: 'First quarter'
+                tooltip: oro.locale.form.tooltip.quarter_start
+                required: true
+                constraints:
+                    - NotBlank: ~
+
     tree:
         system_configuration:
             platform:
@@ -98,6 +108,7 @@ oro_system_configuration:
                                             - oro_locale.format_address_by_address_country
                                             - oro_locale.timezone
                                             - oro_locale.currency
+                                            - oro_locale.quarter_start
                             language_settings:
                                 children:
                                     language_languages:
