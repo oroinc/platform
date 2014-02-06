@@ -102,10 +102,96 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->entityData->hasEntity($entity));
     }
 
+    public function testSetGetMasterEntity()
+    {
+        $entityClass = 'stdClass';
+
+        $this->entityMetadata->expects($this->exactly(2))
+            ->method('getClassName')
+            ->will($this->returnValue($entityClass));
+
+        $this->entityData->addEntity($fooEntity = $this->createTestEntity(1));
+        $this->entityData->addEntity($barEntity = $this->createTestEntity(2));
+
+        $this->assertEquals($this->entityData, $this->entityData->setMasterEntity($fooEntity));
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Add entity before setting it as master.
+     */
+    public function testSetMasterEntityFails()
+    {
+        $entityClass = 'stdClass';
+
+        $this->entityMetadata->expects($this->once())
+            ->method('getClassName')
+            ->will($this->returnValue($entityClass));
+
+        $this->entityData->addEntity($fooEntity = $this->createTestEntity(1));
+        $barEntity = $this->createTestEntity(2);
+
+        $this->assertEquals($this->entityData, $this->entityData->setMasterEntity($barEntity));
+        $this->assertEquals($barEntity, $this->entityData->getMasterEntity());
+    }
+
     protected function createTestEntity($id)
     {
         $result = new \stdClass();
         $result->id = $id;
         return $result;
+    }
+
+    public function testAddNewField()
+    {
+        $fieldName = 'test';
+        $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $fieldMetadata->expects($this->once())
+            ->method('getFieldName')
+            ->will($this->returnValue($fieldName));
+
+        $field = $this->entityData->addNewField($fieldMetadata);
+
+        $this->assertInstanceOf('Oro\Bundle\EntityMergeBundle\Data\FieldData', $field);
+        $this->assertEquals($this->entityData, $field->getEntityData());
+        $this->assertEquals($fieldMetadata, $field->getMetadata());
+
+        $this->assertEquals($field, $this->entityData->getField($fieldName));
+    }
+
+    public function testGetFields()
+    {
+        $this->assertEquals(array(), $this->entityData->getFields());
+
+        $fieldName = 'test';
+        $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $fieldMetadata->expects($this->once())
+            ->method('getFieldName')
+            ->will($this->returnValue($fieldName));
+
+        $field = $this->entityData->addNewField($fieldMetadata);
+
+        $this->assertEquals(array($fieldName => $field), $this->entityData->getFields());
+    }
+
+    public function testHasField()
+    {
+        $fieldName = 'test';
+        $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $fieldMetadata->expects($this->once())
+            ->method('getFieldName')
+            ->will($this->returnValue($fieldName));
+
+        $this->assertFalse($this->entityData->hasField($fieldName));
+
+        $this->entityData->addNewField($fieldMetadata);
+
+        $this->assertTrue($this->entityData->hasField($fieldName));
     }
 }

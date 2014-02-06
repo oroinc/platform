@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class EntityData
@@ -25,7 +26,7 @@ class EntityData
     /**
      * @var FieldData[]
      */
-    protected $fields;
+    protected $fields = array();
 
     /**
      * @param EntityMetadata $metadata
@@ -114,7 +115,7 @@ class EntityData
      */
     protected function assertEntityClassMatch($entity)
     {
-        $entityClass = $this->getMetadata()->getClassName();
+        $entityClass = $this->getClassName();
         if (!$entity instanceof $entityClass) {
             throw new InvalidArgumentException(
                 sprintf(
@@ -124,6 +125,16 @@ class EntityData
                 )
             );
         }
+    }
+
+    /**
+     * Get entity class name
+     *
+     * @return string
+     */
+    public function getClassName()
+    {
+        return $this->getMetadata()->getClassName();
     }
 
     /**
@@ -141,5 +152,65 @@ class EntityData
         $this->masterEntity = $entity;
 
         return $this;
+    }
+
+    /**
+     * Get master entity
+     *
+     * @return object
+     */
+    public function getMasterEntity()
+    {
+        return $this->masterEntity;
+    }
+
+    /**
+     * Add field merge data
+     *
+     * @param FieldMetadata $metadata
+     * @return FieldData
+     */
+    public function addNewField(FieldMetadata $metadata)
+    {
+        $field = new FieldData($this, $metadata);
+        $this->fields[$field->getFieldName()] = $field;
+
+        return $field;
+    }
+
+    /**
+     * Checks if field merge data was added
+     *
+     * @param string $fieldName
+     * @return bool
+     */
+    public function hasField($fieldName)
+    {
+        return !empty($this->fields[$fieldName]);
+    }
+
+    /**
+     * Gets field merge data by field name
+     *
+     * @param string $fieldName
+     * @return FieldData
+     * @throws InvalidArgumentException If such field is not exist
+     */
+    public function getField($fieldName)
+    {
+        if (!$this->hasField($fieldName)) {
+            throw new InvalidArgumentException(sprintf('Field "%s" not exist.', $fieldName));
+        }
+        return $this->fields[$fieldName];
+    }
+
+    /**
+     * Get all fields
+     *
+     * @return FieldData[]
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }

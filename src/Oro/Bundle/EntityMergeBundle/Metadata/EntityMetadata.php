@@ -28,7 +28,7 @@ class EntityMetadata extends Metadata implements MetadataInterface, EntityMetada
     }
 
     /**
-     * @return Metadata[]
+     * @return string
      */
     public function getClassName()
     {
