@@ -50,7 +50,7 @@ class AclGranted extends AbstractCondition
     }
 
     /**
-     * Always return TRUE
+     * Check ACL for resource.
      *
      * @param mixed $context
      * @return boolean
@@ -71,11 +71,15 @@ class AclGranted extends AbstractCondition
     }
 
     /**
-     * Nothing to initialize
+     * Initialize options.
+     *
+     * Configuration example:
+     *      @acl_granted: ['contact_view']
+     *      @acl_granted: ['EDIT', 'Acme\DemoBundle\Entity\Contact']
      *
      * @param array $options
      * @return ConditionInterface
-     * @throws ConditionException If options passed
+     * @throws ConditionException
      */
     public function initialize(array $options)
     {
