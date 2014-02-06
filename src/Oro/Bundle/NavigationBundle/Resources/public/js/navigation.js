@@ -356,16 +356,14 @@ define(function (require) {
             /**
              * Processing all links
              */
-            $(_.bind(function () {
-                this.processClicks(this.getCached$('links'));
-                this.disableEmptyLinks(this.getCached$('menu').find(this.selectors.scrollLinks));
+            this.processClicks(this.getCached$('links'));
+            this.disableEmptyLinks(this.getCached$('menu').find(this.selectors.scrollLinks));
 
-                this.processForms(this.selectors.forms);
-                this.processAnchors(this.getCached$('container').find(this.selectors.scrollLinks));
+            this.processForms(this.selectors.forms);
+            this.processAnchors(this.getCached$('container').find(this.selectors.scrollLinks));
 
-                this.loadingMask = new LoadingMask();
-                this.renderLoadingMask();
-            }, this));
+            this.loadingMask = new LoadingMask();
+            this.renderLoadingMask();
         },
 
         /**
