@@ -117,7 +117,10 @@ class RestUsersACLTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->client->generate('oro_api_delete_user', array('id' => self::DEFAULT_USER_ID))
+            $this->client->generate('oro_api_delete_user', array('id' => self::DEFAULT_USER_ID)),
+            array(),
+            array(),
+            ToolsAPI::generateWsseHeader(self::USER_NAME, self::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 403);

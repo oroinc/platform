@@ -66,9 +66,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     $formOptions['workflow_item'],
                     isset($formOptions['attribute_default_values']) ? $formOptions['attribute_default_values'] : array()
                 );
-            $this->defaultValuesListener->expects($this->once())
-                ->method('setDefaultValues')
-                ->with($this->isInstanceOf('Symfony\Component\Form\FormEvent'));
         } else {
             $this->defaultValuesListener->expects($this->never())->method($this->anything());
         }
@@ -81,9 +78,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     $formOptions['workflow_item'],
                     $formOptions['init_actions']
                 );
-            $this->initActionListener->expects($this->once())
-                ->method('initActionListener')
-                ->with($this->isInstanceOf('Symfony\Component\Form\FormEvent'));
         } else {
             $this->initActionListener->expects($this->never())->method($this->anything());
         }
@@ -167,7 +161,9 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                             'form_type' => 'text',
                             'options' => array('required' => false, 'label' => 'Second Custom')
                         ),
-                    )
+                    ),
+                    'attribute_default_values' => array('first' => 'Test'),
+                    'init_actions' => $this->getMock('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
                 ),
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),

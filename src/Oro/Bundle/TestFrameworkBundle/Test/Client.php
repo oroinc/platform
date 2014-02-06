@@ -83,6 +83,10 @@ class Client extends BaseClient
         if (strpos($uri, 'http://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }
+        if ($this->getServerParameter('HTTP_X-WSSE', '') !== '' && !isset($server['HTTP_X-WSSE'])) {
+        //generate new WSSE header
+            $this->setServerParameters(ToolsAPI::generateWsseHeader());
+        }
 
         return parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }

@@ -11,7 +11,7 @@ class RelatedEntityTest extends Selenium2TestCase
      */
     public function testCreateRelatedEntity()
     {
-        $entitydata = array(
+        $entityData = array(
             'entityName' => 'onetomany'.mt_rand(),
             'stringField' => 'string_field',
             'relationField' => 'one_to_many_field'
@@ -21,19 +21,19 @@ class RelatedEntityTest extends Selenium2TestCase
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
             ->assertTitle('New Entity - Entities - System')
-            ->setName($entitydata['entityName'])
-            ->setLabel($entitydata['entityName'])
-            ->setPluralLabel($entitydata['entityName'])
+            ->setName($entityData['entityName'])
+            ->setLabel($entityData['entityName'])
+            ->setPluralLabel($entityData['entityName'])
             ->save()
             ->assertMessage('Entity saved')
             ->createField()
-            ->setFieldName($entitydata['stringField'])
+            ->setFieldName($entityData['stringField'])
             ->setType('String')
             ->proceed()
             ->save()
             ->assertMessage('Field saved')
             ->createField()
-            ->setFieldName($entitydata['relationField'])
+            ->setFieldName($entityData['relationField'])
             ->setType('Relation one to many')
             ->proceed()
             ->setTargetEntity('OroUserBundle:User')
@@ -46,25 +46,25 @@ class RelatedEntityTest extends Selenium2TestCase
             ->assertMessage('Schema updated')
             ->close();
 
-        return $entitydata;
+        return $entityData;
     }
 
     /**
      * @depends testCreateRelatedEntity
-     * @param $entitydata
+     * @param $entityData
      */
-    public function testCreateNewEntityRecord($entitydata)
+    public function testCreateNewEntityRecord($entityData)
     {
         $login = $this->login();
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
-            ->menu($entitydata['entityName'])
+            ->menu($entityData['entityName'])
             ->open()
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
-            ->setStringField($entitydata['stringField'], 'Some test text')
-            ->addRelation($entitydata['relationField'])
+            ->setStringField($entityData['stringField'], 'Some test text')
+            ->addRelation($entityData['relationField'])
             ->selectEntity(array('John', 'Doe'))
             ->confirmSelection()
             ->save()
