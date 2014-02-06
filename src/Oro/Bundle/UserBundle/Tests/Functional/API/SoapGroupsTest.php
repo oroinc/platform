@@ -35,7 +35,6 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testCreateGroup($request, $response)
     {
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $id = $this->client->getSoap()->createGroup($request);
         $this->assertInternalType('int', $id);
         $this->assertGreaterThan(0, $id);
@@ -46,7 +45,6 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testGetGroups()
     {
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
         $this->assertEquals(6, count($groups['item']));
@@ -61,7 +59,6 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testUpdateGroup($request, $response)
     {
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
         foreach ($groups['item'] as $group) {
@@ -72,12 +69,10 @@ class SoapGroupsTest extends WebTestCase
         }
         $request['name'] .= '_Updated';
 
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->updateGroup($groupId, $request);
         $result = ToolsAPI::classToArray($result);
         ToolsAPI::assertEqualsResponse($response, $result);
 
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $group = $this->client->getSoap()->getGroup($groupId);
         $group = ToolsAPI::classToArray($group);
         $this->assertEquals($request['name'], $group['name']);
@@ -88,7 +83,6 @@ class SoapGroupsTest extends WebTestCase
      */
     public function testDeleteGroups()
     {
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
         $this->assertEquals(6, count($groups['item']));
@@ -96,13 +90,11 @@ class SoapGroupsTest extends WebTestCase
         foreach ($groups['item'] as $k => $group) {
             if ($k > 1) {
                 //do not delete default groups
-                $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
                 $result = $this->client->getSoap()->deleteGroup($group['id']);
                 $this->assertTrue($result);
             }
         }
 
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
         $this->assertEquals(2, count($groups['item']));
