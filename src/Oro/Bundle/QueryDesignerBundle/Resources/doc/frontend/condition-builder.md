@@ -5,11 +5,11 @@ Condition builder is a [jQuery-UI widget], responsible for rendering UI control 
 ```js
     [
         { /* ... */ },
-        'AND',
+        "AND",
         [
             { /* ... */ },
-            'OR',
-            { /* ... */ },
+            "OR",
+            { /* ... */ }
         ]
     ]
 ```
@@ -80,11 +80,11 @@ Then value will have following structure:
 ```js
     [
         { /* ... */, criteria: "matrix-condition" },
-        'AND',
+        "AND",
         [
             { /* ... */ }, // usual condition-item
-            'OR',
-            { /* ... */, criteria: "matrix-condition" },
+            "OR",
+            { /* ... */, criteria: "matrix-condition" }
         ]
     ]
 ```
@@ -120,8 +120,10 @@ Example:
 
 ## Requirements for Condition Widget
 Widget which implements some Condition Item, on value change should:
- - set the value into `data` of element it is appended to `this.element.data('value', value)`;
+ - set the value into `data` of the element it is appended to `this.element.data('value', value)`;
  - trigger DOM-event `'changed'` on its element `this.element.trigger('changed')`.
+
+On create, read initial value from the element it is appended to `var value = this.element.data('value')`
 
 [jQuery-UI widget]: <http://api.jqueryui.com/jQuery.widget/>
 [jQuery-UI sortable]: <http://api.jqueryui.com/sortable/>
