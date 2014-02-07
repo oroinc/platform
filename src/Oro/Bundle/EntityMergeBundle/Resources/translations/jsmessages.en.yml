@@ -1,0 +1,2 @@
+'Mass action validation maximum error': 'Too many records selected. Maximum {{number}} records.'
+'Mass action validation minimum error': 'Select two or more records.'
