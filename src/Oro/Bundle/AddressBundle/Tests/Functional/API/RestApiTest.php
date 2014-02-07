@@ -28,10 +28,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_get_countries'),
-            array(),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $this->client->generate('oro_api_get_countries')
         );
 
         /** @var $result Response */
@@ -50,10 +47,7 @@ class RestApiTest extends WebTestCase
         foreach ($countries as $country) {
             $this->client->request(
                 'GET',
-                $this->client->generate('oro_api_get_country', array('id' => $country['iso2code'])),
-                array(),
-                array(),
-                ToolsAPI::generateWsseHeader()
+                $this->client->generate('oro_api_get_country', array('id' => $country['iso2code']))
             );
             /** @var $result Response */
             $result = $this->client->getResponse();
@@ -68,9 +62,7 @@ class RestApiTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->client->generate('oro_api_get_region'),
-            array('id' => 'US-LA'),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            array('id' => 'US-LA')
         );
         /** @var $result Response */
         $result = $this->client->getResponse();
@@ -83,10 +75,7 @@ class RestApiTest extends WebTestCase
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_api_country_get_regions', array('country' => 'US')),
-            array(),
-            array(),
-            ToolsAPI::generateWsseHeader()
+            $this->client->generate('oro_api_country_get_regions', array('country' => 'US'))
         );
         /** @var $result Response */
         $result = $this->client->getResponse();

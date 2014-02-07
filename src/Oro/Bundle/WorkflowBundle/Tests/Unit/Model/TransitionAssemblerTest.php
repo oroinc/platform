@@ -176,7 +176,15 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $expectedCondition = null;
         $expectedPreCondition = $this->createCondition();
         $expectedAction = null;
-        $defaultAclPrecondition = array('@acl_granted' => array('parameters' => array('EDIT', '$.entity')));
+        $defaultAclPrecondition = array('@acl_granted' => array());
+        if (isset($configuration['acl_message'])) {
+            $defaultAclPrecondition['@acl_granted']['message'] = $configuration['acl_message'];
+        }
+        if (isset($configuration['acl_resource'])) {
+            $defaultAclPrecondition['@acl_granted']['parameters'] = array($configuration['acl_resource']);
+        } else {
+            $defaultAclPrecondition['@acl_granted']['parameters'] = array('EDIT', '$.entity');
+        }
         if (isset($transitionDefinition['pre_conditions'])) {
             $preConditions = array(
                 '@and' => array(
@@ -314,6 +322,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'full_definition' => array(
                 'configuration' => array(
                     'transition_definition' => 'full_definition',
+                    'acl_resource' => 'test_acl',
+                    'acl_message' => 'test acl message',
                     'label' => 'label',
                     'step_to' => 'step',
                 ),

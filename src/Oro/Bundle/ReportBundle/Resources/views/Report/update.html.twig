@@ -161,14 +161,16 @@
                     content: __('Are you sure you want to change entity?')
                 });
 
-                var $conditionFieldCriteria = $('#filter-criteria-list').find('[data-criteria=condition-filed]');
-                _.extend($conditionFieldCriteria.data('util'), {
-                    findEntity:  function (entityName) {
-                        return _.findWhere(entities, {name: entityName});
+                var $fieldConditionCriteria = $('#filter-criteria-list').find('[data-criteria=condition-item]');
+                $.extend(true, $fieldConditionCriteria.data('options'), {
+                    select2: {
+                        formatSelectionTemplate: $('#report-column-chain-template').text()
+                    },
+                    util: {
+                        findEntity:  function (entityName) {
+                            return _.findWhere(entities, {name: entityName});
+                        }
                     }
-                });
-                _.extend($conditionFieldCriteria.data('select2'), {
-                    formatSelectionTemplate: $('#report-column-chain-template').text()
                 });
 
                 $('#report-designer').append(loadingMask.render().$el);

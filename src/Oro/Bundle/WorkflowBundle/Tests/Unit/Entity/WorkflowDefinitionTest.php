@@ -54,6 +54,22 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->workflowDefinition->setSteps(array($startStep));
         $this->workflowDefinition->setStartStep($startStep);
         $this->assertEquals($startStep, $this->workflowDefinition->getStartStep());
+        $this->workflowDefinition->setStartStep(null);
+        $this->assertNull($this->workflowDefinition->getStartStep());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow "test" does not contain step "start_step"
+     */
+    public function testStartStepNoStep()
+    {
+        $this->workflowDefinition->setName('test');
+        $this->assertNull($this->workflowDefinition->getStartStep());
+        $startStep = new WorkflowStep();
+        $startStep->setName('start_step');
+        $this->workflowDefinition->setStartStep($startStep);
+        $this->assertEquals($startStep, $this->workflowDefinition->getStartStep());
     }
 
     public function testConfiguration()
@@ -88,6 +104,33 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
 
         $this->workflowDefinition->import($newDefinition);
         $this->assertEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
+    }
+
+    public function testSetSteps()
+    {
+        $stepOne = new WorkflowStep();
+        $stepOne->setName('step1');
+        $this->workflowDefinition->addStep($stepOne);
+
+        $stepTwo = new WorkflowStep();
+        $stepTwo->setName('step2');
+        $this->workflowDefinition->addStep($stepTwo);
+
+        $stepThree = new WorkflowStep();
+        $stepThree->setName('step3');
+        $this->workflowDefinition->addStep($stepThree);
+
+        $this->assertCount(3, $this->workflowDefinition->getSteps());
+
+        $this->assertTrue($this->workflowDefinition->hasStepByName('step3'));
+        $this->workflowDefinition->removeStep($stepThree);
+        $this->assertFalse($this->workflowDefinition->hasStepByName('step3'));
+
+        $this->assertCount(2, $this->workflowDefinition->getSteps());
+        $this->workflowDefinition->setSteps(new ArrayCollection(array($stepOne)));
+        $actualSteps = $this->workflowDefinition->getSteps();
+        $this->assertCount(1, $actualSteps);
+        $this->assertEquals($stepOne, $actualSteps[0]);
     }
 
     /**
