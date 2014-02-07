@@ -1,5 +1,5 @@
 parameters:
-    oro_entity_merge.extension.mass_action.type.merge.class:      Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassAction
+    oro_entity_merge.extension.mass_action.type.merge.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassAction
 services:
     oro_entity_merge.extension.mass_action.type.merge:
         class: %oro_entity_merge.extension.mass_action.type.merge.class%

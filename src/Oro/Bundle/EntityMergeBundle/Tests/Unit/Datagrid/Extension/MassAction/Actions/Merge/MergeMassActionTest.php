@@ -6,7 +6,7 @@
  * Time: 1:06 PM
  */
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Datagrid\Extension\MassAction\Actions\Merge;
 
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
@@ -26,19 +26,19 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
 
     public function testMergeMassActionSetOptionShouldAddDefaultRouteOptionIfItIsEmpty()
     {
-        $this->target->setOptions(ActionConfiguration::create(array('class_name'=>1)));
+        $this->target->setOptions(ActionConfiguration::create(array('entity_name'=>1)));
         $options  = $this->target->getOptions();
         $this->assertEquals($options['route'], 'oro_entity_merge');
     }
     public function testMergeMassActionSetOptionShouldAddDefaultIPropertyNameOptionIfItIsEmpty()
     {
-        $this->target->setOptions(ActionConfiguration::create(array('class_name'=>1)));
+        $this->target->setOptions(ActionConfiguration::create(array('entity_name'=>1)));
         $options  = $this->target->getOptions();
-        $this->assertEquals($options['id_property_name'], 'id');
+        $this->assertEquals($options['data_identifier'], 'id');
     }
     public function testMergeMassActionSetOptionShouldAddDefaultMaxElementCountOptionIfItIsEmpty()
     {
-        $this->target->setOptions(ActionConfiguration::create(array('class_name'=>1)));
+        $this->target->setOptions(ActionConfiguration::create(array('entity_name'=>1)));
         $options  = $this->target->getOptions();
         $this->assertEquals($options['max_element_count'], '5');
     }

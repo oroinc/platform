@@ -38,8 +38,10 @@ class MergeMassAction extends AbstractMassAction
         }
 
         if (empty($options['route_parameters'])) {
-            $options['route_parameters'] = array('data_identifier' => $options['data_identifier'],
-                'entity_name' => $options['entity_name']);
+            $options['route_parameters'] = array(
+                'data_identifier' => $options['data_identifier'],
+                'entity_name' => $options['entity_name']
+            );
         }
 
         return parent::setOptions($options);
