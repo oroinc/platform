@@ -1,0 +1,8 @@
+parameters:
+    oro_entity_merge.twig.extension.class: Oro\Bundle\EntityMergeBundle\Twig\MergeExtension
+
+services:
+    oro_entity_merge.twig.extension:
+        class: %oro_entity_merge.twig.extension.class%
+        tags:
+            - { name: twig.extension }

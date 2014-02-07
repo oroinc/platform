@@ -32,7 +32,7 @@
         {% for child in form.children.sourceEntity %}
             <td>
                 {{ form_widget(child) }}
-                {# @todo: render value here #}
+                {{ oro_entity_merge_render_field_value(value, loop.index - 1) }}
             </td>
         {% endfor %}
     </tr>

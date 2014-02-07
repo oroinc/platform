@@ -25,7 +25,7 @@ class FieldMergerTest extends \PHPUnit_Framework_TestCase
      */
     protected $fieldMerger;
 
-    protected function setup()
+    protected function setUp()
     {
         $this->fieldMerger = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\FieldMerger\FieldMergerInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');

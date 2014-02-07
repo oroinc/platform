@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Data;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException;
 
 class EntityData
 {
@@ -109,6 +110,22 @@ class EntityData
     public function getEntities()
     {
         return $this->entities;
+    }
+
+    /**
+     * Get entities by offset
+     *
+     * @param int $offset
+     * @return object
+     * @throws OutOfBoundsException
+     */
+    public function getEntityByOffset($offset)
+    {
+        $offset = (int)$offset;
+        if (!isset($this->entities[$offset])) {
+            throw new OutOfBoundsException(sprintf('Illegal offset for getting entity: %d.', $offset));
+        }
+        return $this->entities[$offset];
     }
 
     /**

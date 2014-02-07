@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -25,7 +27,7 @@ class MergeFieldType extends AbstractType
                 'class' => 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account', // @todo Pass class dynamically
                 'choices' => $options['entities'],
                 'multiple' => false,
-                'expanded' => true
+                'expanded' => true,
             )
         );
 
