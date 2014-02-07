@@ -2,39 +2,29 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
-
-class EntityMetadata extends Metadata implements MetadataInterface, EntityMetadataInterface
+class EntityMetadata extends Metadata implements MetadataInterface
 {
     /**
-     * @var CollectionMetadata[]|FieldMetadata[]
+     * @var FieldMetadata[]
      */
-    protected $fieldMetadata;
+    protected $fieldsMetadata;
 
     /**
      * @param array $options
-     * @param array $fieldMetadata
+     * @param FieldMetadata[] $fieldsMetadata
      */
-    public function __construct($options = [], $fieldMetadata = [])
+    public function __construct(array $options = [], array $fieldsMetadata = [])
     {
-        if (!is_array($options)) {
-            throw new InvalidArgumentException('Options argument should have array type');
-        }
-
-        if (!is_array($fieldMetadata)) {
-            throw new InvalidArgumentException('FieldMetadata argument should have array type');
-        }
-
         $this->options       = $options;
-        $this->fieldMetadata = $fieldMetadata;
+        $this->fieldsMetadata = $fieldsMetadata;
     }
 
     /**
-     * @return Metadata[]
+     * @return FieldMetadata[]
      */
-    public function getFieldMetadata()
+    public function getFieldsMetadata()
     {
-        return $this->fieldMetadata;
+        return $this->fieldsMetadata;
     }
 
     /**
@@ -42,6 +32,7 @@ class EntityMetadata extends Metadata implements MetadataInterface, EntityMetada
      */
     public function getClassName()
     {
+        /** @todo Some checks that DoctrineMetadata::OPTION_NAME exist */
         return $this->has(DoctrineMetadata::OPTION_NAME) ?
             $this->get(DoctrineMetadata::OPTION_NAME)->get('name') : null;
     }

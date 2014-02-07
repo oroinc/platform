@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
-interface EntityMetadataInterface
+interface EntityMetadataInterface extends MetadataInterface
 {
     /**
+     * Get class name of entity
+     *
      * @return string
      */
     public function getClassName();

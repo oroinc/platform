@@ -14,17 +14,13 @@ class Metadata implements MetadataInterface
     /**
      * @param array $options
      */
-    public function __construct($options = [])
+    public function __construct(array $options = [])
     {
-        if (!is_array($options)) {
-            throw new InvalidArgumentException('Options argument should have array type');
-        }
-
         $this->options = $options;
     }
 
     /**
-     * {inheritDoc}
+     * {@inheritdoc}
      */
     public function get($code, $strict = false)
     {
@@ -40,7 +36,7 @@ class Metadata implements MetadataInterface
     }
 
     /**
-     * {inheritDoc}
+     * {@inheritdoc}
      */
     public function set($code, $value)
     {
@@ -48,7 +44,7 @@ class Metadata implements MetadataInterface
     }
 
     /**
-     * {inheritDoc}
+     * {@inheritdoc}
      */
     public function has($code)
     {
@@ -56,7 +52,7 @@ class Metadata implements MetadataInterface
     }
 
     /**
-     * {inheritDoc}
+     * {@inheritdoc}
      */
     public function is($code, $value = true)
     {
@@ -64,7 +60,7 @@ class Metadata implements MetadataInterface
     }
 
     /**
-     * {inheritDoc}
+     * {@inheritdoc}
      */
     public function all(\Closure $filter = null)
     {

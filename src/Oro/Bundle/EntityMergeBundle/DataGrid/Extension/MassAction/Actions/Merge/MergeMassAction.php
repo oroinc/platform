@@ -11,7 +11,7 @@ class MergeMassAction extends AbstractMassAction
     protected $requiredOptions = ['route', 'entity_name', 'data_identifier', 'max_element_count'];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function setOptions(ActionConfiguration $options)
     {
