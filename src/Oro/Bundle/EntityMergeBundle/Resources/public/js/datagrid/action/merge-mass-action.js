@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messenger'],
+define(['underscore', 'oro/translator', 'oro/DataGrid/mass-action', 'oro/messenger'],
     /**
      * @param {underscore} _
      * @param {oro/translator} __
@@ -7,7 +7,7 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
      * @param {notificationFlashMessage} messenger
      * @returns {*|Object|void}
      */
-        function (_, __, MassAction, messenger) {
+    function (_, __, MassAction, messenger) {
         'use strict';
 
         /**
@@ -16,7 +16,7 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
          * @export  oro/entity-merge/merge-mass-action
          * @class   oro.entityMerge.MergeMassAction
          * @classdesc Merge mass action js part
-         * @extends oro.datagrid.MassAction
+         * @extends oro.DataGrid.MassAction
          */
         return MassAction.extend({
 
@@ -32,7 +32,7 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
                  * @property {Number} max_element_count Max amount of merging elements
                  * @type {Number}
                  */
-                var max_length = this.max_element_count;
+                var maxLength = this.max_element_count;
                 MassAction.prototype.initialize.apply(this, arguments);
                 /**
                  * @param {object} event Backbone event object
@@ -45,43 +45,25 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
                      * @property {SelectedModelsHash} selectedModels
                      * @property {boolean} inset
                      */
-                    var selectionState = this.datagrid.getSelectionState();
-                    /**
-                     * @type {boolean}
-                     */
+                    var selectionState = this.DataGrid.getSelectionState();
                     var isInset = selectionState.inset;
-                    /**
-                     * @type {Number}
-                     */
                     var length = Object.keys(selectionState.selectedModels).length;
 
                     if (!isInset) {
-                        /**
-                         * @type {Number}
-                         */
-                        var totalRecords = this.datagrid.collection.state.totalRecords;
+                        var totalRecords = this.DataGrid.collection.state.totalRecords;
 
                         length = totalRecords - length;
                     }
 
-                    if (length > max_length) {
-                        /**
-                         * @type {boolean} Need or not to execute action
-                         */
+                    if (length > maxLength) {
                         options['doExecute'] = false;
-                        /**
-                         * @type {string}
-                         */
-                        var validationMessage = __('Mass action validation maximum error').replace('{{number}}', max_length);
+                        var validationMessage = __('oro.entity_merge.mass_action.validation.maximum_records_error', {number: maxLength});
                         messenger.notificationFlashMessage('error', validationMessage);
                     }
 
                     if (length < 2) {
-                        /**
-                         * @type {boolean} Need or not to execute action
-                         */
                         options['doExecute'] = false;
-                        messenger.notificationFlashMessage('error', __('Mass action validation minimum error'));
+                        messenger.notificationFlashMessage('error', __('oro.entity_merge.mass_action.validation.minimum_records_error'));
                     }
 
                 }, this);

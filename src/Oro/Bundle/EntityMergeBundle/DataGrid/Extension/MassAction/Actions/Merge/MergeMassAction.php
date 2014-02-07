@@ -30,6 +30,7 @@ class MergeMassAction extends AbstractMassAction
             $options['data_identifier'] = 'id';
         }
         if (empty($options['max_element_count'])) {
+            // @todo Replace with constant or value from configuration
             $options['max_element_count'] = '5';
         }
 
@@ -37,12 +38,17 @@ class MergeMassAction extends AbstractMassAction
             throw new \LogicException('There is no option "entity_name" for action "merge".');
         }
 
-        if (empty($options['route_parameters'])) {
-            $options['route_parameters'] = array(
+        if (!isset($options['route_parameters'])) {
+            $options['route_parameters'] = array();
+        }
+
+        $options['route_parameters'] = array_merge(
+            (array)$options['route_parameters'],
+            array(
                 'data_identifier' => $options['data_identifier'],
                 'entity_name' => $options['entity_name']
-            );
-        }
+            )
+        );
 
         return parent::setOptions($options);
     }

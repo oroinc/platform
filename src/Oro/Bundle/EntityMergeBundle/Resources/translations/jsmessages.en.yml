@@ -1,2 +1,2 @@
-'Mass action validation maximum error': 'Too many records selected. Maximum {{number}} records.'
-'Mass action validation minimum error': 'Select two or more records.'
+'oro.entity_merge.mass_action.validation.maximum_records_error': 'Too many records selected. Maximum {{ number }} records.'
+'oro.entity_merge.mass_action.validation.minimum_records_error': 'Select two or more records.'
