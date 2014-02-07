@@ -3,12 +3,16 @@
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
  * @ORM\Table(
  *      name="oro_workflow_entity_acl",
  *      uniqueConstraints={
- *          @ORM\UniqueConstraint(name="oro_workflow_acl_unique_idx", columns={"workflow_name", "attribute"})
+ *          @ORM\UniqueConstraint(
+ *              name="oro_workflow_acl_unique_idx",
+ *              columns={"workflow_name", "attribute", "workflow_step_id"}
+ *          )
  *      }
  * )
  * @ORM\Entity
@@ -38,6 +42,14 @@ class WorkflowEntityAcl
      * @ORM\Column(name="attribute", type="string", length=255, nullable=false)
      */
     protected $attribute;
+
+    /**
+     * @var WorkflowStep
+     *
+     * @ORM\ManyToOne(targetEntity="WorkflowStep")
+     * @ORM\JoinColumn(name="workflow_step_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $step;
 
     /**
      * @var string
@@ -70,7 +82,7 @@ class WorkflowEntityAcl
 
     /**
      * @param WorkflowDefinition $definition
-     * @return WorkflowStep
+     * @return WorkflowEntityAcl
      */
     public function setDefinition(WorkflowDefinition $definition)
     {
@@ -104,6 +116,42 @@ class WorkflowEntityAcl
     public function getAttribute()
     {
         return $this->attribute;
+    }
+
+    /**
+     * @param WorkflowStep $step
+     * @return WorkflowEntityAcl
+     */
+    public function setStep($step)
+    {
+        $this->step = $step;
+
+        return $this;
+    }
+
+    /**
+     * @return WorkflowStep
+     */
+    public function getStep()
+    {
+        return $this->step;
+    }
+
+    /**
+     * @return string
+     * @throws WorkflowException
+     */
+    public function getAttributeStepKey()
+    {
+        $attribute = $this->getAttribute();
+        $step = $this->getStep();
+        if (!$step) {
+            throw new WorkflowException(
+                sprintf('Workflow entity ACL with ID %s doesn\'t have workflow step', $this->getId())
+            );
+        }
+
+        return sprintf('%s_%s', $attribute, $step->getName());
     }
 
     /**
@@ -170,6 +218,7 @@ class WorkflowEntityAcl
     public function import(WorkflowEntityAcl $acl)
     {
         $this->setAttribute($acl->getAttribute())
+            ->setStep($this->getDefinition()->getStepByName($acl->getStep()->getName()))
             ->setClassName($acl->getClassName())
             ->setUpdatable($acl->isUpdatable())
             ->setDeletable($acl->isDeletable());

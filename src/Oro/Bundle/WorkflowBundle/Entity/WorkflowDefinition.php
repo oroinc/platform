@@ -84,7 +84,7 @@ class WorkflowDefinition
      * @var WorkflowStep
      *
      * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="start_step_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="start_step_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $startStep;
 
@@ -396,13 +396,13 @@ class WorkflowDefinition
      */
     public function setEntityAcls($entityAcl)
     {
-        $newAttributes = array();
+        $newAttributeSteps = array();
         foreach ($entityAcl as $acl) {
-            $newAttributes[] = $acl->getAttribute();
+            $newAttributeSteps[] = $acl->getAttributeStepKey();
         }
 
         foreach ($this->entityAcls as $acl) {
-            if (!in_array($acl->getAttribute(), $newAttributes)) {
+            if (!in_array($acl->getAttributeStepKey(), $newAttributeSteps)) {
                 $this->removeEntityAcl($acl);
             }
         }
@@ -420,13 +420,14 @@ class WorkflowDefinition
      */
     public function addEntityAcl(WorkflowEntityAcl $acl)
     {
-        $attribute = $acl->getAttribute();
+        $attributeStep = $acl->getAttributeStepKey();
 
-        if (!$this->hasEntityAclByAttribute($attribute)) {
-            $acl->setDefinition($this);
+        if (!$this->hasEntityAclByAttributeStep($attributeStep)) {
+            $acl->setDefinition($this)
+                ->setStep($this->getStepByName($acl->getStep()->getName()));
             $this->entityAcls->add($acl);
         } else {
-            $this->getEntityAclByAttribute($attribute)->import($acl);
+            $this->getEntityAclByAttributeStep($attributeStep)->import($acl);
         }
 
         return $this;
@@ -438,10 +439,10 @@ class WorkflowDefinition
      */
     public function removeEntityAcl(WorkflowEntityAcl $acl)
     {
-        $attribute = $acl->getAttribute();
+        $attributeStep = $acl->getAttributeStepKey();
 
-        if ($this->hasEntityAclByAttribute($attribute)) {
-            $acl = $this->getEntityAclByAttribute($attribute);
+        if ($this->hasEntityAclByAttributeStep($attributeStep)) {
+            $acl = $this->getEntityAclByAttributeStep($attributeStep);
             $this->entityAcls->removeElement($acl);
         }
 
@@ -449,22 +450,22 @@ class WorkflowDefinition
     }
 
     /**
-     * @param string $attribute
+     * @param string $attributeStep
      * @return bool
      */
-    public function hasEntityAclByAttribute($attribute)
+    public function hasEntityAclByAttributeStep($attributeStep)
     {
-        return $this->getEntityAclByAttribute($attribute) !== null;
+        return $this->getEntityAclByAttributeStep($attributeStep) !== null;
     }
 
     /**
-     * @param string $attribute
+     * @param string $attributeStep
      * @return null|WorkflowEntityAcl
      */
-    public function getEntityAclByAttribute($attribute)
+    public function getEntityAclByAttributeStep($attributeStep)
     {
         foreach ($this->entityAcls as $acl) {
-            if ($acl->getAttribute() == $attribute) {
+            if ($acl->getAttributeStepKey() == $attributeStep) {
                 return $acl;
             }
         }

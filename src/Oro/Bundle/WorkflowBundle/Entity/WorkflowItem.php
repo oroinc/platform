@@ -461,13 +461,13 @@ class WorkflowItem
      */
     public function setAclIdentities($aclIdentities)
     {
-        $newAttributes = array();
+        $newAttributeSteps = array();
         foreach ($aclIdentities as $aclIdentity) {
-            $newAttributes[] = $aclIdentity->getAclAttribute();
+            $newAttributeSteps[] = $aclIdentity->getAclAttributeStepKey();
         }
 
         foreach ($this->aclIdentities as $aclIdentity) {
-            if (!in_array($aclIdentity->getAclAttribute(), $newAttributes)) {
+            if (!in_array($aclIdentity->getAclAttributeStepKey(), $newAttributeSteps)) {
                 $this->removeEntityAcl($aclIdentity);
             }
         }
@@ -485,13 +485,13 @@ class WorkflowItem
      */
     public function addEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
     {
-        $attribute = $aclIdentity->getAclAttribute();
+        $attributeStep = $aclIdentity->getAclAttributeStepKey();
 
-        if (!$this->hasAclIdentityByAttribute($attribute)) {
+        if (!$this->hasAclIdentityByAttribute($attributeStep)) {
             $aclIdentity->setWorkflowItem($this);
             $this->aclIdentities->add($aclIdentity);
         } else {
-            $this->getAclIdentityByAttribute($attribute)->import($aclIdentity);
+            $this->getAclIdentityByAttribute($attributeStep)->import($aclIdentity);
         }
 
         return $this;
@@ -503,10 +503,10 @@ class WorkflowItem
      */
     public function removeEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
     {
-        $attribute = $aclIdentity->getAclAttribute();
+        $attributeStep = $aclIdentity->getAclAttributeStepKey();
 
-        if ($this->hasAclIdentityByAttribute($attribute)) {
-            $aclIdentity = $this->getAclIdentityByAttribute($attribute);
+        if ($this->hasAclIdentityByAttribute($attributeStep)) {
+            $aclIdentity = $this->getAclIdentityByAttribute($attributeStep);
             $this->aclIdentities->removeElement($aclIdentity);
         }
 
@@ -529,7 +529,7 @@ class WorkflowItem
     public function getAclIdentityByAttribute($attribute)
     {
         foreach ($this->aclIdentities as $aclIdentity) {
-            if ($aclIdentity->getAclAttribute() == $attribute) {
+            if ($aclIdentity->getAclAttributeStepKey() == $attribute) {
                 return $aclIdentity;
             }
         }

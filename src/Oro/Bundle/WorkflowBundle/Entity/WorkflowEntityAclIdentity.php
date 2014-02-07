@@ -82,7 +82,7 @@ class WorkflowEntityAclIdentity
      * @return string
      * @throws WorkflowException
      */
-    public function getAclAttribute()
+    public function getAclAttributeStepKey()
     {
         $acl = $this->getAcl();
         if (!$acl) {
@@ -91,7 +91,7 @@ class WorkflowEntityAclIdentity
             );
         }
 
-        return $acl->getAttribute();
+        return $acl->getAttributeStepKey();
     }
 
     /**

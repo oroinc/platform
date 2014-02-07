@@ -32,6 +32,19 @@ class Step
     protected $allowedTransitions = array();
 
     /**
+     * array(
+     *      '<attribute_name>' => array(
+                'update' => true|false,
+     *          'delete' => true|false,
+     *      ),
+     *      ...
+     * )
+     *
+     * @var array
+     */
+    protected $entityAcls = array();
+
+    /**
      * Set allowed transitions.
      *
      * @param array $allowedTransitions
@@ -184,5 +197,52 @@ class Step
     public function getLabel()
     {
         return $this->label;
+    }
+
+    /**
+     * @param array $entityAcls
+     * @return Step
+     */
+    public function setEntityAcls(array $entityAcls)
+    {
+        $this->entityAcls = $entityAcls;
+        return $this;
+    }
+
+    /**
+     * @param string $attributeName
+     * @return bool
+     */
+    public function isEntityAclDefined($attributeName)
+    {
+        return array_key_exists($attributeName, $this->entityAcls);
+    }
+
+    /**
+     * @param string $attributeName
+     * @return bool
+     */
+    public function isEntityUpdateAllowed($attributeName)
+    {
+        if (!$this->isEntityAclDefined($attributeName)) {
+            return true;
+        }
+
+        return !array_key_exists('update', $this->entityAcls[$attributeName])
+            || $this->entityAcls[$attributeName]['update'];
+    }
+
+    /**
+     * @param string $attributeName
+     * @return bool
+     */
+    public function isEntityDeleteAllowed($attributeName)
+    {
+        if (!$this->isEntityAclDefined($attributeName)) {
+            return true;
+        }
+
+        return !array_key_exists('delete', $this->entityAcls[$attributeName])
+            || $this->entityAcls[$attributeName]['delete'];
     }
 }

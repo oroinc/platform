@@ -58,10 +58,10 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
             $workflow = $this->workflowAssembler->assemble($workflowDefinition);
 
-            $this->setEntityAcls($workflowDefinition, $workflow);
             $this->setSteps($workflowDefinition, $workflow);
-
             $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
+
+            $this->setEntityAcls($workflowDefinition, $workflow);
 
             $workflowDefinitions[] = $workflowDefinition;
         }
@@ -93,14 +93,22 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     {
         $entityAcls = array();
         foreach ($workflow->getAttributeManager()->getEntityAttributes() as $attribute) {
-            if (!$attribute->isEntityUpdateAllowed() || !$attribute->isEntityDeleteAllowed()) {
-                $entityAcl = new WorkflowEntityAcl();
-                $entityAcl
-                    ->setAttribute($attribute->getName())
-                    ->setClassName($attribute->getOption('class'))
-                    ->setUpdatable($attribute->isEntityUpdateAllowed())
-                    ->setDeletable($attribute->isEntityDeleteAllowed());
-                $entityAcls[] = $entityAcl;
+            foreach ($workflow->getStepManager()->getSteps() as $step) {
+                $updatable = $attribute->isEntityUpdateAllowed()
+                    && $step->isEntityUpdateAllowed($attribute->getName());
+                $deletable = $attribute->isEntityDeleteAllowed()
+                    && $step->isEntityDeleteAllowed($attribute->getName());
+
+                if (!$updatable || !$deletable) {
+                    $entityAcl = new WorkflowEntityAcl();
+                    $entityAcl
+                        ->setAttribute($attribute->getName())
+                        ->setStep($workflowDefinition->getStepByName($step->getName()))
+                        ->setClassName($attribute->getOption('class'))
+                        ->setUpdatable($updatable)
+                        ->setDeletable($deletable);
+                    $entityAcls[] = $entityAcl;
+                }
             }
         }
 
