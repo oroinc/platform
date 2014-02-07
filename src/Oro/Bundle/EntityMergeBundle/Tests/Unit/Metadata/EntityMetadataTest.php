@@ -13,7 +13,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
     public function testConstruct($options, $fieldMetadata, $expectedExceptionMessage)
     {
         $this->setExpectedException(
-            '\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
+            '\Exception',
             $expectedExceptionMessage
         );
         $metadata = new EntityMetadata($options, $fieldMetadata);
@@ -25,17 +25,17 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
             'both_invalid' => [
                 'options' => null,
                 'fieldMetadata' => null,
-                'expectedExceptionMessage' => 'Options argument should have array type',
+                'expectedExceptionMessage' => 'must be of the type array, null given',
             ],
             'first_invalid' => [
                 'options' => true,
                 'fieldMetadata' => [],
-                'expectedExceptionMessage' => 'Options argument should have array type',
+                'expectedExceptionMessage' => 'must be of the type array, boolean given',
             ],
             'second_invalid' => [
                 'options' => [],
                 'fieldMetadata' => 'string',
-                'expectedExceptionMessage' => 'FieldMetadata argument should have array type',
+                'expectedExceptionMessage' => 'must be of the type array, string given',
             ],
         ];
     }
@@ -50,12 +50,12 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
         $metadata = new EntityMetadata(['code' => 'value'], ['metadata']);
     }
 
-    public function testGetFieldMetadata()
+    public function testGetFieldsMetadata()
     {
         $fieldMetadata = ['metadata'];
         $metadata = new EntityMetadata(['code' => 'value'], $fieldMetadata);
 
-        $this->assertEquals($fieldMetadata, $metadata->getFieldMetadata());
+        $this->assertEquals($fieldMetadata, $metadata->getFieldsMetadata());
     }
 
     public function testGetClassName()

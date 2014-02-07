@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
-class EntityMetadata extends Metadata implements MetadataInterface
+class EntityMetadata extends Metadata implements MetadataInterface, EntityMetadataInterface
 {
     /**
      * @var FieldMetadata[]

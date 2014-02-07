@@ -7,13 +7,15 @@ use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 class MetadataTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options argument should have array type
-     *
      * @dataProvider constructorProvider
      */
-    public function testConstruct($options)
+    public function testConstruct($options, $expectedExceptionMessage)
     {
+        $this->setExpectedException(
+            '\Exception',
+            $expectedExceptionMessage
+        );
+
         $metadata = new Metadata($options);
     }
 
@@ -22,18 +24,23 @@ class MetadataTest extends \PHPUnit_Framework_TestCase
         return [
             'null' => [
                 'options' => null,
+                'expectedExceptionMessage' => 'must be of the type array, null given',
             ],
             'bool' => [
                 'options' => true,
+                'expectedExceptionMessage' => 'must be of the type array, boolean given',
             ],
             'integer' => [
                 'options' => 2,
+                'expectedExceptionMessage' => 'must be of the type array, integer given',
             ],
             'object' => [
                 'options' => new \stdClass(),
+                'expectedExceptionMessage' => 'must be of the type array, object given',
             ],
             'string' => [
                 'options' => 'argument',
+                'expectedExceptionMessage' => 'must be of the type array, string given',
             ],
         ];
     }
