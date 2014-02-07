@@ -24,13 +24,13 @@ class FieldDataTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityData = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
+        $this->entityData    = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
             ->disableOriginalConstructor()
             ->getMock();
         $this->fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->fieldData = new FieldData($this->entityData, $this->fieldMetadata);
+        $this->fieldData     = new FieldData($this->entityData, $this->fieldMetadata);
     }
 
     public function testGetMetadata()
@@ -88,7 +88,7 @@ class FieldDataTest extends \PHPUnit_Framework_TestCase
 
     protected function createTestEntity($id)
     {
-        $result = new \stdClass();
+        $result     = new \stdClass();
         $result->id = $id;
         return $result;
     }

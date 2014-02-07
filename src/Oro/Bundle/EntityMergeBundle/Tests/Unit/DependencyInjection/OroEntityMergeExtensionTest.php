@@ -42,8 +42,12 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
     public function loadParameterDataProvider()
     {
         return array(
-            'oro_entity_merge.metadata.factory.class' => array('oro_entity_merge.metadata.factory.class'),
-            'oro_entity_merge.extension.mass_action.type.merge.class' => array('oro_entity_merge.extension.mass_action.type.merge.class'),
+            'metadata.factory'                 => array(
+                'oro_entity_merge.metadata.factory.class'
+            ),
+            'extension.mass_action.type.merge' => array(
+                'oro_entity_merge.extension.mass_action.type.merge.class'
+            ),
         );
     }
 
@@ -66,26 +70,26 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
     public function loadServiceDataProvider()
     {
         return array(
-            'oro_entity_merge.metadata.factory' => array(
-                'service' => 'oro_entity_merge.metadata.factory',
-                'class' => '%oro_entity_merge.metadata.factory.class%',
+            'oro_entity_merge.metadata.factory'                 => array(
+                'service'   => 'oro_entity_merge.metadata.factory',
+                'class'     => '%oro_entity_merge.metadata.factory.class%',
                 'arguments' => array(
                     new Reference('oro_entity_config.provider.merge'),
                     new Reference('doctrine.orm.entity_manager')
                 ),
-                'tags' => array(),
-                'scope' => 'container'
+                'tags'      => array(),
+                'scope'     => 'container'
             ),
             'oro_entity_merge.extension.mass_action.type.merge' => array(
-                'service' => 'oro_entity_merge.extension.mass_action.type.merge',
-                'class' => '%oro_entity_merge.extension.mass_action.type.merge.class%',
+                'service'   => 'oro_entity_merge.extension.mass_action.type.merge',
+                'class'     => '%oro_entity_merge.extension.mass_action.type.merge.class%',
                 'arguments' => array(),
-                'tags' => array(
+                'tags'      => array(
                     'oro_datagrid.extension.mass_action.type' => array(
                         array('type' => 'merge')
                     )
                 ),
-                'scope' => 'prototype'
+                'scope'     => 'prototype'
             ),
         );
     }

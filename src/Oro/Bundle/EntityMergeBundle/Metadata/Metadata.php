@@ -12,6 +12,11 @@ class Metadata implements MetadataInterface
     protected $options;
 
     /**
+     * @var DoctrineMetadata
+     */
+    protected $doctrineMetadata;
+
+    /**
      * @param array $options
      */
     public function __construct(array $options = [])
@@ -69,5 +74,25 @@ class Metadata implements MetadataInterface
         }
 
         return $this->options;
+    }
+
+    /**
+     * @return DoctrineMetadata
+     */
+    public function getDoctrineMetadata()
+    {
+        if (!$this->doctrineMetadata) {
+            throw new InvalidArgumentException('DoctrineMetadata not set');
+        }
+
+        return $this->doctrineMetadata;
+    }
+
+    /**
+     * @param array DoctrineMetadata
+     */
+    public function setDoctrineMetadata($doctrineMetadata)
+    {
+        $this->doctrineMetadata = $doctrineMetadata;
     }
 }

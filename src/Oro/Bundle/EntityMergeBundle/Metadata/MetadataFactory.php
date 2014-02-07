@@ -67,7 +67,7 @@ class MetadataFactory
 
         $entityDoctrineMetadata = new DoctrineMetadata((array)$doctrineMetadata);
         $metadata               = new EntityMetadata($entityMergeConfig->all(), $fieldsMetadata);
-        $metadata->set(DoctrineMetadata::OPTION_NAME, $entityDoctrineMetadata);
+        $metadata->setDoctrineMetadata($entityDoctrineMetadata);
 
         return $metadata;
     }
@@ -106,7 +106,7 @@ class MetadataFactory
                     }
 
                     $fieldDoctrineMetadata = new DoctrineMetadata($fieldMapping);
-                    $mergeMetadata->set(DoctrineMetadata::OPTION_NAME, $fieldDoctrineMetadata);
+                    $mergeMetadata->setDoctrineMetadata($fieldDoctrineMetadata);
                     $fieldMetadata[] = $mergeMetadata;
                 }
             }
@@ -145,7 +145,7 @@ class MetadataFactory
                     $fieldConfig   = $this->configProvider->getConfig($entityClassName, $fieldName);
                     $mergeMetadata = new RelationMetadata($fieldConfig->all());
 
-                    $mergeMetadata->set(DoctrineMetadata::OPTION_NAME, $fieldDoctrineMetadata);
+                    $mergeMetadata->setDoctrineMetadata($fieldDoctrineMetadata);
 
                     $relationMetadata[] = $mergeMetadata;
                 }

@@ -7,7 +7,7 @@ use Oro\Bundle\EntityMergeBundle\Model\FieldMerger\CompositeFieldMerger;
 class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CompositeFieldMerger $merger;
+     * @var CompositeFieldMerger $merger ;
      */
     protected $merger;
 

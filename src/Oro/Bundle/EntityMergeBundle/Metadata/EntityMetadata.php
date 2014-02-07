@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+
 class EntityMetadata extends Metadata implements MetadataInterface, EntityMetadataInterface
 {
     /**
@@ -32,8 +34,10 @@ class EntityMetadata extends Metadata implements MetadataInterface, EntityMetada
      */
     public function getClassName()
     {
-        /** @todo Some checks that DoctrineMetadata::OPTION_NAME exist */
-        return $this->has(DoctrineMetadata::OPTION_NAME) ?
-            $this->get(DoctrineMetadata::OPTION_NAME)->get('name') : null;
+        if (!$this->getDoctrineMetadata()->has('name')) {
+            throw new InvalidArgumentException('Class name not set');
+        }
+
+        return $this->getDoctrineMetadata()->get('name');
     }
 }
