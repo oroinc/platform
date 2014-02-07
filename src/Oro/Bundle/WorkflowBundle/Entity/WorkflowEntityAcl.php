@@ -54,9 +54,9 @@ class WorkflowEntityAcl
     /**
      * @var string
      *
-     * @ORM\Column(name="class_name", type="string", length=255, nullable=false)
+     * @ORM\Column(name="entity_class", type="string", length=255, nullable=false)
      */
-    protected $className;
+    protected $entityClass;
 
     /**
      * @var boolean
@@ -151,16 +151,16 @@ class WorkflowEntityAcl
             );
         }
 
-        return sprintf('%s_%s', $attribute, $step->getName());
+        return sprintf('attribute_%s_step_%s', $attribute, $step->getName());
     }
 
     /**
      * @param mixed $className
      * @return WorkflowEntityAcl
      */
-    public function setClassName($className)
+    public function setEntityClass($className)
     {
-        $this->className = $className;
+        $this->entityClass = $className;
 
         return $this;
     }
@@ -168,9 +168,9 @@ class WorkflowEntityAcl
     /**
      * @return mixed
      */
-    public function getClassName()
+    public function getEntityClass()
     {
-        return $this->className;
+        return $this->entityClass;
     }
 
     /**
@@ -219,7 +219,7 @@ class WorkflowEntityAcl
     {
         $this->setAttribute($acl->getAttribute())
             ->setStep($this->getDefinition()->getStepByName($acl->getStep()->getName()))
-            ->setClassName($acl->getClassName())
+            ->setEntityClass($acl->getEntityClass())
             ->setUpdatable($acl->isUpdatable())
             ->setDeletable($acl->isDeletable());
 

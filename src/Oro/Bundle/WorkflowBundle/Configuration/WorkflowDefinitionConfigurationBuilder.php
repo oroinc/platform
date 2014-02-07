@@ -104,7 +104,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
                     $entityAcl
                         ->setAttribute($attribute->getName())
                         ->setStep($workflowDefinition->getStepByName($step->getName()))
-                        ->setClassName($attribute->getOption('class'))
+                        ->setEntityClass($attribute->getOption('class'))
                         ->setUpdatable($updatable)
                         ->setDeletable($deletable);
                     $entityAcls[] = $entityAcl;

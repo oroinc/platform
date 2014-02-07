@@ -446,9 +446,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
             ->getMock();
+        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $worklflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array($entityConnector, null, $attributeManager, $transitionManager))
+            ->setConstructorArgs(array($entityConnector, $aclManager, null, $attributeManager, $transitionManager))
             ->setMethods(
                 array(
                     'isTransitionAvailable',

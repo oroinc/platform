@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 
@@ -47,13 +48,18 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             $stepManager->setSteps(array($step));
         }
 
+        $attributeManager = new AttributeManager();
+
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
-            ->setMethods(array('getStepManager'))
+            ->setMethods(array('getStepManager', 'getAttributeManager'))
             ->getMock();
-        $workflow->expects($this->once())
+        $workflow->expects($this->any())
             ->method('getStepManager')
             ->will($this->returnValue($stepManager));
+        $workflow->expects($this->any())
+            ->method('getAttributeManager')
+            ->will($this->returnValue($attributeManager));
 
         $workflowAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler')
             ->disableOriginalConstructor()

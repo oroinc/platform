@@ -8,10 +8,16 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 /**
  * @ORM\Table(
  *      name="oro_workflow_entity_acl_identity",
+ *      indexes={
+ *          @ORM\Index(
+ *              name="oro_workflow_entity_acl_identity_idx",
+ *              columns={"entity_id", "entity_class"}
+ *          )
+ *      },
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(
  *              name="oro_workflow_entity_acl_identity_unique_idx",
- *              columns={"workflow_entity_acl_id", "entity_id"}
+ *              columns={"workflow_entity_acl_id", "entity_id", "workflow_item_id"}
  *          )
  *      }
  * )
@@ -35,6 +41,13 @@ class WorkflowEntityAclIdentity
      * @ORM\JoinColumn(name="workflow_entity_acl_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $acl;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="entity_class", type="string", length=255, nullable=false)
+     */
+    protected $entityClass;
 
     /**
      * @var integer
@@ -92,6 +105,25 @@ class WorkflowEntityAclIdentity
         }
 
         return $acl->getAttributeStepKey();
+    }
+
+    /**
+     * @param string $entityClass
+     * @return WorkflowEntityAclIdentity
+     */
+    public function setEntityClass($entityClass)
+    {
+        $this->entityClass = $entityClass;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
     }
 
     /**

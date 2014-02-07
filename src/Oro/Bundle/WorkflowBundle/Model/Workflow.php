@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -31,6 +32,11 @@ class Workflow
      * @var EntityConnector
      */
     protected $entityConnector;
+
+    /**
+     * @var AclManager
+     */
+    protected $aclManager;
 
     /**
      * @var StepManager
@@ -64,17 +70,20 @@ class Workflow
 
     /**
      * @param EntityConnector $entityConnector
+     * @param AclManager $aclManager
      * @param StepManager|null $stepManager
      * @param AttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
      */
     public function __construct(
         EntityConnector $entityConnector,
+        AclManager $aclManager,
         StepManager $stepManager = null,
         AttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
     ) {
         $this->entityConnector = $entityConnector;
+        $this->aclManager = $aclManager;
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager  = $attributeManager ? $attributeManager : new AttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
@@ -290,6 +299,8 @@ class Workflow
         $entity = $workflowItem->getEntity();
         $this->entityConnector->setWorkflowItem($entity, $workflowItem);
         $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
+
+        $this->aclManager->updateAclIdentities($workflowItem);
     }
 
     /**
