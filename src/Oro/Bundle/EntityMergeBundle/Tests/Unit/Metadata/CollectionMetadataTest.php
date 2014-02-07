@@ -7,29 +7,37 @@ use Oro\Bundle\EntityMergeBundle\Metadata\CollectionMetadata;
 
 class CollectionMetadataTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage DoctrineMetadata not set
+     */
     public function testDoctrineOptionNotExists()
     {
         $metadata = new CollectionMetadata();
         $this->assertNull($metadata->getFieldName());
     }
 
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Field name not set
+     */
     public function testDoctrineMetadataExistsWithNotSetField()
     {
-        $metadata = new CollectionMetadata();
+        $metadata         = new CollectionMetadata();
         $doctrineMetadata = new DoctrineMetadata();
-        $metadata->set(DoctrineMetadata::OPTION_NAME, $doctrineMetadata);
+        $metadata->setDoctrineMetadata($doctrineMetadata);
 
-        $this->assertNull($metadata->getFieldName());
+        $metadata->getFieldName();
     }
 
     public function testDoctrineMetadataExists()
     {
-        $metadata = new CollectionMetadata();
+        $metadata         = new CollectionMetadata();
         $doctrineMetadata = new DoctrineMetadata();
 
         $fieldName = 'new_field';
         $doctrineMetadata->set('fieldName', $fieldName);
-        $metadata->set(DoctrineMetadata::OPTION_NAME, $doctrineMetadata);
+        $metadata->setDoctrineMetadata($doctrineMetadata);
 
         $this->assertEquals($fieldName, $metadata->getFieldName());
     }

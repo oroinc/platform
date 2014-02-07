@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+
 class FieldMetadata extends Metadata implements FieldMetadataInterface
 {
     /**
@@ -9,8 +11,10 @@ class FieldMetadata extends Metadata implements FieldMetadataInterface
      */
     public function getFieldName()
     {
-        /** @todo Some checks that $this->get(DoctrineMetadata::OPTION_NAME) returns valid value? */
-        return $this->has(DoctrineMetadata::OPTION_NAME) ?
-            $this->get(DoctrineMetadata::OPTION_NAME)->get('fieldName') : null;
+        if (!$this->getDoctrineMetadata()->has('fieldName')) {
+            throw new InvalidArgumentException('Field name not set');
+        }
+
+        return $this->getDoctrineMetadata()->get('fieldName');
     }
 }

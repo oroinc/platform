@@ -21,7 +21,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $this->entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityData = new EntityData($this->entityMetadata);
+        $this->entityData     = new EntityData($this->entityMetadata);
     }
 
     public function testGetMetadata()
@@ -138,14 +138,14 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
 
     protected function createTestEntity($id)
     {
-        $result = new \stdClass();
+        $result     = new \stdClass();
         $result->id = $id;
         return $result;
     }
 
     public function testAddNewField()
     {
-        $fieldName = 'test';
+        $fieldName     = 'test';
         $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -167,7 +167,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(array(), $this->entityData->getFields());
 
-        $fieldName = 'test';
+        $fieldName     = 'test';
         $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -182,7 +182,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
 
     public function testHasField()
     {
-        $fieldName = 'test';
+        $fieldName     = 'test';
         $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();

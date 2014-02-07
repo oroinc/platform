@@ -22,24 +22,24 @@ class MetadataTest extends \PHPUnit_Framework_TestCase
     public function constructorProvider()
     {
         return [
-            'null' => [
-                'options' => null,
+            'null'    => [
+                'options'                  => null,
                 'expectedExceptionMessage' => 'must be of the type array, null given',
             ],
-            'bool' => [
-                'options' => true,
+            'bool'    => [
+                'options'                  => true,
                 'expectedExceptionMessage' => 'must be of the type array, boolean given',
             ],
             'integer' => [
-                'options' => 2,
+                'options'                  => 2,
                 'expectedExceptionMessage' => 'must be of the type array, integer given',
             ],
-            'object' => [
-                'options' => new \stdClass(),
+            'object'  => [
+                'options'                  => new \stdClass(),
                 'expectedExceptionMessage' => 'must be of the type array, object given',
             ],
-            'string' => [
-                'options' => 'argument',
+            'string'  => [
+                'options'                  => 'argument',
                 'expectedExceptionMessage' => 'must be of the type array, string given',
             ],
         ];
@@ -75,13 +75,20 @@ class MetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAllWithCallback()
     {
-        $options = [
-            'first' => true,
+        $options  = [
+            'first'  => true,
             'second' => false,
         ];
         $metadata = new Metadata($options);
 
-        $this->assertEquals(['first' => true], $metadata->all(function($value) { return (bool) $value; }));
+        $this->assertEquals(
+            ['first' => true],
+            $metadata->all(
+                function ($value) {
+                    return (bool)$value;
+                }
+            )
+        );
     }
 
     /**
@@ -102,55 +109,55 @@ class MetadataTest extends \PHPUnit_Framework_TestCase
     public function dataProvider()
     {
         return [
-            'string' => [
-                'options' => ['code-string' => 'value-string'],
-                'code' => 'code-string',
+            'string'  => [
+                'options'       => ['code-string' => 'value-string'],
+                'code'          => 'code-string',
                 'expectedValue' => 'value-string',
-                'hasMethod' => 'assertTrue',
-                'isMethod' => 'assertTrue',
+                'hasMethod'     => 'assertTrue',
+                'isMethod'      => 'assertTrue',
             ],
             'integer' => [
-                'options' => ['code-integer' => 2],
-                'code' => 'code-integer',
+                'options'       => ['code-integer' => 2],
+                'code'          => 'code-integer',
                 'expectedValue' => 2,
-                'hasMethod' => 'assertTrue',
-                'isMethod' => 'assertTrue',
+                'hasMethod'     => 'assertTrue',
+                'isMethod'      => 'assertTrue',
             ],
-            'bool' => [
-                'options' => ['code-bool' => true],
-                'code' => 'code-bool',
+            'bool'    => [
+                'options'       => ['code-bool' => true],
+                'code'          => 'code-bool',
                 'expectedValue' => true,
-                'hasMethod' => 'assertTrue',
-                'isMethod' => 'assertTrue',
+                'hasMethod'     => 'assertTrue',
+                'isMethod'      => 'assertTrue',
                 'isNotExpected' => 'assertTrue',
             ],
-            'object' => [
-                'options' => ['code-object' => new \stdClass()],
-                'code' => 'code-object',
+            'object'  => [
+                'options'       => ['code-object' => new \stdClass()],
+                'code'          => 'code-object',
                 'expectedValue' => new \stdClass(),
-                'hasMethod' => 'assertTrue',
-                'isMethod' => 'assertTrue',
+                'hasMethod'     => 'assertTrue',
+                'isMethod'      => 'assertTrue',
             ],
-            'null' => [
-                'options' => ['code-null' => null],
-                'code' => 'code-null',
+            'null'    => [
+                'options'       => ['code-null' => null],
+                'code'          => 'code-null',
                 'expectedValue' => null,
-                'hasMethod' => 'assertFalse',
-                'isMethod' => 'assertFalse',
+                'hasMethod'     => 'assertFalse',
+                'isMethod'      => 'assertFalse',
             ],
-            'empty' => [
-                'options' => [],
-                'code' => 'any',
+            'empty'   => [
+                'options'       => [],
+                'code'          => 'any',
                 'expectedValue' => null,
-                'hasMethod' => 'assertFalse',
-                'isMethod' => 'assertFalse',
+                'hasMethod'     => 'assertFalse',
+                'isMethod'      => 'assertFalse',
             ],
             'another' => [
-                'options' => ['code-string' => 'value-string', 'code-bool' => true],
-                'code' => 'code-object',
+                'options'       => ['code-string' => 'value-string', 'code-bool' => true],
+                'code'          => 'code-object',
                 'expectedValue' => null,
-                'hasMethod' => 'assertFalse',
-                'isMethod' => 'assertFalse',
+                'hasMethod'     => 'assertFalse',
+                'isMethod'      => 'assertFalse',
             ]
         ];
     }

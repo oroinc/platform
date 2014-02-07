@@ -6,7 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 
 class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY = 'Namespace\EntityName';
+    const ENTITY         = 'Namespace\EntityName';
     const RELATED_ENTITY = 'Namespace\RelatedEntity';
 
     /**
@@ -73,11 +73,10 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Config for "Namespace\RelatedEntity" not exists
-     *
      */
     public function testCreateMetadataForEntityWithoutConfig()
     {
-        $factory = new MetadataFactory($this->configProvider, $this->entityManager);
+        $factory  = new MetadataFactory($this->configProvider, $this->entityManager);
         $metadata = $factory->createMergeMetadata(self::RELATED_ENTITY);
         $this->assertNull($metadata);
     }
@@ -89,15 +88,15 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->will($this->returnValue($this->config));
 
-        $factory = new MetadataFactory($this->configProvider, $this->entityManager);
+        $factory  = new MetadataFactory($this->configProvider, $this->entityManager);
         $metadata = $factory->createMergeMetadata(self::ENTITY);
         $this->assertNotNull($metadata);
-        $this->assertInstanceOf('\Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata' ,$metadata);
+        $this->assertInstanceOf('\Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata', $metadata);
     }
 
     public function testCreateFieldsMetadataEmpty()
     {
-        $factory = new MetadataFactory($this->configProvider, $this->entityManager);
+        $factory  = new MetadataFactory($this->configProvider, $this->entityManager);
         $metadata = $factory->createFieldsMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertEmpty($metadata);
@@ -125,7 +124,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldMapping')
             ->will($this->returnValue(['ref-one' => []]));
 
-        $factory = new MetadataFactory($this->configProvider, $this->entityManager);
+        $factory  = new MetadataFactory($this->configProvider, $this->entityManager);
         $metadata = $factory->createFieldsMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);
@@ -154,7 +153,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationMapping')
             ->will($this->returnValue(['ref-one' => []]));
 
-        $factory = new MetadataFactory($this->configProvider, $this->entityManager);
+        $factory  = new MetadataFactory($this->configProvider, $this->entityManager);
         $metadata = $factory->createFieldsMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);
@@ -163,7 +162,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateRelationMetadata()
     {
-        $factory = new MetadataFactory($this->configProvider, $this->entityManager);
+        $factory  = new MetadataFactory($this->configProvider, $this->entityManager);
         $metadata = $factory->createRelationMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertEmpty($metadata);
@@ -219,7 +218,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->will($this->returnValue([$config]));
 
-        $factory = new MetadataFactory($this->configProvider, $this->entityManager);
+        $factory  = new MetadataFactory($this->configProvider, $this->entityManager);
         $metadata = $factory->createRelationMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);

@@ -11,7 +11,7 @@ use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 class FieldMergerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EntityMerger $merger;
+     * @var EntityMerger $merger ;
      */
     protected $merger;
 
@@ -27,9 +27,9 @@ class FieldMergerTest extends \PHPUnit_Framework_TestCase
 
     protected function setup()
     {
-        $this->fieldMerger = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\FieldMerger\FieldMergerInterface');
+        $this->fieldMerger     = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\FieldMerger\FieldMergerInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->merger = new EntityMerger($this->fieldMerger, $this->eventDispatcher);
+        $this->merger          = new EntityMerger($this->fieldMerger, $this->eventDispatcher);
     }
 
     public function testMerge()
@@ -98,7 +98,7 @@ class FieldMergerTest extends \PHPUnit_Framework_TestCase
 
     protected function createTestEntity($id)
     {
-        $result = new \stdClass();
+        $result     = new \stdClass();
         $result->id = $id;
         return $result;
     }
