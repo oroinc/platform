@@ -10,10 +10,10 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
                 MassAction.prototype.initialize.apply(this, arguments);
                 this.on('preExecute', function(event, options){
                     var selectionState = this.datagrid.getSelectionState();
-                    var isInset = this.datagrid.inset;
+                    var isInset = selectionState.inset;
                     var length = Object.keys(selectionState.selectedModels).length;
 
-                    if(isInset){
+                    if(!isInset){
                         var totalRecords = this.datagrid.collection.state.totalRecords;
 
                         length = totalRecords - length;
