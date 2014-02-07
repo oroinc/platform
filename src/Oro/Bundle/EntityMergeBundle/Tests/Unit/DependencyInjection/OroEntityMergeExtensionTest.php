@@ -42,7 +42,7 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
     public function loadParameterDataProvider()
     {
         return array(
-            'oro_entity_merge.metadata.merge_factory.class' => array('oro_entity_merge.metadata.merge_factory.class'),
+            'oro_entity_merge.metadata.factory.class' => array('oro_entity_merge.metadata.factory.class'),
             'oro_entity_merge.extension.mass_action.type.merge.class' => array('oro_entity_merge.extension.mass_action.type.merge.class'),
         );
     }
@@ -66,9 +66,9 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
     public function loadServiceDataProvider()
     {
         return array(
-            'oro_entity_merge.metadata.merge_factory' => array(
-                'service' => 'oro_entity_merge.metadata.merge_factory',
-                'class' => '%oro_entity_merge.metadata.merge_factory.class%',
+            'oro_entity_merge.metadata.factory' => array(
+                'service' => 'oro_entity_merge.metadata.factory',
+                'class' => '%oro_entity_merge.metadata.factory.class%',
                 'arguments' => array(
                     new Reference('oro_entity_config.provider.merge'),
                     new Reference('doctrine.orm.entity_manager')

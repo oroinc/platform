@@ -1,0 +1,7 @@
+{# Dummy for merge template #}
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% block content %}
+    {{ form_widget(form, { 'attr': {'class': 'select2'} }) }}
+{% endblock %}

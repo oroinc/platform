@@ -38,13 +38,14 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityClass));
 
         $entities = array(
-            $this->createTestEntity(1),
+            $masterEntity = $this->createTestEntity(1),
             $this->createTestEntity(2),
             $this->createTestEntity(3),
         );
 
         $this->assertEquals($this->entityData, $this->entityData->setEntities($entities));
         $this->assertEquals($entities, $this->entityData->getEntities());
+        $this->assertEquals($masterEntity, $this->entityData->getMasterEntity());
     }
 
     public function testAddEntity()
@@ -157,6 +158,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Bundle\EntityMergeBundle\Data\FieldData', $field);
         $this->assertEquals($this->entityData, $field->getEntityData());
         $this->assertEquals($fieldMetadata, $field->getMetadata());
+        $this->assertEquals($this->entityData->getMasterEntity(), $field->getSourceEntity());
 
         $this->assertEquals($field, $this->entityData->getField($fieldName));
     }

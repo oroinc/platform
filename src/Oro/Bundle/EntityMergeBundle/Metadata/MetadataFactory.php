@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class MetadataFactory
 {
@@ -49,6 +50,10 @@ class MetadataFactory
     {
         $entityMergeConfig = $this->configProvider->getConfig($className);
 
+        if (!$entityMergeConfig) {
+            throw new InvalidArgumentException(sprintf('Config for "%s" not exists', $className));
+        }
+
         /* @var ClassMetadata $doctrineMetadata */
         $doctrineMetadata = $this
             ->entityManager
@@ -83,23 +88,27 @@ class MetadataFactory
             ->getMetadataFactory()
             ->getMetadataFor($className);
 
-        /* @var ConfigInterface $config */
-        foreach ($this->configProvider->getConfigs($className) as $config) {
-            $fieldType = $config->getId()->getFieldType();
-            $fieldName = $config->getId()->getFieldName();
+        $configs = $this->configProvider->getConfigs($className);
 
-            if ($options = $config->all()) {
-                if (in_array($fieldType, self::$relationFieldTypes)) {
-                    $fieldMapping  = $doctrineMetadata->associationMappings[$fieldName];
-                    $mergeMetadata = new CollectionMetadata($options);
-                } else {
-                    $fieldMapping  = $doctrineMetadata->fieldMappings[$fieldName];
-                    $mergeMetadata = new FieldMetadata($options);
+        if ($configs) {
+            /* @var ConfigInterface $config */
+            foreach ($configs as $config) {
+                $fieldType = $config->getId()->getFieldType();
+                $fieldName = $config->getId()->getFieldName();
+
+                if ($options = $config->all()) {
+                    if (in_array($fieldType, self::$relationFieldTypes)) {
+                        $fieldMapping  = $doctrineMetadata->getAssociationMapping($fieldName);
+                        $mergeMetadata = new CollectionMetadata($options);
+                    } else {
+                        $fieldMapping  = $doctrineMetadata->getFieldMapping($fieldName);
+                        $mergeMetadata = new FieldMetadata($options);
+                    }
+
+                    $fieldDoctrineMetadata = new DoctrineMetadata($fieldMapping);
+                    $mergeMetadata->set(DoctrineMetadata::OPTION_NAME, $fieldDoctrineMetadata);
+                    $fieldMetadata[] = $mergeMetadata;
                 }
-
-                $fieldDoctrineMetadata = new DoctrineMetadata($fieldMapping);
-                $mergeMetadata->set(DoctrineMetadata::OPTION_NAME, $fieldDoctrineMetadata);
-                $fieldMetadata[] = $mergeMetadata;
             }
         }
 
@@ -129,8 +138,7 @@ class MetadataFactory
 
                 /* @var \Doctrine\ORM\Mapping\ClassMetadata $entityDoctrineMetadata */
                 $entityDoctrineMetadata = $doctrineMetadataFactory->getMetadataFor($entityClassName);
-                // @todo Some checks for array index is defined?
-                $fieldMapping           = $entityDoctrineMetadata->associationMappings[$fieldName];
+                $fieldMapping           = $entityDoctrineMetadata->getAssociationMapping($fieldName);
                 $fieldDoctrineMetadata  = new DoctrineMetadata($fieldMapping);
 
                 if ($fieldDoctrineMetadata->get('targetEntity') == $className) {

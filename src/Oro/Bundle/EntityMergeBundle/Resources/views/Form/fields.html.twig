@@ -1,1 +1,44 @@
-{# Dummy for form blocks #}
+{% block oro_entity_merge_widget %}
+    {#{{ form_widget(form, { 'attr': {'class': 'select2'} }) }}
+    {{ form_javascript(form) }}#}
+    <table style="width: 100%;">
+        <thead>
+            <tr>
+                <td>
+                    {# @todo: render entity as string #}
+                    {{ form_label(form.masterEntity) }}
+                </td>
+                {% for child in form.masterEntity %}
+                    <td>
+                        {{ form_widget(child) }}
+                        {{ form_label(child) }}
+                    </td>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for child in form.children.fields %}
+                {{ form_widget(child) }}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block oro_entity_merge_field_widget %}
+    <tr>
+        <td rowspan="2">
+            {{ form_label(form) }}
+        </td>
+        {% for child in form.children.sourceEntity %}
+            <td>
+                {{ form_widget(child) }}
+                {# @todo: render value here #}
+            </td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <td>
+            {{ form_rest(form) }}
+        </td>
+    </tr>
+{% endblock %}
