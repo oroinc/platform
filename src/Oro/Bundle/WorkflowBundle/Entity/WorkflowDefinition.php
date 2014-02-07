@@ -89,6 +89,18 @@ class WorkflowDefinition
     protected $startStep;
 
     /**
+     * @var WorkflowEntityAcl[]|Collection
+     *
+     * @ORM\OneToMany(
+     *      targetEntity="WorkflowEntityAcl",
+     *      mappedBy="definition",
+     *      orphanRemoval=true,
+     *      cascade={"all"}
+     * )
+     */
+    protected $entityAcls;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -96,6 +108,7 @@ class WorkflowDefinition
         $this->enabled = false;
         $this->configuration = array();
         $this->steps = new ArrayCollection();
+        $this->entityAcls = new ArrayCollection();
     }
 
     /**
@@ -313,7 +326,7 @@ class WorkflowDefinition
 
     /**
      * @param WorkflowStep $step
-     * @return WorkflowItem
+     * @return WorkflowDefinition
      */
     public function addStep(WorkflowStep $step)
     {
@@ -331,7 +344,7 @@ class WorkflowDefinition
 
     /**
      * @param WorkflowStep $step
-     * @return WorkflowItem
+     * @return WorkflowDefinition
      */
     public function removeStep(WorkflowStep $step)
     {
@@ -370,6 +383,96 @@ class WorkflowDefinition
     }
 
     /**
+     * @return WorkflowEntityAcl[]
+     */
+    public function getEntityAcls()
+    {
+        return $this->entityAcls;
+    }
+
+    /**
+     * @param WorkflowEntityAcl[]|Collection $entityAcl
+     * @return WorkflowDefinition
+     */
+    public function setEntityAcls($entityAcl)
+    {
+        $newAttributes = array();
+        foreach ($entityAcl as $acl) {
+            $newAttributes[] = $acl->getAttribute();
+        }
+
+        foreach ($this->entityAcls as $acl) {
+            if (!in_array($acl->getAttribute(), $newAttributes)) {
+                $this->removeEntityAcl($acl);
+            }
+        }
+
+        foreach ($entityAcl as $acl) {
+            $this->addEntityAcl($acl);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAcl $acl
+     * @return WorkflowDefinition
+     */
+    public function addEntityAcl(WorkflowEntityAcl $acl)
+    {
+        $attribute = $acl->getAttribute();
+
+        if (!$this->hasEntityAclByAttribute($attribute)) {
+            $acl->setDefinition($this);
+            $this->entityAcls->add($acl);
+        } else {
+            $this->getEntityAclByAttribute($attribute)->import($acl);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAcl $acl
+     * @return WorkflowDefinition
+     */
+    public function removeEntityAcl(WorkflowEntityAcl $acl)
+    {
+        $attribute = $acl->getAttribute();
+
+        if ($this->hasEntityAclByAttribute($attribute)) {
+            $acl = $this->getEntityAclByAttribute($attribute);
+            $this->entityAcls->removeElement($acl);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $attribute
+     * @return bool
+     */
+    public function hasEntityAclByAttribute($attribute)
+    {
+        return $this->getEntityAclByAttribute($attribute) !== null;
+    }
+
+    /**
+     * @param string $attribute
+     * @return null|WorkflowEntityAcl
+     */
+    public function getEntityAclByAttribute($attribute)
+    {
+        foreach ($this->entityAcls as $acl) {
+            if ($acl->getAttribute() == $attribute) {
+                return $acl;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param WorkflowDefinition $definition
      * @return WorkflowDefinition
      */
@@ -383,7 +486,8 @@ class WorkflowDefinition
             ->setConfiguration($definition->getConfiguration())
             ->setSteps($definition->getSteps())
             ->setStartStep($definition->getStartStep())
-            ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered());
+            ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
+            ->setEntityAcls($definition->getEntityAcls());
 
         return $this;
     }

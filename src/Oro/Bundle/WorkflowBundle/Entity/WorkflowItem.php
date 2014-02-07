@@ -98,6 +98,20 @@ class WorkflowItem
     protected $transitionRecords;
 
     /**
+     * ACL identities of related entities
+     *
+     * @var Collection|WorkflowEntityAclIdentity[]
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="WorkflowEntityAclIdentity",
+     *  mappedBy="workflowItem",
+     *  cascade={"all"},
+     *  orphanRemoval=true
+     * )
+     */
+    protected $aclIdentities;
+
+    /**
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
@@ -153,6 +167,7 @@ class WorkflowItem
     public function __construct()
     {
         $this->transitionRecords = new ArrayCollection();
+        $this->aclIdentities = new ArrayCollection();
         $this->closed = false;
         $this->data = new WorkflowData();
         $this->result = new WorkflowResult();
@@ -430,6 +445,96 @@ class WorkflowItem
         $this->transitionRecords->add($transitionRecord);
 
         return $this;
+    }
+
+    /**
+     * @return WorkflowEntityAclIdentity[]
+     */
+    public function getAclIdentities()
+    {
+        return $this->aclIdentities;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity[]|Collection $aclIdentities
+     * @return WorkflowItem
+     */
+    public function setAclIdentities($aclIdentities)
+    {
+        $newAttributes = array();
+        foreach ($aclIdentities as $aclIdentity) {
+            $newAttributes[] = $aclIdentity->getAclAttribute();
+        }
+
+        foreach ($this->aclIdentities as $aclIdentity) {
+            if (!in_array($aclIdentity->getAclAttribute(), $newAttributes)) {
+                $this->removeEntityAcl($aclIdentity);
+            }
+        }
+
+        foreach ($aclIdentities as $aclIdentity) {
+            $this->addEntityAcl($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity $aclIdentity
+     * @return WorkflowItem
+     */
+    public function addEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
+    {
+        $attribute = $aclIdentity->getAclAttribute();
+
+        if (!$this->hasAclIdentityByAttribute($attribute)) {
+            $aclIdentity->setWorkflowItem($this);
+            $this->aclIdentities->add($aclIdentity);
+        } else {
+            $this->getAclIdentityByAttribute($attribute)->import($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity $aclIdentity
+     * @return WorkflowItem
+     */
+    public function removeEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
+    {
+        $attribute = $aclIdentity->getAclAttribute();
+
+        if ($this->hasAclIdentityByAttribute($attribute)) {
+            $aclIdentity = $this->getAclIdentityByAttribute($attribute);
+            $this->aclIdentities->removeElement($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $attribute
+     * @return bool
+     */
+    public function hasAclIdentityByAttribute($attribute)
+    {
+        return $this->getAclIdentityByAttribute($attribute) !== null;
+    }
+
+    /**
+     * @param string $attribute
+     * @return null|WorkflowEntityAclIdentity
+     */
+    public function getAclIdentityByAttribute($attribute)
+    {
+        foreach ($this->aclIdentities as $aclIdentity) {
+            if ($aclIdentity->getAclAttribute() == $attribute) {
+                return $aclIdentity;
+            }
+        }
+
+        return null;
     }
 
     /**

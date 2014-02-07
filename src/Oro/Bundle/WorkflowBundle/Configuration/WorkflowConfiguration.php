@@ -9,6 +9,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 class WorkflowConfiguration implements ConfigurationInterface
 {
@@ -129,6 +130,12 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->isRequired()
                         ->cannotBeEmpty()
                     ->end()
+                    ->arrayNode('entity_acl')
+                        ->children()
+                            ->booleanNode('update')->end()
+                            ->booleanNode('delete')->end()
+                        ->end()
+                    ->end()
                     ->scalarNode('property_path')
                         ->defaultNull()
                     ->end()
@@ -136,6 +143,18 @@ class WorkflowConfiguration implements ConfigurationInterface
                         ->prototype('variable')
                         ->end()
                     ->end()
+                ->end()
+                ->validate()
+                    ->always(
+                        function ($value) {
+                            if (array_key_exists('entity_acl', $value) && $value['type'] != 'entity') {
+                                throw new WorkflowException(
+                                    'Entity ACL only can be defined for attributes with type "entity"'
+                                );
+                            }
+                            return $value;
+                        }
+                    )
                 ->end()
             ->end();
 

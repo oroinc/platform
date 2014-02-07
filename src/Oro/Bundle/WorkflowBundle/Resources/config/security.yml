@@ -1,0 +1,8 @@
+parameters:
+    oro_workflow.security.acl.voter.entity.class: Oro\Bundle\WorkflowBundle\Acl\Voter\WorkflowEntityVoter
+
+services:
+    oro_workflow.security.acl.voter.entity:
+        class: %oro_workflow.security.acl.voter.entity.class%
+        tags:
+            - { name: security.voter, priority: 500 }

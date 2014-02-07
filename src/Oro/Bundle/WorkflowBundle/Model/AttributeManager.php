@@ -82,6 +82,8 @@ class AttributeManager
     }
 
     /**
+     * Get related entity attribute
+     *
      * @return Attribute
      * @throws UnknownAttributeException
      */
@@ -92,5 +94,29 @@ class AttributeManager
         }
 
         return $this->attributes->get($this->entityAttributeName);
+    }
+
+    /**
+     * @param string $type
+     * @return Collection|Attribute[]
+     */
+    public function getAttributesByType($type)
+    {
+        return $this->attributes->filter(
+            function ($attribute) use ($type) {
+                /** @var Attribute $attribute */
+                return $attribute->getType() == $type;
+            }
+        );
+    }
+
+    /**
+     * Get list of all attributes with type entity
+     *
+     * @return Collection|Attribute[]
+     */
+    public function getEntityAttributes()
+    {
+        return $this->getAttributesByType('entity');
     }
 }
