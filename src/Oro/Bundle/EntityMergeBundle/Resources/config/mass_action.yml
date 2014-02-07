@@ -5,4 +5,4 @@ services:
         class: %oro_entity_merge.extension.mass_action.type.merge.class%
         scope: prototype
         tags:
-            - { name:  oro_DataGrid.extension.mass_action.type, type: merge }
+            - { name:  oro_datagrid.extension.mass_action.type, type: merge }

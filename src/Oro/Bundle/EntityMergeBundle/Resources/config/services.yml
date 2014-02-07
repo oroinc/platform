@@ -1,7 +1,17 @@
 parameters:
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
-
+    oro_entity_merge.mass_action.data_handler.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassActionHandler
+    oro_entity_merge.http_foundation.merge_data_request_factory.class: Oro\Bundle\EntityMergeBundle\HttpFoundation\MergeDataRequestFactory
 services:
+    oro_entity_merge.mass_action.data_handler:
+        class: %oro_entity_merge.mass_action.data_handler.class%
+    oro_entity_merge.http_foundation.merge_data_request_factory:
+        class: %oro_entity_merge.http_foundation.merge_data_request_factory.class%
+        score: request
+        public: true
+        calls:
+            - [setRequest, [@?request=]]
+
     oro_entity_merge.metadata.factory:
         class: %oro_entity_merge.metadata.factory.class%
         arguments:

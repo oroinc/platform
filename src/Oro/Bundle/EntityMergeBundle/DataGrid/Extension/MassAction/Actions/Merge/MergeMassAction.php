@@ -19,6 +19,10 @@ class MergeMassAction extends AbstractMassAction
             $options['frontend_handle'] = 'redirect';
         }
 
+        if (empty($options['handler'])) {
+            $options['handler'] = 'oro_entity_merge.mass_action.data_handler';
+        }
+
         if (empty($options['frontend_type'])) {
             $options['frontend_type'] = 'merge-mass';
         }
@@ -34,21 +38,9 @@ class MergeMassAction extends AbstractMassAction
             $options['max_element_count'] = '5';
         }
 
-        if (empty($options['entity_name'])) {
-            throw new \LogicException('There is no option "entity_name" for action "merge".');
-        }
-
         if (!isset($options['route_parameters'])) {
             $options['route_parameters'] = array();
         }
-
-        $options['route_parameters'] = array_merge(
-            (array)$options['route_parameters'],
-            array(
-                'data_identifier' => $options['data_identifier'],
-                'entity_name' => $options['entity_name']
-            )
-        );
 
         return parent::setOptions($options);
     }

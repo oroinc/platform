@@ -40,10 +40,8 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'data_identifier' => 'id',
                     'max_element_count' => '5',
                     'route' => 'oro_entity_merge',
-                    'route_parameters' => array(
-                        'data_identifier' => 'id',
-                        'entity_name' => 'SomeEntityClass',
-                    )
+                    'handler' => 'oro_entity_merge.mass_action.data_handler',
+                    'route_parameters'=>array()
                 )
             ),
             'override_values' => array(
@@ -54,9 +52,8 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'data_identifier' => 'code',
                     'max_element_count' => 10,
                     'route' => 'custom_route',
-                    'route_parameters' => array(
-                        'custom_parameter' => 'test_value'
-                    ),
+                    'handler' => 'oro_entity_merge.mass_action.data_handler',
+                    'route_parameters'=>array()
                 ),
                 'expected' => array(
                     'entity_name' => 'SomeEntityClass',
@@ -65,11 +62,8 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'data_identifier' => 'code',
                     'max_element_count' => 10,
                     'route' => 'custom_route',
-                    'route_parameters' => array(
-                        'data_identifier' => 'code',
-                        'entity_name' => 'SomeEntityClass',
-                        'custom_parameter' => 'test_value',
-                    )
+                    'handler' => 'oro_entity_merge.mass_action.data_handler',
+                    'route_parameters'=>array()
                 )
             )
         );
@@ -77,7 +71,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage There is no option "entity_name" for action "merge".
+     * @expectedExceptionMessage Trying to get name of unnamed object
      */
     public function testMergeMassActionSetOptionShouldThrowExceptionIfClassNameOptionIsEmpty()
     {

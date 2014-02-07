@@ -1,6 +1,6 @@
 config:
     map:
        '*':
-          'oro/DataGrid/merge-mass-action': 'oro/entity-merge/merge-mass-action'
+          'oro/datagrid/merge-mass-action': 'oro/entity-merge/merge-mass-action'
     paths:
         'oro/entity-merge/merge-mass-action': 'bundles/oroentitymerge/js/DataGrid/action/merge-mass-action.js'
