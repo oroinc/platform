@@ -152,6 +152,10 @@ class OroJquerySelect2HiddenType extends AbstractType
                         }
                     }
 
+                    if (!array_key_exists('route_parameters', $result)) {
+                        $result['route_parameters'] = array();
+                    }
+
                     if (empty($result['route_name'])) {
                         throw new InvalidConfigurationException(
                             'Option "configs.route_name" must be set.'
