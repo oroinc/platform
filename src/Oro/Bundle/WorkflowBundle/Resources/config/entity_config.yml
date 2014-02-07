@@ -1,0 +1,15 @@
+oro_entity_config:
+    workflow:
+        entity:
+            items:
+                primary:
+                    options:
+                        priority:           200
+                        default_value:      null
+                    form:
+                        type:               oro_workflow_select
+                        options:
+                            label:          'Active workflow'
+                            required:       false
+                            empty_value:    'none'
+                            block:          other

@@ -9,7 +9,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Exception\FormException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 
@@ -195,12 +194,14 @@ class OroJquerySelect2HiddenType extends AbstractType
 
         if ($form->getData()) {
             $result = array();
+            /** @var ConverterInterface $converter */
+            $converter = $options['converter'];
             if (isset($options['configs']['multiple']) && $options['configs']['multiple']) {
                 foreach ($form->getData() as $item) {
-                    $result[] = $options['converter']->convertItem($item);
+                    $result[] = $converter->convertItem($item);
                 }
             } else {
-                $result[] = $options['converter']->convertItem($form->getData());
+                $result[] = $converter->convertItem($form->getData());
             }
 
             $vars['attr'] = array(

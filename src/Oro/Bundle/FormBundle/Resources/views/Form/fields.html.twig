@@ -24,7 +24,8 @@
             var $field = $('#{{ id }}');
 
             {% block genemu_jqueryselect2_javascript_prototype %}
-                {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, configs.route_parameters) : '' %}
+                {% set routeParameters = configs.route_parameters is defined ? configs.route_parameters : [] %}
+                {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, routeParameters) : '' %}
                 {% if configs.placeholder is defined %}
                     {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
                 {% endif %}
