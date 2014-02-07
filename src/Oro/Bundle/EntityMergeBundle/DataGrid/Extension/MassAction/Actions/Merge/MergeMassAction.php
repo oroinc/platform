@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 class MergeMassAction extends AbstractMassAction
 {
     /** @var array */
-    protected $requiredOptions = ['route', 'class_name', 'id_property_name', 'max_element_count'];
+    protected $requiredOptions = ['route', 'entity_name', 'data_identifier', 'max_element_count'];
 
     /**
      * {@inheritDoc}
@@ -19,17 +19,27 @@ class MergeMassAction extends AbstractMassAction
             $options['frontend_handle'] = 'redirect';
         }
 
-        if (empty($options['route_parameters'])) {
-            $options['route_parameters'] = [];
+        if (empty($options['frontend_type'])) {
+            $options['frontend_type'] = 'merge-mass';
         }
+
         if (empty($options['route'])) {
             $options['route'] = 'oro_entity_merge';
         }
-        if (empty($options['id_property_name'])) {
-            $options['id_property_name'] = 'id';
+        if (empty($options['data_identifier'])) {
+            $options['data_identifier'] = 'id';
         }
         if (empty($options['max_element_count'])) {
             $options['max_element_count'] = '5';
+        }
+
+        if (empty($options['entity_name'])) {
+            throw new \LogicException('There is no option "entity_name" for action "merge".');
+        }
+
+        if (empty($options['route_parameters'])) {
+            $options['route_parameters'] = array('data_identifier' => $options['data_identifier'],
+                'entity_name' => $options['entity_name']);
         }
 
         return parent::setOptions($options);
