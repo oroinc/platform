@@ -1,0 +1,14 @@
+parameters:
+    oro_entity_merge.form.type.merge.class: Oro\Bundle\EntityMergeBundle\Form\Type\MergeType
+    oro_entity_merge.form.type.merge_field.class: Oro\Bundle\EntityMergeBundle\Form\Type\MergeFieldType
+
+services:
+    oro_entity_merge.form.type.merge:
+        class: %oro_entity_merge.form.type.merge.class%
+        tags:
+            - { name: form.type, alias: "oro_entity_merge" }
+
+    oro_entity_merge.form.type.merge_field:
+        class: %oro_entity_merge.form.type.merge_field.class%
+        tags:
+            - { name: form.type, alias: "oro_entity_merge_field" }
