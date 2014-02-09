@@ -136,39 +136,6 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * Creates an instance if Config class which stores configuration data for an object
-     * which is represented by the given id.
-     * The returned object is initialized with data specified $values argument.
-     *
-     * @param  ConfigIdInterface $configId
-     * @param  array             $values An associative array contains configuration properties
-     *                                   key = property name
-     *                                   value = property value
-     * @return Config
-     */
-    public function createConfig(ConfigIdInterface $configId, array $values)
-    {
-        $config = new Config($configId);
-        if ($configId instanceof FieldConfigId) {
-            $type          = PropertyConfigContainer::TYPE_FIELD;
-            $defaultValues = $this->getPropertyConfig()->getDefaultValues($type, $configId->getFieldType());
-        } else {
-            $type          = PropertyConfigContainer::TYPE_ENTITY;
-            $defaultValues = $this->getPropertyConfig()->getDefaultValues($type);
-        }
-
-        $values = array_merge($defaultValues, $values);
-
-        foreach ($values as $key => $value) {
-            $config->set($key, $value);
-        }
-
-        $this->merge($config);
-
-        return $config;
-    }
-
-    /**
      * Gets a list of ids for all classes (if $className is not specified) or all fields of
      * the given $className, which can be managed by this provider.
      *

@@ -12,8 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
-use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
+use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
@@ -445,6 +445,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateConfigEntityModel()
     {
+        $configId = new EntityConfigId(self::ENTITY_CLASS, 'test');
         $model = $this->createEntityConfigModel(self::ENTITY_CLASS, 'test');
         $this->modelManager->expects($this->once())
             ->method('findModel')
@@ -465,37 +466,38 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
         $propertyConfigContainer->expects($this->once())
+            ->method('getDefaultValues')
+            ->with($configId)
+            ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
+        $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
-            ->with(PropertyConfigContainer::TYPE_ENTITY)
-            ->will($this->returnValue(['translatable']));
-        $this->configProvider->expects($this->once())
+            ->with($configId)
+            ->will($this->returnValue(['translatable', 'translatable10']));
+        $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
-        $configId = new EntityConfigId(self::ENTITY_CLASS, 'test');
-        $config   = new Config($configId);
-        $this->configProvider->expects($this->once())
-            ->method('createConfig')
-            ->with(
-                $configId,
-                [
-                    'translatable' => 'oro.configtests.unit.fixture.demoentity.entity_translatable',
-                    'other'        => 'otherVal'
-                ]
-            )
-            ->will($this->returnValue($config));
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::NEW_ENTITY_CONFIG_MODEL,
-                new NewEntityConfigModelEvent($model, $this->configManager)
+                Events::NEW_ENTITY_CONFIG,
+                new EntityConfigEvent(self::ENTITY_CLASS, $this->configManager)
             );
 
+        $config   = new Config($configId);
+        $config->set('other', 'otherVal');
+        $config->set('translatable', 'oro.configtests.unit.fixture.demoentity.entity_translatable');
+        $config->set('other10', 'otherVal10');
+        $config->set('translatable10', 'oro.configtests.unit.fixture.demoentity.entity_translatable10');
         $result = $this->configManager->createConfigEntityModel(self::ENTITY_CLASS);
-        $this->assertSame($model, $result);
+        $this->assertEquals($model, $result);
+        $this->assertEquals(
+            [$config],
+            $this->configManager->getUpdateConfig()
+        );
 
         // test that a config for a created model is stored in a local cache
         $result = $this->configManager->getConfig($configId);
-        $this->assertSame($config, $result);
+        $this->assertEquals($config, $result);
     }
 
     public function testCreateConfigFieldModelForExistingModel()
@@ -517,6 +519,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateConfigFieldModel()
     {
+        $configId = new FieldConfigId(self::ENTITY_CLASS, 'test', 'id', 'int');
         $model = $this->createFieldConfigModel(
             $this->createEntityConfigModel(self::ENTITY_CLASS, 'test'),
             'test',
@@ -547,41 +550,43 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
         $propertyConfigContainer->expects($this->once())
+            ->method('getDefaultValues')
+            ->with($configId)
+            ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
+        $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
-            ->with(PropertyConfigContainer::TYPE_FIELD)
-            ->will($this->returnValue(['translatable']));
-        $this->configProvider->expects($this->once())
+            ->with($configId)
+            ->will($this->returnValue(['translatable', 'translatable10']));
+        $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
-        $configId = new FieldConfigId(self::ENTITY_CLASS, 'test', 'id', 'int');
-        $config   = new Config($configId);
-        $this->configProvider->expects($this->once())
-            ->method('createConfig')
-            ->with(
-                $configId,
-                [
-                    'translatable' => 'oro.configtests.unit.fixture.demoentity.id.translatable',
-                    'other'        => 'otherVal'
-                ]
-            )
-            ->will($this->returnValue($config));
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::NEW_FIELD_CONFIG_MODEL,
-                new NewFieldConfigModelEvent($model, $this->configManager)
+                Events::NEW_FIELD_CONFIG,
+                new FieldConfigEvent(self::ENTITY_CLASS, 'id', $this->configManager)
             );
 
+        $config   = new Config($configId);
+        $config->set('other', 'otherVal');
+        $config->set('translatable', 'oro.configtests.unit.fixture.demoentity.id.translatable');
+        $config->set('other10', 'otherVal10');
+        $config->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
         $result = $this->configManager->createConfigFieldModel(self::ENTITY_CLASS, 'id', 'int');
-        $this->assertSame($model, $result);
+        $this->assertEquals($model, $result);
+        $this->assertEquals(
+            [$config],
+            $this->configManager->getUpdateConfig()
+        );
 
         // test that a config for a created model is stored in a local cache
         $result = $this->configManager->getConfig($configId);
-        $this->assertSame($config, $result);
+        $this->assertEquals($config, $result);
     }
 
     public function testUpdateConfigEntityModelWithNoForce()
     {
+        $configId                        = new EntityConfigId(self::ENTITY_CLASS, 'test');
         $metadata                        = new EntityMetadata(self::ENTITY_CLASS);
         $metadata->defaultValues['test'] = [
             'translatable1' => 'labelVal1',
@@ -599,16 +604,16 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
+            ->with($this->identicalTo($configId))
             ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
-            ->with(PropertyConfigContainer::TYPE_ENTITY)
+            ->with($this->identicalTo($configId))
             ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
-        $configId = new EntityConfigId(self::ENTITY_CLASS, 'test');
-        $config   = new Config($configId);
+        $config = new Config($configId);
         $config->set('translatable2', 'labelVal2_old');
         $config->set('other2', 'otherVal2_old');
         $this->configProvider->expects($this->once())
@@ -616,12 +621,15 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($config));
 
-        // TODO: here is an error ('translatable2' and 'other2' must not be updated) - will be fixed soon
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::UPDATE_ENTITY_CONFIG);
+
         $expectedConfig = new Config($configId);
         $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.entity_translatable1');
         $expectedConfig->set('other1', 'otherVal1');
-        $expectedConfig->set('translatable2', 'oro.configtests.unit.fixture.demoentity.entity_translatable2');
-        $expectedConfig->set('other2', 'otherVal2');
+        $expectedConfig->set('translatable2', 'labelVal2_old');
+        $expectedConfig->set('other2', 'otherVal2_old');
         $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.entity_translatable10');
         $expectedConfig->set('other10', 'otherVal10');
 
@@ -642,6 +650,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateConfigEntityModelWithForce()
     {
+        $configId                        = new EntityConfigId(self::ENTITY_CLASS, 'test');
         $metadata                        = new EntityMetadata(self::ENTITY_CLASS);
         $metadata->defaultValues['test'] = [
             'translatable1' => 'labelVal1',
@@ -659,16 +668,16 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
+            ->with($this->identicalTo($configId))
             ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
         $propertyConfigContainer->expects($this->once())
             ->method('getTranslatableValues')
-            ->with(PropertyConfigContainer::TYPE_ENTITY)
+            ->with($this->identicalTo($configId))
             ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
-        $configId = new EntityConfigId(self::ENTITY_CLASS, 'test');
-        $config   = new Config($configId);
+        $config = new Config($configId);
         $config->set('translatable2', 'labelVal2_old');
         $config->set('other2', 'otherVal2_old');
         $this->configProvider->expects($this->once())
@@ -701,6 +710,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateConfigFieldModelWithNoForce()
     {
+        $configId        = new FieldConfigId(self::ENTITY_CLASS, 'test', 'id', 'int');
         $metadata        = new EntityMetadata(self::ENTITY_CLASS);
         $idFieldMetadata = new FieldMetadata(self::ENTITY_CLASS, 'id');
         $metadata->addPropertyMetadata($idFieldMetadata);
@@ -720,17 +730,16 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
+            ->with($this->identicalTo($configId))
             ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
-        // TODO: processing for translatable values is not implemented
-        //$propertyConfigContainer->expects($this->once())
-        //    ->method('getTranslatableValues')
-        //    ->with(PropertyConfigContainer::TYPE_ENTITY)
-        //    ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
-        $this->configProvider->expects($this->once())
+        $propertyConfigContainer->expects($this->once())
+            ->method('getTranslatableValues')
+            ->with($this->identicalTo($configId))
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+        $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
-        $configId = new FieldConfigId(self::ENTITY_CLASS, 'test', 'id', 'int');
-        $config   = new Config($configId);
+        $config = new Config($configId);
         $config->set('translatable2', 'labelVal2_old');
         $config->set('other2', 'otherVal2_old');
         $this->configProvider->expects($this->once())
@@ -738,14 +747,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($config));
 
-        // TODO: here is an error ('translatable2' and 'other2' must not be updated) - will be fixed soon
-        // TODO: processing for translatable values is not implemented
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.id.translatable1');
         $expectedConfig->set('other1', 'otherVal1');
-        $expectedConfig->set('translatable2', 'labelVal2');
-        $expectedConfig->set('other2', 'otherVal2');
-        $expectedConfig->set('translatable10', 'labelVal10');
+        $expectedConfig->set('translatable2', 'labelVal2_old');
+        $expectedConfig->set('other2', 'otherVal2_old');
+        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
         $expectedConfig->set('other10', 'otherVal10');
 
         $actualConfig = null;
@@ -765,6 +772,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testUpdateConfigFieldModelWithForce()
     {
+        $configId        = new FieldConfigId(self::ENTITY_CLASS, 'test', 'id', 'int');
         $metadata        = new EntityMetadata(self::ENTITY_CLASS);
         $idFieldMetadata = new FieldMetadata(self::ENTITY_CLASS, 'id');
         $metadata->addPropertyMetadata($idFieldMetadata);
@@ -784,17 +792,16 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ->getMock();
         $propertyConfigContainer->expects($this->once())
             ->method('getDefaultValues')
+            ->with($this->identicalTo($configId))
             ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
-        // TODO: processing for translatable values is not implemented
-        //$propertyConfigContainer->expects($this->once())
-        //    ->method('getTranslatableValues')
-        //    ->with(PropertyConfigContainer::TYPE_ENTITY)
-        //    ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
-        $this->configProvider->expects($this->once())
+        $propertyConfigContainer->expects($this->once())
+            ->method('getTranslatableValues')
+            ->with($this->identicalTo($configId))
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+        $this->configProvider->expects($this->any())
             ->method('getPropertyConfig')
             ->will($this->returnValue($propertyConfigContainer));
-        $configId = new FieldConfigId(self::ENTITY_CLASS, 'test', 'id', 'int');
-        $config   = new Config($configId);
+        $config = new Config($configId);
         $config->set('translatable2', 'labelVal2_old');
         $config->set('other2', 'otherVal2_old');
         $this->configProvider->expects($this->once())
@@ -802,14 +809,12 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($config));
 
-        // TODO: here is an error ('translatable2' and 'other2' must not be updated) - will be fixed soon
-        // TODO: processing for translatable values is not implemented
         $expectedConfig = new Config($configId);
-        $expectedConfig->set('translatable1', 'labelVal1');
+        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.id.translatable1');
         $expectedConfig->set('other1', 'otherVal1');
-        $expectedConfig->set('translatable2', 'labelVal2');
+        $expectedConfig->set('translatable2', 'oro.configtests.unit.fixture.demoentity.id.translatable2');
         $expectedConfig->set('other2', 'otherVal2');
-        $expectedConfig->set('translatable10', 'labelVal10');
+        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
         $expectedConfig->set('other10', 'otherVal10');
 
         $actualConfig = null;
@@ -830,14 +835,14 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function testPersistAndMerge()
     {
         $configId = new EntityConfigId(self::ENTITY_CLASS, 'test');
-        $config1   = new Config($configId);
+        $config1  = new Config($configId);
         $config1->set('val1', '1');
         $config1->set('val2', '2');
-        $config2   = new Config($configId);
+        $config2 = new Config($configId);
         $config2->set('val2', '2_new');
         $config2->set('val3', '3');
 
-        $expectedConfig   = new Config($configId);
+        $expectedConfig = new Config($configId);
         $expectedConfig->set('val1', '1');
         $expectedConfig->set('val2', '2_new');
         $expectedConfig->set('val3', '3');

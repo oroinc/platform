@@ -3,25 +3,27 @@
 namespace Oro\Bundle\EntityConfigBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-class NewEntityConfigModelEvent extends Event
+class EntityConfigEvent extends Event
 {
     /**
-     * @var EntityConfigModel
+     * @var string
      */
-    protected $configModel;
+    protected $className;
 
     /**
      * @var ConfigManager
      */
     protected $configManager;
 
-    public function __construct(EntityConfigModel $configModel, ConfigManager $configManager)
+    /**
+     * @param string        $className Entity class name
+     * @param ConfigManager $configManager
+     */
+    public function __construct($className, ConfigManager $configManager)
     {
-        $this->configModel   = $configModel;
+        $this->className     = $className;
         $this->configManager = $configManager;
     }
 
@@ -30,7 +32,7 @@ class NewEntityConfigModelEvent extends Event
      */
     public function getClassName()
     {
-        return $this->configModel->getClassName();
+        return $this->className;
     }
 
     /**

@@ -95,25 +95,6 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->entityConfig, $this->configProvider->getConfigById($entityConfigIdWithOtherScope));
     }
 
-    public function testCreateConfig()
-    {
-        $entityConfig = $this->configProvider->createConfig(
-            new EntityConfigId(DemoEntity::ENTITY_NAME, 'testScope'),
-            array('first' => 'test')
-        );
-
-        $this->entityConfig->set('first', 'test');
-        $this->assertEquals($this->entityConfig, $entityConfig);
-
-        $fieldConfig = $this->configProvider->createConfig(
-            new FieldConfigId(DemoEntity::ENTITY_NAME, 'testScope', 'testField', 'string'),
-            array('first' => 'test')
-        );
-
-        $this->fieldConfig->set('first', 'test');
-        $this->assertEquals($this->fieldConfig, $fieldConfig);
-    }
-
     public function testPersistFlush()
     {
         $this->configProvider->persist($this->entityConfig);
