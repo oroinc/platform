@@ -200,10 +200,17 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 $this->configCache->expects($this->once())
                     ->method('setConfigurable')
                     ->with($expectedResult, $className, $fieldName);
-                $this->modelManager->expects($this->once())
-                    ->method('findModel')
-                    ->with($className, $fieldName)
-                    ->will($this->returnValue($findModelResult));
+                if ($fieldName) {
+                    $this->modelManager->expects($this->once())
+                        ->method('findFieldModel')
+                        ->with($className, $fieldName)
+                        ->will($this->returnValue($findModelResult));
+                } else {
+                    $this->modelManager->expects($this->once())
+                        ->method('findEntityModel')
+                        ->with($className)
+                        ->will($this->returnValue($findModelResult));
+                }
             }
         }
 
@@ -359,7 +366,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function testHasConfigEntityModelWithNoModel()
     {
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findEntityModel')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue(null));
         $result = $this->configManager->hasConfigEntityModel(self::ENTITY_CLASS);
@@ -369,7 +376,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function testHasConfigEntityModel()
     {
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findEntityModel')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($this->createEntityConfigModel(self::ENTITY_CLASS, 'test')));
         $result = $this->configManager->hasConfigEntityModel(self::ENTITY_CLASS);
@@ -379,7 +386,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function testHasConfigFieldModelWithNoModel()
     {
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findFieldModel')
             ->with(self::ENTITY_CLASS, 'id')
             ->will($this->returnValue(null));
         $result = $this->configManager->hasConfigFieldModel(self::ENTITY_CLASS, 'id');
@@ -389,7 +396,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     public function testHasConfigFieldModel()
     {
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findFieldModel')
             ->with(self::ENTITY_CLASS, 'id')
             ->will(
                 $this->returnValue(
@@ -408,7 +415,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $model = $this->createEntityConfigModel(self::ENTITY_CLASS, 'test');
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findEntityModel')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($model));
         $result = $this->configManager->getConfigEntityModel(self::ENTITY_CLASS);
@@ -423,7 +430,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             'id'
         );
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findFieldModel')
             ->with(self::ENTITY_CLASS, 'id')
             ->will($this->returnValue($model));
         $result = $this->configManager->getConfigFieldModel(self::ENTITY_CLASS, 'id');
@@ -434,7 +441,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     {
         $model = $this->createEntityConfigModel(self::ENTITY_CLASS, 'test');
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findEntityModel')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue($model));
         $this->modelManager->expects($this->never())
@@ -448,7 +455,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $configId = new EntityConfigId(self::ENTITY_CLASS, 'test');
         $model = $this->createEntityConfigModel(self::ENTITY_CLASS, 'test');
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findEntityModel')
             ->with(self::ENTITY_CLASS)
             ->will($this->returnValue(null));
         $this->modelManager->expects($this->once())
@@ -508,7 +515,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             'id'
         );
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findFieldModel')
             ->with(self::ENTITY_CLASS, 'id')
             ->will($this->returnValue($model));
         $this->modelManager->expects($this->never())
@@ -526,7 +533,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             'id'
         );
         $this->modelManager->expects($this->once())
-            ->method('findModel')
+            ->method('findFieldModel')
             ->with(self::ENTITY_CLASS, 'id')
             ->will($this->returnValue(null));
         $this->modelManager->expects($this->once())

@@ -215,7 +215,10 @@ class ConfigManager
 
         $result = $this->cache->getConfigurable($className, $fieldName);
         if (null === $result) {
-            $result = (null !== $this->modelManager->findModel($className, $fieldName));
+            $model = $fieldName
+                ? $this->modelManager->findFieldModel($className, $fieldName)
+                : $this->modelManager->findEntityModel($className);
+            $result = (null !== $model);
 
             $this->cache->setConfigurable($result, $className, $fieldName);
         }
@@ -503,7 +506,7 @@ class ConfigManager
      */
     public function hasConfigEntityModel($className)
     {
-        return null !== $this->modelManager->findModel($className);
+        return null !== $this->modelManager->findEntityModel($className);
     }
 
     /**
@@ -515,7 +518,7 @@ class ConfigManager
      */
     public function hasConfigFieldModel($className, $fieldName)
     {
-        return null !== $this->modelManager->findModel($className, $fieldName);
+        return null !== $this->modelManager->findFieldModel($className, $fieldName);
     }
 
     /**
@@ -526,7 +529,7 @@ class ConfigManager
      */
     public function getConfigEntityModel($className)
     {
-        return $this->modelManager->findModel($className);
+        return $this->modelManager->findEntityModel($className);
     }
 
     /**
@@ -538,7 +541,7 @@ class ConfigManager
      */
     public function getConfigFieldModel($className, $fieldName)
     {
-        return $this->modelManager->findModel($className, $fieldName);
+        return $this->modelManager->findFieldModel($className, $fieldName);
     }
 
     /**
@@ -550,7 +553,7 @@ class ConfigManager
      */
     public function createConfigEntityModel($className, $mode = ConfigModelManager::MODE_DEFAULT)
     {
-        $entityModel = $this->modelManager->findModel($className);
+        $entityModel = $this->modelManager->findEntityModel($className);
         if (null === $entityModel) {
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
             $metadata    = $this->getEntityMetadata($className);
@@ -586,7 +589,7 @@ class ConfigManager
         $fieldType,
         $mode = ConfigModelManager::MODE_DEFAULT
     ) {
-        $fieldModel = $this->modelManager->findModel($className, $fieldName);
+        $fieldModel = $this->modelManager->findFieldModel($className, $fieldName);
         if (null === $fieldModel) {
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
             $metadata   = $this->getFieldMetadata($className, $fieldName);

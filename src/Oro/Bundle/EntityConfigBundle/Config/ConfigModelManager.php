@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 class ConfigModelManager
@@ -98,26 +99,21 @@ class ConfigModelManager
     }
 
     /**
-     * Finds a model for an entity or entity field
+     * Finds a model for an entity
      *
-     * @param string      $className
-     * @param string|null $fieldName
-     * @return AbstractConfigModel|null An instance of EntityConfigModel for an entity model;
-     *                                  An instance of FieldConfigModel for an entity field model;
-     *                                  null if a model was not found
+     * @param string $className
+     * @return EntityConfigModel|null An instance of EntityConfigModel or null if a model was not found
      */
-    public function findModel($className, $fieldName = null)
+    public function findEntityModel($className)
     {
-        if (in_array($className, $this->ignoreModel)) {
+        if (empty($className) || in_array($className, $this->ignoreModel)) {
             return null;
         }
 
         $result = false;
 
         // check if a model exists in the local cache
-        $cacheKey = $fieldName
-            ? $className . '::' . $fieldName
-            : $className;
+        $cacheKey = $this->buildEntityLocalCacheKey($className);
         if ($this->localCache->containsKey($cacheKey)) {
             $result = $this->localCache->get($cacheKey);
             if ($result && $this->isEntityDetached($result)) {
@@ -129,74 +125,89 @@ class ConfigModelManager
 
         // load a model if it was not found in the local cache
         if ($result === false) {
-            if ($fieldName) {
-                $result = $this->loadEntityFieldModel($className, $fieldName);
-            } else {
-                $result = $this->loadEntityModel($className);
-            }
+            $result = $this->loadEntityModel($className);
         }
 
         return $result;
     }
 
     /**
+     * Finds a model for an entity field
+     *
      * @param string $className
-     * @return EntityConfigModel|null
+     * @param string $fieldName
+     * @return FieldConfigModel|null An instance of FieldConfigModel or null if a model was not found
      */
-    protected function loadEntityModel($className)
+    public function findFieldModel($className, $fieldName)
     {
-        $result = $this->getEntityManager()
-            ->getRepository(EntityConfigModel::ENTITY_NAME)
-            ->findOneBy(['className' => $className]);
-        $this->localCache->set($className, $result);
+        if (empty($className) || empty($fieldName) || in_array($className, $this->ignoreModel)) {
+            return null;
+        }
+
+        $result = false;
+
+        // check if a model exists in the local cache
+        $cacheKey = $this->buildFieldLocalCacheKey($className, $fieldName);
+        if ($this->localCache->containsKey($cacheKey)) {
+            $result = $this->localCache->get($cacheKey);
+            if ($result && $this->isEntityDetached($result)) {
+                // the detached model must be reloaded
+                $result = false;
+                $this->removeFromLocalCache($className);
+            }
+        }
+
+        // load a model if it was not found in the local cache
+        if ($result === false) {
+            $result = $this->loadEntityFieldModel($className, $fieldName);
+        }
 
         return $result;
+    }
+
+    /**
+     * @param string      $className
+     * @return EntityConfigModel
+     * @throws \InvalidArgumentException if $className is empty
+     * @throws RuntimeException if a model was not found
+     */
+    public function getEntityModel($className)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+
+        $model = $this->findEntityModel($className);
+        if (!$model) {
+            throw new RuntimeException(
+                sprintf('A model for "%s" was not found ', $className)
+            );
+        }
+
+        return $model;
     }
 
     /**
      * @param string $className
      * @param string $fieldName
-     * @return FieldConfigModel|null
+     * @return FieldConfigModel
+     * @throws \InvalidArgumentException if $className or $fieldName is empty
+     * @throws RuntimeException if a model was not found
      */
-    protected function loadEntityFieldModel($className, $fieldName)
+    public function getFieldModel($className, $fieldName)
     {
-        $result = null;
-        if (!$this->localCache->containsKey($className . '::!')) {
-            // set a flag indicates that field models are loaded in the local cache
-            $this->localCache->set($className . '::!', true);
-            // load models for all fields and put them in the local cache
-            /** @var EntityConfigModel $entityModel */
-            $entityModel = $this->findModel($className);
-            if ($entityModel) {
-                foreach ($entityModel->getFields() as $fieldModel) {
-                    $this->localCache->set(
-                        $className . '::' . $fieldModel->getFieldName(),
-                        $fieldModel
-                    );
-                }
-                // get a field model from the local cache
-                $result = $this->localCache->get($className . '::' . $fieldName);
-            }
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty');
         }
 
-        return $result;
-    }
-
-    /**
-     * @param      $className
-     * @param null $fieldName
-     * @return null|AbstractConfigModel
-     * @throws RuntimeException
-     */
-    public function getModel($className, $fieldName = null)
-    {
-        $model = $this->findModel($className, $fieldName);
+        $model = $this->findFieldModel($className, $fieldName);
         if (!$model) {
-            $message = $fieldName
-                ? sprintf('FieldConfigModel "%s::%s" is not found ', $className, $fieldName)
-                : sprintf('EntityConfigModel "%s" is not found ', $className);
-
-            throw new RuntimeException($message);
+            throw new RuntimeException(
+                sprintf('A model for "%s::%s" was not found ', $className, $fieldName)
+            );
         }
 
         return $model;
@@ -208,9 +219,9 @@ class ConfigModelManager
      */
     public function getModelByConfigId(ConfigIdInterface $configId)
     {
-        $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
-
-        return $this->getModel($configId->getClassName(), $fieldName);
+        return $configId instanceof FieldConfigId
+            ? $this->getFieldModel($configId->getClassName(), $configId->getFieldName())
+            : $this->getEntityModel($configId->getClassName());
     }
 
     /**
@@ -220,7 +231,7 @@ class ConfigModelManager
     public function getModels($className = null)
     {
         if ($className) {
-            return $this->getModel($className)->getFields()->toArray();
+            return $this->getEntityModel($className)->getFields()->toArray();
         } else {
             $entityConfigModelRepo = $this->getEntityManager()->getRepository(EntityConfigModel::ENTITY_NAME);
 
@@ -245,7 +256,9 @@ class ConfigModelManager
         $entityModel = new EntityConfigModel($className);
         $entityModel->setMode($mode);
 
-        $this->localCache->set($className, $entityModel);
+        if (!empty($className)) {
+            $this->localCache->set($this->buildEntityLocalCacheKey($className), $entityModel);
+        }
 
         return $entityModel;
     }
@@ -266,16 +279,60 @@ class ConfigModelManager
             );
         }
 
-        /** @var EntityConfigModel $entityModel */
-        $entityModel = $this->getModel($className);
+        $entityModel = $this->getEntityModel($className);
 
         $fieldModel = new FieldConfigModel($fieldName, $fieldType);
         $fieldModel->setMode($mode);
         $entityModel->addField($fieldModel);
 
-        $this->localCache->set($className . '::' . $fieldName, $fieldModel);
+        if (!empty($fieldName)) {
+            $this->localCache->set($this->buildFieldLocalCacheKey($className, $fieldName), $fieldModel);
+        }
 
         return $fieldModel;
+    }
+
+    /**
+     * @param string $className
+     * @return EntityConfigModel|null
+     */
+    protected function loadEntityModel($className)
+    {
+        $result = $this->getEntityManager()
+            ->getRepository(EntityConfigModel::ENTITY_NAME)
+            ->findOneBy(['className' => $className]);
+        $this->localCache->set($this->buildEntityLocalCacheKey($className), $result);
+
+        return $result;
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @return FieldConfigModel|null
+     */
+    protected function loadEntityFieldModel($className, $fieldName)
+    {
+        $result                   = null;
+        $fieldsLoadedFlagCacheKey = $this->buildFieldLocalCacheKey($className, '!');
+        if (!$this->localCache->containsKey($fieldsLoadedFlagCacheKey)) {
+            // set a flag indicates that field models are loaded in the local cache
+            $this->localCache->set($fieldsLoadedFlagCacheKey, true);
+            // load models for all fields and put them in the local cache
+            $entityModel = $this->findEntityModel($className);
+            if ($entityModel) {
+                foreach ($entityModel->getFields() as $fieldModel) {
+                    $this->localCache->set(
+                        $this->buildFieldLocalCacheKey($className, $fieldModel->getFieldName()),
+                        $fieldModel
+                    );
+                }
+                // get a field model from the local cache
+                $result = $this->localCache->get($this->buildFieldLocalCacheKey($className, $fieldName));
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -309,5 +366,41 @@ class ConfigModelManager
             ->getEntityState($entity);
 
         return $entityState === UnitOfWork::STATE_DETACHED;
+    }
+
+    /**
+     * Returns a string unique identifies each config model
+     *
+     * @param string $className
+     * @return string
+     * @throws LogicException if $className is empty
+     */
+    protected function buildEntityLocalCacheKey($className)
+    {
+        if (empty($className)) {
+            throw new LogicException('$className must not be empty');
+        }
+
+        return $className;
+    }
+
+    /**
+     * Returns a string unique identifies each config model
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @return string
+     * @throws LogicException if $className or $fieldName is empty
+     */
+    protected function buildFieldLocalCacheKey($className, $fieldName)
+    {
+        if (empty($className)) {
+            throw new LogicException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new LogicException('$fieldName must not be empty');
+        }
+
+        return sprintf('%s::%s', $className, $fieldName);
     }
 }
