@@ -14,10 +14,6 @@ AG:
     currency_code: XCD
     phone_prefix: +1-268
     default_locale: en_AG
-AI:
-    currency_code: XCD
-    phone_prefix: +1-264
-    default_locale: en
 AL:
     currency_code: ALL
     phone_prefix: '355'
@@ -34,10 +30,6 @@ AR:
     currency_code: ARS
     phone_prefix: '54'
     default_locale: es_AR
-AS:
-    currency_code: USD
-    phone_prefix: +1-684
-    default_locale: en_AS
 AT:
     currency_code: EUR
     phone_prefix: '43'
@@ -46,14 +38,6 @@ AU:
     currency_code: AUD
     phone_prefix: '61'
     default_locale: en_AU
-AW:
-    currency_code: AWG
-    phone_prefix: '297'
-    default_locale: nl_AW
-AX:
-    currency_code: EUR
-    phone_prefix: +358-18
-    default_locale: sv_AX
 AZ:
     currency_code: AZN
     phone_prefix: '994'
@@ -98,10 +82,6 @@ BL:
     currency_code: EUR
     phone_prefix: '590'
     default_locale: fr
-BM:
-    currency_code: BMD
-    phone_prefix: +1-441
-    default_locale: en_BM
 BN:
     currency_code: BND
     phone_prefix: '673'
@@ -110,10 +90,6 @@ BO:
     currency_code: BOB
     phone_prefix: '591'
     default_locale: es_BO
-BQ:
-    currency_code: USD
-    phone_prefix: '599'
-    default_locale: nl
 BR:
     currency_code: BRL
     phone_prefix: '55'
@@ -142,10 +118,6 @@ CA:
     currency_code: CAD
     phone_prefix: '1'
     default_locale: en_CA
-CC:
-    currency_code: AUD
-    phone_prefix: '61'
-    default_locale: ms
 CD:
     currency_code: CDF
     phone_prefix: '243'
@@ -166,10 +138,6 @@ CI:
     currency_code: XOF
     phone_prefix: '225'
     default_locale: fr_CI
-CK:
-    currency_code: NZD
-    phone_prefix: '682'
-    default_locale: en
 CL:
     currency_code: CLP
     phone_prefix: '56'
@@ -198,14 +166,6 @@ CV:
     currency_code: CVE
     phone_prefix: '238'
     default_locale: pt_CV
-CW:
-    currency_code: ANG
-    phone_prefix: '599'
-    default_locale: nl
-CX:
-    currency_code: AUD
-    phone_prefix: '61'
-    default_locale: en
 CY:
     currency_code: EUR
     phone_prefix: '357'
@@ -250,10 +210,6 @@ EG:
     currency_code: EGP
     phone_prefix: '20'
     default_locale: ar_EG
-EH:
-    currency_code: MAD
-    phone_prefix: '212'
-    default_locale: ar
 ER:
     currency_code: ERN
     phone_prefix: '291'
@@ -274,18 +230,10 @@ FJ:
     currency_code: FJD
     phone_prefix: '679'
     default_locale: en_FJ
-FK:
-    currency_code: FKP
-    phone_prefix: '500'
-    default_locale: en
 FM:
     currency_code: USD
     phone_prefix: '691'
     default_locale: en_FM
-FO:
-    currency_code: DKK
-    phone_prefix: '298'
-    default_locale: fo
 FR:
     currency_code: EUR
     phone_prefix: '33'
@@ -306,10 +254,6 @@ GE:
     currency_code: GEL
     phone_prefix: '995'
     default_locale: ka
-GF:
-    currency_code: EUR
-    phone_prefix: '594'
-    default_locale: fr_GF
 GG:
     currency_code: GBP
     phone_prefix: +44-1481
@@ -318,10 +262,6 @@ GH:
     currency_code: GHS
     phone_prefix: '233'
     default_locale: en_GH
-GI:
-    currency_code: GIP
-    phone_prefix: '350'
-    default_locale: en_GI
 GL:
     currency_code: DKK
     phone_prefix: '299'
@@ -334,10 +274,6 @@ GN:
     currency_code: GNF
     phone_prefix: '224'
     default_locale: fr_GN
-GP:
-    currency_code: EUR
-    phone_prefix: '590'
-    default_locale: fr_GP
 GQ:
     currency_code: XAF
     phone_prefix: '240'
@@ -346,17 +282,10 @@ GR:
     currency_code: EUR
     phone_prefix: '30'
     default_locale: el_GR
-GS:
-    currency_code: GBP
-    default_locale: en
 GT:
     currency_code: GTQ
     phone_prefix: '502'
     default_locale: es_GT
-GU:
-    currency_code: USD
-    phone_prefix: +1-671
-    default_locale: en_GU
 GW:
     currency_code: XOF
     phone_prefix: '245'
@@ -365,10 +294,6 @@ GY:
     currency_code: GYD
     phone_prefix: '592'
     default_locale: en_GY
-HK:
-    currency_code: HKD
-    phone_prefix: '852'
-    default_locale: zh_HK
 HN:
     currency_code: HNL
     phone_prefix: '504'
@@ -405,10 +330,6 @@ IN:
     currency_code: INR
     phone_prefix: '91'
     default_locale: en_IN
-IO:
-    currency_code: USD
-    phone_prefix: '246'
-    default_locale: en
 IQ:
     currency_code: IQD
     phone_prefix: '964'
@@ -473,17 +394,10 @@ KR:
     currency_code: KRW
     phone_prefix: '82'
     default_locale: ko_KR
-XK:
-    currency_code: EUR
-    default_locale: sq
 KW:
     currency_code: KWD
     phone_prefix: '965'
     default_locale: ar_KW
-KY:
-    currency_code: KYD
-    phone_prefix: +1-345
-    default_locale: en_KY
 KZ:
     currency_code: KZT
     phone_prefix: '7'
@@ -496,10 +410,6 @@ LB:
     currency_code: LBP
     phone_prefix: '961'
     default_locale: ar_LB
-LC:
-    currency_code: XCD
-    phone_prefix: +1-758
-    default_locale: en_LC
 LI:
     currency_code: CHF
     phone_prefix: '423'
@@ -536,10 +446,6 @@ MA:
     currency_code: MAD
     phone_prefix: '212'
     default_locale: ar_MA
-MC:
-    currency_code: EUR
-    phone_prefix: '377'
-    default_locale: fr_MC
 MD:
     currency_code: MDL
     phone_prefix: '373'
@@ -580,22 +486,10 @@ MO:
     currency_code: MOP
     phone_prefix: '853'
     default_locale: zh
-MP:
-    currency_code: USD
-    phone_prefix: +1-670
-    default_locale: fil
-MQ:
-    currency_code: EUR
-    phone_prefix: '596'
-    default_locale: fr_MQ
 MR:
     currency_code: MRO
     phone_prefix: '222'
     default_locale: ar_MR
-MS:
-    currency_code: XCD
-    phone_prefix: +1-664
-    default_locale: en
 MT:
     currency_code: EUR
     phone_prefix: '356'
@@ -628,18 +522,10 @@ NA:
     currency_code: NAD
     phone_prefix: '264'
     default_locale: en_NA
-NC:
-    currency_code: XPF
-    phone_prefix: '687'
-    default_locale: fr_NC
 NE:
     currency_code: XOF
     phone_prefix: '227'
     default_locale: fr_NE
-NF:
-    currency_code: AUD
-    phone_prefix: '672'
-    default_locale: en
 NG:
     currency_code: NGN
     phone_prefix: '234'
@@ -664,10 +550,6 @@ NR:
     currency_code: AUD
     phone_prefix: '674'
     default_locale: en
-NU:
-    currency_code: NZD
-    phone_prefix: '683'
-    default_locale: en
 NZ:
     currency_code: NZD
     phone_prefix: '64'
@@ -684,10 +566,6 @@ PE:
     currency_code: PEN
     phone_prefix: '51'
     default_locale: es_PE
-PF:
-    currency_code: XPF
-    phone_prefix: '689'
-    default_locale: fr_PF
 PG:
     currency_code: PGK
     phone_prefix: '675'
@@ -704,18 +582,6 @@ PL:
     currency_code: PLN
     phone_prefix: '48'
     default_locale: pl
-PM:
-    currency_code: EUR
-    phone_prefix: '508'
-    default_locale: fr
-PN:
-    currency_code: NZD
-    phone_prefix: '870'
-    default_locale: en
-PR:
-    currency_code: USD
-    phone_prefix: +1-787
-    default_locale: en_PR
 PS:
     currency_code: ILS
     phone_prefix: '970'
@@ -736,10 +602,6 @@ QA:
     currency_code: QAR
     phone_prefix: '974'
     default_locale: ar_QA
-RE:
-    currency_code: EUR
-    phone_prefix: '262'
-    default_locale: fr_RE
 RO:
     currency_code: RON
     phone_prefix: '40'
@@ -772,10 +634,6 @@ SD:
     currency_code: SDG
     phone_prefix: '249'
     default_locale: ar_SD
-SS:
-    currency_code: SSP
-    phone_prefix: '211'
-    default_locale: en
 SE:
     currency_code: SEK
     phone_prefix: '46'
@@ -792,10 +650,6 @@ SI:
     currency_code: EUR
     phone_prefix: '386'
     default_locale: sl
-SJ:
-    currency_code: NOK
-    phone_prefix: '47'
-    default_locale: no
 SK:
     currency_code: EUR
     phone_prefix: '421'
@@ -828,10 +682,6 @@ SV:
     currency_code: USD
     phone_prefix: '503'
     default_locale: es_SV
-SX:
-    currency_code: ANG
-    phone_prefix: '599'
-    default_locale: nl
 SY:
     currency_code: SYP
     phone_prefix: '963'
@@ -840,17 +690,10 @@ SZ:
     currency_code: SZL
     phone_prefix: '268'
     default_locale: en_SZ
-TC:
-    currency_code: USD
-    phone_prefix: +1-649
-    default_locale: en_TC
 TD:
     currency_code: XAF
     phone_prefix: '235'
     default_locale: fr_TD
-TF:
-    currency_code: EUR
-    default_locale: fr
 TG:
     currency_code: XOF
     phone_prefix: '228'
@@ -863,10 +706,6 @@ TJ:
     currency_code: TJS
     phone_prefix: '992'
     default_locale: fr
-TK:
-    currency_code: NZD
-    phone_prefix: '690'
-    default_locale: en
 TL:
     currency_code: USD
     phone_prefix: '670'
@@ -927,10 +766,6 @@ UZ:
     currency_code: UZS
     phone_prefix: '998'
     default_locale: uz
-VA:
-    currency_code: EUR
-    phone_prefix: '379'
-    default_locale: it
 VC:
     currency_code: XCD
     phone_prefix: +1-784
@@ -939,14 +774,6 @@ VE:
     currency_code: VEF
     phone_prefix: '58'
     default_locale: es_VE
-VG:
-    currency_code: USD
-    phone_prefix: +1-284
-    default_locale: en_VG
-VI:
-    currency_code: USD
-    phone_prefix: +1-340
-    default_locale: en_VI
 VN:
     currency_code: VND
     phone_prefix: '84'
@@ -954,10 +781,6 @@ VN:
 VU:
     currency_code: VUV
     phone_prefix: '678'
-    default_locale: fr
-WF:
-    currency_code: XPF
-    phone_prefix: '681'
     default_locale: fr
 WS:
     currency_code: WST
@@ -967,10 +790,6 @@ YE:
     currency_code: YER
     phone_prefix: '967'
     default_locale: ar_YE
-YT:
-    currency_code: EUR
-    phone_prefix: '262'
-    default_locale: fr_YT
 ZA:
     currency_code: ZAR
     phone_prefix: '27'
@@ -983,11 +802,3 @@ ZW:
     currency_code: ZWL
     phone_prefix: '263'
     default_locale: en_ZW
-CS:
-    currency_code: RSD
-    phone_prefix: '381'
-    default_locale: sr
-AN:
-    currency_code: ANG
-    phone_prefix: '599'
-    default_locale: nl

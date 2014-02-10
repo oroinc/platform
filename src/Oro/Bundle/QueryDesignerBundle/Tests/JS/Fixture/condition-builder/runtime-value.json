@@ -1,0 +1,21 @@
+[
+    [
+        {"criteria": "matrix-condition", "great": 12},
+        "AND",
+        {"criteria": "matrix-condition", "less": 100}
+    ],
+    "OR",
+    [
+        [
+            {"equal": 98},
+            "OR",
+            {"equal": 17},
+            "OR",
+            {"equal": 23},
+            "OR",
+            {"equal": 85}
+        ],
+        "AND",
+        {"criteria": "matrix-condition", "less": 12}
+    ]
+]

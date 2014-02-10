@@ -71,35 +71,16 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityIdentifier($entity, $class)
     {
-        $entityManager = $this->getMockBuilder('Doctrine\Orm\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata'))
-            ->getMock();
+        $identifierArray = array('id' => self::TEST_IDENTIFIER);
 
-        if ($entity instanceof Proxy) {
-            $entityManager->expects($this->never())
-                ->method('getClassMetadata');
-        } else {
-            $classMetadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->getMockForAbstractClass();
-            $classMetadata->expects($this->once())
-                ->method('getIdentifierValues')
-                ->with($entity)
-                ->will($this->returnValue(self::TEST_IDENTIFIER));
-
-            $entityManager->expects($this->once())
-                ->method('getClassMetadata')
-                ->with($class)
-                ->will($this->returnValue($classMetadata));
-        }
+        $entityManager = $this->getEntityManagerMockForEntityAndClass($entity, $class, $identifierArray);
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with($class)
             ->will($this->returnValue($entityManager));
 
-        $this->assertEquals(self::TEST_IDENTIFIER, $this->doctrineHelper->getEntityIdentifier($entity));
+        $this->assertEquals($identifierArray, $this->doctrineHelper->getEntityIdentifier($entity));
     }
 
     public function testGetEntityIdentifierNotManageableEntity()
@@ -129,7 +110,64 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
                 'entity' => new ItemStub(),
                 'class'  => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
             ),
+            'entity proxy' => array(
+                'entity' => new ItemStubProxy(),
+                'class'  => 'ItemStubProxy',
+            ),
         );
+    }
+
+    public function testGetSingleEntityIdentifier()
+    {
+        $entity = new ItemStubProxy();
+        $class = 'ItemStubProxy';
+        $identifierArray = array('id' => self::TEST_IDENTIFIER);
+
+        $entityManager = $this->getEntityManagerMockForEntityAndClass($entity, $class, $identifierArray);
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($entityManager));
+
+        $this->assertEquals(self::TEST_IDENTIFIER, $this->doctrineHelper->getSingleEntityIdentifier($entity));
+    }
+
+    /**
+     * @return array
+     */
+    public function getSingleEntityIdentifierIncorrectIdentifierDataProvider()
+    {
+        return array(
+            'empty identifier' => array(
+                'identifier' => array(),
+            ),
+            'multiple identifier' => array(
+                'identifier' => array('key1' => 'value1', 'key2' => 'value2'),
+            ),
+        );
+    }
+
+    /**
+     * @param array $identifier
+     * @dataProvider getSingleEntityIdentifierIncorrectIdentifierDataProvider
+     *
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Can't get single identifier for the entity
+     */
+    public function testGetSingleEntityIdentifierIncorrectIdentifier(array $identifier)
+    {
+        $entity = new ItemStubProxy();
+        $class = 'ItemStubProxy';
+
+        $entityManager = $this->getEntityManagerMockForEntityAndClass($entity, $class, $identifier);
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($entityManager));
+
+        $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
     /**
@@ -198,5 +236,34 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             $expectedResult,
             $this->doctrineHelper->getEntityReference($entityClass, $entityId)
         );
+    }
+
+    /**
+     * @param object $entity
+     * @param string $class
+     * @param mixed $identifier
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getEntityManagerMockForEntityAndClass($entity, $class, $identifier)
+    {
+        $entityManager = $this->getMockBuilder('Doctrine\Orm\EntityManager')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getClassMetadata'))
+            ->getMock();
+
+        $classMetadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($entity)
+            ->will($this->returnValue($identifier));
+
+        $entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($classMetadata));
+
+        return $entityManager;
     }
 }
