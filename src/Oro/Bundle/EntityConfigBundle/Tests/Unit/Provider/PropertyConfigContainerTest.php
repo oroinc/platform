@@ -259,22 +259,22 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testFieldVal']
             ],
             'no entity config (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [],
                 [],
             ],
             'entity config (by id)'    => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 ['entity' => ['items' => ['test' => 'testVal']]],
                 ['test' => 'testVal']
             ],
             'no field config (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [],
                 [],
             ],
             'field config (by id)'     => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 ['field' => ['items' => ['test' => 'testFieldVal']]],
                 ['test' => 'testFieldVal']
             ],
@@ -304,7 +304,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'entity config (by id)'                => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 null,
                 [
                     'entity' => $this->getItemsForDefaultValuesTest()
@@ -330,7 +330,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (no field type) (by id)' => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 null,
                 [
                     'field' => $this->getItemsForDefaultValuesTest()
@@ -355,7 +355,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (by id)'                 => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 'string',
                 [
                     'field' => $this->getItemsForDefaultValuesTest()
@@ -422,7 +422,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'entity config (by id)'                => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => $this->getItemsForRequiredPropertyValuesTest()
                 ],
@@ -442,7 +442,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (no field type) (by id)' => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => $this->getItemsForRequiredPropertyValuesTest()
                 ],
@@ -497,7 +497,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'entity config (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => $this->getItemsForNotAuditableValuesTest()
                 ],
@@ -521,7 +521,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => $this->getItemsForNotAuditableValuesTest()
                 ],
@@ -599,7 +599,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['item1']
             ],
             'entity config (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => $this->getItemsForTranslatableValuesTest()
                 ],
@@ -613,7 +613,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['item1']
             ],
             'field config (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => $this->getItemsForTranslatableValuesTest()
                 ],
@@ -665,7 +665,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'entity config (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => $this->getItemsForSerializableValuesTest()
                 ],
@@ -685,7 +685,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => $this->getItemsForSerializableValuesTest()
                 ],
@@ -756,7 +756,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'entity config (by id)'                   => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 null,
                 [
                     'entity' => $this->getItemsForFormItemsTest()
@@ -800,7 +800,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (no field type) (by id)'    => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 null,
                 [
                     'field' => $this->getItemsForFormItemsTest()
@@ -844,7 +844,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (by id)'                    => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 'string',
                 [
                     'field' => $this->getItemsForFormItemsTest()
@@ -880,7 +880,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'field config (not allowed type) (by id)' => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 'int',
                 [
                     'field' => $this->getItemsForFormItemsTest()
@@ -964,7 +964,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 true
             ],
             'entity config (by id)'                   => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 null,
                 [
                     'entity' => $this->getItemsForFormItemsTest()
@@ -980,7 +980,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 true
             ],
             'field config (no field type) (by id)'    => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 null,
                 [
                     'field' => $this->getItemsForFormItemsTest()
@@ -996,7 +996,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 true
             ],
             'field config (by id)'                    => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 'string',
                 [
                     'field' => $this->getItemsForFormItemsTest()
@@ -1012,7 +1012,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 true
             ],
             'field config (not allowed type) (by id)' => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 'int',
                 [
                     'field' => $this->getItemsForFormItemsTest()
@@ -1055,7 +1055,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (by id)'                => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'form' => [
@@ -1066,7 +1066,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['type' => 'SomeForm']
             ],
             'entity config (no form type) (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'form' => [
@@ -1097,7 +1097,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (by id)'                 => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'form' => [
@@ -1108,7 +1108,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['type' => 'SomeForm']
             ],
             'field config (no form type) (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'form' => [
@@ -1155,7 +1155,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 null
             ],
             'entity config (by id)'                   => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'form' => [
@@ -1168,7 +1168,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'entity config (no block config) (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'form' => [
@@ -1201,7 +1201,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 null
             ],
             'field config (by id)'                    => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'form' => [
@@ -1214,7 +1214,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'field config (no block config) (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'form' => [
@@ -1267,7 +1267,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (by id)'                      => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'grid_action' => [
@@ -1278,7 +1278,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'entity config (empty grid actions) (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'grid_action' => [
@@ -1288,7 +1288,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (no grid actions) (by id)'    => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                     ]
@@ -1325,7 +1325,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (by id)'                       => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'grid_action' => [
@@ -1336,7 +1336,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'field config (empty grid actions) (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'grid_action' => [
@@ -1346,7 +1346,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (no grid actions) (by id)'     => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                     ]
@@ -1397,7 +1397,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 null
             ],
             'entity config (by id)'                => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'update_filter' => [
@@ -1408,7 +1408,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'entity config (empty filter) (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'update_filter' => [
@@ -1418,7 +1418,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (no filter) (by id)'    => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                     ]
@@ -1455,7 +1455,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 null
             ],
             'field config (by id)'                 => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'update_filter' => [
@@ -1466,7 +1466,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'field config (empty filter) (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'update_filter' => [
@@ -1476,7 +1476,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (no filter) (by id)'     => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                     ]
@@ -1527,7 +1527,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (by id)'                 => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'layout_action' => [
@@ -1538,7 +1538,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'entity config (empty actions) (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'layout_action' => [
@@ -1548,7 +1548,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (no actions) (by id)'    => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                     ]
@@ -1585,7 +1585,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (by id)'                  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'layout_action' => [
@@ -1596,7 +1596,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'field config (empty actions) (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'layout_action' => [
@@ -1606,7 +1606,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (no actions) (by id)'     => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                     ]
@@ -1657,7 +1657,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (by id)'                 => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'require_js' => [
@@ -1668,7 +1668,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'entity config (empty modules) (by id)' => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                         'require_js' => [
@@ -1678,7 +1678,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'entity config (no modules) (by id)'    => [
-                new EntityConfigId('Test\Cls', 'testScope'),
+                new EntityConfigId('testScope', 'Test\Cls'),
                 [
                     'entity' => [
                     ]
@@ -1715,7 +1715,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (by id)'                  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'require_js' => [
@@ -1726,7 +1726,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 ['test' => 'testVal']
             ],
             'field config (empty modules) (by id)'  => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                         'require_js' => [
@@ -1736,7 +1736,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                 []
             ],
             'field config (no modules) (by id)'     => [
-                new FieldConfigId('Test\Cls', 'testScope', 'fieldName'),
+                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 [
                     'field' => [
                     ]

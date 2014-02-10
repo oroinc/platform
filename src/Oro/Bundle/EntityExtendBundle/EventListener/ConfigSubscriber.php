@@ -210,8 +210,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
 
             $targetFieldId = new FieldConfigId(
-                $targetEntityClass,
                 $scope,
+                $targetEntityClass,
                 $relationFieldName,
                 ExtendHelper::getReversRelationType($selfFieldType)
             );

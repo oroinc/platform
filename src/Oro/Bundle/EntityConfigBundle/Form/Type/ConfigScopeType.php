@@ -103,9 +103,9 @@ class ConfigScopeType extends AbstractType
                             : $this->config->getId()->getScope();
 
                         if ($fieldName) {
-                            $configId = new FieldConfigId($className, $scope, $fieldName);
+                            $configId = new FieldConfigId($scope, $className, $fieldName);
                         } else {
-                            $configId = new EntityConfigId($className, $scope);
+                            $configId = new EntityConfigId($scope, $className);
                         }
 
                         //check if requirement property isset in this form

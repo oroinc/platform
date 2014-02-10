@@ -4,11 +4,20 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config\Id;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
-class EntityIdTest extends \PHPUnit_Framework_TestCase
+class EntityConfigIdTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetConfig()
+    /**
+     * @dataProvider emptyNameProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyScope($scope)
     {
-        $entityId = new EntityConfigId('Test\Class', 'testScope');
+        new EntityConfigId($scope, 'Test\Class');
+    }
+
+    public function testEntityConfigId()
+    {
+        $entityId = new EntityConfigId('testScope', 'Test\Class');
 
         $this->assertEquals('Test\Class', $entityId->getClassName());
         $this->assertEquals('testScope', $entityId->getScope());
@@ -17,7 +26,7 @@ class EntityIdTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $entityId = new EntityConfigId('Test\Class', 'testScope');
+        $entityId = new EntityConfigId('testScope', 'Test\Class');
 
         $this->assertEquals($entityId, unserialize(serialize($entityId)));
     }
@@ -32,5 +41,13 @@ class EntityIdTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals('Test\Class', $entityId->getClassName());
         $this->assertEquals('testScope', $entityId->getScope());
+    }
+
+    public function emptyNameProvider()
+    {
+        return [
+            [null],
+            [''],
+        ];
     }
 }

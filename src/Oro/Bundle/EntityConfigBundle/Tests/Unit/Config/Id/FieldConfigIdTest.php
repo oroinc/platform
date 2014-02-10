@@ -4,11 +4,38 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config\Id;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
-class FieldIdTest extends \PHPUnit_Framework_TestCase
+class FieldConfigIdTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetConfig()
+    /**
+     * @dataProvider emptyNameProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyScope($scope)
     {
-        $fieldId = new FieldConfigId('Test\Class', 'testScope', 'testField', 'string');
+        new FieldConfigId($scope, 'Test\Class', 'testField', 'int');
+    }
+
+    /**
+     * @dataProvider emptyNameProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyClassName($className)
+    {
+        new FieldConfigId('testScope', $className, 'testField', 'int');
+    }
+
+    /**
+     * @dataProvider emptyNameProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyFieldName($fieldName)
+    {
+        new FieldConfigId('testScope', 'Test\Class', $fieldName, 'int');
+    }
+
+    public function testFieldConfigId()
+    {
+        $fieldId = new FieldConfigId('testScope', 'Test\Class', 'testField', 'string');
 
         $this->assertEquals('Test\Class', $fieldId->getClassName());
         $this->assertEquals('testScope', $fieldId->getScope());
@@ -22,7 +49,7 @@ class FieldIdTest extends \PHPUnit_Framework_TestCase
 
     public function testSerialize()
     {
-        $fieldId = new FieldConfigId('Test\Class', 'testScope', 'testField', 'string');
+        $fieldId = new FieldConfigId('testScope', 'Test\Class', 'testField', 'string');
 
         $this->assertEquals($fieldId, unserialize(serialize($fieldId)));
     }
@@ -41,5 +68,13 @@ class FieldIdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testScope', $fieldId->getScope());
         $this->assertEquals('testField', $fieldId->getFieldName());
         $this->assertEquals('string', $fieldId->getFieldType());
+    }
+
+    public function emptyNameProvider()
+    {
+        return [
+            [null],
+            [''],
+        ];
     }
 }

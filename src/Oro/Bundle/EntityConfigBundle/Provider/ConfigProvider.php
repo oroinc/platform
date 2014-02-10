@@ -70,16 +70,20 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * Gets an instance of FieldConfigId or EntityConfigId depends on the given parameters.
      *
-     * @param string      $className
+     * @param string|null $className
      * @param string|null $fieldName
      * @param string|null $fieldType
      * @return ConfigIdInterface
      */
-    public function getId($className, $fieldName = null, $fieldType = null)
+    public function getId($className = null, $fieldName = null, $fieldType = null)
     {
+        if ($className) {
+            $className = $this->getClassName($className);
+        }
+
         return $fieldName
-            ? new FieldConfigId($this->getClassName($className), $this->getScope(), $fieldName, $fieldType)
-            : new EntityConfigId($this->getClassName($className), $this->getScope());
+            ? new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType)
+            : new EntityConfigId($this->getScope(), $className);
     }
 
     /**

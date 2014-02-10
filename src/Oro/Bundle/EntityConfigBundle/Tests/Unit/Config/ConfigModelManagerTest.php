@@ -440,7 +440,6 @@ class ConfigModelManagerTest extends OrmTestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage EntityConfigModel give invalid parameter "mode" : "wrongMode"
      */
     public function testCreateEntityModelException()
     {
@@ -449,7 +448,6 @@ class ConfigModelManagerTest extends OrmTestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage FieldConfigModel give invalid parameter "mode" : "wrongMode"
      */
     public function testCreateFieldModelException()
     {
