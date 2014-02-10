@@ -22,7 +22,7 @@ class AttributeManager
     /**
      * @param Attribute[]|Collection $attributes
      */
-    public function __construct(Collection $attributes = null)
+    public function __construct($attributes = null)
     {
         $this->setAttributes($attributes);
     }

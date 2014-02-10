@@ -16,6 +16,9 @@ return array(
                 'label' => 'First Step',
                 'order' => 1,
                 'is_final' => true,
+                'entity_acl' => array(
+                    'first_attribute' => array('update' => false, 'delete' => true)
+                ),
                 'allowed_transitions' => array('first_transition'),
             )
         ),
@@ -30,9 +33,15 @@ return array(
             ),
             'second_attribute' => array(
                 'label' => 'Second Attribute',
-                'type' => 'string',
+                'type' => 'entity',
+                'entity_acl' => array(
+                    'update' => true,
+                    'delete' => false,
+                ),
                 'property_path' => 'first_attribute.test',
-                'options' => array()
+                'options' => array(
+                    'class' => 'DateTime',
+                )
             )
         ),
         'transitions' => array(
@@ -105,6 +114,7 @@ return array(
                 'order' => 1,
                 'is_final' => false,
                 'allowed_transitions' => array(),
+                'entity_acl' => array(),
             )
         ),
         'attributes' => array(),

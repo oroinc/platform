@@ -11,6 +11,9 @@ workflows:
                 label: 'First Step'
                 order: 1
                 is_final: true
+                entity_acl:
+                    first_attribute:
+                        update: false
                 allowed_transitions:
                     - first_transition
         attributes:
@@ -21,8 +24,12 @@ workflows:
                     class: DateTime
             second_attribute:
                 label: 'Second Attribute'
-                type: string
+                type: entity
                 property_path: first_attribute.test
+                entity_acl:
+                    delete: false
+                options:
+                    class: DateTime
         transitions:
             first_transition:
                 label: 'First Transition'

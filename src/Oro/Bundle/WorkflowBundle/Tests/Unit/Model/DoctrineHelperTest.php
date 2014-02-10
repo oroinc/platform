@@ -117,20 +117,45 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetSingleEntityIdentifier()
+    /**
+     * @param $expected
+     * @param array $actual
+     * @param bool $exception
+     * @dataProvider getSingleEntityIdentifierDataProvider
+     */
+    public function testGetSingleEntityIdentifier($expected, array $actual, $exception = true)
     {
         $entity = new ItemStubProxy();
         $class = 'ItemStubProxy';
-        $identifierArray = array('id' => self::TEST_IDENTIFIER);
 
-        $entityManager = $this->getEntityManagerMockForEntityAndClass($entity, $class, $identifierArray);
+        $entityManager = $this->getEntityManagerMockForEntityAndClass($entity, $class, $actual);
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with($class)
             ->will($this->returnValue($entityManager));
 
-        $this->assertEquals(self::TEST_IDENTIFIER, $this->doctrineHelper->getSingleEntityIdentifier($entity));
+        $this->assertEquals($expected, $this->doctrineHelper->getSingleEntityIdentifier($entity, $exception));
+    }
+
+    public function getSingleEntityIdentifierDataProvider()
+    {
+        return array(
+            'valid identifier' => array(
+                'expected' => self::TEST_IDENTIFIER,
+                'actual' => array('id' => self::TEST_IDENTIFIER),
+            ),
+            'empty identifier, no exception' => array(
+                'expected' => null,
+                'actual' => array('first_id' => 1, 'second_id'),
+                'exception' => false,
+            ),
+            'multiple identifier, no exception' => array(
+                'expected' => null,
+                'actual' => array('first_id' => 1, 'second_id'),
+                'exception' => false,
+            ),
+        );
     }
 
     /**

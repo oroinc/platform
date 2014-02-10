@@ -383,7 +383,7 @@ class WorkflowDefinition
     }
 
     /**
-     * @return WorkflowEntityAcl[]
+     * @return WorkflowEntityAcl[]|Collection
      */
     public function getEntityAcls()
     {

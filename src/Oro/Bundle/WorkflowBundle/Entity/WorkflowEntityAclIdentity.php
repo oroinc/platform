@@ -21,7 +21,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  *          )
  *      }
  * )
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository")
  */
 class WorkflowEntityAclIdentity
 {

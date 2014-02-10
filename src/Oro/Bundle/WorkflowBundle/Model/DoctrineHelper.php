@@ -44,17 +44,24 @@ class DoctrineHelper
 
     /**
      * @param object $entity
-     * @return integer
+     * @param bool $triggerException
+     * @return integer|null
      * @throws WorkflowException
      */
-    public function getSingleEntityIdentifier($entity)
+    public function getSingleEntityIdentifier($entity, $triggerException = true)
     {
         $entityIdentifier = $this->getEntityIdentifier($entity);
+
+        $result = null;
         if (count($entityIdentifier) != 1) {
-            throw new WorkflowException('Can\'t get single identifier for the entity');
+            if ($triggerException) {
+                throw new WorkflowException('Can\'t get single identifier for the entity');
+            }
+        } else {
+            $result = current($entityIdentifier);
         }
 
-        return current($entityIdentifier);
+        return $result;
     }
 
     /**

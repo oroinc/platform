@@ -28,6 +28,8 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowItem
 {
@@ -451,7 +453,7 @@ class WorkflowItem
     }
 
     /**
-     * @return WorkflowEntityAclIdentity[]
+     * @return WorkflowEntityAclIdentity[]|Collection
      */
     public function getAclIdentities()
     {
