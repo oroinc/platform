@@ -12,7 +12,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
                 // see jquery-ui sortable's options
                 placeholder: 'sortable-placeholder',
                 items: '>[data-criteria]',
-                connectWith: '[data-criteria=conditions-group]'
+                connectWith: '.conditions-group'
             },
             conditionsGroup: {
                 items: '>.condition[data-criteria]',
@@ -61,11 +61,9 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             this._initCriteriaList();
             this._initConditionBuilder();
             this._updateOperators();
-            this._on({
-                closed: this._onConditionClose
-            });
             this.element
-                .on('change', '.operator', $.proxy(this._onChangeOperator, this));
+                .on('change', '.operator', $.proxy(this._onChangeOperator, this))
+                .on('click', '.close', $.proxy(this._onConditionClose, this));
         },
 
         _getCreateOptions: function () {
@@ -79,6 +77,9 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             opts.conditionsGroup.appendTo = opts.criteriaListSelector;
             opts.conditionsGroup.helper = $.proxy(this._createHelper, this);
             opts.conditionsGroup.update = $.proxy(this._onHierarchyChange, this);
+            opts.conditionsGroup.remove = function () {
+                $(this).trigger('changed');
+            };
             opts.criteriaList = $.extend({}, opts.sortable, opts.criteriaList);
             opts.criteriaList.start = $.proxy(this._onCriteriaGrab, this);
             opts.criteriaList.stop = $.proxy(this._onCriteriaDrop, this);
@@ -141,13 +142,12 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
 
             // on change update group's value
             $group.on('changed', function () {
-                var values = $group.find('>[data-criteria]>[data-value]').map(function () {
-                    return $(this).data('value');
-                }).get();
+                var values = [];
+                $group.find('>[data-criteria]>[data-value]').each(function () {
+                    values.push($(this).data('value'));
+                });
                 $group.data('value', values);
             });
-
-            $group.attr('data-criteria', 'conditions-group');
         },
 
         _onCriteriaGrab: function (e, ui) {
@@ -194,7 +194,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             $condition = $(this.options.conditionHTML)
                 .attr('data-criteria', criteria)
                 .prepend($content)
-                .prepend('<a class="close" data-dismiss="alert" href="#">&times;</a>');
+                .prepend('<a class="close" href="#">&times;</a>');
 
             $validationInput = this._createValidationInput(criteria, $content.data('value'));
             if ($validationInput) {
@@ -254,8 +254,10 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             if (ui.sender && ui.sender.is(this.$criteriaList)) {
                 $condition = this._createCondition(ui.item.data('criteria'));
                 $condition.insertBefore(ui.item);
-                $condition.trigger('changed');
+            } else {
+                $condition = ui.item;
             }
+            $condition.trigger('changed');
             this._updateOperators();
         },
 
@@ -298,11 +300,12 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
         },
 
         _onConditionClose: function (e) {
-            var $group = $(e.target).parent();
-            this._delay(function () {
-                this._updateOperators();
-                $group.trigger('changed');
-            }, 1);
+            var $condition = $(e.target).parent(),
+                $group = $condition.parent();
+            e.preventDefault();
+            $condition.remove();
+            this._updateOperators();
+            $group.trigger('changed');
         },
 
         _onChanged: function () {
