@@ -3,6 +3,9 @@ parameters:
     oro_entity_merge.mass_action.data_handler.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassActionHandler
     oro_entity_merge.http_foundation.merge_data_request_factory.class: Oro\Bundle\EntityMergeBundle\HttpFoundation\MergeDataRequestFactory
 
+    # Merger
+    oro_entity_merge.merger.class: Oro\Bundle\EntityMergeBundle\Model\EntityMerger
+
     # Accessors
     oro_entity_merge.accessor.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor
     oro_entity_merge.accessor.default.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor
@@ -26,6 +29,13 @@ services:
             - @oro_entity_config.provider.merge
             - @doctrine.orm.entity_manager
 
+    # Merger
+    oro_entity_merge.merger:
+        class: %oro_entity_merge.merger.class%
+        arguments:
+            - @oro_entity_merge.strategy
+            - @event_dispatcher
+
     # Accessors
     oro_entity_merge.accessor.delegate:
         class: %oro_entity_merge.accessor.delegate.class%
@@ -40,7 +50,6 @@ services:
 
     # Strategies
     oro_entity_merge.strategy.delegate:
-        alias: oro_entity_merge.strategy
         class: %oro_entity_merge.strategy.delegate.class%
 
     oro_entity_merge.strategy:
