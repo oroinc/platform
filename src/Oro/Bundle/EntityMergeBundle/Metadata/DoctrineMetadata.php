@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 class DoctrineMetadata extends Metadata implements MetadataInterface
 {
     /**
