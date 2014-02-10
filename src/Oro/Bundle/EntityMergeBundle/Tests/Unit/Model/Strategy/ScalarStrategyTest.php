@@ -7,13 +7,13 @@ use Oro\Bundle\EntityMergeBundle\Model\Strategy\ScalarStrategy;
 class ScalarStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ScalarStrategy $merger ;
+     * @var ScalarStrategy $strategy
      */
-    protected $merger;
+    protected $strategy;
 
     public function setUp()
     {
-        $this->merger = new ScalarStrategy();
+        $this->strategy = new ScalarStrategy();
     }
 
     public function testSupports()
@@ -38,7 +38,7 @@ class ScalarStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadata')
             ->will($this->returnValue($fieldMetadata));
 
-        $this->assertFalse($this->merger->supports($fieldData));
+        $this->assertFalse($this->strategy->supports($fieldData));
     }
 
     protected function createFieldData()

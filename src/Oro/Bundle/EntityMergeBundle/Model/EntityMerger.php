@@ -6,19 +6,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
 use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
-
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class EntityMerger implements EntityMergerInterface
 {
     /**
      * @var StrategyInterface
      */
-    protected $fieldMerger;
+    protected $strategy;
 
     /**
      * @var EventDispatcherInterface
@@ -26,12 +24,12 @@ class EntityMerger implements EntityMergerInterface
     protected $eventDispatcher;
 
     /**
-     * @param StrategyInterface $fieldMerger
+     * @param StrategyInterface $strategy
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(StrategyInterface $fieldMerger, EventDispatcherInterface $eventDispatcher)
+    public function __construct(StrategyInterface $strategy, EventDispatcherInterface $eventDispatcher)
     {
-        $this->fieldMerger = $fieldMerger;
+        $this->strategy = $strategy;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -77,7 +75,7 @@ class EntityMerger implements EntityMergerInterface
     protected function mergeFields(EntityData $data)
     {
         foreach ($data->getFields() as $field) {
-            $this->fieldMerger->merge($field);
+            $this->strategy->merge($field);
         }
     }
 

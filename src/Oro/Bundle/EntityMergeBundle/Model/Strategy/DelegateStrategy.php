@@ -37,13 +37,15 @@ class DelegateStrategy implements StrategyInterface
      */
     public function merge(FieldData $fieldData)
     {
-        $matched = $this->match($fieldData);
+        $delegate = $this->match($fieldData);
 
-        if (!$matched) {
-            throw new InvalidArgumentException(sprintf('Field "%s" cannot be merged.', $fieldData->getFieldName()));
+        if (!$delegate) {
+            throw new InvalidArgumentException(
+                sprintf('Cannot find merge strategy for "%s" field.', $fieldData->getFieldName())
+            );
         }
 
-        $matched->merge($fieldData);
+        $delegate->merge($fieldData);
     }
 
     /**

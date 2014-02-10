@@ -15,6 +15,26 @@ class DefaultAccessor implements AccessorInterface
     protected $propertyAccessor;
 
     /**
+     * @return PropertyAccessor
+     */
+    public function getName()
+    {
+        return 'default';
+    }
+
+    /**
+     * Checks if this class supports accessing entity
+     *
+     * @param string $entity
+     * @param FieldMetadata $metadata
+     * @return string
+     */
+    public function supports($entity, FieldMetadata $metadata)
+    {
+        return !$metadata->getDoctrineMetadata()->has('targetEntity');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getValue($entity, FieldMetadata $metadata)
@@ -25,14 +45,6 @@ class DefaultAccessor implements AccessorInterface
         }
 
         return $this->getPropertyAccessor()->getValue($entity, $this->getPropertyPath($metadata));
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    public function getName()
-    {
-        return 'default';
     }
 
     /**

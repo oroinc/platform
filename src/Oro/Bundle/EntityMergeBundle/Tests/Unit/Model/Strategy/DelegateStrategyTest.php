@@ -7,13 +7,13 @@ use Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy;
 class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DelegateStrategy $merger ;
+     * @var DelegateStrategy $strategy
      */
-    protected $merger;
+    protected $strategy;
 
     protected function setUp()
     {
-        $this->merger = new DelegateStrategy();
+        $this->strategy = new DelegateStrategy();
     }
 
     public function testConstructor()
@@ -21,24 +21,24 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
         $foo = $this->createStrategy();
         $bar = $this->createStrategy();
 
-        $merger = new DelegateStrategy(array($foo, $bar));
+        $strategy = new DelegateStrategy(array($foo, $bar));
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $merger);
+        $this->assertAttributeEquals(array($foo, $bar), 'elements', $strategy);
     }
 
     public function testAdd()
     {
-        $this->merger->add($foo = $this->createStrategy());
-        $this->merger->add($bar = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy());
+        $this->strategy->add($bar = $this->createStrategy());
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $this->merger);
+        $this->assertAttributeEquals(array($foo, $bar), 'elements', $this->strategy);
     }
 
     public function testSupportsTrueLast()
     {
-        $this->merger->add($foo = $this->createStrategy());
-        $this->merger->add($bar = $this->createStrategy());
-        $this->merger->add($baz = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy());
+        $this->strategy->add($bar = $this->createStrategy());
+        $this->strategy->add($baz = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -57,13 +57,13 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
             ->with($data)
             ->will($this->returnValue(true));
 
-        $this->assertTrue($this->merger->supports($data));
+        $this->assertTrue($this->strategy->supports($data));
     }
 
     public function testSupportsTrueFirst()
     {
-        $this->merger->add($foo = $this->createStrategy());
-        $this->merger->add($bar = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy());
+        $this->strategy->add($bar = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -74,13 +74,13 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 
         $bar->expects($this->never())->method('supports');
 
-        $this->assertTrue($this->merger->supports($data));
+        $this->assertTrue($this->strategy->supports($data));
     }
 
     public function testSupportsFalse()
     {
-        $this->merger->add($foo = $this->createStrategy());
-        $this->merger->add($bar = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy());
+        $this->strategy->add($bar = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -94,12 +94,12 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
             ->with($data)
             ->will($this->returnValue(false));
 
-        $this->assertFalse($this->merger->supports($data));
+        $this->assertFalse($this->strategy->supports($data));
     }
 
     public function testMerge()
     {
-        $this->merger->add($foo = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -112,16 +112,16 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('merge')
             ->with($data);
 
-        $this->merger->merge($data);
+        $this->strategy->merge($data);
     }
 
     /**
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Field "test" cannot be merged.
+     * @expectedExceptionMessage Cannot find merge strategy for "test" field.
      */
     public function testMergeFails()
     {
-        $this->merger->add($foo = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -134,7 +134,7 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
             ->with($data)
             ->will($this->returnValue(false));
 
-        $this->merger->merge($data);
+        $this->strategy->merge($data);
     }
 
     protected function createStrategy()

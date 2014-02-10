@@ -23,13 +23,13 @@ class StrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $fieldMerger;
+    protected $strategy;
 
     protected function setUp()
     {
-        $this->fieldMerger     = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
+        $this->strategy     = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->merger          = new EntityMerger($this->fieldMerger, $this->eventDispatcher);
+        $this->merger          = new EntityMerger($this->strategy, $this->eventDispatcher);
     }
 
     public function testMerge()
@@ -54,13 +54,13 @@ class StrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getFields')
             ->will($this->returnValue(array($fooField, $barField)));
 
-        $this->fieldMerger->expects($this->exactly(2))->method('merge');
+        $this->strategy->expects($this->exactly(2))->method('merge');
 
-        $this->fieldMerger->expects($this->at(0))
+        $this->strategy->expects($this->at(0))
             ->method('merge')
             ->with($fooField);
 
-        $this->fieldMerger->expects($this->at(1))
+        $this->strategy->expects($this->at(1))
             ->method('merge')
             ->with($barField);
 

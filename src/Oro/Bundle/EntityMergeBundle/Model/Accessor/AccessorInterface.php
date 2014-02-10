@@ -25,6 +25,15 @@ interface AccessorInterface
     public function setValue($entity, FieldMetadata $metadata, $value);
 
     /**
+     * Checks if this class supports accessing entity
+     *
+     * @param string $entity
+     * @param FieldMetadata $metadata
+     * @return bool
+     */
+    public function supports($entity, FieldMetadata $metadata);
+
+    /**
      * Get name of field accessor
      *
      * @return string
