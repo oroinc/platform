@@ -1,5 +1,5 @@
 /*global define, require, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
-define(['jquery', 'requirejs-exposure', 'oroquerydesigner/js/field-condition'], function ($, requirejsExposure) {
+define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
     'use strict';
 
     describe('oroquerydesigner/js/field-condition', function () {
