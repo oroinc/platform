@@ -24,6 +24,8 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 /**
  * @Rest\NamePrefix("oro_api_workflow_")
@@ -97,24 +99,24 @@ class WorkflowController extends FOSRestController
     }
 
     /**
-     * Gets reference to entity
+     * Try to get reference to entity
      *
-     * @param string $entityClass $entityId
+     * @param string $entityClass
      * @param mixed $entityId
-     * @return object
-     * @throws BadRequestHttpException If entity class is invalid
+     * @throws BadRequestHttpException
+     * @return mixed
      */
     protected function getEntityReference($entityClass, $entityId)
     {
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManagerForClass($entityClass);
-        if (!$em) {
-            throw new BadRequestHttpException(
-                sprintf('Class "%s" is not manageable entity', $entityClass)
-            );
+        /** @var DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+        try {
+            $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
+        } catch (NotManageableEntityException $e) {
+            throw new BadRequestHttpException($e->getMessage(), $e);
         }
 
-        return $em->getReference($entityClass, $entityId);
+        return $entity;
     }
 
     /**
