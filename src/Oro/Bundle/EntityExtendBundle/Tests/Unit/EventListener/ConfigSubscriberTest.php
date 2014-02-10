@@ -23,7 +23,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected $event;
 
-    public function setUp()
+    /*public function setUp()
     {
         parent::setUp();
 
@@ -32,8 +32,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->configSubscriber = new ConfigSubscriber($extendManager);
-    }
-
+    }*/
 
     public function testGetSubscribedEvents()
     {
@@ -132,28 +131,44 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
-                ['state' => ExtendManager::STATE_NEW],
+                [
+                    'state' => ExtendManager::STATE_NEW,
+                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User'
+                ],
                 'oneToMany'
             ),
-            $this->getEntityConfig(
-                ['state' => ExtendManager::STATE_ACTIVE]
-            ),
-            [
-                'state' => [0 => null, 1 => ExtendManager::STATE_NEW]
-            ]
+            $this->getEntityConfig(['state' => ExtendManager::STATE_ACTIVE]),
+            ['state' => [0 => null, 1 => ExtendManager::STATE_NEW]]
         );
 
-        //var_dump($this->configSubscriber);
-        //var_dump($this->event->getConfig()->getId()->getClassName());
-
         /** @var ConfigManager $cm */
-        //$cm = $this->event->getConfigManager();
+        $cm = $this->event->getConfigManager();
 
-        /*$this->assertAttributeEquals(
-            ['extend_TestClass' => $this->getEntityConfig(['state' => ExtendManager::STATE_UPDATED])],
+        $this->assertAttributeEquals(
+            [
+                'extend_TestClass' => $this->getEntityConfig(
+                    [
+                        'state' => ExtendManager::STATE_UPDATED,
+                        'relation' => [
+                            'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                                'assign' => false,
+                                'field_id' => new FieldConfigId(
+                                    'Oro\Bundle\UserBundle\Entity\User',
+                                    'extend',
+                                    'testclass_testFieldName',
+                                    'manyToOne'
+                                ),
+                                'owner' => true,
+                                'target_entity' => 'TestClass',
+                                'target_field_id' => new FieldConfigId('TestClass', 'extend', 'testFieldName', 'oneToMany'),
+                            ]
+                        ]
+                    ]
+                )
+            ],
             'persistConfigs',
             $cm
-        );*/
+        );
     }
 
     /**
@@ -233,7 +248,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $configProvider
             ->expects($this->any())
             ->method('getConfig')
-            ->with($this->equalTo('TestClass'))
+            //->with($this->equalTo('TestClass'))
             ->will($this->returnValue($entityConfig));
         $configProvider
             ->expects($this->any())
@@ -242,13 +257,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
-            ->setMethods(
-                [
-                    'getProviderBag',
-                    'getProvider',
-                    'getConfigChangeSet'
-                ]
-            )
+            ->setMethods(['getProviderBag', 'getProvider', 'getConfigChangeSet'])
             ->getMock();
         $configManager
             ->expects($this->any())
@@ -262,8 +271,6 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($changeSet));
 
         $this->event = new PersistConfigEvent($eventConfig, $configManager);
-
-        //var_dump($this->configSubscriber);
 
         $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
             ->disableOriginalConstructor()
@@ -279,13 +286,12 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getConfigProvider')
             ->will($this->returnValue($extendConfigProvider));
-        $this->configSubscriber = new ConfigSubscriber($extendManager);
 
+        $this->configSubscriber = new ConfigSubscriber($extendManager);
         $this->configSubscriber->persistConfig($this->event);
     }
 
     public function testFindRelationKey()
     {
-
     }
-} 
+}
