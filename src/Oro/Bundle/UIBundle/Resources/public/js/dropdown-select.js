@@ -3,10 +3,7 @@
 define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
     'use strict';
 
-    /**
-     * @export  ororeport/js/dropdown-select
-     */
-    $.widget('oro.dropdownSelect', {
+    $.widget('oroui.dropdownSelect', {
         template: _.template(
             '<% if (useButtonGroup) { %><div class="btn-group"><% } %>' +
                 '<a href="#" class="<%= buttonClass %> dropdown-toggle" ' +
@@ -84,4 +81,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             });
         }
     });
+
+    return $;
 });
