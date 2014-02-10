@@ -1,7 +1,7 @@
 /*jshint browser:true*/
 /*jslint browser:true*/
 /*global define*/
-define(['jquery', 'underscore', 'jquery.select2'], function ($, _) {
+define(['jquery', 'jquery.select2'], function ($) {
     'use strict';
 
     /**
@@ -82,8 +82,8 @@ define(['jquery', 'underscore', 'jquery.select2'], function ($, _) {
                 }
 
                 if (selection.indexOf(resultId) >= 0) {
-                    _.each(parentStack, function (stackItem) {
-                        stackItem.addClass('in');
+                    $.each(parentStack, function () {
+                        this.addClass('in');
                     });
                 }
 
