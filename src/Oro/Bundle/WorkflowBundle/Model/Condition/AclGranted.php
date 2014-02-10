@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\Condition;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\WorkflowBundle\Exception\ConditionException;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class AclGranted extends AbstractCondition
 {

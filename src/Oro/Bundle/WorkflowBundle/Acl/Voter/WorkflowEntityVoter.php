@@ -9,7 +9,7 @@ use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
 
 class WorkflowEntityVoter implements VoterInterface

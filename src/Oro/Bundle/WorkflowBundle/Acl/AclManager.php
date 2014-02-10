@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Acl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 /**

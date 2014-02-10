@@ -21,9 +21,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 class WidgetController extends Controller
 {
@@ -298,7 +298,7 @@ class WidgetController extends Controller
     protected function getEntityReference($entityClass, $entityId)
     {
         /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_workflow.doctrine_helper');
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         try {
             $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
         } catch (NotManageableEntityException $e) {

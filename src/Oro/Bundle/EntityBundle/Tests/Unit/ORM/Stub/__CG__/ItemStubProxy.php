@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\__CG__;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__;
 
 use Doctrine\Common\Persistence\Proxy;
 

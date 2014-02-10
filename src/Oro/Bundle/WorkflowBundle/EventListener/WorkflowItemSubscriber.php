@@ -8,7 +8,7 @@ use Doctrine\ORM\Events;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class WorkflowItemSubscriber implements EventSubscriber
 {

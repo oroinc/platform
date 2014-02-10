@@ -1,13 +1,12 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Model;
+namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
@@ -31,7 +30,6 @@ class DoctrineHelper
     /**
      * @param object $entity
      * @return array
-     * @throws NotManageableEntityException
      */
     public function getEntityIdentifier($entity)
     {
@@ -46,7 +44,7 @@ class DoctrineHelper
      * @param object $entity
      * @param bool $triggerException
      * @return integer|null
-     * @throws WorkflowException
+     * @throws Exception\InvalidEntityException
      */
     public function getSingleEntityIdentifier($entity, $triggerException = true)
     {
@@ -55,7 +53,7 @@ class DoctrineHelper
         $result = null;
         if (count($entityIdentifier) != 1) {
             if ($triggerException) {
-                throw new WorkflowException('Can\'t get single identifier for the entity');
+                throw new Exception\InvalidEntityException('Can\'t get single identifier for the entity');
             }
         } else {
             $result = current($entityIdentifier);
@@ -79,7 +77,7 @@ class DoctrineHelper
     /**
      * @param string $entityOrClass
      * @return EntityManager
-     * @throws NotManageableEntityException
+     * @throws Exception\NotManageableEntityException
      */
     public function getEntityManager($entityOrClass)
     {
@@ -91,7 +89,7 @@ class DoctrineHelper
 
         $entityManager = $this->registry->getManagerForClass($entityClass);
         if (!$entityManager) {
-            throw new NotManageableEntityException($entityClass);
+            throw new Exception\NotManageableEntityException($entityClass);
         }
 
         return $entityManager;
@@ -101,7 +99,6 @@ class DoctrineHelper
      * @param string $entityClass
      * @param mixed $entityId
      * @return mixed
-     * @throws NotManageableEntityException
      */
     public function getEntityReference($entityClass, $entityId)
     {

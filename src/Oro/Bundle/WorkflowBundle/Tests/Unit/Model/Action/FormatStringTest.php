@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\FormatString;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
 class FormatStringTest extends \PHPUnit_Framework_TestCase
 {
