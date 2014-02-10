@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model\FieldMerger;
+namespace Oro\Bundle\EntityMergeBundle\Model\Strategy;
 
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 
-class ScalarFieldMerger implements FieldMergerInterface
+class ScalarStrategy implements StrategyInterface
 {
     public static $scope;
 
@@ -47,4 +47,4 @@ class ScalarFieldMerger implements FieldMergerInterface
 
         return false;
     }
-} 
+}

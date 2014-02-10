@@ -1,15 +1,14 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model\EntityAccessor;
+namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 /**
  * TODO: This class should have all accessors and delegate calls to them according to FieldMetadata
  */
-class DelegateEntityAccessor implements EntityAccessorInterface
+class DelegateAccessor implements AccessorInterface
 {
-
     /**
      * {@inheritdoc}
      */

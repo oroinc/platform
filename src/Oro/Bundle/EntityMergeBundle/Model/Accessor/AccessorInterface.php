@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model\EntityAccessor;
+namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
-interface EntityAccessorInterface
+interface AccessorInterface
 {
     /**
      * Get value from entity

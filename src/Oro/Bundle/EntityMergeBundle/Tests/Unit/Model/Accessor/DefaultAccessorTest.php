@@ -3,20 +3,20 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityMergeBundle\Model\EntityAccessor\DefaultEntityAccessor;
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
 
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class DefaultEntityAccessorTest extends \PHPUnit_Framework_TestCase
+class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DefaultEntityAccessor $fieldAccessor;
+     * @var DefaultAccessor $fieldAccessor;
      */
     protected $accessor;
 
     protected function setUp()
     {
-        $this->accessor = new DefaultEntityAccessor();
+        $this->accessor = new DefaultAccessor();
     }
 
     /**

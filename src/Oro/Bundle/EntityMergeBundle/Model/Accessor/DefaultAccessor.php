@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model\EntityAccessor;
+namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
-class DefaultEntityAccessor implements EntityAccessorInterface
+class DefaultAccessor implements AccessorInterface
 {
     /**
      * @var PropertyAccessor

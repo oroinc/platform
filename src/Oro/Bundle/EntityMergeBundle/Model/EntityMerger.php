@@ -9,14 +9,14 @@ use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Oro\Bundle\EntityMergeBundle\Model\FieldMerger\FieldMergerInterface;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class EntityMerger implements EntityMergerInterface
 {
     /**
-     * @var FieldMergerInterface
+     * @var StrategyInterface
      */
     protected $fieldMerger;
 
@@ -26,10 +26,10 @@ class EntityMerger implements EntityMergerInterface
     protected $eventDispatcher;
 
     /**
-     * @param FieldMergerInterface $fieldMerger
+     * @param StrategyInterface $fieldMerger
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(FieldMergerInterface $fieldMerger, EventDispatcherInterface $eventDispatcher)
+    public function __construct(StrategyInterface $fieldMerger, EventDispatcherInterface $eventDispatcher)
     {
         $this->fieldMerger = $fieldMerger;
         $this->eventDispatcher = $eventDispatcher;

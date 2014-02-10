@@ -1,19 +1,19 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\FieldMerger;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
-use Oro\Bundle\EntityMergeBundle\Model\FieldMerger\ScalarFieldMerger;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\ScalarStrategy;
 
-class ScalarFieldMergerTest extends \PHPUnit_Framework_TestCase
+class ScalarStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ScalarFieldMerger $merger ;
+     * @var ScalarStrategy $merger ;
      */
     protected $merger;
 
     public function setUp()
     {
-        $this->merger = new ScalarFieldMerger();
+        $this->merger = new ScalarStrategy();
     }
 
     public function testSupports()

@@ -1,44 +1,44 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\FieldMerger;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
-use Oro\Bundle\EntityMergeBundle\Model\FieldMerger\DelegateFieldMerger;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy;
 
-class DelegateFieldMergerTest extends \PHPUnit_Framework_TestCase
+class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var DelegateFieldMerger $merger ;
+     * @var DelegateStrategy $merger ;
      */
     protected $merger;
 
     protected function setUp()
     {
-        $this->merger = new DelegateFieldMerger();
+        $this->merger = new DelegateStrategy();
     }
 
     public function testConstructor()
     {
-        $foo = $this->createFieldMerger();
-        $bar = $this->createFieldMerger();
+        $foo = $this->createStrategy();
+        $bar = $this->createStrategy();
 
-        $merger = new DelegateFieldMerger(array($foo, $bar));
+        $merger = new DelegateStrategy(array($foo, $bar));
 
         $this->assertAttributeEquals(array($foo, $bar), 'elements', $merger);
     }
 
     public function testAdd()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
+        $this->merger->add($foo = $this->createStrategy());
+        $this->merger->add($bar = $this->createStrategy());
 
         $this->assertAttributeEquals(array($foo, $bar), 'elements', $this->merger);
     }
 
     public function testSupportsTrueLast()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
-        $this->merger->add($baz = $this->createFieldMerger());
+        $this->merger->add($foo = $this->createStrategy());
+        $this->merger->add($bar = $this->createStrategy());
+        $this->merger->add($baz = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -62,8 +62,8 @@ class DelegateFieldMergerTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsTrueFirst()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
+        $this->merger->add($foo = $this->createStrategy());
+        $this->merger->add($bar = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -79,8 +79,8 @@ class DelegateFieldMergerTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsFalse()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
+        $this->merger->add($foo = $this->createStrategy());
+        $this->merger->add($bar = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -99,7 +99,7 @@ class DelegateFieldMergerTest extends \PHPUnit_Framework_TestCase
 
     public function testMerge()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
+        $this->merger->add($foo = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -121,7 +121,7 @@ class DelegateFieldMergerTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeFails()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
+        $this->merger->add($foo = $this->createStrategy());
 
         $data = $this->createFieldData();
 
@@ -137,9 +137,9 @@ class DelegateFieldMergerTest extends \PHPUnit_Framework_TestCase
         $this->merger->merge($data);
     }
 
-    protected function createFieldMerger()
+    protected function createStrategy()
     {
-        return $this->getMock('Oro\Bundle\EntityMergeBundle\Model\FieldMerger\FieldMergerInterface');
+        return $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
     }
 
     protected function createFieldData()

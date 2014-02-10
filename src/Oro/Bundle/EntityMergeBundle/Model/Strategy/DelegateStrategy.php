@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model\FieldMerger;
+namespace Oro\Bundle\EntityMergeBundle\Model\Strategy;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
-class DelegateFieldMerger implements FieldMergerInterface
+class DelegateStrategy implements StrategyInterface
 {
     /**
-     * @var FieldMergerInterface[]
+     * @var StrategyInterface[]
      */
     protected $elements;
 
@@ -25,9 +25,9 @@ class DelegateFieldMerger implements FieldMergerInterface
     }
 
     /**
-     * @param FieldMergerInterface $fieldMerger
+     * @param StrategyInterface $fieldMerger
      */
-    public function add(FieldMergerInterface $fieldMerger)
+    public function add(StrategyInterface $fieldMerger)
     {
         $this->elements[] = $fieldMerger;
     }
@@ -58,7 +58,7 @@ class DelegateFieldMerger implements FieldMergerInterface
      * Match field data and field merger
      *
      * @param FieldData $fieldData
-     * @return FieldMergerInterface|null
+     * @return StrategyInterface|null
      */
     protected function match(FieldData $fieldData)
     {

@@ -8,7 +8,7 @@ use Oro\Bundle\EntityMergeBundle\MergeEvents;
 
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 
-class FieldMergerTest extends \PHPUnit_Framework_TestCase
+class StrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var EntityMerger $merger ;
@@ -27,7 +27,7 @@ class FieldMergerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->fieldMerger     = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\FieldMerger\FieldMergerInterface');
+        $this->fieldMerger     = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->merger          = new EntityMerger($this->fieldMerger, $this->eventDispatcher);
     }
