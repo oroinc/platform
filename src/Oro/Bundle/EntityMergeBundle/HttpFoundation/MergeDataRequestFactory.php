@@ -63,8 +63,12 @@ class MergeDataRequestFactory
         $entities = $handlerResult['entities'];
 
         $entityMetadata = $this->metadataFactory->createMergeMetadata($options['entity_name']);
+
         $data = new EntityData($entityMetadata);
         $data->setEntities($entities);
+        foreach ($entityMetadata->getFieldsMetadata() as $fieldMetadata) {
+            $data->addNewField($fieldMetadata);
+        }
 
         $this->requestData = $data;
 

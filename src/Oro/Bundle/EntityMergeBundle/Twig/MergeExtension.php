@@ -9,16 +9,23 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 class MergeExtension extends \Twig_Extension
 {
     /**
-     * @var \Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface
+     * @var AccessorInterface
      */
     protected $accessor;
 
     /**
-     * @param AccessorInterface $accessor
+     * @var MergeRenderer
      */
-    public function __construct(AccessorInterface $accessor)
+    protected $fieldValueRenderer;
+
+    /**
+     * @param AccessorInterface $accessor
+     * @param MergeRenderer $fieldValueRenderer
+     */
+    public function __construct(AccessorInterface $accessor, MergeRenderer $fieldValueRenderer)
     {
         $this->accessor = $accessor;
+        $this->fieldValueRenderer = $fieldValueRenderer;
     }
 
     /**
@@ -27,16 +34,48 @@ class MergeExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('oro_entity_merge_render_field_value', array($this, 'renderMergeFieldValue')),
+            new \Twig_SimpleFunction(
+                'oro_entity_merge_render_field_value',
+                array($this, 'renderMergeFieldValue'),
+                array('is_safe' => array('html'))
+            ),
+            new \Twig_SimpleFunction(
+                'oro_entity_merge_render_entity_label',
+                array($this, 'renderMergeEntityLabel'),
+                array('is_safe' => array('html'))
+            ),
         );
     }
 
+    /**
+     * Render value of merge field
+     *
+     * @param FieldData $fieldData
+     * @param int $entityOffset
+     * @return string
+     */
     public function renderMergeFieldValue(FieldData $fieldData, $entityOffset)
     {
         $entity = $fieldData->getEntityData()->getEntityByOffset($entityOffset);
         $metadata = $fieldData->getMetadata();
+        $value = $this->accessor->getValue($entity, $metadata);
 
-        return $this->accessor->getValue($entity, $metadata);
+        return $this->fieldValueRenderer->renderFieldValue($value, $metadata, $entity);
+    }
+
+    /**
+     * Render label of merge entity
+     *
+     * @param EntityData $entityData
+     * @param int $entityOffset
+     * @return string
+     */
+    public function renderMergeEntityLabel(EntityData $entityData, $entityOffset)
+    {
+        $entity = $entityData->getEntityByOffset($entityOffset);
+        $metadata = $entityData->getMetadata();
+
+        return $this->fieldValueRenderer->renderEntityLabel($entity, $metadata);
     }
 
     /**

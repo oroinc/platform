@@ -12,7 +12,7 @@ class OptionSetEntityTest extends Selenium2TestCase
     public function testCreateOptionSetEntity()
     {
         $this->markTestIncomplete('Due to BAP-2966');
-        $entitydata = array(
+        $entityData = array(
             'entityName' => 'optionset'.mt_rand(),
             'stringField' => 'string_field',
             'optionSetField' => 'option_set'
@@ -24,19 +24,19 @@ class OptionSetEntityTest extends Selenium2TestCase
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
             ->assertTitle('New Entity - Entities - System')
-            ->setName($entitydata['entityName'])
-            ->setLabel($entitydata['entityName'])
-            ->setPluralLabel($entitydata['entityName'])
+            ->setName($entityData['entityName'])
+            ->setLabel($entityData['entityName'])
+            ->setPluralLabel($entityData['entityName'])
             ->save()
             ->assertMessage('Entity saved')
             ->createField()
-            ->setFieldName($entitydata['stringField'])
+            ->setFieldName($entityData['stringField'])
             ->setType('String')
             ->proceed()
             ->save()
             ->assertMessage('Field saved')
             ->createField()
-            ->setFieldName($entitydata['optionSetField'])
+            ->setFieldName($entityData['optionSetField'])
             ->setType('Option set')
             ->proceed()
             ->addOptions($options)
@@ -46,14 +46,14 @@ class OptionSetEntityTest extends Selenium2TestCase
             ->assertMessage('Schema updated')
             ->close();
 
-        return $entitydata;
+        return $entityData;
     }
 
     /**
      * @depends testCreateOptionSetEntity
-     * @param $entitydata
+     * @param $entityData
      */
-    public function testCreateNewOptionSetEntityRecord($entitydata)
+    public function testCreateNewOptionSetEntityRecord($entityData)
     {
         //TODO: complete test when BAP-2966 will be fixed
         $this->markTestIncomplete('Due to BAP-2966');
@@ -61,11 +61,11 @@ class OptionSetEntityTest extends Selenium2TestCase
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
-            ->menu($entitydata['entityName'])
+            ->menu($entityData['entityName'])
             ->open()
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
-            ->setStringField($entitydata['stringField'], 'Some test text')
+            ->setStringField($entityData['stringField'], 'Some test text')
             ->setOptionSetField()
             ->save()
             ->assertMessage('Entity saved');

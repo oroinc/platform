@@ -63,7 +63,7 @@ class DelegateAccessor implements AccessorInterface
     /**
      * Checks if this class supports accessing entity
      *
-     * @param string $entity
+     * @param string        $entity
      * @param FieldMetadata $metadata
      * @return string
      */
@@ -75,9 +75,9 @@ class DelegateAccessor implements AccessorInterface
     /**
      * Match field data and field merger
      *
-     * @param object $entity
+     * @param object        $entity
      * @param FieldMetadata $metadata
-     * @param bool $throwException
+     * @param bool          $throwException
      * @return AccessorInterface|null
      * @throws InvalidArgumentException
      */

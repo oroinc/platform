@@ -1,8 +1,8 @@
 /*global define, require, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
-define(['jquery', 'requirejs-exposure', 'oroquerydesigner/js/condition-filed'], function ($, requirejsExposure) {
+define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
     'use strict';
 
-    describe('oroquerydesigner/js/condition-filed', function () {
+    describe('oroquerydesigner/js/field-condition', function () {
         var $div = null;
 
         beforeEach(function () {
@@ -17,7 +17,7 @@ define(['jquery', 'requirejs-exposure', 'oroquerydesigner/js/condition-filed'], 
 
         it('is jQueryUI widget', function () {
             expect(function () {
-                $div.conditionFiled();
+                $div.fieldCondition();
             }).not.toThrow();
         });
     });

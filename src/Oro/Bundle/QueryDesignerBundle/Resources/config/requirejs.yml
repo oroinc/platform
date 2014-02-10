@@ -11,3 +11,4 @@ config:
         'oro/query-designer/grouping/view': 'bundles/oroquerydesigner/js/query-designer/grouping/view.js'
 
         'oroquerydesigner/js/condition-builder': 'bundles/oroquerydesigner/js/condition-builder.js'
+        'oroquerydesigner/js/field-condition': 'bundles/oroquerydesigner/js/field-condition.js'

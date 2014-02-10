@@ -62,7 +62,6 @@ class SoapDataAuditApiTest extends WebTestCase
      */
     public function testGetAudits($response)
     {
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $result = $this->client->getSoap()->getAudits();
         $result = ToolsAPI::classToArray($result);
 
@@ -89,7 +88,6 @@ class SoapDataAuditApiTest extends WebTestCase
     public function testGetAudit($response)
     {
         foreach ($response as $audit) {
-            $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
             $result = $this->client->getSoap()->getAudit($audit['id']);
             $result = ToolsAPI::classToArray($result);
             unset($result['loggedAt']);

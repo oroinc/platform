@@ -1,6 +1,39 @@
 {# Dummy for merge template #}
-{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% block content %}
-{{ result }}
-{%  endblock %}
+
+{% set title = 'Merge Accounts' %}
+{% oro_title_set({}) %}
+{% set gridName = 'role-users-grid' %}
+{% set formAction = path('oro_entity_merge') %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(path('orocrm_account_index')) }}
+    {{ UI.saveAndStayButton() }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% include 'OroUIBundle::page_title_block.html.twig' %}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'entity-merge' %}
+
+    {% set dataBlocks = [{
+        'title' : 'Merge Values'|trans,
+        'subblocks':
+        [
+            {
+                'title' : null,
+                'useSpan': false,
+                'data' : [form_widget(form, { 'attr': {'class': 'select2'} })]
+            }
+        ]
+    }] %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock %}

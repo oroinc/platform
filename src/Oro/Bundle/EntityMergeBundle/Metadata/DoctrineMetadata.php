@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 class DoctrineMetadata extends Metadata implements MetadataInterface
 {
     /**
@@ -37,6 +39,21 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
     public function isAssociation()
     {
         return $this->has('targetEntity') && $this->has('joinColumns');
+    }
+
+    /**
+     * Checks if this field represented by collections
+     *
+     * @return bool
+     */
+    public function isCollection()
+    {
+        $collectionTypes = [
+            ClassMetadataInfo::ONE_TO_MANY,
+            ClassMetadataInfo::MANY_TO_MANY,
+        ];
+
+        return $this->has('type') && in_array($this->get('type'), $collectionTypes);
     }
 
     /**
