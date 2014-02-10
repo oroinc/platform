@@ -129,7 +129,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
     public function testPersistConfig_ScopeExtend_RelationType()
-    {return;
+    {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
                 ['state' => ExtendManager::STATE_NEW],
@@ -175,8 +175,6 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         if (count($values)) {
             $resultValues = array_merge($resultValues, $values);
         }
-
-        //var_dump($resultValues);
 
         $fieldConfigId = new FieldConfigId('TestClass', 'extend', 'testFieldName', $type);
         $eventConfig   = new Config($fieldConfigId);
@@ -226,7 +224,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function runPersistConfig($eventConfig, $entityConfig, $changeSet)//, $scope = 'extend')
+    protected function runPersistConfig($eventConfig, $entityConfig, $changeSet)
     {
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -244,7 +242,13 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
-            ->setMethods(['getProviderBag', 'getProvider', 'getConfigChangeSet'])
+            ->setMethods(
+                [
+                    'getProviderBag',
+                    'getProvider',
+                    'getConfigChangeSet'
+                ]
+            )
             ->getMock();
         $configManager
             ->expects($this->any())
@@ -258,46 +262,26 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($changeSet));
 
         $this->event = new PersistConfigEvent($eventConfig, $configManager);
+
+        //var_dump($this->configSubscriber);
+
+        $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $extendConfigProvider = clone $configProvider;
+        $extendConfigProvider
+            ->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($entityConfig));
+
+        $extendManager
+            ->expects($this->any())
+            ->method('getConfigProvider')
+            ->will($this->returnValue($extendConfigProvider));
+        $this->configSubscriber = new ConfigSubscriber($extendManager);
+
         $this->configSubscriber->persistConfig($this->event);
-
-
-/*
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['getProviderBag', 'getProvider', 'getConfigChangeSet'])
-            //->setMethods(null)
-            ->getMock();
-
-        $configProvider = new ConfigProvider($configManager, $container, $scope, []);
-
-        $configManager
-            ->expects($this->any())
-            ->method('getProvider')
-            ->with('extend')
-            ->will($this->returnValue($configProvider));
-        $configManager
-            ->expects($this->any())
-            ->method('getConfigChangeSet')
-            ->with($eventConfig)
-            ->will($this->returnValue($changeSet));
-        /*$configManager
-            ->expects($this->any())
-            ->method('checkDatabase')
-            ->will($this->returnValue(true));
-*/
-
-
-        //$extendManager          = new ExtendManager($configProvider);
-        //$this->configSubscriber = new ConfigSubscriber($extendManager);
-        //$this->event            = new PersistConfigEvent($eventConfig, $configManager);
-
-        //var_dump($extendManager);
-
-        //$this->configSubscriber->persistConfig($this->event);
     }
 
     public function testFindRelationKey()
