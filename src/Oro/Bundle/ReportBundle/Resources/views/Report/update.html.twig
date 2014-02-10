@@ -163,14 +163,17 @@
 
                 var $fieldConditionCriteria = $('#filter-criteria-list').find('[data-criteria=condition-item]');
                 $.extend(true, $fieldConditionCriteria.data('options'), {
-                    select2: {
-                        formatSelectionTemplate: $('#report-column-chain-template').text()
-                    },
-                    util: {
-                        findEntity:  function (entityName) {
-                            return _.findWhere(entities, {name: entityName});
+                    fieldChoice: {
+                        select2: {
+                            formatSelectionTemplate: $('#report-column-chain-template').text()
+                        },
+                        util: {
+                            findEntity:  function (entityName) {
+                                return _.findWhere(entities, {name: entityName});
+                            }
                         }
-                    }
+                    },
+                    filters: {{ metadata.filters|json_encode|raw }}
                 });
 
                 $('#report-designer').append(loadingMask.render().$el);
