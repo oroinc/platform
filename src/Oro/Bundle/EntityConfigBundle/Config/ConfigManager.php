@@ -375,7 +375,8 @@ class ConfigManager
 
     public function flush()
     {
-        $models = $this->prepareFlush();
+        $models = [];
+        $this->prepareFlush($models);
 
         if ($this->cache) {
             $this->cache->removeAllConfigurable();
@@ -395,9 +396,8 @@ class ConfigManager
 
     /**
      * @param array $models
-     * @return array
      */
-    protected function prepareFlush($models = [])
+    protected function prepareFlush(&$models)
     {
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
@@ -428,10 +428,8 @@ class ConfigManager
         }
 
         if (count($this->persistConfigs) != count($this->configChangeSets)) {
-            $models = $this->prepareFlush($models);
+            $this->prepareFlush($models);
         }
-
-        return $models;
     }
 
 
