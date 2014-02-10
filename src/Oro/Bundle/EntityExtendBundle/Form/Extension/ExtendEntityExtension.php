@@ -9,6 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
+use Symfony\Component\Form\FormConfigBuilder;
 
 class ExtendEntityExtension extends AbstractTypeExtension
 {
@@ -37,15 +38,12 @@ class ExtendEntityExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($builder->getForm()->getName() == CustomEntityType::NAME) {
+        $name = $builder instanceof FormConfigBuilder ? $builder->getName() : $builder->getForm()->getName();
+        if ($name == CustomEntityType::NAME || empty($options['data_class'])) {
             return;
         }
 
-        $className = !empty($options['data_class']) ? $options['data_class'] : null;
-        if (!$className) {
-            return;
-        }
-
+        $className = $options['data_class'];
         if (!$this->extendManager->getConfigProvider()->hasConfig($className)) {
             return;
         }
