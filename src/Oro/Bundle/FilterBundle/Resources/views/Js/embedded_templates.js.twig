@@ -18,15 +18,15 @@
         <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%- selectedChoice %>"/>
     </div>
 </script>
-<script type="text/template" id="date-filter-template-embedded">
-    <span> field value </span>
+
+<script type="text/template" id="select-field-template-embedded">
     <div class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
-                <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                    <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
-                </li>
+            <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
+            <a class="choice_value" href="#" data-value="<%= option.value %>"><%= option.label %></a>
+            </li>
             <% }); %>
         </ul>
         <select name="<%= name %>" class="filter-select-oro name_input" style="display:none">
@@ -35,10 +35,20 @@
             <% }); %>
         </select>
     </div>
+</script>
+
+
+<script type="text/template" id="date-filter-template-embedded">
+    <span> field </span>
+    <% _.each(parts, function (part) { %>
+        <%= part %>
+    <% }); %>
     <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="from">
     <span class="filter-separator">-</span>
     <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="to">
 </script>
+
+
 <script type="text/template" id="select-filter-template-embedded">
     <div class="filter-item">
         <span> field value is </span>

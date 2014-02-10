@@ -19,6 +19,13 @@ function($, _, __, ChoiceFilter, localeSettings) {
         templateSelector: '#date-filter-template',
 
         /**
+         * Template selector for date field parts
+         *
+         * @property
+         */
+        fieldTemplateSelector: '#select-field-template',
+
+        /**
          * Selectors for filter data
          *
          * @property
@@ -91,6 +98,13 @@ function($, _, __, ChoiceFilter, localeSettings) {
         dateWidgetSelector: 'div#ui-datepicker-div.ui-datepicker',
 
         /**
+         * Date parts
+         *
+         * @property
+         */
+        dateParts: [],
+
+        /**
          * @inheritDoc
          */
         initialize: function () {
@@ -103,6 +117,24 @@ function($, _, __, ChoiceFilter, localeSettings) {
                         start: '',
                         end: ''
                     }
+                };
+            }
+
+            if (_.isUndefined(this.dateParts)) {
+                this.dateParts = [];
+            }
+            // temp code to keep backward compatible
+            if ($.isPlainObject(this.dateParts)) {
+                this.dateParts = _.map(this.dateParts, function(option, i) {
+                    return {value: i.toString(), label: option};
+                });
+            }
+
+            if (_.isUndefined(this.emptyPart)) {
+                var firstPart = _.first(this.dateParts).value;
+                this.emptyPart = {
+                    type: (_.isEmpty(this.dateParts) ? '' : firstPart),
+                    value: firstPart
                 };
             }
 
@@ -133,21 +165,31 @@ function($, _, __, ChoiceFilter, localeSettings) {
          */
         render: function () {
             var value = _.extend({}, this.emptyValue, this.value);
-            var selectedChoiceLabel = '';
-            if (!_.isEmpty(this.choices)) {
-                var foundChoice = _.find(this.choices, function(choice) {
-                    return (choice.value == value.type);
-                });
-                selectedChoiceLabel = foundChoice.label;
-            }
-            var $filter = $(this.template({
-                name: this.name,
-                choices: this.choices,
-                selectedChoice: value.type,
-                selectedChoiceLabel: selectedChoiceLabel,
-                inputClass: this.inputClass,
-                value: this._formatDisplayValue(value)
-            }));
+            var part  = _.extend({}, this.emptyPart, this.datePart);
+
+            var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
+            var selectedPartLabel   = this._getSelectedChoiceLabel('dateParts', part);
+
+            var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var $filter = $(
+                this.template({
+                    name: this.name,
+                    inputClass: this.inputClass,
+                    value: this._formatDisplayValue(value),
+                    parts: [
+                        datePartTemplate({
+                            choices: this.dateParts,
+                            selectedChoice: value.type,
+                            selectedChoiceLabel: selectedPartLabel
+                        }),
+                        datePartTemplate({
+                            choices: this.choices,
+                            selectedChoice: value.type,
+                            selectedChoiceLabel: selectedChoiceLabel
+                        })
+                    ]
+                })
+            );
             this._wrap($filter);
 
             this.changeFilterType(value.type);
@@ -317,6 +359,18 @@ function($, _, __, ChoiceFilter, localeSettings) {
          */
         _hideCriteria: function() {
             ChoiceFilter.prototype._hideCriteria.apply(this, arguments);
+        },
+
+        _getSelectedChoiceLabel: function(property, value) {
+            var selectedChoiceLabel = '';
+            if (!_.isEmpty(this[property])) {
+                var foundChoice = _.find(this[property], function(choice) {
+                    return (choice.value == value.type);
+                });
+                selectedChoiceLabel = foundChoice.label;
+            }
+
+            return selectedChoiceLabel;
         }
     });
 });
