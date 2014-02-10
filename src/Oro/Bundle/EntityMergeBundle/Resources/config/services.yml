@@ -9,9 +9,12 @@ parameters:
     # Accessors
     oro_entity_merge.accessor.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor
     oro_entity_merge.accessor.default.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor
+    oro_entity_merge.accessor.relation.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor
 
     # Strategies
     oro_entity_merge.strategy.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy
+    oro_entity_merge.strategy.replace.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy
+    oro_entity_merge.strategy.merge.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStategy
 services:
     oro_entity_merge.mass_action.data_handler:
         class: %oro_entity_merge.mass_action.data_handler.class%
@@ -52,6 +55,13 @@ services:
         tags:
             - { name: oro_entity_merge.accessor }
 
+    oro_entity_merge.accessor.relation:
+        class: %oro_entity_merge.accessor.relation.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_entity_merge.accessor }
+
     # Strategies
     oro_entity_merge.strategy.delegate:
         class: %oro_entity_merge.strategy.delegate.class%
@@ -59,3 +69,17 @@ services:
     oro_entity_merge.strategy:
         alias: oro_entity_merge.strategy.delegate
 
+    oro_entity_merge.strategy.replace:
+        class: %oro_entity_merge.strategy.replace.class%
+        arguments:
+            - @oro_entity_merge.accessor.delegate
+        tags:
+            - { name: oro_entity_merge.strategy }
+
+    oro_entity_merge.strategy.merge:
+        class: %oro_entity_merge.strategy.merge.class%
+        arguments:
+            - @oro_entity_merge.accessor.delegate
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_entity_merge.strategy }
