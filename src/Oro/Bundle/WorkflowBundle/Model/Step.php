@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
-
 class Step
 {
     /**

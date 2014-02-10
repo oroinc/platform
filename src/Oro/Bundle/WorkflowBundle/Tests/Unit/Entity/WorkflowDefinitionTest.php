@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 
 class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
@@ -131,6 +132,44 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $actualSteps = $this->workflowDefinition->getSteps();
         $this->assertCount(1, $actualSteps);
         $this->assertEquals($stepOne, $actualSteps[0]);
+    }
+
+    public function testSetGetAclIdentities()
+    {
+        $firstStep = new WorkflowStep();
+        $firstStep->setName('first_step');
+        $secondStep = new WorkflowStep();
+        $secondStep->setName('second_step');
+        $this->workflowDefinition->setSteps(array($firstStep, $secondStep));
+
+        $firstEntityAcl = new WorkflowEntityAcl();
+        $firstEntityAcl->setStep($firstStep)->setAttribute('first_attribute');
+        $secondEntityAcl = new WorkflowEntityAcl();
+        $secondEntityAcl->setStep($secondStep)->setAttribute('second_attribute');
+
+        // default
+        $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
+
+        // adding
+        $this->workflowDefinition->setEntityAcls(array($firstEntityAcl));
+        $this->assertCount(1, $this->workflowDefinition->getEntityAcls());
+        $this->assertEquals($firstEntityAcl, $this->workflowDefinition->getEntityAcls()->first());
+
+        // merging
+        $this->workflowDefinition->setEntityAcls(array($firstEntityAcl, $secondEntityAcl));
+        $this->assertCount(2, $this->workflowDefinition->getEntityAcls());
+        $entityAcls = array_values($this->workflowDefinition->getEntityAcls()->toArray());
+        $this->assertEquals($firstEntityAcl, $entityAcls[0]);
+        $this->assertEquals($secondEntityAcl, $entityAcls[1]);
+
+        // removing
+        $this->workflowDefinition->setEntityAcls(array($secondEntityAcl));
+        $this->assertCount(1, $this->workflowDefinition->getEntityAcls());
+        $this->assertEquals($secondEntityAcl, $this->workflowDefinition->getEntityAcls()->first());
+
+        // resetting
+        $this->workflowDefinition->setEntityAcls(array());
+        $this->assertEmpty($this->workflowDefinition->getEntityAcls()->toArray());
     }
 
     /**

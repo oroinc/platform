@@ -496,7 +496,7 @@ class WorkflowItem
             $aclIdentity->setWorkflowItem($this);
             $this->aclIdentities->add($aclIdentity);
         } else {
-            $this->getAclIdentityByAttribute($attributeStep)->import($aclIdentity);
+            $this->getAclIdentityByAttributeStep($attributeStep)->import($aclIdentity);
         }
 
         return $this;
@@ -511,7 +511,7 @@ class WorkflowItem
         $attributeStep = $aclIdentity->getAclAttributeStepKey();
 
         if ($this->hasAclIdentityByAttribute($attributeStep)) {
-            $aclIdentity = $this->getAclIdentityByAttribute($attributeStep);
+            $aclIdentity = $this->getAclIdentityByAttributeStep($attributeStep);
             $this->aclIdentities->removeElement($aclIdentity);
         }
 
@@ -524,17 +524,17 @@ class WorkflowItem
      */
     public function hasAclIdentityByAttribute($attribute)
     {
-        return $this->getAclIdentityByAttribute($attribute) !== null;
+        return $this->getAclIdentityByAttributeStep($attribute) !== null;
     }
 
     /**
-     * @param string $attribute
+     * @param string $attributeStep
      * @return null|WorkflowEntityAclIdentity
      */
-    public function getAclIdentityByAttribute($attribute)
+    public function getAclIdentityByAttributeStep($attributeStep)
     {
         foreach ($this->aclIdentities as $aclIdentity) {
-            if ($aclIdentity->getAclAttributeStepKey() == $attribute) {
+            if ($aclIdentity->getAclAttributeStepKey() == $attributeStep) {
                 return $aclIdentity;
             }
         }
