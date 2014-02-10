@@ -1,22 +1,28 @@
 {% block oro_entity_merge_widget %}
     {#{{ form_widget(form, { 'attr': {'class': 'select2'} }) }}
     {{ form_javascript(form) }}#}
-    <table style="width: 100%;">
+    <table class="table table-striped acl-table">
         <thead>
             <tr>
-                <td>
-                    {# @todo: render entity as string #}
-                    {{ form_label(form.masterEntity) }}
-                </td>
-                {% for child in form.masterEntity %}
+                <td>&nbsp;</td>
+                {% for entity in form.vars.value.entities %}
                     <td>
-                        {{ form_widget(child) }}
-                        {{ form_label(child) }}
+                        {{ oro_entity_merge_render_entity_label(form.vars.value, loop.index - 1) }}
                     </td>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
+            <tr class="default-field">
+                <td>
+                    <strong>{{ form.masterEntity.vars.label }}</strong>
+                </td>
+                {% for child in form.masterEntity %}
+                    <td>
+                        {{ form_widget(child) }}
+                    </td>
+                {% endfor %}
+            </tr>
             {% for child in form.children.fields %}
                 {{ form_widget(child) }}
             {% endfor %}
@@ -26,7 +32,7 @@
 
 {% block oro_entity_merge_field_widget %}
     <tr>
-        <td rowspan="2">
+        <td>
             {{ form_label(form) }}
         </td>
         {% for child in form.children.sourceEntity %}
@@ -36,9 +42,16 @@
             </td>
         {% endfor %}
     </tr>
-    <tr>
-        <td>
-            {{ form_rest(form) }}
-        </td>
-    </tr>
+{% endblock %}
+
+{% block oro_entity_merge_field_label %}
+    {% if label is not sameas(false) %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <strong {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</strong>
+    {% endif %}
 {% endblock %}

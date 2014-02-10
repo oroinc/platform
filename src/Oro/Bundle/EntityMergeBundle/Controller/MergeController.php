@@ -31,42 +31,14 @@ class MergeController extends Controller
      */
     public function mergeAction()
     {
-        /**
-         * @var MergeDataRequestFactory $requestFactory
-         */
-        $requestFactory = $data  = $this->get('oro_entity_merge.http_foundation.merge_data_request_factory');
-        $data = $requestFactory->createMergeData();
-        ob_start();
-        print_r(count($data));
-        print_r($data->getEntities());
-        $result = ob_get_contents();
-
-        ob_end_clean();
-
-        return array('result'=>$result);
-    }
-    /**
-     * @Route("/test", name="oro_entity_merge_form_test")
-     * @AclAncestor("oro_entity_merge")
-     * @Template()
-     */
-    public function testAction()
-    {
-        $merger = $this->container->get('oro_entity_merge.merger');
-
-        $entityName = $this->container->getParameter('orocrm_account.account.entity.class');
-
-        $entities = $this->getTestEntities($entityName);
-
-        $entityMetadata = $this->getMetadataFactory()->createMergeMetadata($entityName);
-        $data = $this->createEntityMergeData($entities, $entityMetadata);
+        $mergeData = $this->getMergeDataRequestFactory()->createMergeData();
 
         $form = $this->createForm(
             'oro_entity_merge',
-            $data,
+            $mergeData,
             array(
-                'metadata' => $entityMetadata,
-                'entities' => $entities,
+                'metadata' => $mergeData->getMetadata(),
+                'entities' => $mergeData->getEntities(),
             )
         );
 
@@ -75,41 +47,11 @@ class MergeController extends Controller
         );
     }
 
-    protected function getTestEntities($entityName)
-    {
-        /** @var \Doctrine\ORM\EntityRepository $repository */
-        $repository = $this->getDoctrine()->getRepository($entityName);
-        return $repository->createQueryBuilder('e')
-            ->orderBy('e.id')
-            ->setFirstResult(0)
-            ->setMaxResults(5)
-            ->getQuery()
-            ->execute();
-    }
-
     /**
-     * @return MetadataFactory
+     * @return MergeDataRequestFactory
      */
-    protected function getMetadataFactory()
+    protected function getMergeDataRequestFactory()
     {
-        return $this->get('oro_entity_merge.metadata.factory');
-    }
-
-    /**
-     * @param object[] $entities
-     * @param EntityMetadata $metadata
-     * @return EntityData
-     */
-    protected function createEntityMergeData(array $entities, EntityMetadata $metadata)
-    {
-        $data = new EntityData($metadata);
-
-        $data->setEntities($entities);
-
-        foreach ($metadata->getFieldsMetadata() as $fieldMetadata) {
-            $field = $data->addNewField($fieldMetadata);
-        }
-
-        return $data;
+        return $this->get('oro_entity_merge.http_foundation.merge_data_request_factory');
     }
 }

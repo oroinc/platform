@@ -22,8 +22,8 @@ class MergeType extends AbstractType
             'masterEntity',
             'entity',
             array(
-                'label' => 'Master Entity', // @todo Translate this string
-                'class' => 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account', // @todo Pass class dynamically
+                'label' => 'Master Record', // @todo Translate this string
+                'class' => $metadata->getClassName(),
                 'choices' => $options['entities'],
                 'multiple' => false,
                 'expanded' => true
