@@ -11,7 +11,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testGetConfigTreeBuilder()
     {
         $configuration = new Configuration();
-        $builder = $configuration->getConfigTreeBuilder();
+        $builder       = $configuration->getConfigTreeBuilder();
 
         $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $builder);
     }
@@ -22,7 +22,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     public function testProcessConfiguration($configs, $expected)
     {
         $configuration = new Configuration();
-        $processor = new Processor();
+        $processor     = new Processor();
         $this->assertEquals($expected, $processor->processConfiguration($configuration, $configs));
     }
 
@@ -30,7 +30,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             'empty' => array(
-                'configs' => array(array()),
+                'configs'  => array(array()),
                 'expected' => array()
             )
         );

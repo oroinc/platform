@@ -21,5 +21,6 @@ class OroEntityMergeExtension extends Extension
         $loader->load('services.yml');
         $loader->load('mass_action.yml');
         $loader->load('form_types.yml');
+        $loader->load('twig_extensions.yml');
     }
 }

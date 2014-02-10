@@ -1,44 +1,44 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\FieldMerger;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
-use Oro\Bundle\EntityMergeBundle\Model\FieldMerger\CompositeFieldMerger;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy;
 
-class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
+class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CompositeFieldMerger $merger;
+     * @var DelegateStrategy $strategy
      */
-    protected $merger;
+    protected $strategy;
 
     protected function setUp()
     {
-        $this->merger = new CompositeFieldMerger();
+        $this->strategy = new DelegateStrategy();
     }
 
     public function testConstructor()
     {
-        $foo = $this->createFieldMerger();
-        $bar = $this->createFieldMerger();
+        $foo = $this->createStrategy('foo');
+        $bar = $this->createStrategy('bar');
 
-        $merger = new CompositeFieldMerger(array($foo, $bar));
+        $strategy = new DelegateStrategy(array($foo, $bar));
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $merger);
+        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $strategy);
     }
 
     public function testAdd()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $this->merger);
+        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $this->strategy);
     }
 
     public function testSupportsTrueLast()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
-        $this->merger->add($baz = $this->createFieldMerger());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
+        $this->strategy->add($baz = $this->createStrategy('baz'));
 
         $data = $this->createFieldData();
 
@@ -57,13 +57,13 @@ class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
             ->with($data)
             ->will($this->returnValue(true));
 
-        $this->assertTrue($this->merger->supports($data));
+        $this->assertTrue($this->strategy->supports($data));
     }
 
     public function testSupportsTrueFirst()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
 
         $data = $this->createFieldData();
 
@@ -74,13 +74,13 @@ class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
 
         $bar->expects($this->never())->method('supports');
 
-        $this->assertTrue($this->merger->supports($data));
+        $this->assertTrue($this->strategy->supports($data));
     }
 
     public function testSupportsFalse()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
-        $this->merger->add($bar = $this->createFieldMerger());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
 
         $data = $this->createFieldData();
 
@@ -94,12 +94,12 @@ class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
             ->with($data)
             ->will($this->returnValue(false));
 
-        $this->assertFalse($this->merger->supports($data));
+        $this->assertFalse($this->strategy->supports($data));
     }
 
     public function testMerge()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
 
         $data = $this->createFieldData();
 
@@ -112,16 +112,16 @@ class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
             ->method('merge')
             ->with($data);
 
-        $this->merger->merge($data);
+        $this->strategy->merge($data);
     }
 
     /**
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Field "test" cannot be merged.
+     * @expectedExceptionMessage Cannot find merge strategy for "test" field.
      */
     public function testMergeFails()
     {
-        $this->merger->add($foo = $this->createFieldMerger());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
 
         $data = $this->createFieldData();
 
@@ -134,12 +134,17 @@ class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
             ->with($data)
             ->will($this->returnValue(false));
 
-        $this->merger->merge($data);
+        $this->strategy->merge($data);
     }
 
-    protected function createFieldMerger()
+    protected function createStrategy($name)
     {
-        return $this->getMock('Oro\Bundle\EntityMergeBundle\Model\FieldMerger\FieldMergerInterface');
+        $result = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
+        $result->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+
+        return $result;
     }
 
     protected function createFieldData()

@@ -2,15 +2,42 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+
 class FieldMetadata extends Metadata implements FieldMetadataInterface
 {
+    /**
+     * @var DoctrineMetadata
+     */
+    protected $doctrineMetadata;
+
+    /**
+     * @param array $options
+     * @param DoctrineMetadata $doctrineMetadata
+     */
+    public function __construct(array $options, DoctrineMetadata $doctrineMetadata)
+    {
+        parent::__construct($options);
+        $this->doctrineMetadata = $doctrineMetadata;
+    }
+
+    /**
+     * @return DoctrineMetadata
+     */
+    public function getDoctrineMetadata()
+    {
+        return $this->doctrineMetadata;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function getFieldName()
     {
-        /** @todo Some checks that $this->get(DoctrineMetadata::OPTION_NAME) returns valid value? */
-        return $this->has(DoctrineMetadata::OPTION_NAME) ?
-            $this->get(DoctrineMetadata::OPTION_NAME)->get('fieldName') : null;
+        if (!$this->getDoctrineMetadata()->has('fieldName')) {
+            throw new InvalidArgumentException('Cannot get field name from merge field metadata.');
+        }
+
+        return $this->getDoctrineMetadata()->get('fieldName');
     }
 }

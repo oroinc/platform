@@ -52,6 +52,8 @@ class MergeController extends Controller
      */
     public function testAction()
     {
+        $merger = $this->container->get('oro_entity_merge.merger');
+
         $entityName = $this->container->getParameter('orocrm_account.account.entity.class');
 
         $entities = $this->getTestEntities($entityName);

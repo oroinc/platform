@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Model\FieldMerger;
+namespace Oro\Bundle\EntityMergeBundle\Model\Strategy;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 
-interface FieldMergerInterface
+interface StrategyInterface
 {
     /**
      * Merge field
@@ -20,4 +20,11 @@ interface FieldMergerInterface
      * @return bool
      */
     public function supports(FieldData $fieldData);
+
+    /**
+     * Get name of field merge strategy
+     *
+     * @return string
+     */
+    public function getName();
 }
