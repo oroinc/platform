@@ -4,5 +4,7 @@ parameters:
 services:
     oro_entity_merge.twig.extension:
         class: %oro_entity_merge.twig.extension.class%
+        arguments:
+            - @oro_entity_merge.accessor
         tags:
             - { name: twig.extension }

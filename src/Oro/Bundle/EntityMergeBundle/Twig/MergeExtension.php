@@ -4,9 +4,23 @@ namespace Oro\Bundle\EntityMergeBundle\Twig;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 
 class MergeExtension extends \Twig_Extension
 {
+    /**
+     * @var \Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface
+     */
+    protected $accessor;
+
+    /**
+     * @param AccessorInterface $accessor
+     */
+    public function __construct(AccessorInterface $accessor)
+    {
+        $this->accessor = $accessor;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -19,9 +33,10 @@ class MergeExtension extends \Twig_Extension
 
     public function renderMergeFieldValue(FieldData $fieldData, $entityOffset)
     {
-        $metadata = $fieldData->getMetadata();
         $entity = $fieldData->getEntityData()->getEntityByOffset($entityOffset);
-        $fieldName = $metadata->getFieldName();
+        $metadata = $fieldData->getMetadata();
+
+        return $this->accessor->getValue($entity, $metadata);
     }
 
     /**

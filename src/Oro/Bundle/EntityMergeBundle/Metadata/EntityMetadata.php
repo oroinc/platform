@@ -4,8 +4,13 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
-class EntityMetadata extends Metadata implements MetadataInterface, EntityMetadataInterface
+class EntityMetadata extends Metadata implements EntityMetadataInterface
 {
+    /**
+     * @var DoctrineMetadata
+     */
+    protected $doctrineMetadata;
+
     /**
      * @var FieldMetadata[]
      */
@@ -14,14 +19,26 @@ class EntityMetadata extends Metadata implements MetadataInterface, EntityMetada
     /**
      * @param array $options
      * @param FieldMetadata[] $fieldsMetadata
+     * @param DoctrineMetadata $doctrineMetadata
      */
-    public function __construct(array $options = [], array $fieldsMetadata = [])
+    public function __construct(array $options, array $fieldsMetadata, DoctrineMetadata $doctrineMetadata)
     {
-        $this->options       = $options;
-        $this->fieldsMetadata = $fieldsMetadata;
+        parent::__construct($options);
+        $this->fieldsMetadata   = $fieldsMetadata;
+        $this->doctrineMetadata = $doctrineMetadata;
     }
 
     /**
+     * @return DoctrineMetadata
+     */
+    public function getDoctrineMetadata()
+    {
+        return $this->doctrineMetadata;
+    }
+
+    /**
+     * Get list of fields metadata
+     *
      * @return FieldMetadata[]
      */
     public function getFieldsMetadata()
@@ -30,12 +47,15 @@ class EntityMetadata extends Metadata implements MetadataInterface, EntityMetada
     }
 
     /**
+     * Get entity class name
+     *
      * @return string
+     * @throws InvalidArgumentException
      */
     public function getClassName()
     {
         if (!$this->getDoctrineMetadata()->has('name')) {
-            throw new InvalidArgumentException('Class name not set');
+            throw new InvalidArgumentException('Cannot get class name from merge entity metadata.');
         }
 
         return $this->getDoctrineMetadata()->get('name');

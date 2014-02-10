@@ -8,37 +8,72 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 class FieldMetadataTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage DoctrineMetadata not set
+     * @var array
      */
-    public function testDoctrineOptionNotExists()
+    protected $options;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineMetadata;
+
+    /**
+     * @var FieldMetadata
+     */
+    protected $metadata;
+
+    protected function setUp()
     {
-        $metadata = new FieldMetadata();
-        $this->assertNull($metadata->getFieldName());
+        $this->options = array('foo' => 'bar');
+        $this->doctrineMetadata = $this->createDoctrineMetadata();
+        $this->metadata = new FieldMetadata($this->options, $this->doctrineMetadata);
+    }
+
+    public function testGetDoctrineMetadata()
+    {
+        $this->assertEquals($this->doctrineMetadata, $this->metadata->getDoctrineMetadata());
+    }
+
+    public function testGetFieldName()
+    {
+        $className = 'test';
+
+        $this->doctrineMetadata->expects($this->once())
+            ->method('has')
+            ->with('fieldName')
+            ->will($this->returnValue(true));
+
+        $this->doctrineMetadata->expects($this->once())
+            ->method('get')
+            ->with('fieldName')
+            ->will($this->returnValue($className));
+
+        $this->assertEquals($className, $this->metadata->getFieldName());
     }
 
     /**
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Field name not set
+     * @expectedExceptionMessage Cannot get field name from merge field metadata.
      */
-    public function testDoctrineMetadataExistsWithNotSetField()
+    public function testGetFieldNameFails()
     {
-        $metadata         = new FieldMetadata();
-        $doctrineMetadata = new DoctrineMetadata();
-        $metadata->setDoctrineMetadata($doctrineMetadata);
+        $this->doctrineMetadata->expects($this->once())
+            ->method('has')
+            ->with('fieldName')
+            ->will($this->returnValue(false));
 
-        $this->assertNull($metadata->getFieldName());
+        $this->metadata->getFieldName();
     }
 
-    public function testDoctrineMetadataExists()
+    protected function createDoctrineMetadata()
     {
-        $metadata         = new FieldMetadata();
-        $doctrineMetadata = new DoctrineMetadata();
+        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
+            ->disableOriginalConstructor()->getMock();
+    }
 
-        $fieldName = 'new_field';
-        $doctrineMetadata->set('fieldName', $fieldName);
-        $metadata->setDoctrineMetadata($doctrineMetadata);
-
-        $this->assertEquals($fieldName, $metadata->getFieldName());
+    protected function createFieldMetadata()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
+            ->disableOriginalConstructor()->getMock();
     }
 }

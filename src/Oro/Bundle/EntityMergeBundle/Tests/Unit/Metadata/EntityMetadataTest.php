@@ -2,94 +2,88 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
-use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 
 class EntityMetadataTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider constructorProvider
+     * @var array
      */
-    public function testConstruct($options, $fieldMetadata, $expectedExceptionMessage)
-    {
-        $this->setExpectedException(
-            '\Exception',
-            $expectedExceptionMessage
-        );
-        $metadata = new EntityMetadata($options, $fieldMetadata);
-    }
+    protected $options;
 
-    public function constructorProvider()
-    {
-        return [
-            'both_invalid'   => [
-                'options'                  => null,
-                'fieldMetadata'            => null,
-                'expectedExceptionMessage' => 'must be of the type array, null given',
-            ],
-            'first_invalid'  => [
-                'options'                  => true,
-                'fieldMetadata'            => [],
-                'expectedExceptionMessage' => 'must be of the type array, boolean given',
-            ],
-            'second_invalid' => [
-                'options'                  => [],
-                'fieldMetadata'            => 'string',
-                'expectedExceptionMessage' => 'must be of the type array, string given',
-            ],
-        ];
-    }
+    /**
+     * @var array
+     */
+    protected $fieldsMetadata;
 
-    public function testConstructEmptyArguments()
-    {
-        $metadata = new EntityMetadata();
-    }
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineMetadata;
 
-    public function testConstructBothValid()
+    /**
+     * @var EntityMetadata
+     */
+    protected $metadata;
+
+    protected function setUp()
     {
-        $metadata = new EntityMetadata(['code' => 'value'], ['metadata']);
+        $this->options = array('foo' => 'bar');
+        $this->fieldsMetadata = array($this->createFieldMetadata());
+        $this->doctrineMetadata = $this->createDoctrineMetadata();
+        $this->metadata = new EntityMetadata($this->options, $this->fieldsMetadata, $this->doctrineMetadata);
     }
 
     public function testGetFieldsMetadata()
     {
-        $fieldMetadata = ['metadata'];
-        $metadata      = new EntityMetadata(['code' => 'value'], $fieldMetadata);
-
-        $this->assertEquals($fieldMetadata, $metadata->getFieldsMetadata());
+        $this->assertEquals($this->fieldsMetadata, $this->metadata->getFieldsMetadata());
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage DoctrineMetadata not set
-     */
+    public function testGetDoctrineMetadata()
+    {
+        $this->assertEquals($this->doctrineMetadata, $this->metadata->getDoctrineMetadata());
+    }
+
     public function testGetClassName()
     {
-        $metadata = new EntityMetadata();
-        $this->assertNull($metadata->getClassName());
+        $className = 'TestEntity';
+
+        $this->doctrineMetadata->expects($this->once())
+            ->method('has')
+            ->with('name')
+            ->will($this->returnValue(true));
+
+        $this->doctrineMetadata->expects($this->once())
+            ->method('get')
+            ->with('name')
+            ->will($this->returnValue($className));
+
+        $this->assertEquals($className, $this->metadata->getClassName());
     }
 
     /**
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Class name not set
+     * @expectedExceptionMessage Cannot get class name from merge entity metadata.
      */
-    public function testDoctrineMetadataExistsWithNotSetField()
+    public function testGetClassNameFails()
     {
-        $metadata         = new EntityMetadata();
-        $doctrineMetadata = new DoctrineMetadata();
-        $metadata->setDoctrineMetadata($doctrineMetadata);
+        $this->doctrineMetadata->expects($this->once())
+            ->method('has')
+            ->with('name')
+            ->will($this->returnValue(false));
 
-        $this->assertNull($metadata->getClassName());
+        $this->metadata->getClassName();
     }
 
-    public function testDoctrineMetadataExists()
+    protected function createDoctrineMetadata()
     {
-        $metadata         = new EntityMetadata();
-        $doctrineMetadata = new DoctrineMetadata();
+        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
+            ->disableOriginalConstructor()->getMock();
+    }
 
-        $className = 'className';
-        $doctrineMetadata->set('name', $className);
-        $metadata->setDoctrineMetadata($doctrineMetadata);
-
-        $this->assertEquals($className, $metadata->getClassName());
+    protected function createFieldMetadata()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
+            ->disableOriginalConstructor()->getMock();
     }
 }

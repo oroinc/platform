@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -12,14 +11,6 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class MetadataFactory
 {
-    /**
-     * @var array
-     */
-    protected static $relationFieldTypes = [
-        'ref-one',
-        'ref-many'
-    ];
-
     /**
      * @var ConfigProvider
      */
@@ -45,31 +36,40 @@ class MetadataFactory
      *
      * @param string $className
      * @return EntityMetadata
+     * @throws InvalidArgumentException
      */
     public function createMergeMetadata($className)
     {
         $entityMergeConfig = $this->configProvider->getConfig($className);
 
         if (!$entityMergeConfig) {
-            throw new InvalidArgumentException(sprintf('Config for "%s" not exists', $className));
+            throw new InvalidArgumentException(sprintf('Merge config for "%s" is not exist.', $className));
         }
-
-        /* @var ClassMetadata $doctrineMetadata */
-        $doctrineMetadata = $this
-            ->entityManager
-            ->getMetadataFactory()
-            ->getMetadataFor($className);
 
         $fieldsMetadata = array_merge(
             $this->createFieldsMetadata($className),
-            $this->createRelationMetadata($className)
+            $this->createMappedOutsideFieldsMetadata($className)
         );
 
-        $entityDoctrineMetadata = new DoctrineMetadata((array)$doctrineMetadata);
-        $metadata               = new EntityMetadata($entityMergeConfig->all(), $fieldsMetadata);
-        $metadata->setDoctrineMetadata($entityDoctrineMetadata);
+        $metadata = new EntityMetadata(
+            $entityMergeConfig->all(),
+            $fieldsMetadata,
+            new DoctrineMetadata($className, (array)$this->getDoctrineMetadataFor($className))
+        );
 
         return $metadata;
+    }
+
+    /**
+     * @param string $className
+     * @return \Doctrine\ORM\Mapping\ClassMetadata
+     */
+    protected function getDoctrineMetadataFor($className)
+    {
+        return $this
+            ->entityManager
+            ->getMetadataFactory()
+            ->getMetadataFor($className);
     }
 
     /**
@@ -82,32 +82,23 @@ class MetadataFactory
     {
         $fieldMetadata = [];
 
-        /* @var \Doctrine\ORM\Mapping\ClassMetadata $doctrineMetadata */
-        $doctrineMetadata = $this
-            ->entityManager
-            ->getMetadataFactory()
-            ->getMetadataFor($className);
+        $doctrineMetadata = $this->getDoctrineMetadataFor($className);
 
         $configs = $this->configProvider->getConfigs($className);
 
         if ($configs) {
             /* @var ConfigInterface $config */
             foreach ($configs as $config) {
-                $fieldType = $config->getId()->getFieldType();
                 $fieldName = $config->getId()->getFieldName();
 
                 if ($options = $config->all()) {
-                    if (in_array($fieldType, self::$relationFieldTypes)) {
-                        $fieldMapping  = $doctrineMetadata->getAssociationMapping($fieldName);
-                        $mergeMetadata = new CollectionMetadata($options);
+                    if ($doctrineMetadata->hasAssociation($fieldName)) {
+                        $fieldMapping = $doctrineMetadata->getAssociationMapping($fieldName);
                     } else {
-                        $fieldMapping  = $doctrineMetadata->getFieldMapping($fieldName);
-                        $mergeMetadata = new FieldMetadata($options);
+                        $fieldMapping = $doctrineMetadata->getFieldMapping($fieldName);
                     }
 
-                    $fieldDoctrineMetadata = new DoctrineMetadata($fieldMapping);
-                    $mergeMetadata->setDoctrineMetadata($fieldDoctrineMetadata);
-                    $fieldMetadata[] = $mergeMetadata;
+                    $fieldMetadata[] = new FieldMetadata($options, new DoctrineMetadata($className, $fieldMapping));
                 }
             }
         }
@@ -119,35 +110,34 @@ class MetadataFactory
      * Get metadata from doctrine relations ref-one and ref-many outside of the entity
      *
      * @param string $className
-     * @return RelationMetadata[]
+     * @return FieldMetadata[]
      */
-    public function createRelationMetadata($className)
+    public function createMappedOutsideFieldsMetadata($className)
     {
-        $relationMetadata        = [];
-        $repository              = $this->entityManager->getRepository('OroEntityConfigBundle:ConfigModelValue');
-        $configs                 = $repository->findBy(['code' => 'merge_relation_enable']);
-        $doctrineMetadataFactory = $this->entityManager->getMetadataFactory();
+        $relationMetadata = [];
+        $repository       = $this->entityManager->getRepository('OroEntityConfigBundle:ConfigModelValue');
+        $configs          = $repository->findBy(['code' => 'merge_relation_enable']);
 
-        if ($configs) {
-            /* @var ConfigModelValue $config */
-            foreach ($configs as $config) {
-                $field           = $config->getField();
-                $fieldName       = $field->getFieldName();
-                $entity          = $field->getEntity();
-                $entityClassName = $entity->getClassName();
+        if (!$configs) {
+            return $relationMetadata;
+        }
 
-                /* @var \Doctrine\ORM\Mapping\ClassMetadata $entityDoctrineMetadata */
-                $entityDoctrineMetadata = $doctrineMetadataFactory->getMetadataFor($entityClassName);
-                $fieldMapping           = $entityDoctrineMetadata->getAssociationMapping($fieldName);
-                $fieldDoctrineMetadata  = new DoctrineMetadata($fieldMapping);
+        /* @var ConfigModelValue $config */
+        foreach ($configs as $config) {
+            $field           = $config->getField();
+            $fieldName       = $field->getFieldName();
+            $entity          = $field->getEntity();
+            $entityClassName = $entity->getClassName();
+
+            $doctrineMetadata = $this->getDoctrineMetadataFor($entityClassName);
+
+            if ($doctrineMetadata->hasAssociation($fieldName)) {
+                $fieldMapping           = $doctrineMetadata->getAssociationMapping($fieldName);
+                $fieldDoctrineMetadata  = new DoctrineMetadata($className, $fieldMapping);
 
                 if ($fieldDoctrineMetadata->get('targetEntity') == $className) {
-                    $fieldConfig   = $this->configProvider->getConfig($entityClassName, $fieldName);
-                    $mergeMetadata = new RelationMetadata($fieldConfig->all());
-
-                    $mergeMetadata->setDoctrineMetadata($fieldDoctrineMetadata);
-
-                    $relationMetadata[] = $mergeMetadata;
+                    $fieldConfig        = $this->configProvider->getConfig($entityClassName, $fieldName);
+                    $relationMetadata[] = new FieldMetadata($fieldConfig->all(), $fieldDoctrineMetadata);
                 }
             }
         }
