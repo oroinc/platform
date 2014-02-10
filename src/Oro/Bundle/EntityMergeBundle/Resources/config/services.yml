@@ -1,6 +1,7 @@
 parameters:
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
     oro_entity_merge.mass_action.data_handler.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassActionHandler
+    oro_entity_merge.mass_action.entity_data_provider.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeEntitiesDataProvider
     oro_entity_merge.http_foundation.merge_data_request_factory.class: Oro\Bundle\EntityMergeBundle\HttpFoundation\MergeDataRequestFactory
 
     # Merger
@@ -15,6 +16,10 @@ parameters:
 services:
     oro_entity_merge.mass_action.data_handler:
         class: %oro_entity_merge.mass_action.data_handler.class%
+        calls:
+            - [setMergeDataProvider, [@oro_entity_merge.mass_action.entity_data_provider]]
+    oro_entity_merge.mass_action.entity_data_provider:
+        class: %oro_entity_merge.mass_action.entity_data_provider.class%
         calls:
             - [setDoctrineRegistry, [@doctrine]]
     oro_entity_merge.http_foundation.merge_data_request_factory:
