@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Model\FieldMerger;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
-class CompositeFieldMerger implements FieldMergerInterface
+class DelegateFieldMerger implements FieldMergerInterface
 {
     /**
      * @var FieldMergerInterface[]

@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\FieldMerger;
 
-use Oro\Bundle\EntityMergeBundle\Model\FieldMerger\CompositeFieldMerger;
+use Oro\Bundle\EntityMergeBundle\Model\FieldMerger\DelegateFieldMerger;
 
-class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
+class DelegateFieldMergerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var CompositeFieldMerger $merger ;
+     * @var DelegateFieldMerger $merger ;
      */
     protected $merger;
 
     protected function setUp()
     {
-        $this->merger = new CompositeFieldMerger();
+        $this->merger = new DelegateFieldMerger();
     }
 
     public function testConstructor()
@@ -21,7 +21,7 @@ class CompositeFieldMergerTest extends \PHPUnit_Framework_TestCase
         $foo = $this->createFieldMerger();
         $bar = $this->createFieldMerger();
 
-        $merger = new CompositeFieldMerger(array($foo, $bar));
+        $merger = new DelegateFieldMerger(array($foo, $bar));
 
         $this->assertAttributeEquals(array($foo, $bar), 'elements', $merger);
     }
