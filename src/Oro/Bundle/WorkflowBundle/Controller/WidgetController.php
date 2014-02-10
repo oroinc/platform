@@ -92,10 +92,7 @@ class WidgetController extends Controller
      */
     public function startTransitionFormAction($transitionName, $workflowName)
     {
-        $entityId = $this->getRequest()->get('entityId');
-        if (!$entityId) {
-            throw new BadRequestHttpException('Entity identifier is required');
-        }
+        $entityId = $this->getRequest()->get('entityId', 0);
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
@@ -270,7 +267,7 @@ class WidgetController extends Controller
         $transitionsData = array();
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $transitions = $workflowManager->getStartTransitions($workflow, $entity);
+        $transitions = $workflowManager->getStartTransitions($workflow);
         /** @var Transition $transition */
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {

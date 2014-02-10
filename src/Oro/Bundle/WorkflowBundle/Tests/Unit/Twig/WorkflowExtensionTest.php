@@ -57,13 +57,13 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasWorkflow($result, $expected)
     {
-        $entity = new \stdClass();
+        $entityClass = '\stdClass';
         $this->workflowManager->expects($this->once())
-            ->method('getApplicableWorkflow')
-            ->with($entity)
+            ->method('getApplicableWorkflowByEntityClass')
+            ->with($entityClass)
             ->will($this->returnValue($result));
 
-        $this->assertEquals($expected, $this->extension->hasWorkflow($entity));
+        $this->assertEquals($expected, $this->extension->hasWorkflow($entityClass));
     }
 
     public function testHasWorkflowNoEntity()

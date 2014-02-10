@@ -33,16 +33,16 @@ class WorkflowExtension extends \Twig_Extension
     /**
      * Check for workflow instances
      *
-     * @param object $entity
+     * @param string $entityClass
      * @return bool
      */
-    public function hasWorkflow($entity)
+    public function hasWorkflow($entityClass)
     {
-        if (!$entity) {
+        if (!$entityClass) {
             return false;
         }
 
-        return $this->workflowManager->getApplicableWorkflow($entity) !== null;
+        return $this->workflowManager->getApplicableWorkflowByEntityClass($entityClass) !== null;
     }
 
     /**
