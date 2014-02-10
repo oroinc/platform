@@ -554,8 +554,6 @@ class ConfigManager
     }
 
     /**
-     * TODO:: check class name for custom entity
-     *
      * @param string|null $className
      * @param string|null $mode
      * @return EntityConfigModel
@@ -630,7 +628,6 @@ class ConfigManager
      * @param bool   $force - if TRUE overwrite existing value from annotation
      *
      * @TODO: need handling for removed values
-     *        need refactor getConfig
      */
     public function updateConfigEntityModel($className, $force = false)
     {
@@ -642,12 +639,11 @@ class ConfigManager
             if ($hasChanges) {
                 $provider->persist($config);
             }
-
-            $this->eventDispatcher->dispatch(
-                Events::UPDATE_ENTITY_CONFIG,
-                new EntityConfigEvent($className, $this)
-            );
         }
+        $this->eventDispatcher->dispatch(
+            Events::UPDATE_ENTITY_CONFIG,
+            new EntityConfigEvent($className, $this)
+        );
     }
 
     /**
@@ -656,7 +652,6 @@ class ConfigManager
      * @param bool   $force - if TRUE overwrite existing value from annotation
      *
      * @TODO: need handling for removed values
-     *        need refactor getConfig
      */
     public function updateConfigFieldModel($className, $fieldName, $force = false)
     {
@@ -677,6 +672,10 @@ class ConfigManager
                 $provider->persist($config);
             }
         }
+        $this->eventDispatcher->dispatch(
+            Events::UPDATE_FIELD_CONFIG,
+            new FieldConfigEvent($className, $fieldName, $this)
+        );
     }
 
     /**
