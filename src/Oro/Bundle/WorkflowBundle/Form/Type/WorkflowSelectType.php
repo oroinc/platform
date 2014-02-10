@@ -67,8 +67,8 @@ class WorkflowSelectType extends AbstractType
 
                     $choices = array();
                     if ($entityClass) {
-                        $workflowDefinition = $this->workflowRegistry->getWorkflowByEntityClass($entityClass);
-                        if ($workflowDefinition) {
+                        $workflowDefinitions = $this->workflowRegistry->getWorkflowsByEntityClass($entityClass);
+                        foreach ($workflowDefinitions as $workflowDefinition) {
                             $choices[$workflowDefinition->getName()] = $workflowDefinition->getLabel();
                         }
                     }

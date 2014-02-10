@@ -18,6 +18,9 @@ use JMS\Serializer\Annotation as Serializer;
  *
  * @ORM\Table(
  *      name="oro_workflow_item",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(name="oro_workflow_item_entity_definition_unq",columns={"entity_id", "workflow_name"})
+ *      },
  *      indexes={
  *          @ORM\Index(name="oro_workflow_item_workflow_name_idx", columns={"workflow_name"})
  *      }

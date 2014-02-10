@@ -301,7 +301,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($entity)
             ->will($this->returnValue($entityClass));
         $this->workflowRegistry->expects($this->once())
-            ->method('getWorkflowByEntityClass')
+            ->method('getActiveWorkflowByEntityClass')
             ->with($entityClass)
             ->will($this->returnValue($workflow));
 

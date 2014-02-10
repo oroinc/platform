@@ -23,6 +23,7 @@ services:
         arguments:
             - @doctrine
             - @oro_workflow.workflow_assembler
+            - @oro_entity_config.provider.workflow
 
     oro_workflow.manager:
         class: %oro_workflow.manager.class%

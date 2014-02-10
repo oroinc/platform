@@ -2,7 +2,7 @@ oro_entity_config:
     workflow:
         entity:
             items:
-                primary:
+                active_workflow:
                     options:
                         priority:           200
                         default_value:      null

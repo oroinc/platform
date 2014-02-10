@@ -37,7 +37,7 @@ class WorkflowDefinition
     /**
      * @var string
      *
-     * @ORM\Column(name="related_entity", type="string", length=255, unique=true)
+     * @ORM\Column(name="related_entity", type="string", length=255)
      */
     protected $relatedEntity;
 

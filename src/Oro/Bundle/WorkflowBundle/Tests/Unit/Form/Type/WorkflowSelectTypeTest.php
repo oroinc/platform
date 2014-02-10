@@ -8,7 +8,7 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
-class WorkflowSelectorTypeTest extends FormIntegrationTestCase
+class WorkflowSelectTypeTest extends FormIntegrationTestCase
 {
     const TEST_ENTITY_CLASS   = 'Test\Entity\Class';
     const TEST_WORKFLOW_NAME  = 'test_workflow_name';
@@ -53,13 +53,16 @@ class WorkflowSelectorTypeTest extends FormIntegrationTestCase
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
             ->getMock();
-        $testWorkflow = new Workflow($entityConnector);
+        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $testWorkflow = new Workflow($entityConnector, $aclManager);
         $testWorkflow->setName(self::TEST_WORKFLOW_NAME)
             ->setLabel(self::TEST_WORKFLOW_LABEL);
         $this->workflowRegistry->expects($this->any())
-            ->method('getWorkflowByEntityClass')
+            ->method('getWorkflowsByEntityClass')
             ->with(self::TEST_ENTITY_CLASS)
-            ->will($this->returnValue($testWorkflow));
+            ->will($this->returnValue(array($testWorkflow)));
 
         $form = $this->factory->create($this->type, null, $inputOptions);
 

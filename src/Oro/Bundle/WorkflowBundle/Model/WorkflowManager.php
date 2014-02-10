@@ -166,7 +166,7 @@ class WorkflowManager
      */
     public function getApplicableWorkflowByEntityClass($entityClass)
     {
-        return $this->workflowRegistry->getWorkflowByEntityClass($entityClass);
+        return $this->workflowRegistry->getActiveWorkflowByEntityClass($entityClass);
     }
 
     /**
