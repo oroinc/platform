@@ -40,3 +40,7 @@ services:
             - @doctrine.orm.entity_manager
             - @kernel
             - @service_container
+
+    oro_installer.migrations.loader:
+        class: Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader
+        arguments: [ @kernel, @doctrine.orm.entity_manager, @service_container ]
