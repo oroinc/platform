@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Extension;
 
+use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -9,7 +10,6 @@ use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityBundle\Form\Type\CustomEntityType;
-use Symfony\Component\Form\FormConfigBuilder;
 
 class ExtendEntityExtension extends AbstractTypeExtension
 {
