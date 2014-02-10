@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Accessor;
 
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor;
 
@@ -18,12 +18,12 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
-        $foo = $this->createAccessor();
-        $bar = $this->createAccessor();
+        $foo = $this->createAccessor('foo');
+        $bar = $this->createAccessor('bar');
 
         $accessor = new DelegateAccessor(array($foo, $bar));
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $accessor);
+        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $accessor);
     }
 
     public function testGetName()
@@ -33,17 +33,26 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testAdd()
     {
-        $this->accessor->add($foo = $this->createAccessor());
-        $this->accessor->add($bar = $this->createAccessor());
+        $this->accessor->add($foo = $this->createAccessor('foo'));
+        $this->accessor->add($bar = $this->createAccessor('bar'));
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $this->accessor);
+        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $this->accessor);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Cannot add accessor to itself.
+     */
+    public function testAddFails()
+    {
+        $this->accessor->add($this->accessor);
     }
 
     public function testSupportsTrueLast()
     {
-        $this->accessor->add($foo = $this->createAccessor());
-        $this->accessor->add($bar = $this->createAccessor());
-        $this->accessor->add($baz = $this->createAccessor());
+        $this->accessor->add($foo = $this->createAccessor('foo'));
+        $this->accessor->add($bar = $this->createAccessor('bar'));
+        $this->accessor->add($baz = $this->createAccessor('baz'));
 
         $entity = $this->createTestEntity(1);
         $metadata = $this->createFieldMetadata();
@@ -68,8 +77,8 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsTrueFirst()
     {
-        $this->accessor->add($foo = $this->createAccessor());
-        $this->accessor->add($bar = $this->createAccessor());
+        $this->accessor->add($foo = $this->createAccessor('foo'));
+        $this->accessor->add($bar = $this->createAccessor('bar'));
 
         $entity = $this->createTestEntity(1);
         $metadata = $this->createFieldMetadata();
@@ -86,8 +95,8 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsFalse()
     {
-        $this->accessor->add($foo = $this->createAccessor());
-        $this->accessor->add($bar = $this->createAccessor());
+        $this->accessor->add($foo = $this->createAccessor('foo'));
+        $this->accessor->add($bar = $this->createAccessor('bar'));
 
         $entity = $this->createTestEntity(1);
         $metadata = $this->createFieldMetadata();
@@ -107,7 +116,7 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetValue()
     {
-        $this->accessor->add($foo = $this->createAccessor());
+        $this->accessor->add($foo = $this->createAccessor('foo'));
 
         $entity = $this->createTestEntity(1);
         $metadata = $this->createFieldMetadata();
@@ -132,7 +141,7 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetValueFails()
     {
-        $this->accessor->add($foo = $this->createAccessor());
+        $this->accessor->add($foo = $this->createAccessor('foo'));
 
         $entity = $this->createTestEntity(1);
         $metadata = $this->createFieldMetadata();
@@ -151,7 +160,7 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function testSetValue()
     {
-        $this->accessor->add($foo = $this->createAccessor());
+        $this->accessor->add($foo = $this->createAccessor('foo'));
 
         $entity = $this->createTestEntity(1);
         $metadata = $this->createFieldMetadata();
@@ -169,9 +178,14 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
         $this->accessor->setValue($entity, $metadata, $value);
     }
 
-    protected function createAccessor()
+    protected function createAccessor($name)
     {
-        return $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface');
+        $result = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface');
+        $result->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+
+        return $result;
     }
 
     protected function createFieldMetadata()

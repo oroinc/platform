@@ -13,23 +13,26 @@ class DelegateStrategy implements StrategyInterface
     protected $elements;
 
     /**
-     * @param array $fieldMergers
+     * @param array $strategies
      */
-    public function __construct(array $fieldMergers = array())
+    public function __construct(array $strategies = array())
     {
         $this->elements = array();
 
-        foreach ($fieldMergers as $fieldMerger) {
-            $this->add($fieldMerger);
+        foreach ($strategies as $strategy) {
+            $this->add($strategy);
         }
     }
 
     /**
-     * @param StrategyInterface $fieldMerger
+     * @param StrategyInterface $strategy
      */
-    public function add(StrategyInterface $fieldMerger)
+    public function add(StrategyInterface $strategy)
     {
-        $this->elements[] = $fieldMerger;
+        if ($strategy === $this) {
+            throw new InvalidArgumentException("Cannot add strategy to itself.");
+        }
+        $this->elements[$strategy->getName()] = $strategy;
     }
 
     /**
@@ -64,9 +67,9 @@ class DelegateStrategy implements StrategyInterface
      */
     protected function match(FieldData $fieldData)
     {
-        foreach ($this->elements as $fieldMerger) {
-            if ($fieldMerger->supports($fieldData)) {
-                return $fieldMerger;
+        foreach ($this->elements as $strategy) {
+            if ($strategy->supports($fieldData)) {
+                return $strategy;
             }
         }
         return null;

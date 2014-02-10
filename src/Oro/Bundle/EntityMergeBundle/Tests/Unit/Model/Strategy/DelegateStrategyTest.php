@@ -18,27 +18,27 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor()
     {
-        $foo = $this->createStrategy();
-        $bar = $this->createStrategy();
+        $foo = $this->createStrategy('foo');
+        $bar = $this->createStrategy('bar');
 
         $strategy = new DelegateStrategy(array($foo, $bar));
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $strategy);
+        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $strategy);
     }
 
     public function testAdd()
     {
-        $this->strategy->add($foo = $this->createStrategy());
-        $this->strategy->add($bar = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
 
-        $this->assertAttributeEquals(array($foo, $bar), 'elements', $this->strategy);
+        $this->assertAttributeEquals(array('foo' => $foo, 'bar' => $bar), 'elements', $this->strategy);
     }
 
     public function testSupportsTrueLast()
     {
-        $this->strategy->add($foo = $this->createStrategy());
-        $this->strategy->add($bar = $this->createStrategy());
-        $this->strategy->add($baz = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
+        $this->strategy->add($baz = $this->createStrategy('baz'));
 
         $data = $this->createFieldData();
 
@@ -62,8 +62,8 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsTrueFirst()
     {
-        $this->strategy->add($foo = $this->createStrategy());
-        $this->strategy->add($bar = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
 
         $data = $this->createFieldData();
 
@@ -79,8 +79,8 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testSupportsFalse()
     {
-        $this->strategy->add($foo = $this->createStrategy());
-        $this->strategy->add($bar = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
+        $this->strategy->add($bar = $this->createStrategy('bar'));
 
         $data = $this->createFieldData();
 
@@ -99,7 +99,7 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testMerge()
     {
-        $this->strategy->add($foo = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
 
         $data = $this->createFieldData();
 
@@ -121,7 +121,7 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testMergeFails()
     {
-        $this->strategy->add($foo = $this->createStrategy());
+        $this->strategy->add($foo = $this->createStrategy('foo'));
 
         $data = $this->createFieldData();
 
@@ -137,9 +137,14 @@ class DelegateStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->merge($data);
     }
 
-    protected function createStrategy()
+    protected function createStrategy($name)
     {
-        return $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
+        $result = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
+        $result->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+
+        return $result;
     }
 
     protected function createFieldData()

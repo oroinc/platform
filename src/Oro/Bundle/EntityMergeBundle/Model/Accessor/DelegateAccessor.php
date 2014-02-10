@@ -26,10 +26,14 @@ class DelegateAccessor implements AccessorInterface
 
     /**
      * @param AccessorInterface $accessor
+     * @throws InvalidArgumentException
      */
     public function add(AccessorInterface $accessor)
     {
-        $this->elements[] = $accessor;
+        if ($accessor === $this) {
+            throw new InvalidArgumentException("Cannot add accessor to itself.");
+        }
+        $this->elements[$accessor->getName()] = $accessor;
     }
 
     /**

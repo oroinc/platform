@@ -2,9 +2,17 @@ parameters:
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
     oro_entity_merge.mass_action.data_handler.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassActionHandler
     oro_entity_merge.http_foundation.merge_data_request_factory.class: Oro\Bundle\EntityMergeBundle\HttpFoundation\MergeDataRequestFactory
+
+    # Accessors
+    oro_entity_merge.accessor.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor
+    oro_entity_merge.accessor.default.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor
+
+    # Strategies
+    oro_entity_merge.strategy.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy
 services:
     oro_entity_merge.mass_action.data_handler:
         class: %oro_entity_merge.mass_action.data_handler.class%
+
     oro_entity_merge.http_foundation.merge_data_request_factory:
         class: %oro_entity_merge.http_foundation.merge_data_request_factory.class%
         score: request
@@ -17,3 +25,24 @@ services:
         arguments:
             - @oro_entity_config.provider.merge
             - @doctrine.orm.entity_manager
+
+    # Accessors
+    oro_entity_merge.accessor.delegate:
+        class: %oro_entity_merge.accessor.delegate.class%
+
+    oro_entity_merge.accessor:
+        alias: oro_entity_merge.accessor.delegate
+
+    oro_entity_merge.accessor.default:
+        class: %oro_entity_merge.accessor.default.class%
+        tags:
+            - { name: oro_entity_merge.accessor }
+
+    # Strategies
+    oro_entity_merge.strategy.delegate:
+        alias: oro_entity_merge.strategy
+        class: %oro_entity_merge.strategy.delegate.class%
+
+    oro_entity_merge.strategy:
+        alias: oro_entity_merge.strategy.delegate
+
