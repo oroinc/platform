@@ -62,7 +62,7 @@ class MergeStategy implements StrategyInterface
     public function supports(FieldData $fieldData)
     {
         return ($fieldData->getMode() == MergeModes::MERGE) &&
-            ($fieldData->getMetadata()->getDoctrineMetadata()->isCollection() ||
+        ($fieldData->getMetadata()->getDoctrineMetadata()->isCollection() ||
             !$fieldData->getMetadata()->getDoctrineMetadata()->isMappedBySourceEntity());
     }
 
@@ -75,4 +75,4 @@ class MergeStategy implements StrategyInterface
     {
         // TODO: Implement getName() method.
     }
-} 
+}

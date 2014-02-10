@@ -25,7 +25,7 @@ class DefaultAccessor implements AccessorInterface
     /**
      * Checks if this class supports accessing entity
      *
-     * @param string $entity
+     * @param string        $entity
      * @param FieldMetadata $metadata
      * @return string
      */

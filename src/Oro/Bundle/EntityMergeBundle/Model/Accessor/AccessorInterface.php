@@ -9,7 +9,7 @@ interface AccessorInterface
     /**
      * Get value from entity
      *
-     * @param object $entity
+     * @param object        $entity
      * @param FieldMetadata $metadata
      * @return mixed
      */
@@ -18,16 +18,16 @@ interface AccessorInterface
     /**
      * Set value to entity
      *
-     * @param object $entity
+     * @param object        $entity
      * @param FieldMetadata $metadata
-     * @param mixed $value
+     * @param mixed         $value
      */
     public function setValue($entity, FieldMetadata $metadata, $value);
 
     /**
      * Checks if this class supports accessing entity
      *
-     * @param string $entity
+     * @param string        $entity
      * @param FieldMetadata $metadata
      * @return bool
      */
