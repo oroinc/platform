@@ -286,14 +286,12 @@
     {% set selector_id = selector_name %}
 
     {# Actual date field that uses ISO format #}
-    {% set attr = attr|merge({'data-input-id': selector_id}) %}
     <span style="display:none">{{ block('date_widget') }}</span>
 
     {# Visible fake datepicker field that uses localized format #}
-    <input type="text"
-           name="{{ selector_name }}"
-           id="{{ selector_id }}"
-           placeholder="{{ placeholder|trans }}" />
+    {% set id = selector_id %}
+    {% set full_name = selector_name %}
+    <input type="text" {{ block('widget_attributes') }} />
 
     <script type="text/javascript">
         require(['jquery', 'oro/formatter/datetime', 'jquery-ui'],
@@ -335,14 +333,12 @@
     {% set selector_id = selector_name %}
 
     {# Actual date field that uses ISO format #}
-    {% set attr = attr|merge({'data-input-id': selector_id}) %}
     <span style="display:none">{{ block('datetime_widget') }}</span>
 
     {# Visible fake datetimepicker field that uses localized format #}
-    <input type="text"
-           name="{{ selector_name }}"
-           id="{{ selector_id }}"
-           placeholder="{{ placeholder|trans }}" />
+    {% set id = selector_id %}
+    {% set full_name = selector_name %}
+    <input type="text" {{ block('widget_attributes') }} />
 
     <script type="text/javascript">
         require(['jquery', 'oro/formatter/datetime', 'jquery-ui-timepicker'],

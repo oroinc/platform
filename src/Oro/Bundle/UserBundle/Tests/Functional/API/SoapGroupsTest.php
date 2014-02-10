@@ -61,16 +61,24 @@ class SoapGroupsTest extends WebTestCase
     {
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
-        foreach ($groups['item'] as $group) {
-            if ($group['name'] == $request['name']) {
-                $groupId = $group['id'];
-                break;
+
+        $group = array_filter(
+            $groups['item'],
+            function ($a) use ($request) {
+                return $a['name'] === $request['name'];
             }
-        }
+        );
+
+        $this->assertNotEmpty($group, 'Created group is not in groups list');
+
+        $groupId = reset($group)['id'];
+
         $request['name'] .= '_Updated';
+
         $result = $this->client->getSoap()->updateGroup($groupId, $request);
         $result = ToolsAPI::classToArray($result);
         ToolsAPI::assertEqualsResponse($response, $result);
+
         $group = $this->client->getSoap()->getGroup($groupId);
         $group = ToolsAPI::classToArray($group);
         $this->assertEquals($request['name'], $group['name']);
@@ -84,6 +92,7 @@ class SoapGroupsTest extends WebTestCase
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
         $this->assertEquals(6, count($groups['item']));
+
         foreach ($groups['item'] as $k => $group) {
             if ($k > 1) {
                 //do not delete default groups
@@ -91,6 +100,7 @@ class SoapGroupsTest extends WebTestCase
                 $this->assertTrue($result);
             }
         }
+
         $groups = $this->client->getSoap()->getGroups();
         $groups = ToolsAPI::classToArray($groups);
         $this->assertEquals(2, count($groups['item']));

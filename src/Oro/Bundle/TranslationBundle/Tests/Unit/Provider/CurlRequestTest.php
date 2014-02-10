@@ -35,11 +35,14 @@ class CurlRequestTest extends \PHPUnit_Framework_TestCase
 
     public function testExecute()
     {
+        $tmp = tempnam(sys_get_temp_dir(), '');
+
         $this->request->setOptions(
             [
-                CURLOPT_URL => 'file:///tmp',
+                CURLOPT_URL => 'file:///'.$tmp,
             ]
         );
+
 
         $this->assertTrue($this->request->execute());
     }
