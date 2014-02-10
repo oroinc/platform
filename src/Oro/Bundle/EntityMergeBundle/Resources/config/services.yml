@@ -5,10 +5,15 @@ parameters:
 services:
     oro_entity_merge.mass_action.data_handler:
         class: %oro_entity_merge.mass_action.data_handler.class%
+        calls:
+            - [setDoctrineRegistry, [@doctrine]]
     oro_entity_merge.http_foundation.merge_data_request_factory:
         class: %oro_entity_merge.http_foundation.merge_data_request_factory.class%
         score: request
-        public: true
+        arguments:
+            - @oro_datagrid.mass_action.parameters_parser
+            - @oro_datagrid.mass_action.dispatcher
+            - @oro_entity_merge.metadata.factory
         calls:
             - [setRequest, [@?request=]]
 

@@ -7,6 +7,8 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
 
 class MergeMassAction extends AbstractMassAction
 {
+    const MAX_ELEMENT_COUNT = 5;
+
     /** @var array */
     protected $requiredOptions = ['route', 'entity_name', 'data_identifier', 'max_element_count'];
 
@@ -34,8 +36,7 @@ class MergeMassAction extends AbstractMassAction
             $options['data_identifier'] = 'id';
         }
         if (empty($options['max_element_count'])) {
-            // @todo Replace with constant or value from configuration
-            $options['max_element_count'] = '5';
+            $options['max_element_count'] = self::MAX_ELEMENT_COUNT;
         }
 
         if (!isset($options['route_parameters'])) {

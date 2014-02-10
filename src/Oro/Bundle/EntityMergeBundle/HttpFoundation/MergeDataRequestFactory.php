@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\EntityMergeBundle\HttpFoundation;
 
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 use Symfony\Component\HttpFoundation\Request;
 
 class MergeDataRequestFactory
@@ -17,40 +21,62 @@ class MergeDataRequestFactory
      */
     private $massActionDispatcher;
 
-    public function __construct(MassActionParametersParser $parametersParser,
-        MassActionDispatcher $massActionDispatcher)
-    {
+    /**
+     * @var MetadataFactory $metadataFactory
+     */
+    private $metadataFactory;
 
+    /**
+     * @var @var EntityData $requestData
+     */
+    private $requestData;
+
+    public function __construct(
+        MassActionParametersParser $parametersParser,
+        MassActionDispatcher $massActionDispatcher,
+        MetadataFactory $metadataFactory
+    ) {
         $this->parametersParser = $parametersParser;
         $this->massActionDispatcher = $massActionDispatcher;
-    }
-
-    private function getDataFromRequest()
-    {
-        $request = $this->getRequest();
-        $gridName = $request->get('gridName', 'actionName');
-        $actionName = $request->get('', null);
-
-        /**
-         * @var MassActionParametersParser $parametersParser
-         */
-        $parametersParser = $this->get('oro_datagrid.mass_action.parameters_parser');
-        $parameters = $parametersParser->parse($request);
-        $requestData = array_merge($request->query->all(), $request->request->all());
-
-        /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
-
-        $parameters = $massActionDispatcher->dispatch($gridName, $actionName, $parameters, $requestData);
-        return $parameters;
+        $this->metadataFactory = $metadataFactory;
     }
 
     /**
-     * @return mixed
+     * @return EntityData
+     */
+    private function getDataFromRequest()
+    {
+        if ($this->requestData !== null) {
+            return $this->requestData;
+        }
+
+        $request = $this->getRequest();
+
+        $gridName = $request->get('gridName', null);
+        $actionName = $request->get('actionName', null);
+
+        $parameters = $this->parametersParser->parse($request);
+        $requestData = array_merge($request->query->all(), $request->request->all());
+        $handlerResult = $this->massActionDispatcher->dispatch($gridName, $actionName, $parameters, $requestData);
+
+        $options = $handlerResult['options'];
+        $entities = $handlerResult['entities'];
+
+        $entityMetadata = $this->metadataFactory->createMergeMetadata($options['entity_name']);
+        $data = new EntityData($entityMetadata);
+        $data->setEntities($entities);
+
+        $this->requestData = $data;
+
+        return $this->requestData;
+    }
+
+    /**
+     * @return EntityData
      */
     public function createMergeData()
     {
-
+        return $this->getDataFromRequest();
     }
 
     /**

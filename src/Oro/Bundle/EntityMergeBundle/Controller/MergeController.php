@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Controller;
 
+use Oro\Bundle\EntityMergeBundle\HttpFoundation\MergeDataRequestFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -30,7 +31,19 @@ class MergeController extends Controller
      */
     public function mergeAction()
     {
-        return array();
+        /**
+         * @var MergeDataRequestFactory $requestFactory
+         */
+        $requestFactory = $data  = $this->get('oro_entity_merge.http_foundation.merge_data_request_factory');
+        $data = $requestFactory->createMergeData();
+        ob_start();
+        print_r(count($data));
+        print_r($data->getEntities());
+        $result = ob_get_contents();
+
+        ob_end_clean();
+
+        return array('result'=>$result);
     }
     /**
      * @Route("/test", name="oro_entity_merge_form_test")
