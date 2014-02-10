@@ -26,6 +26,11 @@ class DelegateAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals(array($foo, $bar), 'elements', $accessor);
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('delegate', $this->accessor->getName());
+    }
+
     public function testAdd()
     {
         $this->accessor->add($foo = $this->createAccessor());

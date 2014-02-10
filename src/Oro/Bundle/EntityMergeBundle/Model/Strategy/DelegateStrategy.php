@@ -71,4 +71,12 @@ class DelegateStrategy implements StrategyInterface
         }
         return null;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'delegate';
+    }
 }

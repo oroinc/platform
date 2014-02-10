@@ -20,4 +20,11 @@ interface StrategyInterface
      * @return bool
      */
     public function supports(FieldData $fieldData);
+
+    /**
+     * Get name of field merge strategy
+     *
+     * @return string
+     */
+    public function getName();
 }

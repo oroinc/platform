@@ -19,6 +19,11 @@ class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
         $this->accessor = new DefaultAccessor();
     }
 
+    public function testGetName()
+    {
+        $this->assertEquals('default', $this->accessor->getName());
+    }
+
     /**
      * @dataProvider getValueDataProvider
      */
@@ -79,11 +84,6 @@ class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
                 'expected' => $this->createEntity('foo', $this->createEntity('baz')),
             ),
         );
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('default', $this->accessor->getName());
     }
 
     protected function createEntity($id = null, $parent = null)

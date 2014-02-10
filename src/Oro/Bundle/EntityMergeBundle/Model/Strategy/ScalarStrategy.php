@@ -47,4 +47,14 @@ class ScalarStrategy implements StrategyInterface
 
         return false;
     }
+
+    /**
+     * Get name of field merge strategy
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        // TODO: Implement getName() method.
+    }
 }
