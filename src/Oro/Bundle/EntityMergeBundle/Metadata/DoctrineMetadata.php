@@ -48,6 +48,6 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
      */
     public function isMappedBySourceEntity()
     {
-        return $this->className == $this->get('sourceEntity');
+        return $this->isField() || $this->className == $this->get('sourceEntity');
     }
 }

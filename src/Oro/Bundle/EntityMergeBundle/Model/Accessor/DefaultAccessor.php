@@ -31,7 +31,7 @@ class DefaultAccessor implements AccessorInterface
      */
     public function supports($entity, FieldMetadata $metadata)
     {
-        return !$metadata->getDoctrineMetadata()->has('targetEntity');
+        return $metadata->getDoctrineMetadata()->isMappedBySourceEntity();
     }
 
     /**
