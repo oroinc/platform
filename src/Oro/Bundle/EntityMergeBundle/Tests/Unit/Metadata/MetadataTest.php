@@ -96,14 +96,14 @@ class MetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testMethods($options, $code, $expectedValue, $hasMethod, $isMethod, $isNotExpected = 'assertFalse')
     {
-        $metadata = new Metadata();
-        $metadata->set($code, $options[$code]);
+        $metadata = new Metadata($options);
+        $metadata->set($code, $expectedValue);
         $this->$hasMethod($metadata->has($code));
         $this->$isMethod($metadata->is($code));
         $this->$isMethod($metadata->is($code, $expectedValue));
         $this->$isNotExpected($metadata->is($code, 'not_expected_value'));
         $this->assertEquals($expectedValue, $metadata->get($code));
-        $this->assertEquals([$code => $options[$code]], $metadata->all());
+        $this->assertEquals(array_merge($options, [$code => $expectedValue]), $metadata->all());
     }
 
     public function dataProvider()
