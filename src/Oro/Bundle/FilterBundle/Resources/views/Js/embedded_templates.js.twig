@@ -21,7 +21,7 @@
 
 <script type="text/template" id="select-field-template-embedded">
     <div class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>:
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#"><%= selectedChoiceLabel %></a>
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
             <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
@@ -42,7 +42,8 @@
     <span> field </span>
     <% _.each(parts, function (part) { %>
         <%= part %>
-    <% }); %>
+    <% }); %>:
+    <div />
     <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="from">
     <span class="filter-separator">-</span>
     <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="to">

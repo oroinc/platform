@@ -181,3 +181,9 @@
 .filter-item-simple .caret {
     display: none;
 }
+.active-filter .dropdown:after {
+    display: inline-block;
+}
+.active-filter .field-select {
+    display: block;
+}
