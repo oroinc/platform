@@ -10,5 +10,7 @@ services:
 
     oro_entity_merge.form.type.merge_field:
         class: %oro_entity_merge.form.type.merge_field.class%
+        arguments:
+            - @translator
         tags:
             - { name: form.type, alias: "oro_entity_merge_field" }

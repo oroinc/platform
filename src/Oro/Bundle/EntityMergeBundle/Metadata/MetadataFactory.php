@@ -4,13 +4,14 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class MetadataFactory
 {
@@ -30,8 +31,9 @@ class MetadataFactory
     protected $eventDispatcher;
 
     /**
-     * @param ConfigProvider $configProvider
-     * @param EntityManager  $entityManager
+     * @param ConfigProvider  $configProvider
+     * @param EntityManager   $entityManager
+     * @param EventDispatcher $eventDispatcher
      */
     public function __construct(
         ConfigProvider $configProvider,

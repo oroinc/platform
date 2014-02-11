@@ -1,3 +1,7 @@
 oro:
     entity_merge:
         action.merge: Merge entities
+
+        merge_modes:
+            replace: Replace
+            merge: Merge

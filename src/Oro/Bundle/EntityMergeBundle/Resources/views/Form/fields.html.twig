@@ -36,13 +36,20 @@
         </td>
         {% for child in form.children.sourceEntity %}
             <td>
-                {{ form_widget(child) }}
-                <label for="{{ child.vars.id }}" {% for attrname, attrvalue in child.vars.label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-                    {{ oro_entity_merge_render_field_value(value, loop.index - 1) }}
-                </label>
+                {% if loop.first %}
+                    {{ form_widget(form.children.mode) }}
+                {% endif %}
+                {{ form_widget(child, {entityOffset: loop.index - 1}) }}
             </td>
         {% endfor %}
     </tr>
+{% endblock %}
+
+{% block oro_entity_merge_choice_value_widget %}
+    {{ form_widget(form) }}
+    <label for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+        {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
+    </label>
 {% endblock %}
 
 {% block oro_entity_merge_field_label %}

@@ -41,9 +41,10 @@ class MergeListener
         }
 
         $fieldMetadataOptions = [
-            'getter'     => self::GETTER,
-            'setter'     => self::SETTER,
-            'field_name' => self::FIELD_NAME,
+            'getter'        => self::GETTER,
+            'setter'        => self::SETTER,
+            'field_name'    => self::FIELD_NAME,
+            'is_collection' => true
         ];
         $fieldMetadata        = new FieldMetadata($fieldMetadataOptions);
         $entityMetadata->addFieldMetadata($fieldMetadata);
