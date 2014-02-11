@@ -30,10 +30,31 @@ class WorkflowEntityVoter implements VoterInterface
     protected $supportedAttributes = array('EDIT', 'DELETE');
 
     /**
+     * array(
+     *      '<entityClass>' => array(
+     *          'acls' => array(
+     *              <WorkflowEntityAcl.id> => <WorkflowEntityAcl>,
+     *              ...
+     *          ),
+     *          'entities' => array(
+     *              <entityId> => array(
+     *                  'update' => true|false,
+     *                  'delete' => true|false
+     *              ),
+     *              ...
+     *          )
+     *      ),
+     *      ...
+     * )
+     *
      * @var array
      */
     protected $entityAcls;
 
+    /**
+     * @param ManagerRegistry $registry
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
     {
         $this->registry = $registry;
@@ -86,6 +107,7 @@ class WorkflowEntityVoter implements VoterInterface
             return self::ACCESS_ABSTAIN;
         }
 
+        // both entity and identity objects are supported
         $class = $this->getEntityClass($object);
         $identifier = $this->getEntityIdentifier($object);
         if (null === $identifier) {
