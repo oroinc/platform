@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'oro/translator', 'oro/DataGrid/mass-action', 'oro/messenger'],
+define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messenger'],
     /**
      * @param {underscore} _
      * @param {oro/translator} __
@@ -16,7 +16,7 @@ define(['underscore', 'oro/translator', 'oro/DataGrid/mass-action', 'oro/messeng
          * @export  oro/entity-merge/merge-mass-action
          * @class   oro.entityMerge.MergeMassAction
          * @classdesc Merge mass action js part
-         * @extends oro.DataGrid.MassAction
+         * @extends oro.datagrid.MassAction
          */
         return MassAction.extend({
 
@@ -45,12 +45,12 @@ define(['underscore', 'oro/translator', 'oro/DataGrid/mass-action', 'oro/messeng
                      * @property {SelectedModelsHash} selectedModels
                      * @property {boolean} inset
                      */
-                    var selectionState = this.DataGrid.getSelectionState();
+                    var selectionState = this.datagrid.getSelectionState();
                     var isInset = selectionState.inset;
                     var length = Object.keys(selectionState.selectedModels).length;
 
                     if (!isInset) {
-                        var totalRecords = this.DataGrid.collection.state.totalRecords;
+                        var totalRecords = this.datagrid.collection.state.totalRecords;
 
                         length = totalRecords - length;
                     }
