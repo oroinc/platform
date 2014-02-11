@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction\Actions\Merge;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
-use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassActionHandler;
+use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use OroCRM\Bundle\AccountBundle\Entity\Account;
 use PHPUnit_Framework_MockObject_MockObject;
@@ -44,7 +44,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
     private function initMockObjects()
     {
         $this->dataProvider = $this->getMock(
-            '\Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeEntitiesDataProvider',
+            'Oro\Bundle\EntityMergeBundle\Data\EntityProvider',
             array(),
             array(),
             '',
@@ -147,12 +147,12 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->dataProvider
             ->expects($this->any())
             ->method(
-                'getEntitiesByPk'
+                'getEntitiesByIds'
             )
             ->withAnyParameters()
             ->will($this->returnValue(array($this->firstEntity, $this->secondEntity)));
 
-        $this->target->setMergeDataProvider($this->dataProvider);
+        $this->target->setEntityProvider($this->dataProvider);
 
 
         $options = & $this->fakeOptionsArray;
@@ -194,7 +194,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
     protected function setCorrectOptions()
     {
         $this->fakeOptionsArray = array(
-            'entity_name'       => 'test_entity',
+            'entity_name' => 'test_entity',
             'max_element_count' => 5
         );
     }
@@ -273,11 +273,31 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
          */
         $firstActual = $actual[0];
         /**
-         * @var Account $firstActual
+         * @var Account $secondActual
          */
         $secondActual = $actual[1];
 
         $this->assertEquals($firstActual->getId(), 1);
         $this->assertEquals($secondActual->getId(), 2);
+    }
+
+    public function testHandleShouldCallEntityProviderMethodGetEntitiesByIdsWithCorrectData()
+    {
+
+        $this->firstTestObject->expects($this->any())->method('getValue')->will($this->returnValue(1235567));
+        $this->secondTestObject->expects($this->any())->method('getValue')->will($this->returnValue(24078));
+
+        $this->setIteratedResultMock();
+        $this->fakeOptionsArray['entity_name'] = 'AccountTestEntityName';
+        $callback = function ($param) {
+            return $param[0] == 1235567 && $param[1] == 24078;
+        };
+
+        $this->dataProvider->expects($this->once())->method('getEntitiesByIds')->with(
+            $this->equalTo('AccountTestEntityName'),
+            $this->callback($callback)
+        );
+
+        $this->target->handle($this->fakeArgs);
     }
 }

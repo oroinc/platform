@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction\Actions\Merge;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
-use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge\MergeMassAction;
+use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction;
 
 class MergeMassActionTest extends \PHPUnit_Framework_TestCase
 {
