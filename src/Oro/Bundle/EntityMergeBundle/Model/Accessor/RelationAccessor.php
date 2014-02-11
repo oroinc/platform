@@ -81,9 +81,6 @@ class RelationAccessor implements AccessorInterface
                     $this->getPropertyPath($metadata),
                     $entity
                 );
-
-            $this->entityManager->persist($relatedEntity);
-            $this->entityManager->flush($relatedEntity);
         }
     }
 
