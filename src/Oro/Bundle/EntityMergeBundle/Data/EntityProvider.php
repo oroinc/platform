@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
@@ -10,7 +9,7 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 class EntityProvider
 {
     /**
-     * @var Registry
+     * @var EntityManager
      */
     private $entityManager;
 
@@ -24,24 +23,8 @@ class EntityProvider
 
     /**
      * @param string $entityName
-     * @return \Doctrine\ORM\EntityRepository
-     * @throws InvalidArgumentException
-     */
-    public function getEntityRepository($entityName)
-    {
-        $repository = $this->getRepository($entityName);
-
-        if ($repository->getClassName() != $entityName) {
-            throw new InvalidArgumentException('Incorrect repository returned');
-        }
-
-        return $repository;
-    }
-
-    /**
-     * @param string $entityName
      * @param array $entityIds
-     * @return mixed
+     * @return object[]
      */
     public function getEntitiesByIds($entityName, array $entityIds)
     {
@@ -60,12 +43,19 @@ class EntityProvider
     }
 
     /**
-     * @param string $className
-     * @return string
+     * @param string $entityName
+     * @return \Doctrine\ORM\EntityRepository
+     * @throws InvalidArgumentException
      */
-    public function getEntityIdentifier($className)
+    protected function getEntityRepository($entityName)
     {
-        return $this->entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
+        $repository = $this->getRepository($entityName);
+
+        if ($repository->getClassName() != $entityName) {
+            throw new InvalidArgumentException('Incorrect repository returned');
+        }
+
+        return $repository;
     }
 
     /**
@@ -77,4 +67,12 @@ class EntityProvider
         return $this->entityManager->getRepository($entityName);
     }
 
+    /**
+     * @param string $className
+     * @return string
+     */
+    public function getEntityIdentifier($className)
+    {
+        return $this->entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
+    }
 }

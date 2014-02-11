@@ -30,7 +30,7 @@ class MergeMassAction extends AbstractMassAction
         }
 
         if (empty($options['route'])) {
-            $options['route'] = 'oro_entity_merge';
+            $options['route'] = 'oro_entity_merge_massaction';
         }
         if (empty($options['data_identifier'])) {
             $options['data_identifier'] = 'id';

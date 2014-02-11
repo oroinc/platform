@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use OroCRM\Bundle\AccountBundle\Entity\Account;
@@ -92,8 +93,6 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->target = new MergeMassActionHandler();
-
         $this->initMockObjects();
 
         $this->firstEntity = new Account();
@@ -105,6 +104,8 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->secondEntity->setId(2);
 
         $this->setUpMockObjects();
+
+        $this->target = new MergeMassActionHandler($this->dataProvider);
     }
 
 
@@ -152,9 +153,6 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->will($this->returnValue(array($this->firstEntity, $this->secondEntity)));
 
-        $this->target->setEntityProvider($this->dataProvider);
-
-
         $options = & $this->fakeOptionsArray;
         $this->fakeOptions
             ->expects($this->any())
@@ -170,7 +168,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->setCorrectOptions();
 
         $fakeMassAction = $this->getMock(
-            'Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface',
+            'Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface',
             array(),
             array(),
             '',
@@ -202,8 +200,14 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testMethodDoesNotThrowAnExceptionIfAllDataIsCorrect()
     {
         $this->setIteratedResultMock();
+        /**
+         * @var MassActionResponse $result
+         */
         $result = $this->target->handle($this->fakeArgs);
 
+        $this->assertInstanceOf('\Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse', $result);
+
+        $result = $result->getOptions();
         $this->assertArrayHasKey('entities', $result);
         $this->assertEquals(2, count($result['entities']));
         $this->assertArrayHasKey('options', $result);
@@ -211,7 +215,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Entity name is missing
+     * @expectedExceptionMessage Entity name is missing.
      */
     public function testHandleMustThrowInvalidArgumentExceptionIfEntityNameIsEmpty()
     {
@@ -222,7 +226,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Max element count invalid
+     * @expectedExceptionMessage Option "max_element_count" of "" mass action is invalid.
      */
     public function testHandleMustThrowInvalidArgumentExceptionIfMaxElementCountIsEmpty()
     {
@@ -265,9 +269,12 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $this->setIteratedResultMock();
 
+        /**
+         * MassActionResponse $result
+         */
         $result = $this->target->handle($this->fakeArgs);
 
-        $actual = $result['entities'];
+        $actual = $result->getOption('entities');
         /**
          * @var Account $firstActual
          */

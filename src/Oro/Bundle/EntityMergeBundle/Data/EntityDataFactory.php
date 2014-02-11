@@ -6,17 +6,20 @@ use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 
 class EntityDataFactory
 {
-
-
     /**
      * @var MetadataFactory $metadataFactory
      */
     private $metadataFactory;
+
     /**
      * @var EntityProvider $entityProvider
      */
     private $entityProvider;
 
+    /**
+     * @param MetadataFactory $metadataFactory
+     * @param EntityProvider $entityProvider
+     */
     public function __construct(MetadataFactory $metadataFactory, EntityProvider $entityProvider)
     {
         $this->metadataFactory = $metadataFactory;
@@ -24,7 +27,7 @@ class EntityDataFactory
     }
 
     /**
-     * @param $entityName
+     * @param string $entityName
      * @param array $entities
      * @return EntityData
      */
@@ -42,7 +45,7 @@ class EntityDataFactory
     }
 
     /**
-     * @param $entityName
+     * @param string $entityName
      * @param array $entityIds
      * @return EntityData
      */

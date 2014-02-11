@@ -36,11 +36,11 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                 'expected' => array(
                     'entity_name'       => 'SomeEntityClass',
                     'frontend_handle'   => 'redirect',
+                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'merge-mass',
                     'data_identifier'   => 'id',
                     'max_element_count' => '5',
-                    'route'             => 'oro_entity_merge',
-                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
+                    'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array()
                 )
             ),
@@ -48,21 +48,21 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                 'actual'   => array(
                     'entity_name'       => 'SomeEntityClass',
                     'frontend_handle'   => 'custom_handler',
+                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
                     'max_element_count' => 10,
-                    'route'             => 'custom_route',
-                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
+                    'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array()
                 ),
                 'expected' => array(
                     'entity_name'       => 'SomeEntityClass',
                     'frontend_handle'   => 'custom_handler',
+                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
                     'max_element_count' => 10,
-                    'route'             => 'custom_route',
-                    'handler'           => 'oro_entity_merge.mass_action.data_handler',
+                    'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array()
                 )
             )
