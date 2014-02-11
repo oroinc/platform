@@ -23,6 +23,7 @@ class MergeStategy implements StrategyInterface
 
     /**
      * @param AccessorInterface $accessor
+     * @param EntityManager     $entityManager
      */
     public function __construct(AccessorInterface $accessor, EntityManager $entityManager)
     {
