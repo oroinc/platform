@@ -2,58 +2,45 @@
 
 namespace Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction;
 
-
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
+
 use Oro\Bundle\EntityMergeBundle\Data\EntityProvider;
-use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class MergeMassActionHandler implements MassActionHandlerInterface
 {
-
     /**
-     * @var EntityProvider $entityProvider ;
+     * @var EntityProvider $entityProvider
      */
     private $entityProvider;
 
-
-    public function setEntityProvider(EntityProvider $entityProvider)
+    /**
+     * @param EntityProvider $entityProvider
+     */
+    public function __construct(EntityProvider $entityProvider)
     {
         $this->entityProvider = $entityProvider;
     }
 
     /**
-     * Handle mass action
-     *
-     * @param MassActionHandlerArgs $args
-     * @throws \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @return array array('entities' => $entities, 'options' => $options)
+     * {@inheritdoc}
      */
     public function handle(MassActionHandlerArgs $args)
     {
-        $options = $this->getOptionsArray($args);
-
-        if (empty($options['entity_name'])) {
-            throw new InvalidArgumentException('Entity name is missing');
-        }
+        $massAction = $args->getMassAction();
+        $this->validateMassAction($massAction);
+        $options = $massAction->getOptions();
 
         $entityIdentifier = $this->entityProvider->getEntityIdentifier($options['entity_name']);
-
         $entityIds = $this->getIdsFromResult($args->getResults(), $entityIdentifier);
 
-        if (empty($options['max_element_count']) || (int)$options['max_element_count'] < 2) {
-            throw new InvalidArgumentException('Max element count invalid');
-        }
-
         $maxCountOfElements = $options['max_element_count'];
-
         $countOfSelectedItems = count($entityIds);
         $this->validateItemsCount($countOfSelectedItems, $maxCountOfElements);
 
@@ -62,13 +49,42 @@ class MergeMassActionHandler implements MassActionHandlerInterface
             $entityIds
         );
 
-        return array('entities' => $entities, 'options' => $options);
+        return new MassActionResponse(
+            true,
+            null,
+            array(
+                'entities' => $entities,
+                'entity_name' => $options['entity_name'],
+                'options' => $options
+            )
+        );
     }
 
 
     /**
-     * @param $countOfSelectedItems
-     * @param $maxCountOfElements
+     * @param MassActionInterface $massAction
+     * @throws InvalidArgumentException
+     */
+    public function validateMassAction(MassActionInterface $massAction)
+    {
+        $options = $massAction->getOptions();
+        if (empty($options['entity_name'])) {
+            throw new InvalidArgumentException('Entity name is missing.');
+        }
+
+        if (empty($options['max_element_count']) || (int)$options['max_element_count'] < 2) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Option "max_element_count" of "%s" mass action is invalid.',
+                    $massAction->getName()
+                )
+            );
+        }
+    }
+
+    /**
+     * @param int $countOfSelectedItems
+     * @param int $maxCountOfElements
      * @throws InvalidArgumentException
      */
     public function validateItemsCount($countOfSelectedItems, $maxCountOfElements)
@@ -81,36 +97,15 @@ class MergeMassActionHandler implements MassActionHandlerInterface
     }
 
     /**
-     * @param MassActionHandlerArgs $args
+     * @param IterableResultInterface $iterated
+     * @param string $entityIdentifier
      * @return array
      */
-    public function getSelectedEntityArrayFromArgs(MassActionHandlerArgs $args)
-    {
-        return $args->getResults()->getSource()->getQuery()->getArrayResult();
-    }
-
-    /**
-     * @param MassActionHandlerArgs $args
-     * @return array
-     */
-    public function getOptionsArray(MassActionHandlerArgs $args)
-    {
-        return $args->getMassAction()->getOptions()->toArray();
-    }
-
-    /**
-     * @param \Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface $iterated
-     * @param $entityIdentifier
-     * @internal param $entityArray
-     * @return array
-     */
-    public function getIdsFromResult(IterableResultInterface $iterated, $entityIdentifier)
+    protected function getIdsFromResult(IterableResultInterface $iterated, $entityIdentifier)
     {
         $entityIds = array();
+        /** @var ResultRecord $entity */
         foreach ($iterated as $entity) {
-            /**
-             * @var ResultRecord $entity
-             */
             $entityIds[] = $entity->getValue($entityIdentifier);
         }
         return $entityIds;

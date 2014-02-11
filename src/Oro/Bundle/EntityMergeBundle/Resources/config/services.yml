@@ -5,12 +5,11 @@ parameters:
     #Entity Data
     oro_entity_merge.data.entity_provider.class: Oro\Bundle\EntityMergeBundle\Data\EntityProvider
     oro_entity_merge.data.entity_data_factory.class: Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory
+
     # Merger
     oro_entity_merge.merger.class: Oro\Bundle\EntityMergeBundle\Model\EntityMerger
-    oro_entity_merge.mass_action.data_handler.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler
-    oro_entity_merge.http_foundation.merge_data_request_factory.class: Oro\Bundle\EntityMergeBundle\HttpFoundation\MergeDataRequestFactory
-    # Accessors
 
+    # Accessors
     oro_entity_merge.accessor.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor
     oro_entity_merge.accessor.default.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor
     oro_entity_merge.accessor.relation.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor
@@ -25,23 +24,11 @@ services:
         arguments:
             - @oro_entity_merge.metadata.factory
             - @oro_entity_merge.data.entity_provider
-    oro_entity_merge.mass_action.data_handler:
-        class: %oro_entity_merge.mass_action.data_handler.class%
-        calls:
-            - [setEntityProvider, [@oro_entity_merge.data.entity_provider]]
+
     oro_entity_merge.data.entity_provider:
         class: %oro_entity_merge.data.entity_provider.class%
         arguments:
             - @doctrine.orm.entity_manager
-    oro_entity_merge.http_foundation.merge_data_request_factory:
-        class: %oro_entity_merge.http_foundation.merge_data_request_factory.class%
-        score: request
-        arguments:
-            - @oro_datagrid.mass_action.parameters_parser
-            - @oro_datagrid.mass_action.dispatcher
-            - @oro_entity_merge.data.entity_data_factory
-        calls:
-            - [setRequest, [@?request=]]
 
     oro_entity_merge.metadata.factory:
         class: %oro_entity_merge.metadata.factory.class%
