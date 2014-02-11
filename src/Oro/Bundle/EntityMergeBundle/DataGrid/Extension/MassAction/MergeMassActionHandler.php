@@ -35,7 +35,7 @@ class MergeMassActionHandler implements MassActionHandlerInterface
     {
         $massAction = $args->getMassAction();
         $this->validateMassAction($massAction);
-        $options = $massAction->getOptions();
+        $options = $massAction->getOptions()->toArray();
 
         $entityIdentifier = $this->entityProvider->getEntityIdentifier($options['entity_name']);
         $entityIds = $this->getIdsFromResult($args->getResults(), $entityIdentifier);
@@ -67,7 +67,7 @@ class MergeMassActionHandler implements MassActionHandlerInterface
      */
     public function validateMassAction(MassActionInterface $massAction)
     {
-        $options = $massAction->getOptions();
+        $options = $massAction->getOptions()->toArray();
         if (empty($options['entity_name'])) {
             throw new InvalidArgumentException('Entity name is missing.');
         }
