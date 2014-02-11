@@ -60,6 +60,7 @@ class DefaultAccessor implements AccessorInterface
         if ($metadata->has('setter')) {
             $setter = $metadata->get('setter');
             $entity->$setter($value);
+
             return;
         }
 

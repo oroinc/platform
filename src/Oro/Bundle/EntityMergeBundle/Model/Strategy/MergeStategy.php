@@ -38,12 +38,13 @@ class MergeStategy implements StrategyInterface
         $entityData    = $fieldData->getEntityData();
         $masterEntity  = $entityData->getMasterEntity();
         $fieldMetadata = $fieldData->getMetadata();
-        $entities      = $fieldData->getEntityData()->getEntities();
+        $entities      = $entityData->getEntities();
 
         $relatedEntities         = [];
         $doctrineMetadataFactory = $this->entityManager->getMetadataFactory();
         foreach ($entities as $entity) {
-            $doctrineMetadata = $doctrineMetadataFactory->getMetadataFor(ClassUtils::getRealClass($entity));
+            $doctrineMetadata = $doctrineMetadataFactory
+                ->getMetadataFor(ClassUtils::getRealClass($entity));
             $ids              = $doctrineMetadata->getIdentifierValues($entity);
             $key              = implode('_', $ids);
             $values           = $this->accessor->getValue($entity, $fieldMetadata);
@@ -61,9 +62,15 @@ class MergeStategy implements StrategyInterface
      */
     public function supports(FieldData $fieldData)
     {
-        return ($fieldData->getMode() == MergeModes::MERGE) &&
-        ($fieldData->getMetadata()->getDoctrineMetadata()->isCollection() ||
-            !$fieldData->getMetadata()->getDoctrineMetadata()->isMappedBySourceEntity());
+        if ($fieldData->getMode() == MergeModes::MERGE) {
+            $fieldDoctrineMetadata = $fieldData->getMetadata()->getDoctrineMetadata();
+            $isCollection = $fieldDoctrineMetadata->isCollection();
+            $isMappedBySourceEntity = $fieldDoctrineMetadata->isMappedBySourceEntity();
+
+            return $isCollection || !$isMappedBySourceEntity;
+        }
+
+        return false;
     }
 
     /**
