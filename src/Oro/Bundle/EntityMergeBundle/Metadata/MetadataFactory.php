@@ -7,7 +7,10 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\MergeEvents;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class MetadataFactory
 {
@@ -22,13 +25,22 @@ class MetadataFactory
     protected $entityManager;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * @param ConfigProvider $configProvider
      * @param EntityManager  $entityManager
      */
-    public function __construct(ConfigProvider $configProvider, EntityManager $entityManager)
-    {
+    public function __construct(
+        ConfigProvider $configProvider,
+        EntityManager $entityManager,
+        EventDispatcher $eventDispatcher
+    ) {
         $this->configProvider = $configProvider;
-        $this->entityManager  = $entityManager;
+        $this->entityManager = $entityManager;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -57,6 +69,11 @@ class MetadataFactory
             new DoctrineMetadata($className, (array)$this->getDoctrineMetadataFor($className))
         );
 
+        $this->eventDispatcher->dispatch(
+            MergeEvents::CREATE_METADATA,
+            new CreateMetadataEvent($metadata)
+        );
+
         return $metadata;
     }
 
@@ -80,7 +97,7 @@ class MetadataFactory
      */
     public function createFieldsMetadata($className)
     {
-        $fieldMetadata = [];
+        $fieldsMetadata = [];
 
         $doctrineMetadata = $this->getDoctrineMetadataFor($className);
 
@@ -98,12 +115,12 @@ class MetadataFactory
                         $fieldMapping = $doctrineMetadata->getFieldMapping($fieldName);
                     }
 
-                    $fieldMetadata[] = new FieldMetadata($options, new DoctrineMetadata($className, $fieldMapping));
+                    $fieldsMetadata[] = new FieldMetadata($options, new DoctrineMetadata($className, $fieldMapping));
                 }
             }
         }
 
-        return $fieldMetadata;
+        return $fieldsMetadata;
     }
 
     /**

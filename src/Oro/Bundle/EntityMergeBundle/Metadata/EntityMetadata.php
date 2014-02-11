@@ -24,8 +24,18 @@ class EntityMetadata extends Metadata implements EntityMetadataInterface
     public function __construct(array $options, array $fieldsMetadata, DoctrineMetadata $doctrineMetadata)
     {
         parent::__construct($options);
-        $this->fieldsMetadata   = $fieldsMetadata;
+        foreach ($fieldsMetadata as $fieldMetadata) {
+            $this->addFieldMetadata($fieldMetadata);
+        }
         $this->doctrineMetadata = $doctrineMetadata;
+    }
+
+    /**
+     * @param FieldMetadata $fieldMetadata
+     */
+    public function addFieldMetadata(FieldMetadata $fieldMetadata)
+    {
+        $this->fieldsMetadata[] = $fieldMetadata;
     }
 
     /**

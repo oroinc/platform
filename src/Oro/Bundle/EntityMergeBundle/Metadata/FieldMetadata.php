@@ -15,10 +15,22 @@ class FieldMetadata extends Metadata implements FieldMetadataInterface
      * @param array $options
      * @param DoctrineMetadata $doctrineMetadata
      */
-    public function __construct(array $options, DoctrineMetadata $doctrineMetadata)
+    public function __construct(array $options, DoctrineMetadata $doctrineMetadata = null)
     {
         parent::__construct($options);
+        if ($doctrineMetadata) {
+            $this->setDoctrineMetadata($doctrineMetadata);
+        }
+    }
+
+    /**
+     * @param DoctrineMetadata $doctrineMetadata
+     * @return DoctrineMetadata
+     */
+    public function setDoctrineMetadata(DoctrineMetadata $doctrineMetadata)
+    {
         $this->doctrineMetadata = $doctrineMetadata;
+        $this->set('field_name', $doctrineMetadata->get('fieldName'));
     }
 
     /**
@@ -30,14 +42,22 @@ class FieldMetadata extends Metadata implements FieldMetadataInterface
     }
 
     /**
+     * @return bool
+     */
+    public function hasDoctrineMetadata()
+    {
+        return null !== $this->doctrineMetadata;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFieldName()
     {
-        if (!$this->getDoctrineMetadata()->has('fieldName')) {
+        if (!$this->has('field_name')) {
             throw new InvalidArgumentException('Cannot get field name from merge field metadata.');
         }
 
-        return $this->getDoctrineMetadata()->get('fieldName');
+        return $this->get('field_name');
     }
 }

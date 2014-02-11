@@ -174,6 +174,11 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($masterEntity, $collectionItem2->getEntityStub());
     }
 
+    public function testGetName()
+    {
+        $this->markTestIncomplete();
+    }
+
     protected function createFieldData()
     {
         return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\FieldData')

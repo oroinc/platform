@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
+use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
+use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EntityDataFactory
 {
@@ -17,18 +20,28 @@ class EntityDataFactory
     private $entityProvider;
 
     /**
-     * @param MetadataFactory $metadataFactory
-     * @param EntityProvider $entityProvider
+     * @var EventDispatcher
      */
-    public function __construct(MetadataFactory $metadataFactory, EntityProvider $entityProvider)
-    {
+    protected $eventDispatcher;
+
+    /**
+     * @param MetadataFactory $metadataFactory
+     * @param EntityProvider  $entityProvider
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function __construct(
+        MetadataFactory $metadataFactory,
+        EntityProvider $entityProvider,
+        EventDispatcher $eventDispatcher
+    ) {
         $this->metadataFactory = $metadataFactory;
-        $this->entityProvider = $entityProvider;
+        $this->entityProvider  = $entityProvider;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * @param string $entityName
-     * @param array $entities
+     * @param array  $entities
      * @return EntityData
      */
     public function createEntityData($entityName, array $entities)
@@ -41,12 +54,17 @@ class EntityDataFactory
             $data->addNewField($fieldMetadata);
         }
 
+        $this->eventDispatcher->dispatch(
+            MergeEvents::CREATE_ENTITYDATA,
+            new CreateEntityDataEvent($data)
+        );
+
         return $data;
     }
 
     /**
      * @param string $entityName
-     * @param array $entityIds
+     * @param array  $entityIds
      * @return EntityData
      */
     public function createEntityDataByIds($entityName, array $entityIds)
