@@ -44,7 +44,7 @@ class RelationAccessor implements AccessorInterface
      */
     public function supports($entity, FieldMetadata $metadata)
     {
-        return !$metadata->getDoctrineMetadata()->isMappedBySourceEntity();
+        return $metadata->hasDoctrineMetadata() && !$metadata->getDoctrineMetadata()->isMappedBySourceEntity();
     }
 
     /**

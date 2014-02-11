@@ -53,10 +53,10 @@ class MergeController extends Controller
     public function mergeAction(EntityData $entityData = null)
     {
         if (!$entityData) {
-            $entityName = $this->getRequest()->get('entityName');
+            $className = $this->getRequest()->get('className');
             $ids = (array)$this->getRequest()->get('ids');
 
-            $entityData = $this->getEntityDataFactory()->createEntityDataByIds($entityName, $ids);
+            $entityData = $this->getEntityDataFactory()->createEntityDataByIds($className, $ids);
         }
 
         $form = $this->createForm(
@@ -87,7 +87,9 @@ class MergeController extends Controller
         }
 
         return array(
-            'cancelRoute' => $this->getEntityIndexRoute($entityData->getClassName()),
+            'submitUrl' => '',
+            'entityPluralLabel' => $this->getEntityPluralLabel($entityData->getClassName()),
+            'cancelUrl' => $this->generateUrl($this->getEntityIndexRoute($entityData->getClassName())),
             'form' => $form->createView()
         );
     }
@@ -100,9 +102,7 @@ class MergeController extends Controller
      */
     protected function getEntityViewRoute($className)
     {
-        /** @var \Oro\Bundle\EntityConfigBundle\Config\ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
-        return $configManager->getEntityMetadata($className)->routeView;
+        return $this->getConfigManager()->getEntityMetadata($className)->routeView;
     }
 
     /**
@@ -113,9 +113,26 @@ class MergeController extends Controller
      */
     protected function getEntityIndexRoute($className)
     {
-        /** @var \Oro\Bundle\EntityConfigBundle\Config\ConfigManager $configManager */
-        $configManager = $this->get('oro_entity_config.config_manager');
-        return $configManager->getEntityMetadata($className)->routeName;
+        return $this->getConfigManager()->getEntityMetadata($className)->routeName;
+    }
+
+    /**
+     * Get plural label by entity name
+     *
+     * @param string $className
+     * @return string
+     */
+    protected function getEntityPluralLabel($className)
+    {
+        return $this->getConfigManager()->getProvider('entity')->getConfig($className)->get('pluralLabel');
+    }
+
+    /**
+     * @return \Oro\Bundle\EntityConfigBundle\Config\ConfigManager
+     */
+    protected function getConfigManager()
+    {
+        return $this->get('oro_entity_config.config_manager');
     }
 
     /**

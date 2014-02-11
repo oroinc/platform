@@ -80,7 +80,7 @@ class MetadataFactory
      */
     public function createFieldsMetadata($className)
     {
-        $fieldMetadata = [];
+        $fieldsMetadata = [];
 
         $doctrineMetadata = $this->getDoctrineMetadataFor($className);
 
@@ -98,12 +98,12 @@ class MetadataFactory
                         $fieldMapping = $doctrineMetadata->getFieldMapping($fieldName);
                     }
 
-                    $fieldMetadata[] = new FieldMetadata($options, new DoctrineMetadata($className, $fieldMapping));
+                    $fieldsMetadata[] = new FieldMetadata($options, new DoctrineMetadata($className, $fieldMapping));
                 }
             }
         }
 
-        return $fieldMetadata;
+        return $fieldsMetadata;
     }
 
     /**

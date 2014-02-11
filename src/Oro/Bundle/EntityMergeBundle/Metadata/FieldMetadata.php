@@ -15,9 +15,18 @@ class FieldMetadata extends Metadata implements FieldMetadataInterface
      * @param array $options
      * @param DoctrineMetadata $doctrineMetadata
      */
-    public function __construct(array $options, DoctrineMetadata $doctrineMetadata)
+    public function __construct(array $options, DoctrineMetadata $doctrineMetadata = null)
     {
         parent::__construct($options);
+        $this->doctrineMetadata = $doctrineMetadata;
+    }
+
+    /**
+     * @param DoctrineMetadata $doctrineMetadata
+     * @return DoctrineMetadata
+     */
+    public function setDoctrineMetadata(DoctrineMetadata $doctrineMetadata)
+    {
         $this->doctrineMetadata = $doctrineMetadata;
     }
 
@@ -27,6 +36,14 @@ class FieldMetadata extends Metadata implements FieldMetadataInterface
     public function getDoctrineMetadata()
     {
         return $this->doctrineMetadata;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDoctrineMetadata()
+    {
+        return null !== $this->doctrineMetadata;
     }
 
     /**
