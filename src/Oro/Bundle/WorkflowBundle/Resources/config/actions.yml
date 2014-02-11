@@ -78,8 +78,8 @@ services:
     oro_workflow.action.create_related_entity:
         class: %oro_workflow.action.create_related_entity.class%
         arguments:
-            - @oro_workflow.context_accessor
-            - @doctrine
+            - @oro_workflow.action.create_entity
+            - @oro_workflow.configuration_pass.replace_property_path
         tags:
             - { name: oro_workflow.action, alias: create_related_entity }
 
