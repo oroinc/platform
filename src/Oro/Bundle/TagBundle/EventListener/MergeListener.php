@@ -36,7 +36,9 @@ class MergeListener
     public function onCreateMetadata(CreateMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
-        $this->checkNotTaggable($entityMetadata);
+        if (!$this->isTaggable($entityMetadata)) {
+            return;
+        }
 
         $fieldMetadataOptions = [
             'getter'     => self::GETTER,
@@ -54,7 +56,9 @@ class MergeListener
     {
         $entityData     = $event->getEntityData();
         $entityMetadata = $entityData->getMetadata();
-        $this->checkNotTaggable($entityMetadata);
+        if (!$this->isTaggable($entityMetadata)) {
+            return;
+        }
 
         $entities = $entityData->getEntities();
         foreach ($entities as $entity) {
@@ -70,7 +74,9 @@ class MergeListener
     {
         $entityData     = $event->getEntityData();
         $entityMetadata = $entityData->getMetadata();
-        $this->checkNotTaggable($entityMetadata);
+        if (!$this->isTaggable($entityMetadata)) {
+            return;
+        }
 
         $masterEntity = $entityData->getMasterEntity();
         $this->manager->saveTagging($masterEntity, false);
@@ -79,12 +85,12 @@ class MergeListener
     /**
      * @param EntityMetadata $entityMetadata
      */
-    private function checkNotTaggable(EntityMetadata $entityMetadata)
+    private function isTaggable(EntityMetadata $entityMetadata)
     {
         $className       = $entityMetadata->getClassName();
         $classInterfaces = class_implements($className);
 
-        if (!isset($classInterfaces['Oro\Bundle\TagBundle\Entity\Taggable'])) {
+        if (isset($classInterfaces['Oro\Bundle\TagBundle\Entity\Taggable'])) {
             return true;
         }
 
