@@ -75,7 +75,8 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
                 'class'     => '%oro_entity_merge.metadata.factory.class%',
                 'arguments' => array(
                     new Reference('oro_entity_config.provider.merge'),
-                    new Reference('doctrine.orm.entity_manager')
+                    new Reference('doctrine.orm.entity_manager'),
+                    new Reference('event_dispatcher'),
                 ),
                 'tags'      => array(),
                 'scope'     => 'container'

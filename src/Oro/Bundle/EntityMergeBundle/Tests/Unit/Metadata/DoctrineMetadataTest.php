@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 
 class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase

@@ -149,6 +149,7 @@ services:
         tags:
             - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\TagBundle\Entity\Tag }
 
+    # Merge listener
     oro_tag.event_listener.merge_listener:
         class: %oro_tag.event_listener.merge_listener.class%
         arguments:

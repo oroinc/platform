@@ -7,6 +7,11 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 class FieldMetadata extends Metadata implements MetadataInterface
 {
     /**
+     * @var EntityMetadata
+     */
+    protected $entityMetadata;
+
+    /**
      * @var DoctrineMetadata
      */
     protected $doctrineMetadata;
@@ -21,6 +26,22 @@ class FieldMetadata extends Metadata implements MetadataInterface
         if ($doctrineMetadata) {
             $this->setDoctrineMetadata($doctrineMetadata);
         }
+    }
+
+    /**
+     * @param EntityMetadata $entityMetadata
+     */
+    public function setEntityMetadata(EntityMetadata $entityMetadata)
+    {
+        $this->entityMetadata = $entityMetadata;
+    }
+
+    /**
+     * @return EntityMetadata
+     */
+    public function getEntityMetadata()
+    {
+        return $this->entityMetadata;
     }
 
     /**
@@ -59,5 +80,55 @@ class FieldMetadata extends Metadata implements MetadataInterface
         }
 
         return $this->get('field_name');
+    }
+
+    /**
+     * Get merge modes available
+     *
+     * @return array
+     */
+    public function getMergeModes()
+    {
+        return (array)$this->get('merge_modes');
+    }
+
+    /**
+     * Add available merge mode.
+     *
+     * @param string $mergeMode
+     * @return array
+     */
+    public function addMergeMode($mergeMode)
+    {
+        if (!$this->hasMergeMode($mergeMode)) {
+            $mergeModes = $this->getMergeModes();
+            $mergeModes[] = $mergeMode;
+            $this->set('merge_modes', $mergeModes);
+        }
+    }
+
+    /**
+     * Checks if merge mode is available
+     *
+     * @param string $mode
+     * @return array
+     */
+    public function hasMergeMode($mode)
+    {
+        return in_array($mode, $this->getMergeModes());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCollection()
+    {
+        if ($this->has('merge_is_collection')) {
+            return (bool)$this->get('merge_is_collection');
+        }
+        if ($this->hasDoctrineMetadata()) {
+            return $this->getDoctrineMetadata()->isCollection();
+        }
+        return false;
     }
 }

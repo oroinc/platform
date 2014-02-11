@@ -20,38 +20,51 @@ oro_entity_config:
         field:
             items:
                 # Label of field that should be displayed for this field in merge UI, value will be translated
-                merge_label: ~
+                label: ~
                 # Enable merge for this field
-                merge_enable:
+                enable:
                     options:
                         is_bool: true
                 # Option for sorting field on UI
-                merge_priority: ~
-                # Mode of merge supports next values: default, readonly, hidden
-                #   default  - field will be used during merged and user will be able to choose a value of this field from entities
-                #   readonly - user will not be able to choose a value and value will be used from master entity, but user will see entities values for this field
-                #   hidden - field is not used in merge, value will be used from master entity
-                merge_mode: ~
+                priority: ~
+                # Hide field in merge
+                hidden:
+                    options:
+                        is_bool: true
+                # Make field read-only in merge
+                readonly:
+                    options:
+                        is_bool: true
+                # Mode of merge supports next values, value can be an array or single mode:
+                #   replace - replace value with selected one
+                #   merge   - merge all values into one (applicable for collections and lists)
+                merge_modes:
+                    options:
+                        serializable: true
+                # Flag for collection fields. This fields will support merge mode by default
+                is_collection:
+                    options:
+                        is_bool: true
                 # Options for rendering field value in the UI
                 #
                 # Method will be used to cast value to string (applicable only for values that are objects)
-                merge_cast_method: ~
+                cast_method: ~
                 # Template can be used to render value of field
-                merge_template: ~
+                template: ~
                 # Method for setting value to entity
-                merge_setter: ~
+                setter: ~
                 # Method for getting value to entity
-                merge_getter: ~
+                getter: ~
                 # Can be used if you want to be able to merge this field for entity on other side of relation,
                 # For example there is a Call entity with field referenced to Account using ManyToOne unidirectional relation.
                 # As Account doesn't have access to collection of calls the only possible place to configure calls merging
                 # for account is this field in Call entity
-                merge_relation_enable:
+                relation_enable:
                     options:
                         is_bool: true
                 # Same as merge_mode but used for relation entity
-                merge_relation_mode: ~
-                # Same as merge_label but used for relation entity
-                merge_relation_label: ~
-                # Same as merge_priority but used for relation entity
-                merge_relation_priority: ~
+                relation_modes: ~
+                # Same as label but used for relation entity
+                relation_label: ~
+                # Same as priority but used for relation entity
+                relation_priority: ~
