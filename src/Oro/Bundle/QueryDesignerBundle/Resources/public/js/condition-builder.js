@@ -45,25 +45,23 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
             this.$criteriaList = $(this.options.criteriaListSelector);
             this._prepareOptions();
 
+            this._initCriteriaList();
+            this._initConditionBuilder();
+
+            this.element
+                .on('change', '.operator', $.proxy(this._onChangeOperator, this))
+                .on('click', '.close', $.proxy(this._onConditionClose, this));
+
             // if some criteria requires addition modules, load them before initialization
             modules = this.$criteriaList.find('[data-module]').map(function () {
                 return $(this).data('module');
             }).get();
 
             if (modules.length) {
-                require(modules, $.proxy(this._initControl(), this));
+                require(modules, $.proxy(this._initControl, this));
             } else {
                 this._initControl();
             }
-        },
-
-        _initControl: function () {
-            this._initCriteriaList();
-            this._initConditionBuilder();
-            this._updateOperators();
-            this.element
-                .on('change', '.operator', $.proxy(this._onChangeOperator, this))
-                .on('click', '.close', $.proxy(this._onConditionClose, this));
         },
 
         _getCreateOptions: function () {
@@ -86,13 +84,17 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
         },
 
         getValue: function () {
-            return this.$rootCondition ? this.$rootCondition.data('value') : [];
+            return this.$rootCondition.data('value') || [];
         },
 
         setValue: function (value) {
             value = value || [];
-            this._createConditionContent(this.$rootCondition.empty(), value);
-            this._setSourceValue(value);
+            if (this.$rootCondition.data('initialized')) {
+                this._createConditionContent(this.$rootCondition.empty(), value);
+            } else {
+                this.$rootCondition.data('value', value);
+            }
+            this.$rootCondition.trigger('changed');
         },
 
         _initCriteriaList: function () {
@@ -104,8 +106,7 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
         },
 
         _initConditionBuilder: function () {
-            var $content,
-                $root = this.element,
+            var $root = this.element,
                 sortableConnectWith = this.options.sortable.connectWith;
             if (!$root.is(sortableConnectWith)) {
                 $root = $root.find(sortableConnectWith);
@@ -114,12 +115,16 @@ define(['jquery', 'jquery-ui', 'oroui/js/dropdown-select'], function ($) {
                 }
             }
 
-            $content = this._createConditionContent($root, this._getSourceValue());
-            this._initConditionsGroup($content);
-
+            $root.data('value', this._getSourceValue());
             $root.on('changed', $.proxy(this._onChanged, this));
-
             this.$rootCondition = $root;
+        },
+
+        _initControl: function () {
+            var $content = this._createConditionContent(this.$rootCondition, this.$rootCondition.data('value'));
+            this._initConditionsGroup($content);
+            this._updateOperators();
+            this.$rootCondition.data('initialized', true);
         },
 
         _initConditionsGroup: function ($group) {
