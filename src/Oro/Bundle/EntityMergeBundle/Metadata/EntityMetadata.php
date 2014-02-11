@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
-class EntityMetadata extends Metadata implements EntityMetadataInterface
+class EntityMetadata extends Metadata implements MetadataInterface
 {
     /**
      * @var DoctrineMetadata

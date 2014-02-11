@@ -34,21 +34,22 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->doctrineMetadata, $this->metadata->getDoctrineMetadata());
     }
 
+    public function testHasDoctrineMetadata()
+    {
+        $metadata = new FieldMetadata($this->options);
+        $this->assertFalse($metadata->hasDoctrineMetadata());
+
+        $metadata->setDoctrineMetadata($this->doctrineMetadata);
+        $this->assertTrue($metadata->hasDoctrineMetadata());
+    }
+
     public function testGetFieldName()
     {
-        $className = 'test';
+        $fieldName = 'field';
 
-        $this->doctrineMetadata->expects($this->once())
-            ->method('has')
-            ->with('fieldName')
-            ->will($this->returnValue(true));
+        $this->metadata->set('field_name', 'field');
 
-        $this->doctrineMetadata->expects($this->once())
-            ->method('get')
-            ->with('fieldName')
-            ->will($this->returnValue($className));
-
-        $this->assertEquals($className, $this->metadata->getFieldName());
+        $this->assertEquals($fieldName, $this->metadata->getFieldName());
     }
 
     /**
@@ -57,11 +58,6 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFieldNameFails()
     {
-        $this->doctrineMetadata->expects($this->once())
-            ->method('has')
-            ->with('fieldName')
-            ->will($this->returnValue(false));
-
         $this->metadata->getFieldName();
     }
 

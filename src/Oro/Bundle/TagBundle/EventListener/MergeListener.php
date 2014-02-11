@@ -84,6 +84,7 @@ class MergeListener
 
     /**
      * @param EntityMetadata $entityMetadata
+     * @return bool
      */
     private function isTaggable(EntityMetadata $entityMetadata)
     {
