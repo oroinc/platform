@@ -24,8 +24,9 @@ class ChannelAwareFormType extends AbstractType
             'channel',
             $options['channel_form_type'],
             [
-                'class' => 'OroIntegrationBundle:Channel',
+                'class'    => 'OroIntegrationBundle:Channel',
                 'property' => 'name',
+                'multiple' => false
             ]
         );
     }
