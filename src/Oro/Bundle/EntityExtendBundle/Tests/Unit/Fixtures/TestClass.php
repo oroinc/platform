@@ -10,8 +10,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Table()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="orocrm_account_index",
- *  routeView="orocrm_account_view",
+ *  routeName="oro_entity_index",
+ *  routeView="oro_entity_view",
  *  defaultValues={
  *      "ownership"={
  *          "owner_type"="USER",
