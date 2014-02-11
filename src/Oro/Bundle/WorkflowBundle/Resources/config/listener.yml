@@ -24,5 +24,6 @@ services:
         class: %oro_workflow.listener.subscriber.workflow_item.class%
         arguments:
             - @oro_entity.doctrine_helper
+            - @oro_workflow.entity_connector
         tags:
             - { name: doctrine.event_subscriber }
