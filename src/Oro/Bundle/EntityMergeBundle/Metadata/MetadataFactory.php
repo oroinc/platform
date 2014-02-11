@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MetadataFactory
 {
@@ -25,7 +25,7 @@ class MetadataFactory
     protected $entityManager;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -36,10 +36,10 @@ class MetadataFactory
     public function __construct(
         ConfigProvider $configProvider,
         EntityManager $entityManager,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
-        $this->configProvider = $configProvider;
-        $this->entityManager = $entityManager;
+        $this->configProvider  = $configProvider;
+        $this->entityManager   = $entityManager;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -149,8 +149,8 @@ class MetadataFactory
             $doctrineMetadata = $this->getDoctrineMetadataFor($entityClassName);
 
             if ($doctrineMetadata->hasAssociation($fieldName)) {
-                $fieldMapping           = $doctrineMetadata->getAssociationMapping($fieldName);
-                $fieldDoctrineMetadata  = new DoctrineMetadata($className, $fieldMapping);
+                $fieldMapping          = $doctrineMetadata->getAssociationMapping($fieldName);
+                $fieldDoctrineMetadata = new DoctrineMetadata($className, $fieldMapping);
 
                 if ($fieldDoctrineMetadata->get('targetEntity') == $className) {
                     $fieldConfig        = $this->configProvider->getConfig($entityClassName, $fieldName);
