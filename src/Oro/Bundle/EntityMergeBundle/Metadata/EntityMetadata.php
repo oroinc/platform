@@ -27,6 +27,7 @@ class EntityMetadata extends Metadata implements EntityMetadataInterface
         foreach ($fieldsMetadata as $fieldMetadata) {
             $this->addFieldMetadata($fieldMetadata);
         }
+        $this->doctrineMetadata = $doctrineMetadata;
     }
 
     /**
