@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class UpdateCommand extends BaseCommand
 {
@@ -50,20 +51,18 @@ class UpdateCommand extends BaseCommand
             );
         }
 
+        $force = $input->getOption('force');
+
         foreach ($doctrineAllMetadata as $doctrineMetadata) {
             $className = $doctrineMetadata->getName();
-            $classMetadata = $configManager->getEntityMetadata($className);
-            if ($classMetadata
-                && $classMetadata->name === $className
-                && $classMetadata->configurable
-            ) {
-                if ($configManager->hasConfig($classMetadata->name)) {
+            if ($this->isConfigurableEntity($className, $configManager)) {
+                if ($configManager->hasConfig($className)) {
                     $this->logMessage(
                         $output,
                         OutputInterface::VERBOSITY_NORMAL,
                         sprintf('Update config for "%s" entity.', $className)
                     );
-                    $configManager->updateConfigEntityModel($className, $input->getOption('force'));
+                    $configManager->updateConfigEntityModel($className, $force);
                 } else {
                     $this->logMessage(
                         $output,
@@ -81,7 +80,7 @@ class UpdateCommand extends BaseCommand
                             OutputInterface::VERBOSITY_VERBOSE,
                             sprintf('  Update config for "%s" field.', $fieldName)
                         );
-                        $configManager->updateConfigFieldModel($className, $fieldName, $input->getOption('force'));
+                        $configManager->updateConfigFieldModel($className, $fieldName, $force);
                     } else {
                         $this->logMessage(
                             $output,
@@ -100,7 +99,7 @@ class UpdateCommand extends BaseCommand
                             OutputInterface::VERBOSITY_VERBOSE,
                             sprintf('  Update config for "%s" field.', $fieldName)
                         );
-                        $configManager->updateConfigFieldModel($className, $fieldName, $input->getOption('force'));
+                        $configManager->updateConfigFieldModel($className, $fieldName, $force);
                     } else {
                         $this->logMessage(
                             $output,
@@ -118,6 +117,23 @@ class UpdateCommand extends BaseCommand
         $configManager->flush();
 
         $output->writeln('Completed');
+    }
+
+    /**
+     * @param string        $className
+     * @param ConfigManager $configManager
+     * @return bool
+     */
+    protected function isConfigurableEntity($className, ConfigManager $configManager)
+    {
+        $classMetadata = $configManager->getEntityMetadata($className);
+        if ($classMetadata) {
+            // check if an entity is marked as configurable
+            return $classMetadata->name === $className && $classMetadata->configurable;
+        } else {
+            // check if it is a custom entity
+            return $configManager->hasConfig($className);
+        }
     }
 
     /**
