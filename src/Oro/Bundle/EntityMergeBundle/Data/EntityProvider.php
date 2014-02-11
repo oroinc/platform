@@ -22,17 +22,17 @@ class EntityProvider
     }
 
     /**
-     * @param string $entityName
+     * @param string $className
      * @param array $entityIds
      * @return object[]
      */
-    public function getEntitiesByIds($entityName, array $entityIds)
+    public function getEntitiesByIds($className, array $entityIds)
     {
-        $repository = $this->getEntityRepository($entityName);
+        $repository = $this->getEntityRepository($className);
 
         $queryBuilder = $repository->createQueryBuilder('entity');
 
-        $entityIdentifier = $this->getEntityIdentifier($entityName);
+        $entityIdentifier = $this->getEntityIdentifier($className);
 
         $identifierExpression = sprintf('entity.%s', $entityIdentifier);
 
@@ -40,6 +40,23 @@ class EntityProvider
 
         $entities = $queryBuilder->getQuery()->execute();
         return $entities;
+    }
+
+    /**
+     * Get list of entities ids
+     *
+     * @param array $entities
+     * @return array
+     */
+    public function getEntityIds(array $entities)
+    {
+        $result = array();
+
+        foreach ($entities as $entity) {
+            $result[] = $this->getEntityIdentifierValue($entity);
+        }
+
+        return $result;
     }
 
     /**
@@ -74,5 +91,15 @@ class EntityProvider
     public function getEntityIdentifier($className)
     {
         return $this->entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
+    }
+
+    /**
+     * @param string $entity
+     * @return string
+     */
+    protected function getEntityIdentifierValue($entity)
+    {
+        $idValues = $this->entityManager->getClassMetadata(get_class($entity))->getIdentifierValues($entity);
+        return current($idValues);
     }
 }

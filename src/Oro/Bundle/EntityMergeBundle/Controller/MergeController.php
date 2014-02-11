@@ -14,6 +14,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
+use Oro\Bundle\EntityMergeBundle\Data\EntityProvider;
 
 /**
  * @Route("/merge")
@@ -57,6 +58,8 @@ class MergeController extends Controller
             $ids = (array)$this->getRequest()->get('ids');
 
             $entityData = $this->getEntityDataFactory()->createEntityDataByIds($className, $ids);
+        } else {
+            $className = $entityData->getClassName();
         }
 
         $form = $this->createForm(
@@ -77,19 +80,25 @@ class MergeController extends Controller
 
                 // @todo Flash message with success or error
 
-                return $this->redirect(
+                /*return $this->redirect(
                     $this->generateUrl(
                         $this->getEntityViewRoute($entityData->getClassName()),
                         array('id' => $entityData->getMasterEntity()->getId())
                     )
-                );
+                );*/
             }
         }
 
         return array(
-            'submitUrl' => '',
-            'entityPluralLabel' => $this->getEntityPluralLabel($entityData->getClassName()),
-            'cancelUrl' => $this->generateUrl($this->getEntityIndexRoute($entityData->getClassName())),
+            'formAction' => $this->generateUrl(
+                'oro_entity_merge',
+                array(
+                    'className' => $className,
+                    'ids' => $this->getEntityProvider()->getEntityIds($entityData->getEntities()),
+                )
+            ),
+            'entityPluralLabel' => $this->getEntityPluralLabel($className),
+            'cancelPath' => $this->generateUrl($this->getEntityIndexRoute($className)),
             'form' => $form->createView()
         );
     }
@@ -141,5 +150,13 @@ class MergeController extends Controller
     protected function getEntityDataFactory()
     {
         return $this->get('oro_entity_merge.data.entity_data_factory');
+    }
+
+    /**
+     * @return EntityProvider
+     */
+    protected function getEntityProvider()
+    {
+        return $this->get('oro_entity_merge.data.entity_provider');
     }
 }

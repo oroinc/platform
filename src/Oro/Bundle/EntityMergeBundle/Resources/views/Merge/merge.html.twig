@@ -5,10 +5,9 @@
 {% set title = 'Merge Accounts' %}
 {% oro_title_set({}) %}
 {% set gridName = 'role-users-grid' %}
-{% set formAction = path('oro_entity_merge') %}
 
 {% block navButtons %}
-    {{ UI.cancelButton(path('orocrm_account_index')) }}
+    {{ UI.cancelButton(cancelPath) }}
     {{ UI.saveAndStayButton() }}
 {% endblock navButtons %}
 
