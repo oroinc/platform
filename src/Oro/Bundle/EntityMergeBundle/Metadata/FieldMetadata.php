@@ -7,6 +7,11 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 class FieldMetadata extends Metadata implements MetadataInterface
 {
     /**
+     * @var EntityMetadata
+     */
+    protected $entityMetadata;
+
+    /**
      * @var DoctrineMetadata
      */
     protected $doctrineMetadata;
@@ -21,6 +26,22 @@ class FieldMetadata extends Metadata implements MetadataInterface
         if ($doctrineMetadata) {
             $this->setDoctrineMetadata($doctrineMetadata);
         }
+    }
+
+    /**
+     * @param EntityMetadata $entityMetadata
+     */
+    public function setEntityMetadata(EntityMetadata $entityMetadata)
+    {
+        $this->entityMetadata = $entityMetadata;
+    }
+
+    /**
+     * @return EntityMetadata
+     */
+    public function getEntityMetadata()
+    {
+        return $this->entityMetadata;
     }
 
     /**

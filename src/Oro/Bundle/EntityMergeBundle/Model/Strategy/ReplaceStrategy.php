@@ -43,12 +43,10 @@ class ReplaceStrategy implements StrategyInterface
     }
 
     /**
-     * Get name of field merge strategy
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
-        // TODO: Implement getName() method.
+        return 'replace';
     }
 }

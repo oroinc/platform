@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Strategy;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Symfony\Component\Security\Core\Util\ClassUtils;
 
-class MergeStategy implements StrategyInterface
+class MergeStrategy implements StrategyInterface
 {
     /**
      * @var AccessorInterface $accessor
@@ -44,8 +46,7 @@ class MergeStategy implements StrategyInterface
         $relatedEntities         = [];
         $doctrineMetadataFactory = $this->entityManager->getMetadataFactory();
         foreach ($entities as $entity) {
-            $doctrineMetadata = $doctrineMetadataFactory
-                ->getMetadataFor(ClassUtils::getRealClass($entity));
+            $doctrineMetadata = $doctrineMetadataFactory->getMetadataFor(ClassUtils::getRealClass($entity));
             $ids              = $doctrineMetadata->getIdentifierValues($entity);
             $key              = implode('_', $ids);
             $values           = $this->accessor->getValue($entity, $fieldMetadata);
@@ -75,12 +76,10 @@ class MergeStategy implements StrategyInterface
     }
 
     /**
-     * Get name of field merge strategy
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
-        // TODO: Implement getName() method.
+        return 'merge';
     }
 }

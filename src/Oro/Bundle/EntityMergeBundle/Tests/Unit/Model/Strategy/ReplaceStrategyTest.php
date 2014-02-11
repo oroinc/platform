@@ -91,7 +91,7 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->markTestIncomplete();
+        $this->assertEquals('replace', $this->strategy->getName());
     }
 
     protected function createFieldData()

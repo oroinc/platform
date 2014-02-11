@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStategy;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStrategy;
+
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class MergeStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MergeStategy $strategy
+     * @var MergeStrategy $strategy
      */
     protected $strategy;
 
     /**
-     * @var
+     * @var \PHPUnit_Framework_TestCase
      */
     protected $entityManager;
 
@@ -30,7 +30,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
 
         $accessor = new RelationAccessor($this->entityManager);
 
-        $this->strategy = new MergeStategy($accessor, $this->entityManager);
+        $this->strategy = new MergeStrategy($accessor, $this->entityManager);
     }
 
     public function testNotSupports()
@@ -68,6 +68,9 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->strategy->supports($fieldData));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testMerge()
     {
         $fieldData         = $this->createFieldData();
@@ -176,7 +179,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->markTestIncomplete();
+        $this->assertEquals('merge', $this->strategy->getName());
     }
 
     protected function createFieldData()

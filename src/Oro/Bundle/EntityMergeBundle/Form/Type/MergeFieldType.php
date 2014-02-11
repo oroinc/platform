@@ -39,7 +39,7 @@ class MergeFieldType extends AbstractType
             'sourceEntity',
             'entity',
             array(
-                'class' => 'OroCRM\\Bundle\\AccountBundle\\Entity\\Account', // @todo Pass class dynamically
+                'class' => $metadata->getEntityMetadata()->getClassName(),
                 'choices' => $options['entities'],
                 'multiple' => false,
                 'expanded' => true,

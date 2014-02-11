@@ -5,3 +5,7 @@ oro:
         merge_modes:
             replace: Replace
             merge: Merge
+
+
+        form:
+            master_record: Master Record

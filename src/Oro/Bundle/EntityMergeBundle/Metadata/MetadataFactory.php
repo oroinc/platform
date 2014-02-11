@@ -4,13 +4,14 @@ namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MetadataFactory
 {
@@ -31,7 +32,8 @@ class MetadataFactory
 
     /**
      * @param ConfigProvider $configProvider
-     * @param EntityManager  $entityManager
+     * @param EntityManager $entityManager
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         ConfigProvider $configProvider,
@@ -115,12 +117,35 @@ class MetadataFactory
                         $fieldMapping = $doctrineMetadata->getFieldMapping($fieldName);
                     }
 
-                    $fieldsMetadata[] = new FieldMetadata($options, new DoctrineMetadata($className, $fieldMapping));
+                    $fieldsMetadata[] = $this->createFieldMetadata(
+                        $options,
+                        $this->createDoctrineMetadata($className, $fieldMapping)
+                    );
                 }
             }
         }
 
         return $fieldsMetadata;
+    }
+
+    /**
+     * @param array $options
+     * @param DoctrineMetadata $doctrineMetadata
+     * @return FieldMetadata
+     */
+    protected function createFieldMetadata(array $options, DoctrineMetadata $doctrineMetadata = null)
+    {
+        return new FieldMetadata($options, $doctrineMetadata);
+    }
+
+    /**
+     * @param string $classMame
+     * @param array $fieldMapping
+     * @return DoctrineMetadata
+     */
+    protected function createDoctrineMetadata($classMame, array $fieldMapping)
+    {
+        return new DoctrineMetadata($classMame, $fieldMapping);
     }
 
     /**
@@ -150,11 +175,11 @@ class MetadataFactory
 
             if ($doctrineMetadata->hasAssociation($fieldName)) {
                 $fieldMapping          = $doctrineMetadata->getAssociationMapping($fieldName);
-                $fieldDoctrineMetadata = new DoctrineMetadata($className, $fieldMapping);
+                $fieldDoctrineMetadata = $this->createDoctrineMetadata($className, $fieldMapping);
 
                 if ($fieldDoctrineMetadata->get('targetEntity') == $className) {
                     $fieldConfig        = $this->configProvider->getConfig($entityClassName, $fieldName);
-                    $relationMetadata[] = new FieldMetadata($fieldConfig->all(), $fieldDoctrineMetadata);
+                    $relationMetadata[] = $this->createFieldMetadata($fieldConfig->all(), $fieldDoctrineMetadata);
                 }
             }
         }

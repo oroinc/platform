@@ -17,7 +17,7 @@ parameters:
     # Strategies
     oro_entity_merge.strategy.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy
     oro_entity_merge.strategy.replace.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy
-    oro_entity_merge.strategy.merge.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStategy
+    oro_entity_merge.strategy.merge.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStrategy
 
     # Listeners
     oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener

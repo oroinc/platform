@@ -157,7 +157,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($metadata);
     }
 
-    public function testCreateFieldsMetadataReturnFieldMetada()
+    public function testCreateFieldsMetadataReturnFieldMetadata()
     {
         $this->configProvider
             ->expects($this->once())
@@ -188,7 +188,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);
         $this->assertInstanceOf(
-            '\Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
+            'Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
             $metadata[0]
         );
     }
@@ -225,7 +225,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);
         $this->assertInstanceOf(
-            '\Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
+            'Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
             $metadata[0]
         );
     }
