@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStategy;
+use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class MergeStrategyTest extends \PHPUnit_Framework_TestCase
@@ -73,6 +75,10 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
         $entityData        = $this->createEntityData();
         $masterEntity      = new EntityStub(1);
         $sourceEntity      = new EntityStub(2);
+        $collectionItem1   = new CollectionItemStub(1);
+        $collectionItem2   = new CollectionItemStub(2);
+        $masterEntity->addCollectionItem($collectionItem1);
+        $sourceEntity->addCollectionItem($collectionItem2);
 
         $entities = [$masterEntity, $sourceEntity];
 
@@ -91,7 +97,12 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getEntities')
             ->will($this->returnValue($entities));
 
-        $this->doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+        $entityData
+            ->expects($this->once())
+            ->method('getMasterEntity')
+            ->will($this->returnValue($masterEntity));
+
+        $doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setMethods([])
             ->disableOriginalConstructor()
             ->getMock();
@@ -103,42 +114,64 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
 
         $metadataFactory->expects($this->any())
             ->method('getMetadataFor')
-            ->will($this->returnValue($this->doctrineMetadata));
+            ->will($this->returnValue($doctrineMetadata));
 
-        $this->doctrineMetadata->expects($this->any())
+        $doctrineMetadata->expects($this->at(0))
             ->method('getIdentifierValues')
             ->will($this->returnValue([1]));
+
+        $doctrineMetadata->expects($this->at(1))
+            ->method('getIdentifierValues')
+            ->will($this->returnValue([2]));
 
         $this->entityManager->expects($this->any())
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
-        $doctrineMetadata = $this->createDoctrineMetadata();
+        $fieldDoctrineMetadata = $this->createDoctrineMetadata();
         $fieldMetadataData
             ->expects($this->any())
             ->method('getDoctrineMetadata')
-            ->will($this->returnValue($doctrineMetadata));
+            ->will($this->returnValue($fieldDoctrineMetadata));
 
         $fieldMetadataData
             ->expects($this->any())
             ->method('getFieldName')
-            ->will($this->returnValue('id'));
+            ->will($this->returnValue('collection'));
 
-        $this->repository = $this
+        $fieldMetadataData
+            ->expects($this->any())
+            ->method('has')
+            ->will($this->returnValue(true));
+
+        $fieldMetadataData
+            ->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue('setEntityStub'));
+
+        $repository = $this
             ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($this->repository));
+            ->will($this->returnValue($repository));
 
-        $this->repository
-            ->expects($this->any())
+        $repository
+            ->expects($this->at(0))
             ->method('findBy')
-            ->will($this->returnValue($entities));
+            ->will($this->returnValue([$masterEntity->getCollection()->first()]));
+
+        $repository
+            ->expects($this->at(1))
+            ->method('findBy')
+            ->will($this->returnValue([$sourceEntity->getCollection()->first()]));
 
         $this->strategy->merge($fieldData);
+
+        $this->assertEquals($masterEntity, $collectionItem1->getEntityStub());
+        $this->assertEquals($masterEntity, $collectionItem2->getEntityStub());
     }
 
     protected function createFieldData()

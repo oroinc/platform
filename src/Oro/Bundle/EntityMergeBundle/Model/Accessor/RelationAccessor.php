@@ -44,8 +44,7 @@ class RelationAccessor implements AccessorInterface
      */
     public function supports($entity, FieldMetadata $metadata)
     {
-        return !$metadata->getDoctrineMetadata()->isMappedBySourceEntity() ||
-        $metadata->getDoctrineMetadata()->isCollection();
+        return !$metadata->getDoctrineMetadata()->isMappedBySourceEntity();
     }
 
     /**
@@ -71,7 +70,8 @@ class RelationAccessor implements AccessorInterface
             if ($metadata->has('setter')) {
                 $setter = $metadata->get('setter');
                 $relatedEntity->$setter($entity);
-                return;
+
+                continue;
             }
 
             $this
