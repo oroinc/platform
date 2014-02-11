@@ -12,7 +12,7 @@ class NewFieldConfigModelEvent extends Event
     /**
      * @var FieldConfigModel
      */
-    protected $configModel;
+    public $configModel;
 
     /**
      * @var ConfigManager
