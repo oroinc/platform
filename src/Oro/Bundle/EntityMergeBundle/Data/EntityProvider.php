@@ -1,32 +1,25 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Alexandr
- * Date: 2/10/14
- * Time: 5:34 PM
- */
 
-namespace Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge;
-
+namespace Oro\Bundle\EntityMergeBundle\Data;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
-class MergeEntitiesDataProvider
+class EntityProvider
 {
-
     /**
      * @var Registry
      */
-    private $doctrineRegistry;
+    private $entityManager;
 
     /**
-     * @param Registry $doctrine
+     * @param EntityManager $entityManager
      */
-    public function setDoctrineRegistry(Registry $doctrine)
+    public function __construct(EntityManager $entityManager)
     {
-        $this->doctrineRegistry = $doctrine;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -36,7 +29,7 @@ class MergeEntitiesDataProvider
      */
     public function getEntityRepository($entityName)
     {
-        $repository = $this->getRepository($this->getEntityManager(), $entityName);
+        $repository = $this->getRepository($entityName);
 
         if ($repository->getClassName() != $entityName) {
             throw new InvalidArgumentException('Incorrect repository returned');
@@ -47,16 +40,16 @@ class MergeEntitiesDataProvider
 
     /**
      * @param string $entityName
-     * @param string $entityIdentifier
      * @param array $entityIds
-     * @internal param $repository
      * @return mixed
      */
-    public function getEntitiesByPk($entityName, $entityIdentifier, array $entityIds)
+    public function getEntitiesByIds($entityName, array $entityIds)
     {
         $repository = $this->getEntityRepository($entityName);
 
         $queryBuilder = $repository->createQueryBuilder('entity');
+
+        $entityIdentifier = $this->getEntityIdentifier($entityName);
 
         $identifierExpression = sprintf('entity.%s', $entityIdentifier);
 
@@ -72,24 +65,16 @@ class MergeEntitiesDataProvider
      */
     public function getEntityIdentifier($className)
     {
-        return $this->getEntityManager()->getClassMetadata($className)->getSingleIdentifierFieldName();
+        return $this->entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
     }
 
     /**
-     * @param EntityManager $manager
      * @param string $entityName
      * @return \Doctrine\ORM\EntityRepository
      */
-    protected function getRepository(EntityManager $manager, $entityName)
+    protected function getRepository($entityName)
     {
-        return $manager->getRepository($entityName);
+        return $this->entityManager->getRepository($entityName);
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->doctrineRegistry->getManager();
-    }
 }

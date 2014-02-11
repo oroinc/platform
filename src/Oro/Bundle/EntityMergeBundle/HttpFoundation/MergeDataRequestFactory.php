@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\HttpFoundation;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionParametersParser;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -12,33 +13,32 @@ class MergeDataRequestFactory
 {
 
     private $request;
+
     /**
      * @var MassActionParametersParser
      */
     private $parametersParser;
+
     /**
      * @var MassActionDispatcher
      */
     private $massActionDispatcher;
 
     /**
-     * @var MetadataFactory $metadataFactory
-     */
-    private $metadataFactory;
-
-    /**
      * @var @var EntityData $requestData
      */
     private $requestData;
 
+    private $entityDataFactory;
+
     public function __construct(
         MassActionParametersParser $parametersParser,
         MassActionDispatcher $massActionDispatcher,
-        MetadataFactory $metadataFactory
+        EntityDataFactory $entityDataFactory
     ) {
         $this->parametersParser = $parametersParser;
         $this->massActionDispatcher = $massActionDispatcher;
-        $this->metadataFactory = $metadataFactory;
+        $this->entityDataFactory = $entityDataFactory;
     }
 
     /**
@@ -61,14 +61,7 @@ class MergeDataRequestFactory
 
         $options = $handlerResult['options'];
         $entities = $handlerResult['entities'];
-
-        $entityMetadata = $this->metadataFactory->createMergeMetadata($options['entity_name']);
-
-        $data = new EntityData($entityMetadata);
-        $data->setEntities($entities);
-        foreach ($entityMetadata->getFieldsMetadata() as $fieldMetadata) {
-            $data->addNewField($fieldMetadata);
-        }
+        $data = $this->entityDataFactory->createEntityData($options['entity_name'], $entities);
 
         $this->requestData = $data;
 

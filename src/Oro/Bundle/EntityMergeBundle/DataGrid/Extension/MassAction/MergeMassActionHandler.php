@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\Actions\Merge;
+namespace Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction;
 
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -11,6 +11,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
+use Oro\Bundle\EntityMergeBundle\Data\EntityProvider;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
@@ -18,14 +19,14 @@ class MergeMassActionHandler implements MassActionHandlerInterface
 {
 
     /**
-     * @var MergeEntitiesDataProvider $mergeEntitiesDataProvider ;
+     * @var EntityProvider $entityProvider ;
      */
-    private $mergeEntitiesDataProvider;
+    private $entityProvider;
 
 
-    public function setMergeDataProvider(MergeEntitiesDataProvider $mergeEntitiesDataProvider)
+    public function setEntityProvider(EntityProvider $entityProvider)
     {
-        $this->mergeEntitiesDataProvider = $mergeEntitiesDataProvider;
+        $this->entityProvider = $entityProvider;
     }
 
     /**
@@ -43,7 +44,7 @@ class MergeMassActionHandler implements MassActionHandlerInterface
             throw new InvalidArgumentException('Entity name is missing');
         }
 
-        $entityIdentifier = $this->mergeEntitiesDataProvider->getEntityIdentifier($options['entity_name']);
+        $entityIdentifier = $this->entityProvider->getEntityIdentifier($options['entity_name']);
 
         $entityIds = $this->getIdsFromResult($args->getResults(), $entityIdentifier);
 
@@ -56,9 +57,8 @@ class MergeMassActionHandler implements MassActionHandlerInterface
         $countOfSelectedItems = count($entityIds);
         $this->validateItemsCount($countOfSelectedItems, $maxCountOfElements);
 
-        $entities = $this->mergeEntitiesDataProvider->getEntitiesByPk(
+        $entities = $this->entityProvider->getEntitiesByIds(
             $options['entity_name'],
-            $entityIdentifier,
             $entityIds
         );
 
