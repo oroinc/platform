@@ -3,9 +3,15 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $contextAccessor;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
@@ -23,12 +29,20 @@ class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->createEntityAction = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
             ->getMock();
         $this->replacePropertyPath = $this
             ->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface')
             ->getMock();
-        $this->action = new CreateRelatedEntity($this->createEntityAction, $this->replacePropertyPath);
+
+        $this->action = new CreateRelatedEntity(
+            $this->contextAccessor,
+            $this->createEntityAction,
+            $this->replacePropertyPath
+        );
     }
 
     /**
@@ -124,6 +138,11 @@ class CreateRelatedEntityTest extends \PHPUnit_Framework_TestCase
         $this->createEntityAction->expects($this->once())
             ->method('execute')
             ->with($workflowItem)
+            ->will($this->returnSelf());
+
+        $this->contextAccessor->expects($this->once())
+            ->method('getValue')
+            ->with($workflowItem, 'data.' . $attributeName)
             ->will($this->returnValue($entity));
 
         $this->action->initialize($options);

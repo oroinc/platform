@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface;
+use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 /**
  * Class CreateRelatedEntity.
@@ -13,10 +14,6 @@ use Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface
  */
 class CreateRelatedEntity extends AbstractAction
 {
-    const OPTION_KEY_DATA = 'data';
-    const OPTION_KEY_CLASS = 'class';
-    const OPTION_KEY_ATTRIBUTE = 'attribute';
-
     /**
      * @var ActionInterface
      */
@@ -33,13 +30,17 @@ class CreateRelatedEntity extends AbstractAction
     protected $options = array();
 
     /**
+     * @param ContextAccessor $contextAccessor
      * @param ActionInterface $createEntityAction
      * @param ConfigurationPassInterface $replacePropertyPathPass
      */
     public function __construct(
+        ContextAccessor $contextAccessor,
         ActionInterface $createEntityAction,
         ConfigurationPassInterface $replacePropertyPathPass
     ) {
+        parent::__construct($contextAccessor);
+
         $this->createEntityAction = $createEntityAction;
         $this->replacePropertyPathPass = $replacePropertyPathPass;
     }
@@ -55,17 +56,17 @@ class CreateRelatedEntity extends AbstractAction
 
         $definition = $context->getDefinition();
         $createEntityOptions = array(
-            self::OPTION_KEY_ATTRIBUTE => '$' . $definition->getEntityAttributeName(),
-            self::OPTION_KEY_CLASS => $definition->getRelatedEntity(),
-            self::OPTION_KEY_DATA => $this->getOption($this->options, self::OPTION_KEY_DATA)
+            CreateObject::OPTION_KEY_ATTRIBUTE => '$' . $definition->getEntityAttributeName(),
+            CreateObject::OPTION_KEY_CLASS => $definition->getRelatedEntity(),
+            CreateObject::OPTION_KEY_DATA => $this->getOption($this->options, CreateObject::OPTION_KEY_DATA)
         );
         $createEntityOptions = $this->replacePropertyPathPass->passConfiguration($createEntityOptions);
 
         $this->createEntityAction->initialize($createEntityOptions);
-        $entity = $this->createEntityAction->execute($context);
-        $context->setEntity($entity);
+        $this->createEntityAction->execute($context);
 
-        return $entity;
+        $entity = $this->contextAccessor->getValue($context, $createEntityOptions[CreateObject::OPTION_KEY_ATTRIBUTE]);
+        $context->setEntity($entity);
     }
 
     /**
@@ -73,7 +74,7 @@ class CreateRelatedEntity extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (!empty($options[self::OPTION_KEY_DATA]) && !is_array($options[self::OPTION_KEY_DATA])) {
+        if (!empty($options[CreateObject::OPTION_KEY_DATA]) && !is_array($options[CreateObject::OPTION_KEY_DATA])) {
             throw new InvalidParameterException('Object data must be an array.');
         }
         $this->options = $options;
