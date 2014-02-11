@@ -82,7 +82,18 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
             '\OroCRM\Bundle\AccountBundle\Entity\Account'
         )->will($this->returnValue($this->fakeMetadata));
         $this->fakeEntities = array(new Account(), new Account());
-        $this->target = new EntityDataFactory($this->fakeMetadataFactory, $this->fakeEntityProvider);
+        $fakeEventDispatcher = $this->getMock(
+            '\Symfony\Component\EventDispatcher\EventDispatcher',
+            array(),
+            array(),
+            '',
+            false
+        );
+        $this->target = new EntityDataFactory(
+            $this->fakeMetadataFactory,
+            $this->fakeEntityProvider,
+            $fakeEventDispatcher
+        );
     }
 
     public function testCreateEntityDataShouldReturnCorrectEntities()
@@ -92,30 +103,6 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->fakeMetadata, $result->getMetadata());
         $expected = $this->fakeEntities;
         $this->assertEquals($result->getEntities(), $expected);
-    }
-
-    public function testCreateEntityDataShouldSetFieldsMetadataForEachField()
-    {
-        $options = array();
-        $doctrineMetadata = $this->getMock(
-            '\Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata',
-            array(),
-            array(),
-            '',
-            false
-        );
-        $doctrineMetadata->expects($this->any())->method('has')->will($this->returnValue(true));
-        $doctrineMetadata->expects($this->at(1))->method('get')->will($this->returnValue('testFieldName'));
-        $doctrineMetadata->expects($this->at(3))->method('get')->will($this->returnValue('SecondFieldTest'));
-        $this->fakeFieldsMetadata = array(
-            new FieldMetadata($options, $doctrineMetadata),
-            new FieldMetadata($options, $doctrineMetadata)
-        );
-        $result = $this->target->createEntityData('\OroCRM\Bundle\AccountBundle\Entity\Account', $this->fakeEntities);
-
-        $field = $result->getFields();
-        $this->assertArrayHasKey('testFieldName', $field);
-        $this->assertArrayHasKey('SecondFieldTest', $field);
     }
 
     public function testCreateEntityDataByIdsShouldCallCreateEntityDataWithCorrectData()
