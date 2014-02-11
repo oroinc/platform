@@ -418,7 +418,7 @@ function($, _, Backbone, app) {
          *
          * @public
          */
-        apply: function () {
+        applyValue: function () {
             this.setValue(this._formatRawValue(this._readDOMValue()));
         },
 
