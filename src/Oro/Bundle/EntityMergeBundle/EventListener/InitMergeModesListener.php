@@ -9,11 +9,6 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 class InitMergeModesListener
 {
     /**
-     * @var CreateMetadataEvent
-     */
-    protected $event;
-
-    /**
      * @param CreateMetadataEvent $event
      */
     public function onCreateMetadata(CreateMetadataEvent $event)

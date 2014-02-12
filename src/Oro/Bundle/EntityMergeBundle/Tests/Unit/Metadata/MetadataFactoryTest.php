@@ -17,7 +17,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $configProvider;
+    protected $mergeConfigProvider;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -51,16 +51,14 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->configProvider = $this
+        $this->mergeConfigProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->eventDispatcher = $this
-            ->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->config = $this
-            ->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $this->config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
         $this->doctrineHelper = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
@@ -110,7 +108,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->repository));
 
         $this->factory = new MetadataFactory(
-            $this->configProvider,
+            $this->mergeConfigProvider,
             $this->doctrineHelper,
             $this->eventDispatcher
         );
@@ -120,15 +118,15 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Merge config for "Namespace\RelatedEntity" is not exist.
      */
-    public function testCreateEntityMetadataEmpty()
+    public function testCreateEntityMergeMetadataEmpty()
     {
         $metadata = $this->factory->createEntityMetadata(self::RELATED_ENTITY);
         $this->assertNull($metadata);
     }
 
-    public function testCreateEntityMetadata()
+    public function testCreateMergeMetadata()
     {
-        $this->configProvider
+        $this->mergeConfigProvider
             ->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($this->config));
@@ -150,7 +148,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFieldsMetadataReturnFieldMetadata()
     {
-        $this->configProvider
+        $this->mergeConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
             ->will($this->returnValue([$this->config, $this->config]));
@@ -171,11 +169,11 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['ref-one' => []]));
 
         $this->factory = new MetadataFactory(
-            $this->configProvider,
+            $this->mergeConfigProvider,
             $this->doctrineHelper,
             $this->eventDispatcher
         );
-        $metadata      = $this->factory->createFieldsMetadata(self::ENTITY);
+        $metadata = $this->factory->createFieldsMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);
 
@@ -187,7 +185,9 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFieldsMetadataReturnCollectionMetadata()
     {
-        $this->configProvider
+        $label = 'test';
+
+        $this->mergeConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
             ->will($this->returnValue([$this->config, $this->config]));
@@ -275,7 +275,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->with('fieldName')
             ->will($this->returnValue(['targetEntity' => self::ENTITY]));
 
-        $this->configProvider
+        $this->mergeConfigProvider
             ->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($this->config));
