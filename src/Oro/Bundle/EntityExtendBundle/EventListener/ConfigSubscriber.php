@@ -11,8 +11,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
-use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
+use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
@@ -48,10 +48,10 @@ class ConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::PRE_PERSIST_CONFIG         => 'persistConfig',
-            Events::NEW_ENTITY_CONFIG_MODEL    => 'newEntity',
-            Events::UPDATE_ENTITY_CONFIG_MODEL => 'newEntity',
-            Events::NEW_FIELD_CONFIG_MODEL     => 'newField',
+            Events::PRE_PERSIST_CONFIG     => 'persistConfig',
+            Events::NEW_ENTITY_CONFIG      => 'updateEntityConfig',
+            Events::UPDATE_ENTITY_CONFIG   => 'updateEntityConfig',
+            Events::NEW_FIELD_CONFIG       => 'newFieldConfig',
         ];
     }
 
@@ -123,9 +123,9 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param NewEntityConfigModelEvent $event
+     * @param EntityConfigEvent $event
      */
-    public function newEntity(NewEntityConfigModelEvent $event)
+    public function updateEntityConfig(EntityConfigEvent $event)
     {
         $originalClassName       = $event->getClassName();
         $originalParentClassName = get_parent_class($originalClassName);
@@ -146,9 +146,9 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param NewFieldConfigModelEvent $event
+     * @param FieldConfigEvent $event
      */
-    public function newField(NewFieldConfigModelEvent $event)
+    public function newFieldConfig(FieldConfigEvent $event)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $event->getConfigManager()->getProvider('extend');
@@ -209,8 +209,8 @@ class ConfigSubscriber implements EventSubscriberInterface
             }
 
             $targetFieldId = new FieldConfigId(
-                $targetEntityClass,
                 $scope,
+                $targetEntityClass,
                 $relationFieldName,
                 ExtendHelper::getReversRelationType($selfFieldType)
             );
@@ -224,7 +224,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'target_field_id' => $targetFieldId // for 1:*, create field
         ];
 
-        $selfRelations                 = $selfConfig->get('relation') ? : [];
+        $selfRelations               = $selfConfig->get('relation') ? : [];
         $selfRelations[$relationKey] = $selfRelationConfig;
 
         $selfConfig->set('relation', $selfRelations);
@@ -258,13 +258,13 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         $selfConfig         = $this->extendConfigProvider->getConfig($selfEntityClass);
         $selfRelations      = $selfConfig->get('relation');
-        $selfRelationConfig = &$selfRelations[$relationKey];
+        $selfRelationConfig = & $selfRelations[$relationKey];
 
         $selfRelationConfig['field_id'] = $fieldConfig;
 
         $targetConfig         = $this->extendConfigProvider->getConfig($targetEntityClass);
         $targetRelations      = $targetConfig->get('relation');
-        $targetRelationConfig = &$targetRelations[$relationKey];
+        $targetRelationConfig = & $targetRelations[$relationKey];
 
         $targetRelationConfig['target_field_id'] = $fieldConfig;
 

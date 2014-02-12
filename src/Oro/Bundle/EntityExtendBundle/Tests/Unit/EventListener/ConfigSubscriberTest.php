@@ -23,10 +23,10 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             [
-                Events::PRE_PERSIST_CONFIG         => 'persistConfig',
-                Events::NEW_ENTITY_CONFIG_MODEL    => 'newEntity',
-                Events::UPDATE_ENTITY_CONFIG_MODEL => 'newEntity',
-                Events::NEW_FIELD_CONFIG_MODEL     => 'newField',
+                Events::PRE_PERSIST_CONFIG   => 'persistConfig',
+                Events::NEW_ENTITY_CONFIG    => 'updateEntityConfig',
+                Events::UPDATE_ENTITY_CONFIG => 'updateEntityConfig',
+                Events::NEW_FIELD_CONFIG     => 'newFieldConfig',
             ],
             ConfigSubscriber::getSubscribedEvents()
         );
@@ -137,14 +137,19 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                             'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                                 'assign' => false,
                                 'field_id' => new FieldConfigId(
-                                    'Oro\Bundle\UserBundle\Entity\User',
                                     'extend',
+                                    'Oro\Bundle\UserBundle\Entity\User',
                                     'testclass_testFieldName',
                                     'manyToOne'
                                 ),
                                 'owner' => true,
                                 'target_entity' => 'TestClass',
-                                'target_field_id' => new FieldConfigId('TestClass', 'extend', 'testFieldName', 'oneToMany'),
+                                'target_field_id' => new FieldConfigId(
+                                    'extend',
+                                    'TestClass',
+                                    'testFieldName',
+                                    'oneToMany'
+                                ),
                             ]
                         ]
                     ]
@@ -186,7 +191,12 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                                 'field_id' => false,
                                 'owner' => false,
                                 'target_entity' => 'TestClass',
-                                'target_field_id' => new FieldConfigId('TestClass', 'extend', 'testFieldName', 'manyToOne'),
+                                'target_field_id' => new FieldConfigId(
+                                    'extend',
+                                    'TestClass',
+                                    'testFieldName',
+                                    'manyToOne'
+                                ),
                             ]
                         ]
                     ]
@@ -226,14 +236,19 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                             'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                                 'assign' => false,
                                 'field_id' => new FieldConfigId(
-                                        'Oro\Bundle\UserBundle\Entity\User',
-                                        'extend',
-                                        'testclass_testFieldName',
-                                        'manyToMany'
-                                    ),
+                                    'extend',
+                                    'Oro\Bundle\UserBundle\Entity\User',
+                                    'testclass_testFieldName',
+                                    'manyToMany'
+                                ),
                                 'owner' => false,
                                 'target_entity' => 'TestClass',
-                                'target_field_id' => new FieldConfigId('TestClass', 'extend', 'testFieldName', 'manyToMany'),
+                                'target_field_id' => new FieldConfigId(
+                                    'extend',
+                                    'TestClass',
+                                    'testFieldName',
+                                    'manyToMany'
+                                ),
                             ]
                         ]
                     ]
@@ -258,7 +273,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     'relation' => [
                         'oneToMany|TestClass|TestClass|testFieldName' => [
                             'assign' => false,
-                            'field_id' => new FieldConfigId('TestClass', 'extend', 'testFieldName', 'oneToMany'),
+                            'field_id' => new FieldConfigId('extend', 'TestClass', 'testFieldName', 'oneToMany'),
                             'owner' => true,
                             'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
                         ]
@@ -333,7 +348,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $resultValues = array_merge($resultValues, $values);
         }
 
-        $fieldConfigId = new FieldConfigId('TestClass', $scope, 'testFieldName', $type);
+        $fieldConfigId = new FieldConfigId($scope, 'TestClass', 'testFieldName', $type);
         $eventConfig   = new Config($fieldConfigId);
         $eventConfig->setValues($resultValues);
 
@@ -364,7 +379,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $resultValues = array_merge($resultValues, $values);
         }
 
-        $entityConfigId = new EntityConfigId('TestClass', $scope);
+        $entityConfigId = new EntityConfigId($scope, 'TestClass');
         $entityConfig   = new Config($entityConfigId);
         $entityConfig->setValues($resultValues);
 

@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
@@ -88,7 +89,9 @@ class UpdateCommand extends InitCommand
                 }
 
                 foreach ($config as $className => $entityOptions) {
-                    $className = class_exists($className) ? $className : 'Extend\\Entity\\' . $className;
+                    $className = class_exists($className)
+                        ? $className
+                        : ExtendConfigDumper::ENTITY . $className;
                     if ($this->info) {
                         $output->writeln(
                             '-- entity: ' . $className . ' (<comment>'

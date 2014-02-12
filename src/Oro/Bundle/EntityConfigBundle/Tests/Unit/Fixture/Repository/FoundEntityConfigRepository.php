@@ -63,7 +63,7 @@ class FoundEntityConfigRepository extends EntityRepository
     public static function getResultConfigField()
     {
         if (!self::$configField) {
-            self::$configField = new FieldConfigModel('test', 'string');
+            self::$configField = new FieldConfigModel('testField', 'string');
 
             $configValue = new ConfigModelValue(
                 'test_value',

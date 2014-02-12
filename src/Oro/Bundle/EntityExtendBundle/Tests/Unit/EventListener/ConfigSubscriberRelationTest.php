@@ -22,7 +22,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
      */
     public function testPersistConfig_ScopeExtend_RelationType_createTargetRelation_manyToMany()
     {
-        $fieldConfigId = new FieldConfigId('TestClass', 'extend', 'rel', 'manyToMany');
+        $fieldConfigId = new FieldConfigId('extend', 'TestClass', 'rel', 'manyToMany');
         $eventConfig   = new Config($fieldConfigId);
         $eventConfig->setValues(
             [
@@ -37,7 +37,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $selfEntityConfigId = new EntityConfigId('TestClass', 'extend');
+        $selfEntityConfigId = new EntityConfigId('extend', 'TestClass');
         $selfEntityConfig   = new Config($selfEntityConfigId);
         $selfEntityConfig->setValues(
             [
@@ -52,14 +52,14 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                         'owner'           => true,
                         'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
                         'field_id'        => new FieldConfigId(
+                                'extend',
                             'TestEntity',
-                            'extend',
                             'rel',
                             'manyToMany'
                         ),
                         'target_field_id' => new FieldConfigId(
-                            'Oro\Bundle\UserBundle\Entity\User',
                             'extend',
+                            'Oro\Bundle\UserBundle\Entity\User',
                             'testclass_rel',
                             'manyToMany'
                         ),
@@ -70,7 +70,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $targetEntityConfigId = new EntityConfigId('Oro\Bundle\UserBundle\Entity\User', 'extend');
+        $targetEntityConfigId = new EntityConfigId('extend', 'Oro\Bundle\UserBundle\Entity\User');
         $targetEntityConfig   = new Config($targetEntityConfigId);
         $targetEntityConfig->setValues(
             [
@@ -85,14 +85,14 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                         'owner'           => false,
                         'target_entity'   => 'TestClass',
                         'field_id'        => new FieldConfigId(
-                            'Oro\Bundle\UserBundle\Entity\User',
                             'extend',
+                            'Oro\Bundle\UserBundle\Entity\User',
                             'testclass_rel',
                             'manyToMany'
                         ),
                         'target_field_id' => new FieldConfigId(
-                            'TestEntity',
                             'extend',
+                            'TestEntity',
                             'rel',
                             'manyToMany'
                         ),
@@ -125,14 +125,19 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                                 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                                     'assign' => false,
                                     'field_id' => new FieldConfigId(
-                                            'Oro\Bundle\UserBundle\Entity\User',
                                             'extend',
+                                            'Oro\Bundle\UserBundle\Entity\User',
                                             'testclass_testFieldName',
                                             'manyToMany'
                                         ),
                                     'owner' => false,
                                     'target_entity' => 'TestClass',
-                                    'target_field_id' => new FieldConfigId('TestClass', 'extend', 'testFieldName', 'manyToMany'),
+                                    'target_field_id' => new FieldConfigId(
+                                            'extend',
+                                             'TestClass',
+                                             'testFieldName',
+                                             'manyToMany'
+                                        ),
                                 ]
                             ]
                         ]
