@@ -127,7 +127,7 @@ class MetadataFactory
         $repository     = $this
             ->doctrineHelper
             ->getEntityRepository('Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue');
-        $configs        = $repository->findBy(['code' => 'merge_relation_enable']);
+        $configs        = $repository->findBy(['code' => 'relation_enable']);
 
         if (!$configs) {
             return $fieldsMetadata;

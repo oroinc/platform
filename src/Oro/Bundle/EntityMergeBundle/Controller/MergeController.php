@@ -85,7 +85,6 @@ class MergeController extends Controller
                 );
 
                 // @todo Flash message with success or error
-
                 return $this->redirect(
                     $this->generateUrl(
                         $this->getEntityViewRoute($entityData->getClassName()),
