@@ -17,5 +17,5 @@ services:
     oro_entity_merge.mass_action.data_handler:
         class: %oro_entity_merge.mass_action.data_handler.class%
         arguments:
-            - @oro_entity_merge.data.entity_provider
+            - @oro_entity_merge.doctrine_helper
 

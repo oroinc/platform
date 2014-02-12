@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Doctrine\ORM\EntityManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -75,19 +76,22 @@ class MergeController extends Controller
         if ($this->getRequest()->isMethod('POST')) {
             $form->submit($this->getRequest());
             if ($form->isValid()) {
-                $this->getEntityMerger()->merge($entityData);
-                // @todo Run merge and flush (use transations)
 
-                // @todo Validate master entity once more
+                $merger = $this->getEntityMerger();
+                $this->getEntityManager()->transactional(
+                    function () use ($merger, $entityData) {
+                        $merger->merge($entityData);
+                    }
+                );
 
                 // @todo Flash message with success or error
 
-                /*return $this->redirect(
+                return $this->redirect(
                     $this->generateUrl(
                         $this->getEntityViewRoute($entityData->getClassName()),
                         array('id' => $entityData->getMasterEntity()->getId())
                     )
-                );*/
+                );
             }
         }
 
@@ -168,5 +172,13 @@ class MergeController extends Controller
     protected function getEntityMerger()
     {
         return $this->get('oro_entity_merge.merger');
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->get('doctrine.orm.entity_manager');
     }
 }
