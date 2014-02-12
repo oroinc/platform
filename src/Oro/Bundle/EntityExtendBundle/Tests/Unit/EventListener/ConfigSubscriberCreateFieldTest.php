@@ -46,6 +46,7 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent')
             ->setConstructorArgs([$configModel, $configManager])
+            ->setMethods(['getClassName'])
             ->getMock();
         $event
             ->expects($this->once())
@@ -102,6 +103,7 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
 
         $event = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent')
             ->setConstructorArgs([$configModel, $configManager])
+            ->setMethods(['getClassName'])
             ->getMock();
         $event
             ->expects($this->once())
