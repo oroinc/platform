@@ -18,15 +18,17 @@ define(['jquery', 'jquery.select2'], function ($) {
         var populate, data, result, children,
             opts = this.opts,
             id = opts.id,
-            parent = container.parent();
+            parent = container.parent(),
+            selection = this.val();
 
-        populate = function (results, container, depth) {
-            var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted, subId, parent;
+        populate = function (results, container, depth, parentStack) {
+            var i, l, result, selectable, disabled, compound, node, label, innerContainer, formatted, subId, parent, resultId;
             results = opts.sortResults(results, container, query);
             parent = container.parent();
 
             for (i = 0, l = results.length; i < l; i = i + 1) {
                 result = results[i];
+                resultId = result.id;
 
                 disabled = (result.disabled === true);
                 selectable = (!disabled) && (id(result) !== undefined);
@@ -59,7 +61,7 @@ define(['jquery', 'jquery.select2'], function ($) {
                     innerContainer = $('<ul></ul>')
                         .addClass('select2-result-sub')
                         .wrap('<div class="accordion-body collapse" id="' + subId + '" />');
-                    populate(result.children, innerContainer, depth + 1);
+                    populate(result.children, innerContainer, depth + 1, parentStack.concat(innerContainer.parent()));
                     innerContainer = innerContainer.parent();
 
                     node.addClass('accordion-group')
@@ -78,6 +80,13 @@ define(['jquery', 'jquery.select2'], function ($) {
                         .wrap('<div class="accordion-heading"/>')
                         .parent();
                 }
+
+                if (selection.indexOf(resultId) >= 0) {
+                    $.each(parentStack, function () {
+                        this.addClass('in');
+                    });
+                }
+
                 node.prepend(label);
                 node.data('select2-data', result);
                 container.append(node);
@@ -92,7 +101,7 @@ define(['jquery', 'jquery.select2'], function ($) {
             $this[$(target).hasClass('in') ? 'addClass' : 'removeClass']('collapsed');
             $(target).collapse(option);
         });
-        populate(results, container, 0);
+        populate(results, container, 0, []);
     }
 
     // Overwrite methods of AbstractSelect2 class
@@ -101,6 +110,10 @@ define(['jquery', 'jquery.select2'], function ($) {
         prototype.prepareOpts = function (options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
+                var matcher = options.matcher || $.fn.select2.defaults.matcher;
+                options.matcher = function (term, text, option) {
+                    return !option.children && matcher.apply(this, arguments);
+                };
             }
             return prepareOpts.call(this, options);
         };
