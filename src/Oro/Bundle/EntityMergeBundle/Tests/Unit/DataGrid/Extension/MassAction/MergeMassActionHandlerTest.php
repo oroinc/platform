@@ -2,12 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\DataGrid\Extension\MassAction;
 
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
-use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler;
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
-use OroCRM\Bundle\AccountBundle\Entity\Account;
-use PHPUnit_Framework_MockObject_MockObject;
 
 class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,31 +11,48 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private $target;
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeArgs
+     * @var \PHPUnit_Framework_MockObject_MockObject $fakeArgs
      */
-    private $fakeArgs;
+    private $args;
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject $doctrineRegistry
+     * @var \PHPUnit_Framework_MockObject_MockObject $doctrineRegistry
      */
     private $dataProvider;
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeOptions
+     * @var \PHPUnit_Framework_MockObject_MockObject $fakeOptions
      */
-    private $fakeOptions;
+    private $options;
 
-    private $fakeOptionsArray;
+    private $optionsArray;
+
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeResult
+     * @var \PHPUnit_Framework_MockObject_MockObject $fakeResult
      */
-    private $fakeResult;
+    private $iteratedResult;
 
-    private $firstTestObject;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject $firstTestObject
+     */
+    private $firstResultRecord;
 
-    private $secondTestObject;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject $secondTestObject
+     */
+    private $secondResultRecord;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject $firstEntity
+     */
     private $firstEntity;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject $secondEntity
+     */
     private $secondEntity;
+
+    private $firstResultRecordId;
+
+    private $secondResultRecordId;
 
     private function initMockObjects()
     {
@@ -51,36 +63,36 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
             '',
             false
         );
-        $this->fakeResult = $this->getMock(
-            '\Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface',
+        $this->iteratedResult = $this->getMock(
+            'Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface',
             array(),
             array(),
             '',
             false
         );
-        $this->firstTestObject = $this->getMock(
-            '\Oro\Bundle\DataGridBundle\Datasource\ResultRecord',
+        $this->firstResultRecord = $this->getMock(
+            'Oro\Bundle\DataGridBundle\Datasource\ResultRecord',
             array(),
             array(),
             '',
             false
         );
-        $this->secondTestObject = $this->getMock(
-            '\Oro\Bundle\DataGridBundle\Datasource\ResultRecord',
+        $this->secondResultRecord = $this->getMock(
+            'Oro\Bundle\DataGridBundle\Datasource\ResultRecord',
             array(),
             array(),
             '',
             false
         );
-        $this->fakeArgs = $this->getMock(
-            '\Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs',
+        $this->args = $this->getMock(
+            'Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs',
             array(),
             array(),
             '',
             false
         );
 
-        $this->fakeOptions = $this->getMock(
+        $this->options = $this->getMock(
             'Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration',
             array(),
             array(),
@@ -91,17 +103,9 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initMockObjects();
-
-        $this->firstEntity = new Account();
-
-        $this->firstEntity->setId(1);
-
-        $this->secondEntity = new Account();
-
-        $this->secondEntity->setId(2);
 
         $this->setUpMockObjects();
 
@@ -111,26 +115,30 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     private function setIteratedResultMock()
     {
-        $this->fakeResult->expects($this->at(0))
+        $this->iteratedResult->expects($this->at(0))
             ->method('rewind');
 
-        $this->firstTestObject->expects($this->any())->method('getValue')->will($this->returnValue(1));
-        $this->secondTestObject->expects($this->any())->method('getValue')->will($this->returnValue(2));
+        $this->firstResultRecord->expects($this->any())->method('getValue')->will(
+            $this->returnValue($this->firstResultRecordId)
+        );
+        $this->secondResultRecord->expects($this->any())->method('getValue')->will(
+            $this->returnValue($this->secondResultRecordId)
+        );
         // iteration 1
-        $this->fakeResult->expects($this->at(1))
+        $this->iteratedResult->expects($this->at(1))
             ->method('valid')
             ->will($this->returnValue(true));
-        $this->fakeResult->expects($this->at(2))
+        $this->iteratedResult->expects($this->at(2))
             ->method('current')
-            ->will($this->returnValue($this->firstTestObject));
-        $this->fakeResult->expects($this->at(3))
+            ->will($this->returnValue($this->firstResultRecord));
+        $this->iteratedResult->expects($this->at(3))
             ->method('next');
-        $this->fakeResult->expects($this->at(4))
+        $this->iteratedResult->expects($this->at(4))
             ->method('valid')
             ->will($this->returnValue(true));
-        $this->fakeResult->expects($this->at(5))
+        $this->iteratedResult->expects($this->at(5))
             ->method('current')
-            ->will($this->returnValue($this->secondTestObject));
+            ->will($this->returnValue($this->secondResultRecord));
     }
 
     /**
@@ -138,6 +146,15 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
      */
     private function setUpMockObjects()
     {
+        $this->firstEntity = $this->getMock('stdClass', array('getId'));
+        $this->secondEntity = $this->getMock('stdClass', array('getId'));
+        $this->firstResultRecordId = rand();
+        $this->secondResultRecordId = rand();
+        $this->firstEntity->expects($this->any())->method('getId')->will($this->returnValue($this->firstResultRecordId));
+        $this->secondEntity->expects($this->any())->method('getId')->will(
+            $this->returnValue($this->secondResultRecordId)
+        );
+
         $this->dataProvider
             ->expects($this->any())
             ->method(
@@ -153,8 +170,8 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters()
             ->will($this->returnValue(array($this->firstEntity, $this->secondEntity)));
 
-        $options = & $this->fakeOptionsArray;
-        $this->fakeOptions
+        $options = & $this->optionsArray;
+        $this->options
             ->expects($this->any())
             ->method('toArray')
             ->withAnyParameters()
@@ -175,23 +192,23 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
             false
         );
 
-        $fakeMassAction->expects($this->any())->method('getOptions')->will($this->returnValue($this->fakeOptions));
+        $fakeMassAction->expects($this->any())->method('getOptions')->will($this->returnValue($this->options));
 
-        $this->fakeArgs
+        $this->args
             ->expects($this->any())
             ->method('getMassAction')
             ->withAnyParameters()
             ->will($this->returnValue($fakeMassAction));
-        $this->fakeArgs
+        $this->args
             ->expects($this->any())
             ->method('getResults')
             ->withAnyParameters()
-            ->will($this->returnValue($this->fakeResult));
+            ->will($this->returnValue($this->iteratedResult));
     }
 
     protected function setCorrectOptions()
     {
-        $this->fakeOptionsArray = array(
+        $this->optionsArray = array(
             'entity_name' => 'test_entity',
             'max_element_count' => 5
         );
@@ -200,12 +217,10 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
     public function testMethodDoesNotThrowAnExceptionIfAllDataIsCorrect()
     {
         $this->setIteratedResultMock();
-        /**
-         * @var MassActionResponse $result
-         */
-        $result = $this->target->handle($this->fakeArgs);
 
-        $this->assertInstanceOf('\Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse', $result);
+        $result = $this->target->handle($this->args);
+
+        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse', $result);
 
         $result = $result->getOptions();
         $this->assertArrayHasKey('entities', $result);
@@ -214,90 +229,81 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Entity name is missing.
      */
     public function testHandleMustThrowInvalidArgumentExceptionIfEntityNameIsEmpty()
     {
-        $this->fakeOptionsArray['entity_name'] = '';
+        $this->optionsArray['entity_name'] = '';
 
-        $this->target->handle($this->fakeArgs);
+        $this->target->handle($this->args);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Option "max_element_count" of "" mass action is invalid.
      */
     public function testHandleMustThrowInvalidArgumentExceptionIfMaxElementCountIsEmpty()
     {
-        $this->fakeOptionsArray = array('entity_name' => 'test_entity', 'max_element_count' => '');
+        $this->optionsArray = array('entity_name' => 'test_entity', 'max_element_count' => '');
 
-        $this->target->handle($this->fakeArgs);
+        $this->target->handle($this->args);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Count of selected items less then 2
      */
     public function testHandleMustThrowInvalidArgumentExceptionIfCountOfItemsToMergeLessThan2()
     {
-        $this->target->handle($this->fakeArgs);
+        $this->target->handle($this->args);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Too many items selected
      */
     public function testHandleMustThrowInvalidArgumentExceptionIfCountOfItemsToMergeMoreThanMaxAllowedInConfig()
     {
-        $this->fakeOptionsArray['max_element_count'] = 2;
+        $this->optionsArray['max_element_count'] = 2;
         $this->setIteratedResultMock();
-        $this->fakeResult->expects($this->at(6))
+        $this->iteratedResult->expects($this->at(6))
             ->method('next');
-        $this->fakeResult->expects($this->at(7))
+        $this->iteratedResult->expects($this->at(7))
             ->method('valid')
             ->will($this->returnValue(true));
-        $this->fakeResult->expects($this->at(8))
+        $this->iteratedResult->expects($this->at(8))
             ->method('current')
-            ->will($this->returnValue($this->secondTestObject));
+            ->will($this->returnValue($this->secondResultRecord));
 
 
-        $this->target->handle($this->fakeArgs);
+        $this->target->handle($this->args);
     }
 
     public function testHandleMustReturnRequestedEntitiesForMerge()
     {
         $this->setIteratedResultMock();
-
-        /**
-         * MassActionResponse $result
-         */
-        $result = $this->target->handle($this->fakeArgs);
-
+        $result = $this->target->handle($this->args);
         $actual = $result->getOption('entities');
-        /**
-         * @var Account $firstActual
-         */
+
         $firstActual = $actual[0];
-        /**
-         * @var Account $secondActual
-         */
         $secondActual = $actual[1];
 
-        $this->assertEquals($firstActual->getId(), 1);
-        $this->assertEquals($secondActual->getId(), 2);
+        $this->assertEquals($this->firstResultRecordId, $firstActual->getId());
+        $this->assertEquals($this->secondResultRecordId, $secondActual->getId());
     }
 
     public function testHandleShouldCallEntityProviderMethodGetEntitiesByIdsWithCorrectData()
     {
-
-        $this->firstTestObject->expects($this->any())->method('getValue')->will($this->returnValue(1235567));
-        $this->secondTestObject->expects($this->any())->method('getValue')->will($this->returnValue(24078));
+        $expectedIdFirst = rand();
+        $expectedIdSecond = rand();
+        $this->firstResultRecord->expects($this->any())->method('getValue')->will($this->returnValue($expectedIdFirst));
+        $this->secondResultRecord->expects($this->any())->method('getValue')->will($this->returnValue($expectedIdSecond));
 
         $this->setIteratedResultMock();
-        $this->fakeOptionsArray['entity_name'] = 'AccountTestEntityName';
-        $callback = function ($param) {
-            return $param[0] == 1235567 && $param[1] == 24078;
+        $this->optionsArray['entity_name'] = 'AccountTestEntityName';
+        $callback = function ($param) use($expectedIdFirst, $expectedIdSecond) {
+            return $param[0] == $expectedIdFirst && $param[1] == $expectedIdSecond;
         };
 
         $this->dataProvider->expects($this->once())->method('getEntitiesByIds')->with(
@@ -305,6 +311,6 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
             $this->callback($callback)
         );
 
-        $this->target->handle($this->fakeArgs);
+        $this->target->handle($this->args);
     }
 }

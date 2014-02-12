@@ -52,8 +52,9 @@ class RelationAccessor implements AccessorInterface
      */
     public function getValue($entity, FieldMetadata $metadata)
     {
-        $fieldName = $metadata->getFieldName();
-        $className = $metadata->getDoctrineMetadata()->get('sourceEntity');
+        $doctrineMetadata = $metadata->getDoctrineMetadata();
+        $fieldName        = $doctrineMetadata->getFieldName();
+        $className        = $doctrineMetadata->get('sourceEntity');
 
         return $this
             ->entityManager

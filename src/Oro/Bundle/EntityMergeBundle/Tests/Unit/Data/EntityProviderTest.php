@@ -3,8 +3,6 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityProvider;
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
-use PHPUnit_Framework_MockObject_MockObject;
 
 class EntityProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,36 +12,38 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
     private $target;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
+     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
      */
-    private $fakeEntityManager;
+    private $entityManager;
 
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
+     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
      */
-    private $fakeMetadata;
+    private $metadata;
 
-    private $fakeIdentifier;
+    private $identifier = 'id';
 
-    private $fakeEntityRepositoryName;
-    /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
-     */
-    private $fakeRepository;
-    /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeQueryBuilder
-     */
-    private $fakeQueryBuilder;
-    /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeQueryBuilder
-     */
-    private $fakeQuery;
+    private $entityRepositoryName = 'testEntityName';
 
-    private $fakeEntities;
     /**
-     * @var PHPUnit_Framework_MockObject_MockObject $fakeQueryBuilder
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $fakeExpression;
+    private $repository;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $queryBuilder;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $query;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $expression;
 
     public function setUp()
     {
@@ -51,33 +51,24 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->setUpFakeObjects();
 
-        $this->setDefaultValues();
-
-        $this->target = new EntityProvider($this->fakeEntityManager);
+        $this->target = new EntityProvider($this->entityManager);
     }
 
-    private function setDefaultValues()
-    {
-        $this->fakeEntityRepositoryName = 'testEntityName';
-        $this->fakeIdentifier = 'id';
-    }
 
     private function createFakeDependencies()
     {
-        $this->fakeEntityManager = $this->getMock('\Doctrine\ORM\EntityManager', array(), array(), '', false);
-        $this->fakeMetadata = $this->getMock('\Doctrine\ORM\Mapping\ClassMetadata', array(), array(), '', false);
-        $this->fakeRepository = $this->getMock('\Doctrine\ORM\EntityRepository', array(), array(), '', false);
-        $this->fakeQueryBuilder = $this->getMock('\Doctrine\ORM\QueryBuilder', array(), array(), '', false);
-        $this->fakeQuery = $this->getMockForAbstractClass(
-            '\Doctrine\ORM\AbstractQuery',
-            array(),
-            '',
-            false,
-            false,
-            true,
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor(
+        )->getMock();
+        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor(
+        )->getMock();
+        $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor(
+        )->getMock();
+        $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()
+            ->getMock();
+        $this->query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')->disableOriginalConstructor()->setMethods(
             array('execute')
-        );
-        $this->fakeExpression = $this->getMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
+        )->getMockForAbstractClass();
+        $this->expression = $this->getMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
     }
 
     /**
@@ -85,51 +76,51 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
      */
     private function setUpFakeObjects()
     {
-        $fakeIdentifier = & $this->fakeIdentifier;
+        $fakeIdentifier = & $this->identifier;
 
-        $this->fakeMetadata->expects($this->any())->method('getSingleIdentifierFieldName')->will(
+        $this->metadata->expects($this->any())->method('getSingleIdentifierFieldName')->will(
             $this->returnCallback(
                 function () use (&$fakeIdentifier) {
                     return $fakeIdentifier;
                 }
             )
         );
-        $this->fakeEntityManager->expects($this->any())->method('getClassMetadata')->will(
-            $this->returnValue($this->fakeMetadata)
+        $this->entityManager->expects($this->any())->method('getClassMetadata')->will(
+            $this->returnValue($this->metadata)
         );
 
-        $this->fakeEntityManager->expects($this->any())->method('getRepository')->will(
-            $this->returnValue($this->fakeRepository)
+        $this->entityManager->expects($this->any())->method('getRepository')->will(
+            $this->returnValue($this->repository)
         );
-        $fakeEntityRepositoryName = & $this->fakeEntityRepositoryName;
-        $this->fakeRepository->expects($this->any())->method('getClassName')->will(
+        $fakeEntityRepositoryName = & $this->entityRepositoryName;
+        $this->repository->expects($this->any())->method('getClassName')->will(
             $this->returnCallback(
                 function () use (&$fakeEntityRepositoryName) {
                     return $fakeEntityRepositoryName;
                 }
             )
         );
-        $this->fakeRepository->expects($this->any())->method('createQueryBuilder')->will(
-            $this->returnValue($this->fakeQueryBuilder)
+        $this->repository->expects($this->any())->method('createQueryBuilder')->will(
+            $this->returnValue($this->queryBuilder)
         );
 
         $this->queryMatcher = function () {
             return true;
         };
-        $this->fakeQueryBuilder->expects($this->any())->method('add')->with(
+        $this->queryBuilder->expects($this->any())->method('add')->with(
             $this->equalTo('where')
-        )->will($this->returnValue($this->fakeQueryBuilder));
+        )->will($this->returnValue($this->queryBuilder));
 
-        $this->fakeQueryBuilder->expects($this->any())->method('expr')->will($this->returnValue($this->fakeExpression));
+        $this->queryBuilder->expects($this->any())->method('expr')->will($this->returnValue($this->expression));
 
-        $this->fakeQuery->expects($this->any())->method('execute')->will($this->returnValue($this->fakeEntities));
+        $this->query->expects($this->any())->method('execute')->will($this->returnValue(array()));
 
-        $this->fakeQueryBuilder->expects($this->any())->method('getQuery')->will($this->returnValue($this->fakeQuery));
+        $this->queryBuilder->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
     }
 
     public function testGetEntityIdentifierReturnCorrectData()
     {
-        $this->fakeIdentifier = 'test_primary_key';
+        $this->identifier = 'test_primary_key';
 
         $actual = $this->target->getEntityIdentifier('testClassName');
 
@@ -137,12 +128,12 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Incorrect repository returned
      */
     public function testGetRepositoryShouldGenerateExceptionIfRepositoryIsIncorrect()
     {
-        $this->fakeEntityRepositoryName = 'notThisName';
+        $this->entityRepositoryName = 'notThisName';
 
         $this->target->getEntitiesByIds('testEntityName', array());
     }
@@ -154,8 +145,8 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetEntitiesByIdsMustTryToAddWhereInExpressionToQueryBuilder()
     {
-        $this->fakeIdentifier = 'testIdentifier';
-        $this->fakeExpression->expects($this->once())->method('in')->with(
+        $this->identifier = 'testIdentifier';
+        $this->expression->expects($this->once())->method('in')->with(
             $this->equalTo('entity.testIdentifier'),
             $this->callback(
                 function ($params) {

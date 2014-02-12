@@ -48,11 +48,7 @@ class EntityDataFactory
     {
         $entityMetadata = $this->metadataFactory->createMergeMetadata($entityName);
 
-        $data = new EntityData($entityMetadata);
-        $data->setEntities($entities);
-        foreach ($entityMetadata->getFieldsMetadata() as $fieldMetadata) {
-            $data->addNewField($fieldMetadata);
-        }
+        $data = new EntityData($entityMetadata, $entities);
 
         $this->eventDispatcher->dispatch(
             MergeEvents::CREATE_ENTITYDATA,

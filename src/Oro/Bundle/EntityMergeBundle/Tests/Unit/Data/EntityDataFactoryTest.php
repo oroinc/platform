@@ -1,123 +1,118 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Alexandr
- * Date: 2/11/14
- * Time: 5:26 PM
- */
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
-
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
-use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
-use OroCRM\Bundle\AccountBundle\Entity\Account;
 
 class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
      * @var EntityDataFactory $target
      */
     private $target;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $fakeMetadataFactory
-     */
-    private $fakeMetadataFactory;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityProvider
-     */
-    private $fakeEntityProvider;
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityProvider
-     */
-    private $fakeMetadata;
 
     /**
-     * @var array
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $fakeEntities;
+    private $metadataFactory;
 
-    private $fakeFieldsMetadata;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $entityProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $metadata;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject[]
+     */
+    private $entities = array();
+
+    private $fieldsMetadata = array();
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $firstEntity;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $secondEntity;
+
+    /**
+     * @var string $entitiesClassName Fake class name for entities
+     */
+    private $entitiesClassName;
 
     public function setUp()
     {
-        $this->fakeMetadataFactory = $this->getMock(
-            '\Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory',
-            array(),
-            array(),
-            '',
-            false
-        );
-        $this->fakeEntityProvider = $this->getMock(
-            '\Oro\Bundle\EntityMergeBundle\Data\EntityProvider',
-            array(),
-            array(),
-            '',
-            false
-        );
-        $this->fakeMetadata = $this->getMock(
-            '\Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata',
-            array(),
-            array(),
-            '',
-            false
-        );
-        $this->fakeMetadata->expects($this->any())->method('getClassName')->will(
-            $this->returnValue('\OroCRM\Bundle\AccountBundle\Entity\Account')
+        $this->entitiesClassName = 'testClassNameForEntity';
+        $this->firstEntity = $this->getMockBuilder('stdClass')->setMockClassName($this->entitiesClassName)->getMock();
+        $this->secondEntity = $this->getMockBuilder('stdClass')->setMockClassName(
+            $this->entitiesClassName
+        )->getMock();
+
+        $this->entities[] = $this->firstEntity;
+        $this->entities[] = $this->secondEntity;
+
+        $this->metadataFactory = $this->getMockBuilder(
+            'Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory'
+        )->disableOriginalConstructor()->getMock();
+
+        $this->entityProvider = $this->getMockBuilder(
+            'Oro\Bundle\EntityMergeBundle\Data\EntityProvider'
+        )->disableOriginalConstructor()->getMock();
+        $this->metadata = $this->getMockBuilder(
+            'Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata'
+        )->disableOriginalConstructor()->getMock();
+        $this->metadata->expects($this->any())->method('getClassName')->will(
+            $this->returnValue($this->entitiesClassName)
         );
 
-        $fakeFieldsMetadata = & $this->fakeFieldsMetadata;
-        $fakeFieldsMetadata = array();
-        $this->fakeMetadata->expects($this->any())->method('getFieldsMetadata')->will(
-            $this->returnCallback(
-                function () use (&$fakeFieldsMetadata) {
-                    return $fakeFieldsMetadata;
-                }
-            )
+        $this->metadata->expects($this->any())->method('getFieldsMetadata')->will(
+            $this->returnValue($this->fieldsMetadata)
         );
-        $this->fakeMetadataFactory->expects($this->any())->method('createMergeMetadata')->with(
-            '\OroCRM\Bundle\AccountBundle\Entity\Account'
-        )->will($this->returnValue($this->fakeMetadata));
-        $this->fakeEntities = array(new Account(), new Account());
-        $fakeEventDispatcher = $this->getMock(
-            '\Symfony\Component\EventDispatcher\EventDispatcher',
-            array(),
-            array(),
-            '',
-            false
-        );
+        $this->metadataFactory->expects($this->any())->method('createMergeMetadata')->with(
+            $this->entitiesClassName
+        )->will($this->returnValue($this->metadata));
+
+        $eventDispatcher = $this->getMockBuilder(
+            'Symfony\Component\EventDispatcher\EventDispatcher'
+        )->disableOriginalConstructor()->getMock();
+
         $this->target = new EntityDataFactory(
-            $this->fakeMetadataFactory,
-            $this->fakeEntityProvider,
-            $fakeEventDispatcher
+            $this->metadataFactory,
+            $this->entityProvider,
+            $eventDispatcher
         );
     }
 
     public function testCreateEntityDataShouldReturnCorrectEntities()
     {
-        $result = $this->target->createEntityData('\OroCRM\Bundle\AccountBundle\Entity\Account', $this->fakeEntities);
-        $this->assertEquals($result->getClassName(), '\OroCRM\Bundle\AccountBundle\Entity\Account');
-        $this->assertEquals($this->fakeMetadata, $result->getMetadata());
-        $expected = $this->fakeEntities;
+        $result = $this->target->createEntityData($this->entitiesClassName, $this->entities);
+        $this->assertEquals($result->getClassName(), $this->entitiesClassName);
+        $this->assertEquals($this->metadata, $result->getMetadata());
+        $expected = $this->entities;
         $this->assertEquals($result->getEntities(), $expected);
     }
 
     public function testCreateEntityDataByIdsShouldCallCreateEntityDataWithCorrectData()
     {
-        $this->fakeEntityProvider->expects($this->any())->method('getEntitiesByIds')->with(
-            $this->equalTo('\OroCRM\Bundle\AccountBundle\Entity\Account'),
+        $this->entityProvider->expects($this->any())->method('getEntitiesByIds')->with(
+            $this->equalTo($this->entitiesClassName),
             $this->callback(
                 function ($params) {
                     return $params[0] == '12' && $params[1] == '88';
                 }
             )
-        )->will($this->returnValue($this->fakeEntities));
-        $expected = $this->fakeEntities;
+        )->will($this->returnValue($this->entities));
+        $expected = $this->entities;
         $result = $this->target->createEntityDataByIds(
-            '\OroCRM\Bundle\AccountBundle\Entity\Account',
+            $this->entitiesClassName,
             array('12', '88')
         );
         $this->assertEquals($result->getEntities(), $expected);
