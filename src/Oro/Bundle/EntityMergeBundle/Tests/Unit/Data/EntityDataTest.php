@@ -38,7 +38,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
     protected $thirdEntityId;
 
     /**
-     * @var /stdClass
+     * @var \stdClass
      */
     protected $masterEntity;
 

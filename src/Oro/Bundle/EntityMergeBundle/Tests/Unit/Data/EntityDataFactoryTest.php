@@ -105,7 +105,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateEntityDataByIdsShouldCallCreateEntityDataWithCorrectData()
     {
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntitiesByIds')
             ->with(
                 $this->equalTo($this->entitiesClassName),
