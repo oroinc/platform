@@ -120,20 +120,20 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Merge config for "Namespace\RelatedEntity" is not exist.
      */
-    public function testCreateMergeMetadataEmpty()
+    public function testCreateEntityMetadataEmpty()
     {
-        $metadata = $this->factory->createMergeMetadata(self::RELATED_ENTITY);
+        $metadata = $this->factory->createEntityMetadata(self::RELATED_ENTITY);
         $this->assertNull($metadata);
     }
 
-    public function testCreateMergeMetadata()
+    public function testCreateEntityMetadata()
     {
         $this->configProvider
             ->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($this->config));
 
-        $metadata = $this->factory->createMergeMetadata(self::ENTITY);
+        $metadata = $this->factory->createEntityMetadata(self::ENTITY);
         $this->assertNotNull($metadata);
         $this->assertInstanceOf(
             '\Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata',

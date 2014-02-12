@@ -47,9 +47,9 @@
 
 {% block oro_entity_merge_choice_value_widget %}
     {{ form_widget(form) }}
-    <label for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+    {#<label for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>#}
         {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
-    </label>
+    {#</label>#}
 {% endblock %}
 
 {% block oro_entity_merge_field_label %}

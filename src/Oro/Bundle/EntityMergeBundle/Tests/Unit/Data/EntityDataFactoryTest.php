@@ -80,7 +80,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->fieldsMetadata));
 
         $this->metadataFactory->expects($this->any())
-            ->method('createMergeMetadata')
+            ->method('createEntityMetadata')
             ->with($this->entitiesClassName)
             ->will($this->returnValue($this->metadata));
 

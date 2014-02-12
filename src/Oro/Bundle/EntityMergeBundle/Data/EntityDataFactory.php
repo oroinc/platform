@@ -49,7 +49,7 @@ class EntityDataFactory
      */
     public function createEntityData($entityName, array $entities)
     {
-        $entityMetadata = $this->metadataFactory->createMergeMetadata($entityName);
+        $entityMetadata = $this->metadataFactory->createEntityMetadata($entityName);
 
         $data = new EntityData($entityMetadata, $entities);
 

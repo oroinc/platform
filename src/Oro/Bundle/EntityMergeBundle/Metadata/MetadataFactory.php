@@ -51,7 +51,7 @@ class MetadataFactory
      * @return EntityMetadata
      * @throws InvalidArgumentException
      */
-    public function createMergeMetadata($className)
+    public function createEntityMetadata($className)
     {
         $entityMergeConfig = $this->configProvider->getConfig($className);
 
