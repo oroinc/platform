@@ -2,22 +2,25 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+
 use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EntityDataFactory
 {
     /**
-     * @var MetadataFactory $metadataFactory
+     * @var MetadataFactory
      */
     private $metadataFactory;
 
     /**
-     * @var EntityProvider $entityProvider
+     * @var DoctrineHelper
      */
-    private $entityProvider;
+    private $doctrineHelper;
 
     /**
      * @var EventDispatcher
@@ -26,16 +29,16 @@ class EntityDataFactory
 
     /**
      * @param MetadataFactory $metadataFactory
-     * @param EntityProvider  $entityProvider
+     * @param DoctrineHelper $doctrineHelper
      * @param EventDispatcher $eventDispatcher
      */
     public function __construct(
         MetadataFactory $metadataFactory,
-        EntityProvider $entityProvider,
+        DoctrineHelper $doctrineHelper,
         EventDispatcher $eventDispatcher
     ) {
         $this->metadataFactory = $metadataFactory;
-        $this->entityProvider  = $entityProvider;
+        $this->doctrineHelper  = $doctrineHelper;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -65,7 +68,7 @@ class EntityDataFactory
      */
     public function createEntityDataByIds($entityName, array $entityIds)
     {
-        $entities = $this->entityProvider->getEntitiesByIds($entityName, $entityIds);
+        $entities = $this->doctrineHelper->getEntitiesByIds($entityName, $entityIds);
         return $this->createEntityData($entityName, $entities);
     }
 }

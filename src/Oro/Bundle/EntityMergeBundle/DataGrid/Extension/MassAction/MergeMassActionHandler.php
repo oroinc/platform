@@ -10,22 +10,22 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 
-use Oro\Bundle\EntityMergeBundle\Data\EntityProvider;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class MergeMassActionHandler implements MassActionHandlerInterface
 {
     /**
-     * @var EntityProvider $entityProvider
+     * @var DoctrineHelper
      */
-    private $entityProvider;
+    private $doctrineHelper;
 
     /**
-     * @param EntityProvider $entityProvider
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(EntityProvider $entityProvider)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->entityProvider = $entityProvider;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -37,14 +37,14 @@ class MergeMassActionHandler implements MassActionHandlerInterface
         $this->validateMassAction($massAction);
         $options = $massAction->getOptions()->toArray();
 
-        $entityIdentifier = $this->entityProvider->getEntityIdentifier($options['entity_name']);
+        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($options['entity_name']);
         $entityIds = $this->getIdsFromResult($args->getResults(), $entityIdentifier);
 
         $maxCountOfElements = $options['max_element_count'];
         $countOfSelectedItems = count($entityIds);
         $this->validateItemsCount($countOfSelectedItems, $maxCountOfElements);
 
-        $entities = $this->entityProvider->getEntitiesByIds(
+        $entities = $this->doctrineHelper->getEntitiesByIds(
             $options['entity_name'],
             $entityIds
         );

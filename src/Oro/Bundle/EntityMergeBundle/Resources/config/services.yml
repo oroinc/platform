@@ -6,7 +6,6 @@ parameters:
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
 
     # Entity Data
-    oro_entity_merge.data.entity_provider.class: Oro\Bundle\EntityMergeBundle\Data\EntityProvider
     oro_entity_merge.data.entity_data_factory.class: Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory
 
     # Merger

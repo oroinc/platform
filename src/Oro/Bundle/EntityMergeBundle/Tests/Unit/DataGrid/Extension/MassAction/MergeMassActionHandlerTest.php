@@ -17,7 +17,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject $doctrineRegistry
      */
-    private $dataProvider;
+    private $doctrineHelper;
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject $fakeOptions
      */
@@ -56,8 +56,8 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 
     private function initMockObjects()
     {
-        $this->dataProvider = $this->getMock(
-            'Oro\Bundle\EntityMergeBundle\Data\EntityProvider',
+        $this->doctrineHelper = $this->getMock(
+            'Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper',
             array(),
             array(),
             '',
@@ -109,7 +109,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->setUpMockObjects();
 
-        $this->target = new MergeMassActionHandler($this->dataProvider);
+        $this->target = new MergeMassActionHandler($this->doctrineHelper);
     }
 
 
@@ -155,14 +155,14 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
             $this->returnValue($this->secondResultRecordId)
         );
 
-        $this->dataProvider
+        $this->doctrineHelper
             ->expects($this->any())
             ->method(
                 'getEntityIdentifier'
             )
             ->withAnyParameters()
             ->will($this->returnValue('id'));
-        $this->dataProvider
+        $this->doctrineHelper
             ->expects($this->any())
             ->method(
                 'getEntitiesByIds'
@@ -293,7 +293,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->secondResultRecordId, $secondActual->getId());
     }
 
-    public function testHandleShouldCallEntityProviderMethodGetEntitiesByIdsWithCorrectData()
+    public function testHandleShouldCallDoctrineHelperMethodGetEntitiesByIdsWithCorrectData()
     {
         $expectedIdFirst = rand();
         $expectedIdSecond = rand();
@@ -306,7 +306,7 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
             return $param[0] == $expectedIdFirst && $param[1] == $expectedIdSecond;
         };
 
-        $this->dataProvider->expects($this->once())->method('getEntitiesByIds')->with(
+        $this->doctrineHelper->expects($this->once())->method('getEntitiesByIds')->with(
             $this->equalTo('AccountTestEntityName'),
             $this->callback($callback)
         );
