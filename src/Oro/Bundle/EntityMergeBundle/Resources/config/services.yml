@@ -4,6 +4,7 @@ parameters:
 
     # Metadata
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
+    oro_entity_merge.metadata.registry.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry
 
     # Entity Data
     oro_entity_merge.data.entity_data_factory.class: Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory
@@ -41,7 +42,7 @@ services:
     oro_entity_merge.data.entity_data_factory:
         class: %oro_entity_merge.data.entity_data_factory.class%
         arguments:
-            - @oro_entity_merge.metadata.factory
+            - @oro_entity_merge.metadata.registry
             - @oro_entity_merge.doctrine_helper
             - @event_dispatcher
 
@@ -51,6 +52,11 @@ services:
             - @oro_entity_config.provider.merge
             - @oro_entity_merge.doctrine_helper
             - @event_dispatcher
+
+    oro_entity_merge.metadata.registry:
+        class: %oro_entity_merge.metadata.registry.class%
+        arguments:
+            - @oro_entity_merge.metadata.factory
 
     # Merger
     oro_entity_merge.merger:
