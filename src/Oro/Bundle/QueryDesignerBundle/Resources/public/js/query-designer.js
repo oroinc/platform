@@ -99,7 +99,7 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
             if (!_.isUndefined(data['columns']) && !_.isEmpty(data['columns'])) {
                 this.columnsView.getCollection().reset(data['columns']);
             }
-            this.listenTo(this.columnsView, 'collection:change', _.bind(this.updateStorage, this));
+            this.columnsView.$itemContainer.on('collection:change', _.bind(this.updateStorage, this));
             this.listenTo(this.columnsView, 'grouping:change', _.bind(this.updateStorage, this));
             this.$conditions.on('changed', _.bind(this.updateStorage, this));
             if (!_.isEmpty(data.filters)) {
