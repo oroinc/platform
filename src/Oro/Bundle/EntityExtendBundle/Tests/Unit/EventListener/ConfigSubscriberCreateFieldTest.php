@@ -6,15 +6,17 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 
 class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
 {
+    const ENTITY_CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
+
     public function testCreateNew()
     {
-        $configModel = new FieldConfigModel('testField', 'string');
         $entityConfig = new Config(
-            new EntityConfigId('Oro\Bundle\UserBundle\Entity\User', 'extend')
+            new EntityConfigId('extend', self::ENTITY_CLASS_NAME)
         );
 
         //value of Config should be empty
@@ -26,9 +28,10 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
         $configProvider
             ->expects($this->once())
             ->method('getConfig')
+            ->with(self::ENTITY_CLASS_NAME)
             ->will($this->returnValue($entityConfig));
         $configProvider
-            ->expects($this->exactly(0))
+            ->expects($this->never())
             ->method('persist');
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -44,17 +47,10 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $event = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent')
-            ->setConstructorArgs([$configModel, $configManager])
-            ->setMethods(['getClassName'])
-            ->getMock();
-        $event
-            ->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue('Oro\Bundle\UserBundle\Entity\User'));
+        $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $configManager);
 
         $configSubscriber = new ConfigSubscriber($extendManager);
-        $configSubscriber->newField($event);
+        $configSubscriber->newFieldConfig($event);
 
         /** @var ConfigManager $cm */
         $cm = $event->getConfigManager();
@@ -68,7 +64,7 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
     {
         $configModel = new FieldConfigModel('testField', 'string');
         $entityConfig = new Config(
-            new EntityConfigId('Oro\Bundle\UserBundle\Entity\User', 'extend')
+            new EntityConfigId('extend', self::ENTITY_CLASS_NAME)
         );
         $entityConfig->set('upgradeable', false);
 
@@ -83,6 +79,7 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
         $configProvider
             ->expects($this->once())
             ->method('getConfig')
+            ->with(self::ENTITY_CLASS_NAME)
             ->will($this->returnValue($entityConfig));
         $configProvider
             ->expects($this->once())
@@ -101,17 +98,10 @@ class ConfigSubscriberCreateFieldTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $event = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent')
-            ->setConstructorArgs([$configModel, $configManager])
-            ->setMethods(['getClassName'])
-            ->getMock();
-        $event
-            ->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue('Oro\Bundle\UserBundle\Entity\User'));
+        $event = new FieldConfigEvent(self::ENTITY_CLASS_NAME, 'testField', $configManager);
 
         $configSubscriber = new ConfigSubscriber($extendManager);
-        $configSubscriber->newField($event);
+        $configSubscriber->newFieldConfig($event);
 
         /** @var ConfigManager $cm */
         $cm = $event->getConfigManager();

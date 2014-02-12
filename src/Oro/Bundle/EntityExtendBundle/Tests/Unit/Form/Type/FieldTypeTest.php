@@ -162,14 +162,14 @@ class FieldTypeTest extends \PHPUnit_Framework_TestCase
     protected function prepareRelationsConfig()
     {
         $relationConfigFieldId       = new FieldConfigId(
-            'Oro\Bundle\UserBundle\Entity\User',
             'extend',
+            'Oro\Bundle\UserBundle\Entity\User',
             'testentity1_rel1',
             'manyToOne'
         );
         $relationTargetConfigFieldId = new FieldConfigId(
-            'Extend\Entity\testEntity1',
             'extend',
+            'Extend\Entity\testEntity1',
             'rel1',
             'oneToMany'
         );

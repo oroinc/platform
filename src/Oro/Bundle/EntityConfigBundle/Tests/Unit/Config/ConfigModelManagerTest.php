@@ -406,7 +406,7 @@ class ConfigModelManagerTest extends OrmTestCase
 
         $this->assertEquals(
             FoundEntityConfigRepository::getResultConfigEntity(),
-            $configModelManager->getModelByConfigId(new EntityConfigId(DemoEntity::ENTITY_NAME, 'test'))
+            $configModelManager->getModelByConfigId(new EntityConfigId('test', DemoEntity::ENTITY_NAME))
         );
     }
 

@@ -9,7 +9,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 {
     public function testCloneConfig()
     {
-        $config = new Config(new EntityConfigId('testClass', 'testScope'));
+        $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
         $values = array('firstKey' => 'firstValue', 'secondKey' => new \stdClass());
         $config->setValues($values);
@@ -23,7 +23,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testValueConfig()
     {
-        $config = new Config(new EntityConfigId('testClass', 'testScope'));
+        $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
         $values = array('firstKey' => 'firstValue', 'secondKey' => 'secondValue', 'fourthKey' => new \stdClass());
         $config->setValues($values);
@@ -59,7 +59,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testSetState()
     {
-        $configId = new EntityConfigId('Test\Class', 'testScope');
+        $configId = new EntityConfigId('testScope', 'Test\Class');
         $configValues = ['test' => 'testVal'];
         $config = Config::__set_state(
             [

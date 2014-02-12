@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -38,6 +37,8 @@ use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 /**
  * @SuppressWarnings(PHPMD)
