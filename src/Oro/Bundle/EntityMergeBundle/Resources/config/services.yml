@@ -30,7 +30,8 @@ parameters:
     oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener
 
     # Validator
-    oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesValidator
+    oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator
+    oro_entity_merge.validator.min_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MinEntitiesCountValidator
 services:
     oro_entity_merge.doctrine_helper:
         class: %oro_entity_merge.doctrine_helper.class%
@@ -131,7 +132,10 @@ services:
     # Validators
     oro_entity_merge.validator.max_entities_validator:
         class: %oro_entity_merge.validator.max_entities_validator.class%
-        arguments:
-            - @oro_entity_config.provider.merge
         tags:
             - { name: validator.constraint_validator, alias: max_entities_validator }
+
+    oro_entity_merge.validator.min_entities_validator:
+        class: %oro_entity_merge.validator.min_entities_validator.class%
+        tags:
+            - { name: validator.constraint_validator, alias: min_entities_validator }

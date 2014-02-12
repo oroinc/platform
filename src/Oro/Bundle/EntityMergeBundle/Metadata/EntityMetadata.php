@@ -6,6 +6,8 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class EntityMetadata extends Metadata implements MetadataInterface
 {
+    const MAX_ENTITIES_COUNT = 5;
+
     /**
      * @var DoctrineMetadata
      */
@@ -70,5 +72,17 @@ class EntityMetadata extends Metadata implements MetadataInterface
         }
 
         return $this->getDoctrineMetadata()->get('name');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMaxEntitiesCount()
+    {
+        if ($this->has('max_entities_count')) {
+            return $this->get('max_entities_count');
+        }
+
+        return self::MAX_ENTITIES_COUNT;
     }
 }
