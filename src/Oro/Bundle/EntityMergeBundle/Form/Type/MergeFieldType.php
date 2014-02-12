@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\Translator;
+use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -89,13 +90,13 @@ class MergeFieldType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
+        $offset = 0;
         foreach ($view->children['sourceEntity']->children as $child) {
-            $offset = 0;
             $child->vars['block_prefixes'] = array_merge(
                 $child->vars['block_prefixes'],
                 array('oro_entity_merge_choice_value')
             );
-            $child->vars['merge_entity_offset'] = $offset;
+            $child->vars['merge_entity_offset'] = $offset++;
             $child->vars['merge_field_data'] = $view->vars['value'];
         }
     }
@@ -122,6 +123,14 @@ class MergeFieldType extends AbstractType
             array(
                 'metadata' => 'Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata',
                 'entities' => 'array',
+            )
+        );
+
+        $resolver->setNormalizers(
+            array(
+                'label' => function (Options $options, $value) {
+                    return $options['metadata']->get('relation_label');
+                }
             )
         );
     }

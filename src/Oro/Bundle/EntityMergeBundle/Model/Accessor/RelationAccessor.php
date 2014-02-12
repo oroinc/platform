@@ -91,8 +91,15 @@ class RelationAccessor implements AccessorInterface
      */
     protected function getPropertyPath(FieldMetadata $metadata)
     {
-        return $metadata->has('property_path') ?
-            $metadata->get('property_path') : $metadata->getFieldName();
+        if ($metadata->has('property_path')) {
+            return $metadata->get('property_path');
+        }
+
+        if ($metadata->hasDoctrineMetadata()) {
+            return $metadata->getDoctrineMetadata()->getFieldName();
+        }
+
+        return $metadata->getFieldName();
     }
 
     /**

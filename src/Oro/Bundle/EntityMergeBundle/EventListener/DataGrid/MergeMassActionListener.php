@@ -15,13 +15,5 @@ class MergeMassActionListener
     {
         $config = $event->getConfig();
         $parameters = $event->getParameters();
-
-        if (!empty($parameters['contactId'])) {
-            $this->removeColumn($config, 'contactName');
-        }
-
-        if (!empty($parameters['accountId'])) {
-            $this->removeColumn($config, 'accountName');
-        }
     }
-} 
+}

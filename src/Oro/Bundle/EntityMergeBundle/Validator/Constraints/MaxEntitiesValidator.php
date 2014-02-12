@@ -34,10 +34,8 @@ class MaxEntitiesValidator extends ConstraintValidator
         if ($config && $config->has('merge_max_entities')) {
             $maxEntities = $config->get('merge_max_entities');
 
-            if (sizeof($value->getEntities) > $maxEntities) {
-                $this->context->addViolation(
-                    $constraint->message, []
-                );
+            if (sizeof($value->getEntities()) > $maxEntities) {
+                $this->context->addViolation($constraint->message, []);
             }
         }
     }
