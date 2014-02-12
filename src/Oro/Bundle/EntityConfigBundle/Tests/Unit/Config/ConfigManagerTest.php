@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -764,6 +765,105 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedConfig, $actualConfig);
     }
 
+    public function testUpdateConfigEntityModelWithForceForCustomEntity()
+    {
+        $configId                        = new EntityConfigId('test', self::ENTITY_CLASS);
+        $metadata                        = new EntityMetadata(self::ENTITY_CLASS);
+        $metadata->defaultValues['test'] = [
+            'translatable1' => 'labelVal1',
+            'other1'        => 'otherVal1',
+            'translatable2' => 'labelVal2',
+            'other2'        => 'otherVal2',
+        ];
+        $this->metadataFactory->expects($this->once())
+            ->method('getMetadataForClass')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($metadata));
+        $propertyConfigContainer =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $propertyConfigContainer->expects($this->once())
+            ->method('getDefaultValues')
+            ->with(PropertyConfigContainer::TYPE_ENTITY)
+            ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
+        $propertyConfigContainer->expects($this->once())
+            ->method('getTranslatableValues')
+            ->with(PropertyConfigContainer::TYPE_ENTITY)
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+        $this->configProvider->expects($this->any())
+            ->method('getPropertyConfig')
+            ->will($this->returnValue($propertyConfigContainer));
+        $config = new Config($configId);
+        $config->set('translatable2', 'labelVal2_old');
+        $config->set('other2', 'otherVal2_old');
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($config));
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(Events::UPDATE_ENTITY_CONFIG);
+
+        $extendConfig = new Config(new EntityConfigId('extend', self::ENTITY_CLASS));
+        $extendConfig->set('owner', ExtendManager::OWNER_CUSTOM);
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $extendConfigProvider->expects($this->any())
+            ->method('getScope')
+            ->will($this->returnValue('extend'));
+        $this->configProviderBag->addProvider($extendConfigProvider);
+        $extendConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue(true));
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($extendConfig));
+        $extendPropertyConfigContainer =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $extendPropertyConfigContainer->expects($this->once())
+            ->method('getDefaultValues')
+            ->with(PropertyConfigContainer::TYPE_ENTITY)
+            ->will($this->returnValue(['owner' => ExtendManager::OWNER_SYSTEM]));
+        $extendPropertyConfigContainer->expects($this->once())
+            ->method('getTranslatableValues')
+            ->with(PropertyConfigContainer::TYPE_ENTITY)
+            ->will($this->returnValue([]));
+        $extendConfigProvider->expects($this->any())
+            ->method('getPropertyConfig')
+            ->will($this->returnValue($extendPropertyConfigContainer));
+        $extendConfigProvider->expects($this->never())
+            ->method('persist');
+
+        $expectedConfig = new Config($configId);
+        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.entity_translatable1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('translatable2', 'labelVal2_old');
+        $expectedConfig->set('other2', 'otherVal2_old');
+        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.entity_translatable10');
+        $expectedConfig->set('other10', 'otherVal10');
+
+        $actualConfig = null;
+        $this->configProvider->expects($this->once())
+            ->method('persist')
+            ->will(
+                $this->returnCallback(
+                    function ($c) use (&$actualConfig) {
+                        $actualConfig = $c;
+                    }
+                )
+            );
+
+        $this->configManager->updateConfigEntityModel(self::ENTITY_CLASS, true);
+        $this->assertEquals($expectedConfig, $actualConfig);
+    }
+
     public function testUpdateConfigFieldModelWithNoForce()
     {
         $configId        = new FieldConfigId('test', self::ENTITY_CLASS, 'id', 'int');
@@ -870,6 +970,103 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $expectedConfig->set('other1', 'otherVal1');
         $expectedConfig->set('translatable2', 'oro.configtests.unit.fixture.demoentity.id.translatable2');
         $expectedConfig->set('other2', 'otherVal2');
+        $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
+        $expectedConfig->set('other10', 'otherVal10');
+
+        $actualConfig = null;
+        $this->configProvider->expects($this->once())
+            ->method('persist')
+            ->will(
+                $this->returnCallback(
+                    function ($c) use (&$actualConfig) {
+                        $actualConfig = $c;
+                    }
+                )
+            );
+
+        $this->configManager->updateConfigFieldModel(self::ENTITY_CLASS, 'id', true);
+        $this->assertEquals($expectedConfig, $actualConfig);
+    }
+
+    public function testUpdateConfigFieldModelWithForceForCustomField()
+    {
+        $configId        = new FieldConfigId('test', self::ENTITY_CLASS, 'id', 'int');
+        $metadata        = new EntityMetadata(self::ENTITY_CLASS);
+        $idFieldMetadata = new FieldMetadata(self::ENTITY_CLASS, 'id');
+        $metadata->addPropertyMetadata($idFieldMetadata);
+        $idFieldMetadata->defaultValues['test'] = [
+            'translatable1' => 'labelVal1',
+            'other1'        => 'otherVal1',
+            'translatable2' => 'labelVal2',
+            'other2'        => 'otherVal2',
+        ];
+        $this->metadataFactory->expects($this->once())
+            ->method('getMetadataForClass')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($metadata));
+        $propertyConfigContainer =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $propertyConfigContainer->expects($this->once())
+            ->method('getDefaultValues')
+            ->with(PropertyConfigContainer::TYPE_FIELD, 'int')
+            ->will($this->returnValue(['translatable10' => 'labelVal10', 'other10' => 'otherVal10']));
+        $propertyConfigContainer->expects($this->once())
+            ->method('getTranslatableValues')
+            ->with(PropertyConfigContainer::TYPE_FIELD)
+            ->will($this->returnValue(['translatable1', 'translatable2', 'translatable10']));
+        $this->configProvider->expects($this->any())
+            ->method('getPropertyConfig')
+            ->will($this->returnValue($propertyConfigContainer));
+        $config = new Config($configId);
+        $config->set('translatable2', 'labelVal2_old');
+        $config->set('other2', 'otherVal2_old');
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS)
+            ->will($this->returnValue($config));
+
+        $extendConfig = new Config(new FieldConfigId('extend', self::ENTITY_CLASS, 'id'));
+        $extendConfig->set('owner', ExtendManager::OWNER_CUSTOM);
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $extendConfigProvider->expects($this->any())
+            ->method('getScope')
+            ->will($this->returnValue('extend'));
+        $this->configProviderBag->addProvider($extendConfigProvider);
+        $extendConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with(self::ENTITY_CLASS, 'id')
+            ->will($this->returnValue(true));
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, 'id')
+            ->will($this->returnValue($extendConfig));
+        $extendPropertyConfigContainer =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $extendPropertyConfigContainer->expects($this->once())
+            ->method('getDefaultValues')
+            ->with(PropertyConfigContainer::TYPE_FIELD)
+            ->will($this->returnValue(['owner' => ExtendManager::OWNER_SYSTEM]));
+        $extendPropertyConfigContainer->expects($this->once())
+            ->method('getTranslatableValues')
+            ->with(PropertyConfigContainer::TYPE_FIELD)
+            ->will($this->returnValue([]));
+        $extendConfigProvider->expects($this->any())
+            ->method('getPropertyConfig')
+            ->will($this->returnValue($extendPropertyConfigContainer));
+        $extendConfigProvider->expects($this->never())
+            ->method('persist');
+
+        $expectedConfig = new Config($configId);
+        $expectedConfig->set('translatable1', 'oro.configtests.unit.fixture.demoentity.id.translatable1');
+        $expectedConfig->set('other1', 'otherVal1');
+        $expectedConfig->set('translatable2', 'labelVal2_old');
+        $expectedConfig->set('other2', 'otherVal2_old');
         $expectedConfig->set('translatable10', 'oro.configtests.unit.fixture.demoentity.id.translatable10');
         $expectedConfig->set('other10', 'otherVal10');
 

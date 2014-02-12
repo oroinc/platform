@@ -46,19 +46,12 @@ class ExtendConfigDumper
 
         $extendProvider = $this->em->getExtendManager()->getConfigProvider();
 
-        if ($className && $extendProvider->hasConfig($className)) {
-            $config = $extendProvider->getConfig($className);
-            if ($config->is('is_extend') && $config->is('upgradeable')) {
-                $this->checkSchema($config);
-            }
-        } else {
-            $configs = $extendProvider->getConfigs();
-            foreach ($configs as $config) {
-                if ($config->is('is_extend') && $config->is('upgradeable')) {
-                    $this->checkSchema($config);
-                }
-            }
+        $configs = $className
+            ? [$extendProvider->getConfig($className)]
+            : $extendProvider->getConfigs();
 
+        foreach ($configs as $config) {
+            $this->checkSchema($config);
         }
 
         $this->clear();
@@ -104,6 +97,10 @@ class ExtendConfigDumper
      */
     protected function checkSchema(ConfigInterface $entityConfig)
     {
+        if (!$entityConfig->is('is_extend') || !$entityConfig->is('upgradeable')) {
+            return;
+        }
+
         $extendProvider = $this->em->getExtendManager()->getConfigProvider();
         $className      = $entityConfig->getId()->getClassName();
         $doctrine       = [];

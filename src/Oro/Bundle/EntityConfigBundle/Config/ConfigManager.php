@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -629,6 +630,11 @@ class ConfigManager
      */
     public function updateConfigEntityModel($className, $force = false)
     {
+        // existing values for a custom entity must not be overridden
+        if ($force && $this->isCustom($className)) {
+            $force = false;
+        }
+
         $metadata = $this->getEntityMetadata($className);
         foreach ($this->getProviders() as $provider) {
             $config        = $provider->getConfig($className);
@@ -653,6 +659,11 @@ class ConfigManager
      */
     public function updateConfigFieldModel($className, $fieldName, $force = false)
     {
+        // existing values for a custom field must not be overridden
+        if ($force && $this->isCustom($className, $fieldName)) {
+            $force = false;
+        }
+
         $metadata = $this->getFieldMetadata($className, $fieldName);
         foreach ($this->getProviders() as $provider) {
             $config = $provider->getConfig($className, $fieldName);
@@ -840,5 +851,25 @@ class ConfigManager
         return $configId instanceof FieldConfigId
             ? sprintf('%s_%s_%s', $configId->getScope(), $configId->getClassName(), $configId->getFieldName())
             : sprintf('%s_%s', $configId->getScope(), $configId->getClassName());
+    }
+
+    /**
+     * Checks whether an entity or entity field is custom or system
+     * Custom means that "extend::owner" equals "Custom"
+     *
+     * @param string      $className
+     * @param string|null $fieldName
+     * @return bool
+     */
+    protected function isCustom($className, $fieldName = null)
+    {
+        $result         = false;
+        $extendProvider = $this->getProvider('extend');
+        if ($extendProvider && $extendProvider->hasConfig($className, $fieldName)) {
+            $result = $extendProvider->getConfig($className, $fieldName)
+                ->is('owner', ExtendManager::OWNER_CUSTOM);
+        }
+
+        return $result;
     }
 }
