@@ -138,7 +138,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $id
-     * @return EntityStub
+     * @return TaggableEntityStub
      */
     protected function createTaggableEntity($id = null)
     {
@@ -147,7 +147,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $id
-     * @return EntityStub
+     * @return NotTaggableEntityStub
      */
     protected function createNotTaggableEntity($id = null)
     {
