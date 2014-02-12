@@ -10,7 +10,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowEntityAclIdentityRepository;
 
 class WorkflowEntityVoter implements VoterInterface
@@ -24,11 +23,6 @@ class WorkflowEntityVoter implements VoterInterface
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
-
-    /**
-     * @var WorkflowManager
-     */
-    protected $workflowManager;
 
     /**
      * @var array
@@ -60,16 +54,11 @@ class WorkflowEntityVoter implements VoterInterface
     /**
      * @param ManagerRegistry $registry
      * @param DoctrineHelper $doctrineHelper
-     * @param WorkflowManager $workflowManager
      */
-    public function __construct(
-        ManagerRegistry $registry,
-        DoctrineHelper $doctrineHelper,
-        WorkflowManager $workflowManager
-    ) {
+    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
+    {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
-        $this->workflowManager = $workflowManager;
     }
 
     /**
@@ -122,10 +111,6 @@ class WorkflowEntityVoter implements VoterInterface
         $class = $this->getEntityClass($object);
         $identifier = $this->getEntityIdentifier($object);
         if (null === $identifier) {
-            return self::ACCESS_ABSTAIN;
-        }
-
-        if (!$this->workflowManager->hasApplicableWorkflowByEntityClass($class)) {
             return self::ACCESS_ABSTAIN;
         }
 
