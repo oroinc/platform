@@ -15,6 +15,15 @@ abstract class AbstractDateFilterType extends AbstractType
     const TYPE_MORE_THAN   = 3;
     const TYPE_LESS_THAN   = 4;
 
+    const PART_VALUE   = 'value';
+    const PART_DOW     = 'dayofweek';
+    const PART_WEEK    = 'week';
+    const PART_DAY     = 'day';
+    const PART_MONTH   = 'month';
+    const PART_QUARTER = 'quarter';
+    const PART_DOY     = 'dayofyear';
+    const PART_YEAR    = 'year';
+
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -58,14 +67,14 @@ abstract class AbstractDateFilterType extends AbstractType
         $resolver->setDefaults(
             [
                 'date_parts' => [
-                    'value'     => $t->trans('oro.filter.form.label_date_part.value'),
-                    'dayofweek' => $t->trans('oro.filter.form.label_date_part.dayofweek'),
-                    'week'      => $t->trans('oro.filter.form.label_date_part.week'),
-                    'day'       => $t->trans('oro.filter.form.label_date_part.day'),
-                    'month'     => $t->trans('oro.filter.form.label_date_part.month'),
-                    'quarter'   => $t->trans('oro.filter.form.label_date_part.quarter'),
-                    'dayofyear' => $t->trans('oro.filter.form.label_date_part.dayofyear'),
-                    'year'      => $t->trans('oro.filter.form.label_date_part.year'),
+                    self::PART_VALUE   => $t->trans('oro.filter.form.label_date_part.value'),
+                    self::PART_DOW     => $t->trans('oro.filter.form.label_date_part.dayofweek'),
+                    self::PART_WEEK    => $t->trans('oro.filter.form.label_date_part.week'),
+                    self::PART_DAY     => $t->trans('oro.filter.form.label_date_part.day'),
+                    self::PART_MONTH   => $t->trans('oro.filter.form.label_date_part.month'),
+                    self::PART_QUARTER => $t->trans('oro.filter.form.label_date_part.quarter'),
+                    self::PART_DOY     => $t->trans('oro.filter.form.label_date_part.dayofyear'),
+                    self::PART_YEAR    => $t->trans('oro.filter.form.label_date_part.year'),
                 ],
             ]
         );
