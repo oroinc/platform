@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 
 class EntityDataTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,12 +17,88 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityData;
 
+    /**
+     * @var array
+     */
+    protected $entities = array();
+
+    /**
+     * @var int
+     */
+    protected $masterEntityId;
+
+    /**
+     * @var int
+     */
+    protected $secondEntityId;
+
+    /**
+     * @var int
+     */
+    protected $thirdEntityId;
+
+    /**
+     * @var /stdClass
+     */
+    protected $masterEntity;
+
+    /**
+     * @var string
+     */
+    protected $entityClass = 'stdClass';
+
+    /**
+     * @var array
+     */
+    protected $entityFieldsMetadata  = array();
+
     protected function setUp()
     {
         $this->entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityData     = new EntityData($this->entityMetadata);
+
+        $this->masterEntityId = rand();
+        $this->secondEntityId = rand();
+        $this->thirdEntityId = rand();
+        $this->masterEntity = $this->createTestEntity($this->masterEntityId);
+        $this->entities[] = $this->masterEntity;
+        $this->entities[] = $this->createTestEntity($this->secondEntityId);
+        $this->entities[] = $this->createTestEntity($this->thirdEntityId);
+
+        $entityClass = & $this->entityClass;
+
+        $this->entityMetadata->expects($this->any())
+            ->method('getClassName')
+            ->will(
+                $this->returnCallback(
+                    function () use (&$entityClass) {
+                        return $entityClass;
+                    }
+                )
+            );
+
+        $entityFieldsMetadata = & $this->entityFieldsMetadata;
+        $this->entityMetadata->expects($this->any())
+            ->method('getFieldsMetadata')
+            ->will(
+                $this->returnCallback(
+                    function () use (&$entityFieldsMetadata) {
+                        return $entityFieldsMetadata;
+                    }
+                )
+            );
+        $this->resetEntityData();
+    }
+
+    public function testEntityMetadataShouldCheckClassNameExactlyOneTimeForOneEntity()
+    {
+        $entityClass = 'stdClass';
+        $expected = count($this->entities);
+        $this->entityMetadata->expects($this->exactly($expected))
+            ->method('getClassName')
+            ->will($this->returnValue($entityClass));
+        $this->entityData = new EntityData($this->entityMetadata, $this->entities);
     }
 
     public function testGetMetadata()
@@ -31,44 +108,32 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
 
     public function testSetEntities()
     {
-        $entityClass = 'stdClass';
-
-        $this->entityMetadata->expects($this->exactly(3))
-            ->method('getClassName')
-            ->will($this->returnValue($entityClass));
-
-        $entities = array(
-            $masterEntity = $this->createTestEntity(1),
-            $this->createTestEntity(2),
-            $this->createTestEntity(3),
-        );
-
-        $this->assertEquals($this->entityData, $this->entityData->setEntities($entities));
-        $this->assertEquals($entities, $this->entityData->getEntities());
-        $this->assertEquals($masterEntity, $this->entityData->getMasterEntity());
+        $this->assertEquals($this->entities, $this->entityData->getEntities());
+        $this->assertEquals($this->masterEntity, $this->entityData->getMasterEntity());
     }
 
     public function testAddEntity()
     {
-        $entityClass = 'stdClass';
-
-        $this->entityMetadata->expects($this->exactly(2))
-            ->method('getClassName')
-            ->will($this->returnValue($entityClass));
-
         $fooEntity = $this->createTestEntity(1);
         $barEntity = $this->createTestEntity(2);
 
+        $expectedSize = count($this->entities) + 1;
+        $expectedArray = array_merge($this->entities, array($fooEntity));
+
         $this->assertEquals($this->entityData, $this->entityData->addEntity($fooEntity));
-        $this->assertCount(1, $this->entityData->getEntities());
-        $this->assertEquals(array($fooEntity), $this->entityData->getEntities());
+        $this->assertCount($expectedSize, $this->entityData->getEntities());
+        $this->assertEquals($expectedArray, $this->entityData->getEntities());
 
         $this->entityData->addEntity($fooEntity);
-        $this->assertCount(1, $this->entityData->getEntities());
+        $this->assertCount($expectedSize, $this->entityData->getEntities());
 
         $this->entityData->addEntity($barEntity);
-        $this->assertCount(2, $this->entityData->getEntities());
-        $this->assertEquals(array($fooEntity, $barEntity), $this->entityData->getEntities());
+
+        $expectedSizeAfterAddDifferentEntity = $expectedSize + 1;
+        $expectedArrayAfterAddDifferentEntity = array_merge($expectedArray, array($barEntity));
+
+        $this->assertCount($expectedSizeAfterAddDifferentEntity, $this->entityData->getEntities());
+        $this->assertEquals($expectedArrayAfterAddDifferentEntity, $this->entityData->getEntities());
     }
 
     /**
@@ -77,10 +142,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddEntityFailsWhenMetadataClassNameNotMatch()
     {
-        $entityClass = 'SomeClass';
-        $this->entityMetadata->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue($entityClass));
+        $this->entityClass = 'SomeClass';
 
         $entity = $this->createTestEntity(1);
 
@@ -123,11 +185,7 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetMasterEntityFails()
     {
-        $entityClass = 'stdClass';
-
-        $this->entityMetadata->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue($entityClass));
+        $this->entityClass = 'stdClass';
 
         $this->entityData->addEntity($fooEntity = $this->createTestEntity(1));
         $barEntity = $this->createTestEntity(2);
@@ -138,36 +196,16 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
 
     protected function createTestEntity($id)
     {
-        $result     = new \stdClass();
+        $result = new \stdClass();
         $result->id = $id;
         return $result;
-    }
-
-    public function testAddNewField()
-    {
-        $fieldName     = 'test';
-        $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldMetadata->expects($this->once())
-            ->method('getFieldName')
-            ->will($this->returnValue($fieldName));
-
-        $field = $this->entityData->addNewField($fieldMetadata);
-
-        $this->assertInstanceOf('Oro\Bundle\EntityMergeBundle\Data\FieldData', $field);
-        $this->assertEquals($this->entityData, $field->getEntityData());
-        $this->assertEquals($fieldMetadata, $field->getMetadata());
-        $this->assertEquals($this->entityData->getMasterEntity(), $field->getSourceEntity());
-
-        $this->assertEquals($field, $this->entityData->getField($fieldName));
     }
 
     public function testGetFields()
     {
         $this->assertEquals(array(), $this->entityData->getFields());
 
-        $fieldName     = 'test';
+        $fieldName = 'test';
         $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -175,25 +213,43 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldName')
             ->will($this->returnValue($fieldName));
 
-        $field = $this->entityData->addNewField($fieldMetadata);
-
+        $this->entityFieldsMetadata = array($fieldMetadata);
+        $this->resetEntityData();
+        $field = new FieldData($this->entityData, $fieldMetadata);
+        $field->setSourceEntity($this->entityData->getMasterEntity());
         $this->assertEquals(array($fieldName => $field), $this->entityData->getFields());
     }
 
-    public function testHasField()
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Field "test" not exist.
+     */
+    public function testHasFieldReturnFalseIfFieldNotFoundAndExceptionWillThrow()
     {
-        $fieldName     = 'test';
+        $fieldName = 'test';
+
+        $this->entityData->getField($fieldName);
+    }
+
+    public function testHasFieldReturnTrueIfFieldNotFoundAndExceptionWillNotThrow()
+    {
+        $this->assertEquals(array(), $this->entityData->getFields());
+        $fieldName = 'test';
         $fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $fieldMetadata->expects($this->once())
+        $fieldMetadata->expects($this->exactly(2))
             ->method('getFieldName')
             ->will($this->returnValue($fieldName));
 
-        $this->assertFalse($this->entityData->hasField($fieldName));
+        $this->entityFieldsMetadata = array($fieldMetadata);
+        $this->resetEntityData();
+        $field = $this->entityData->getField($fieldName);
+        $this->assertTrue($field->getFieldName() == $fieldName);
+    }
 
-        $this->entityData->addNewField($fieldMetadata);
-
-        $this->assertTrue($this->entityData->hasField($fieldName));
+    protected function resetEntityData()
+    {
+        $this->entityData = new EntityData($this->entityMetadata, $this->entities);
     }
 }

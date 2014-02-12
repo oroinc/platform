@@ -31,10 +31,16 @@ class EntityData
 
     /**
      * @param EntityMetadata $metadata
+     * @param array $entities
      */
-    public function __construct(EntityMetadata $metadata)
+    public function __construct(EntityMetadata $metadata, array $entities)
     {
         $this->metadata = $metadata;
+        $this->setEntities($entities);
+
+        foreach ($metadata->getFieldsMetadata() as $fieldMetadata) {
+            $this->addNewField($fieldMetadata);
+        }
     }
 
     /**
@@ -53,7 +59,7 @@ class EntityData
      * @param object[] $entities
      * @return EntityData
      */
-    public function setEntities(array $entities)
+    protected function setEntities(array $entities)
     {
         $this->masterEntity = null;
         $this->entities = array();
@@ -191,7 +197,7 @@ class EntityData
      * @param FieldMetadata $metadata
      * @return FieldData
      */
-    public function addNewField(FieldMetadata $metadata)
+    protected function addNewField(FieldMetadata $metadata)
     {
         $field = new FieldData($this, $metadata);
         $this->fields[$field->getFieldName()] = $field;
