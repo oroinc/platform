@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Exception\ActionException;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\ConfigurationPass\ConfigurationPassInterface;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 /**
@@ -15,14 +18,9 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 class CreateRelatedEntity extends AbstractAction
 {
     /**
-     * @var ActionInterface
+     * @var ManagerRegistry
      */
-    protected $createEntityAction;
-
-    /**
-     * @var ConfigurationPassInterface
-     */
-    protected $replacePropertyPathPass;
+    protected $registry;
 
     /**
      * @var array
@@ -31,18 +29,15 @@ class CreateRelatedEntity extends AbstractAction
 
     /**
      * @param ContextAccessor $contextAccessor
-     * @param ActionInterface $createEntityAction
-     * @param ConfigurationPassInterface $replacePropertyPathPass
+     * @param ManagerRegistry $registry
      */
     public function __construct(
         ContextAccessor $contextAccessor,
-        ActionInterface $createEntityAction,
-        ConfigurationPassInterface $replacePropertyPathPass
+        ManagerRegistry $registry
     ) {
         parent::__construct($contextAccessor);
 
-        $this->createEntityAction = $createEntityAction;
-        $this->replacePropertyPathPass = $replacePropertyPathPass;
+        $this->registry = $registry;
     }
 
     /**
@@ -54,19 +49,44 @@ class CreateRelatedEntity extends AbstractAction
             throw new \InvalidArgumentException('Context must be instance of WorkflowItem');
         }
 
-        $definition = $context->getDefinition();
-        $createEntityOptions = array(
-            CreateObject::OPTION_KEY_ATTRIBUTE => '$' . $definition->getEntityAttributeName(),
-            CreateObject::OPTION_KEY_CLASS => $definition->getRelatedEntity(),
-            CreateObject::OPTION_KEY_DATA => $this->getOption($this->options, CreateObject::OPTION_KEY_DATA)
-        );
-        $createEntityOptions = $this->replacePropertyPathPass->passConfiguration($createEntityOptions);
+        $entityClassName = $context->getDefinition()->getRelatedEntity();
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->registry->getManagerForClass($entityClassName);
+        if (!$entityManager) {
+            throw new NotManageableEntityException($entityClassName);
+        }
 
-        $this->createEntityAction->initialize($createEntityOptions);
-        $this->createEntityAction->execute($context);
+        $entity = $context->getEntity();
+        $this->assignObjectData($context, $entity, $this->getData());
+        try {
+            $entityManager->persist($entity);
+            $entityManager->flush($entity);
+        } catch (\Exception $e) {
+            throw new ActionException(
+                sprintf('Can\'t create related entity %s. %s', $entityClassName, $e->getMessage())
+            );
+        }
+    }
 
-        $entity = $this->contextAccessor->getValue($context, $createEntityOptions[CreateObject::OPTION_KEY_ATTRIBUTE]);
-        $context->setEntity($entity);
+    /**
+     * @return array()
+     */
+    protected function getData()
+    {
+        return $this->getOption($this->options, CreateObject::OPTION_KEY_DATA, array());
+    }
+
+    /**
+     * @param mixed $context
+     * @param object $entity
+     * @param array $parameters
+     */
+    protected function assignObjectData($context, $entity, array $parameters)
+    {
+        foreach ($parameters as $parameterName => $valuePath) {
+            $parameterValue = $this->contextAccessor->getValue($context, $valuePath);
+            $this->contextAccessor->setValue($entity, $parameterName, $parameterValue);
+        }
     }
 
     /**

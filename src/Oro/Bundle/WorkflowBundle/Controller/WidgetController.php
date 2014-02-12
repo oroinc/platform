@@ -300,7 +300,11 @@ class WidgetController extends Controller
         /** @var DoctrineHelper $doctrineHelper */
         $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         try {
-            $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
+            if ($entityId) {
+                $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
+            } else {
+                $entity = $doctrineHelper->createEntityInstance($entityClass);
+            }
         } catch (NotManageableEntityException $e) {
             throw new BadRequestHttpException($e->getMessage(), $e);
         }

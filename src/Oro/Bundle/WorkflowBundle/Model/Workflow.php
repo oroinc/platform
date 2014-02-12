@@ -318,6 +318,11 @@ class Workflow
         $workflowItem
             ->setWorkflowName($this->getName())
             ->setEntity($entity);
+
+        if (array_key_exists($entityAttributeName, $data)) {
+            unset($data[$entityAttributeName]);
+        }
+
         $workflowItem->getData()
             ->set($entityAttributeName, $entity)
             ->setFieldsMapping($this->getAttributesMapping())

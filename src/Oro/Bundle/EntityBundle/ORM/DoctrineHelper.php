@@ -105,4 +105,15 @@ class DoctrineHelper
         $entityManager = $this->getEntityManager($entityClass);
         return $entityManager->getReference($entityClass, $entityId);
     }
+
+    /**
+     * @param string $entityClass
+     * @return object
+     */
+    public function createEntityInstance($entityClass)
+    {
+        $em = $this->getEntityManager($entityClass);
+        $class = $em->getClassMetadata($entityClass);
+        return $class->newInstance();
+    }
 }
