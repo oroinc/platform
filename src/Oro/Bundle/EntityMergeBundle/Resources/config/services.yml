@@ -24,6 +24,9 @@ parameters:
 
     # Listeners
     oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener
+
+    # Validator
+    oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesValidator
 services:
     oro_entity_merge.doctrine_helper:
         class: %oro_entity_merge.doctrine_helper.class%
@@ -102,3 +105,11 @@ services:
         class: %oro_entity_merge.listener.init_merge_modes.class%
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata, priority: -1000 }
+
+    # Validators
+    oro_entity_merge.validator.max_entities_validator:
+        class: %oro_entity_merge.validator.max_entities_validator.class%
+        arguments:
+            - @oro_entity_config.provider.merge
+        tags:
+            - { name: validator.constraint_validator, alias: max_entities_validator }
