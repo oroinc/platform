@@ -41,12 +41,12 @@ class DatePartsTest extends OrmTestCase
     public function testDateParts($part)
     {
         $query = $this->em->createQuery(
-            sprintf("SELECT %s('2003-12-31 01:02:03') FROM %s", strtoupper($part), self::FAKE_ENTITY)
+            sprintf("SELECT %s(s0_.somedate) FROM %s as s0_", strtoupper($part), self::FAKE_ENTITY)
         );
 
         $this->assertEquals(
             $query->getSQL(),
-            sprintf("SELECT %s('2003-12-31 01:02:03') AS sclr0 FROM some_fake s0_", strtoupper($part))
+            sprintf("SELECT %s(s0_.somedate) AS sclr0 FROM some_fake s0_", strtoupper($part))
         );
     }
 

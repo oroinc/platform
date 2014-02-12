@@ -17,15 +17,15 @@ class Fake
     /**
      * @Column(type="date", nullable=false)
      */
-    public $date;
+    public $somedate;
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function getDate()
+    public function getSomedate()
     {
-        return $this->date;
+        return $this->somedate;
     }
 }
