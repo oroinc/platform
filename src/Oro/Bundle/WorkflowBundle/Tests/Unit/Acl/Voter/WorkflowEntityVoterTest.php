@@ -27,6 +27,11 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
      */
     protected $doctrineHelper;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $workflowManager;
+
     protected function setUp()
     {
         $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
@@ -37,7 +42,11 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->voter = new WorkflowEntityVoter($this->registry, $this->doctrineHelper);
+        $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->voter = new WorkflowEntityVoter($this->registry, $this->doctrineHelper, $this->workflowManager);
     }
 
     protected function tearDown()
@@ -45,6 +54,7 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
         unset($this->voter);
         unset($this->registry);
         unset($this->doctrineHelper);
+        unset($this->workflowManager);
     }
 
     /**
@@ -94,12 +104,19 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
      * @param int $expected
      * @param object $object
      * @param array $attributes
+     * @param bool $hasWorkflow
      * @param bool $updatable
      * @param bool $deletable
      * @dataProvider voteDataProvider
      */
-    public function testVote($expected, $object, array $attributes = array(), $updatable = true, $deletable = true)
-    {
+    public function testVote(
+        $expected,
+        $object,
+        array $attributes = array(),
+        $hasWorkflow = false,
+        $updatable = true,
+        $deletable = true
+    ) {
         $entityAcl = new WorkflowEntityAcl();
         $entityAcl->setEntityClass('WorkflowEntity')
             ->setUpdatable($updatable)
@@ -109,14 +126,18 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
         $aclIdentity->setAcl($entityAcl);
 
         $identifier = null;
+        $class = null;
         if ($object instanceof WorkflowEntity) {
             $identifier = $object->getId();
             $this->setDoctrineHelper('WorkflowEntity', $identifier);
+            $class = 'WorkflowEntity';
         } elseif ($object instanceof ObjectIdentity && filter_var($object->getIdentifier(), FILTER_VALIDATE_INT)) {
             $identifier = $object->getIdentifier();
+            $class = $object->getType();
         }
 
-        $this->setRegistryRepositories(array($entityAcl), 'WorkflowEntity', $identifier, array($aclIdentity));
+        $this->setRegistryRepositories(array($entityAcl), $class, $identifier, array($aclIdentity));
+        $this->setWorkflowManager($class, $hasWorkflow);
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
@@ -145,41 +166,53 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
                 'object' => new WorkflowEntity(),
             ),
+            'no applicable workflow' => array(
+                'expected' => VoterInterface::ACCESS_ABSTAIN,
+                'object' => new WorkflowEntity(1),
+                'attributes' => array('EDIT'),
+            ),
             'not supported attributes' => array(
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array('VIEW', 'ASSIGN'),
+                'hasWorkflow' => true,
             ),
             'no attributes' => array(
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array(),
+                'hasWorkflow' => true,
             ),
             'not supported class' => array(
                 'expected' => VoterInterface::ACCESS_ABSTAIN,
                 'object' => new ObjectIdentity('1', 'UnknownEntity'),
                 'attributes' => array('EDIT'),
+                'hasWorkflow' => true,
             ),
             'update granted' => array(
                 'expected' => VoterInterface::ACCESS_GRANTED,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array('EDIT'),
+                'hasWorkflow' => true,
             ),
             'delete granted' => array(
                 'expected' => VoterInterface::ACCESS_GRANTED,
                 'object' => new ObjectIdentity('1', 'WorkflowEntity'),
                 'attributes' => array('DELETE'),
+                'hasWorkflow' => true,
             ),
             'update denied' => array(
                 'expected' => VoterInterface::ACCESS_DENIED,
                 'object' => new ObjectIdentity('1', 'WorkflowEntity'),
                 'attributes' => array('EDIT'),
+                'hasWorkflow' => true,
                 'updatable' => false,
             ),
             'delete denied' => array(
                 'expected' => VoterInterface::ACCESS_DENIED,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array('DELETE'),
+                'hasWorkflow' => true,
                 'updatable' => true,
                 'deletable' => false,
             ),
@@ -187,17 +220,20 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
                 'expected' => VoterInterface::ACCESS_GRANTED,
                 'object' => new ObjectIdentity('1', 'WorkflowEntity'),
                 'attributes' => array('EDIT', 'DELETE'),
+                'hasWorkflow' => true,
             ),
             'update denied and delete granted' => array(
                 'expected' => VoterInterface::ACCESS_DENIED,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array('EDIT', 'DELETE'),
+                'hasWorkflow' => true,
                 'updatable' => false,
             ),
             'update granted and delete denied' => array(
                 'expected' => VoterInterface::ACCESS_DENIED,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array('EDIT', 'DELETE'),
+                'hasWorkflow' => true,
                 'updatable' => true,
                 'deletable' => false,
             ),
@@ -205,6 +241,7 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
                 'expected' => VoterInterface::ACCESS_DENIED,
                 'object' => new ObjectIdentity('1', 'WorkflowEntity'),
                 'attributes' => array('EDIT', 'DELETE'),
+                'hasWorkflow' => true,
                 'updatable' => false,
                 'deletable' => false,
             ),
@@ -212,22 +249,26 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
                 'expected' => VoterInterface::ACCESS_GRANTED,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array('EDIT', 'VIEW'),
+                'hasWorkflow' => true,
             ),
             'update denied with not supported attribute' => array(
                 'expected' => VoterInterface::ACCESS_DENIED,
                 'object' => new ObjectIdentity('1', 'WorkflowEntity'),
                 'attributes' => array('EDIT', 'ASSIGN'),
+                'hasWorkflow' => true,
                 'updatable' => false,
             ),
             'delete granted with not supported attribute' => array(
                 'expected' => VoterInterface::ACCESS_GRANTED,
                 'object' => new WorkflowEntity(1),
                 'attributes' => array('DELETE', 'VIEW'),
+                'hasWorkflow' => true,
             ),
             'delete denied with not supported attribute' => array(
                 'expected' => VoterInterface::ACCESS_DENIED,
                 'object' => new ObjectIdentity('1', 'WorkflowEntity'),
                 'attributes' => array('DELETE', 'CREATE'),
+                'hasWorkflow' => true,
                 'updatable' => true,
                 'deletable' => false
             ),
@@ -298,5 +339,17 @@ class WorkflowEntityVoterTest extends \PHPUnit_Framework_TestCase
             ->method('getSingleEntityIdentifier')
             ->with($this->isType('object'), false)
             ->will($this->returnValue($entityIdentifier));
+    }
+
+    /**
+     * @param string $entityClass
+     * @param bool $hasWorkflow
+     */
+    protected function setWorkflowManager($entityClass, $hasWorkflow)
+    {
+        $this->workflowManager->expects($this->any())
+            ->method('hasApplicableWorkflowByEntityClass')
+            ->with($entityClass)
+            ->will($this->returnValue($hasWorkflow));
     }
 }

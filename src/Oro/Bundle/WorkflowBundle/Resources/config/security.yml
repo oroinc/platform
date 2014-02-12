@@ -14,5 +14,6 @@ services:
         arguments:
             - @doctrine
             - @oro_entity.doctrine_helper
+            - @oro_workflow.manager
         tags:
             - { name: security.voter, priority: 500 }

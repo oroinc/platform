@@ -171,6 +171,15 @@ class WorkflowManager
     }
 
     /**
+     * @param string $entityClass
+     * @return bool
+     */
+    public function hasApplicableWorkflowByEntityClass($entityClass)
+    {
+        return $this->workflowRegistry->hasActiveWorkflowByEntityClass($entityClass);
+    }
+
+    /**
      * @param object $entity
      * @return WorkflowItem|null
      */

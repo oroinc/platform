@@ -140,17 +140,17 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $managerRegistry = $this->createManagerRegistryMock($workflowDefinitionRepository);
         $workflowAssembler = $this->createWorkflowAssemblerMock($workflowDefinition, $workflow);
         $configProvider = $this->createConfigurationProviderMock();
-        $configProvider->expects($this->once())
+        $configProvider->expects($this->any())
             ->method('hasConfig')
             ->with($entityClass)
             ->will($this->returnValue(true));
         $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
             ->getMock();
-        $config->expects($this->once())
+        $config->expects($this->any())
             ->method('get')
             ->with('active_workflow')
             ->will($this->returnValue($workflowName));
-        $configProvider->expects($this->once())
+        $configProvider->expects($this->any())
             ->method('getConfig')
             ->with($entityClass)
             ->will($this->returnValue($config));
@@ -230,17 +230,17 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $managerRegistry = $this->createManagerRegistryMock($workflowDefinitionRepository);
         $workflowAssembler = $this->createWorkflowAssemblerMock();
         $configProvider = $this->createConfigurationProviderMock();
-        $configProvider->expects($this->once())
+        $configProvider->expects($this->any())
             ->method('hasConfig')
             ->with($entityClass)
             ->will($this->returnValue(true));
         $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
             ->getMock();
-        $config->expects($this->once())
+        $config->expects($this->any())
             ->method('get')
             ->with('active_workflow')
             ->will($this->returnValue($workflowName));
-        $configProvider->expects($this->once())
+        $configProvider->expects($this->any())
             ->method('getConfig')
             ->with($entityClass)
             ->will($this->returnValue($config));

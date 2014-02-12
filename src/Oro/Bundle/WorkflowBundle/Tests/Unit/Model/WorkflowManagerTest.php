@@ -476,4 +476,20 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             array(false)
         );
     }
+
+    /**
+     * @param bool $result
+     * @dataProvider trueFalseDataProvider
+     */
+    public function testHasApplicableWorkflowByEntityClass($result)
+    {
+        $entityClass = 'TestEntity';
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('hasActiveWorkflowByEntityClass')
+            ->with($entityClass)
+            ->will($this->returnValue($result));
+
+        $this->assertEquals($result, $this->workflowManager->hasApplicableWorkflowByEntityClass($entityClass));
+    }
 }

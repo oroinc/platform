@@ -42,7 +42,7 @@ class WorkflowExtension extends \Twig_Extension
             return false;
         }
 
-        return $this->workflowManager->getApplicableWorkflowByEntityClass($entityClass) !== null;
+        return $this->workflowManager->hasApplicableWorkflowByEntityClass($entityClass);
     }
 
     /**
