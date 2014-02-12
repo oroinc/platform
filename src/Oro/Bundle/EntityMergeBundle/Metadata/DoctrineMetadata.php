@@ -9,15 +9,15 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
     /**
      * @var string
      */
-    protected $className;
+    protected $sourceClassName;
 
     /**
      * @param string $className
      * @param array $options
      */
-    public function __construct($className, array $options = [])
+    public function __construct($sourceClassName, array $options = [])
     {
-        $this->className = $className;
+        $this->sourceClassName = $sourceClassName;
         parent::__construct($options);
     }
 
@@ -63,6 +63,14 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
      */
     public function isMappedBySourceEntity()
     {
-        return $this->isField() || $this->className == $this->get('sourceEntity');
+        return $this->isField() || $this->sourceClassName == $this->get('sourceEntity');
+    }
+
+    /**
+     * @return string
+     */
+    public function getFieldName()
+    {
+        return $this->get('fieldName', true);
     }
 }

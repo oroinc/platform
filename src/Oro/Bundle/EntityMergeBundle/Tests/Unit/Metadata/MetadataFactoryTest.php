@@ -22,7 +22,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $entityManager;
+    protected $doctrineHelper;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -62,8 +62,8 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->config = $this
             ->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(['getMetadataFactory', 'getRepository'])
+        $this->doctrineHelper = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -76,18 +76,13 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setMethods(
                 [
-                    'getSingleIdentifierFieldName',
+                    'getName',
+                    'getAssociationsByTargetClass',
                     'getAssociationMapping',
                     'getFieldMapping',
                     'hasAssociation'
                 ]
             )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadataFactory = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
-            ->setMethods(['getMetadataFor'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -106,21 +101,17 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue($this->fieldId));
 
-        $metadataFactory->expects($this->any())
-            ->method('getMetadataFor')
+        $this->doctrineHelper->expects($this->any())
+            ->method('getDoctrineMetadataFor')
             ->will($this->returnValue($this->doctrineMetadata));
 
-        $this->entityManager->expects($this->any())
-            ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
-
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
             ->will($this->returnValue($this->repository));
 
         $this->factory = new MetadataFactory(
             $this->configProvider,
-            $this->entityManager,
+            $this->doctrineHelper,
             $this->eventDispatcher
         );
     }
@@ -129,7 +120,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Merge config for "Namespace\RelatedEntity" is not exist.
      */
-    public function testCreateMetadataForEntityWithoutConfig()
+    public function testCreateMergeMetadataEmpty()
     {
         $metadata = $this->factory->createMergeMetadata(self::RELATED_ENTITY);
         $this->assertNull($metadata);
@@ -181,15 +172,16 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->factory = new MetadataFactory(
             $this->configProvider,
-            $this->entityManager,
+            $this->doctrineHelper,
             $this->eventDispatcher
         );
         $metadata      = $this->factory->createFieldsMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);
+
         $this->assertInstanceOf(
             'Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
-            $metadata[0]
+            $metadata['string']
         );
     }
 
@@ -226,18 +218,19 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($metadata);
         $this->assertInstanceOf(
             'Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
-            $metadata[0]
+            $metadata['ref-one']
         );
     }
 
-    public function testCreateRelationMetadata()
+    public function testCreateMappedOutsideFieldsMetadataByConfigEmpty()
     {
-        $metadata = $this->factory->createMappedOutsideFieldsMetadata(self::ENTITY);
+        $metadata = $this->factory
+            ->createMappedOutsideFieldsMetadataByConfig(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertEmpty($metadata);
     }
 
-    public function testCreateRelationReturnRelationMetadata()
+    public function testCreateMappedOutsideFieldsMetadataByConfig()
     {
         $config = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue')
@@ -292,7 +285,47 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->will($this->returnValue([$config]));
 
-        $metadata = $this->factory->createMappedOutsideFieldsMetadata(self::ENTITY);
+        $metadata = $this->factory
+            ->createMappedOutsideFieldsMetadataByConfig(self::ENTITY);
+        $this->assertInternalType('array', $metadata);
+        $this->assertNotEmpty($metadata);
+    }
+
+    public function testCreateMappedOutsideFieldsMetadataByDoctrineMetadataEmpty()
+    {
+        $metadata = $this->factory
+            ->createMappedOutsideFieldsMetadataByDoctrineMetadata(self::ENTITY);
+        $this->assertInternalType('array', $metadata);
+        $this->assertEmpty($metadata);
+    }
+
+    public function testCreateMappedOutsideFieldsMetadataByDoctrineMetadata()
+    {
+        $this->doctrineMetadata
+            ->expects($this->any())
+            ->method('getAssociationsByTargetClass')
+            ->will(
+                $this->returnValue(
+                    [
+                        'ref-one' => [
+                            'fieldName' => 'field'
+                        ]
+                    ]
+                )
+            );
+
+        $this->doctrineMetadata
+            ->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue(self::RELATED_ENTITY));
+
+        $this->doctrineHelper
+            ->expects($this->any())
+            ->method('getAllMetadata')
+            ->will($this->returnValue([$this->doctrineMetadata]));
+
+        $metadata = $this->factory
+            ->createMappedOutsideFieldsMetadataByDoctrineMetadata(self::ENTITY);
         $this->assertInternalType('array', $metadata);
         $this->assertNotEmpty($metadata);
     }

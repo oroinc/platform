@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Doctrine;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
@@ -48,7 +49,7 @@ class DoctrineHelper
      * @return EntityRepository
      * @throws InvalidArgumentException
      */
-    protected function getEntityRepository($entityName)
+    public function getEntityRepository($entityName)
     {
         $repository = $this->entityManager->getRepository($entityName);
 
@@ -123,5 +124,36 @@ class DoctrineHelper
         return
             $firstClass == $secondClass &&
             $this->getEntityIdentifierValue($entity) == $this->getEntityIdentifierValue($other);
+    }
+
+    /**
+     * @param string $className
+     * @return ClassMetadata
+     */
+    public function getDoctrineMetadataFor($className)
+    {
+        return $this
+            ->getMetadataFactory()
+            ->getMetadataFor($className);
+    }
+
+    /**
+     * @return ClassMetadata[]
+     */
+    public function getAllMetadata()
+    {
+        return $this
+            ->getMetadataFactory()
+            ->getAllMetadata();
+    }
+
+    /**
+     * @return \Doctrine\ORM\Mapping\ClassMetadataFactory
+     */
+    protected function getMetadataFactory()
+    {
+        return $this
+            ->entityManager
+            ->getMetadataFactory();
     }
 }
