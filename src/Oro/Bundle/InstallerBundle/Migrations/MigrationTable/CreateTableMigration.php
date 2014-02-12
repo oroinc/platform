@@ -4,7 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Migrations\MigrationTable;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader;
 
-class CreateTable
+class CreateTableMigration
 {
     public function up(Schema $schema)
     {

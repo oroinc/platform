@@ -8,13 +8,14 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
-use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\CreateTable;
+use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\CreateTableMigration;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\UpdateBundleVersions;
 
 class MigrationsLoader
 {
-    const MIGRATIONS_PATH = 'Migrations/Structure';
+    const MIGRATIONS_PATH = 'Migration';
     const MIGRATION_TABLE = 'oro_installer_migrations';
 
     /**
@@ -83,9 +84,9 @@ class MigrationsLoader
         }
 
         $bundleMigrations = $this->checkMigrationVersions($bundleMigrations);
-        $fileFinder = new Finder();
-        $includedFiles = [];
-        $bundleVersions = [];
+        $fileFinder       = new Finder();
+        $includedFiles    = [];
+        $bundleVersions   = [];
         foreach ($bundleMigrations as $bundleName => $migrations) {
             uksort(
                 $migrations,
@@ -110,13 +111,39 @@ class MigrationsLoader
         $migrations = $this->getMigrationFiles($includedFiles);
 
         if (!$this->checkMigrationTable()) {
-            array_unshift($migrations, new CreateTable());
+            array_unshift($migrations, new CreateTableMigration());
         }
-        $updateVersionMigration = new UpdateBundleVersions();
-        $updateVersionMigration->setBundleVersions($bundleVersions);
-        $migrations[] = $updateVersionMigration;
+        if (!empty($bundleVersions)) {
+            $updateVersionMigration = new UpdateBundleVersions();
+            $updateVersionMigration->setBundleVersions($bundleVersions);
+            $migrations[] = $updateVersionMigration;
+        }
 
         return $migrations;
+    }
+
+    /**
+     * @return array
+     *   key - class name of migration file
+     *   value - array of sql queries from this file
+     */
+    public function getMigrationsQueries()
+    {
+        $connection       = $this->em->getConnection();
+        $sm               = $connection->getSchemaManager();
+        $platform         = $connection->getDatabasePlatform();
+        $migrations       = $this->getMigrations();
+        $migrationQueries = [];
+        foreach ($migrations as $migration) {
+            $fromSchema = $sm->createSchema();
+            $toSchema   = clone $fromSchema;
+            $queries    = $migration->up($toSchema);
+            $queries    = array_merge($queries, $fromSchema->getMigrateToSql($toSchema, $platform));
+
+            $migrationQueries[get_class($migration)] = $queries;
+        }
+
+        return $migrationQueries;
     }
 
     /**
@@ -125,13 +152,17 @@ class MigrationsLoader
      */
     protected function getMigrationFiles($includedFiles)
     {
-        $declared = get_declared_classes();
+        $declared   = get_declared_classes();
         $migrations = [];
         foreach ($declared as $className) {
             $reflClass  = new \ReflectionClass($className);
             $sourceFile = $reflClass->getFileName();
             if (in_array($sourceFile, $includedFiles)) {
-                $migrations[] = new $className;
+                $migration = new $className;
+                if ($migration instanceof ContainerAwareInterface) {
+                    $migration->setContainer($this->container);
+                }
+                $migrations[] = $migration;
             }
         }
 
@@ -160,7 +191,7 @@ class MigrationsLoader
                             return ($val['bundle'] == $bundleName);
                         }
                     );
-                    $dbVersion = array_pop($bundleVersion)['version'];
+                    $dbVersion     = array_pop($bundleVersion)['version'];
                     foreach (array_keys($migrations) as $migrationKey) {
                         if (version_compare($migrationKey, $dbVersion) < 1) {
                             unset ($bundleMigrations[$bundleName][$migrationKey]);
@@ -188,10 +219,11 @@ class MigrationsLoader
                 $this->em->getConnection()->connect();
             }
 
-            $result = $conn->isConnected() && (bool)array_intersect(
-                [self::MIGRATION_TABLE],
-                $this->em->getConnection()->getSchemaManager()->listTableNames()
-            );
+            $result = $conn->isConnected()
+                && (bool)array_intersect(
+                    [self::MIGRATION_TABLE],
+                    $this->em->getConnection()->getSchemaManager()->listTableNames()
+                );
         } catch (\PDOException $e) {
         }
 

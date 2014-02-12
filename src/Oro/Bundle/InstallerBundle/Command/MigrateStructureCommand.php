@@ -2,20 +2,11 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Command\Proxy\DoctrineCommandHelper;
-use Doctrine\Bundle\MigrationsBundle\Command\DoctrineCommand;
 use Doctrine\DBAL\Connection;
-
-use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
-use Oro\Bundle\InstallerBundle\Migrations\DependendMigrationInterface;
-use Oro\Bundle\InstallerBundle\Migrations\Structure\Version20;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Oro\Bundle\InstallerBundle\Migrations\Structure\Version10;
-
 
 class MigrateStructureCommand extends ContainerAwareCommand
 {
@@ -24,9 +15,9 @@ class MigrateStructureCommand extends ContainerAwareCommand
      */
     protected function configure()
     {
-        $this->setName('oro:migration:structure')
-            ->setDescription('Execute platform application update commands and init platform assets.')
-            ->addOption('em', null, InputOption::VALUE_OPTIONAL, 'The entity manager to use for this command.');
+        $this->setName('oro:installer:migration:load')
+            ->setDescription('Execute migration scripts.')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs list of migrations without apply them');
     }
 
     /**
@@ -36,17 +27,49 @@ class MigrateStructureCommand extends ContainerAwareCommand
     {
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
-        $sm         = $connection->getSchemaManager();
-        $migrations = $this->getContainer()->get('oro_installer.migrations.loader')->getMigrations();
-        foreach ($migrations as $migration) {
-            $fromSchema = $sm->createSchema();
-            $toSchema   = clone $fromSchema;
-            $sqls =  $migration->up($toSchema);
-            $sqls = array_merge($sqls, $fromSchema->getMigrateToSql($toSchema, $connection->getDatabasePlatform()));
-            foreach ($sqls as $sql) {
-                $output->writeln($sql);
-                $connection->executeQuery($sql);
+        $queries    = $this->getContainer()->get('oro_installer.migrations.loader')->getMigrationsQueries();
+
+        if ($input->getOption('dry-run')) {
+            $this->outputMigrationQueries($output, $queries);
+        } else {
+            $this->processMigrationsQueries($output, $queries, $connection);
+        }
+    }
+
+    /**
+     * List the list of migration files with sql queries
+     *
+     * @param OutputInterface $output
+     * @param array $queries
+     */
+    protected function outputMigrationQueries(OutputInterface $output, $queries)
+    {
+        $output->writeln('List of migrations:');
+
+        foreach ($queries as $migrationClass => $sqlQueries) {
+            $output->writeln(sprintf(' <comment>> %s</comment>', $migrationClass));
+            foreach ($sqlQueries as $sqlQuery) {
+                $output->writeln(sprintf('  <info>%s</info>', $sqlQuery));
             }
         }
+    }
+
+    /**
+     * Process migrations
+     *
+     * @param OutputInterface $output
+     * @param array $queries
+     * @param Connection $connection
+     */
+    protected function processMigrationsQueries(OutputInterface $output, $queries, Connection $connection)
+    {
+        $output->writeln('Process migrations...');
+        foreach ($queries as $migrationClass => $sqlQueries) {
+            $output->writeln(sprintf(' <comment>></comment> <info>%s</info>', $migrationClass));
+            foreach ($sqlQueries as $sqlQuery) {
+                $connection->executeQuery($sqlQuery);
+            }
+        }
+        $output->writeln('Done.');
     }
 }
