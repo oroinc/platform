@@ -57,7 +57,10 @@ class CreateRelatedEntity extends AbstractAction
         }
 
         $entity = $context->getEntity();
-        $this->assignObjectData($context, $entity, $this->getData());
+        $data = $this->getData();
+        if (is_array($data) && !empty($data)) {
+            $this->assignObjectData($context, $entity, $data);
+        }
         try {
             $entityManager->persist($entity);
             $entityManager->flush($entity);
