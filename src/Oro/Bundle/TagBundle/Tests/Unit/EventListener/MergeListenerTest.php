@@ -5,10 +5,8 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
 use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
-use Oro\Bundle\EntityMergeBundle\Event\createTaggableEntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
 use Oro\Bundle\TagBundle\EventListener\MergeListener;
-use Oro\Bundle\TagBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\NotTaggableEntityStub;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\TaggableEntityStub;
 

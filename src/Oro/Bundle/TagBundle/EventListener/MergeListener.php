@@ -51,7 +51,7 @@ class MergeListener
     }
 
     /**
-     * @param BeforeMergeEvent $event
+     * @param CreateEntityDataEvent $event
      */
     public function onCreateEntityData(CreateEntityDataEvent $event)
     {
