@@ -1,169 +1,124 @@
-/*global define*/
+/*global define, require*/
 /*jslint nomen: true*/
 define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name', 'oro/query-designer/util',
-    'oro/entity-field-select-util', 'oro/entity-field-view', 'jquery-ui', 'jquery.select2'
-    ], function ($, _, __, mapFilterModuleName, util, EntityFieldUtil, EntityFieldView) {
+    'oroentity/js/field-choice', 'jquery-ui'
+    ], function ($, _, __, mapFilterModuleName, util) {
     'use strict';
-
-    $.widget('oroquerydesigner.fieldCondition', {
-        options: {
-            util: {}
-        },
-
-        _create: function () {
-            var entityFieldUtil = new EntityFieldUtil(this.$select),
-                select2Options = this.options.select2;
-            $.extend(entityFieldUtil, this.options.util);
-
-            this.options.fields = entityFieldUtil._convertData(this.options.fields, this.options.entity, null);
-
-            if (select2Options.formatSelectionTemplate) {
-                (function () {
-                    var template = _.template(select2Options.formatSelectionTemplate);
-                    select2Options.formatSelection = function (item) {
-                        return item.id ? template(entityFieldUtil.splitFieldId(item.id)) : '';
-                    };
-                }());
-            }
-
-            this.$select
-                .data('entity', this.options.entity)
-                .data('data', this.options.fields);
-
-            this._getFieldApplicableConditions = function (fieldId) {
-                return EntityFieldView.prototype.getFieldApplicableConditions.call(entityFieldUtil, fieldId);
-            };
-        }
-    });
 
     /**
      * Compare field widget
      */
-    $.widget('oroquerydesigner.fieldCondition', $.oroquerydesigner.fieldCondition, {
+    $.widget('oroquerydesigner.fieldCondition', {
         options: {
-            fields: [],
-            filterMetadataSelector: '',
-            select2: {
-                collapsibleResults: true,
-                dropdownAutoWidth: true
-            }
+            fieldChoice: {},
+            fieldChoiceClass: 'select',
+            filters: [],
+            filterContainerClass: 'active-filter'
+
         },
 
         _create: function () {
             var data = this.element.data('value');
 
-            this.template = _.template('<input class="select" /><span class="active-filter" />');
-            this.element.append(this.template(this.options));
-            this.$select = this.element.find('input.select');
-
-            this._super();
-
-            this.$select.select2($.extend({
-                data: this.options.fields
-            }, this.options.select2));
-
-            if (data && data.columnName) {
-                this.$select.select2('val', data.columnName, true);
-                this._renderFilter(data.columnName);
-            }
-
-            this.$select.change(_.bind(function (e) {
-                $(':focus').blur();
-                if (e.added) {
-                    // reset current value on field change
-                    this.element.data('value', {});
-                    this._renderFilter(e.added.id);
-                }
-            }, this));
-        },
-
-        _renderFilter: function (fieldId) {
-            var self = this,
-                conditions = self._getFieldApplicableConditions(fieldId),
-                filterIndex = self._getActiveFilterName(conditions);
-            self._createFilter(filterIndex, function () {
-                self._appendFilter();
-                self._onUpdate();
-            });
-        },
-
-        _getFiltersMetadata: function () {
-            var metadata = $(this.options.filterMetadataSelector).data('metadata');
-
-            metadata.filters.push({
+            // @TODO this 'none' filter probably in not in use any more, to delete
+            this.options.filters.push({
                 type: 'none',
                 applicable: {},
                 popupHint: __('Choose a column first')
             });
 
-            return _.extend({ filters: [] }, metadata);
-        },
+            this.$fieldChoice = $('<input>').addClass(this.options.fieldChoiceClass);
+            this.$filterContainer = $('<span>').addClass(this.options.filterContainerClass);
+            this.element.append(this.$fieldChoice, this.$filterContainer);
 
-        _getActiveFilterName: function (criteria) {
-            var foundFilterName = null;
+            this.$fieldChoice.fieldChoice(this.options.fieldChoice);
 
-            if (!_.isUndefined(criteria.filter)) {
-                // the criteria parameter represents a filter
-                foundFilterName = criteria.filter;
-                return foundFilterName;
+            if (data && data.columnName) {
+                this.$fieldChoice.fieldChoice('setValue', data.columnName);
+                this._renderFilter(data.columnName);
             }
 
-            var foundFilterMatchedBy = null;
+            this.$fieldChoice.on('changed', _.bind(function (e, fieldId) {
+                $(':focus').blur();
+                // reset current value on field change
+                this.element.data('value', {});
+                this._renderFilter(fieldId);
+                e.stopPropagation();
+            }, this));
 
-            _.each(this._getFiltersMetadata().filters, function (filter, filterName) {
-                var isApplicable = false;
+            this.$filterContainer.on('change', _.bind(function () {
+                if (this.filter) {
+                    this.filter.applyValue();
+                }
+            }, this));
+        },
+
+        _getCreateOptions: function () {
+            return $.extend(true, {}, this.options);
+        },
+
+        _renderFilter: function (fieldId) {
+            var conditions = this.$fieldChoice.fieldChoice('getApplicableConditions', fieldId),
+                filterId = this._getApplicableFilterId(conditions);
+            this._createFilter(this.options.filters[filterId]);
+        },
+
+        _getApplicableFilterId: function (conditions) {
+            var filterId = null,
+                matchedBy = null;
+
+            if (!_.isUndefined(conditions.filter)) {
+                // the criteria parameter represents a filter
+                return conditions.filter;
+            }
+
+            _.each(this.options.filters, function (filter, id) {
+                var matched;
 
                 if (!_.isEmpty(filter.applicable)) {
                     // check if a filter conforms the given criteria
-                    var matched = util.matchApplicable(filter.applicable, criteria);
-
-                    if (!_.isUndefined(matched)) {
-                        if (_.isNull(foundFilterMatchedBy)
+                    matched = util.matchApplicable(filter.applicable, conditions);
+                    if (matched && (
+                            _.isNull(matchedBy) ||
                             // new rule is more exact
-                            || _.size(foundFilterMatchedBy) < _.size(matched)
+                            _.size(matchedBy) < _.size(matched) ||
                             // 'type' rule is most low level one, so any other rule can override it
-                            || (_.size(foundFilterMatchedBy) == 1 && _.has(foundFilterMatchedBy, 'type'))) {
-                            foundFilterMatchedBy = matched;
-                            isApplicable = true;
-                        }
+                            (_.size(matchedBy) === 1 && _.has(matchedBy, 'type'))
+                        )) {
+                        matchedBy = matched;
+                        filterId = id;
                     }
-                } else if (_.isNull(foundFilterName)) {
-                    // if a filter was nor found so far, use a default filter
-                    isApplicable = true;
-                }
-                if (isApplicable) {
-                    foundFilterName = filterName;
+                } else if (_.isNull(filterId)) {
+                    // if a filter was not found so far, use a default filter
+                    filterId = id;
                 }
             });
 
-            return foundFilterName;
+            return filterId;
         },
 
-        _createFilter: function (filterIndex, cb) {
-            var self = this;
+        _createFilter: function (options) {
+            var moduleName = mapFilterModuleName(options.type);
 
-            var metadata = self._getFiltersMetadata();
-            var filterOptions = metadata.filters[filterIndex];
-            var filterModuleName = mapFilterModuleName(filterOptions.type);
-
-            requirejs([filterModuleName], function (Filter) {
-                self.filterIndex = filterIndex;
-                var filter = self.filter = new (Filter.extend(filterOptions));
-                cb(filter);
-            });
+            require([moduleName], _.bind(function (Filter) {
+                var filter = new (Filter.extend(options))();
+                this._appendFilter(filter);
+            }, this));
         },
 
-        _appendFilter: function () {
+        _appendFilter: function (filter) {
             var value = this.element.data('value');
+            this.filter = filter;
+
             if (value && value.criterion) {
                 this.filter.value = value.criterion.data;
             }
+
             this.filter.render();
+            this.$filterContainer.empty().append(this.filter.$el);
 
-            var $filter = this.element.find('.active-filter').empty().append(this.filter.$el);
-
-            $filter.on('change', _.bind(this.filter.apply, this.filter));
             this.filter.on('update', _.bind(this._onUpdate, this));
+            this._onUpdate();
         },
 
         _onUpdate: function () {
@@ -185,4 +140,6 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             this.element.trigger('changed');
         }
     });
+
+    return $;
 });

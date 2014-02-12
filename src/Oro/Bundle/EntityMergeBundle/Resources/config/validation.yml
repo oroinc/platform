@@ -1,0 +1,6 @@
+Oro\Bundle\EntityMergeBundle\Data\EntityData:
+    properties:
+        masterEntity:
+            - NotBlank: ~
+    constraints:
+        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntities: ~

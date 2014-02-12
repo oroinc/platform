@@ -171,7 +171,7 @@ class MetadataFactory
 
     /**
      * Get metadata from doctrine relations ref-one and ref-many
-     * outside of the entity by doctrine metadta
+     * outside of the entity by doctrine metadata
      *
      * @param string $className
      * @return FieldMetadata[]
