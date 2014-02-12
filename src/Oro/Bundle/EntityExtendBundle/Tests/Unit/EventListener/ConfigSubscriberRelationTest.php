@@ -10,8 +10,6 @@ use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
-use Oro\Bundle\EntityConfigBundle\Event\Events;
-
 class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 {
     /** @var  ConfigSubscriber */
@@ -31,10 +29,9 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                 'owner'           => ExtendManager::OWNER_CUSTOM,
                 'state'           => ExtendManager::STATE_NEW,
                 'is_extend'       => true,
+                'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
                 'target_title'    => ['username'],
                 'target_grid'     => ['username'],
-                'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
-                'target_field'    => ['username'],
                 'target_detailed' => ['username'],
                 'relation_key'    => 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|rel'
             ]
@@ -85,18 +82,18 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                 'relation'    => [
                     'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|rel' => [
                         'assign'          => false,
-                        'owner'           => true,
-                        'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
+                        'owner'           => false,
+                        'target_entity'   => 'TestClass',
                         'field_id'        => new FieldConfigId(
-                            'TestEntity',
-                            'extend',
-                            'rel',
-                            'manyToMany'
-                        ),
-                        'target_field_id' => new FieldConfigId(
                             'Oro\Bundle\UserBundle\Entity\User',
                             'extend',
                             'testclass_rel',
+                            'manyToMany'
+                        ),
+                        'target_field_id' => new FieldConfigId(
+                            'TestEntity',
+                            'extend',
+                            'rel',
                             'manyToMany'
                         ),
                     ]
@@ -106,11 +103,12 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-
         $this->runPersistConfig(
             $eventConfig,
             $selfEntityConfig,
-            ['state' => [0 => null, 1 => ExtendManager::STATE_NEW]]
+            [
+                'state' => [0 => null, 1 => ExtendManager::STATE_NEW]
+            ]
         );
 
         /** @var ConfigManager $cm */
@@ -151,7 +149,6 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
         $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
         $configProvider
             ->expects($this->any())
             ->method('getConfig')
@@ -163,7 +160,6 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
-            ->setMethods(['getProvider', 'getConfigChangeSet'])
             ->getMock();
         $configManager
             ->expects($this->any())
@@ -187,7 +183,6 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($eventConfig));
-
         $extendManager
             ->expects($this->any())
             ->method('getConfigProvider')

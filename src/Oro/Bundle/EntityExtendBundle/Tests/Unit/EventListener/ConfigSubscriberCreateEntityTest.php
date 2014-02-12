@@ -44,7 +44,6 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
-            ->setMethods(['getProvider'])
             ->getMock();
         $configManager
             ->expects($this->any())
@@ -118,7 +117,6 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
 
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
-            ->setMethods(['getProvider'])
             ->getMock();
         $configManager
             ->expects($this->any())

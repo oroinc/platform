@@ -7,10 +7,10 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\Events;
+
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
-
-use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Nothing should be persisted
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testPersistConfig_ScopeExtend_NewField_NewEntity()
+    public function testPersistConfigScopeExtendNewFieldNewEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(),
@@ -55,7 +55,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Test create new field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testPersistConfig_ScopeExtend_NewField_ActiveEntity()
+    public function testPersistConfigScopeExtendNewFieldActiveEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(),
@@ -76,7 +76,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Test update active field (entity state is 'Active')
      *  ConfigManager should have persisted 'extend_TestClass' with state 'Requires update'
      */
-    public function testPersistConfig_ScopeExtend_ActiveField_ActiveEntity()
+    public function testPersistConfigScopeExtendActiveFieldActiveEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(['state' => ExtendManager::STATE_ACTIVE]),
@@ -111,7 +111,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [1:*])
      */
-    public function testPersistConfig_ScopeExtend_RelationType_createSelfRelation_oneToMany()
+    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationOneToMany()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -158,7 +158,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [*:1])
      */
-    public function testPersistConfig_ScopeExtend_RelationType_createSelfRelation_ManyToOne()
+    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationManyToOne()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -200,7 +200,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Test create new field (relation type [*:*])
      */
-    public function testPersistConfig_ScopeExtend_RelationType_createSelfRelation_manyToMany()
+    public function testPersistConfigScopeExtendRelationTypeCreateSelfRelationManyToMany()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField(
@@ -248,7 +248,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      *  Test create new relation field to own entity
      *  Should NOT be persisted
      */
-    public function testPersistConfig_ScopeExtend_RelationType_ownEntity()
+    public function testPersistConfigScopeExtendRelationTypeOwnEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'oneToMany'),
@@ -279,7 +279,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Field should be added to index
      */
-    public function testPersistConfig_ScopeDataGrid_NewField_NewEntity()
+    public function testPersistConfigScopeDataGridNewFieldNewEntity()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'integer', 'datagrid'),
@@ -299,7 +299,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      *  Field type 'text' should NOT be added to index
      */
-    public function testPersistConfig_ScopeDataGrid_NewField_NewEntity_not()
+    public function testPersistConfigScopeDataGridNewFieldNewEntityNot()
     {
         $this->runPersistConfig(
             $this->getEventConfigNewField([], 'text', 'datagrid'),
