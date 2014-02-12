@@ -52,7 +52,7 @@ class AttributeAssembler extends AbstractAssembler
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
         $attribute->setEntityAcl($this->getOption($options, 'entity_acl', array()));
-        $attribute->setPropertyPath($this->getOption($options, 'property_path', null));
+        $attribute->setPropertyPath($this->getOption($options, 'property_path'));
         $attribute->setOptions($this->getOption($options, 'options', array()));
 
         $this->validateAttribute($attribute);

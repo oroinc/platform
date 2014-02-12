@@ -176,36 +176,44 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $expectedCondition = null;
         $expectedPreCondition = $this->createCondition();
         $expectedAction = null;
-        $defaultAclPrecondition = array('@acl_granted' => array());
-        if (isset($configuration['acl_message'])) {
-            $defaultAclPrecondition['@acl_granted']['message'] = $configuration['acl_message'];
-        }
+        $defaultAclPrecondition = array();
         if (isset($configuration['acl_resource'])) {
-            $defaultAclPrecondition['@acl_granted']['parameters'] = array($configuration['acl_resource']);
-        } else {
-            $defaultAclPrecondition['@acl_granted']['parameters'] = array('EDIT', '$.entity');
+            $defaultAclPrecondition = array(
+                '@acl_granted' => array(
+                    'parameters' => array($configuration['acl_resource'])
+                )
+            );
+            if (isset($configuration['acl_message'])) {
+                $defaultAclPrecondition['@acl_granted']['message'] = $configuration['acl_message'];
+            }
         }
-        if (isset($transitionDefinition['pre_conditions'])) {
+        if (isset($transitionDefinition['pre_conditions']) && $defaultAclPrecondition) {
             $preConditions = array(
                 '@and' => array(
                     $defaultAclPrecondition,
                     $transitionDefinition['pre_conditions']
                 )
             );
+        } elseif (isset($transitionDefinition['pre_conditions'])) {
+            $preConditions = $transitionDefinition['pre_conditions'];
         } else {
-            $preConditions = $defaultAclPrecondition;
+            $preConditions = array();
         }
 
-        $this->conditionFactory->expects($this->at(0))
-            ->method('create')
-            ->with(
-                ConfigurableCondition::ALIAS,
-                $preConditions
-            )
-            ->will($this->returnValue($expectedPreCondition));
+        $count = 0;
+        if ($preConditions) {
+            $this->conditionFactory->expects($this->at($count))
+                ->method('create')
+                ->with(
+                    ConfigurableCondition::ALIAS,
+                    $preConditions
+                )
+                ->will($this->returnValue($expectedPreCondition));
+            $count++;
+        }
         if (array_key_exists('conditions', $transitionDefinition)) {
             $expectedCondition = $this->createCondition();
-            $this->conditionFactory->expects($this->at(1))
+            $this->conditionFactory->expects($this->at($count))
                 ->method('create')
                 ->with(
                     ConfigurableCondition::ALIAS,
@@ -280,8 +288,14 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             $actualTransition->getFormOptions(),
             'Incorrect form_options'
         );
+
+        if ($preConditions) {
+            $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
+        } else {
+            $this->assertNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
+        }
+
         $this->assertEquals($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
-        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
         $this->assertEquals($expectedAction, $actualTransition->getPostAction(), 'Incorrect post_action');
     }
 
