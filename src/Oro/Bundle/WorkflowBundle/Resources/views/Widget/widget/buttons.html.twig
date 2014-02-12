@@ -8,7 +8,7 @@
             {% set transitionData = {
                 'enabled': data.isAllowed,
                 'transition-label': data.transition.label|trans,
-                'message': data.transition.message|trans,
+                'message': data.transition.message|trans|nl2br,
                 'transition-condition-messages': data.errors
             } %}
 
