@@ -186,15 +186,18 @@ class MetadataFactory
         }
 
         foreach ($allMetadata as $metadata) {
-            $fieldsMapping = $metadata
-                ->getAssociationsByTargetClass($className);
+            $fieldsMapping = $metadata->getAssociationsByTargetClass($className);
             if ($fieldsMapping) {
                 foreach ($fieldsMapping as $fieldMapping) {
                     $relatedClassName      = $metadata->getName();
                     $fieldDoctrineMetadata = $this->createDoctrineMetadata(
-                        $relatedClassName,
+                        $className,
                         $fieldMapping
                     );
+
+                    if ($fieldDoctrineMetadata->has('mappedBy')) {
+                        continue;
+                    }
 
                     $fieldMetadata = $this->createFieldMetadata(
                         ['hidden' => true],
@@ -248,5 +251,4 @@ class MetadataFactory
     {
         return new DoctrineMetadata($classMame, $fieldMapping);
     }
-
 }

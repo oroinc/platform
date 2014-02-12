@@ -12,7 +12,7 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
     protected $sourceClassName;
 
     /**
-     * @param string $className
+     * @param string $sourceClassName
      * @param array $options
      */
     public function __construct($sourceClassName, array $options = [])
@@ -38,7 +38,7 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
      */
     public function isAssociation()
     {
-        return $this->has('targetEntity') && $this->has('joinColumns');
+        return $this->has('targetEntity') && ($this->has('joinColumns') || $this->has('joinTable'));
     }
 
     /**
