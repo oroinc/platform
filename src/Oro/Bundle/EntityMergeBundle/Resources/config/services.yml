@@ -1,8 +1,11 @@
 parameters:
-    #Metadata
+    # Doctrine Helper
+    oro_entity_merge.doctrine_helper.class: Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper
+
+    # Metadata
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
 
-    #Entity Data
+    # Entity Data
     oro_entity_merge.data.entity_provider.class: Oro\Bundle\EntityMergeBundle\Data\EntityProvider
     oro_entity_merge.data.entity_data_factory.class: Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory
 
@@ -22,6 +25,11 @@ parameters:
     # Listeners
     oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener
 services:
+    oro_entity_merge.doctrine_helper:
+        class: %oro_entity_merge.doctrine_helper.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+
     oro_entity_merge.data.entity_data_factory:
         class: %oro_entity_merge.data.entity_data_factory.class%
         arguments:
