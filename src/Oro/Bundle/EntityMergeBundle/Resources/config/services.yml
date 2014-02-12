@@ -12,6 +12,11 @@ parameters:
     # Merger
     oro_entity_merge.merger.class: Oro\Bundle\EntityMergeBundle\Model\EntityMerger
 
+    # Steps
+    oro_entity_merge.step.validate.class: Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep
+    oro_entity_merge.step.merge_fields.class: Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep
+    oro_entity_merge.step.remove_entities.class: Oro\Bundle\EntityMergeBundle\Model\Step\RemoveEntitiesStep
+
     # Accessors
     oro_entity_merge.accessor.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor
     oro_entity_merge.accessor.default.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor
@@ -53,8 +58,31 @@ services:
     oro_entity_merge.merger:
         class: %oro_entity_merge.merger.class%
         arguments:
-            - @oro_entity_merge.strategy
+            - []
             - @event_dispatcher
+
+    # Steps
+    oro_entity_merge.step.validate:
+        class: %oro_entity_merge.step.validate.class%
+        arguments:
+            - @validator
+        tags:
+            - { name: oro_entity_merge.step }
+
+    oro_entity_merge.step.merge_fields:
+        class: %oro_entity_merge.step.merge_fields.class%
+        arguments:
+            - @oro_entity_merge.strategy
+        tags:
+            - { name: oro_entity_merge.step }
+
+    oro_entity_merge.step.remove_entities:
+        class: %oro_entity_merge.step.remove_entities.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_entity_merge.doctrine_helper
+        tags:
+            - { name: oro_entity_merge.step }
 
     # Accessors
     oro_entity_merge.accessor.delegate:

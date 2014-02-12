@@ -4,19 +4,19 @@ namespace Oro\Bundle\EntityMergeBundle\Model;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\EntityMergeBundle\Model\Step\StepSorter;
+use Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface;
 use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
 use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 
 class EntityMerger implements EntityMergerInterface
 {
     /**
-     * @var StrategyInterface
+     * @var MergeStepInterface[]
      */
-    protected $strategy;
+    protected $steps = array();
 
     /**
      * @var EventDispatcherInterface
@@ -24,67 +24,40 @@ class EntityMerger implements EntityMergerInterface
     protected $eventDispatcher;
 
     /**
-     * @param StrategyInterface $strategy
+     * @param MergeStepInterface[] $steps
      * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(StrategyInterface $strategy, EventDispatcherInterface $eventDispatcher)
+    public function __construct(array $steps, EventDispatcherInterface $eventDispatcher)
     {
-        $this->strategy = $strategy;
+        foreach ($steps as $step) {
+            $this->addMergeStep($step);
+        }
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * Add merge step
+     *
+     * @param MergeStepInterface $step
+     */
+    protected function addMergeStep(MergeStepInterface $step)
+    {
+        $this->steps[] = $step;
     }
 
     /**
      * Merge entities
      *
      * @param EntityData $data
-     * @throws InvalidArgumentException
      */
     public function merge(EntityData $data)
     {
-        $this->validate($data);
         $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE, new BeforeMergeEvent($data));
-        $this->mergeFields($data);
-        $this->updateDoctrineReferences($data);
+
+        foreach (StepSorter::getOrderedSteps($this->steps) as $step) {
+            $step->run($data);
+        }
+
         $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE, new AfterMergeEvent($data));
-    }
-
-    /**
-     * Validate merge data
-     *
-     * @param EntityData $data
-     * @throws InvalidArgumentException If data is invalid
-     */
-    protected function validate(EntityData $data)
-    {
-        if (count($data->getEntities()) < 2) {
-            // @todo Add rule to validation.yml
-            throw new InvalidArgumentException('Cannot merge less than 2 entities.');
-        }
-
-        if (!$data->getMasterEntity()) {
-            // @todo Add rule to validation.yml
-            throw new InvalidArgumentException('Master entity must be set.');
-        }
-    }
-
-    /**
-     * Merge fields of entity
-     *
-     * @param EntityData $data
-     */
-    protected function mergeFields(EntityData $data)
-    {
-        foreach ($data->getFields() as $field) {
-            $this->strategy->merge($field);
-        }
-    }
-
-    /**
-     * Update values of Doctrine entities which are referencing to merged entities
-     *
-     * @param EntityData $data
-     */
-    protected function updateDoctrineReferences(EntityData $data)
-    {
     }
 }

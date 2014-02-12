@@ -5,13 +5,12 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model;
 use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
 use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 
 class StrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EntityMerger $merger ;
+     * @var EntityMerger
      */
     protected $merger;
 
@@ -21,48 +20,26 @@ class StrategyTest extends \PHPUnit_Framework_TestCase
     protected $eventDispatcher;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject[]
      */
-    protected $strategy;
+    protected $steps;
 
     protected function setUp()
     {
-        $this->strategy     = $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface');
+        $this->steps = array(
+            $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface'),
+            $this->getMock('Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface')
+        );
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $this->merger          = new EntityMerger($this->strategy, $this->eventDispatcher);
+        $this->merger = new EntityMerger($this->steps, $this->eventDispatcher);
     }
 
     public function testMerge()
     {
-        $fooEntity = $this->createTestEntity(1);
-        $barEntity = $this->createTestEntity(2);
-
         $data = $this->createEntityData();
 
-        $data->expects($this->once())
-            ->method('getEntities')
-            ->will($this->returnValue(array($fooEntity, $barEntity)));
-
-        $data->expects($this->once())
-            ->method('getMasterEntity')
-            ->will($this->returnValue($fooEntity));
-
-        $fooField = $this->createFieldData();
-        $barField = $this->createFieldData();
-
-        $data->expects($this->once())
-            ->method('getFields')
-            ->will($this->returnValue(array($fooField, $barField)));
-
-        $this->strategy->expects($this->exactly(2))->method('merge');
-
-        $this->strategy->expects($this->at(0))
-            ->method('merge')
-            ->with($fooField);
-
-        $this->strategy->expects($this->at(1))
-            ->method('merge')
-            ->with($barField);
+        $this->steps[0]->expects($this->once())->method('run')->with($data);
+        $this->steps[1]->expects($this->once())->method('run')->with($data);
 
         $this->eventDispatcher->expects($this->exactly(2))->method('dispatch');
         $this->eventDispatcher->expects($this->at(0))
@@ -87,19 +64,5 @@ class StrategyTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    protected function createFieldData()
-    {
-        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\FieldData')
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
-    protected function createTestEntity($id)
-    {
-        $result     = new \stdClass();
-        $result->id = $id;
-        return $result;
     }
 }

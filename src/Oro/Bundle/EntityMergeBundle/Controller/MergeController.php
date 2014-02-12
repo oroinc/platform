@@ -12,9 +12,10 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 
+use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
-use Oro\Bundle\EntityMergeBundle\Data\EntityProvider;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
 /**
  * @Route("/merge")
@@ -74,6 +75,7 @@ class MergeController extends Controller
         if ($this->getRequest()->isMethod('POST')) {
             $form->submit($this->getRequest());
             if ($form->isValid()) {
+                $this->getEntityMerger()->merge($entityData);
                 // @todo Run merge and flush (use transations)
 
                 // @todo Validate master entity once more
@@ -94,7 +96,7 @@ class MergeController extends Controller
                 'oro_entity_merge',
                 array(
                     'className' => $className,
-                    'ids' => $this->getEntityProvider()->getEntityIds($entityData->getEntities()),
+                    'ids' => $this->getDoctineHelper()->getEntityIds($entityData->getEntities()),
                 )
             ),
             'entityPluralLabel' => $this->getEntityPluralLabel($className),
@@ -153,10 +155,18 @@ class MergeController extends Controller
     }
 
     /**
-     * @return EntityProvider
+     * @return DoctrineHelper
      */
-    protected function getEntityProvider()
+    protected function getDoctineHelper()
     {
-        return $this->get('oro_entity_merge.data.entity_provider');
+        return $this->get('oro_entity_merge.doctrine_helper');
+    }
+
+    /**
+     * @return EntityMerger
+     */
+    protected function getEntityMerger()
+    {
+        return $this->get('oro_entity_merge.merger');
     }
 }
