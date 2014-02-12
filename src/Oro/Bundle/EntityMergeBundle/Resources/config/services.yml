@@ -6,11 +6,15 @@ parameters:
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
 
     # Entity Data
-    oro_entity_merge.data.entity_provider.class: Oro\Bundle\EntityMergeBundle\Data\EntityProvider
     oro_entity_merge.data.entity_data_factory.class: Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory
 
     # Merger
     oro_entity_merge.merger.class: Oro\Bundle\EntityMergeBundle\Model\EntityMerger
+
+    # Steps
+    oro_entity_merge.step.validate.class: Oro\Bundle\EntityMergeBundle\Model\Step\ValidateStep
+    oro_entity_merge.step.merge_fields.class: Oro\Bundle\EntityMergeBundle\Model\Step\MergeFieldsStep
+    oro_entity_merge.step.remove_entities.class: Oro\Bundle\EntityMergeBundle\Model\Step\RemoveEntitiesStep
 
     # Accessors
     oro_entity_merge.accessor.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor
@@ -37,13 +41,8 @@ services:
         class: %oro_entity_merge.data.entity_data_factory.class%
         arguments:
             - @oro_entity_merge.metadata.factory
-            - @oro_entity_merge.data.entity_provider
+            - @oro_entity_merge.doctrine_helper
             - @event_dispatcher
-
-    oro_entity_merge.data.entity_provider:
-        class: %oro_entity_merge.data.entity_provider.class%
-        arguments:
-            - @doctrine.orm.entity_manager
 
     oro_entity_merge.metadata.factory:
         class: %oro_entity_merge.metadata.factory.class%
@@ -56,8 +55,31 @@ services:
     oro_entity_merge.merger:
         class: %oro_entity_merge.merger.class%
         arguments:
-            - @oro_entity_merge.strategy
+            - []
             - @event_dispatcher
+
+    # Steps
+    oro_entity_merge.step.validate:
+        class: %oro_entity_merge.step.validate.class%
+        arguments:
+            - @validator
+        tags:
+            - { name: oro_entity_merge.step }
+
+    oro_entity_merge.step.merge_fields:
+        class: %oro_entity_merge.step.merge_fields.class%
+        arguments:
+            - @oro_entity_merge.strategy
+        tags:
+            - { name: oro_entity_merge.step }
+
+    oro_entity_merge.step.remove_entities:
+        class: %oro_entity_merge.step.remove_entities.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_entity_merge.doctrine_helper
+        tags:
+            - { name: oro_entity_merge.step }
 
     # Accessors
     oro_entity_merge.accessor.delegate:

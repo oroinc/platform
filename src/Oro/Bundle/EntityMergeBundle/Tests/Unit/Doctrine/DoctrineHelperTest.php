@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Doctrine\DoctrineHelper;
 
-use Oro\Bundle\EntityMergeBundle\Data\EntityProvider;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
-class EntityProviderTest extends \PHPUnit_Framework_TestCase
+class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EntityProvider $target
+     * @var DoctrineHelper $target
      */
     private $target;
 
@@ -51,7 +51,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->setUpFakeObjects();
 
-        $this->target = new EntityProvider($this->entityManager);
+        $this->target = new DoctrineHelper($this->entityManager);
     }
 
 

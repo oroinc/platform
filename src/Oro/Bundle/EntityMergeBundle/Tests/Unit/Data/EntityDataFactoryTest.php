@@ -19,7 +19,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $entityProvider;
+    private $doctrineHelper;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -31,6 +31,9 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private $entities = array();
 
+    /**
+     * @var array
+     */
     private $fieldsMetadata = array();
 
     /**
@@ -44,7 +47,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
     private $secondEntity;
 
     /**
-     * @var string $entitiesClassName Fake class name for entities
+     * @var string $entitiesClassName Class name for entities
      */
     private $entitiesClassName;
 
@@ -59,34 +62,34 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
         $this->entities[] = $this->firstEntity;
         $this->entities[] = $this->secondEntity;
 
-        $this->metadataFactory = $this->getMockBuilder(
-            'Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory'
-        )->disableOriginalConstructor()->getMock();
+        $this->metadataFactory = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->entityProvider = $this->getMockBuilder(
-            'Oro\Bundle\EntityMergeBundle\Data\EntityProvider'
-        )->disableOriginalConstructor()->getMock();
-        $this->metadata = $this->getMockBuilder(
-            'Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata'
-        )->disableOriginalConstructor()->getMock();
-        $this->metadata->expects($this->any())->method('getClassName')->will(
-            $this->returnValue($this->entitiesClassName)
-        );
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
+            ->disableOriginalConstructor()->getMock();
 
-        $this->metadata->expects($this->any())->method('getFieldsMetadata')->will(
-            $this->returnValue($this->fieldsMetadata)
-        );
-        $this->metadataFactory->expects($this->any())->method('createMergeMetadata')->with(
-            $this->entitiesClassName
-        )->will($this->returnValue($this->metadata));
+        $this->metadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
+            ->disableOriginalConstructor()->getMock();
 
-        $eventDispatcher = $this->getMockBuilder(
-            'Symfony\Component\EventDispatcher\EventDispatcher'
-        )->disableOriginalConstructor()->getMock();
+        $this->metadata->expects($this->any())
+            ->method('getClassName')
+            ->will($this->returnValue($this->entitiesClassName));
+
+        $this->metadata->expects($this->any())
+            ->method('getFieldsMetadata')
+            ->will($this->returnValue($this->fieldsMetadata));
+
+        $this->metadataFactory->expects($this->any())
+            ->method('createMergeMetadata')
+            ->with($this->entitiesClassName)
+            ->will($this->returnValue($this->metadata));
+
+        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()->getMock();
 
         $this->target = new EntityDataFactory(
             $this->metadataFactory,
-            $this->entityProvider,
+            $this->doctrineHelper,
             $eventDispatcher
         );
     }
@@ -102,19 +105,22 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateEntityDataByIdsShouldCallCreateEntityDataWithCorrectData()
     {
-        $this->entityProvider->expects($this->any())->method('getEntitiesByIds')->with(
-            $this->equalTo($this->entitiesClassName),
-            $this->callback(
-                function ($params) {
-                    return $params[0] == '12' && $params[1] == '88';
-                }
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntitiesByIds')
+            ->with(
+                $this->equalTo($this->entitiesClassName),
+                $this->callback(
+                    function ($params) {
+                        return $params[0] == '12' && $params[1] == '88';
+                    }
+                )
             )
-        )->will($this->returnValue($this->entities));
+            ->will($this->returnValue($this->entities));
+
         $expected = $this->entities;
-        $result = $this->target->createEntityDataByIds(
-            $this->entitiesClassName,
-            array('12', '88')
-        );
+
+        $result = $this->target->createEntityDataByIds($this->entitiesClassName, array('12', '88'));
+
         $this->assertEquals($result->getEntities(), $expected);
     }
 }
