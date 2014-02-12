@@ -7,16 +7,18 @@ use Symfony\Component\Validator\Constraint;
 /**
  * @Annotation
  */
-class MaxEntities extends Constraint
+class MinEntitiesCount extends Constraint
 {
-    public $message = 'test'; //@todo: message
+    const MIN_ENTITIES_COUNT = 2;
+
+    public $message = 'You need minimum %min_count% entities to merge';
 
     /**
      * {inheritdoc}
      */
     public function validatedBy()
     {
-        return 'max_entities_validator';
+        return 'min_entities_validator';
     }
 
     /**

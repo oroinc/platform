@@ -3,4 +3,5 @@ Oro\Bundle\EntityMergeBundle\Data\EntityData:
         masterEntity:
             - NotBlank: ~
     constraints:
-        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntities: ~
+        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount: ~
+        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MinEntitiesCount: ~
