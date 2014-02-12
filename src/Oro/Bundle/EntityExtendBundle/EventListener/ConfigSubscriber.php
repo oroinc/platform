@@ -6,7 +6,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
@@ -273,23 +272,5 @@ class ConfigSubscriber implements EventSubscriberInterface
         $targetConfig->set('relation', $targetRelations);
 
         $this->extendConfigProvider->persist($targetConfig);
-    }
-
-    /**
-     * @param ConfigInterface   $entityConfig
-     * @param ConfigIdInterface $fieldConfigId
-     * @param bool              $target
-     * @return null|string
-     */
-    protected function findRelationKey(ConfigInterface $entityConfig, ConfigIdInterface $fieldConfigId, $target = false)
-    {
-        $relations = $entityConfig->get('relation');
-        foreach ($relations as $key => $relation) {
-            if ($relation[$target ? 'target_field_id' : 'field_id'] == $fieldConfigId) {
-                return $key;
-            }
-        }
-
-        return null;
     }
 }
