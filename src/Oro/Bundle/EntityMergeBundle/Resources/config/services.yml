@@ -38,13 +38,8 @@ services:
         class: %oro_entity_merge.data.entity_data_factory.class%
         arguments:
             - @oro_entity_merge.metadata.factory
-            - @oro_entity_merge.data.entity_provider
+            - @oro_entity_merge.doctrine_helper
             - @event_dispatcher
-
-    oro_entity_merge.data.entity_provider:
-        class: %oro_entity_merge.data.entity_provider.class%
-        arguments:
-            - @doctrine.orm.entity_manager
 
     oro_entity_merge.metadata.factory:
         class: %oro_entity_merge.metadata.factory.class%
