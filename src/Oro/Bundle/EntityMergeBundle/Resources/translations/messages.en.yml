@@ -1,5 +1,8 @@
 oro:
     entity_merge:
+        controller:
+            merged: Entities are successfully merged
+            select: Select entities to merge.
         action:
             merge: Merge {{ label }}
 
