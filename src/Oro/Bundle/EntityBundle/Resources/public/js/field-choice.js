@@ -18,8 +18,18 @@ define(['jquery', 'underscore', 'oro/entity-field-select-util', 'oro/entity-fiel
 
         _create: function () {
             this.entityFieldUtil = new EntityFieldUtil(this.element);
-            $.extend(this.entityFieldUtil, this.options.util);
 
+            this._on({
+                change: function (e) {
+                    if (e.added) {
+                        this.element.trigger('changed', e.added.id);
+                    }
+                }
+            });
+        },
+
+        _init: function () {
+            $.extend(this.entityFieldUtil, this.options.util);
             this.options.fields = this.entityFieldUtil._convertData(this.options.fields, this.options.entity, null);
             this.element
                 .data('entity', this.options.entity)
@@ -30,14 +40,15 @@ define(['jquery', 'underscore', 'oro/entity-field-select-util', 'oro/entity-fiel
             this.element.select2($.extend({
                 data: this.options.fields
             }, this.options.select2));
+        },
 
-            this._on({
-                change: function (e) {
-                    if (e.added) {
-                        this.element.trigger('changed', e.added.id);
-                    }
-                }
-            });
+        _setOption: function (key, value) {
+            if ($.isPlainObject(value)) {
+                $.extend(this.options[key], value);
+            } else {
+                this._super(key, value);
+            }
+            return this;
         },
 
         _getCreateOptions: function () {

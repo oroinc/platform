@@ -95,7 +95,11 @@
                 'title': 'oro.report.form.columns'|trans,
                 'spanClass': 'report-columns responsive-cell',
                 'data': [
-                    QD.query_designer_grouping_form(form.grouping, {'id': 'report-grouping-form'}),
+                    QD.query_designer_grouping_form(
+                        form.grouping,
+                        {'id': 'report-grouping-form'}, {
+                            'entity_choice_id': 'oro_report_form_entity'
+                        }),
                     QD.query_designer_column_form(form.column, {'id': 'report-column-form'}),
                     QD.query_designer_column_list(),
                     QD.query_designer_column_template('report-column-row')
@@ -160,20 +164,22 @@
                     content: __('Are you sure you want to change entity?')
                 });
 
+                var fieldChoiceOptions = {
+                    select2: {
+                        formatSelectionTemplate: $('#report-column-chain-template').text()
+                    },
+                    util: {
+                        findEntity:  function (entityName) {
+                            return _.findWhere(entities, {name: entityName});
+                        }
+                    }
+                };
                 var $fieldConditionCriteria = $('#filter-criteria-list').find('[data-criteria=condition-item]');
                 $.extend(true, $fieldConditionCriteria.data('options'), {
-                    fieldChoice: {
-                        select2: {
-                            formatSelectionTemplate: $('#report-column-chain-template').text()
-                        },
-                        util: {
-                            findEntity:  function (entityName) {
-                                return _.findWhere(entities, {name: entityName});
-                            }
-                        }
-                    },
+                    fieldChoice: fieldChoiceOptions,
                     filters: {{ metadata.filters|json_encode|raw }}
                 });
+                $('#test-element').fieldChoice(fieldChoiceOptions);
 
                 $('#report-designer').append(loadingMask.render().$el);
 

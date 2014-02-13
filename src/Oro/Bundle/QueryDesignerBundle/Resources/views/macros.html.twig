@@ -148,7 +148,7 @@
     </div>
 {% endmacro %}
 
-{% macro query_designer_grouping_form(form, attr) %}
+{% macro query_designer_grouping_form(form, attr, params) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
@@ -158,7 +158,48 @@
                 'data-purpose': 'column-selector'
             }
         }) }}
+        {% set validation = {NotBlank: {message: 'oro.query_designer.condition_builder.conditions_group.not_blank'}} %}
+        <input type="hidden" name="oro_report_form1[grouping][columnNames]" id="test-element" data-validation="{{ validation|json_encode }}">
+        {{ UI.clientButton({
+            'visible': false,
+            'aCss': 'no-hash cancel-button',
+            'label' : 'oro.query_designer.form.action.cancel'|trans
+        }) }}
+        {{ UI.clientButton({
+            'visible': false,
+            'aCss': 'no-hash btn-success save-button',
+            'label' : 'oro.query_designer.form.action.save'|trans
+        }) }}
+        {{ UI.clientButton({
+            'visible': false,
+            'aCss': 'no-hash btn-primary add-button',
+            'label' : 'oro.query_designer.form.action.add'|trans
+        }) }}
     </div>
+    {% set fieldConditionOptions = {
+        select2: {
+            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+        },
+        util: {}
+    } %}
+    <script type="text/javascript">
+        require(['oroquerydesigner/js/field-condition', 'oroui/js/edit-form'], function ($) {
+            $('#test-element').fieldChoice({{ fieldConditionOptions|json_encode|raw }});
+            $('#{{ params.entity_choice_id }}')
+                .on('fieldsloaderupdate', function (e, fields) {
+                    $('#test-element')
+                        .fieldChoice('setValue', '')
+                        .fieldChoice({
+                            fields: fields,
+                            entity: $(e.target).val()
+                        });
+                });
+
+            $('#{{ attr.id }}').editForm({
+                namePattern:  /^oro_report_form1\[grouping\]\[([\w\W]*)\]$/
+            });
+        });
+    </script>
 {% endmacro %}
 
 {% macro query_designer_column_chain_template(id) %}
