@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata\Annotation;
 
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
-class ConfigTest extends \PHPUnit_Framework_TestCase
+class ConfigFieldTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider constructorDataProvider
@@ -12,14 +12,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testConstructor(
         $data,
         $expectedMode,
-        $expectedRouteName,
-        $expectedRouteView,
         $expectedDefaultValues
     ) {
-        $config = new Config($data);
+        $config = new ConfigField($data);
         $this->assertEquals($expectedMode, $config->mode);
-        $this->assertEquals($expectedRouteName, $config->routeName);
-        $this->assertEquals($expectedRouteView, $config->routeView);
         $this->assertEquals($expectedDefaultValues, $config->defaultValues);
     }
 
@@ -28,7 +24,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testIncorrectMode()
     {
-        new Config(['mode' => 'some mode']);
+        new ConfigField(['mode' => 'some mode']);
     }
 
     /**
@@ -36,7 +32,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testIncorrectDefaultValues()
     {
-        new Config(['defaultValues' => 'some string']);
+        new ConfigField(['defaultValues' => 'some string']);
     }
 
     public function constructorDataProvider()
@@ -45,36 +41,26 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             [
                 [],
                 'default',
-                '',
-                '',
                 [],
             ],
             [
                 ['mode' => 'readonly'],
                 'readonly',
-                '',
-                '',
                 [],
             ],
             [
                 ['value' => 'readonly'],
                 'readonly',
-                '',
-                '',
                 [],
             ],
             [
                 [
                     'mode'          => 'readonly',
-                    'routeName'     => 'test_route_name',
-                    'routeView'     => 'test_route_view',
                     'defaultValues' => [
                         'test' => 'test_val'
                     ]
                 ],
                 'readonly',
-                'test_route_name',
-                'test_route_view',
                 [
                     'test' => 'test_val'
                 ],
