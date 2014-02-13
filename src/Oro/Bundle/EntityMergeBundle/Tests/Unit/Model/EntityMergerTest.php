@@ -44,14 +44,14 @@ class StrategyTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
             ->with(
-                MergeEvents::BEFORE_MERGE,
+                MergeEvents::BEFORE_MERGE_ENTITY,
                 new EntityDataEvent($data)
             );
 
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
             ->with(
-                MergeEvents::AFTER_MERGE,
+                MergeEvents::AFTER_MERGE_ENTITY,
                 new EntityDataEvent($data)
             );
 

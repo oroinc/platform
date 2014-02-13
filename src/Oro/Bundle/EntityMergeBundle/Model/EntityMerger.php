@@ -51,12 +51,12 @@ class EntityMerger implements EntityMergerInterface
      */
     public function merge(EntityData $data)
     {
-        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE, new EntityDataEvent($data));
+        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE_ENTITY, new EntityDataEvent($data));
 
         foreach (StepSorter::getOrderedSteps($this->steps) as $step) {
             $step->run($data);
         }
 
-        $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE, new EntityDataEvent($data));
+        $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE_ENTITY, new EntityDataEvent($data));
     }
 }

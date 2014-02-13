@@ -97,7 +97,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->onCreateEntityData($event);
     }
 
-    public function testAfterMerge()
+    public function testAfterMergeEntity()
     {
         $this->entityData
             ->expects($this->any())
@@ -110,7 +110,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('saveTagging');
 
-        $this->listener->afterMerge($event);
+        $this->listener->afterMergeEntity($event);
     }
 
     public function testNotTaggable()

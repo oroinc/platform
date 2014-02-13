@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Data;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
@@ -23,19 +23,19 @@ class EntityDataFactory
     private $doctrineHelper;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
     /**
      * @param MetadataRegistry $metadataRegistry
-     * @param DoctrineHelper   $doctrineHelper
-     * @param EventDispatcher  $eventDispatcher
+     * @param DoctrineHelper $doctrineHelper
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         MetadataRegistry $metadataRegistry,
         DoctrineHelper $doctrineHelper,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->metadataRegistry = $metadataRegistry;
         $this->doctrineHelper   = $doctrineHelper;

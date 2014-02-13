@@ -156,5 +156,5 @@ services:
           - @oro_tag.tag.manager
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata }
-          - { name: kernel.event_listener, event: oro.entity_merge.create_entitydata, method: onCreateEntityData }
-          - { name: kernel.event_listener, event: oro.entity_merge.after_merge, method: afterMerge }
+          - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
+          - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }

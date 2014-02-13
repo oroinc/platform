@@ -69,7 +69,7 @@ class MergeListener
     /**
      * @param EntityDataEvent $event
      */
-    public function afterMerge(EntityDataEvent $event)
+    public function afterMergeEntity(EntityDataEvent $event)
     {
         $entityData     = $event->getEntityData();
         $entityMetadata = $entityData->getMetadata();

@@ -28,12 +28,15 @@ class MergeMassActionListener
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
-        $massActions = $config['mass_actions'];
-        if (!isset($massActions['merge']) || empty($massActions['merge']['entity_name'])) {
+
+        if (!isset($config['mass_actions']) ||
+            !isset($config['mass_actions']['merge']) ||
+            empty($config['mass_actions']['merge']['entity_name'])
+        ) {
             return;
         }
 
-        $entityName = $massActions['merge']['entity_name'];
+        $entityName = $config['mass_actions']['merge']['entity_name'];
 
         $entityMergeEnable = $this->metadataRegistry->getEntityMetadata($entityName)->is('enable', true);
 

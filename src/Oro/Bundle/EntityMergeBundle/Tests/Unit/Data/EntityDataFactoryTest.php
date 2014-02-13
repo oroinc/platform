@@ -96,10 +96,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($this->entitiesClassName)
             ->will($this->returnValue($this->metadata));
 
-        $eventDispatcher = $this
-            ->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
         $this->target = new EntityDataFactory(
             $this->metadataRegistry,
