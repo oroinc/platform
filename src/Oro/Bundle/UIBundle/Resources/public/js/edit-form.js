@@ -34,6 +34,10 @@ define(['jquery', 'jquery-ui' ],   function ($) {
         _create: function () {
             // turn off global validation on submit form
             this.element.attr('data-validation-ignore', '');
+            this.errors = $({});
+            this.form = this.element.parents('form');
+            this.form.on('submit', $.proxy(this._hideErrors, this));
+
             this.reset();
             this.element
                 .on('click', '.add-button, .save-button', $.proxy(this._onSaveItem, this));
@@ -46,6 +50,7 @@ define(['jquery', 'jquery-ui' ],   function ($) {
 
         reset: function (item) {
             var elementsMap;
+            this._hideErrors();
             this.validated = false;
             this.itemId = (item && item.id) || null;
             this.item = item;
@@ -87,11 +92,10 @@ define(['jquery', 'jquery-ui' ],   function ($) {
         },
 
         _validate: function (elem) {
-            var validator, result = true,
-                form = this.element.parents('form');
-            if (form.validate) {
+            var validator = this._getValidator(),
+                result = true;
+            if (validator) {
                 this.element.removeAttr('data-validation-ignore');
-                validator = form.validate();
                 if (elem) {
                     result = validator.element(elem);
                 } else {
@@ -100,9 +104,28 @@ define(['jquery', 'jquery-ui' ],   function ($) {
                     });
                     this.validated = true;
                 }
+                this.errors = validator.toShow;
                 this.element.attr('data-validation-ignore', '');
             }
             return result;
+        },
+
+        _hideErrors: function () {
+            var validator = this._getValidator();
+            if (validator) {
+                this._elements().each(function () {
+                    validator.settings.unhighlight(this);
+                });
+                this.errors.hide();
+            }
+        },
+
+        _getValidator: function () {
+            var validator;
+            if (this.form.validate) {
+                validator = this.form.validate();
+            }
+            return validator;
         },
 
         _elements: function () {
