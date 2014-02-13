@@ -1,5 +1,6 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as ui %}
+{% oro_title_set({ params : {"%form.title%": entity.title} }) %}
 
 {% block navButtons %}
     {% if resource_granted('oro_embedded_form_delete') %}

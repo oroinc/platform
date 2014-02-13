@@ -1,7 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
 {% set formAction = form.vars.value.id ? path('oro_embedded_form_update', { 'id': form.vars.value.id }) : path('oro_embedded_form_create') %}
-
+{% oro_title_set({ params : {"%form.title%": form.vars.value ? form.vars.value.title : null} }) %}
 {% set title = 'New'|trans ~ ' ' ~ 'oro.embedded_form.entity.label'|trans|lower %}
 
 {% block navButtons %}
