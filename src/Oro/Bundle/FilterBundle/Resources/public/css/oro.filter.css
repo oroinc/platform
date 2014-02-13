@@ -187,3 +187,18 @@
 .active-filter .field-select {
     display: block;
 }
+
+.ui-datevariables-div {
+    position: absolute;
+    float: right;
+    top: 0;
+    right: -200px;
+    width: 200px;
+    border: 1px #aaaaaa solid;
+    background-color: white;
+    padding: 0 2px 0 2px;
+}
+
+.ui-datevariables-div dl {
+    margin: 0px;
+}

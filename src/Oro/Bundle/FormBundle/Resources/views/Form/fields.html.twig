@@ -294,8 +294,10 @@
     <input type="text" {{ block('widget_attributes') }} />
 
     <script type="text/javascript">
-        require(['jquery', 'oro/formatter/datetime', 'jquery-ui'],
-        function($, datetimeFormatter) {
+        require(['jquery', 'oro/formatter/datetime', 'jquery-ui', 'jquery-ui-datevariables'],
+        function($, datetimeFormatter, ui, datevars) {
+            debugger;
+            alert('test');
             var selector = $("#{{ selector_id }}");
             var actual = $("#{{ actual_id }}");
             var sync = function() {
@@ -341,7 +343,7 @@
     <input type="text" {{ block('widget_attributes') }} />
 
     <script type="text/javascript">
-        require(['jquery', 'oro/formatter/datetime', 'jquery-ui-timepicker'],
+        require(['jquery', 'oro/formatter/datetime', 'jquery-ui-timepicker', 'jquery-ui-datevariables'],
         function($, datetimeFormatter) {
             var selector = $("#{{ selector_id }}");
             var actual = $("#{{ actual_id }}");

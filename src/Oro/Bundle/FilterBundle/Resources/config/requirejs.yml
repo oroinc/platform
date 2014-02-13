@@ -6,6 +6,9 @@ config:
         'jquery.multiselect.filter':
             deps:
                 - 'jquery.multiselect'
+        'jquery-ui-datevariables':
+            deps:
+                - 'jquery-ui'
     paths:
         'jquery.multiselect': 'bundles/orofilter/lib/multiselect/jquery.multiselect.js'
         'jquery.multiselect.filter': 'bundles/orofilter/lib/multiselect/jquery.multiselect.filter.js'
@@ -26,3 +29,4 @@ config:
         'oro/datafilter-builder': 'bundles/orofilter/js/datafilter-builder.js'
         'oro/datafilter-wrapper': 'bundles/orofilter/js/datafilter-wrapper.js'
         'oro/multiselect-decorator': 'bundles/orofilter/js/multiselect-decorator.js'
+        'jquery-ui-datevariables': 'bundles/orofilter/js/jquery-ui-datevariables-addon.js'
