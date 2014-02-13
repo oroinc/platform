@@ -51,7 +51,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
      */
     private $entitiesClassName;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entitiesClassName = 'testClassNameForEntity';
         $this->firstEntity = $this

@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Validator\Constraints;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -21,6 +19,7 @@ class MaxEntitiesCountValidator extends ConstraintValidator
 
         if ($entitiesCount > $maxEntitiesCount) {
             $this->context->addViolation(
+                /* @var MaxEntitiesCount $constraint */
                 $constraint->message,
                 ['%max_count%' => $maxEntitiesCount]
             );
