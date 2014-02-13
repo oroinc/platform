@@ -30,8 +30,9 @@ class ChannelAwareFormTypeTest extends \PHPUnit_Framework_TestCase
                 'channel',
                 $options['channel_form_type'],
                 [
-                    'class' => 'OroIntegrationBundle:Channel',
+                    'class'    => 'OroIntegrationBundle:Channel',
                     'property' => 'name',
+                    'multiple' => false
                 ]
             )
             ->will($this->returnSelf());
