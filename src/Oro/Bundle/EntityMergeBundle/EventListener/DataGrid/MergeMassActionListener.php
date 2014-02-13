@@ -7,8 +7,14 @@ use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class MergeMassActionListener
 {
+    /**
+     * @var MetadataRegistry
+     */
     protected $metadataRegistry;
 
+    /**
+     * @param MetadataRegistry $metadataRegistry
+     */
     public function __construct(MetadataRegistry $metadataRegistry)
     {
         $this->metadataRegistry = $metadataRegistry;
@@ -29,8 +35,7 @@ class MergeMassActionListener
 
         $entityName = $massActions['merge']['entity_name'];
 
-        $entityMergeEnable = $this->metadataRegistry->getEntityMetadata($entityName)
-            ->get('enable');
+        $entityMergeEnable = $this->metadataRegistry->getEntityMetadata($entityName)->is('enable', true);
 
         if (!$entityMergeEnable) {
             $config->offsetUnsetByPath('[mass_actions][merge]');
