@@ -26,7 +26,7 @@ class FieldDataEvent extends Event
      *
      * @return FieldData
      */
-    public function getEntityData()
+    public function getFieldData()
     {
         return $this->fieldData;
     }
