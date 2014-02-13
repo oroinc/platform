@@ -24,10 +24,9 @@ datagrid:
         ...
         options:
             export:
-                csv: oro.grid.export.csv
-                pdf: acme.grid.export.pdf
+                csv: { label: oro.grid.export.csv }
+                pdf: { label: acme.grid.export.pdf }
 ```
 
-`oro.grid.export.csv` and `acme.grid.export.pdf` are label names. The translation for `oro.grid.export.csv` is already exists in BAP, but your bundle need provide a translation for your label, in this case it is `acme.grid.export.pdf`.
 Also you need to implement and register a writer for new export format. To register a writer in dependency container you should use the following naming convention: `oro_importexport.writer.echo.[format]`. So, a writer for PDF should be registerd as `oro_importexport.writer.echo.pdf`.
-You can use [existing CSV writer](../../../../ImportExportBundle/Writer/CsvEchoWriter) as an example for your writer.
+You can use [existing CSV writer](../../../../../ImportExportBundle/Writer/CsvEchoWriter) as an example for your writer.
