@@ -7,8 +7,14 @@ use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class MergeMassActionListener
 {
+    /**
+     * @var \Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry
+     */
     protected $metadataRegistry;
 
+    /**
+     * @param MetadataRegistry $metadataRegistry
+     */
     public function __construct(MetadataRegistry $metadataRegistry)
     {
         $this->metadataRegistry = $metadataRegistry;

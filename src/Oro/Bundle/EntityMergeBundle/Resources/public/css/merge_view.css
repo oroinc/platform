@@ -1,0 +1,60 @@
+.table.entity-merge-table input[type="radio"]{
+    margin-top: 0;
+}
+.entity-merge-select-all{
+    padding-left: 12px;
+    width: 70px;
+}
+.table.entity-merge-table .merge-first-column{
+    vertical-align: top;
+    padding-left: 20px;
+}
+.table.entity-merge-table td{
+    vertical-align: top;
+    padding: 6px 8px 6px 12px;
+    cursor: pointer;
+}
+.table.entity-merge-table tbody .merge-first-column{
+    background-color: #F6F6F6;
+    width: 265px;
+}
+.table thead td{
+    background-color: #F1F1F1;
+}
+.entity-merge-uppercase{
+    text-transform: uppercase;
+}
+.entity-merge-table thead .entity-merge-inline-label{
+    line-height: 16px;
+    padding: 3px 12px 0 0px;
+    border-right: 1px solid #DDDDDD;
+}
+.entity-merge-table thead .entity-merge-inline-label input[type="radio"]{
+    margin-right: 5px;
+}
+.entity-merge-inline-label{
+    float: left;
+    padding-left: 10px;
+}
+.entity-merge-inline{
+    float: left;
+}
+.entity-merge-table ul{
+    list-style: none outside none;
+    margin: 0;
+}
+.entity-merge-strategy-label{
+    padding: 3px 10px 0 0;
+}
+.entity-merge-strategy-wrapper{
+    padding-top:10px;
+}
+.entity-merge-blocks-wrapper{
+    overflow: hidden;
+}
+tbody .entity-merge-blocks-wrapper .entity-merge-inline-label{
+    width: calc(100% - 20px);
+}
+thead .entity-merge-blocks-wrapper .entity-merge-inline-label{
+    max-width: calc(100% - 70px);
+}

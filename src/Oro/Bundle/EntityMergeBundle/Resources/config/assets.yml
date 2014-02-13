@@ -1,0 +1,3 @@
+css:
+  oroentitymerge:
+      - 'bundles/oroentitymerge/css/merge_view.css'
