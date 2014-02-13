@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\EventListener;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
-use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class InitDefaultLabelListener
@@ -23,9 +23,9 @@ class InitDefaultLabelListener
     }
 
     /**
-     * @param CreateMetadataEvent $event
+     * @param EntityMetadataEvent $event
      */
-    public function onCreateMetadata(CreateMetadataEvent $event)
+    public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
 

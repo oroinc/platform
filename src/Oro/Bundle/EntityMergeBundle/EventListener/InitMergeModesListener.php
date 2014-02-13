@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\EntityMergeBundle\EventListener;
 
-use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class InitMergeModesListener
 {
     /**
-     * @param CreateMetadataEvent $event
+     * @param EntityMetadataEvent $event
      */
-    public function onCreateMetadata(CreateMetadataEvent $event)
+    public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
 

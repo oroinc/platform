@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
-use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
@@ -54,8 +54,8 @@ class EntityDataFactory
         $data = new EntityData($entityMetadata, $entities);
 
         $this->eventDispatcher->dispatch(
-            MergeEvents::CREATE_ENTITYDATA,
-            new CreateEntityDataEvent($data)
+            MergeEvents::CREATE_ENTITY_DATA,
+            new EntityDataEvent($data)
         );
 
         return $data;

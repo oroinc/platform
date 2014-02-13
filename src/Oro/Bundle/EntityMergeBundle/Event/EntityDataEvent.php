@@ -6,7 +6,7 @@ use Symfony\Component\EventDispatcher\Event;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 
-abstract class AbstractMergeEvent extends Event
+class EntityDataEvent extends Event
 {
     /**
      * @var EntityData

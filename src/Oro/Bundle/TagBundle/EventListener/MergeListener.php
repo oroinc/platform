@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
-use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
-use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\TagBundle\Entity\Taggable;
@@ -31,9 +29,9 @@ class MergeListener
     }
 
     /**
-     * @param CreateMetadataEvent $event
+     * @param EntityMetadataEvent $event
      */
-    public function onCreateMetadata(CreateMetadataEvent $event)
+    public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
         if (!$this->isTaggable($entityMetadata)) {
@@ -51,9 +49,9 @@ class MergeListener
     }
 
     /**
-     * @param CreateEntityDataEvent $event
+     * @param EntityDataEvent $event
      */
-    public function onCreateEntityData(CreateEntityDataEvent $event)
+    public function onCreateEntityData(EntityDataEvent $event)
     {
         $entityData     = $event->getEntityData();
         $entityMetadata = $entityData->getMetadata();
@@ -69,9 +67,9 @@ class MergeListener
     }
 
     /**
-     * @param AfterMergeEvent $event
+     * @param EntityDataEvent $event
      */
-    public function afterMerge(AfterMergeEvent $event)
+    public function afterMerge(EntityDataEvent $event)
     {
         $entityData     = $event->getEntityData();
         $entityMetadata = $entityData->getMetadata();
