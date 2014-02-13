@@ -127,7 +127,7 @@ services:
         class: %oro_entity_merge.strategy.merge.class%
         arguments:
             - @oro_entity_merge.accessor.delegate
-            - @doctrine.orm.entity_manager
+            - @oro_entity_merge.doctrine_helper
         tags:
             - { name: oro_entity_merge.strategy }
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Strategy;
 
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,18 +20,20 @@ class MergeStrategy implements StrategyInterface
     protected $accessor;
 
     /**
-     * @var EntityManager
+     * @var DoctrineHelper
      */
-    protected $entityManager;
+    protected $doctrineHelper;
 
     /**
      * @param AccessorInterface $accessor
-     * @param EntityManager     $entityManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(AccessorInterface $accessor, EntityManager $entityManager)
-    {
-        $this->accessor      = $accessor;
-        $this->entityManager = $entityManager;
+    public function __construct(
+        AccessorInterface $accessor,
+        DoctrineHelper $doctrineHelper
+    ) {
+        $this->accessor = $accessor;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -44,14 +47,11 @@ class MergeStrategy implements StrategyInterface
         $entities      = $entityData->getEntities();
 
         $relatedEntities         = [];
-        $doctrineMetadataFactory = $this->entityManager->getMetadataFactory();
         foreach ($entities as $entity) {
-            $doctrineMetadata = $doctrineMetadataFactory->getMetadataFor(ClassUtils::getRealClass($entity));
-            $ids              = $doctrineMetadata->getIdentifierValues($entity);
-            $doctrineKey      = implode('_', $ids);
-            $values           = $this->accessor->getValue($entity, $fieldMetadata);
-            foreach ($values as $key => $value) {
-                $relatedEntities[$doctrineKey . '_' . $key] = $value;
+            $values = $this->accessor->getValue($entity, $fieldMetadata);
+            foreach ($values as $value) {
+                $key = $this->doctrineHelper->getEntityIdentifierValue($value);
+                $relatedEntities[$key] = $value;
             }
         }
 

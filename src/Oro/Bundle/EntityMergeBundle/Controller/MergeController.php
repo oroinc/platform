@@ -78,20 +78,19 @@ class MergeController extends Controller
             if ($form->isValid()) {
 
                 $merger = $this->getEntityMerger();
-                $merger->merge($entityData);
-                /*$this->getEntityManager()->transactional(
+                $this->getEntityManager()->transactional(
                     function () use ($merger, $entityData) {
                         $merger->merge($entityData);
                     }
-                );*/
+                );
 
                 // @todo Flash message with success or error
-                /*return $this->redirect(
+                return $this->redirect(
                     $this->generateUrl(
                         $this->getEntityViewRoute($entityData->getClassName()),
                         array('id' => $entityData->getMasterEntity()->getId())
                     )
-                );*/
+                );
             }
         }
 
