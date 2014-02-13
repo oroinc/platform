@@ -5,6 +5,14 @@ function($, _, __, DeleteConfirmation) {
 
     /**
      * Item container widget
+     *
+     * Emits events:
+     * collection:change, collection:reset, model:edit, model:delete
+     *
+     * Listens to options.collection events:
+     * add, remove, change, reset
+     *
+     * Uses options.itemTemplateSelector and options.getFieldLabel for item rendering
      */
     $.widget('oroquerydesigner.itemContainer', {
         options: {
@@ -21,10 +29,11 @@ function($, _, __, DeleteConfirmation) {
         _create: function () {
             this.itemTemplate = _.template($(this.options.itemTemplateSelector).html());
 
-            this.options.collection.on('add', _.bind(this._onModelAdded, this));
-            this.options.collection.on('remove', _.bind(this._onModelDeleted, this));
-            this.options.collection.on('change', _.bind(this._onModelChanged, this));
-            this.options.collection.on('reset', _.bind(this._onResetCollection, this));
+            var collection = this.options.collection;
+            collection.on('add', this._onModelAdded, this);
+            collection.on('remove', this._onModelDeleted, this);
+            collection.on('change', this._onModelChanged, this);
+            collection.on('reset', this._onResetCollection, this);
 
             this._initSorting();
             this._render();
@@ -109,9 +118,9 @@ function($, _, __, DeleteConfirmation) {
 
         _renderModel: function (model) {
             var data = model.toJSON();
-            _.each(data, _.bind(function (value, name) {
+            _.each(data, function (value, name) {
                 data[name] = this.options.getFieldLabel(name, value);
-            }, this));
+            }, this);
 
             var item = $(this.itemTemplate(data));
             this._bindItemActions(item);

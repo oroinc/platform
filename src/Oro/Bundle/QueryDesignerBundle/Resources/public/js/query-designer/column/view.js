@@ -75,7 +75,7 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
             this.$itemContainer.itemContainer({
                 collection: this.options.collection,
                 itemTemplateSelector: this.options.itemTemplateSelector,
-                //getFieldLabel: _.bind(this.getFieldLabel, this),
+                getFieldLabel: _.bind(this.getFieldLabel, this),
                 'model:edit': _.bind(this.onModelEdit, this),
                 'model:delete': _.bind(this.onModelDelete, this),
                 'collection:reset': _.bind(this.onCollectionReset, this)
