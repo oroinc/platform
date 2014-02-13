@@ -211,8 +211,8 @@ function($, _, __, ChoiceFilter, localeSettings) {
          * @protected
          */
         _initializeDateWidget: function(widgetSelector) {
-            this.$(widgetSelector).datepicker(this.dateWidgetOptions);
-            var widget = this.$(widgetSelector).datepicker('widget');
+            this.$(widgetSelector).datevariables(this.dateWidgetOptions);
+            var widget = this.$(widgetSelector).datevariables('widget');
             widget.addClass(this.dateWidgetOptions.className);
             $(this.dateWidgetSelector).on('click', function(e) {
                 e.stopImmediatePropagation();

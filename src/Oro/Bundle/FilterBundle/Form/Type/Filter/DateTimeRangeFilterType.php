@@ -38,6 +38,8 @@ class DateTimeRangeFilterType extends AbstractDateFilterType
                 'field_type' => DateTimeRangeType::NAME,
                 'widget_options' => [
                     'showDatevariables' => true,
+                    'showTime' => true,
+                    'showTimepicker' => true,
                 ]
             )
         );

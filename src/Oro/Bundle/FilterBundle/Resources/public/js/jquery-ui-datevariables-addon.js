@@ -225,38 +225,15 @@
             var tmp_args = Array.prototype.slice.call(arguments);
 
             if (typeof o == 'object') {
-                tmp_args[0] = $.extend(o, {
-                    timeOnly: true
+                return this.each(function() {
+                    var $t = $(this);
+                    $t.datetimepicker($.datevariables._newInst($t, o)._defaults);
                 });
             }
 
             return $(this).each(function() {
                 $.fn.datetimepicker.apply($(this), tmp_args);
             });
-        },
-
-        /*
-         * extend datevariables to datepicker
-         */
-        datetimepicker: function(o) {
-            o = o || {};
-            var tmp_args = arguments;
-
-            if (typeof(o) == 'string') {
-                if (o == 'getDate') {
-                    return $.fn.datepicker.apply($(this[0]), tmp_args);
-                } else {
-                    return this.each(function() {
-                        var $t = $(this);
-                        $t.datepicker.apply($t, tmp_args);
-                    });
-                }
-            } else {
-                return this.each(function() {
-                    var $t = $(this);
-                    $t.datepicker($.datevariables._newInst($t, o)._defaults);
-                });
-            }
         }
     });
 
