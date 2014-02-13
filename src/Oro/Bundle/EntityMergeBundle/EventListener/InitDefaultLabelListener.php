@@ -28,6 +28,13 @@ class InitDefaultLabelListener
     public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
+        $entityMetadata->set(
+            'label',
+            $this
+                ->entityConfig
+                ->getConfig($entityMetadata->getClassName())
+                ->get('plural_label')
+        );
 
         foreach ($entityMetadata->getFieldsMetadata() as $fieldMetadata) {
             $this->initDefaultLabel($fieldMetadata);

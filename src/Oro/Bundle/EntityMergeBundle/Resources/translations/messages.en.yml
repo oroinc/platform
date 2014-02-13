@@ -1,13 +1,15 @@
 oro:
     entity_merge:
-        action.merge: Merge entities
+        controller:
+            merged_successful: Entities were successfully merged.
+            select_error: Select entities to merge.
+        action:
+            merge: Merge {{ label }}
 
         merge_modes:
             replace: Replace
-            merge: Union
+            merge: Unite
 
         form:
             master_record: Master Record
             strategy: Strategy
-
-        merge_success_message: Records were merged successfuly.

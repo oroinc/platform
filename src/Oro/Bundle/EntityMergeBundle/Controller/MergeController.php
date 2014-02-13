@@ -64,6 +64,19 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
+        if (count($entityData->getEntities()) < 2) {
+            $this->get('session')->getFlashBag()->add(
+                'warning',
+                $this->get('translator')->trans('oro.entity_merge.controller.select_error')
+            );
+
+            return $this->redirect(
+                $this->generateUrl(
+                    $this->getEntityIndexRoute($entityData->getClassName())
+                )
+            );
+        }
+
         $form = $this->createForm(
             'oro_entity_merge',
             $entityData,
@@ -86,7 +99,7 @@ class MergeController extends Controller
 
                 $this->get('session')->getFlashBag()->add(
                     'success',
-                    $this->get('translator')->trans('oro.entity_merge.merge_success_message')
+                    $this->get('translator')->trans('oro.entity_merge.controller.merged_successful')
                 );
 
                 return $this->redirect(
