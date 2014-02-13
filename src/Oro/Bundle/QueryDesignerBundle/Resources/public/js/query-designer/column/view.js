@@ -22,7 +22,7 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
         collectionClass: ColumnCollection,
 
         /** @property {oro.queryDesigner.grouping.View} */
-        groupingColumnsSelector: null,
+        //groupingColumnsSelector: null,
 
         /** @property {oro.queryDesigner.FunctionManager} */
         functionManager: null,
@@ -40,7 +40,7 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
         initForm: function() {
             AbstractView.prototype.initForm.apply(this, arguments);
 
-            this.groupingColumnsSelector = new GroupingView({
+            /* this.groupingColumnsSelector = new GroupingView({
                 el: this.$el.find(this.options.groupingFormSelector),
                 fieldsLabel: this.options.fieldsLabel,
                 relatedLabel: this.options.relatedLabel,
@@ -48,7 +48,7 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
             });
             this.listenTo(this.groupingColumnsSelector, 'grouping:change', _.bind(function (e) {
                 this.trigger('grouping:change');
-            }, this));
+            }, this)); */
 
             this.functionManager = new FunctionManager({
                 el: this.$el.find('[data-purpose="function-selector"]')
@@ -76,16 +76,16 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
 
         changeEntity: function (entityName, columns) {
             AbstractView.prototype.changeEntity.apply(this, arguments);
-            this.groupingColumnsSelector.changeEntity(entityName, columns);
+            //this.groupingColumnsSelector.changeEntity(entityName, columns);
         },
 
-        getGroupingColumns: function () {
+        /*getGroupingColumns: function () {
             return this.groupingColumnsSelector.getGroupingColumns();
-        },
+        },*/
 
-        setGroupingColumns: function (columns) {
+        /*setGroupingColumns: function (columns) {
             this.groupingColumnsSelector.setGroupingColumns(columns);
-        },
+        },*/
 
         getFunctionFieldLabel: function (field, name, value) {
             if (field.attr('name') == this.functionManager.$el.attr('name')) {

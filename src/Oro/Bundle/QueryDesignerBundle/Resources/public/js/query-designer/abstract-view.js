@@ -27,9 +27,9 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         /** @property {Object} */
         selectors: {
             itemContainer:  '.item-container',
-            cancelButton:   '.cancel-button',
-            saveButton:     '.save-button',
-            addButton:      '.add-button',
+            cancelButton:   '.cancel-button.column-form-button',
+            saveButton:     '.save-button.column-form-button',
+            addButton:      '.add-button.column-form-button',
             editButton:     '.edit-button',
             deleteButton:   '.delete-button',
             columnSelector: '[data-purpose="column-selector"]'

@@ -30,12 +30,12 @@ class GroupingType extends AbstractType
                         null,
                         array(
                             'required'           => false,
-                            'entity'             => $form->getConfig()->getOption('entity'),
+                            'auto_initialize'    => false,
+                            /*'entity'             => $form->getConfig()->getOption('entity'),
                             'skip_load_entities' => true,
                             'skip_load_data'     => true,
                             'with_relations'     => true,
-                            'auto_initialize'    => false,
-                            'multiple'           => true
+                            'multiple'           => true*/
                         )
                     )
                 );

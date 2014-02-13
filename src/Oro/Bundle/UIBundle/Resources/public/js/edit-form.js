@@ -32,6 +32,8 @@ define(['jquery', 'jquery-ui' ],   function ($) {
         },
 
         _create: function () {
+            // turn off global validation on submit form
+            this.element.attr('data-validation-ignore', '');
             this.reset();
             this.element
                 .on('click', '.add-button, .save-button', $.proxy(this._onSaveItem, this));
@@ -42,29 +44,28 @@ define(['jquery', 'jquery-ui' ],   function ($) {
             });
         },
 
-        reset: function () {
+        reset: function (item) {
+            var elementsMap;
             this.validated = false;
-            this.itemId = null;
-            this._elements().each(function () {
-                setValue($(this), '');
-            });
+            this.itemId = (item && item.id) || null;
+            this.item = item;
+            if (item) {
+                elementsMap = this._elementsMap();
+                $.each(item, function (name, value) {
+                    if (elementsMap[name]) {
+                        setValue(elementsMap[name], value.value);
+                    }
+                });
+            } else {
+                this._elements().each(function () {
+                    setValue($(this), '');
+                });
+            }
+            this._updateActions();
         },
 
         setItem: function (item) {
-            var elementsMap;
-
-            this.reset();
-            if (item.id) {
-                this.itemId = item.id;
-            }
-
-            elementsMap = this._elementsMap();
-
-            $.each(item, function (name, value) {
-                if (elementsMap[name]) {
-                    setValue(elementsMap[name], value.value);
-                }
-            });
+            this.reset(item);
         },
 
         _onSaveItem: function (e) {
@@ -82,12 +83,14 @@ define(['jquery', 'jquery-ui' ],   function ($) {
 
         _onCancel: function (e) {
             e.preventDefault();
+            this.reset();
         },
 
         _validate: function (elem) {
             var validator, result = true,
                 form = this.element.parents('form');
             if (form.validate) {
+                this.element.removeAttr('data-validation-ignore');
                 validator = form.validate();
                 if (elem) {
                     result = validator.element(elem);
@@ -97,6 +100,7 @@ define(['jquery', 'jquery-ui' ],   function ($) {
                     });
                     this.validated = true;
                 }
+                this.element.attr('data-validation-ignore', '');
             }
             return result;
         },
@@ -141,6 +145,12 @@ define(['jquery', 'jquery-ui' ],   function ($) {
             });
 
             return elementsMap;
+        },
+
+        _updateActions: function () {
+            var isNewItem = this.itemId === null;
+            this.element.find('.add-button')[isNewItem ? 'show' : 'hide']();
+            this.element.find('.save-button')[isNewItem ? 'hide' : 'show']();
         }
     });
 

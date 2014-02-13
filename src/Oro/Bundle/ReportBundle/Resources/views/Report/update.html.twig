@@ -97,7 +97,9 @@
                 'data': [
                     QD.query_designer_grouping_form(
                         form.grouping,
-                        {'id': 'report-grouping-form'}, {
+                        {
+                            'id': 'report-grouping-form'
+                        }, {
                             'entity_choice_id': 'oro_report_form_entity'
                         }),
                     QD.query_designer_column_form(form.column, {'id': 'report-column-form'}),
@@ -179,7 +181,7 @@
                     fieldChoice: fieldChoiceOptions,
                     filters: {{ metadata.filters|json_encode|raw }}
                 });
-                $('#test-element').fieldChoice(fieldChoiceOptions);
+                $('#report-grouping-form').find('[data-purpose=column-selector]').fieldChoice(fieldChoiceOptions);
 
                 $('#report-designer').append(loadingMask.render().$el);
 

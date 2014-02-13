@@ -67,12 +67,13 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
                     delete value.id;
                 });
                 var filters = this.$conditions.conditionBuilder('getValue');
+                // @todo read grouping from a new component
                 var groupingColumns = [];
-                _.each(this.columnsView.getGroupingColumns(), function (name) {
+                /*_.each(this.columnsView.getGroupingColumns(), function (name) {
                     groupingColumns.push({
                         name: name
                     });
-                });
+                });*/
                 var data = {
                     columns: columns,
                     grouping_columns: groupingColumns,
@@ -95,7 +96,8 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
             _.each(data['grouping_columns'], function (column) {
                 groupingColumnNames.push(column['name']);
             });
-            this.columnsView.setGroupingColumns(groupingColumnNames);
+            // @todo set grouping columns to a new component
+            //this.columnsView.setGroupingColumns(groupingColumnNames);
             if (!_.isUndefined(data['columns']) && !_.isEmpty(data['columns'])) {
                 this.columnsView.getCollection().reset(data['columns']);
             }

@@ -132,17 +132,17 @@
             }
         }) }}
         {{ UI.clientButton({
-            'visible': false,
-            'aCss': 'no-hash cancel-button',
+            'aCss': 'no-hash cancel-button column-form-button',
             'label' : 'oro.query_designer.form.action.cancel'|trans
         }) }}
         {{ UI.clientButton({
             'visible': false,
-            'aCss': 'no-hash btn-success save-button',
+            'aCss': 'no-hash btn-success save-button column-form-button',
             'label' : 'oro.query_designer.form.action.save'|trans
         }) }}
         {{ UI.clientButton({
-            'aCss': 'no-hash btn-primary add-button',
+            'visible': false,
+            'aCss': 'no-hash btn-primary add-button column-form-button',
             'label' : 'oro.query_designer.form.action.add'|trans
         }) }}
     </div>
@@ -152,16 +152,23 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
-        {{ form_row(form.columnNames, {
-            'label': 'oro.query_designer.form.grouping_columns'|trans,
-            'attr': {
-                'data-purpose': 'column-selector'
-            }
-        }) }}
-        {% set validation = {NotBlank: {message: 'oro.query_designer.condition_builder.conditions_group.not_blank'}} %}
-        <input type="hidden" name="oro_report_form1[grouping][columnNames]" id="test-element" data-validation="{{ validation|json_encode }}">
+        {# @todo own formtype for this kind field based on hidden input #}
+        <div class="control-group">
+            <label class="control-label required" for="s2id_autogen2">Grouping columns<em>*</em></label>
+            <div class="controls">
+            {% set validation = {
+                NotBlank: {message: 'oro.query_designer.condition_builder.conditions_group.not_blank'}
+            } %}
+            {{ form_row(form.columnNames, {
+                'label': 'oro.query_designer.form.grouping_columns'|trans,
+                'attr': {
+                    'data-purpose': 'column-selector',
+                    'data-validation': validation|json_encode
+                }
+            }) }}
+            </div>
+        </div>
         {{ UI.clientButton({
-            'visible': false,
             'aCss': 'no-hash cancel-button',
             'label' : 'oro.query_designer.form.action.cancel'|trans
         }) }}
@@ -184,10 +191,12 @@
     } %}
     <script type="text/javascript">
         require(['oroquerydesigner/js/field-condition', 'oroui/js/edit-form'], function ($) {
-            $('#test-element').fieldChoice({{ fieldConditionOptions|json_encode|raw }});
+            var $editForm = $('#{{ attr.id }}');
+            var $fieldChoice = $editForm.find('[data-purpose=column-selector]');
+            $fieldChoice.fieldChoice({{ fieldConditionOptions|json_encode|raw }});
             $('#{{ params.entity_choice_id }}')
                 .on('fieldsloaderupdate', function (e, fields) {
-                    $('#test-element')
+                    $fieldChoice
                         .fieldChoice('setValue', '')
                         .fieldChoice({
                             fields: fields,
@@ -195,8 +204,8 @@
                         });
                 });
 
-            $('#{{ attr.id }}').editForm({
-                namePattern:  /^oro_report_form1\[grouping\]\[([\w\W]*)\]$/
+            $editForm.editForm({
+                namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/
             });
         });
     </script>
