@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\HttpFoundation\Request;
+
+use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 
 class EmbedFormController extends Controller
 {
@@ -18,7 +19,6 @@ class EmbedFormController extends Controller
      * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="[-\d\w]+"})
      * @Template
      */
-    
     public function formAction(EmbeddedForm $formEntity, Request $request)
     {
         /** @var EntityManager $em */
@@ -38,8 +38,8 @@ class EmbedFormController extends Controller
         }
 
         return [
-            'form' => $form->createView(),
-            'formEntity' => $formEntity,
+            'form'             => $form->createView(),
+            'formEntity'       => $formEntity,
             'customFormLayout' => $formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
         ];
     }
