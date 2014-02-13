@@ -12,9 +12,29 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
      */
     private $target;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->target = new MergeMassAction();
+        $metadata = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $metadata
+            ->expects($this->any())
+            ->method('getMaxEntitiesCount')
+            ->will($this->returnValue(10));
+
+        $metadataRegistry = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $metadataRegistry
+            ->expects($this->any())
+            ->method('getEntityMetadata')
+            ->will($this->returnValue($metadata));
+
+        $this->target = new MergeMassAction($metadataRegistry);
     }
 
     /**
@@ -38,9 +58,9 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'frontend_handle'   => 'redirect',
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'merge-mass',
-                    'data_identifier'   => 'id',
-                    'max_element_count' => '5',
                     'route'             => 'oro_entity_merge_massaction',
+                    'data_identifier'   => 'id',
+                    'max_element_count' => 10,
                     'route_parameters'  => array()
                 )
             ),

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class MergeMassAction extends AbstractMassAction
@@ -48,10 +49,15 @@ class MergeMassAction extends AbstractMassAction
             $options['data_identifier'] = 'id';
         }
 
-        $options['max_element_count'] = $this
-            ->metadataRegistry
-            ->getEntityMetadata($options['entity_name'])
-            ->getMaxEntitiesCount();
+        if (isset($options['entity_name'])) {
+            $options['max_element_count'] = $this
+                ->metadataRegistry
+                ->getEntityMetadata($options['entity_name'])
+                ->getMaxEntitiesCount();
+        } else {
+            $options['max_element_count'] = EntityMetadata::MAX_ENTITIES_COUNT;
+        }
+
 
         if (!isset($options['route_parameters'])) {
             $options['route_parameters'] = array();

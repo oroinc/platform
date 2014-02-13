@@ -84,7 +84,9 @@ class OroEntityMergeExtensionTest extends \PHPUnit_Framework_TestCase
             'oro_entity_merge.mass_action.merge' => array(
                 'service'   => 'oro_entity_merge.mass_action.merge',
                 'class'     => '%oro_entity_merge.mass_action.merge.class%',
-                'arguments' => array(),
+                'arguments' => array(
+                    new Reference('oro_entity_merge.metadata.registry')
+                ),
                 'tags'      => array(
                     'oro_datagrid.extension.mass_action.type' => array(
                         array('type' => 'merge')

@@ -49,7 +49,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected $config;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->mergeConfigProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')

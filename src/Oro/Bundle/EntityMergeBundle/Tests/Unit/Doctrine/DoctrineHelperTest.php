@@ -51,7 +51,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $expression;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->createFakeDependencies();
         $this->setUpFakeObjects();
