@@ -10,30 +10,34 @@ function($, _, __, DeleteConfirmation) {
         options: {
             itemTemplateSelector: null,
             selectors: {
-                editButton:     '.edit-button',
-                deleteButton:   '.delete-button',
+                editButton: '.edit-button',
+                deleteButton: '.delete-button'
+            },
+            getFieldLabel: function (name, value) {
+                return (typeof value === 'object') ? JSON.stringify(value) : value;
             }
         },
 
         _create: function () {
             this.itemTemplate = _.template($(this.options.itemTemplateSelector).html());
 
-            this._initColumnSorting();
+            this.options.collection.on('add', _.bind(this._onModelAdded, this));
+            this.options.collection.on('remove', _.bind(this._onModelDeleted, this));
+            this.options.collection.on('change', _.bind(this._onModelChanged, this));
+            this.options.collection.on('reset', _.bind(this._onResetCollection, this));
 
-            this.options.collection.on('add', _.bind(this.onModelAdded, this));
-            this.options.collection.on('remove', _.bind(this.onModelDeleted, this));
-            this.options.collection.on('change', _.bind(this.onModelChanged, this));
-            this.options.collection.on('reset', _.bind(this.onResetCollection, this));
+            this._initSorting();
+            this._render();
         },
 
-        _initColumnSorting: function () {
+        _initSorting: function () {
             this.element.sortable({
                 cursor: 'move',
                 delay : 100,
                 opacity: 0.7,
                 revert: 10,
                 axis: 'y',
-                containment: ".query-designer-grid-container",
+                containment: '.query-designer-grid-container',
                 items: 'tr',
                 helper: function (e, ui) {
                     ui.children().each(function () {
@@ -73,29 +77,27 @@ function($, _, __, DeleteConfirmation) {
             }
         },
 
-        render: function() {
+        _render: function() {
             this.element.empty();
-            this.options.collection.each(_.bind(function (model) {
-                this.onModelAdded(model);
-            }, this));
+            this.options.collection.each(_.bind(this._onModelAdded, this));
         },
 
-        onModelAdded: function (model) {
+        _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
             this.element.trigger('collection:change');
         },
 
-        onModelChanged: function (model) {
+        _onModelChanged: function (model) {
             this.element.find('[data-id="' + model.id + '"]').outerHTML(this._renderModel(model));
             this.element.trigger('collection:change');
         },
 
-        onModelDeleted: function (model) {
+        _onModelDeleted: function (model) {
             this.element.find('[data-id="' + model.id + '"]').remove();
             this.element.trigger('collection:change');
         },
 
-        onResetCollection: function () {
+        _onResetCollection: function () {
             this.element.empty();
             //this.resetForm();
             this.options.collection.each(_.bind(function (model, index) {
@@ -106,17 +108,15 @@ function($, _, __, DeleteConfirmation) {
         },
 
         _renderModel: function (model) {
-            var item = $(this.itemTemplate(this._prepareItemTemplateData(model)));
-            this._bindItemActions(item);
-            return item;
-        },
-
-        _prepareItemTemplateData: function (model) {
             var data = model.toJSON();
             _.each(data, _.bind(function (value, name) {
                 data[name] = this.options.getFieldLabel(name, value);
             }, this));
-            return data;
+
+            var item = $(this.itemTemplate(data));
+            this._bindItemActions(item);
+
+            return item;
         },
 
         _bindItemActions: function (item) {
@@ -166,8 +166,7 @@ function($, _, __, DeleteConfirmation) {
 
         deleteModel: function (model) {
             this.options.collection.remove(model);
-        },
-
+        }
     });
 
     return $;

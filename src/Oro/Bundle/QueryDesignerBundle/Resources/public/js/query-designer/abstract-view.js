@@ -61,11 +61,6 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             this.$el.on('model:delete', _.bind(this.onModelDelete, this));
         },
 
-        render: function() {
-            this.$itemContainer.itemContainerWidget('render');
-            return this;
-        },
-
         initForm: function () {
             this.form = $(this.options.itemFormSelector);
             this.columnSelector = new ColumnSelectorView({

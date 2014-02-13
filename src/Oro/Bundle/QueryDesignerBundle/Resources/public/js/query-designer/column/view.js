@@ -75,7 +75,7 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
             this.$itemContainer.itemContainerWidget({
                 collection: this.options.collection,
                 itemTemplateSelector: this.options.itemTemplateSelector,
-                getFieldLabel: _.bind(this.getFieldLabel, this),
+                //getFieldLabel: _.bind(this.getFieldLabel, this),
             });
         },
 
