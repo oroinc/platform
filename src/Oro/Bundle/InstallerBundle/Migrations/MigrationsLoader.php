@@ -44,11 +44,32 @@ class MigrationsLoader
      */
     protected $excludeBundles;
 
+    /**
+     * @param KernelInterface $kernel
+     * @param EntityManager $em
+     * @param ContainerInterface $container
+     */
     public function __construct(KernelInterface $kernel, EntityManager $em, ContainerInterface $container)
     {
         $this->kernel    = $kernel;
         $this->em        = $em;
         $this->container = $container;
+    }
+
+    /**
+     * @param array $bundles
+     */
+    public function setBundles($bundles)
+    {
+        $this->bundles = $bundles;
+    }
+
+    /**
+     * @param array $excludeBundles
+     */
+    public function setExcludeBundles($excludeBundles)
+    {
+        $this->excludeBundles = $excludeBundles;
     }
 
     /**
@@ -159,10 +180,12 @@ class MigrationsLoader
             $sourceFile = $reflClass->getFileName();
             if (in_array($sourceFile, $includedFiles)) {
                 $migration = new $className;
-                if ($migration instanceof ContainerAwareInterface) {
-                    $migration->setContainer($this->container);
+                if ($migration instanceof Migration) {
+                    if ($migration instanceof ContainerAwareInterface) {
+                        $migration->setContainer($this->container);
+                    }
+                    $migrations[] = $migration;
                 }
-                $migrations[] = $migration;
             }
         }
 

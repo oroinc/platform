@@ -17,7 +17,30 @@ class MigrateStructureCommand extends ContainerAwareCommand
     {
         $this->setName('oro:installer:migration:load')
             ->setDescription('Execute migration scripts.')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs list of migrations without apply them');
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Outputs list of migrations without apply them'
+            )
+            ->addOption(
+                'show-queries',
+                null,
+                InputOption::VALUE_NONE,
+                'Outputs list of database queries for each migration file'
+            )
+            ->addOption(
+                'bundles',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'A list of bundles to load data from. If option is not set, migrations will be taken from all bundles.'
+            )
+            ->addOption(
+                'exclude',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'A list of bundle names which migrations should be skipped'
+            );
     }
 
     /**
@@ -27,47 +50,26 @@ class MigrateStructureCommand extends ContainerAwareCommand
     {
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
-        $queries    = $this->getContainer()->get('oro_installer.migrations.loader')->getMigrationsQueries();
-
-        if ($input->getOption('dry-run')) {
-            $this->outputMigrationQueries($output, $queries);
-        } else {
-            $this->processMigrationsQueries($output, $queries, $connection);
+        $migrationLoader = $this->getContainer()->get('oro_installer.migrations.loader');
+        $bundles = $input->getOption('bundles');
+        if (!empty($bundles)) {
+            $migrationLoader->setBundles($bundles);
         }
-    }
-
-    /**
-     * List the list of migration files with sql queries
-     *
-     * @param OutputInterface $output
-     * @param array $queries
-     */
-    protected function outputMigrationQueries(OutputInterface $output, $queries)
-    {
-        $output->writeln('List of migrations:');
-
-        foreach ($queries as $migrationClass => $sqlQueries) {
-            $output->writeln(sprintf(' <comment>> %s</comment>', $migrationClass));
-            foreach ($sqlQueries as $sqlQuery) {
-                $output->writeln(sprintf('  <info>%s</info>', $sqlQuery));
-            }
+        $excludeBundles = $input->getOption('exclude');
+        if (!empty($excludeBundles)) {
+            $migrationLoader->setExcludeBundles($excludeBundles);
         }
-    }
-
-    /**
-     * Process migrations
-     *
-     * @param OutputInterface $output
-     * @param array $queries
-     * @param Connection $connection
-     */
-    protected function processMigrationsQueries(OutputInterface $output, $queries, Connection $connection)
-    {
-        $output->writeln('Process migrations...');
+        $queries    = $migrationLoader->getMigrationsQueries();
+        $output->writeln($input->getOption('dry-run') ? 'List of migrations:' : 'Process migrations...');
         foreach ($queries as $migrationClass => $sqlQueries) {
-            $output->writeln(sprintf(' <comment>></comment> <info>%s</info>', $migrationClass));
+            $output->writeln(sprintf('<comment>> %s</comment>', $migrationClass));
             foreach ($sqlQueries as $sqlQuery) {
-                $connection->executeQuery($sqlQuery);
+                if ($input->getOption('show-queries')) {
+                    $output->writeln(sprintf('  <info>%s</info>', $sqlQuery));
+                }
+                if (!$input->getOption('dry-run')) {
+                    $connection->executeQuery($sqlQuery);
+                }
             }
         }
         $output->writeln('Done.');

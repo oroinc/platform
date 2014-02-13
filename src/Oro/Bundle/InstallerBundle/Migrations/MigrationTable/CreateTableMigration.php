@@ -2,10 +2,14 @@
 namespace Oro\Bundle\InstallerBundle\Migrations\MigrationTable;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\InstallerBundle\Migrations\Migration;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader;
 
-class CreateTableMigration
+class CreateTableMigration implements Migration
 {
+    /**
+     * @inheritdoc
+     */
     public function up(Schema $schema)
     {
         return [

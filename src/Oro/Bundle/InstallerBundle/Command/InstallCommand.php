@@ -141,7 +141,7 @@ class InstallCommand extends ContainerAwareCommand
                 array('--force' => true, '--full-database' => true)
             )
             //->runCommand('doctrine:schema:create')
-            ->runCommand('oro:installer:migration')
+            ->runCommand('oro:installer:migration:load')
             ->runCommand('oro:entity-config:init')
             ->runCommand('oro:entity-extend:init')
             ->runCommand(

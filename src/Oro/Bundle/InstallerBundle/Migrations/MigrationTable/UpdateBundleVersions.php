@@ -2,20 +2,26 @@
 namespace Oro\Bundle\InstallerBundle\Migrations\MigrationTable;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\InstallerBundle\Migrations\Migration;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader;
 
-class UpdateBundleVersions
+class UpdateBundleVersions implements Migration
 {
+    /**
+     * @var array
+     */
     protected $bundleVersions;
 
-    public function setBundleVersions($bundleVersions)
+    /**
+     * @param array $bundleVersions
+     */
+    public function setBundleVersions(array $bundleVersions)
     {
         $this->bundleVersions = $bundleVersions;
     }
 
     /**
-     * @param Schema $schema
-     * @return array
+     * @inheritdoc
      */
     public function up(Schema $schema)
     {
