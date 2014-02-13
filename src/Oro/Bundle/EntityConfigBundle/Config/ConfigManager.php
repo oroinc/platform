@@ -8,8 +8,6 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
-use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -20,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
@@ -32,13 +31,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
-use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
-use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
+use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
+use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
-use Oro\Bundle\EntityConfigBundle\Event\UpdateEntityConfigModelEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 /**
  * @SuppressWarnings(PHPMD)
@@ -110,15 +110,13 @@ class ConfigManager
      * @param ServiceLink        $providerBagLink
      * @param ConfigModelManager $modelManager
      * @param AuditManager       $auditManager
-     * @param Container          $container
      */
     public function __construct(
         MetadataFactory $metadataFactory,
         EventDispatcher $eventDispatcher,
         ServiceLink $providerBagLink,
         ConfigModelManager $modelManager,
-        AuditManager $auditManager,
-        Container $container
+        AuditManager $auditManager
     ) {
         $this->metadataFactory = $metadataFactory;
         $this->eventDispatcher = $eventDispatcher;
@@ -128,8 +126,6 @@ class ConfigManager
         $this->persistConfigs   = [];
         $this->originalConfigs  = [];
         $this->configChangeSets = [];
-
-        $this->container        = $container;
 
         $this->modelManager = $modelManager;
         $this->auditManager = $auditManager;
@@ -221,13 +217,73 @@ class ConfigManager
         }
 
         $result = $this->cache->getConfigurable($className, $fieldName);
-        if ($result === false) {
-            $result = (bool)$this->modelManager->findModel($className, $fieldName) ? : null;
+        if (null === $result) {
+            $model  = $fieldName
+                ? $this->modelManager->findFieldModel($className, $fieldName)
+                : $this->modelManager->findEntityModel($className);
+            $result = (null !== $model);
 
             $this->cache->setConfigurable($result, $className, $fieldName);
         }
 
         return $result;
+    }
+
+    /**
+     * @param ConfigIdInterface $configId
+     * @throws RuntimeException
+     * @throws LogicException
+     * @return ConfigInterface
+     */
+    public function getConfig(ConfigIdInterface $configId)
+    {
+        if ($configId instanceof EntityConfigId && !$configId->getClassName()) {
+            $config = new Config($configId);
+            $config->setValues(
+                $this->getEntityDefaultValues($this->getProvider($configId->getScope()))
+            );
+
+            return $config;
+        }
+
+        $configKey = $this->buildConfigKey($configId);
+        if (isset($this->localCache[$configKey])) {
+            return $this->localCache[$configKey];
+        }
+
+        if (!$this->modelManager->checkDatabase()) {
+            throw new LogicException(
+                'Database is not synced, if you use ConfigManager, when a db schema may be hasn\'t synced.'
+                . ' check it by ConfigManager::modelManager::checkDatabase'
+            );
+        }
+
+        if (!$this->hasConfig($configId->getClassName())) {
+            throw new RuntimeException(sprintf('Entity "%s" is not configurable', $configId->getClassName()));
+        }
+
+        $config = null !== $this->cache
+            ? $this->cache->loadConfigFromCache($configId)
+            : null;
+
+        if (!$config) {
+            $model = $this->modelManager->getModelByConfigId($configId);
+
+            $config = new Config($configId);
+            $config->setValues($model->toArray($configId->getScope()));
+
+            if (null !== $this->cache) {
+                $this->cache->putConfigInCache($config);
+            }
+        }
+
+        //local cache
+        $this->localCache[$configKey] = $config;
+
+        //for calculate change set
+        $this->originalConfigs[$configKey] = clone $config;
+
+        return $config;
     }
 
     /**
@@ -255,70 +311,12 @@ class ConfigManager
         }
 
         return array_map(
-            function (AbstractConfigModel $model) use ($scope) {
-                if ($model instanceof FieldConfigModel) {
-                    return new FieldConfigId(
-                        $model->getEntity()->getClassName(),
-                        $scope,
-                        $model->getFieldName(),
-                        $model->getType()
-                    );
-                } else {
-                    return new EntityConfigId($model->getClassName(), $scope);
-                }
+            function ($model) use ($scope) {
+                return $this->getConfigIdByModel($model, $scope);
             },
             $entityModels
         );
     }
-
-    /**
-     * @param ConfigIdInterface $configId
-     * @throws RuntimeException
-     * @throws LogicException
-     * @return ConfigInterface
-     */
-    public function getConfig(ConfigIdInterface $configId)
-    {
-        $configKey = $this->buildConfigKey($configId);
-        if (isset($this->localCache[$configKey])) {
-            return $this->localCache[$configKey];
-        }
-
-        if (!$this->modelManager->checkDatabase()) {
-            throw new LogicException(
-                'Database is not synced, if you use ConfigManager, when a db schema may be hasn\'t synced.'
-                . ' check it by ConfigManager::modelManager::checkDatabase'
-            );
-        }
-
-        if (!$this->hasConfig($configId->getClassName())) {
-            throw new RuntimeException(sprintf('Entity "%s" is not configurable', $configId->getClassName()));
-        }
-
-        $config = null !== $this->cache
-            ? $this->cache->loadConfigFromCache($configId)
-            : null;
-
-        if (!$config) {
-            $model = $this->modelManager->getModelByConfigId($configId);
-
-            $config = new Config($this->getConfigIdByModel($model, $configId->getScope()));
-            $config->setValues($model->toArray($configId->getScope()));
-
-            if (null !== $this->cache) {
-                $this->cache->putConfigInCache($config);
-            }
-        }
-
-        //local cache
-        $this->localCache[$configKey] = $config;
-
-        //for calculate change set
-        $this->originalConfigs[$configKey] = clone $config;
-
-        return $config;
-    }
-
 
     /**
      * @param ConfigIdInterface $configId
@@ -379,7 +377,8 @@ class ConfigManager
 
     public function flush()
     {
-        $models = $this->prepareFlush();
+        $models = [];
+        $this->prepareFlush($models);
 
         if ($this->cache) {
             $this->cache->removeAllConfigurable();
@@ -399,9 +398,8 @@ class ConfigManager
 
     /**
      * @param array $models
-     * @return array
      */
-    protected function prepareFlush($models = [])
+    protected function prepareFlush(&$models)
     {
         foreach ($this->persistConfigs as $config) {
             $this->calculateConfigChangeSet($config);
@@ -432,10 +430,8 @@ class ConfigManager
         }
 
         if (count($this->persistConfigs) != count($this->configChangeSets)) {
-            $models = $this->prepareFlush($models);
+            $this->prepareFlush($models);
         }
-
-        return $models;
     }
 
 
@@ -519,7 +515,7 @@ class ConfigManager
      */
     public function hasConfigEntityModel($className)
     {
-        return null !== $this->modelManager->findModel($className);
+        return null !== $this->modelManager->findEntityModel($className);
     }
 
     /**
@@ -531,7 +527,7 @@ class ConfigManager
      */
     public function hasConfigFieldModel($className, $fieldName)
     {
-        return null !== $this->modelManager->findModel($className, $fieldName);
+        return null !== $this->modelManager->findFieldModel($className, $fieldName);
     }
 
     /**
@@ -542,9 +538,7 @@ class ConfigManager
      */
     public function getConfigEntityModel($className)
     {
-        return $this->hasConfigEntityModel($className)
-            ? $this->modelManager->findModel($className)
-            : null;
+        return $this->modelManager->findEntityModel($className);
     }
 
     /**
@@ -556,112 +550,41 @@ class ConfigManager
      */
     public function getConfigFieldModel($className, $fieldName)
     {
-        return $this->hasConfigFieldModel($className, $fieldName)
-            ? $this->modelManager->findModel($className, $fieldName)
-            : null;
+        return $this->modelManager->findFieldModel($className, $fieldName);
     }
 
     /**
-     * TODO:: check class name for custom entity
-     *
-     * @param string $className
-     * @param string $mode
+     * @param string|null $className
+     * @param string|null $mode
      * @return EntityConfigModel
      */
-    public function createConfigEntityModel($className, $mode = ConfigModelManager::MODE_DEFAULT)
+    public function createConfigEntityModel($className = null, $mode = ConfigModelManager::MODE_DEFAULT)
     {
-        if (!$entityModel = $this->modelManager->findModel($className)) {
+        if (empty($className)) {
             $entityModel = $this->modelManager->createEntityModel($className, $mode);
-            $metadata    = $this->getEntityMetadata($className);
+        } else {
+            $entityModel = $this->modelManager->findEntityModel($className);
+            if (null === $entityModel) {
+                $entityModel = $this->modelManager->createEntityModel($className, $mode);
+                $metadata    = $this->getEntityMetadata($className);
+                foreach ($this->getProviders() as $provider) {
+                    $configId = new EntityConfigId($provider->getScope(), $className);
+                    $config   = $this->createConfig(
+                        $configId,
+                        $this->getEntityDefaultValues($provider, $className, $metadata)
+                    );
 
-            foreach ($this->getProviders() as $provider) {
-                $translatable = $provider->getPropertyConfig()
-                    ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
-
-                $defaultValues = [];
-                if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
-                    $defaultValues = $metadata->defaultValues[$provider->getScope()];
+                    $this->localCache[$this->buildConfigKey($config->getId())] = $config;
                 }
 
-                $entityId = new EntityConfigId($className, $provider->getScope());
-
-                foreach ($translatable as $code) {
-                    if (!in_array($code, $defaultValues)) {
-                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, null, $code);
-                    }
-                }
-
-                $config = $provider->createConfig($entityId, $defaultValues);
-
-                $this->localCache[$this->buildConfigKey($config->getId())] = $config;
+                $this->eventDispatcher->dispatch(
+                    Events::NEW_ENTITY_CONFIG,
+                    new EntityConfigEvent($className, $this)
+                );
             }
-
-            $this->eventDispatcher->dispatch(
-                Events::NEW_ENTITY_CONFIG_MODEL,
-                new NewEntityConfigModelEvent($entityModel, $this)
-            );
         }
 
         return $entityModel;
-    }
-
-    /**
-     * @param string $className
-     * @param bool $force - if TRUE overwrite existing value from annotation
-     *
-     * @TODO: need refactoring. Join updateConfigEntityModel and updateConfigFieldModel.
-     *        may be need introduce MetadataWithDefaultValuesInterface
-     *        need handling for removed values
-     *        need refactor getConfig
-     *        need to find out more appropriate name for this method
-     */
-    public function updateConfigEntityModel($className, $force = false)
-    {
-        $metadata = $this->getEntityMetadata($className);
-        foreach ($this->getProviders() as $provider) {
-            $scope = $provider->getScope();
-            // try to get default values from annotation
-            $defaultValues = [];
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
-            // combine them with default values from config file
-            $defaultValues = array_merge(
-                $provider->getPropertyConfig()->getDefaultValues(),
-                $defaultValues
-            );
-
-            $translatable = $provider->getPropertyConfig()
-                ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
-
-            foreach ($translatable as $code) {
-                if (!in_array($code, $defaultValues)) {
-                    $defaultValues[$code] = ConfigHelper::getTranslationKey($className, null, $code);
-                }
-            }
-
-            // set missing values with default ones
-            $hasChanges = false;
-            $config     = $provider->getConfig($className);
-            foreach ($defaultValues as $code => $value) {
-                if (!$config->has($code) || !$config->is($code, $value) || $force) {
-                    $config->set($code, $value);
-                    $hasChanges = true;
-                }
-            }
-            if ($hasChanges) {
-                $provider->persist($config);
-            }
-
-            if (in_array($scope, UpdateEntityConfigModelEvent::$scopes)) {
-                if ($entityModel = $this->getConfigEntityModel($className)) {
-                    $this->eventDispatcher->dispatch(
-                        Events::UPDATE_ENTITY_CONFIG_MODEL,
-                        new UpdateEntityConfigModelEvent($entityModel, $this)
-                    );
-                }
-            }
-        }
     }
 
     /**
@@ -671,35 +594,29 @@ class ConfigManager
      * @param string $mode
      * @return FieldConfigModel
      */
-    public function createConfigFieldModel($className, $fieldName, $fieldType, $mode = ConfigModelManager::MODE_DEFAULT)
-    {
-        if (!$fieldModel = $this->modelManager->findModel($className, $fieldName)) {
+    public function createConfigFieldModel(
+        $className,
+        $fieldName,
+        $fieldType,
+        $mode = ConfigModelManager::MODE_DEFAULT
+    ) {
+        $fieldModel = $this->modelManager->findFieldModel($className, $fieldName);
+        if (null === $fieldModel) {
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
             $metadata   = $this->getFieldMetadata($className, $fieldName);
-
             foreach ($this->getProviders() as $provider) {
-                $translatable  = $provider->getPropertyConfig()->getTranslatableValues();
-                $defaultValues = [];
-                if ($metadata && isset($metadata->defaultValues[$provider->getScope()])) {
-                    $defaultValues = $metadata->defaultValues[$provider->getScope()];
-                }
-
-                $fieldId = new FieldConfigId($className, $provider->getScope(), $fieldName, $fieldType);
-
-                foreach ($translatable as $code) {
-                    if (!in_array($code, $defaultValues)) {
-                        $defaultValues[$code] = ConfigHelper::getTranslationKey($className, $fieldName, $code);
-                    }
-                }
-
-                $config  = $provider->createConfig($fieldId, $defaultValues);
+                $configId = new FieldConfigId($provider->getScope(), $className, $fieldName, $fieldType);
+                $config   = $this->createConfig(
+                    $configId,
+                    $this->getFieldDefaultValues($provider, $className, $fieldName, $fieldType, $metadata)
+                );
 
                 $this->localCache[$this->buildConfigKey($config->getId())] = $config;
             }
 
             $this->eventDispatcher->dispatch(
-                Events::NEW_FIELD_CONFIG_MODEL,
-                new NewFieldConfigModelEvent($fieldModel, $this)
+                Events::NEW_FIELD_CONFIG,
+                new FieldConfigEvent($className, $fieldName, $this)
             );
         }
 
@@ -708,61 +625,220 @@ class ConfigManager
 
     /**
      * @param string $className
-     * @param string $fieldName
-     * @param bool $force - if TRUE overwrite existing value from annotation
+     * @param bool   $force - if TRUE overwrite existing value from annotation
      *
-     * @TODO: need refactoring. Join updateConfigEntityModel and updateConfigFieldModel.
-     *        may be need introduce MetadataWithDefaultValuesInterface
-     *        need handling for removed values
-     *        need refactor getConfig
-     *        need to find out more appropriate name for this method
+     * @TODO: need handling for removed values
      */
-    public function updateConfigFieldModel($className, $fieldName, $force = false)
+    public function updateConfigEntityModel($className, $force = false)
     {
-        $metadata = $this->getFieldMetadata($className, $fieldName);
-        foreach ($this->getProviders() as $provider) {
-            $scope = $provider->getScope();
-            // try to get default values from annotation
-            $defaultValues = [];
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
-            // combine them with default values from config file
-            $defaultValues = array_merge(
-                $provider->getPropertyConfig()->getDefaultValues(),
-                $defaultValues
-            );
+        // existing values for a custom entity must not be overridden
+        if ($force && $this->isCustom($className)) {
+            $force = false;
+        }
 
-            // set missing values with default ones
-            $hasChanges = false;
-            $config     = $provider->getConfig($className, $fieldName);
-            foreach ($defaultValues as $code => $value) {
-                if (!$config->has($code) || !$config->is($code, $value) || $force) {
-                    $config->set($code, $value);
-                    $hasChanges = true;
-                }
-            }
+        $metadata = $this->getEntityMetadata($className);
+        foreach ($this->getProviders() as $provider) {
+            $config        = $provider->getConfig($className);
+            $defaultValues = $this->getEntityDefaultValues($provider, $className, $metadata);
+            $hasChanges    = $this->updateConfigValues($config, $defaultValues, $force);
             if ($hasChanges) {
                 $provider->persist($config);
             }
         }
+        $this->eventDispatcher->dispatch(
+            Events::UPDATE_ENTITY_CONFIG,
+            new EntityConfigEvent($className, $this)
+        );
     }
 
-    private function getConfigIdByModel(AbstractConfigModel $model, $scope)
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param bool   $force - if TRUE overwrite existing value from annotation
+     *
+     * @TODO: need handling for removed values
+     */
+    public function updateConfigFieldModel($className, $fieldName, $force = false)
+    {
+        // existing values for a custom field must not be overridden
+        if ($force && $this->isCustom($className, $fieldName)) {
+            $force = false;
+        }
+
+        $metadata = $this->getFieldMetadata($className, $fieldName);
+        foreach ($this->getProviders() as $provider) {
+            $config = $provider->getConfig($className, $fieldName);
+            /** @var FieldConfigId $configId */
+            $configId      = $config->getId();
+            $defaultValues = $this->getFieldDefaultValues(
+                $provider,
+                $className,
+                $fieldName,
+                $configId->getFieldType(),
+                $metadata
+            );
+            $hasChanges    = $this->updateConfigValues($config, $defaultValues, $force);
+            if ($hasChanges) {
+                $provider->persist($config);
+            }
+        }
+        $this->eventDispatcher->dispatch(
+            Events::UPDATE_FIELD_CONFIG,
+            new FieldConfigEvent($className, $fieldName, $this)
+        );
+    }
+
+    /**
+     * Gets config id for the given model
+     *
+     * @param EntityConfigModel|FieldConfigModel $model
+     * @param string                             $scope
+     * @return ConfigIdInterface
+     */
+    public function getConfigIdByModel($model, $scope)
     {
         if ($model instanceof FieldConfigModel) {
             return new FieldConfigId(
-                $model->getEntity()->getClassName(),
                 $scope,
+                $model->getEntity()->getClassName(),
                 $model->getFieldName(),
                 $model->getType()
             );
         } else {
-            return new EntityConfigId(
-                $model->getClassName(),
-                $scope
-            );
+            return new EntityConfigId($scope, $model->getClassName());
         }
+    }
+
+    /**
+     * Creates an instance if Config class which stores configuration data for an object
+     * which is represented by the given id.
+     * The returned object is initialized with data specified $values argument.
+     *
+     * @param  ConfigIdInterface $configId
+     * @param  array             $values An associative array contains configuration properties
+     *                                   key = property name
+     *                                   value = property value
+     * @return Config
+     */
+    protected function createConfig(ConfigIdInterface $configId, array $values)
+    {
+        $config = new Config($configId);
+
+        foreach ($values as $key => $value) {
+            $config->set($key, $value);
+        }
+
+        $this->merge($config);
+
+        return $config;
+    }
+
+    /**
+     * Extracts entity default values from an annotation and config file
+     *
+     * @param ConfigProvider      $provider
+     * @param string|null         $className
+     * @param EntityMetadata|null $metadata
+     * @return array
+     */
+    protected function getEntityDefaultValues(ConfigProvider $provider, $className = null, $metadata = null)
+    {
+        $defaultValues = [];
+
+        // try to get default values from an annotation
+        if ($metadata) {
+            $scope = $provider->getScope();
+            if (isset($metadata->defaultValues[$scope])) {
+                $defaultValues = $metadata->defaultValues[$scope];
+            }
+        }
+
+        // combine them with default values from a config file
+        $defaultValues = array_merge(
+            $provider->getPropertyConfig()->getDefaultValues(PropertyConfigContainer::TYPE_ENTITY),
+            $defaultValues
+        );
+
+        // process translatable values
+        if ($className) {
+            $translatablePropertyNames = $provider->getPropertyConfig()
+                ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
+            foreach ($translatablePropertyNames as $propertyName) {
+                if (!in_array($propertyName, $defaultValues)) {
+                    $defaultValues[$propertyName] =
+                        ConfigHelper::getTranslationKey($propertyName, $className);
+                }
+            }
+        }
+
+        return $defaultValues;
+    }
+
+    /**
+     * Extracts field default values from an annotation and config file
+     *
+     * @param ConfigProvider     $provider
+     * @param string             $className
+     * @param string             $fieldName
+     * @param string             $fieldType
+     * @param FieldMetadata|null $metadata
+     * @return array
+     */
+    protected function getFieldDefaultValues(
+        ConfigProvider $provider,
+        $className,
+        $fieldName,
+        $fieldType,
+        $metadata = null
+    ) {
+        $defaultValues = [];
+
+        // try to get default values from an annotation
+        if ($metadata) {
+            $scope = $provider->getScope();
+            if (isset($metadata->defaultValues[$scope])) {
+                $defaultValues = $metadata->defaultValues[$scope];
+            }
+        }
+
+        // combine them with default values from a config file
+        $defaultValues = array_merge(
+            $provider->getPropertyConfig()->getDefaultValues(PropertyConfigContainer::TYPE_FIELD, $fieldType),
+            $defaultValues
+        );
+
+        // process translatable values
+        $translatablePropertyNames = $provider->getPropertyConfig()
+            ->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
+        foreach ($translatablePropertyNames as $propertyName) {
+            if (!in_array($propertyName, $defaultValues)) {
+                $defaultValues[$propertyName] =
+                    ConfigHelper::getTranslationKey($propertyName, $className, $fieldName);
+            }
+        }
+
+        return $defaultValues;
+    }
+
+    /**
+     * Updates values of the given config based on the given default values and $force flag
+     *
+     * @param ConfigInterface $config
+     * @param array           $defaultValues
+     * @param bool            $force
+     * @return bool  TRUE if at least one config value was updated; otherwise, FALSE
+     */
+    protected function updateConfigValues(ConfigInterface $config, array $defaultValues, $force)
+    {
+        $hasChanges = false;
+        foreach ($defaultValues as $code => $value) {
+            if (!$config->has($code) || $force) {
+                $config->set($code, $value);
+                $hasChanges = true;
+            }
+        }
+
+        return $hasChanges;
     }
 
     /**
@@ -776,5 +852,25 @@ class ConfigManager
         return $configId instanceof FieldConfigId
             ? sprintf('%s_%s_%s', $configId->getScope(), $configId->getClassName(), $configId->getFieldName())
             : sprintf('%s_%s', $configId->getScope(), $configId->getClassName());
+    }
+
+    /**
+     * Checks whether an entity or entity field is custom or system
+     * Custom means that "extend::owner" equals "Custom"
+     *
+     * @param string      $className
+     * @param string|null $fieldName
+     * @return bool
+     */
+    protected function isCustom($className, $fieldName = null)
+    {
+        $result         = false;
+        $extendProvider = $this->getProvider('extend');
+        if ($extendProvider && $extendProvider->hasConfig($className, $fieldName)) {
+            $result = $extendProvider->getConfig($className, $fieldName)
+                ->is('owner', ExtendManager::OWNER_CUSTOM);
+        }
+
+        return $result;
     }
 }

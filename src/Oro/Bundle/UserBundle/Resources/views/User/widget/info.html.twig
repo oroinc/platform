@@ -57,16 +57,23 @@
         function($, messenger){
             'use strict';
             $(function () {
-                $(document).on('click', '#btn-apigen', function () {
+                var message;
+                $('#btn-apigen').on('click', function (e) {
                     var el = $(this);
-
+                    e.preventDefault();
+                    if (el.is('.process')) {
+                        return;
+                    }
+                    el.addClass('process');
                     $.get(el.attr('href'), function (data) {
+                        if (message) {
+                            message.close();
+                        }
                         el.parent().find('.api-key').text(data);
                         var messageText = el.attr('data-message') + ' <strong>' + data + '</strong>';
-                        messenger.notificationFlashMessage('success', messageText);
+                        message = messenger.notificationFlashMessage('success', messageText);
+                        el.removeClass('process');
                     });
-
-                    return false;
                 });
             });
         });

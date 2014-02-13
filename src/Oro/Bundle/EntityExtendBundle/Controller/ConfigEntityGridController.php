@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,17 +11,19 @@ use FOS\Rest\Util\Codes;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
 /**
  * Class ConfigGridController
@@ -139,26 +140,27 @@ class ConfigEntityGridController extends Controller
         /** @var ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
 
-        $className = '';
         if ($request->getMethod() == 'POST') {
-            $className = 'Extend\\Entity\\' . $request->request->get(
+            $className = ExtendConfigDumper::ENTITY . $request->request->get(
                 'oro_entity_config_type[model][className]',
                 null,
                 true
             );
+
+            $entityModel  = $configManager->createConfigEntityModel($className);
+            $extendConfig = $configManager->getProvider('extend')->getConfig($className);
+            $extendConfig->set('owner', ExtendManager::OWNER_CUSTOM);
+            $extendConfig->set('state', ExtendManager::STATE_NEW);
+            $extendConfig->set('upgradeable', false);
+            $extendConfig->set('is_extend', true);
+
+            $config = $configManager->getProvider('security')->getConfig($className);
+            $config->set('type', EntitySecurityMetadataProvider::ACL_SECURITY_TYPE);
+
+            $configManager->persist($extendConfig);
+        } else {
+            $entityModel  = $configManager->createConfigEntityModel();
         }
-
-        $entityModel  = $configManager->createConfigEntityModel($className);
-        $extendConfig = $configManager->getProvider('extend')->getConfig($className);
-        $extendConfig->set('owner', ExtendManager::OWNER_CUSTOM);
-        $extendConfig->set('state', ExtendManager::STATE_NEW);
-        $extendConfig->set('upgradeable', false);
-        $extendConfig->set('is_extend', true);
-
-        $config = $configManager->getProvider('security')->getConfig($className);
-        $config->set('type', EntitySecurityMetadataProvider::ACL_SECURITY_TYPE);
-
-        $configManager->persist($extendConfig);
 
         $form = $this->createForm(
             'oro_entity_config_type',
@@ -172,7 +174,7 @@ class ConfigEntityGridController extends Controller
         $cloneEntityModel->setClassName('');
         $form->add(
             'model',
-            new EntityType,
+            new EntityType(),
             array(
                 'data' => $cloneEntityModel,
             )

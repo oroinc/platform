@@ -239,7 +239,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getEntityConfig($entityClassName, $values)
     {
-        $entityConfigId = new EntityConfigId($entityClassName, 'entity');
+        $entityConfigId = new EntityConfigId('entity', $entityClassName);
         $entityConfig   = new Config($entityConfigId);
         $entityConfig->setValues($values);
 

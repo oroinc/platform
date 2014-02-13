@@ -24,7 +24,7 @@ class AttributeManager
      */
     public function __construct(Collection $attributes = null)
     {
-        $this->attributes = $attributes ?: new ArrayCollection();
+        $this->setAttributes($attributes);
     }
 
     /**
@@ -60,16 +60,14 @@ class AttributeManager
      */
     public function setAttributes($attributes)
     {
-        if ($attributes instanceof Collection) {
-            $this->attributes = $attributes;
-        } else {
-            $data = array();
+        $data = array();
+        if ($attributes) {
             foreach ($attributes as $attribute) {
                 $data[$attribute->getName()] = $attribute;
             }
             unset($attributes);
-            $this->attributes = new ArrayCollection($data);
         }
+        $this->attributes = new ArrayCollection($data);
 
         return $this;
     }

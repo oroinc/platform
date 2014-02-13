@@ -677,7 +677,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getEntityConfig($entityClassName, $values)
     {
-        $entityConfigId = new EntityConfigId($entityClassName, 'entity');
+        $entityConfigId = new EntityConfigId('entity', $entityClassName);
         $entityConfig   = new Config($entityConfigId);
         $entityConfig->setValues($values);
 
@@ -686,7 +686,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getEntityFieldConfig($entityClassName, $fieldName, $fieldType, $values)
     {
-        $entityFieldConfigId = new FieldConfigId($entityClassName, 'entity', $fieldName, $fieldType);
+        $entityFieldConfigId = new FieldConfigId('entity', $entityClassName, $fieldName, $fieldType);
         $entityFieldConfig   = new Config($entityFieldConfigId);
         $entityFieldConfig->setValues($values);
 
@@ -697,7 +697,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     {
         $result = [];
         foreach ($config[$entityClassName]['fields'] as $fieldName => $fieldConfig) {
-            $result[] = new FieldConfigId($entityClassName, 'entity', $fieldName, $fieldConfig['type']);
+            $result[] = new FieldConfigId('entity', $entityClassName, $fieldName, $fieldConfig['type']);
         }
 
         return $result;

@@ -70,16 +70,20 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * Gets an instance of FieldConfigId or EntityConfigId depends on the given parameters.
      *
-     * @param string      $className
+     * @param string|null $className
      * @param string|null $fieldName
      * @param string|null $fieldType
      * @return ConfigIdInterface
      */
-    public function getId($className, $fieldName = null, $fieldType = null)
+    public function getId($className = null, $fieldName = null, $fieldType = null)
     {
+        if ($className) {
+            $className = $this->getClassName($className);
+        }
+
         return $fieldName
-            ? new FieldConfigId($this->getClassName($className), $this->getScope(), $fieldName, $fieldType)
-            : new EntityConfigId($this->getClassName($className), $this->getScope());
+            ? new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType)
+            : new EntityConfigId($this->getScope(), $className);
     }
 
     /**
@@ -133,39 +137,6 @@ class ConfigProvider implements ConfigProviderInterface
     public function getConfigById(ConfigIdInterface $configId)
     {
         return $this->configManager->getConfig($this->copyId($configId));
-    }
-
-    /**
-     * Creates an instance if Config class which stores configuration data for an object
-     * which is represented by the given id.
-     * The returned object is initialized with data specified $values argument.
-     *
-     * @param  ConfigIdInterface $configId
-     * @param  array             $values An associative array contains configuration properties
-     *                                   key = property name
-     *                                   value = property value
-     * @return Config
-     */
-    public function createConfig(ConfigIdInterface $configId, array $values)
-    {
-        $config = new Config($configId);
-        if ($configId instanceof FieldConfigId) {
-            $type          = PropertyConfigContainer::TYPE_FIELD;
-            $defaultValues = $this->getPropertyConfig()->getDefaultValues($type, $configId->getFieldType());
-        } else {
-            $type          = PropertyConfigContainer::TYPE_ENTITY;
-            $defaultValues = $this->getPropertyConfig()->getDefaultValues($type);
-        }
-
-        $values = array_merge($defaultValues, $values);
-
-        foreach ($values as $key => $value) {
-            $config->set($key, $value);
-        }
-
-        $this->merge($config);
-
-        return $config;
     }
 
     /**
