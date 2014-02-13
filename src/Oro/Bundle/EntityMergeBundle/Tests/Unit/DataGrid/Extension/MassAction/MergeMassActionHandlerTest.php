@@ -227,14 +227,9 @@ class MergeMassActionHandlerTest extends \PHPUnit_Framework_TestCase
         );
 
         $result = $result->getOptions();
-        $this->assertArrayHasKey(
-            'entities',
-            $result
-        );
-        $this->assertEquals(
-            2,
-            count($result['entities'])
-        );
+
+        $this->assertArrayHasKey('entities', $result);
+        $this->assertEquals(2, count($result['entities']));
         $this->assertArrayHasKey(
             'options',
             $result

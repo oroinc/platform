@@ -21,8 +21,14 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $metadata;
 
+    /**
+     * @var string
+     */
     private $identifier = 'id';
 
+    /**
+     * @var string
+     */
     private $entityRepositoryName = 'testEntityName';
 
     /**
@@ -45,29 +51,31 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     private $expression;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->createFakeDependencies();
-
         $this->setUpFakeObjects();
-
         $this->target = new DoctrineHelper($this->entityManager);
     }
 
-
     private function createFakeDependencies()
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor(
-        )->getMock();
-        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')->disableOriginalConstructor(
-        )->getMock();
-        $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')->disableOriginalConstructor(
-        )->getMock();
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()->getMock();
+
         $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()
             ->getMock();
-        $this->query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')->disableOriginalConstructor()->setMethods(
-            array('execute')
-        )->getMockForAbstractClass();
+
+        $this->query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()->setMethods(array('execute'))
+            ->getMockForAbstractClass();
+
         $this->expression = $this->getMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
     }
 
@@ -107,15 +115,24 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         $this->queryMatcher = function () {
             return true;
         };
-        $this->queryBuilder->expects($this->any())->method('add')->with(
-            $this->equalTo('where')
-        )->will($this->returnValue($this->queryBuilder));
 
-        $this->queryBuilder->expects($this->any())->method('expr')->will($this->returnValue($this->expression));
+        $this->queryBuilder->expects($this->any())
+            ->method('add')
+            ->with(
+                $this->equalTo('where')
+            )->will($this->returnValue($this->queryBuilder));
 
-        $this->query->expects($this->any())->method('execute')->will($this->returnValue(array()));
+        $this->queryBuilder->expects($this->any())
+            ->method('expr')
+            ->will($this->returnValue($this->expression));
 
-        $this->queryBuilder->expects($this->any())->method('getQuery')->will($this->returnValue($this->query));
+        $this->query->expects($this->any())
+            ->method('execute')
+            ->will($this->returnValue(array()));
+
+        $this->queryBuilder->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnValue($this->query));
     }
 
     public function testGetEntityIdentifierReturnCorrectData()

@@ -129,7 +129,10 @@ class MergeFieldType extends AbstractType
         $resolver->setNormalizers(
             array(
                 'label' => function (Options $options, $value) {
-                    return $options['metadata']->get('relation_label');
+                    if (!$value) {
+                        $value = $options['metadata']->get('label');
+                    }
+                    return $value;
                 }
             )
         );

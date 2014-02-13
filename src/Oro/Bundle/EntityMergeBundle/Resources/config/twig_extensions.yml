@@ -15,4 +15,4 @@ services:
         class: %oro_entity_merge.twig.renderer.class%
         arguments:
             - @twig
-            - 'OroEntityMergeBundle:Merge:mergeValue.html.twig'
+            - 'OroEntityMergeBundle:Form:mergeValue.html.twig'

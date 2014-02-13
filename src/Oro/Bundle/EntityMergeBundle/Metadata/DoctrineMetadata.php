@@ -48,12 +48,27 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
      */
     public function isCollection()
     {
-        $collectionTypes = [
+        $sourceCollectionTypes = [
             ClassMetadataInfo::ONE_TO_MANY,
             ClassMetadataInfo::MANY_TO_MANY,
         ];
 
-        return $this->has('type') && in_array($this->get('type'), $collectionTypes);
+        $inverseCollectionTypes = [
+            ClassMetadataInfo::MANY_TO_ONE,
+            ClassMetadataInfo::MANY_TO_MANY,
+        ];
+
+        return ($this->isTypeIn($sourceCollectionTypes) && $this->isMappedBySourceEntity()) ||
+            ($this->isTypeIn($inverseCollectionTypes) && !$this->isMappedBySourceEntity());
+    }
+
+    /**
+     * @param array $types
+     * @return bool
+     */
+    protected function isTypeIn(array $types)
+    {
+        return $this->has('type') && in_array($this->get('type'), $types);
     }
 
     /**

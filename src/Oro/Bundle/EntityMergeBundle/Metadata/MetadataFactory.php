@@ -14,10 +14,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MetadataFactory
 {
+    const RELATION_OPTION_PREFIX = 'relation_';
+
     /**
      * @var ConfigProvider
      */
-    protected $configProvider;
+    protected $mergeConfigProvider;
 
     /**
      * @var DoctrineHelper
@@ -30,18 +32,18 @@ class MetadataFactory
     protected $eventDispatcher;
 
     /**
-     * @param ConfigProvider           $configProvider
+     * @param ConfigProvider           $mergeConfigProvider
      * @param DoctrineHelper           $doctrineHelper
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        ConfigProvider $configProvider,
+        ConfigProvider $mergeConfigProvider,
         DoctrineHelper $doctrineHelper,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->configProvider  = $configProvider;
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->mergeConfigProvider  = $mergeConfigProvider;
+        $this->doctrineHelper       = $doctrineHelper;
+        $this->eventDispatcher      = $eventDispatcher;
     }
 
     /**
@@ -53,7 +55,7 @@ class MetadataFactory
      */
     public function createEntityMetadata($className)
     {
-        $entityMergeConfig = $this->configProvider->getConfig($className);
+        $entityMergeConfig = $this->mergeConfigProvider->getConfig($className);
 
         if (!$entityMergeConfig) {
             throw new InvalidArgumentException(sprintf('Merge config for "%s" is not exist.', $className));
@@ -89,7 +91,7 @@ class MetadataFactory
     {
         $fieldsMetadata   = [];
         $doctrineMetadata = $this->doctrineHelper->getDoctrineMetadataFor($className);
-        $configs          = $this->configProvider->getConfigs($className);
+        $configs          = $this->mergeConfigProvider->getConfigs($className);
 
         if ($configs) {
             /* @var ConfigInterface $config */
@@ -104,7 +106,7 @@ class MetadataFactory
                     }
 
                     $fieldsMetadata[$fieldName] = $this->createFieldMetadata(
-                        $options,
+                        $this->filterOptions($options),
                         $this->createDoctrineMetadata($className, $fieldMapping)
                     );
                 }
@@ -124,10 +126,9 @@ class MetadataFactory
     public function createMappedOutsideFieldsMetadataByConfig($className)
     {
         $fieldsMetadata = [];
-        $repository     = $this
-            ->doctrineHelper
+        $repository     = $this->doctrineHelper
             ->getEntityRepository('Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue');
-        $configs        = $repository->findBy(['code' => 'relation_enable']);
+        $configs        = $repository->findBy(['scope' => 'merge', 'code' => 'relation_enable']);
 
         if (!$configs) {
             return $fieldsMetadata;
@@ -148,7 +149,7 @@ class MetadataFactory
                 $fieldDoctrineMetadata = $this->createDoctrineMetadata($className, $fieldMapping);
 
                 if ($fieldDoctrineMetadata->get('targetEntity') == $className) {
-                    $fieldConfig = $this->configProvider->getConfig($entityClassName, $fieldName);
+                    $fieldConfig = $this->mergeConfigProvider->getConfig($entityClassName, $fieldName);
 
                     $uniqueFieldName = $this->createUniqueFieldName(
                         $relatedClassName,
@@ -156,7 +157,7 @@ class MetadataFactory
                     );
 
                     $fieldMetadata = $this->createFieldMetadata(
-                        $fieldConfig->all(),
+                        $this->filterOptions($fieldConfig->all(), true),
                         $fieldDoctrineMetadata
                     );
 
@@ -167,6 +168,28 @@ class MetadataFactory
         }
 
         return $fieldsMetadata;
+    }
+
+    /**
+     * @param array $options
+     * @param bool $fromRelation
+     * @return array
+     */
+    protected function filterOptions(array $options, $fromRelation = false)
+    {
+        $result = array();
+        foreach ($options as $key => $value) {
+            if (0 === strpos($key, self::RELATION_OPTION_PREFIX)) {
+                if ($fromRelation) {
+                    $key = substr($key, strlen(self::RELATION_OPTION_PREFIX));
+                } else {
+                    break;
+                }
+            }
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 
     /**
@@ -200,7 +223,7 @@ class MetadataFactory
                     }
 
                     $fieldMetadata = $this->createFieldMetadata(
-                        ['hidden' => true],
+                        $this->filterOptions(['hidden' => true, 'merge_modes' => array('merge')]),
                         $fieldDoctrineMetadata
                     );
 

@@ -21,7 +21,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

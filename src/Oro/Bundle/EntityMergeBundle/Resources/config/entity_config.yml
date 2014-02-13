@@ -8,11 +8,11 @@ oro_entity_config:
                 # If these options are empty __toString will be used (if it's available).
                 #
                 # Method of entity to cast object to string
-                merge_cast_method: ~
+                cast_method: ~
                 # Twig template to render object as string
-                merge_template: ~
+                template: ~
                 # Enable merge for this entity
-                merge_enable:
+                enable:
                     options:
                         is_bool: true
 
@@ -25,8 +25,6 @@ oro_entity_config:
                 enable:
                     options:
                         is_bool: true
-                # Option for sorting field on UI
-                priority: ~
                 # Hide field in merge
                 hidden:
                     options:
@@ -66,5 +64,3 @@ oro_entity_config:
                 relation_modes: ~
                 # Same as label but used for relation entity
                 relation_label: ~
-                # Same as priority but used for relation entity
-                relation_priority: ~

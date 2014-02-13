@@ -83,6 +83,17 @@ class FieldMetadata extends Metadata implements MetadataInterface
     }
 
     /**
+     * Get default merge mode
+     *
+     * @return array
+     */
+    public function getMergeMode()
+    {
+        $modes = $this->getMergeModes();
+        return $modes ? reset($modes) : null;
+    }
+
+    /**
      * Get merge modes available
      *
      * @return array
