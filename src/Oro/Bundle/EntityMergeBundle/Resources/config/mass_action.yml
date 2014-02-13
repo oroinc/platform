@@ -10,6 +10,8 @@ services:
 
     oro_entity_merge.mass_action.merge:
         class: %oro_entity_merge.mass_action.merge.class%
+        arguments:
+            - @oro_entity_merge.metadata.registry
         scope: prototype
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: merge }

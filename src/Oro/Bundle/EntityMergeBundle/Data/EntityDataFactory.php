@@ -8,14 +8,14 @@ use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
 use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
+use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class EntityDataFactory
 {
     /**
-     * @var MetadataFactory
+     * @var MetadataRegistry
      */
-    private $metadataFactory;
+    private $metadataRegistry;
 
     /**
      * @var DoctrineHelper
@@ -28,18 +28,18 @@ class EntityDataFactory
     protected $eventDispatcher;
 
     /**
-     * @param MetadataFactory $metadataFactory
-     * @param DoctrineHelper $doctrineHelper
-     * @param EventDispatcher $eventDispatcher
+     * @param MetadataRegistry $metadataRegistry
+     * @param DoctrineHelper   $doctrineHelper
+     * @param EventDispatcher  $eventDispatcher
      */
     public function __construct(
-        MetadataFactory $metadataFactory,
+        MetadataRegistry $metadataRegistry,
         DoctrineHelper $doctrineHelper,
         EventDispatcher $eventDispatcher
     ) {
-        $this->metadataFactory = $metadataFactory;
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->metadataRegistry = $metadataRegistry;
+        $this->doctrineHelper   = $doctrineHelper;
+        $this->eventDispatcher  = $eventDispatcher;
     }
 
     /**
@@ -49,7 +49,7 @@ class EntityDataFactory
      */
     public function createEntityData($entityName, array $entities)
     {
-        $entityMetadata = $this->metadataFactory->createEntityMetadata($entityName);
+        $entityMetadata = $this->metadataRegistry->getEntityMetadata($entityName);
 
         $data = new EntityData($entityMetadata, $entities);
 

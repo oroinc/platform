@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MinEntitiesCount;
 
 class MergeMassActionHandler implements MassActionHandlerInterface
 {
@@ -72,7 +73,9 @@ class MergeMassActionHandler implements MassActionHandlerInterface
             throw new InvalidArgumentException('Entity name is missing.');
         }
 
-        if (empty($options['max_element_count']) || (int)$options['max_element_count'] < 2) {
+        if (empty($options['max_element_count'])
+            || (int)$options['max_element_count'] < MinEntitiesCount::MIN_ENTITIES_COUNT
+        ) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Option "max_element_count" of "%s" mass action is invalid.',
@@ -89,8 +92,10 @@ class MergeMassActionHandler implements MassActionHandlerInterface
      */
     public function validateItemsCount($countOfSelectedItems, $maxCountOfElements)
     {
-        if ($countOfSelectedItems < 2) {
-            throw new InvalidArgumentException('Count of selected items less then 2');
+        if ($countOfSelectedItems < MinEntitiesCount::MIN_ENTITIES_COUNT) {
+            throw new InvalidArgumentException(
+                sprintf('Count of selected items less then %s', MinEntitiesCount::MIN_ENTITIES_COUNT)
+            );
         } elseif ($countOfSelectedItems > $maxCountOfElements) {
             throw new InvalidArgumentException('Too many items selected');
         }

@@ -14,7 +14,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $metadataFactory;
+    private $metadataRegistry;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -54,22 +54,33 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->entitiesClassName = 'testClassNameForEntity';
-        $this->firstEntity = $this->getMockBuilder('stdClass')->setMockClassName($this->entitiesClassName)->getMock();
-        $this->secondEntity = $this->getMockBuilder('stdClass')->setMockClassName(
-            $this->entitiesClassName
-        )->getMock();
+        $this->firstEntity = $this
+            ->getMockBuilder('stdClass')
+            ->setMockClassName($this->entitiesClassName)
+            ->getMock();
+
+        $this->secondEntity = $this
+            ->getMockBuilder('stdClass')
+            ->setMockClassName($this->entitiesClassName)
+            ->getMock();
 
         $this->entities[] = $this->firstEntity;
         $this->entities[] = $this->secondEntity;
 
-        $this->metadataFactory = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory')
-            ->disableOriginalConstructor()->getMock();
+        $this->metadataRegistry = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()->getMock();
+        $this->doctrineHelper = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->metadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()->getMock();
+        $this->metadata = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->metadata->expects($this->any())
             ->method('getClassName')
@@ -79,16 +90,19 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldsMetadata')
             ->will($this->returnValue($this->fieldsMetadata));
 
-        $this->metadataFactory->expects($this->any())
-            ->method('createEntityMetadata')
+        $this->metadataRegistry
+            ->expects($this->any())
+            ->method('getEntityMetadata')
             ->with($this->entitiesClassName)
             ->will($this->returnValue($this->metadata));
 
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()->getMock();
+        $eventDispatcher = $this
+            ->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->target = new EntityDataFactory(
-            $this->metadataFactory,
+            $this->metadataRegistry,
             $this->doctrineHelper,
             $eventDispatcher
         );
