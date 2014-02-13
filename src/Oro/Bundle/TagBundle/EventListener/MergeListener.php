@@ -6,6 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 
@@ -44,7 +45,8 @@ class MergeListener
             'getter'        => self::GETTER,
             'setter'        => self::SETTER,
             'field_name'    => self::FIELD_NAME,
-            'is_collection' => true
+            'is_collection' => true,
+            'merge_modes'   => [MergeModes::REPLACE, MergeModes::MERGE]
         ];
 
         $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
@@ -84,8 +86,11 @@ class MergeListener
             return;
         }
 
+        /* @var Taggable $masterEntity */
         $masterEntity = $entityData->getMasterEntity();
-        $this->manager->saveTagging($masterEntity, false);
+        $masterTags   = $masterEntity->getTags()->getValues();
+        $masterEntity->setTags(['all' => $masterTags, 'owner' => $masterTags]);
+        $this->manager->saveTagging($masterEntity);
     }
 
     /**

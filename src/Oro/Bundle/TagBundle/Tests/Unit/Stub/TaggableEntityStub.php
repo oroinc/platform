@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Stub;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 
 class TaggableEntityStub implements Taggable
@@ -19,6 +20,7 @@ class TaggableEntityStub implements Taggable
     public function __construct($id = null)
     {
         $this->id = $id;
+        $this->tags = new ArrayCollection();
     }
 
     public function getId()
