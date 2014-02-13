@@ -58,3 +58,6 @@ tbody .entity-merge-blocks-wrapper .entity-merge-inline-label{
 thead .entity-merge-blocks-wrapper .entity-merge-inline-label{
     max-width: calc(100% - 70px);
 }
+.entity-merge-not-selected{
+    color: #CECECE;
+}

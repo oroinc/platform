@@ -11,7 +11,7 @@
                     <div class="entity-merge-blocks-wrapper">
                         <label class="entity-merge-uppercase entity-merge-inline-label">
                             {{ form_widget(child) }}
-                            <strong>
+                            <strong class="merge-entity-representative">
                                 {{ (oro_entity_merge_render_entity_label(form.vars.value, loop.index - 1)) }}
                             </strong>
                         </label>
@@ -29,6 +29,12 @@
         {% endfor %}
         </tbody>
     </table>
+
+<script type="text/javascript">
+    require(['jquery', 'oro/entity-merge/merge-view'],function(){
+        mergeView.init();
+    });
+</script>
 {% endblock %}
 
 {% block oro_entity_merge_field_widget %}
@@ -64,7 +70,7 @@
 {% block oro_entity_merge_choice_value_widget %}
     <div class="entity-merge-blocks-wrapper">
         <div class="entity-merge-inline">{{ form_widget(form) }}</div>
-        <label class="entity-merge-inline-label"
+        <label class="entity-merge-inline-label merge-entity-representative"
                for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
         {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
         </label>
