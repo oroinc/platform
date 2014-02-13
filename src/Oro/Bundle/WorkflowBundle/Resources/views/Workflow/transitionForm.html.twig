@@ -2,8 +2,6 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as macros %}
 
-{#{% oro_title_set({params : {"%sales_funnel.name%": entity.name} }) %}#}
-
 {% set pageParams = transition.frontendOptions.page is defined ?transition.frontendOptions.page : null  %}
 {% if pageParams.title is defined %}
     {% set title = pageParams.title %}
@@ -22,6 +20,8 @@
 {% else %}
     {% set indexPath = null %}
 {% endif %}
+
+{% oro_title_set({params : {"%workflow_title%": title ~ ' - ' ~ indexLabel} }) %}
 
 {% block navButtons %}
     {% if indexPath %}
