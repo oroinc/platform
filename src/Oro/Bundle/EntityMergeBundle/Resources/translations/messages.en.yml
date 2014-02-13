@@ -4,9 +4,10 @@ oro:
 
         merge_modes:
             replace: Replace
-            merge: Merge
-
+            merge: Union
 
         form:
             master_record: Master Record
             strategy: Strategy
+
+        merge_success_message: Records were merged successfuly.

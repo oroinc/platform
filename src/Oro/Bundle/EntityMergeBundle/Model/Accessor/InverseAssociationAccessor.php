@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class RelationAccessor implements AccessorInterface
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+
+class InverseAssociationAccessor implements AccessorInterface
 {
     /**
      * @var PropertyAccessor
@@ -15,24 +17,16 @@ class RelationAccessor implements AccessorInterface
     protected $propertyAccessor;
 
     /**
-     * @var EntityManager
+     * @var DoctrineHelper
      */
-    protected $entityManager;
+    protected $doctrineHelper;
 
     /**
-     * @param EntityManager $entityManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->entityManager = $entityManager;
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    public function getName()
-    {
-        return 'relation';
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -56,10 +50,7 @@ class RelationAccessor implements AccessorInterface
         $fieldName        = $doctrineMetadata->getFieldName();
         $className        = $doctrineMetadata->get('sourceEntity');
 
-        return $this
-            ->entityManager
-            ->getRepository($className)
-            ->findBy([$fieldName => $entity]);
+        return $this->doctrineHelper->getEntityRepository($className)->findBy([$fieldName => $entity]);
     }
 
     /**
@@ -67,20 +58,38 @@ class RelationAccessor implements AccessorInterface
      */
     public function setValue($entity, FieldMetadata $metadata, $value)
     {
+        $oldRelatedEntities = array();
+
+        foreach ($this->getValue($entity, $metadata) as $oldRelatedEntity) {
+            $oldRelatedEntities[$this->doctrineHelper->getEntityIdentifierValue($oldRelatedEntity)] = $oldRelatedEntity;
+        }
+
         foreach ($value as $relatedEntity) {
-            if ($metadata->has('setter')) {
-                $setter = $metadata->get('setter');
-                $relatedEntity->$setter($entity);
+            $this->setRelatedEntityValue($relatedEntity, $metadata, $entity);
+            unset($oldRelatedEntities[$this->doctrineHelper->getEntityIdentifierValue($relatedEntity)]);
+        }
 
-                continue;
-            }
+        foreach ($oldRelatedEntities as $oldRelatedEntity) {
+            $this->setRelatedEntityValue($oldRelatedEntity, $metadata, null);
+        }
+    }
 
-            $this
-                ->getPropertyAccessor()
+    /**
+     * @param object $relatedEntity
+     * @param FieldMetadata $metadata
+     * @param object $value
+     */
+    protected function setRelatedEntityValue($relatedEntity, FieldMetadata $metadata, $value)
+    {
+        if ($metadata->has('setter')) {
+            $setter = $metadata->get('setter');
+            $relatedEntity->$setter($value);
+        } else {
+            $this->getPropertyAccessor()
                 ->setValue(
                     $relatedEntity,
                     $this->getPropertyPath($metadata),
-                    $entity
+                    $value
                 );
         }
     }
@@ -111,5 +120,13 @@ class RelationAccessor implements AccessorInterface
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
         return $this->propertyAccessor;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return 'inverse_association';
     }
 }

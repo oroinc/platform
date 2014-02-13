@@ -20,7 +20,7 @@ parameters:
     # Accessors
     oro_entity_merge.accessor.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DelegateAccessor
     oro_entity_merge.accessor.default.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor
-    oro_entity_merge.accessor.relation.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor
+    oro_entity_merge.accessor.inverse_association.class: Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor
 
     # Strategies
     oro_entity_merge.strategy.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy
@@ -30,7 +30,7 @@ parameters:
     # Listeners
     oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener
     oro_entity_merge.listener.init_default_label.class: Oro\Bundle\EntityMergeBundle\EventListener\InitDefaultLabelListener
-    oro_entity_merge.listener.clear_cascade_remove_references.class: Oro\Bundle\EntityMergeBundle\EventListener\ClearCascadeRemoveReferencesListener
+    oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener\CascadeRemoveAssociationListener
 
     # Validator
     oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator
@@ -102,10 +102,10 @@ services:
         tags:
             - { name: oro_entity_merge.accessor }
 
-    oro_entity_merge.accessor.relation:
-        class: %oro_entity_merge.accessor.relation.class%
+    oro_entity_merge.accessor.inverse_association:
+        class: %oro_entity_merge.accessor.inverse_association.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity_merge.doctrine_helper
         tags:
             - { name: oro_entity_merge.accessor }
 
@@ -144,8 +144,8 @@ services:
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata, priority: -1000 }
 
-    oro_entity_merge.listener.clear_cascade_remove_references:
-        class: %oro_entity_merge.listener.clear_cascade_remove_references.class%
+    oro_entity_merge.listener.merge_field.cascade_remove_association:
+        class: %oro_entity_merge.listener.merge_field.cascade_remove_association.class%
         arguments:
           - @oro_entity_merge.accessor
           - @oro_entity_merge.doctrine_helper

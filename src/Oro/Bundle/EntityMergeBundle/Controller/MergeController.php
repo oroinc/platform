@@ -84,7 +84,11 @@ class MergeController extends Controller
                     }
                 );
 
-                // @todo Flash message with success or error
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.entity_merge.merge_success_message')
+                );
+
                 return $this->redirect(
                     $this->generateUrl(
                         $this->getEntityViewRoute($entityData->getClassName()),

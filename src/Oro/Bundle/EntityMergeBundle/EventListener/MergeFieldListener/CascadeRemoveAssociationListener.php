@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\EventListener;
+namespace Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
@@ -11,7 +11,7 @@ use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 /**
  * Clear references to selected value from other entities, because it will be deleted according to cascade remove logic.
  */
-class ClearCascadeRemoveReferencesListener
+class CascadeRemoveAssociationListener
 {
     /**
      * @var AccessorInterface
@@ -45,6 +45,7 @@ class ClearCascadeRemoveReferencesListener
             !$metadata->hasDoctrineMetadata() ||
             !$metadata->getDoctrineMetadata()->isMappedBySourceEntity() ||
             !$metadata->getDoctrineMetadata()->isAssociation() ||
+            $metadata->getDoctrineMetadata()->isCollection() ||
             !in_array('remove', (array)$metadata->getDoctrineMetadata()->get('cascade'))
         ) {
             return;

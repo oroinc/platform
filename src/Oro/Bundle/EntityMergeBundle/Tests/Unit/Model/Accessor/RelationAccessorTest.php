@@ -4,20 +4,25 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Accessor;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
-use Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor;
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class RelationAccessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var RelationAccessor $fieldAccessor;
+     * @var InverseAssociationAccessor
      */
     protected $accessor;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineHelper;
+
     protected function setUp()
     {
-        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
             ->disableOriginalConstructor()
             ->setMethods([])
             ->getMock();
@@ -32,17 +37,17 @@ class RelationAccessorTest extends \PHPUnit_Framework_TestCase
             ->method('findBy')
             ->will($this->returnValue([]));
 
-        $entityManager
+        $this->doctrineHelper
             ->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
-        $this->accessor = new RelationAccessor($entityManager);
+        $this->accessor = new InverseAssociationAccessor($this->doctrineHelper);
     }
 
     public function testGetName()
     {
-        $this->assertEquals('relation', $this->accessor->getName());
+        $this->assertEquals('inverse_association', $this->accessor->getName());
     }
 
     /**
@@ -96,16 +101,6 @@ class RelationAccessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function createEntity($id = null, $parent = null)
-    {
-        return new EntityStub($id, $parent);
-    }
-
-    protected function createRelatedEntity($id = null)
-    {
-        return new CollectionItemStub($id);
-    }
-
     protected function getFieldMetadata($fieldName = null, array $options = array())
     {
         $result = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
@@ -148,5 +143,15 @@ class RelationAccessorTest extends \PHPUnit_Framework_TestCase
             );
 
         return $result;
+    }
+
+    protected function createEntity($id = null, $parent = null)
+    {
+        return new EntityStub($id, $parent);
+    }
+
+    protected function createRelatedEntity($id = null)
+    {
+        return new CollectionItemStub($id);
     }
 }
