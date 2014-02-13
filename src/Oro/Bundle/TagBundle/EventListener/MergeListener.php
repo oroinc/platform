@@ -29,6 +29,8 @@ class MergeListener
     }
 
     /**
+     * Add merge metadata for tags
+     *
      * @param EntityMetadataEvent $event
      */
     public function onCreateMetadata(EntityMetadataEvent $event)
@@ -44,11 +46,14 @@ class MergeListener
             'field_name'    => self::FIELD_NAME,
             'is_collection' => true
         ];
-        $fieldMetadata        = new FieldMetadata($fieldMetadataOptions);
+
+        $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
         $entityMetadata->addFieldMetadata($fieldMetadata);
     }
 
     /**
+     * Load tags
+     *
      * @param EntityDataEvent $event
      */
     public function onCreateEntityData(EntityDataEvent $event)
@@ -67,6 +72,8 @@ class MergeListener
     }
 
     /**
+     * Save tags
+     *
      * @param EntityDataEvent $event
      */
     public function afterMergeEntity(EntityDataEvent $event)

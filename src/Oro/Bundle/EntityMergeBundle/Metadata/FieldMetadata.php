@@ -134,8 +134,8 @@ class FieldMetadata extends Metadata implements MetadataInterface
      */
     public function isCollection()
     {
-        if ($this->has('merge_is_collection')) {
-            return (bool)$this->get('merge_is_collection');
+        if ($this->has('is_collection')) {
+            return (bool)$this->get('is_collection');
         }
         if ($this->hasDoctrineMetadata()) {
             return $this->getDoctrineMetadata()->isCollection();
