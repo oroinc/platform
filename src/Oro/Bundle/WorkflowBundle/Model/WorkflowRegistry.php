@@ -91,16 +91,17 @@ class WorkflowRegistry
      */
     public function getActiveWorkflowByEntityClass($entityClass)
     {
-        if (!$this->hasActiveWorkflowByEntityClass($entityClass)) {
-            return null;
-        }
+        if ($this->configProvider->hasConfig($entityClass)) {
+            $entityConfig = $this->configProvider->getConfig($entityClass);
+            $activeWorkflowName = $entityConfig->get('active_workflow');
 
-        $entityConfig = $this->configProvider->getConfig($entityClass);
-        $activeWorkflowName = $entityConfig->get('active_workflow');
-        $workflows = $this->getWorkflowsByEntityClass($entityClass, $activeWorkflowName);
+            if ($activeWorkflowName) {
+                $workflows = $this->getWorkflowsByEntityClass($entityClass, $activeWorkflowName, true);
 
-        if (array_key_exists($activeWorkflowName, $workflows)) {
-            return $workflows[$activeWorkflowName];
+                if (array_key_exists($activeWorkflowName, $workflows)) {
+                    return $workflows[$activeWorkflowName];
+                }
+            }
         }
 
         return null;
@@ -114,13 +115,7 @@ class WorkflowRegistry
      */
     public function hasActiveWorkflowByEntityClass($entityClass)
     {
-        if (!$this->configProvider->hasConfig($entityClass)) {
-            return false;
-        }
-
-        $activeWorkflow = $this->configProvider->getConfig($entityClass)->get('active_workflow');
-
-        return !empty($activeWorkflow);
+        return $this->getActiveWorkflowByEntityClass($entityClass) !== null;
     }
 
     /**
@@ -128,13 +123,14 @@ class WorkflowRegistry
      *
      * @param string $entityClass
      * @param string|null $workflowName
+     * @param bool|null $enabled
      * @return Workflow[]
      */
-    public function getWorkflowsByEntityClass($entityClass, $workflowName = null)
+    public function getWorkflowsByEntityClass($entityClass, $workflowName = null, $enabled = null)
     {
         $result = array();
         $workflowDefinitions = $this->getWorkflowDefinitionRepository()
-            ->findByEntityClass($entityClass, $workflowName);
+            ->findByEntityClass($entityClass, $workflowName, $enabled);
 
         foreach ($workflowDefinitions as $workflowDefinition) {
             $result[$workflowDefinition->getName()] = $this->getAssembledWorkflow($workflowDefinition);

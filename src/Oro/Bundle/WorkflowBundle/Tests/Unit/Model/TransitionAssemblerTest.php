@@ -346,6 +346,8 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             'start_transition' => array(
                 'configuration' => array(
                     'transition_definition' => 'empty_definition',
+                    'acl_resource' => 'test_acl',
+                    'acl_message' => 'test acl message',
                     'label' => 'label',
                     'step_to' => 'step',
                     'is_start' => true,

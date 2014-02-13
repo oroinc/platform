@@ -26,19 +26,21 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $workflowDefinitionRepository
      * @return ManagerRegistry
      */
-    protected function createManagerRegistryMock($workflowDefinitionRepository)
+    protected function createManagerRegistryMock($workflowDefinitionRepository = null)
     {
         $managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->setMethods(array('getRepository'))
             ->getMockForAbstractClass();
-        $managerRegistry->expects($this->once())
-            ->method('getRepository')
-            ->with('OroWorkflowBundle:WorkflowDefinition')
-            ->will($this->returnValue($workflowDefinitionRepository));
+        if ($workflowDefinitionRepository) {
+            $managerRegistry->expects($this->once())
+                ->method('getRepository')
+                ->with('OroWorkflowBundle:WorkflowDefinition')
+                ->will($this->returnValue($workflowDefinitionRepository));
+        }
 
         return $managerRegistry;
     }
@@ -124,13 +126,27 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetWorkflowByEntityClass()
     {
         $entityClass = '\stdClass';
-        $workflowName = 'test_workflow';
-        $workflowDefinition = new WorkflowDefinition();
-        $workflowDefinition->setName($workflowName);
-        /** @var Workflow $workflow */
         $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
             ->disableOriginalConstructor()
             ->getMock();
+
+        list($managerRegistry, $workflowAssembler, $configProvider)
+            = $this->prepareArgumentsForGetWorkflowForEntityClass($entityClass, $workflow);
+
+        $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler, $configProvider);
+        $this->assertEquals($workflow, $workflowRegistry->getActiveWorkflowByEntityClass($entityClass));
+    }
+
+    /**
+     * @param string $entityClass
+     * @param Workflow $workflow
+     * @return array
+     */
+    protected function prepareArgumentsForGetWorkflowForEntityClass($entityClass, Workflow $workflow)
+    {
+        $workflowName = 'test_workflow';
+        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition->setName($workflowName);
 
         $workflowDefinitionRepository = $this->createWorkflowDefinitionRepositoryMock();
         $workflowDefinitionRepository->expects($this->once())
@@ -155,8 +171,7 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($entityClass)
             ->will($this->returnValue($config));
 
-        $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler, $configProvider);
-        $this->assertEquals($workflow, $workflowRegistry->getActiveWorkflowByEntityClass($entityClass));
+        return array($managerRegistry, $workflowAssembler, $configProvider);
     }
 
     public function testGetWorkflowByEntityClassNoEntityConfig()
@@ -217,10 +232,6 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         $workflowName = 'test_workflow';
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName($workflowName);
-        /** @var Workflow $workflow */
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $workflowDefinitionRepository = $this->createWorkflowDefinitionRepositoryMock();
         $workflowDefinitionRepository->expects($this->once())
@@ -247,5 +258,35 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
 
         $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler, $configProvider);
         $this->assertNull($workflowRegistry->getActiveWorkflowByEntityClass($entityClass));
+    }
+
+    public function testHasActiveWorkflowByEntityClass()
+    {
+        $entityClass = '\stdClass';
+        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        list($managerRegistry, $workflowAssembler, $configProvider)
+            = $this->prepareArgumentsForGetWorkflowForEntityClass($entityClass, $workflow);
+
+        $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler, $configProvider);
+        $this->assertTrue($workflowRegistry->hasActiveWorkflowByEntityClass($entityClass));
+    }
+
+    public function testHasActiveWorkflowByEntityClassNoWorkflow()
+    {
+        $entityClass = '\stdClass';
+
+        $managerRegistry = $this->createManagerRegistryMock();
+        $workflowAssembler = $this->createWorkflowAssemblerMock();
+        $configProvider = $this->createConfigurationProviderMock();
+        $configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($entityClass)
+            ->will($this->returnValue(false));
+
+        $workflowRegistry = new WorkflowRegistry($managerRegistry, $workflowAssembler, $configProvider);
+        $this->assertFalse($workflowRegistry->hasActiveWorkflowByEntityClass($entityClass));
     }
 }

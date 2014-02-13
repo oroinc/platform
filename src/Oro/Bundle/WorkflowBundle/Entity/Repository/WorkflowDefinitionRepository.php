@@ -13,9 +13,10 @@ class WorkflowDefinitionRepository extends EntityRepository
      *
      * @param string $entityClass
      * @param string|null $workflowName
+     * @param bool|null $enabled
      * @return WorkflowDefinition[]
      */
-    public function findByEntityClass($entityClass, $workflowName = null)
+    public function findByEntityClass($entityClass, $workflowName = null, $enabled = null)
     {
         $queryBuilder = $this->createQueryBuilder('wd');
         $queryBuilder
@@ -25,6 +26,11 @@ class WorkflowDefinitionRepository extends EntityRepository
         if ($workflowName) {
             $queryBuilder->andWhere('wd.name = :workflowName')
                 ->setParameter('workflowName', $workflowName);
+        }
+
+        if (null !== $enabled) {
+            $queryBuilder->andWhere('wd.enabled = :enabled')
+                ->setParameter('enabled', $enabled);
         }
 
         return $queryBuilder->getQuery()->getResult();

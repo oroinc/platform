@@ -45,5 +45,6 @@ services:
         class: %oro_workflow.form.type.workflow_select.class%
         arguments:
             - @oro_workflow.registry
+            - @translator
         tags:
             - { name: form.type, alias: oro_workflow_select }

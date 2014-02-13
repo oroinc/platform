@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -17,9 +17,15 @@ class WorkflowSelectType extends AbstractType
      */
     protected $workflowRegistry;
 
-    public function __construct(WorkflowRegistry $workflowRegistry)
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    public function __construct(WorkflowRegistry $workflowRegistry, TranslatorInterface $translator)
     {
         $this->workflowRegistry = $workflowRegistry;
+        $this->translator = $translator;
     }
 
     /**
@@ -67,9 +73,14 @@ class WorkflowSelectType extends AbstractType
 
                     $choices = array();
                     if ($entityClass) {
-                        $workflowDefinitions = $this->workflowRegistry->getWorkflowsByEntityClass($entityClass);
-                        foreach ($workflowDefinitions as $workflowDefinition) {
-                            $choices[$workflowDefinition->getName()] = $workflowDefinition->getLabel();
+                        $workflows = $this->workflowRegistry->getWorkflowsByEntityClass($entityClass);
+                        foreach ($workflows as $workflow) {
+                            $name = $workflow->getName();
+                            $label = $workflow->getLabel();
+                            if (!$workflow->isEnabled()) {
+                                $label = sprintf("%s (%s)", $label, $this->translator->trans('oro.workflow.disabled'));
+                            }
+                            $choices[$name] = $label;
                         }
                     }
 
