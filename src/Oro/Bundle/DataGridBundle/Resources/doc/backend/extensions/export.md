@@ -29,4 +29,4 @@ datagrid:
 ```
 
 Also you need to implement and register a writer for new export format. To register a writer in dependency container you should use the following naming convention: `oro_importexport.writer.echo.[format]`. So, a writer for PDF should be registerd as `oro_importexport.writer.echo.pdf`.
-You can use [existing CSV writer](../../../../../ImportExportBundle/Writer/CsvEchoWriter) as an example for your writer.
+You can use [existing CSV writer](../../../../../ImportExportBundle/Writer/CsvEchoWriter.php) as an example for your writer.
