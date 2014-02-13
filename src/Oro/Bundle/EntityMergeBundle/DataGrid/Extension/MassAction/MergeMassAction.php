@@ -50,10 +50,10 @@ class MergeMassAction extends AbstractMassAction
         }
 
         if (isset($options['entity_name'])) {
-            $options['max_element_count'] = $this
+            $options['max_element_count'] = 10;/*$this
                 ->metadataRegistry
                 ->getEntityMetadata($options['entity_name'])
-                ->getMaxEntitiesCount();
+                ->getMaxEntitiesCount();*/
         }
 
         if (!isset($options['route_parameters'])) {

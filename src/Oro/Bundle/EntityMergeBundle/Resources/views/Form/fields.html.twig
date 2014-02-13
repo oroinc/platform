@@ -8,18 +8,29 @@
             </td>
             {% for child in form.masterEntity %}
                 <td>
-                    <div class="entity-merge-blocks-wrapper">
-                        <label class="entity-merge-uppercase entity-merge-inline-label">
-                            {{ form_widget(child) }}
-                            <strong class="merge-entity-representative">
-                                {{ (oro_entity_merge_render_entity_label(form.vars.value, loop.index - 1)) }}
-                            </strong>
-                        </label>
-                        <a class="entity-merge-inline entity-merge-select-all" href="javascript:void(0);">
-                            Select all
-                        </a>
-                    </div>
+
+                        <div class="entity-merge-fields-blocks-wrapper">
+                            <label class="entity-merge-uppercase entity-merge-inline">
+                                {{ form_widget(child, {'attr': form.vars.attr|merge({'class': 'entity-merge-field-choice'})}) }}
+
+                                <strong data-entity-key="{{ child.vars.name }}" data-entity-field-name="{{ child.vars.full_name }}" class="merge-entity-representative">
+                                    {{ (oro_entity_merge_render_entity_label(form.vars.value, loop.index - 1)) }}
+                                </strong>
+                            </label>
+                        </div>
                 </td>
+            {% endfor %}
+        </tr>
+        <tr>
+            <td class="entity-merge-select-all-holder">
+
+            </td>
+            {% for child in form.masterEntity %}
+            <td class="entity-merge-select-all-holder">
+                <a class="entity-merge-select-all" data-entity-key="{{ child.vars.value }}" href="javascript:void(0);">
+                    {{ "Select all"|trans }}
+                </a>
+            </td>
             {% endfor %}
         </tr>
         </thead>
@@ -68,9 +79,9 @@
 {% endblock %}
 
 {% block oro_entity_merge_choice_value_widget %}
-    <div class="entity-merge-blocks-wrapper">
-        <div class="entity-merge-inline">{{ form_widget(form) }}</div>
-        <label class="entity-merge-inline-label merge-entity-representative"
+    <div class="entity-merge-fields-blocks-wrapper">
+        <div class="entity-merge-inline">{{ form_widget(form, {'attr': form.vars.attr|merge({'class': 'entity-merge-field-choice'})}) }}</div>
+        <label data-entity-key="{{ form.vars.name }}" data-entity-field-name="{{ form.vars.full_name }}" class="entity-merge-inline-label merge-entity-representative"
                for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
         {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
         </label>

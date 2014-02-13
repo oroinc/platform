@@ -1,9 +1,9 @@
 .table.entity-merge-table input[type="radio"]{
     margin-top: 0;
 }
-.entity-merge-select-all{
-    padding-left: 12px;
-    width: 70px;
+.entity-merge-table tr td.entity-merge-select-all-holder{
+    border-top:none;
+    padding-top: 0;
 }
 .table.entity-merge-table .merge-first-column{
     vertical-align: top;
@@ -26,10 +26,8 @@
 }
 .entity-merge-table thead .entity-merge-inline-label{
     line-height: 16px;
-    padding: 3px 12px 0 0px;
-    border-right: 1px solid #DDDDDD;
 }
-.entity-merge-table thead .entity-merge-inline-label input[type="radio"]{
+.entity-merge-table thead .entity-merge-inline input[type="radio"]{
     margin-right: 5px;
 }
 .entity-merge-inline-label{
@@ -49,15 +47,19 @@
 .entity-merge-strategy-wrapper{
     padding-top:10px;
 }
-.entity-merge-blocks-wrapper{
+.entity-merge-fields-blocks-wrapper {
     overflow: hidden;
 }
-tbody .entity-merge-blocks-wrapper .entity-merge-inline-label{
-    width: calc(100% - 20px);
+.entity-merge-header-wrapper{
+    position: relative;
+    padding-bottom: 12px;
 }
-thead .entity-merge-blocks-wrapper .entity-merge-inline-label{
-    max-width: calc(100% - 70px);
+tbody .entity-merge-fields-blocks-wrapper .entity-merge-inline-label{
+    width: calc(100% - 20px);
 }
 .entity-merge-not-selected{
     color: #CECECE;
+}
+.entity-merge-small-select{
+    width: 150px;
 }
