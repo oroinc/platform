@@ -1,6 +1,5 @@
 define(['jquery', 'underscore', 'oro/modal', 'oro/workflow-transition-executor'],
 function($, _, Modal, performTransition) {
-    console.log(performTransition);
     'use strict';
 
     /**

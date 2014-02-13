@@ -62,7 +62,8 @@
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': transitionFormUrl,
-            'alias': 'transition-form'
+            'alias': 'transition-form',
+            'loadingElement': '#main'
         }) }}
         <script type="text/javascript">
             require(['jquery', 'oro/widget-manager', 'oro/workflow-transition-executor'],
