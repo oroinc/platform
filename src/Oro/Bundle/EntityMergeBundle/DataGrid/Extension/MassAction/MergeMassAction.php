@@ -54,10 +54,7 @@ class MergeMassAction extends AbstractMassAction
                 ->metadataRegistry
                 ->getEntityMetadata($options['entity_name'])
                 ->getMaxEntitiesCount();
-        } else {
-            $options['max_element_count'] = EntityMetadata::MAX_ENTITIES_COUNT;
         }
-
 
         if (!isset($options['route_parameters'])) {
             $options['route_parameters'] = array();

@@ -5,14 +5,12 @@ namespace Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 
-use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MinEntitiesCount;
 
 class MergeMassActionHandler implements MassActionHandlerInterface
 {
@@ -35,15 +33,14 @@ class MergeMassActionHandler implements MassActionHandlerInterface
     public function handle(MassActionHandlerArgs $args)
     {
         $massAction = $args->getMassAction();
-        $this->validateMassAction($massAction);
         $options = $massAction->getOptions()->toArray();
+
+        if (empty($options['entity_name'])) {
+            throw new InvalidArgumentException('Entity name is missing.');
+        }
 
         $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($options['entity_name']);
         $entityIds = $this->getIdsFromResult($args->getResults(), $entityIdentifier);
-
-        $maxCountOfElements = $options['max_element_count'];
-        $countOfSelectedItems = count($entityIds);
-        $this->validateItemsCount($countOfSelectedItems, $maxCountOfElements);
 
         $entities = $this->doctrineHelper->getEntitiesByIds(
             $options['entity_name'],
@@ -59,46 +56,6 @@ class MergeMassActionHandler implements MassActionHandlerInterface
                 'options' => $options
             )
         );
-    }
-
-
-    /**
-     * @param MassActionInterface $massAction
-     * @throws InvalidArgumentException
-     */
-    public function validateMassAction(MassActionInterface $massAction)
-    {
-        $options = $massAction->getOptions()->toArray();
-        if (empty($options['entity_name'])) {
-            throw new InvalidArgumentException('Entity name is missing.');
-        }
-
-        if (empty($options['max_element_count'])
-            || (int)$options['max_element_count'] < MinEntitiesCount::MIN_ENTITIES_COUNT
-        ) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Option "max_element_count" of "%s" mass action is invalid.',
-                    $massAction->getName()
-                )
-            );
-        }
-    }
-
-    /**
-     * @param int $countOfSelectedItems
-     * @param int $maxCountOfElements
-     * @throws InvalidArgumentException
-     */
-    public function validateItemsCount($countOfSelectedItems, $maxCountOfElements)
-    {
-        if ($countOfSelectedItems < MinEntitiesCount::MIN_ENTITIES_COUNT) {
-            throw new InvalidArgumentException(
-                sprintf('Count of selected items less then %s', MinEntitiesCount::MIN_ENTITIES_COUNT)
-            );
-        } elseif ($countOfSelectedItems > $maxCountOfElements) {
-            throw new InvalidArgumentException('Too many items selected');
-        }
     }
 
     /**

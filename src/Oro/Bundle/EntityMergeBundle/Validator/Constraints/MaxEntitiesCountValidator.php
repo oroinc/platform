@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Validator\Constraints;
 
-use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class MaxEntitiesCountValidator extends ConstraintValidator
 {
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
@@ -25,13 +26,13 @@ class MaxEntitiesCountValidator extends ConstraintValidator
 
         /* @var EntityData $value */
         $maxEntitiesCount = $value->getMetadata()->getMaxEntitiesCount();
-        $entitiesCount    = sizeof($value->getEntities());
+        $entitiesCount    = count($value->getEntities());
 
         if ($entitiesCount > $maxEntitiesCount) {
             $this->context->addViolation(
                 /* @var MaxEntitiesCount $constraint */
                 $constraint->message,
-                ['%max_count%' => $maxEntitiesCount]
+                ['{{ limit }}' => $maxEntitiesCount]
             );
         }
     }

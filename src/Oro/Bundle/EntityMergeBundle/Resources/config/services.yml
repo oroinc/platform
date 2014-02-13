@@ -33,7 +33,6 @@ parameters:
 
     # Validator
     oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator
-    oro_entity_merge.validator.min_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MinEntitiesCountValidator
 services:
     oro_entity_merge.doctrine_helper:
         class: %oro_entity_merge.doctrine_helper.class%
@@ -147,9 +146,4 @@ services:
     oro_entity_merge.validator.max_entities_validator:
         class: %oro_entity_merge.validator.max_entities_validator.class%
         tags:
-            - { name: validator.constraint_validator, alias: max_entities_validator }
-
-    oro_entity_merge.validator.min_entities_validator:
-        class: %oro_entity_merge.validator.min_entities_validator.class%
-        tags:
-            - { name: validator.constraint_validator, alias: min_entities_validator }
+            - { name: validator.constraint_validator, alias: oro_entity_merge_max_entities_validator }

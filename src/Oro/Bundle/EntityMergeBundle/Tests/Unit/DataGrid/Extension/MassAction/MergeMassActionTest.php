@@ -7,6 +7,8 @@ use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction;
 
 class MergeMassActionTest extends \PHPUnit_Framework_TestCase
 {
+    const MAX_ENTITIES_COUNT = 1;
+
     /**
      * @var MergeMassAction $target
      */
@@ -22,7 +24,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
         $metadata
             ->expects($this->any())
             ->method('getMaxEntitiesCount')
-            ->will($this->returnValue(10));
+            ->will($this->returnValue(self::MAX_ENTITIES_COUNT));
 
         $metadataRegistry = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
@@ -60,7 +62,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'frontend_type'     => 'merge-mass',
                     'route'             => 'oro_entity_merge_massaction',
                     'data_identifier'   => 'id',
-                    'max_element_count' => 10,
+                    'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route_parameters'  => array()
                 )
             ),
@@ -71,7 +73,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
-                    'max_element_count' => 10,
+                    'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array()
                 ),
@@ -81,7 +83,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
-                    'max_element_count' => 10,
+                    'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array()
                 )
