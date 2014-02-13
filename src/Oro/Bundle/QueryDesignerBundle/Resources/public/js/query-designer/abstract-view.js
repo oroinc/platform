@@ -56,9 +56,6 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             // prepare field label getters
             this.addFieldLabelGetter(this.getSelectFieldLabel);
             this.addFieldLabelGetter(this.getColumnFieldLabel);
-
-            this.$el.on('model:edit', _.bind(this.onModelEdit, this));
-            this.$el.on('model:delete', _.bind(this.onModelDelete, this));
         },
 
         initForm: function () {
@@ -107,7 +104,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
                 var data = this.getFormData();
                 this.clearFormData();
                 model.set(data);
-                this.$itemContainer.itemContainerWidget('addModel', model);
+                this.$itemContainer.itemContainer('addModel', model);
             }
         },
 
@@ -273,5 +270,8 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             }
         },
 
+        onCollectionReset: function () {
+            this.resetForm();
+        }
     });
 });

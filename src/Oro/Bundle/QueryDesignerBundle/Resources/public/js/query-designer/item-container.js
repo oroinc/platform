@@ -6,7 +6,7 @@ function($, _, __, DeleteConfirmation) {
     /**
      * Item container widget
      */
-    $.widget('oroquerydesigner.itemContainerWidget', {
+    $.widget('oroquerydesigner.itemContainer', {
         options: {
             itemTemplateSelector: null,
             selectors: {
@@ -73,7 +73,7 @@ function($, _, __, DeleteConfirmation) {
                 }
             }, this);
             if (collectionChanged) {
-                this.element.trigger('collection:change');
+                this._trigger('collection:change');
             }
         },
 
@@ -84,27 +84,27 @@ function($, _, __, DeleteConfirmation) {
 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
-            this.element.trigger('collection:change');
+            this._trigger('collection:change');
         },
 
         _onModelChanged: function (model) {
             this.element.find('[data-id="' + model.id + '"]').outerHTML(this._renderModel(model));
-            this.element.trigger('collection:change');
+            this._trigger('collection:change');
         },
 
         _onModelDeleted: function (model) {
             this.element.find('[data-id="' + model.id + '"]').remove();
-            this.element.trigger('collection:change');
+            this._trigger('collection:change');
         },
 
         _onResetCollection: function () {
             this.element.empty();
-            //this.resetForm();
+            this._trigger('collection:reset');
             this.options.collection.each(_.bind(function (model, index) {
                 this.initModel(model, index);
                 this.element.append(this._renderModel(model));
             }, this));
-            this.element.trigger('collection:change');
+            this._trigger('collection:change');
         },
 
         _renderModel: function (model) {
@@ -126,7 +126,7 @@ function($, _, __, DeleteConfirmation) {
                 var el = $(e.currentTarget);
                 var id = el.closest('[data-id]').data('id');
                 var model = this.options.collection.get(id);
-                this.element.trigger('model:edit', {
+                this._trigger('model:edit', {
                     modelId: id,
                     modelAttributes: model.attributes
                 });
@@ -149,7 +149,7 @@ function($, _, __, DeleteConfirmation) {
 
         _handleDeleteModel: function (modelId) {
             var model = this.options.collection.get(modelId);
-            this.element.trigger('model:delete', {
+            this._trigger('model:delete', {
                 modelId: modelId
             });
             this.deleteModel(model);
