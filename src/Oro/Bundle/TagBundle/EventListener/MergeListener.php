@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
-use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
-use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 
@@ -31,9 +30,11 @@ class MergeListener
     }
 
     /**
-     * @param CreateMetadataEvent $event
+     * Add merge metadata for tags
+     *
+     * @param EntityMetadataEvent $event
      */
-    public function onCreateMetadata(CreateMetadataEvent $event)
+    public function onCreateMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
         if (!$this->isTaggable($entityMetadata)) {
@@ -44,16 +45,20 @@ class MergeListener
             'getter'        => self::GETTER,
             'setter'        => self::SETTER,
             'field_name'    => self::FIELD_NAME,
-            'is_collection' => true
+            'is_collection' => true,
+            'merge_modes'   => [MergeModes::REPLACE, MergeModes::MERGE]
         ];
-        $fieldMetadata        = new FieldMetadata($fieldMetadataOptions);
+
+        $fieldMetadata = new FieldMetadata($fieldMetadataOptions);
         $entityMetadata->addFieldMetadata($fieldMetadata);
     }
 
     /**
-     * @param CreateEntityDataEvent $event
+     * Load tags
+     *
+     * @param EntityDataEvent $event
      */
-    public function onCreateEntityData(CreateEntityDataEvent $event)
+    public function onCreateEntityData(EntityDataEvent $event)
     {
         $entityData     = $event->getEntityData();
         $entityMetadata = $entityData->getMetadata();
@@ -69,9 +74,11 @@ class MergeListener
     }
 
     /**
-     * @param AfterMergeEvent $event
+     * Save tags
+     *
+     * @param EntityDataEvent $event
      */
-    public function afterMerge(AfterMergeEvent $event)
+    public function afterMergeEntity(EntityDataEvent $event)
     {
         $entityData     = $event->getEntityData();
         $entityMetadata = $entityData->getMetadata();
@@ -79,8 +86,11 @@ class MergeListener
             return;
         }
 
+        /* @var Taggable $masterEntity */
         $masterEntity = $entityData->getMasterEntity();
-        $this->manager->saveTagging($masterEntity, false);
+        $masterTags   = $masterEntity->getTags()->getValues();
+        $masterEntity->setTags(['all' => $masterTags, 'owner' => $masterTags]);
+        $this->manager->saveTagging($masterEntity);
     }
 
     /**

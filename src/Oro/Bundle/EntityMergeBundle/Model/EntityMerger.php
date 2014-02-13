@@ -6,8 +6,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\EntityMergeBundle\Model\Step\StepSorter;
 use Oro\Bundle\EntityMergeBundle\Model\Step\MergeStepInterface;
-use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 
@@ -52,12 +51,12 @@ class EntityMerger implements EntityMergerInterface
      */
     public function merge(EntityData $data)
     {
-        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE, new BeforeMergeEvent($data));
+        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE_ENTITY, new EntityDataEvent($data));
 
         foreach (StepSorter::getOrderedSteps($this->steps) as $step) {
             $step->run($data);
         }
 
-        $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE, new AfterMergeEvent($data));
+        $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE_ENTITY, new EntityDataEvent($data));
     }
 }

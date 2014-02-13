@@ -2,6 +2,9 @@ Oro\Bundle\EntityMergeBundle\Data\EntityData:
     properties:
         masterEntity:
             - NotBlank: ~
+        entities:
+            - Count:
+                min: 2
+                minMessage: You need minimum {{ limit }} entities to merge.
     constraints:
         - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount: ~
-        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MinEntitiesCount: ~

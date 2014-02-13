@@ -48,10 +48,10 @@ class MergeStrategy implements StrategyInterface
         foreach ($entities as $entity) {
             $doctrineMetadata = $doctrineMetadataFactory->getMetadataFor(ClassUtils::getRealClass($entity));
             $ids              = $doctrineMetadata->getIdentifierValues($entity);
-            $key              = implode('_', $ids);
+            $doctrineKey      = implode('_', $ids);
             $values           = $this->accessor->getValue($entity, $fieldMetadata);
-            foreach ($values as $value) {
-                $relatedEntities[$key] = $value;
+            foreach ($values as $key => $value) {
+                $relatedEntities[$doctrineKey . '_' . $key] = $value;
             }
         }
 
@@ -65,11 +65,7 @@ class MergeStrategy implements StrategyInterface
     public function supports(FieldData $fieldData)
     {
         if ($fieldData->getMode() == MergeModes::MERGE) {
-            $fieldDoctrineMetadata = $fieldData->getMetadata()->getDoctrineMetadata();
-            $isCollection = $fieldDoctrineMetadata->isCollection();
-            $isMappedBySourceEntity = $fieldDoctrineMetadata->isMappedBySourceEntity();
-
-            return $isCollection || !$isMappedBySourceEntity;
+            return $fieldData->getMetadata()->isCollection();
         }
 
         return false;

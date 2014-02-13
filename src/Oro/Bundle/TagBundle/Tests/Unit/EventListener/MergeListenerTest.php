@@ -3,9 +3,9 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Event\CreateEntityDataEvent;
-use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
+
+use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\TagBundle\EventListener\MergeListener;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\NotTaggableEntityStub;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\TaggableEntityStub;
@@ -68,7 +68,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('addFieldMetadata');
 
-        $event = new CreateMetadataEvent($this->entityMetadata);
+        $event = new EntityMetadataEvent($this->entityMetadata);
 
         $this->listener->onCreateMetadata($event);
     }
@@ -93,25 +93,25 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly(2))
             ->method('loadTagging');
 
-        $event = new CreateEntityDataEvent($this->entityData);
+        $event = new EntityDataEvent($this->entityData);
 
         $this->listener->onCreateEntityData($event);
     }
 
-    public function testAfterMerge()
+    public function testAfterMergeEntity()
     {
         $this->entityData
             ->expects($this->any())
             ->method('getMasterEntity')
             ->will($this->returnValue($this->createTaggableEntity('foo')));
 
-        $event = new AfterMergeEvent($this->entityData);
+        $event = new EntityDataEvent($this->entityData);
 
         $this->manager
             ->expects($this->once())
             ->method('saveTagging');
 
-        $this->listener->afterMerge($event);
+        $this->listener->afterMergeEntity($event);
     }
 
     public function testNotTaggable()
@@ -131,7 +131,7 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->never())
             ->method('addFieldMetadata');
 
-        $event = new CreateMetadataEvent($this->entityMetadata);
+        $event = new EntityMetadataEvent($this->entityMetadata);
 
         $this->listener->onCreateMetadata($event);
     }

@@ -1,0 +1,2 @@
+"You need minimum {{ limit }} entities to merge.": "You need minimum {{ limit }} entities to merge."
+"You can merge only {{ limit }} entities at once.": "You can merge only {{ limit }} entities at once."

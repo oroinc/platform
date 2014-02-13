@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model;
 
-use Oro\Bundle\EntityMergeBundle\Event\AfterMergeEvent;
-use Oro\Bundle\EntityMergeBundle\Event\BeforeMergeEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 
@@ -45,15 +44,15 @@ class StrategyTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
             ->with(
-                MergeEvents::BEFORE_MERGE,
-                new BeforeMergeEvent($data)
+                MergeEvents::BEFORE_MERGE_ENTITY,
+                new EntityDataEvent($data)
             );
 
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
             ->with(
-                MergeEvents::AFTER_MERGE,
-                new AfterMergeEvent($data)
+                MergeEvents::AFTER_MERGE_ENTITY,
+                new EntityDataEvent($data)
             );
 
         $this->merger->merge($data);

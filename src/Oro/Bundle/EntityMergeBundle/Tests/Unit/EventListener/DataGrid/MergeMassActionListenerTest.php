@@ -24,7 +24,7 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $object;
+    private $datagridConfig;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -46,9 +46,11 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
         $this->metadataRegistry = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->entityMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->buildBefore = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Event\BuildBefore')
             ->disableOriginalConstructor()
             ->getMock();
@@ -56,39 +58,43 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
         $this->entityName = 'testEntityName';
         $this->config = array('mass_actions' => array('merge' => array('entity_name' => $this->entityName)));
 
-        $this->object = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Common\Object')
+        $this->datagridConfig = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->buildBefore->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($this->object));
+            ->will($this->returnValue($this->datagridConfig));
 
         $this->target = new MergeMassActionListener($this->metadataRegistry);
     }
 
-    public function testOnBuildBeforeShouldUnsetMergeMassActionIfEnableConfigReturnFalse()
+    public function testOnBuildUnsetMergeMassAction()
     {
         $this->init();
+
         $this->entityMetadata->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('enable'))
+            ->method('is')
+            ->with('enable', true)
             ->will($this->returnValue(false));
-        $this->object->expects($this->once())
+
+        $this->datagridConfig->expects($this->once())
             ->method('offsetUnsetByPath')
-            ->with($this->equalTo('[mass_actions][merge]'));
+            ->with('[mass_actions][merge]');
 
         $this->target->onBuildBefore($this->buildBefore);
     }
 
-    public function testOnBuildBeforeShouldNotUnsetMergeMassActionIfEnableConfigReturnTrue()
+    public function testOnBuildNotUnsetMergeMass()
     {
-        $this->initMetadataRegistry();
-        $this->initObject();
+        $this->init();
+
         $this->entityMetadata->expects($this->once())
-            ->method('get')
-            ->with($this->equalTo('enable'))
+            ->method('is')
+            ->with('enable', true)
             ->will($this->returnValue(true));
-        $this->object->expects($this->never())
+
+        $this->datagridConfig->expects($this->never())
             ->method('offsetUnsetByPath')
             ->withAnyParameters();
 
@@ -96,9 +102,10 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
         $this->target->onBuildBefore($this->buildBefore);
     }
 
-    public function testOnBuildBeforeDoesNotCallGetEntityMetadataIfMergeKeyDoesNotExistInConfig()
+    public function testOnBuildBeforeSkipsForEmptyMassActions()
     {
-        $this->initObject(array('mass_actions' => array()));
+        $this->initDatagridConfig(array('mass_actions' => array()));
+
         $this->metadataRegistry->expects($this->never())
             ->method('getEntityMetadata')
             ->withAnyParameters();
@@ -106,9 +113,10 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
         $this->target->onBuildBefore($this->buildBefore);
     }
 
-    public function testOnBuildBeforeDoesNotCallGetEntityMetadataIfEntityNameIsEmpty()
+    public function testOnBuildBeforeForEmptyEntityName()
     {
-        $this->initObject(array('mass_actions' => array('merge' => array('entity_name' => ''))));
+        $this->initDatagridConfig(array('mass_actions' => array('merge' => array('entity_name' => ''))));
+
         $this->metadataRegistry->expects($this->never())
             ->method('getEntityMetadata')
             ->withAnyParameters();
@@ -123,19 +131,36 @@ class MergeMassActionListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->entityMetadata));
     }
 
-    protected function initObject($offsetResult = null)
+    protected function initDatagridConfig($offsetResult = null)
     {
+        $rawConfig = $this->config;
         $offsetResult = $offsetResult === null ? $this->config['mass_actions'] : $offsetResult;
 
-        $this->object->expects($this->any())
+        $this->datagridConfig->expects($this->any())
+            ->method('offsetExists')
+            ->with('mass_actions')
+            ->will(
+                $this->returnCallback(
+                    function ($offset) use ($rawConfig) {
+                        return isset($rawConfig[$offset]);
+                    }
+                )
+            );
+
+        $this->datagridConfig->expects($this->any())
             ->method('offsetGet')
-            ->with($this->equalTo('mass_actions'))
+            ->with('mass_actions')
+            ->will($this->returnValue($offsetResult));
+
+        $this->datagridConfig->expects($this->any())
+            ->method('offsetGet')
+            ->with('mass_actions')
             ->will($this->returnValue($offsetResult));
     }
 
     protected function init()
     {
         $this->initMetadataRegistry();
-        $this->initObject();
+        $this->initDatagridConfig();
     }
 }

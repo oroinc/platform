@@ -6,7 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
-use Oro\Bundle\EntityMergeBundle\Event\CreateMetadataEvent;
+use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 
@@ -75,7 +75,7 @@ class MetadataFactory
 
         $this->eventDispatcher->dispatch(
             MergeEvents::CREATE_METADATA,
-            new CreateMetadataEvent($metadata)
+            new EntityMetadataEvent($metadata)
         );
 
         return $metadata;

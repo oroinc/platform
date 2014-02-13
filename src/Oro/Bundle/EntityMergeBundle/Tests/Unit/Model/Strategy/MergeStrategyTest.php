@@ -48,23 +48,28 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
     {
         $fieldData         = $this->createFieldData();
         $fieldMetadataData = $this->createFieldMetadata();
-        $doctrineMetadata  = $this->createDoctrineMetadata();
 
         $fieldData
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getMode')
             ->will($this->returnValue(MergeModes::MERGE));
 
         $fieldMetadataData
-            ->expects($this->once())
-            ->method('getDoctrineMetadata')
-            ->will($this->returnValue($doctrineMetadata));
+            ->expects($this->at(0))
+            ->method('isCollection')
+            ->will($this->returnValue(false));
+
+        $fieldMetadataData
+            ->expects($this->at(1))
+            ->method('isCollection')
+            ->will($this->returnValue(true));
 
         $fieldData
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getMetadata')
             ->will($this->returnValue($fieldMetadataData));
 
+        $this->assertFalse($this->strategy->supports($fieldData));
         $this->assertTrue($this->strategy->supports($fieldData));
     }
 

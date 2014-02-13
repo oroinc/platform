@@ -36,7 +36,9 @@ class FieldData
     {
         $this->entityData = $entityData;
         $this->metadata = $metadata;
-        $this->mode = $metadata->getMergeMode();
+        if ($metadata->getMergeMode()) {
+            $this->mode = $metadata->getMergeMode();
+        }
     }
 
     /**
