@@ -1,6 +1,6 @@
 Export extension
 ================
-This extension provides a functionality to export grid rows. This allows you to export rows from all pages. The exported data are the same as you see them on a grid, including filters and sorting.
+This extension provides a functionality to export grid rows. This allows you to export rows from all pages. The exported data will be the same as on a grid, including filters and sorting.
 
 Configuration
 -------------
