@@ -4,9 +4,11 @@ parameters:
     oro_entity_merge.mass_action.merge_mass_action_listener.class: Oro\Bundle\EntityMergeBundle\EventListener\DataGrid\MergeMassActionListener
 services:
     oro_entity_merge.mass_action.merge_mass_action_listener:
-        class: %oro_entity_merge.mass_action.merge_mass_action_listener.class%
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.before.widget-calls-grid, method: onBuildBefore }
+           class: %oro_entity_merge.mass_action.merge_mass_action_listener.class%
+           arguments:
+               - @oro_entity_merge.metadata.registry
+           tags:
+               - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.before.accounts-grid, method: onBuildBefore }
 
     oro_entity_merge.mass_action.merge:
         class: %oro_entity_merge.mass_action.merge.class%

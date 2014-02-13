@@ -3,34 +3,37 @@
 namespace Oro\Bundle\EntityMergeBundle\EventListener\DataGrid;
 
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class MergeMassActionListener
 {
+    protected $metadataRegistry;
+
+    public function __construct(MetadataRegistry $metadataRegistry)
+    {
+        $this->metadataRegistry = $metadataRegistry;
+    }
+
     /**
-     * Remove useless fields in case of filtering
+     * Remove mass action if entity config mass action disabled
      *
      * @param BuildBefore $event
      */
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();
-        $parameters = $event->getParameters();
-
-        if (!empty($parameters['contactId'])) {
-            $this->removeColumn($config, 'contactName');
+        $massActions = $config['mass_actions'];
+        if (!isset($massActions['merge']) || empty($massActions['merge']['entity_name'])) {
+            return;
         }
 
-        if (!empty($parameters['accountId'])) {
-            $this->removeColumn($config, 'accountName');
-        }
-    }
+        $entityName = $massActions['merge']['entity_name'];
 
-    /**
-     * @param object $config
-     * @param string $columnName
-     */
-    public function removeColumn($config, $columnName)
-    {
-        //@todo: implement
+        $entityMergeEnable = $this->metadataRegistry->getEntityMetadata($entityName)
+            ->get('enable');
+
+        if (!$entityMergeEnable) {
+            $config->offsetUnsetByPath('[mass_actions][merge]');
+        }
     }
 }
