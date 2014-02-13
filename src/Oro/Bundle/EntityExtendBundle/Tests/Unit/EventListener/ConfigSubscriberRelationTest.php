@@ -106,15 +106,11 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
         $this->runPersistConfig(
             $eventConfig,
             $selfEntityConfig,
-            [
-                'state' => [0 => null, 1 => ExtendManager::STATE_NEW]
-            ]
+            ['state' => [0 => null, 1 => ExtendManager::STATE_NEW]]
         );
 
         /** @var ConfigManager $cm */
         $cm = $this->event->getConfigManager();
-        //print_r($cm->persistConfigs);
-
         /*
         $this->assertAttributeEquals(
             [
