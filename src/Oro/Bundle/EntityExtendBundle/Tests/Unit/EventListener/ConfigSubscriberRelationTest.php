@@ -18,9 +18,11 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
     protected $event;
 
     /**
-     *  Test create new field (relation type [*:*])
+     * Test create new field (relation type [*:*])
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPersistConfig_ScopeExtend_RelationType_createTargetRelation_manyToMany()
+    public function testPersistConfigScopeExtendRelationTypeCreateTargetRelationManyToMany()
     {
         $fieldConfigId = new FieldConfigId('extend', 'TestClass', 'rel', 'manyToMany');
         $eventConfig   = new Config($fieldConfigId);
@@ -52,7 +54,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
                         'owner'           => true,
                         'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
                         'field_id'        => new FieldConfigId(
-                                'extend',
+                            'extend',
                             'TestEntity',
                             'rel',
                             'manyToMany'
