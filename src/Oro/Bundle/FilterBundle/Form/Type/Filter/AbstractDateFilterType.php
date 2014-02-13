@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Provider\DatevariablesInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -27,12 +28,17 @@ abstract class AbstractDateFilterType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var DatevariablesInterface */
+    protected $dateVars;
+
     /**
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface    $translator
+     * @param DatevariablesInterface $dateVars
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, DatevariablesInterface $dateVars)
     {
         $this->translator = $translator;
+        $this->dateVars = $dateVars;
     }
 
     /**
@@ -76,6 +82,12 @@ abstract class AbstractDateFilterType extends AbstractType
                     self::PART_DOY     => $t->trans('oro.filter.form.label_date_part.dayofyear'),
                     self::PART_YEAR    => $t->trans('oro.filter.form.label_date_part.year'),
                 ],
+                'date_vars' => array_map(
+                    function ($item) use ($t) {
+                        return $t->trans($item);
+                    },
+                    $this->dateVars->getDateVariables()
+                ),
             ]
         );
     }
@@ -90,5 +102,6 @@ abstract class AbstractDateFilterType extends AbstractType
         $widgetOptions                = ['firstDay' => 0];
         $view->vars['widget_options'] = array_merge($widgetOptions, $options['widget_options']);
         $view->vars['date_parts']     = $options['date_parts'];
+        $view->vars['date_vars']      = $options['date_vars'];
     }
 }

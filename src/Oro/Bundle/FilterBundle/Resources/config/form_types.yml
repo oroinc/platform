@@ -36,13 +36,17 @@ services:
 
     oro_filter.form.type.filter.date_range:
         class:     Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType
-        arguments: ["@translator"]
+        arguments:
+            - @translator
+            - @oro_filter.provider.datevarsprovider
         tags:
             - { name: form.type, alias: oro_type_date_range_filter }
 
     oro_filter.form.type.filter.datetime_range:
         class:     Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType
-        arguments: ["@translator"]
+        arguments:
+            - @translator
+            - @oro_filter.provider.datevarsprovider
         tags:
             - { name: form.type, alias: oro_type_datetime_range_filter }
 

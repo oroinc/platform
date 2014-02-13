@@ -306,6 +306,11 @@ abstract class AbstractDateFilter extends AbstractFilter
         $metadata['typeValues']            = $formView->vars['type_values'];
         $metadata['externalWidgetOptions'] = $formView->vars['widget_options'];
         $metadata['dateParts']             = $formView->vars['date_parts'];
+        //$metadata['dateVars']              = $formView->vars['date_vars'];
+        $metadata['externalWidgetOptions'] = array_merge(
+            $formView->vars['widget_options'],
+            ['dateVars' => $formView->vars['date_vars']]
+        );
 
         return $metadata;
     }

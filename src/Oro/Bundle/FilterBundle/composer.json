@@ -11,7 +11,7 @@
         "oro/ui-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",
-        "luxifer/doctrine-functions": "dev-master"
+        "luxifer/doctrine-functions": "1.1.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\FilterBundle": "" }

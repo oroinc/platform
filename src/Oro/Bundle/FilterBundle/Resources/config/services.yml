@@ -1,5 +1,6 @@
 parameters:
-    oro_filter.extension.orm_filter.class: Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
+    oro_filter.extension.orm_filter.class:      Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
+    oro_filter.provider.datevarsprovider.class: Oro\Bundle\FilterBundle\Provider\DatevarsProvider
 
 services:
     oro_filter.extension.orm_filter:
@@ -9,3 +10,6 @@ services:
             - @translator
         tags:
             - { name: oro_datagrid.extension }
+
+    oro_filter.provider.datevarsprovider:
+        class: %oro_filter.provider.datevarsprovider.class%

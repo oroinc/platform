@@ -202,3 +202,8 @@
 .ui-datevariables-div dl {
     margin: 0px;
 }
+a.ui_dvariable {
+    color: #006acc !important;
+    font-weight: bold;
+    cursor: pointer;
+}

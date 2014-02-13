@@ -105,14 +105,13 @@
                 tp_inst = this;
 
             // Prevent displaying twice
-            o.showDatevariables = true;
             if ($dp.find("div.ui-datevariables-div").length === 0 && o.showDatevariables) {
                 var html = '<div class="ui-datevariables-div'+ (o.isRTL? ' ui-datevariables-rtl' : '') +'"><dl>' +
-                        '<dt class="ui_dvars_time_label">Date vars</dt>' +
-                        '<dd class="ui_dvars_content">sdf</dd>' +
-                        '<dd class="ui_dvars_content">sdf</dd>' +
-                        '<dd class="ui_dvars_content">sdf</dd>'
-                    ;
+                        '<dt class="ui_dvars_time_label">Date variables</dt>';
+                for (var varCode in o.dateVars) {
+                    html += '<dd class="ui_dvars_content">' +
+                        '<a class="ui_dvariable" href="#" data-code="' + varCode + '">{{ ' + o.dateVars[varCode] + ' }}</a></dd>';
+                }
                 html += '</dl></div>';
 
                 var $tp = $(html);
@@ -128,6 +127,14 @@
                 } else {
                     $dp.append($tp);
                 }
+
+                $(".ui-datevariables-div a.ui_dvariable").click(function() {
+                    var code = this.dataset.code,
+                        variable = this.text;
+
+                    tp_inst.$input.val(variable);
+                    tp_inst.$input.trigger("change");
+                });
             }
         },
 

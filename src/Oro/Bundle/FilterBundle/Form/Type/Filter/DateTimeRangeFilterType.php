@@ -35,7 +35,10 @@ class DateTimeRangeFilterType extends AbstractDateFilterType
 
         $resolver->setDefaults(
             array(
-                'field_type' => DateTimeRangeType::NAME
+                'field_type' => DateTimeRangeType::NAME,
+                'widget_options' => [
+                    'showDatevariables' => true,
+                ]
             )
         );
     }
