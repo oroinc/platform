@@ -107,29 +107,24 @@ class ResponseHistoryListener
      */
     private function canAddToHistory(Response $response, Request $request)
     {
-        $result = !(
-            $response->getStatusCode() != 200
-            || $request->getRequestFormat() != 'html'
-            || $request->getMethod() != 'GET'
-            || ($request->isXmlHttpRequest()
-                && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
-            || is_null($this->user)
-        );
+        $result =
+            $response->getStatusCode() == 200
+            && $request->getRequestFormat() == 'html'
+            && $request->getMethod() == 'GET'
+            && (!$request->isXmlHttpRequest()
+                || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
+            && $this->user;
 
         if ($result) {
             $route = $request->get('_route');
-            $result = !(
-                $route[0] == '_'
-                || $route == 'oro_default'
-            );
+            $result = $route[0] != '_' && $route != 'oro_default';
         }
 
         if ($result && $response->headers->has('Content-Disposition')) {
             $contentDisposition = $response->headers->get('Content-Disposition');
-            $result = !(
-                strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_INLINE) === 0
-                || strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_ATTACHMENT) === 0
-            );
+            $result =
+                (strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_INLINE) !== 0)
+                && (strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_ATTACHMENT) !== 0);
         }
 
         return $result;
