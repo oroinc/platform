@@ -9,3 +9,4 @@ oro:
 
         form:
             master_record: Master Record
+            strategy: Strategy

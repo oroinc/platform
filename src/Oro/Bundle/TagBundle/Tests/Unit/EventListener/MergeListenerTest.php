@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\TagBundle\EventListener\MergeListener;

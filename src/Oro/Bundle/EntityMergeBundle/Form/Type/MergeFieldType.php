@@ -54,9 +54,11 @@ class MergeFieldType extends AbstractType
                 'mode',
                 'choice',
                 array(
-                    'choices' => $this->getMergeValues($mergeModes),
+                    'choices'  => $this->getMergeValues($mergeModes),
                     'multiple' => false,
                     'expanded' => false,
+                    'label'    => 'oro.entity_merge.form.strategy',
+                    'attr'=>array('style'=>'width:150px')
                 )
             );
         } else {
