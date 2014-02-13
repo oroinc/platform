@@ -7,6 +7,7 @@ services:
         class: %oro_entity_merge.mass_action.merge.class%
         arguments:
             - @oro_entity_merge.metadata.registry
+            - @translator
         scope: prototype
         tags:
             - { name:  oro_datagrid.extension.mass_action.type, type: merge }
