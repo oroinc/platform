@@ -1,6 +1,6 @@
-/global define*/
-define(['underscore', 'oro/translator', 'oro/query-designer/util', 'oro/delete-confirmation', 'jquery-outer-html'],
-function(_, __, util, DeleteConfirmation) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jquery-outer-html'],
+function($, _, __, DeleteConfirmation) {
     'use strict';
 
     /**
@@ -80,14 +80,38 @@ function(_, __, util, DeleteConfirmation) {
             }, this));
         },
 
-        onModelAdded: function(model) {
-            var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
-            this.bindItemActions(item);
-            this.element.append(item);
+        onModelAdded: function (model) {
+            this.element.append(this._renderModel(model));
             this.element.trigger('collection:change');
         },
 
-        prepareItemTemplateData: function (model) {
+        onModelChanged: function (model) {
+            this.element.find('[data-id="' + model.id + '"]').outerHTML(this._renderModel(model));
+            this.element.trigger('collection:change');
+        },
+
+        onModelDeleted: function (model) {
+            this.element.find('[data-id="' + model.id + '"]').remove();
+            this.element.trigger('collection:change');
+        },
+
+        onResetCollection: function () {
+            this.element.empty();
+            //this.resetForm();
+            this.options.collection.each(_.bind(function (model, index) {
+                this.initModel(model, index);
+                this.element.append(this._renderModel(model));
+            }, this));
+            this.element.trigger('collection:change');
+        },
+
+        _renderModel: function (model) {
+            var item = $(this.itemTemplate(this._prepareItemTemplateData(model)));
+            this._bindItemActions(item);
+            return item;
+        },
+
+        _prepareItemTemplateData: function (model) {
             var data = model.toJSON();
             _.each(data, _.bind(function (value, name) {
                 data[name] = this.options.getFieldLabel(name, value);
@@ -95,7 +119,7 @@ function(_, __, util, DeleteConfirmation) {
             return data;
         },
 
-        bindItemActions: function (item) {
+        _bindItemActions: function (item) {
             // bind edit button
             var onEdit = _.bind(function (e) {
                 e.preventDefault();
@@ -117,46 +141,18 @@ function(_, __, util, DeleteConfirmation) {
                 var confirm = new DeleteConfirmation({
                     content: el.data('message')
                 });
-                confirm.on('ok', _.bind(this.handleDeleteModel, this, id));
+                confirm.on('ok', _.bind(this._handleDeleteModel, this, id));
                 confirm.open();
             }, this);
             item.find(this.options.selectors.deleteButton).on('click', onDelete);
         },
 
-        handleDeleteModel: function (modelId) {
+        _handleDeleteModel: function (modelId) {
             var model = this.options.collection.get(modelId);
             this.element.trigger('model:delete', {
                 modelId: modelId
             });
             this.deleteModel(model);
-        },
-
-        deleteModel: function (model) {
-            this.options.collection.remove(model);
-        },
-
-        onModelDeleted: function (model) {
-            this.element.find('[data-id="' + model.id + '"]').remove();
-            this.element.trigger('collection:change');
-        },
-
-        onModelChanged: function (model) {
-            var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
-            this.bindItemActions(item);
-            this.element.find('[data-id="' + model.id + '"]').outerHTML(item);
-            this.element.trigger('collection:change');
-        },
-
-        onResetCollection: function () {
-            this.element.empty();
-            //this.resetForm();
-            this.options.collection.each(_.bind(function (model, index) {
-                this.initModel(model, index);
-                var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
-                this.bindItemActions(item);
-                this.element.append(item);
-            }, this));
-            this.element.trigger('collection:change');
         },
 
         initModel: function (model, index) {
@@ -166,6 +162,10 @@ function(_, __, util, DeleteConfirmation) {
         addModel: function (model) {
             this.initModel(model, this.options.collection.size());
             this.options.collection.add(model);
+        },
+
+        deleteModel: function (model) {
+            this.options.collection.remove(model);
         },
 
     });
