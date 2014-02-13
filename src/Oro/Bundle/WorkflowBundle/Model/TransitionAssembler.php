@@ -119,7 +119,8 @@ class TransitionAssembler extends AbstractAssembler
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
-            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()));
+            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()))
+            ->setDisplayType($this->getOption($options, 'display_type'));
 
         $definition['pre_conditions'] = $this->addAclPreConditions($options, $definition);
         if (!empty($definition['pre_conditions'])) {

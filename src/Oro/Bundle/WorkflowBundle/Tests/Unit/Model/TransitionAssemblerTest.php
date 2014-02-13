@@ -276,6 +276,13 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $actualTransition->getName(), 'Incorrect name');
         $this->assertEquals($steps['step'], $actualTransition->getStepTo(), 'Incorrect step_to');
         $this->assertEquals($configuration['label'], $actualTransition->getLabel(), 'Incorrect label');
+        if (array_key_exists('display_type', $configuration)) {
+            $this->assertEquals(
+                $configuration['display_type'],
+                $actualTransition->getDisplayType(),
+                'Incorrect display type'
+            );
+        }
         $this->assertEquals(
             $configuration['frontend_options'],
             $actualTransition->getFrontendOptions(),
@@ -308,6 +315,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'step',
                     'form_type' => 'custom_workflow_transition',
+                    'display_type' => 'page',
                     'form_options' => array(
                         'attribute_fields' => array(
                             'attribute_onbe' => array('type' => 'text')

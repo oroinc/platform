@@ -44,6 +44,7 @@ workflows:
                 frontend_options:
                     class: foo
                 form_type: custom_workflow_transition
+                display_type: page
                 form_options:
                     attribute_fields:
                         first_attribute:

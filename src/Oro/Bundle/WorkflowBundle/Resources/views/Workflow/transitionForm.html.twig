@@ -1,3 +1,4 @@
+{% set entity = null %}
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as macros %}
 
@@ -17,7 +18,7 @@
 {% endif %}
 
 {% if pageParams.parent_route is defined %}
-    {% set indexPath = path(pageParams.parent_route) %}
+    {% set indexPath = path(pageParams.parent_route, pageParams.parent_route_parameters is defined ? pageParams.parent_route_parameters : []) %}
 {% else %}
     {% set indexPath = null %}
 {% endif %}
@@ -33,7 +34,7 @@
             class="btn btn-success"
             id="save-and-transit"
             data-transition-url="{{ transitionUrl }}"
-        >{{ 'Save'|trans }}</button>
+        >{{ 'Submit'|trans }}</button>
     </div>
 {% endblock navButtons %}
 
@@ -60,13 +61,7 @@
         <div class="form-container">
         {{ oro_widget_render({
             'widgetType': 'block',
-            'url': path(
-                'oro_workflow_widget_start_transition_form',
-                {
-                    workflowName: workflow.name,
-                    transitionName: transition.name,
-                }
-            ),
+            'url': transitionFormUrl,
             'alias': 'transition-form'
         }) }}
         <script type="text/javascript">
@@ -98,5 +93,6 @@
 
     {% set id = 'transitionPage' %}
     {% set data = {'dataBlocks': dataBlocks} %}
+
     {{ parent() }}
 {% endblock content_data %}

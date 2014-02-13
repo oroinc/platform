@@ -12,11 +12,23 @@
                 'transition-condition-messages': data.errors
             } %}
 
-            {% if data.workflowItem is not defined %}
-                {% set data = data|merge({'workflowItem': null}) %}
-                {% if data.transition.hasForm() %}
-                    {% set transitionData = transitionData|merge({'dialog-url': path(
-                        'oro_workflow_widget_start_transition_form',
+            {% if data.transition.displayType == 'dialog' %}
+                {% if data.workflowItem is not defined %}
+                    {% set data = data|merge({'workflowItem': null}) %}
+                    {% if data.transition.hasForm() %}
+                        {% set transitionData = transitionData|merge({'dialog-url': path(
+                            'oro_workflow_widget_start_transition_form',
+                            {
+                                workflowName: data.workflow.name,
+                                transitionName: data.transition.name,
+                                entityId: entity_id
+                            })
+                        }) %}
+                    {% endif %}
+
+                    {# New workflow #}
+                    {% set transitionData = transitionData|merge({'transition-url': path(
+                        'oro_workflow_api_rest_workflow_start',
                         {
                             workflowName: data.workflow.name,
                             transitionName: data.transition.name,
@@ -24,16 +36,26 @@
                         })
                     }) %}
                 {% endif %}
-
-                {# New workflow #}
-                {% set transitionData = transitionData|merge({'transition-url': path(
-                    'oro_workflow_api_rest_workflow_start',
-                    {
-                        workflowName: data.workflow.name,
-                        transitionName: data.transition.name,
-                        entityId: entity_id
-                    })
-                }) %}
+            {% else %}
+                {% if data.workflowItem is not defined %}
+                    {% set data = data|merge({'workflowItem': null}) %}
+                    {% set transitionData = transitionData|merge({'transition-url': path(
+                        'oro_workflow_start_transition_form',
+                        {
+                            workflowName: data.workflow.name,
+                            transitionName: data.transition.name,
+                            entityId: entity_id
+                        })
+                    }) %}
+                {% else %}
+                    {% set transitionData = transitionData|merge({'transition-url': path(
+                        'oro_workflow_transition_form',
+                        {
+                            transitionName: data.transition.name,
+                            workflowItemId: data.workflowItem.id
+                        })
+                    }) %}
+                {% endif %}
             {% endif %}
 
             {{ workflowMacros.renderTransitionButton(

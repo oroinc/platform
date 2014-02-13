@@ -18,6 +18,7 @@ class WorkflowConfiguration implements ConfigurationInterface
     const NODE_TRANSITIONS = 'transitions';
     const NODE_TRANSITION_DEFINITIONS = 'transition_definitions';
 
+    const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
 
     /**
@@ -225,10 +226,27 @@ class WorkflowConfiguration implements ConfigurationInterface
                     ->scalarNode('form_type')
                         ->defaultValue(WorkflowTransitionType::NAME)
                     ->end()
+                    ->enumNode('display_type')
+                        ->values(array('dialog', 'page'))
+                        ->defaultValue(self::DEFAULT_TRANSITION_DISPLAY_TYPE)
+                    ->end()
                     ->arrayNode('form_options')
                         ->prototype('variable')
                         ->end()
                     ->end()
+                ->end()
+                ->validate()
+                    ->always(
+                        function ($value) {
+                            if ($value['display_type'] == 'page'
+                                && (!array_key_exists('form_options', $value) || empty($value['form_options']))) {
+                                throw new WorkflowException(
+                                    'Display type "page" require "form_options" to be set.'
+                                );
+                            }
+                            return $value;
+                        }
+                    )
                 ->end()
             ->end();
 

@@ -55,6 +55,7 @@ return array(
                 'acl_message' => 'Test ACL message',
                 'message' => 'Test message',
                 'transition_definition' => 'first_transition_definition',
+                'display_type' => 'page',
                 'frontend_options' => array(
                     'class' => 'foo'
                 ),
@@ -129,6 +130,7 @@ return array(
                 'acl_message' => null,
                 'message' => null,
                 'transition_definition' => 'second_transition_definition',
+                'display_type' => 'dialog',
                 'frontend_options' => array(
                     'icon' => 'bar'
                 ),
