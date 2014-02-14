@@ -27,7 +27,7 @@ class PersistConfigEventTest extends \PHPUnit_Framework_TestCase
 
     public function testEvent()
     {
-        $config = new Config(new EntityConfigId('Test/Class', 'test'));
+        $config = new Config(new EntityConfigId('test', 'Test/Class'));
         $event  = new PersistConfigEvent($config, $this->configManager);
 
         $this->assertEquals($config, $event->getConfig());

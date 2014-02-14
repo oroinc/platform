@@ -351,10 +351,23 @@ function(_, Backbone, BackbonePageableCollection, app) {
          * @returns {Array}
          */
         getFetchData: function () {
-            var state = this._checkState(this.state);
             var data = {};
+
+            // extract params from a grid collection url
+            var url = _.result(this, "url") || '';
+            var qsi = url.indexOf('?');
+            if (qsi != -1) {
+                var nvp = url.slice(qsi + 1).split('&');
+                for (var i = 0 ; i < nvp.length ; i++) {
+                    var pair  = nvp[i].split('=');
+                    data[app.decodeUriComponent(pair[0])] = app.decodeUriComponent(pair[1]);
+                }
+            }
+
+            var state = this._checkState(this.state);
             data = this.processQueryParams(data, state);
             data = this.processFiltersParams(data, state);
+
             return data;
         },
 

@@ -4,24 +4,34 @@ namespace Oro\Bundle\EntityConfigBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
-use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-class NewFieldConfigModelEvent extends Event
+class FieldConfigEvent extends Event
 {
     /**
-     * @var FieldConfigModel
+     * @var string
      */
-    protected $configModel;
+    protected $className;
+
+    /**
+     * @var string
+     */
+    protected $fieldName;
 
     /**
      * @var ConfigManager
      */
     protected $configManager;
 
-    public function __construct(FieldConfigModel $configModel, ConfigManager $configManager)
+    /**
+     * @param string        $className Entity class name
+     * @param string        $fieldName
+     * @param ConfigManager $configManager
+     */
+    public function __construct($className, $fieldName, ConfigManager $configManager)
     {
-        $this->configModel   = $configModel;
+        $this->className     = $className;
+        $this->fieldName     = $fieldName;
         $this->configManager = $configManager;
     }
 
@@ -30,7 +40,7 @@ class NewFieldConfigModelEvent extends Event
      */
     public function getClassName()
     {
-        return $this->configModel->getEntity()->getClassName();
+        return $this->className;
     }
 
     /**
@@ -38,15 +48,7 @@ class NewFieldConfigModelEvent extends Event
      */
     public function getFieldName()
     {
-        return $this->configModel->getFieldName();
-    }
-
-    /**
-     * @return string
-     */
-    public function getFieldType()
-    {
-        return $this->configModel->getType();
+        return $this->fieldName;
     }
 
     /**
