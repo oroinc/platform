@@ -44,8 +44,7 @@ class WorkflowConfigurationProvider extends AbstractConfigurationProvider
         /** @var $file \SplFileInfo */
         foreach ($finder as $file) {
             $realPathName = $file->getRealPath();
-
-            $configData = Yaml::parse($realPathName);
+            $configData = $this->loadConfigFile($file);
 
             try {
                 $finalizedData = $this->configuration->processConfiguration($configData);
