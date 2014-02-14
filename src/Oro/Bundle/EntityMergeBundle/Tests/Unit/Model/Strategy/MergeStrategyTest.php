@@ -89,6 +89,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
         $sourceEntity->addCollectionItem($collectionItem2);
 
         $entities = [$masterEntity, $sourceEntity];
+        $relatedEntities = [$collectionItem1, $collectionItem2];
 
         $fieldData
             ->expects($this->once())
@@ -110,30 +111,6 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getMasterEntity')
             ->will($this->returnValue($masterEntity));
 
-        $doctrineMetadata = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setMethods([])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadataFactory = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
-            ->setMethods([])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadataFactory->expects($this->any())
-            ->method('getMetadataFor')
-            ->will($this->returnValue($doctrineMetadata));
-
-        $doctrineMetadata->expects($this->at(0))
-            ->method('getIdentifierValues')
-            ->will($this->returnValue([1]));
-
-        $doctrineMetadata->expects($this->at(1))
-            ->method('getIdentifierValues')
-            ->will($this->returnValue([2]));
-
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityIdentifierValue')
             ->will(
@@ -144,11 +121,11 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->doctrineHelper->expects($this->any())
-            ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
-
         $fieldDoctrineMetadata = $this->createDoctrineMetadata();
+        $fieldDoctrineMetadata->expects($this->any())
+            ->method('getFieldName')
+            ->will($this->returnValue('field_name'));
+
         $fieldMetadataData
             ->expects($this->any())
             ->method('getDoctrineMetadata')
@@ -181,7 +158,13 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
         $repository
             ->expects($this->any())
             ->method('findBy')
-            ->will($this->returnValue([$masterEntity->getCollection()->first()]));
+            ->will(
+                $this->returnCallback(
+                    function ($values) use ($relatedEntities) {
+                        return [$relatedEntities[$values['field_name']->getId()-1]];
+                    }
+                )
+            );
 
         $this->strategy->merge($fieldData);
 
