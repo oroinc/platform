@@ -20,9 +20,6 @@ function($, _, __, DeleteConfirmation) {
             selectors: {
                 editButton: '.edit-button',
                 deleteButton: '.delete-button'
-            },
-            getFieldLabel: function (name, value) {
-                return (typeof value === 'object') ? JSON.stringify(value) : value;
             }
         },
 
@@ -115,10 +112,10 @@ function($, _, __, DeleteConfirmation) {
         },
 
         _renderModel: function (model) {
-            var data = model.toJSON();
-            _.each(data, function (value, name) {
-                data[name] = this.options.getFieldLabel(name, value);
-            }, this);
+            var data = {};
+            _.each(model.toJSON(), function (value, name) {
+                data[name] = model.getFieldLabel(name, value);
+            });
 
             var item = $(this.itemTemplate(data));
             this._bindItemActions(item);
