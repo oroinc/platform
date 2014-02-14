@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jquery-outer-html'],
+define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jquery-outer-html', 'jquery-ui'],
 function($, _, __, DeleteConfirmation) {
     'use strict';
 

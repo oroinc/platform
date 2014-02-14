@@ -1,21 +1,7 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'jquery-ui' ],   function ($) {
+define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
     'use strict';
-
-    function getLabel($elem) {
-        var label;
-        if ($elem.data('select2')) {
-            label = $elem.data('select2').selection.html();
-        } else if ($elem.is('select')) {
-            label = $elem.find('option:selected').map(function () {
-                return $(this).text();
-            }).get().join(', ');
-        } else {
-            label = $elem.val();
-        }
-        return label;
-    }
 
     function setValue($elem, value) {
         if ($elem.data('select2')) {
@@ -28,7 +14,12 @@ define(['jquery', 'jquery-ui' ],   function ($) {
     $.widget('oroui.editForm', {
 
         options: {
-            namePattern: /^([\w\W]*)$/
+            prefix: 'entity_',
+            namePattern: /^([\w\W]*)$/,
+            addButton: '.add-button',
+            saveButton: '.save-button',
+            cancelButton: '.cancel-button',
+            collection: null
         },
 
         _create: function () {
@@ -39,24 +30,23 @@ define(['jquery', 'jquery-ui' ],   function ($) {
             this.form.on('submit', $.proxy(this._hideErrors, this));
 
             this.reset();
-            this.element
-                .on('click', '.add-button, .save-button', $.proxy(this._onSaveItem, this));
-            this.element
-                .on('click', '.cancel-button', $.proxy(this._onCancel, this));
             this._on({
-                change: this._onElementChange
+                change: this._onElementChange,
+                click: this._onClick
             });
+
+            this.options.collection.on('edit', $.proxy(this._onEditModel, this));
         },
 
-        reset: function (item) {
-            var elementsMap;
+        reset: function (model) {
+            var elementsMap, attrs;
             this._hideErrors();
             this.validated = false;
-            this.itemId = (item && item.id) || null;
-            this.item = item;
-            if (item) {
+            this.model = model;
+            if (model) {
                 elementsMap = this._elementsMap();
-                $.each(item, function (name, value) {
+                attrs = model.toJSON();
+                $.each(attrs, function (name, value) {
                     if (elementsMap[name]) {
                         setValue(elementsMap[name], value.value);
                     }
@@ -69,21 +59,27 @@ define(['jquery', 'jquery-ui' ],   function ($) {
             this._updateActions();
         },
 
-        setItem: function (item) {
-            this.reset(item);
-        },
-
         _onSaveItem: function (e) {
-            var item;
+            var attrs, model;
             e.preventDefault();
             if (!this._validate()) {
                 return;
             }
 
-            item = this._getItem();
-            this._trigger('save', e, item);
+            attrs = this._collectAttrs();
+            if (this.model) {
+                this.model.set(attrs);
+            } else {
+                attrs.id = _.uniqueId(this.options.prefix);
+                model = new (this.options.collection.model)(attrs);
+                this.options.collection.add(model);
+            }
 
             this.reset();
+        },
+
+        _onEditModel: function (e, model) {
+            this.reset(model);
         },
 
         _onCancel: function (e) {
@@ -139,21 +135,23 @@ define(['jquery', 'jquery-ui' ],   function ($) {
             }
         },
 
-        _getItem: function () {
-            var item = {};
-
-            if (this.itemId) {
-                item.id = this.itemId;
+        _onClick: function (e) {
+            var $target = $(e.target);
+            if ($target.is(this.options.addButton) || $target.is(this.options.saveButton)) {
+                this._onSaveItem(e);
+            } else if ($target.is(this.options.cancelButton)) {
+                this._onCancel(e);
             }
+        },
+
+        _collectAttrs: function () {
+            var arrts = {};
 
             $.each(this._elementsMap(), function (name, $elem) {
-                item[name] = {
-                    value: $elem.val(),
-                    label: getLabel($elem)
-                };
+                arrts[name] = $elem.val();
             });
 
-            return item;
+            return arrts;
         },
 
         _elementsMap: function () {
@@ -171,9 +169,8 @@ define(['jquery', 'jquery-ui' ],   function ($) {
         },
 
         _updateActions: function () {
-            var isNewItem = this.itemId === null;
-            this.element.find('.add-button')[isNewItem ? 'show' : 'hide']();
-            this.element.find('.save-button')[isNewItem ? 'hide' : 'show']();
+            this.element.find(this.options.addButton)[this.model ? 'hide' : 'show']();
+            this.element.find(this.options.saveButton)[this.model ? 'show' : 'hide']();
         }
     });
 

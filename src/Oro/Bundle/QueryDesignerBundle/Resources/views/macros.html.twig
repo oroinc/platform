@@ -180,7 +180,7 @@
             <label class="control-label required" for="s2id_autogen2">Grouping columns<em>*</em></label>
             <div class="controls">
             {% set validation = {
-                NotBlank: {message: 'oro.query_designer.condition_builder.conditions_group.not_blank'}
+                NotBlank: {message: 'Field should be chosen'}
             } %}
             {{ form_row(form.columnNames, {
                 'label': 'oro.query_designer.form.grouping_columns'|trans,
@@ -226,9 +226,9 @@
         util: {}
     } %}
     <script type="text/javascript">
-        require(['oro/query-designer/grouping/collection', 'oroquerydesigner/js/field-condition', 'oroui/js/edit-form',
-            'oroquerydesigner/js/item-container'],
-        function (GroupingCollection, $) {
+        require(['jquery', 'oro/query-designer/grouping/collection',
+                'oroquerydesigner/js/field-condition', 'oroui/js/edit-form', 'oroquerydesigner/js/item-container'
+        ], function ($, GroupingCollection) {
             var $editForm = $('#{{ attr.id }}');
             var $fieldChoice = $editForm.find('[data-purpose=column-selector]');
             $fieldChoice.fieldChoice({{ fieldConditionOptions|json_encode|raw }});
@@ -242,23 +242,25 @@
                         });
                 });
 
-            $editForm.editForm({
-                namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/
-            });
-
             var $storage = $('#oro_report_form_definition');
             var load = function () {
                 return JSON.parse($storage.val());
             };
             var save = function (data) {
                 $storage.val(JSON.stringify(data));
-            }
+            };
 
             var data = load();
+            // @todo names of inputs in form should represent model attribute
+            $('[name="oro_report_form[grouping][columnNames]"]').attr('name', 'oro_report_form[grouping][name]');
             console.log('#oro_report_form_definition:', data);
 
             var collection = new GroupingCollection(data.grouping_columns);
-
+            
+            $editForm.editForm({
+                namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
+                collection: collection
+            });
             var $groupingItems = $editForm.find('.grouping-item-container');
             $groupingItems.itemContainer({
                 collection: collection,
