@@ -8,10 +8,7 @@ config:
         'oro/query-designer/column/collection': 'bundles/oroquerydesigner/js/query-designer/column/collection.js'
         'oro/query-designer/column/model': 'bundles/oroquerydesigner/js/query-designer/column/model.js'
         'oro/query-designer/column/view': 'bundles/oroquerydesigner/js/query-designer/column/view.js'
-        'oro/query-designer/grouping/collection': 'bundles/oroquerydesigner/js/query-designer/grouping/collection.js'
         'oro/query-designer/grouping/model': 'bundles/oroquerydesigner/js/query-designer/grouping/model.js'
-        'oro/query-designer/grouping/view': 'bundles/oroquerydesigner/js/query-designer/grouping/view.js'
-
         'oroquerydesigner/js/condition-builder': 'bundles/oroquerydesigner/js/condition-builder.js'
         'oroquerydesigner/js/field-condition': 'bundles/oroquerydesigner/js/field-condition.js'
         'oroquerydesigner/js/item-container': 'bundles/oroquerydesigner/js/query-designer/item-container.js'

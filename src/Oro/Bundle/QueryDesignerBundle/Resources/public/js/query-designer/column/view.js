@@ -1,8 +1,7 @@
 /* global define */
 define(['underscore', 'backbone', 'oro/query-designer/util', 'oro/query-designer/abstract-view', 'oro/query-designer/column/collection',
-    'oro/query-designer/grouping/view', 'oro/query-designer/function-manager', 'jquery-ui'],
-function(_, Backbone, util, AbstractView, ColumnCollection,
-         GroupingView, FunctionManager) {
+    'oro/query-designer/function-manager', 'jquery-ui'],
+function(_, Backbone, util, AbstractView, ColumnCollection, FunctionManager) {
     'use strict';
 
     var $ = Backbone.$;
@@ -39,16 +38,6 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
 
         initForm: function() {
             AbstractView.prototype.initForm.apply(this, arguments);
-
-            /* this.groupingColumnsSelector = new GroupingView({
-                el: this.$el.find(this.options.groupingFormSelector),
-                fieldsLabel: this.options.fieldsLabel,
-                relatedLabel: this.options.relatedLabel,
-                findEntity: this.options.findEntity
-            });
-            this.listenTo(this.groupingColumnsSelector, 'grouping:change', _.bind(function (e) {
-                this.trigger('grouping:change');
-            }, this)); */
 
             this.functionManager = new FunctionManager({
                 el: this.$el.find('[data-purpose="function-selector"]')
