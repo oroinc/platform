@@ -1,7 +1,7 @@
 oro_menu_config:
     items:
         embedded_forms:
-            label: Embedded Forms
+            label: oro.embeddedform.entity_plural_label
             route: oro_embedded_form_list
             extras:
                 routes: ['oro_embedded_form_*']
