@@ -46,7 +46,7 @@ class DefaultAccessor implements AccessorInterface
 
         return $this
             ->getPropertyAccessor()
-            ->getValue($entity, $this->getPropertyPath($metadata));
+            ->getValue($entity, $metadata->getFieldName());
     }
 
     /**
@@ -61,23 +61,12 @@ class DefaultAccessor implements AccessorInterface
             return;
         }
 
-        $this
-            ->getPropertyAccessor()
+        $this->getPropertyAccessor()
             ->setValue(
                 $entity,
-                $this->getPropertyPath($metadata),
+                $metadata->getFieldName(),
                 $value
             );
-    }
-
-    /**
-     * @param FieldMetadata $metadata
-     * @return string
-     */
-    protected function getPropertyPath(FieldMetadata $metadata)
-    {
-        return $metadata->has('property_path') ?
-            $metadata->get('property_path') : $metadata->getFieldName();
     }
 
     /**

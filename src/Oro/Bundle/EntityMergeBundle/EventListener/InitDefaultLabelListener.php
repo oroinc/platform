@@ -51,14 +51,24 @@ class InitDefaultLabelListener
             return;
         }
 
+        $labelCode = 'label';
+
         if ($fieldMetadata->getDoctrineMetadata()->isMappedBySourceEntity()) {
-            $fieldMetadata->set(
-                'label',
-                $this->entityConfig->getConfig(
-                    $fieldMetadata->getEntityMetadata()->getClassName(),
-                    $fieldMetadata->getFieldName()
-                )->get('label')
-            );
+
+            $className = $fieldMetadata->getEntityMetadata()->getClassName();
+            $fieldName = $fieldMetadata->getFieldName();
+            $labelCode = 'label';
+
+        } else {
+            $className = $fieldMetadata->getDoctrineMetadata()->get('sourceEntity');
+            $fieldName = null;
+            if ($fieldMetadata->isCollection()) {
+                $labelCode = 'plural_label';
+            }
+        }
+
+        if ($this->entityConfig->hasConfig($className, $fieldName)) {
+            $fieldMetadata->set('label', $this->entityConfig->getConfig($className, $fieldName)->get($labelCode));
         }
     }
 }

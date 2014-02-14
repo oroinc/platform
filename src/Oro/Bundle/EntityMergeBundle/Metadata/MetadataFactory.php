@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Metadata;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -209,6 +210,9 @@ class MetadataFactory
         }
 
         foreach ($allMetadata as $metadata) {
+            if ($metadata->getName() == $className) {
+                continue;
+            }
             $fieldsMapping = $metadata->getAssociationsByTargetClass($className);
             if ($fieldsMapping) {
                 foreach ($fieldsMapping as $fieldMapping) {
@@ -217,6 +221,11 @@ class MetadataFactory
                         $className,
                         $fieldMapping
                     );
+
+                    if ($fieldDoctrineMetadata->get('type') === ClassMetadataInfo::MANY_TO_MANY) {
+                        // Skip many-to-many as it's included on other side.
+                        continue;
+                    }
 
                     if ($fieldDoctrineMetadata->has('mappedBy')) {
                         continue;
