@@ -141,11 +141,12 @@ class UniqueEntityValidatorTest extends \PHPUnit_Framework_TestCase
      */
     private function createEntityData($ids)
     {
-        $entities = [];
-
-        foreach ($ids as $id) {
-            $entities[] = new EntityStub($id);
-        }
+        $entities = array_map(
+            function ($id) {
+                return new EntityStub($id);
+            },
+            $ids
+        );
 
         $entityData = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')

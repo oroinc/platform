@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
-use Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor;
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStrategy;
 
@@ -19,18 +19,18 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_TestCase
      */
-    protected $entityManager;
+    protected $doctrineHelper;
 
     protected function setUp()
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->doctrineHelper = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
             ->disableOriginalConstructor()
-            ->setMethods(['getMetadataFactory', 'getRepository'])
             ->getMock();
 
-        $accessor = new RelationAccessor($this->entityManager);
+        $accessor = new InverseAssociationAccessor($this->doctrineHelper);
 
-        $this->strategy = new MergeStrategy($accessor, $this->entityManager);
+        $this->strategy = new MergeStrategy($accessor, $this->doctrineHelper);
     }
 
     public function testNotSupports()
@@ -110,12 +110,14 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getMasterEntity')
             ->will($this->returnValue($masterEntity));
 
-        $doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+        $doctrineMetadata = $this
+            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setMethods([])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
+        $metadataFactory = $this
+            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->setMethods([])
             ->disableOriginalConstructor()
             ->getMock();
@@ -132,7 +134,17 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getIdentifierValues')
             ->will($this->returnValue([2]));
 
-        $this->entityManager->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityIdentifierValue')
+            ->will(
+                $this->returnCallback(
+                    function ($value) {
+                        return $value->getId();
+                    }
+                )
+            );
+
+        $this->doctrineHelper->expects($this->any())
             ->method('getMetadataFactory')
             ->will($this->returnValue($metadataFactory));
 
@@ -162,19 +174,14 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
             ->will($this->returnValue($repository));
 
         $repository
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('findBy')
             ->will($this->returnValue([$masterEntity->getCollection()->first()]));
-
-        $repository
-            ->expects($this->at(1))
-            ->method('findBy')
-            ->will($this->returnValue([$sourceEntity->getCollection()->first()]));
 
         $this->strategy->merge($fieldData);
 

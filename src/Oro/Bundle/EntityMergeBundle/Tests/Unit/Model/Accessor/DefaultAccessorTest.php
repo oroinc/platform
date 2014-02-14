@@ -34,23 +34,23 @@ class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function getValueDataProvider()
     {
-        return array(
-            'default' => array(
+        return [
+            'default' => [
                 'entity' => $this->createEntity('foo'),
                 'metadata' => $this->getFieldMetadata('id'),
                 'expected' => 'foo',
-            ),
-            'getter' => array(
+            ],
+            'getter' => [
                 'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('getter' => 'getParentId')),
+                'metadata' => $this->getFieldMetadata('id', ['getter' => 'getParentId']),
                 'expected' => 'bar',
-            ),
-            'property_path' => array(
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('property_path' => 'parent.id')),
-                'expected' => 'bar',
-            ),
-        );
+            ],
+            'field' => [
+                'entity' => $this->createEntity('foo'),
+                'metadata' => $this->getFieldMetadata('id', ['field_name' => 'id']),
+                'expected' => 'foo',
+            ],
+        ];
     }
 
     /**
@@ -64,26 +64,26 @@ class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function setValueDataProvider()
     {
-        return array(
-            'default' => array(
+        return [
+            'default' => [
                 'entity' => $this->createEntity(),
                 'metadata' => $this->getFieldMetadata('id'),
                 'value' => 'foo',
                 'expected' => $this->createEntity('foo'),
-            ),
-            'setter' => array(
+            ],
+            'setter' => [
                 'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('setter' => 'setParentId')),
+                'metadata' => $this->getFieldMetadata('id', ['setter' => 'setParentId']),
                 'value' => 'baz',
                 'expected' => $this->createEntity('foo', $this->createEntity('baz')),
-            ),
-            'property_path' => array(
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('property_path' => 'parent.id')),
+            ],
+            'field' => [
+                'entity' => $this->createEntity('foo'),
+                'metadata' => $this->getFieldMetadata('id', ['field_name' => 'id']),
                 'value' => 'baz',
-                'expected' => $this->createEntity('foo', $this->createEntity('baz')),
-            ),
-        );
+                'expected' => $this->createEntity('baz'),
+            ],
+        ];
     }
 
     protected function createEntity($id = null, $parent = null)
@@ -91,7 +91,7 @@ class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
         return new EntityStub($id, $parent);
     }
 
-    protected function getFieldMetadata($fieldName = null, array $options = array())
+    protected function getFieldMetadata($fieldName = null, array $options = [])
     {
         $result = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
