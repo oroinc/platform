@@ -284,6 +284,16 @@
             console.log(err);
     };
 
+    $.datepicker.parseDate = function(format, value, settings) {
+        var date;
+        try {
+            date = this._base_parseDate(format, value, settings);
+        } catch (err) {
+            $.timepicker.log("Error parsing the date string: " + err + "\ndate string = " + value + "\ndate format = " + format);
+        }
+        return date;
+    };
+
     $.datevariables.version = "1.0";
 
 })(jQuery);
