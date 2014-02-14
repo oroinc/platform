@@ -244,20 +244,25 @@
 
             var $storage = $('#oro_report_form_definition');
             var load = function () {
-                return JSON.parse($storage.val());
+                var data = JSON.parse($storage.val());
+                console.log('Load:', data);
+                return data;
             };
             var save = function (data) {
+                console.log('Save:', data);
                 $storage.val(JSON.stringify(data));
             };
 
             var data = load();
             // @todo names of inputs in form should represent model attribute
             $('[name="oro_report_form[grouping][columnNames]"]').attr('name', 'oro_report_form[grouping][name]');
-            console.log('#oro_report_form_definition:', data);
+
 
             var collection = new GroupingCollection(data.grouping_columns);
             collection.on('all', function () {
                 console.log(arguments);
+                data.grouping_columns = collection.toJSON();
+                save(data);
             });
             
             $editForm.editForm({
