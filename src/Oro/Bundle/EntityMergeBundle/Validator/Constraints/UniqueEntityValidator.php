@@ -35,7 +35,7 @@ class UniqueEntityValidator extends DoctrineHelperValidator
 
         if (count($entities) != count($uniqueEntities)) {
             $this->context->addViolation(
-            /* @var UniqueEntity $constraint */
+                /* @var UniqueEntity $constraint */
                 $constraint->message
             );
         }

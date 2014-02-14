@@ -9,7 +9,6 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class SourceEntityValidator extends DoctrineHelperValidator
 {
-
     /**
      * {@inheritdoc}
      */
@@ -37,7 +36,7 @@ class SourceEntityValidator extends DoctrineHelperValidator
             }
 
             $this->context->addViolation(
-            /* @var SourceEntity $constraint */
+                /* @var SourceEntity $constraint */
                 $constraint->message,
                 ['{{ limit }}' => $field->getFieldName()]
             );
