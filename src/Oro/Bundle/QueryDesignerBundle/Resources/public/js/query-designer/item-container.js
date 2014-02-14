@@ -6,11 +6,8 @@ function($, _, __, DeleteConfirmation) {
     /**
      * Item container widget
      *
-     * Emits events:
-     * collection:change, collection:reset
-     *
-     * Emits model events
-     * edit
+     * Emits events
+     * edit, change, add, remove
      *
      * Listens to options.collection events:
      * add, remove, change, reset
@@ -49,7 +46,7 @@ function($, _, __, DeleteConfirmation) {
                 opacity: 0.7,
                 revert: 10,
                 axis: 'y',
-                containment: '.query-designer-grid-container',
+                containment: this.element.closest('.grid'),
                 items: 'tr',
                 helper: function (e, ui) {
                     ui.children().each(function () {
@@ -66,26 +63,29 @@ function($, _, __, DeleteConfirmation) {
         _syncCollectionWithUi: function () {
             var collectionChanged = false;
             var collection = this.options.collection;
+
             _.each(this.element.find('tr'), function (el, index) {
                 var uiId = $(el).data('id');
                 var model = collection.at(index);
-                if (uiId !== model.id) {
-                    var anotherModel = collection.get(uiId);
-                    var anotherIndex = collection.indexOf(anotherModel);
-                    collection.remove(model, {silent: true});
-                    collection.remove(anotherModel, {silent: true});
-                    if (index < anotherIndex) {
-                        collection.add(anotherModel, {silent: true, at: index});
-                        collection.add(model, {silent: true, at: anotherIndex});
-                    } else {
-                        collection.add(model, {silent: true, at: anotherIndex});
-                        collection.add(anotherModel, {silent: true, at: index});
-                    }
-                    collectionChanged = true;
+                if (uiId === model.id) {
+                    return;
                 }
-            }, this);
+                var anotherModel = collection.get(uiId);
+                var anotherIndex = collection.indexOf(anotherModel);
+                collection.remove(model, {silent: true});
+                collection.remove(anotherModel, {silent: true});
+                if (index < anotherIndex) {
+                    collection.add(anotherModel, {silent: true, at: index});
+                    collection.add(model, {silent: true, at: anotherIndex});
+                } else {
+                    collection.add(model, {silent: true, at: anotherIndex});
+                    collection.add(anotherModel, {silent: true, at: index});
+                }
+                collectionChanged = true;
+            });
+
             if (collectionChanged) {
-                this._trigger('collection:change');
+                collection.trigger('sort');
             }
         },
 
@@ -96,27 +96,22 @@ function($, _, __, DeleteConfirmation) {
 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
-            this._trigger('collection:change');
         },
 
         _onModelChanged: function (model) {
             this.element.find('[data-id="' + model.id + '"]').outerHTML(this._renderModel(model));
-            this._trigger('collection:change');
         },
 
         _onModelDeleted: function (model) {
             this.element.find('[data-id="' + model.id + '"]').remove();
-            this._trigger('collection:change');
         },
 
         _onResetCollection: function () {
             this.element.empty();
-            this._trigger('collection:reset');
             this.options.collection.each(_.bind(function (model, index) {
                 this.initModel(model, index);
                 this.element.append(this._renderModel(model));
             }, this));
-            this._trigger('collection:change');
         },
 
         _renderModel: function (model) {

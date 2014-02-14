@@ -258,7 +258,7 @@
             $('[name="oro_report_form[grouping][columnNames]"]').attr('name', 'oro_report_form[grouping][name]');
 
             var collection = new GroupingCollection(data.grouping_columns);
-            collection.on('add remove', function () {
+            collection.on('add remove sort', function () {
                 data.grouping_columns = collection.toJSON();
                 save(data);
             });
