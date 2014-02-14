@@ -113,38 +113,33 @@ function($, _, __, DeleteConfirmation) {
             data.cid = model.cid;
 
             var item = $(this.itemTemplate(data));
-            this._bindItemActions(item);
+            item.find(this.options.selectors.editButton).on('click', _.bind(this._onEditAction, this));
+            item.find(this.options.selectors.deleteButton).on('click', _.bind(this._onDeleteAction, this));
 
             return item;
         },
 
-        _bindItemActions: function (item) {
-            // bind edit button
-            var onEdit = _.bind(function (e) {
-                e.preventDefault();
-                var cid = $(e.currentTarget).closest('[data-cid]').data('cid');
-                var model = this.options.collection.get(cid);
-                if (model) {
-                    model.trigger('edit', model);
-                }
-            }, this);
-            item.find(this.options.selectors.editButton).on('click', onEdit);
-
-            // bind delete button
-            var onDelete = _.bind(function (e) {
-                e.preventDefault();
-                var el = $(e.currentTarget);
-                var cid = el.closest('[data-cid]').data('cid');
-                var confirm = new DeleteConfirmation({
-                    content: el.data('message')
-                });
-                confirm.on('ok', _.bind(this._handleDeleteModel, this, cid));
-                confirm.open();
-            }, this);
-            item.find(this.options.selectors.deleteButton).on('click', onDelete);
+        _onEditAction: function (e) {
+            e.preventDefault();
+            var cid = $(e.currentTarget).closest('[data-cid]').data('cid');
+            var model = this.options.collection.get(cid);
+            if (model) {
+                model.trigger('edit', model);
+            }
         },
 
-        _handleDeleteModel: function (cid) {
+        _onDeleteAction: function (e) {
+            e.preventDefault();
+            var el = $(e.currentTarget);
+            var cid = el.closest('[data-cid]').data('cid');
+            var confirm = new DeleteConfirmation({
+                content: el.data('message')
+            });
+            confirm.on('ok', _.bind(this._handleDeleteAction, this, cid));
+            confirm.open();
+        },
+
+        _handleDeleteAction: function (cid) {
             var model = this.options.collection.get(cid);
             if (model) {
                 this.options.collection.remove(model);
