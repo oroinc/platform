@@ -229,6 +229,14 @@
         require(['jquery', 'oro/query-designer/grouping/collection',
                 'oroquerydesigner/js/field-condition', 'oroui/js/edit-form', 'oroquerydesigner/js/item-container'
         ], function ($, GroupingCollection) {
+            // @todo names of inputs in form should represent model attribute
+            var $elem =$('[name="oro_report_form[grouping][columnNames]"]')
+                    .attr('name', 'oro_report_form[grouping][name]');
+            $elem.parents('form').submit(function () {
+                $elem.attr('name', 'oro_report_form[grouping][columnNames]');
+            });
+
+
             var $editForm = $('#{{ attr.id }}');
             var $fieldChoice = $editForm.find('[data-purpose=column-selector]');
             $fieldChoice.fieldChoice({{ fieldConditionOptions|json_encode|raw }});
@@ -254,8 +262,6 @@
             };
 
             var data = load();
-            // @todo names of inputs in form should represent model attribute
-            $('[name="oro_report_form[grouping][columnNames]"]').attr('name', 'oro_report_form[grouping][name]');
 
             var collection = new GroupingCollection(data.grouping_columns);
             collection.on('add remove sort', function () {
