@@ -8,6 +8,7 @@ parameters:
     oro_workflow.action.create_object.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateObject
     oro_workflow.action.create_datetime.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateDateTime
     oro_workflow.action.create_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity
+    oro_workflow.action.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
     oro_workflow.action.request_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity
     oro_workflow.action.call_method.class: Oro\Bundle\WorkflowBundle\Model\Action\CallMethod
     oro_workflow.action.start_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow
@@ -73,6 +74,14 @@ services:
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: create_entity }
+
+    oro_workflow.action.create_related_entity:
+        class: %oro_workflow.action.create_related_entity.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_workflow.action, alias: create_related_entity }
 
     oro_workflow.action.request_entity:
         class: %oro_workflow.action.request_entity.class%

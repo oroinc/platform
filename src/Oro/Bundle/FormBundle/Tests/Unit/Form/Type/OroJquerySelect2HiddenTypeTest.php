@@ -161,6 +161,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'autocomplete_alias' => 'foo',
                         'properties' => array('bar', 'baz'),
                         'route_name' => 'oro_form_autocomplete_search',
+                        'route_parameters' => array(),
                         'extra_config' => 'autocomplete'
                     ),
                     'attr' => array(
@@ -178,7 +179,8 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                 '1',
                 array(
                     'configs' => array(
-                        'route_name' => 'custom_route'
+                        'route_name' => 'custom_route',
+                        'route_parameters' => array('test' => 'hello')
                     ),
                     'converter' => 'getMockConverter',
                     'entity_class' => 'TestEntityClass'
@@ -204,7 +206,8 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
                         'placeholder' => 'oro.form.choose_value',
                         'allowClear' => 1,
                         'minimumInputLength' => 1,
-                        'route_name' => 'custom_route'
+                        'route_name' => 'custom_route',
+                        'route_parameters' => array('test' => 'hello'),
                     ),
                     'attr' => array(
                         'data-selected-data' => json_encode(

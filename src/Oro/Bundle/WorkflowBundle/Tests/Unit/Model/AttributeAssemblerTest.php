@@ -88,6 +88,16 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                 'Oro\Bundle\WorkflowBundle\Exception\AssemblerException',
                 'Class "InvalidClass" referenced by "class" option in attribute "name" not found'
             ),
+            'not_allowed_entity_acl' => array(
+                array(
+                    'name' => array(
+                        'label' => 'Label', 'type' => 'object', 'options' => array('class' => 'stdClass'),
+                        'entity_acl' => array('update' => false),
+                    )
+                ),
+                'Oro\Bundle\WorkflowBundle\Exception\AssemblerException',
+                'Attribute "Label" with type "object" can\'t have entity ACL'
+            ),
         );
     }
 
@@ -192,7 +202,23 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
                     'entity',
                     array('class' => 'stdClass')
                 )
-            )
+            ),
+            'with_entity_acl' => array(
+                array(
+                    'attribute_one' => array(
+                        'label' => 'label', 'type' => 'entity', 'options' => array('class' => 'stdClass'),
+                        'property_path' => null, 'entity_acl' => array('update' => false),
+                    )
+                ),
+                $this->getAttribute(
+                    'attribute_one',
+                    'label',
+                    'entity',
+                    array('class' => 'stdClass'),
+                    null,
+                    array('update' => false)
+                )
+            ),
         );
     }
 
@@ -202,16 +228,24 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      * @param string $type
      * @param array $options
      * @param string $propertyPath
+     * @param array $entityAcl
      * @return Attribute
      */
-    protected function getAttribute($name, $label, $type, array $options = array(), $propertyPath = null)
-    {
+    protected function getAttribute(
+        $name,
+        $label,
+        $type,
+        array $options = array(),
+        $propertyPath = null,
+        array $entityAcl = array()
+    ) {
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($label);
         $attribute->setType($type);
         $attribute->setOptions($options);
         $attribute->setPropertyPath($propertyPath);
+        $attribute->setEntityAcl($entityAcl);
         return $attribute;
     }
 }

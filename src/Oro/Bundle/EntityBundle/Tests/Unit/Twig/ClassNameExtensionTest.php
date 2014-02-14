@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\EntityBundle\Twig\ClassNameExtension;
-use Oro\Bundle\EntityBundle\Tests\Unit\Twig\Stub\ItemStub;
-use Oro\Bundle\EntityBundle\Tests\Unit\Twig\Stub\__CG__\ItemStubProxy;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
 
 class ClassNameExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,7 +53,7 @@ class ClassNameExtensionTest extends \PHPUnit_Framework_TestCase
                 'object'        => 'string',
             ),
             'object' => array(
-                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\Twig\Stub\ItemStub',
+                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                 'object'        => new ItemStub(),
             ),
             'proxy' => array(

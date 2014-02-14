@@ -58,8 +58,8 @@ class EntityConnector
      */
     protected function setProperty($entity, $property, $value)
     {
-        $setter = 'set' . ucfirst($property);
-        if (!method_exists($entity, $setter)) {
+        $setter = $this->getSetter($entity, $property);
+        if (!$setter) {
             throw new WorkflowException(sprintf('Can\'t set property "%s" to entity', $property));
         }
 
@@ -74,11 +74,45 @@ class EntityConnector
      */
     protected function getProperty($entity, $property)
     {
-        $getter = 'get' . ucfirst($property);
-        if (!method_exists($entity, $getter)) {
+        $getter = $this->getGetter($entity, $property);
+        if (!$getter) {
             throw new WorkflowException(sprintf('Can\'t get property "%s" from entity', $property));
         }
 
         return $entity->$getter();
+    }
+
+    /**
+     * @param object $entity
+     * @param string $property
+     * @return null|string
+     */
+    protected function getSetter($entity, $property)
+    {
+        $setter = 'set' . ucfirst($property);
+        return method_exists($entity, $setter) ? $setter : null;
+    }
+
+    /**
+     * @param object $entity
+     * @param string $property
+     * @return null|string
+     */
+    protected function getGetter($entity, $property)
+    {
+        $getter = 'get' . ucfirst($property);
+        return method_exists($entity, $getter) ? $getter : null;
+    }
+
+    /**
+     * @param object $entity
+     * @return bool
+     */
+    public function isWorkflowAware($entity)
+    {
+        return $this->getGetter($entity, self::PROPERTY_WORKFLOW_ITEM)
+            && $this->getSetter($entity, self::PROPERTY_WORKFLOW_ITEM)
+            && $this->getGetter($entity, self::PROPERTY_WORKFLOW_STEP)
+            && $this->getSetter($entity, self::PROPERTY_WORKFLOW_STEP);
     }
 }

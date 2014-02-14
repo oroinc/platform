@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Exception;
+namespace Oro\Bundle\EntityBundle\Exception;
 
-class NotManageableEntityException extends WorkflowException
+class NotManageableEntityException extends RuntimeException
 {
     public function __construct($className)
     {
