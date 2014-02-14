@@ -226,10 +226,8 @@
         util: {}
     } %}
     <script type="text/javascript">
-        require(['jquery', 'backbone', 'oro/query-designer/grouping/model',
-                'oroquerydesigner/js/field-condition',
-                'oroui/js/edit-form', 'oroquerydesigner/js/item-container'
-        ], function ($, Backbone, GroupingModel) {
+        require(['jquery', 'oroentity/js/field-choice'], function ($) {
+
             // @todo names of inputs in form should represent model attribute
             var $elem =$('[name="oro_report_form[grouping][columnNames]"]')
                     .attr('name', 'oro_report_form[grouping][name]');
@@ -239,9 +237,8 @@
             // end
 
 
-            var $editForm = $('#{{ attr.id }}');
             // @todo move into fieldChoice type
-            var $fieldChoice = $editForm.find('[data-purpose=column-selector]');
+            var $fieldChoice = $('#{{ attr.id }}').find('[data-purpose=column-selector]');
             $fieldChoice.fieldChoice({{ fieldConditionOptions|json_encode|raw }});
             $('#{{ params.entity_choice_id }}')
                 .on('fieldsloaderupdate', function (e, fields) {
@@ -253,34 +250,6 @@
                         });
                 });
             // end
-
-            var $storage = $('#oro_report_form_definition');
-            var load = function () {
-                var data = JSON.parse($storage.val());
-                console.log('Load:', data);
-                return data;
-            };
-            var save = function (data) {
-                console.log('Save:', data);
-                $storage.val(JSON.stringify(data));
-            };
-
-            var data = load();
-
-            var collection = new (Backbone.Collection)(data.grouping_columns, {model: GroupingModel});
-            collection.on('add remove sort', function () {
-                data.grouping_columns = collection.toJSON();
-                save(data);
-            });
-
-            $editForm.editForm({
-                namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
-                collection: collection
-            });
-            $editForm.find('.grouping-item-container').itemContainer({
-                collection: collection,
-                itemTemplateSelector: '#report-grouping-item-row'
-            });
         });
     </script>
 {% endmacro %}

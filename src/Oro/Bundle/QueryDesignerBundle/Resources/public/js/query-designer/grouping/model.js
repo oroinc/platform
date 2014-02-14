@@ -1,6 +1,6 @@
-/* global define */
-define(['backbone', 'oro/app'],
-function(Backbone, app) {
+/*global define*/
+/*jslint nomen: true*/
+define(['backbone', 'underscore'], function (Backbone, _) {
     'use strict';
 
     /**
@@ -17,8 +17,14 @@ function(Backbone, app) {
             sorting: null
         },
 
-        getFieldLabel: function (name, value) {
-            return (typeof value === 'object') ? JSON.stringify(value) : value;
+        getFieldLabel: function (name) {
+            var getter = 'get' + name.charAt(0).toUpperCase() + name.slice(1) + 'Label';
+            return this[getter] ? _.result(this, getter) : this.get(name);
+        },
+
+        getNameLabel: function () {
+            var name = this.get('name');
+            return name ? this.nameTemplate(this.util.splitFieldId(name)) : '';
         }
     });
 });
