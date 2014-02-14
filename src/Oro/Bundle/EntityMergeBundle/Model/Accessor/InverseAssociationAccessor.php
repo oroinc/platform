@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
-
+use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class InverseAssociationAccessor implements AccessorInterface
@@ -38,7 +41,21 @@ class InverseAssociationAccessor implements AccessorInterface
      */
     public function supports($entity, FieldMetadata $metadata)
     {
-        return $metadata->hasDoctrineMetadata() && !$metadata->getDoctrineMetadata()->isMappedBySourceEntity();
+        return $metadata->hasDoctrineMetadata() &&
+            $this->isInverseAssociationTypeToOne($metadata->getDoctrineMetadata());
+    }
+
+    /**
+     * Checks if association is inverse and related to one entity
+     *
+     * @param DoctrineMetadata $metadata
+     * @return bool
+     */
+    protected function isInverseAssociationTypeToOne(DoctrineMetadata $metadata)
+    {
+        return !$metadata->isMappedBySourceEntity() &&
+            ($metadata->get('type') == ClassMetadataInfo::MANY_TO_ONE ||
+            $metadata->get('type') == ClassMetadataInfo::ONE_TO_ONE);
     }
 
     /**
@@ -85,30 +102,23 @@ class InverseAssociationAccessor implements AccessorInterface
             $setter = $metadata->get('setter');
             $relatedEntity->$setter($value);
         } else {
-            $this->getPropertyAccessor()
-                ->setValue(
-                    $relatedEntity,
-                    $this->getPropertyPath($metadata),
-                    $value
+            try {
+                $this->getPropertyAccessor()
+                    ->setValue(
+                        $relatedEntity,
+                        $metadata->getDoctrineMetadata()->getFieldName(),
+                        $value
+                    );
+            } catch (NoSuchPropertyException $e) {
+                // If setter is not exist
+                $reflection = new \ReflectionProperty(
+                    get_class($relatedEntity),
+                    $metadata->getDoctrineMetadata()->getFieldName()
                 );
+                $reflection->setAccessible(true);
+                $reflection->setValue($relatedEntity, $value);
+            }
         }
-    }
-
-    /**
-     * @param FieldMetadata $metadata
-     * @return string
-     */
-    protected function getPropertyPath(FieldMetadata $metadata)
-    {
-        if ($metadata->has('property_path')) {
-            return $metadata->get('property_path');
-        }
-
-        if ($metadata->hasDoctrineMetadata()) {
-            return $metadata->getDoctrineMetadata()->getFieldName();
-        }
-
-        return $metadata->getFieldName();
     }
 
     /**

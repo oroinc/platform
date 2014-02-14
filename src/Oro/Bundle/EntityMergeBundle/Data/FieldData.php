@@ -76,13 +76,9 @@ class FieldData
      *
      * @param object $entity
      * @return FieldData
-     * @throws InvalidArgumentException If $entity is not an object
      */
     public function setSourceEntity($entity)
     {
-        if (!$this->entityData->hasEntity($entity)) {
-            throw new InvalidArgumentException('Passed entity must be included to merge data.');
-        }
         $this->sourceEntity = $entity;
 
         return $this;
