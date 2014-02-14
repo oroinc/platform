@@ -32,7 +32,7 @@ class EmbeddedFormType extends AbstractType
                 ]
             )
             ->add('css', 'textarea')
-            ->add('successMessage', 'textarea', ['tooltip' => 'oro.embedded_form.successMessage.tooltip']);
+            ->add('successMessage', 'textarea', ['tooltip' => 'oro.embeddedform.success_message.tooltip']);
     }
 
     /**

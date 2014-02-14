@@ -24,7 +24,8 @@
             var $field = $('#{{ id }}');
 
             {% block genemu_jqueryselect2_javascript_prototype %}
-                {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name) : '' %}
+                {% set routeParameters = configs.route_parameters is defined ? configs.route_parameters : [] %}
+                {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, routeParameters) : '' %}
                 {% if configs.placeholder is defined %}
                     {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
                 {% endif %}
@@ -146,13 +147,15 @@
 {% endblock %}
 
 {% block oro_combobox_dataconfig_grid %}
-    {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, {'_format': 'json'}) : '' %}
+    {% set url = path('oro_datagrid_index', {'gridName': configs.grid.name}) %}
+    {% set perPage = configs.per_page|default(10) %}
+
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
         'data': function (query, page) {
             return {
                 '{{ configs.grid.name }}[_pager][_page]': page,
-                '{{ configs.grid.name }}[_pager][_per_page]': {{ configs.per_page|default(10) }},
+                '{{ configs.grid.name }}[_pager][_per_page]': {{ perPage }},
                 '{{ configs.grid.name }}[_sort_by][{{ configs.grid.sort_by|default(configs.properties[0]) }}]': "{{ configs.grid.sort_order|default('ASC') }}",
                 '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][type]': 1,
                 '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][value]': query
@@ -160,10 +163,8 @@
         },
         'results': function (data, page) {
             return {
-                results: $.map(data.data, function(item) {
-                    return {'id': item.id, 'text': item.{{- configs.properties[0] -}} };
-                }),
-                more: page*10 < data.options.totalRecords
+                results: data.data,
+                more: page*{{ perPage }} < data.options.totalRecords
             };
         }
     };

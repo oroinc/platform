@@ -34,7 +34,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 

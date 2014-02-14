@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
@@ -31,6 +32,11 @@ class Workflow
      * @var EntityConnector
      */
     protected $entityConnector;
+
+    /**
+     * @var AclManager
+     */
+    protected $aclManager;
 
     /**
      * @var StepManager
@@ -64,17 +70,20 @@ class Workflow
 
     /**
      * @param EntityConnector $entityConnector
+     * @param AclManager $aclManager
      * @param StepManager|null $stepManager
      * @param AttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
      */
     public function __construct(
         EntityConnector $entityConnector,
+        AclManager $aclManager,
         StepManager $stepManager = null,
         AttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
     ) {
         $this->entityConnector = $entityConnector;
+        $this->aclManager = $aclManager;
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
         $this->attributeManager  = $attributeManager ? $attributeManager : new AttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
@@ -290,6 +299,8 @@ class Workflow
         $entity = $workflowItem->getEntity();
         $this->entityConnector->setWorkflowItem($entity, $workflowItem);
         $this->entityConnector->setWorkflowStep($entity, $workflowItem->getCurrentStep());
+
+        $this->aclManager->updateAclIdentities($workflowItem);
     }
 
     /**
@@ -307,6 +318,11 @@ class Workflow
         $workflowItem
             ->setWorkflowName($this->getName())
             ->setEntity($entity);
+
+        if (array_key_exists($entityAttributeName, $data)) {
+            unset($data[$entityAttributeName]);
+        }
+
         $workflowItem->getData()
             ->set($entityAttributeName, $entity)
             ->setFieldsMapping($this->getAttributesMapping())
@@ -427,23 +443,27 @@ class Workflow
     public function getPassedStepsByWorkflowItem(WorkflowItem $workflowItem)
     {
         $transitionRecords = $workflowItem->getTransitionRecords();
-        $minStepIdx = count($transitionRecords) - 1;
-        $minStep = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
-        $steps = array($minStep);
-        $minStepIdx--;
-        while ($minStepIdx > -1) {
-            $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
-            if ($step->getOrder() < $minStep->getOrder()) {
-                $minStepIdx--;
-                $minStep = $step;
-                $steps[] = $step;
-            } elseif ($step->getName() === $minStep->getName()) {
-                $minStepIdx--;
-            } else {
-                break;
+        $passedSteps = array();
+        if ($transitionRecords) {
+            $minStepIdx = count($transitionRecords) - 1;
+            $minStep = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
+            $steps = array($minStep);
+            $minStepIdx--;
+            while ($minStepIdx > -1) {
+                $step = $this->stepManager->getStep($transitionRecords[$minStepIdx]->getStepTo()->getName());
+                if ($step->getOrder() < $minStep->getOrder()) {
+                    $minStepIdx--;
+                    $minStep = $step;
+                    $steps[] = $step;
+                } elseif ($step->getName() === $minStep->getName()) {
+                    $minStepIdx--;
+                } else {
+                    break;
+                }
             }
+            $passedSteps = array_reverse($steps);
         }
-        return new ArrayCollection(array_reverse($steps));
+        return new ArrayCollection($passedSteps);
     }
 
     /**

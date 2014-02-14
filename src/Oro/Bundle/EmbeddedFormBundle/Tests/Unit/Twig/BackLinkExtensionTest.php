@@ -92,7 +92,7 @@ class BackLinkExtensionTest extends \PHPUnit_Framework_TestCase
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface', [], [], '', false);
         $translator->expects($this->once())
             ->method('trans')
-            ->with('oro.embedded_form.back_link_default_text')
+            ->with('oro.embeddedform.back_link_default_text')
             ->will($this->returnValue('Back'));
 
         $extension = $this->createBackLinkExtension($router, $translator);

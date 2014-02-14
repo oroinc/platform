@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Stub;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub;
 
 class ItemStub
 {
