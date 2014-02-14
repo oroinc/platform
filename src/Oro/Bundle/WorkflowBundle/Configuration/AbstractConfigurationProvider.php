@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
@@ -72,6 +73,39 @@ abstract class AbstractConfigurationProvider
         }
 
         return $configDirectories;
+    }
+
+    /**
+     * Load config file and include imports.
+     *
+     * @param \SplFileInfo $file
+     * @throws InvalidConfigurationException
+     * @return array
+     */
+    protected function loadConfigFile(\SplFileInfo $file)
+    {
+        $realPathName = $file->getRealPath();
+        $configData = Yaml::parse($realPathName);
+
+        if (array_key_exists('imports', $configData) && is_array($configData['imports'])) {
+            $imports = $configData['imports'];
+            unset($configData['imports']);
+            foreach ($imports as $importData) {
+                if (array_key_exists('resource', $importData)) {
+                    $resourceFile = new \SplFileInfo($file->getPath() . DIRECTORY_SEPARATOR . $importData['resource']);
+                    if ($resourceFile->isReadable()) {
+                        $includedData = $this->loadConfigFile($resourceFile);
+                        $configData = array_merge_recursive($configData, $includedData);
+                    } else {
+                        throw new InvalidConfigurationException(
+                            sprintf('Resource "%s" is unreadable', $resourceFile->getBasename())
+                        );
+                    }
+                }
+            }
+        }
+
+        return $configData;
     }
 
     /**

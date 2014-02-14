@@ -8,17 +8,41 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class WorkflowStepTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @var WorkflowStep
+     */
+    protected $step;
+
+    protected function setUp()
+    {
+        $this->step = new WorkflowStep();
+    }
+
+    protected function tearDown()
+    {
+        unset($this->step);
+    }
+
+    public function testGetId()
+    {
+        $this->assertNull($this->step->getId());
+
+        $value = 42;
+        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep', 'id');
+        $idReflection->setAccessible(true);
+        $idReflection->setValue($this->step, $value);
+        $this->assertEquals($value, $this->step->getId());
+    }
+
+    /**
      * @dataProvider propertiesDataProvider
      * @param string $property
      * @param mixed $value
      */
     public function testSettersAndGetters($property, $value)
     {
-        $obj = new WorkflowStep();
-
         $accessor = PropertyAccess::createPropertyAccessor();
-        $accessor->setValue($obj, $property, $value);
-        $this->assertEquals($value, $accessor->getValue($obj, $property));
+        $accessor->setValue($this->step, $property, $value);
+        $this->assertEquals($value, $accessor->getValue($this->step, $property));
     }
 
     public function propertiesDataProvider()
@@ -33,13 +57,12 @@ class WorkflowStepTest extends \PHPUnit_Framework_TestCase
 
     public function testImport()
     {
-        $step = new WorkflowStep();
-        $step->setName('test');
-        $step->setLabel('test');
-        $step->setStepOrder(1);
+        $this->step->setName('test');
+        $this->step->setLabel('test');
+        $this->step->setStepOrder(1);
 
         $newStep = new WorkflowStep();
-        $newStep->import($step);
+        $newStep->import($this->step);
 
         $this->assertEquals('test', $newStep->getName());
         $this->assertEquals('test', $newStep->getLabel());

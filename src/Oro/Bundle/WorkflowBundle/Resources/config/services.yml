@@ -1,6 +1,5 @@
 parameters:
     oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
-    oro_workflow.doctrine_helper.class: Oro\Bundle\WorkflowBundle\Model\DoctrineHelper
     oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
@@ -10,11 +9,6 @@ services:
     oro_workflow.context_accessor:
         class: %oro_workflow.context_accessor.class%
 
-    oro_workflow.doctrine_helper:
-        class: %oro_workflow.doctrine_helper.class%
-        arguments:
-            - @doctrine
-
     oro_workflow.entity_connector:
         class: %oro_workflow.entity_connector.class%
 
@@ -23,10 +17,11 @@ services:
         arguments:
             - @doctrine
             - @oro_workflow.workflow_assembler
+            - @oro_entity_config.provider.workflow
 
     oro_workflow.manager:
         class: %oro_workflow.manager.class%
         arguments:
             - @doctrine
             - @oro_workflow.registry
-            - @oro_workflow.doctrine_helper
+            - @oro_entity.doctrine_helper

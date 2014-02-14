@@ -45,17 +45,36 @@ class AttributeAssembler extends AbstractAssembler
     protected function assembleAttribute($name, array $options)
     {
         $this->assertOptions($options, array('label', 'type'));
+        $this->assertAttributeEntityAcl($options);
 
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
-        $attribute->setPropertyPath($this->getOption($options, 'property_path', null));
+        $attribute->setEntityAcl($this->getOption($options, 'entity_acl', array()));
+        $attribute->setPropertyPath($this->getOption($options, 'property_path'));
         $attribute->setOptions($this->getOption($options, 'options', array()));
 
         $this->validateAttribute($attribute);
 
         return $attribute;
+    }
+
+    /**
+     * @param array $options
+     * @throws AssemblerException
+     */
+    protected function assertAttributeEntityAcl(array $options)
+    {
+        if ($options['type'] !== 'entity' && array_key_exists('entity_acl', $options)) {
+            throw new AssemblerException(
+                sprintf(
+                    'Attribute "%s" with type "%s" can\'t have entity ACL',
+                    $options['label'],
+                    $options['type']
+                )
+            );
+        }
     }
 
     /**

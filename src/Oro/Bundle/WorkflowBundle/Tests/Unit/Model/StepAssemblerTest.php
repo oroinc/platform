@@ -113,6 +113,9 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                         'order' => 10,
                         'is_final' => true,
                         'allowed_transitions' => array('transition_one'),
+                        'entity_acl' => array(
+                            'attribute_one' => array('update' => false)
+                        )
                     )
                 ),
                 array(
@@ -124,6 +127,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
                     ->setIsFinal(true)
                     ->setOrder(10)
                     ->setAllowedTransitions(array('transition_one'))
+                    ->setEntityAcls(array('attribute_one' => array('update' => false)))
             ),
         );
     }

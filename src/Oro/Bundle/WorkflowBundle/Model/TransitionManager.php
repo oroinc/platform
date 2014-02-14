@@ -15,9 +15,9 @@ class TransitionManager
     protected $transitions;
 
     /**
-     * @param Collection $transitions
+     * @param Collection|Transition[] $transitions
      */
-    public function __construct(Collection $transitions = null)
+    public function __construct($transitions = null)
     {
         $this->setTransitions($transitions);
     }

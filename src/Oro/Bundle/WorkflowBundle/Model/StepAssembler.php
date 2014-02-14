@@ -56,7 +56,8 @@ class StepAssembler extends AbstractAssembler
             ->setLabel($options['label'])
             ->setOrder($this->getOption($options, 'order', 0))
             ->setIsFinal($this->getOption($options, 'is_final', false))
-            ->setAllowedTransitions($this->getOption($options, 'allowed_transitions', array()));
+            ->setAllowedTransitions($this->getOption($options, 'allowed_transitions', array()))
+            ->setEntityAcls($this->getOption($options, 'entity_acl', array()));
 
         return $step;
     }
