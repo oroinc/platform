@@ -256,6 +256,9 @@
             console.log('#oro_report_form_definition:', data);
 
             var collection = new GroupingCollection(data.grouping_columns);
+            collection.on('all', function () {
+                console.log(arguments);
+            });
             
             $editForm.editForm({
                 namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,

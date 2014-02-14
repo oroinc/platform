@@ -17,6 +17,12 @@ function(Backbone, app) {
             sorting: null
         },
 
+        initialize: function() {
+            if (!this.get('id')) {
+                this.set('id', this.cid);
+            }
+        },
+
         toJSON: function(options) {
             return app.deepClone(this.attributes);
         }

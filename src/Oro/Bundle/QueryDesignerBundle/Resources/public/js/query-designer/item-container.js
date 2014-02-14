@@ -7,7 +7,10 @@ function($, _, __, DeleteConfirmation) {
      * Item container widget
      *
      * Emits events:
-     * collection:change, collection:reset, model:edit, model:delete
+     * collection:change, collection:reset, model:delete
+     *
+     * Emits model events
+     * edit
      *
      * Listens to options.collection events:
      * add, remove, change, reset
@@ -132,13 +135,11 @@ function($, _, __, DeleteConfirmation) {
             // bind edit button
             var onEdit = _.bind(function (e) {
                 e.preventDefault();
-                var el = $(e.currentTarget);
-                var id = el.closest('[data-id]').data('id');
+                var id = $(e.currentTarget).closest('[data-id]').data('id');
                 var model = this.options.collection.get(id);
-                this._trigger('model:edit', {
-                    modelId: id,
-                    modelAttributes: model.attributes
-                });
+                if (model) {
+                    model.trigger('edit', id);
+                }
             }, this);
             item.find(this.options.selectors.editButton).on('click', onEdit);
 
