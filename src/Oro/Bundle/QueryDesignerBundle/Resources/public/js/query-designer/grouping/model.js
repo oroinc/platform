@@ -17,12 +17,6 @@ function(Backbone, app) {
             sorting: null
         },
 
-        initialize: function () {
-            if (!this.get('id')) {
-                this.set('id', this.cid);
-            }
-        },
-
         getFieldLabel: function (name, value) {
             return (typeof value === 'object') ? JSON.stringify(value) : value;
         }
