@@ -257,26 +257,23 @@
             // @todo names of inputs in form should represent model attribute
             $('[name="oro_report_form[grouping][columnNames]"]').attr('name', 'oro_report_form[grouping][name]');
 
-
             var collection = new GroupingCollection(data.grouping_columns);
-            collection.on('all', function () {
-                console.log(arguments);
+            collection.on('add remove', function () {
                 data.grouping_columns = collection.toJSON();
                 save(data);
+            });
+            collection.on('all', function () {
+                console.log(arguments);
             });
             
             $editForm.editForm({
                 namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
                 collection: collection
             });
-            var $groupingItems = $editForm.find('.grouping-item-container');
-            $groupingItems.itemContainer({
+            $editForm.find('.grouping-item-container').itemContainer({
                 collection: collection,
                 itemTemplateSelector: '#report-grouping-item-row',
                 //getFieldLabel: _.bind(this.getFieldLabel, this),
-                //'model:edit': _.bind(this.onModelEdit, this),
-                //'model:delete': _.bind(this.onModelDelete, this),
-                //'collection:reset': _.bind(this.onCollectionReset, this)
             });
         });
     </script>

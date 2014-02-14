@@ -7,7 +7,7 @@ function($, _, __, DeleteConfirmation) {
      * Item container widget
      *
      * Emits events:
-     * collection:change, collection:reset, model:delete
+     * collection:change, collection:reset
      *
      * Emits model events
      * edit
@@ -157,25 +157,11 @@ function($, _, __, DeleteConfirmation) {
             item.find(this.options.selectors.deleteButton).on('click', onDelete);
         },
 
-        _handleDeleteModel: function (modelId) {
-            var model = this.options.collection.get(modelId);
-            this._trigger('model:delete', {
-                modelId: modelId
-            });
-            this.deleteModel(model);
-        },
-
-        initModel: function (model, index) {
-            model.set('id', _.uniqueId('designer'));
-        },
-
-        addModel: function (model) {
-            this.initModel(model, this.options.collection.size());
-            this.options.collection.add(model);
-        },
-
-        deleteModel: function (model) {
-            this.options.collection.remove(model);
+        _handleDeleteModel: function (id) {
+            var model = this.options.collection.get(id);
+            if (model) {
+                this.options.collection.remove(model);
+            }
         }
     });
 
