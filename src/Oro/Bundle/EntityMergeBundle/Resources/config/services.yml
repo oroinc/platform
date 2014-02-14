@@ -33,7 +33,12 @@ parameters:
     oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener\CascadeRemoveAssociationListener
 
     # Validator
+    oro_entity_merge.validator.doctrine_helper.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\DoctrineHelperValidator
     oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator
+    oro_entity_merge.validator.master_entity.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MasterEntityValidator
+    oro_entity_merge.validator.source_entity.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntityValidator
+    oro_entity_merge.validator.unique_entity.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntityValidator
+
 services:
     oro_entity_merge.doctrine_helper:
         class: %oro_entity_merge.doctrine_helper.class%
@@ -157,3 +162,27 @@ services:
         class: %oro_entity_merge.validator.max_entities_validator.class%
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_merge_max_entities_validator }
+
+    oro_entity_merge.validator.doctrine_helper:
+        class: %oro_entity_merge.validator.doctrine_helper.class%
+        abstract:  true
+        arguments:
+          - @oro_entity_merge.doctrine_helper
+
+    oro_entity_merge.validator.master_entity:
+        class: %oro_entity_merge.validator.master_entity.class%
+        parent: oro_entity_merge.validator.doctrine_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_merge_master_entity_validator }
+
+    oro_entity_merge.validator.source_entity:
+        class: %oro_entity_merge.validator.source_entity.class%
+        parent: oro_entity_merge.validator.doctrine_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_merge_source_entity_validator }
+
+    oro_entity_merge.validator.unique_entity:
+        class: %oro_entity_merge.validator.unique_entity.class%
+        parent: oro_entity_merge.validator.doctrine_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_merge_unique_entity_validator }

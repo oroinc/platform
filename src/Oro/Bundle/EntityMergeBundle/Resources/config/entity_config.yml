@@ -15,6 +15,8 @@ oro_entity_config:
                 enable:
                     options:
                         is_bool: true
+                # Max entities to merge
+                max_entities_count: 5
 
         # Attributes applicable on entity fields level
         field:
