@@ -531,9 +531,9 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             },
 
             /**
-             * Render no data block.
+             * Define no data block.
              */
-            renderNoDataBlock: function () {
+            _defineNoDataBlock: function () {
                 var placeholders = {entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()},
                     template = _.isEmpty(this.collection.state.filters) ? 'oro.datagrid.noentities' :
                         'oro.datagrid.noresults',
@@ -542,6 +542,13 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
                     hint: __(template, placeholders).replace('\n', '<br />')
                 }))).hide();
+            },
+
+            /**
+             * Render no data block.
+             */
+            renderNoDataBlock: function () {
+                this._defineNoDataBlock();
                 this._updateNoDataBlock();
             },
 
@@ -564,7 +571,6 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.requestsCount -= 1;
                 if (this.requestsCount === 0) {
                     this.hideLoading();
-
                     /**
                      * Backbone event. Fired when data for grid has been successfully rendered.
                      * @event grid_load:complete
@@ -595,6 +601,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              * @private
              */
             _updateNoDataBlock: function () {
+                this._defineNoDataBlock();
                 if (this.collection.models.length > 0 && !this.noColumnsFlag) {
                     this.$(this.selectors.toolbar).show();
                     this.$(this.selectors.grid).show();
