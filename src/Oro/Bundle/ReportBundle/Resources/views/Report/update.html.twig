@@ -212,26 +212,21 @@
                 // grouping
                 var $editForm = $('#report-grouping-form');
                 var $groupingFieldChoice = $editForm.find('[data-purpose=column-selector]');
+                $groupingFieldChoice.fieldChoice(fieldChoiceOptions);
+
                 GroupingModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
                 GroupingModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
-                $groupingFieldChoice.fieldChoice(fieldChoiceOptions);
+
                 var $storage = $('#oro_report_form_definition');
                 var load = function () {
-                    var data = JSON.parse($storage.val());
-                    console.log('Load:', data);
-                    return data;
-                };
-                var save = function (data) {
-                    console.log('Save:', data);
-                    $storage.val(JSON.stringify(data));
+                    return JSON.parse($storage.val());
                 };
 
-                var data = load();
-
-                var collection = new (Backbone.Collection)(data.grouping_columns, {model: GroupingModel});
+                var collection = new (Backbone.Collection)(load().grouping_columns, {model: GroupingModel});
                 collection.on('add remove sort', function () {
+                    var data = load();
                     data.grouping_columns = collection.toJSON();
-                    save(data);
+                    $storage.val(JSON.stringify(data));
                 });
 
                 $editForm.editForm({
