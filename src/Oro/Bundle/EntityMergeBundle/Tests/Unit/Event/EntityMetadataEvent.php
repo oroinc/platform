@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 
-class EntityDataEventTest extends \PHPUnit_Framework_TestCase
+class EntityMetadataEventTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
