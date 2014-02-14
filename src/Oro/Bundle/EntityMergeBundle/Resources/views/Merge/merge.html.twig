@@ -1,8 +1,8 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% set title = 'Merge Accounts' %}
-{% oro_title_set({}) %}
+{% set title = 'oro.entity_merge.action.merge'|trans({'{{ label }}': entityLabel|trans}) %}
+{% oro_title_set({params : {'{{ label }}': entityLabel|trans }}) %}
 
 {% block navButtons %}
     {{ UI.cancelButton(cancelPath) }}
@@ -17,7 +17,7 @@
     {% set id = 'entity-merge' %}
 
     {% set dataBlocks = [{
-        'title' : 'Merge Values'|trans,
+        'title' : 'oro.entity_merge.form.merge_values'|trans,
         'subblocks':
         [
             {

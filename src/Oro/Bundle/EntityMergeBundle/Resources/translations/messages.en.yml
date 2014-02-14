@@ -14,3 +14,4 @@ oro:
             master_record: Master Record
             strategy: Strategy
             select_all: Select all
+            merge_values: Merge Values

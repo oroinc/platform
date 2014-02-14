@@ -134,7 +134,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
         $metadata = $this->factory->createEntityMetadata(self::ENTITY);
         $this->assertNotNull($metadata);
         $this->assertInstanceOf(
-            '\Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata',
+            'Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata',
             $metadata
         );
     }
@@ -185,8 +185,6 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateFieldsMetadataReturnCollectionMetadata()
     {
-        $label = 'test';
-
         $this->mergeConfigProvider
             ->expects($this->once())
             ->method('getConfigs')
