@@ -48,7 +48,7 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
                 attrs = model.toJSON();
                 $.each(attrs, function (name, value) {
                     if (elementsMap[name]) {
-                        setValue(elementsMap[name], value.value);
+                        setValue(elementsMap[name], value);
                     }
                 });
             } else {
