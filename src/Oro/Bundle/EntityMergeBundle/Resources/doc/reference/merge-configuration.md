@@ -78,11 +78,11 @@ oro_entity_config:
                         is_bool: true
                 # Mode of merge supports next values, value can be an array or single mode:
                 #   replace - replace value with selected one
-                #   merge   - merge all values into one (applicable for collections and lists)
+                #   unite   - merge all values into one (applicable for collections and lists)
                 merge_modes:
                     options:
                         serializable: true
-                # Flag for collection fields. This fields will support merge mode by default
+                # Flag for collection fields. This fields will support unite mode by default
                 is_collection:
                     options:
                         is_bool: true
@@ -109,7 +109,6 @@ oro_entity_config:
                 relation_label: ~
                 # Same as cast_method but used for relation entity
                 relation_cast_method: ~
-
 ```
 
 Example:

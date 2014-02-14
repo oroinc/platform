@@ -77,11 +77,7 @@ class MergeController extends Controller
                 );
             }
 
-            return $this->redirect(
-                $this->generateUrl(
-                    $this->getEntityIndexRoute($entityData->getClassName())
-                )
-            );
+            return $this->redirect($this->generateUrl($this->getEntityIndexRoute($entityData->getClassName())));
         }
 
         $form = $this->createForm(

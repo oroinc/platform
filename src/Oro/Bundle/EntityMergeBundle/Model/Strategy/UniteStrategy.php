@@ -12,7 +12,7 @@ use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
-class MergeStrategy implements StrategyInterface
+class UniteStrategy implements StrategyInterface
 {
     /**
      * @var AccessorInterface $accessor
@@ -64,7 +64,7 @@ class MergeStrategy implements StrategyInterface
      */
     public function supports(FieldData $fieldData)
     {
-        if ($fieldData->getMode() == MergeModes::MERGE) {
+        if ($fieldData->getMode() == MergeModes::UNITE) {
             return $fieldData->getMetadata()->isCollection();
         }
 
@@ -76,6 +76,6 @@ class MergeStrategy implements StrategyInterface
      */
     public function getName()
     {
-        return 'merge';
+        return 'unite';
     }
 }

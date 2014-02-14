@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -233,7 +234,7 @@ class MetadataFactory
                     }
 
                     $fieldMetadata = $this->createFieldMetadata(
-                        $this->filterOptions(['hidden' => true, 'merge_modes' => array('merge')]),
+                        $this->filterOptions(['hidden' => true, 'merge_modes' => array(MergeModes::UNITE)]),
                         $fieldDoctrineMetadata
                     );
 

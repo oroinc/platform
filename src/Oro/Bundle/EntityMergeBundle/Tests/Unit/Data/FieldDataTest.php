@@ -49,8 +49,8 @@ class FieldDataTest extends \PHPUnit_Framework_TestCase
     public function testSetGetMode()
     {
         $this->assertEquals(MergeModes::REPLACE, $this->fieldData->getMode());
-        $this->assertEquals($this->fieldData, $this->fieldData->setMode(MergeModes::MERGE));
-        $this->assertEquals(MergeModes::MERGE, $this->fieldData->getMode());
+        $this->assertEquals($this->fieldData, $this->fieldData->setMode(MergeModes::UNITE));
+        $this->assertEquals(MergeModes::UNITE, $this->fieldData->getMode());
     }
 
     public function testGetEntityData()

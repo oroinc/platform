@@ -25,7 +25,7 @@ parameters:
     # Strategies
     oro_entity_merge.strategy.delegate.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy
     oro_entity_merge.strategy.replace.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy
-    oro_entity_merge.strategy.merge.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStrategy
+    oro_entity_merge.strategy.unite.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\UniteStrategy
 
     # Listeners
     oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener
@@ -128,8 +128,8 @@ services:
         tags:
             - { name: oro_entity_merge.strategy }
 
-    oro_entity_merge.strategy.merge:
-        class: %oro_entity_merge.strategy.merge.class%
+    oro_entity_merge.strategy.unite:
+        class: %oro_entity_merge.strategy.unite.class%
         arguments:
             - @oro_entity_merge.accessor.delegate
             - @oro_entity_merge.doctrine_helper

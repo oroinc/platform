@@ -10,7 +10,7 @@ final class MergeModes
     const REPLACE = 'replace';
 
     /**
-     * Applicable for collections, will merge all values into one collection
+     * Applicable for collections, will unite all values into one collection
      */
-    const MERGE = 'merge';
+    const UNITE = 'unite';
 }

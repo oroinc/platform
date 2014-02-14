@@ -8,7 +8,7 @@ oro:
 
         merge_modes:
             replace: Replace
-            merge: Unite
+            unite: Unite
 
         form:
             master_record: Master Record

@@ -46,7 +46,7 @@ class MergeListener
             'setter'        => self::SETTER,
             'field_name'    => self::FIELD_NAME,
             'is_collection' => true,
-            'merge_modes'   => [MergeModes::REPLACE, MergeModes::MERGE]
+            'merge_modes'   => [MergeModes::REPLACE, MergeModes::UNITE]
         ];
 
         $fieldMetadata = new FieldMetadata($fieldMetadataOptions);

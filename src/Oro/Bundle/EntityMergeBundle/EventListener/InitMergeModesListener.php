@@ -29,7 +29,7 @@ class InitMergeModesListener
         $fieldMetadata->addMergeMode(MergeModes::REPLACE);
 
         if ($fieldMetadata->isCollection()) {
-            $fieldMetadata->addMergeMode(MergeModes::MERGE);
+            $fieldMetadata->addMergeMode(MergeModes::UNITE);
         }
     }
 }

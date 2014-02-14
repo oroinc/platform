@@ -25,7 +25,7 @@ class ReplaceStrategyTest extends \PHPUnit_Framework_TestCase
         $fieldData
             ->expects($this->once())
             ->method('getMode')
-            ->will($this->returnValue(MergeModes::MERGE));
+            ->will($this->returnValue(MergeModes::UNITE));
 
         $this->assertFalse($this->strategy->supports($fieldData));
     }

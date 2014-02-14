@@ -4,15 +4,15 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
-use Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStrategy;
+use Oro\Bundle\EntityMergeBundle\Model\Strategy\UniteStrategy;
 
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class MergeStrategyTest extends \PHPUnit_Framework_TestCase
+class UniteStrategyTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MergeStrategy $strategy
+     * @var UniteStrategy $strategy
      */
     protected $strategy;
 
@@ -30,7 +30,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
 
         $accessor = new InverseAssociationAccessor($this->doctrineHelper);
 
-        $this->strategy = new MergeStrategy($accessor, $this->doctrineHelper);
+        $this->strategy = new UniteStrategy($accessor, $this->doctrineHelper);
     }
 
     public function testNotSupports()
@@ -52,7 +52,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
         $fieldData
             ->expects($this->exactly(2))
             ->method('getMode')
-            ->will($this->returnValue(MergeModes::MERGE));
+            ->will($this->returnValue(MergeModes::UNITE));
 
         $fieldMetadataData
             ->expects($this->at(0))
@@ -174,7 +174,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('merge', $this->strategy->getName());
+        $this->assertEquals('unite', $this->strategy->getName());
     }
 
     protected function createFieldData()
