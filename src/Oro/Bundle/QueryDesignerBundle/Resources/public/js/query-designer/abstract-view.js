@@ -16,6 +16,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         /** @property {Object} */
         options: {
             collection: null,
+            itemTemplateSelector: null,
             itemFormSelector: null,
             columnChainTemplateSelector: null,
             fieldsLabel: null,
@@ -29,6 +30,8 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             cancelButton:   '.cancel-button',
             saveButton:     '.save-button',
             addButton:      '.add-button',
+            editButton:     '.edit-button',
+            deleteButton:   '.delete-button',
             columnSelector: '[data-purpose="column-selector"]'
         },
 
@@ -51,11 +54,28 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             this.options.collection = this.options.collection || new this.collectionClass();
             this.fieldNames = _.without(_.keys((this.createNewModel()).attributes), 'id');
 
+            this.itemTemplate = _.template($(this.options.itemTemplateSelector).html());
+
             this.initForm();
 
             // prepare field label getters
             this.addFieldLabelGetter(this.getSelectFieldLabel);
             this.addFieldLabelGetter(this.getColumnFieldLabel);
+
+            // subscribe to collection events
+            this.listenTo(this.getCollection(), 'add', this.onModelAdded);
+            this.listenTo(this.getCollection(), 'change', this.onModelChanged);
+            this.listenTo(this.getCollection(), 'remove', this.onModelDeleted);
+            this.listenTo(this.getCollection(), 'reset', this.onResetCollection);
+        },
+
+        render: function() {
+            this.getContainer().empty();
+            this.getCollection().each(_.bind(function (model) {
+                this.onModelAdded(model);
+            }, this));
+
+            return this;
         },
 
         initForm: function () {
@@ -88,13 +108,82 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             this.$el.find(this.selectors.cancelButton).on('click', onCancel);
         },
 
+        initColumnSorting: function () {
+            this.getContainer().sortable({
+                cursor: 'move',
+                delay : 100,
+                opacity: 0.7,
+                revert: 10,
+                axis: 'y',
+                containment: ".query-designer-grid-container",
+                items: 'tr',
+                helper: function (e, ui) {
+                    ui.children().each(function () {
+                        $(this).width($(this).width());
+                    });
+                    return ui;
+                },
+                stop: _.bind(function(e, ui) {
+                    this.syncCollectionWithUi();
+                }, this)
+            }).disableSelection();
+        },
+
         getCollection: function() {
             return this.options.collection;
+        },
+
+        getContainer: function() {
+            return this.$el.find(this.selectors.itemContainer);
         },
 
         changeEntity: function (entityName, columns) {
             this.getCollection().reset();
             this.columnSelector.changeEntity(entityName, columns);
+        },
+
+        initModel: function (model, index) {
+            model.set('id', _.uniqueId('designer'));
+        },
+
+        addModel: function(model) {
+            this.initModel(model, this.getCollection().size());
+            this.getCollection().add(model);
+        },
+
+        deleteModel: function(model) {
+            this.getCollection().remove(model);
+        },
+
+        onModelAdded: function(model) {
+            var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
+            this.bindItemActions(item);
+            this.getContainer().append(item);
+            this.trigger('collection:change');
+        },
+
+        onModelChanged: function(model) {
+            var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
+            this.bindItemActions(item);
+            this.getContainer().find('[data-id="' + model.id + '"]').outerHTML(item);
+            this.trigger('collection:change');
+        },
+
+        onModelDeleted: function(model) {
+            this.getContainer().find('[data-id="' + model.id + '"]').remove();
+            this.trigger('collection:change');
+        },
+
+        onResetCollection: function () {
+            this.getContainer().empty();
+            this.resetForm();
+            this.getCollection().each(_.bind(function (model, index) {
+                this.initModel(model, index);
+                var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
+                this.bindItemActions(item);
+                this.getContainer().append(item);
+            }, this));
+            this.trigger('collection:change');
         },
 
         handleAddModel: function() {
@@ -104,7 +193,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
                 var data = this.getFormData();
                 this.clearFormData();
                 model.set(data);
-                this.$itemContainer.itemContainer('addModel', model);
+                this.addModel(model);
             }
         },
 
@@ -117,8 +206,24 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             }
         },
 
+        handleDeleteModel: function(modelId) {
+            var model = this.getCollection().get(modelId);
+            if (this.$el.find(this.selectors.saveButton).data('id') == modelId) {
+                this.resetForm();
+            }
+            this.deleteModel(model);
+        },
+
         handleCancelButton: function() {
             this.resetForm();
+        },
+
+        prepareItemTemplateData: function (model) {
+            var data = model.toJSON();
+            _.each(data, _.bind(function (value, name) {
+                data[name] = this.getFieldLabel(name, value);
+            }, this));
+            return data;
         },
 
         toggleFormButtons: function (modelId) {
@@ -137,6 +242,58 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
                 addButton.hide();
                 cancelButton.show();
                 saveButton.show();
+            }
+        },
+
+        bindItemActions: function (item) {
+            // bind edit button
+            var onEdit = _.bind(function (e) {
+                e.preventDefault();
+                var el = $(e.currentTarget);
+                var id = el.closest('[data-id]').data('id');
+                var model = this.getCollection().get(id);
+                this.setFormData(model.attributes);
+                this.toggleFormButtons(id);
+            }, this);
+            item.find(this.selectors.editButton).on('click', onEdit);
+
+            // bind delete button
+            var onDelete = _.bind(function (e) {
+                e.preventDefault();
+                var el = $(e.currentTarget);
+                var id = el.closest('[data-id]').data('id');
+                var confirm = new DeleteConfirmation({
+                    content: el.data('message')
+                });
+                confirm.on('ok', _.bind(this.handleDeleteModel, this, id));
+                confirm.open();
+            }, this);
+            item.find(this.selectors.deleteButton).on('click', onDelete);
+        },
+
+        syncCollectionWithUi: function () {
+            var collectionChanged = false;
+            var collection = this.getCollection();
+            _.each(this.getContainer().find('tr'), function (el, index) {
+                var uiId = $(el).data('id');
+                var model = collection.at(index);
+                if (uiId !== model.id) {
+                    var anotherModel = collection.get(uiId);
+                    var anotherIndex = collection.indexOf(anotherModel);
+                    collection.remove(model, {silent: true});
+                    collection.remove(anotherModel, {silent: true});
+                    if (index < anotherIndex) {
+                        collection.add(anotherModel, {silent: true, at: index});
+                        collection.add(model, {silent: true, at: anotherIndex});
+                    } else {
+                        collection.add(model, {silent: true, at: anotherIndex});
+                        collection.add(anotherModel, {silent: true, at: index});
+                    }
+                    collectionChanged = true;
+                }
+            }, this);
+            if (collectionChanged) {
+                this.trigger('collection:change');
             }
         },
 
@@ -216,7 +373,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         createNewModel: function () {
-            var modelClass = this.options.collection.model;
+            var modelClass = this.getCollection().model;
             return new modelClass();
         },
 
@@ -257,21 +414,6 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
                 return this.columnSelector.getLabel(value);
             }
             return null;
-        },
-
-        onModelEdit: function (e, data) {
-            this.setFormData(data.modelAttributes);
-            this.toggleFormButtons(data.modelId);
-        },
-
-        onModelDelete: function (e, data) {
-            if (this.$el.find(this.selectors.saveButton).data('id') == data.modelId) {
-                this.resetForm();
-            }
-        },
-
-        onCollectionReset: function () {
-            this.resetForm();
         }
     });
 });

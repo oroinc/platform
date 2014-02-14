@@ -1,6 +1,6 @@
 /* global define */
 define(['underscore', 'backbone', 'oro/query-designer/util', 'oro/query-designer/abstract-view', 'oro/query-designer/column/collection',
-    'oro/query-designer/grouping/view', 'oro/query-designer/function-manager', '../item-container', 'jquery-ui'],
+    'oro/query-designer/grouping/view', 'oro/query-designer/function-manager', 'jquery-ui'],
 function(_, Backbone, util, AbstractView, ColumnCollection,
          GroupingView, FunctionManager) {
     'use strict';
@@ -71,15 +71,7 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
 
             this.sortingSelector = this.form.find('[data-purpose="sorting-selector"]');
 
-            this.$itemContainer = this.$el.find(this.selectors.itemContainer);
-            this.$itemContainer.itemContainer({
-                collection: this.options.collection,
-                itemTemplateSelector: this.options.itemTemplateSelector,
-                getFieldLabel: _.bind(this.getFieldLabel, this),
-                'model:edit': _.bind(this.onModelEdit, this),
-                'model:delete': _.bind(this.onModelDelete, this),
-                'collection:reset': _.bind(this.onCollectionReset, this)
-            });
+            this.initColumnSorting();
         },
 
         changeEntity: function (entityName, columns) {
