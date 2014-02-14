@@ -2,18 +2,36 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Validator\Constraints;
 
-use Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldData;
+use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntityValidator;
 
-class MaxEntitiesCountValidatorTest extends \PHPUnit_Framework_TestCase
+class UniqueEntityValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MaxEntitiesCountValidator
+     * @var UniqueEntityValidator
      */
     protected $validator;
 
     protected function setUp()
     {
-        $this->validator = new MaxEntitiesCountValidator();
+        $doctrineHelper = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $doctrineHelper
+            ->expects($this->any())
+            ->method('getEntityIdentifierValue')
+            ->will(
+                $this->returnCallback(
+                    function ($entity) {
+                        return $entity->getId();
+                    }
+                )
+            );
+
+        $this->validator = new UniqueEntityValidator($doctrineHelper);
     }
 
     /**
@@ -27,7 +45,7 @@ class MaxEntitiesCountValidatorTest extends \PHPUnit_Framework_TestCase
         );
 
         $constraint = $this
-            ->getMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount');
+            ->getMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity');
         $this->validator->validate($value, $constraint);
     }
 
@@ -70,7 +88,7 @@ class MaxEntitiesCountValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider validArgumentProvider
      */
-    public function testValidate($value, $addViolation)
+    public function testValidate($entityData, $addViolation)
     {
         $context = $this->getMockBuilder('Symfony\Component\Validator\ExecutionContext')
             ->disableOriginalConstructor()
@@ -80,56 +98,47 @@ class MaxEntitiesCountValidatorTest extends \PHPUnit_Framework_TestCase
             ->method('addViolation');
 
         $constraint = $this
-            ->getMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount');
+            ->getMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity');
         $this->validator->initialize($context);
 
-        $this->validator->validate($value, $constraint);
+        $this->validator->validate($entityData, $constraint);
     }
 
     public function validArgumentProvider()
     {
         return [
-            'valid-default' => [
-                'value'        => $this->createEntityData(5, 2),
-                'addViolation' => 'never'
+            'valid'     => [
+                'entityData'   => $this->createEntityData(['entity-0', 'entity-1']),
+                'addViolation' => 'never',
             ],
-            'valid-custom'  => [
-                'value'        => $this->createEntityData(10, 2),
-                'addViolation' => 'never'
-            ],
-            'non-valid'     => [
-                'value'        => $this->createEntityData(5, 10),
-                'addViolation' => 'once'
+            'non-valid' => [
+                'entityData'   => $this->createEntityData(['duplicate', 'duplicate']),
+                'addViolation' => 'once',
             ],
         ];
     }
 
-    private function createEntityData($maxCount, $count)
+    /**
+     * @return object
+     */
+    private function createEntityData($ids)
     {
+        $entities = array_map(
+            function ($id) {
+                return new EntityStub($id);
+            },
+            $ids
+        );
+
         $entityData = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $metadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadata
-            ->expects($this->any())
-            ->method('getMaxEntitiesCount')
-            ->will($this->returnValue($maxCount));
-
-        $entityData
-            ->expects($this->any())
-            ->method('getMetadata')
-            ->will($this->returnValue($metadata));
-
         $entityData
             ->expects($this->any())
             ->method('getEntities')
-            ->will($this->returnValue(array_fill(0, $count, new \stdClass())));
+            ->will($this->returnValue($entities));
 
         return $entityData;
     }

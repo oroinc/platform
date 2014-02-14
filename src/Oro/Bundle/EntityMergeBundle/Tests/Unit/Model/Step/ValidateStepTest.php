@@ -16,26 +16,47 @@ class ValidateStepTest extends \PHPUnit_Framework_TestCase
      */
     protected $validator;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $constraintViolation;
+
     protected function setUp()
     {
-        $this->validator = $this->getMock('Symfony\Component\Validator\ValidatorInterface');
+        $this->validator = $this
+            ->getMock('Symfony\Component\Validator\ValidatorInterface');
+
+        $this->constraintViolation = $this
+            ->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->validator
+            ->expects($this->once())
+            ->method('validate')
+            ->will($this->returnValue($this->constraintViolation));
+
         $this->step = new ValidateStep($this->validator);
     }
 
     public function testRun()
     {
-        $fooEntity = $this->createTestEntity(1);
-        $barEntity = $this->createTestEntity(2);
-
         $data = $this->createEntityData();
 
-        $data->expects($this->once())
-            ->method('getEntities')
-            ->will($this->returnValue(array($fooEntity, $barEntity)));
+        $this->step->run($data);
+    }
 
-        $data->expects($this->once())
-            ->method('getMasterEntity')
-            ->will($this->returnValue($fooEntity));
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\ValidationException
+     */
+    public function testFail()
+    {
+        $data = $this->createEntityData();
+
+        $this->constraintViolation
+            ->expects($this->once())
+            ->method('count')
+            ->will($this->returnValue(1));
 
         $this->step->run($data);
     }

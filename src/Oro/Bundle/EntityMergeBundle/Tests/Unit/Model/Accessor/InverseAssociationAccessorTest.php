@@ -8,7 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
-class RelationAccessorTest extends \PHPUnit_Framework_TestCase
+class InverseAssociationAccessorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var InverseAssociationAccessor
@@ -39,7 +39,7 @@ class RelationAccessorTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper
             ->expects($this->any())
-            ->method('getRepository')
+            ->method('getEntityRepository')
             ->will($this->returnValue($repository));
 
         $this->accessor = new InverseAssociationAccessor($this->doctrineHelper);
@@ -60,13 +60,13 @@ class RelationAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function getValueDataProvider()
     {
-        return array(
-            'default' => array(
+        return [
+            'default' => [
                 'entity' => $this->createEntity('foo'),
                 'metadata' => $this->getFieldMetadata('id'),
                 'expected' => [],
-            )
-        );
+            ]
+        ];
     }
 
     /**
@@ -82,26 +82,26 @@ class RelationAccessorTest extends \PHPUnit_Framework_TestCase
 
     public function setValueDataProvider()
     {
-        return array(
-            'default' => array(
+        return [
+            'default' => [
                 'entity' => $this->createEntity('foo'),
                 'metadata' => $this->getFieldMetadata('entityStub'),
                 'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
-            ),
-            'setter' => array(
+            ],
+            'setter' => [
                 'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('setter' => 'setEntityStub')),
+                'metadata' => $this->getFieldMetadata('entityStub', ['setter' => 'setEntityStub']),
                 'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
-            ),
-            'property_path' => array(
-                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
-                'metadata' => $this->getFieldMetadata('id', array('property_path' => 'entityStub')),
+            ],
+            'reflection' => [
+                'entity' => null, //@todo: approve this
+                'metadata' => $this->getFieldMetadata('noGetter'),
                 'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
-            ),
-        );
+            ],
+        ];
     }
 
-    protected function getFieldMetadata($fieldName = null, array $options = array())
+    protected function getFieldMetadata($fieldName = null, array $options = [])
     {
         $result = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
@@ -112,7 +112,7 @@ class RelationAccessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $result->expects($this->any())
+        $doctrineMetadata->expects($this->any())
             ->method('getFieldName')
             ->will($this->returnValue($fieldName));
 

@@ -24,13 +24,13 @@ class FieldDataTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityData    = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
+        $this->entityData = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
             ->disableOriginalConstructor()
             ->getMock();
         $this->fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->fieldData     = new FieldData($this->entityData, $this->fieldMetadata);
+        $this->fieldData = new FieldData($this->entityData, $this->fieldMetadata);
     }
 
     public function testGetMetadata()
@@ -42,26 +42,8 @@ class FieldDataTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->fieldData->getSourceEntity());
         $entity = $this->createTestEntity(1);
-        $this->entityData->expects($this->once())
-            ->method('hasEntity')
-            ->with($entity)
-            ->will($this->returnValue(true));
         $this->assertEquals($this->fieldData, $this->fieldData->setSourceEntity($entity));
         $this->assertEquals($entity, $this->fieldData->getSourceEntity());
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Passed entity must be included to merge data.
-     */
-    public function testSetSourceEntityFails()
-    {
-        $entity = $this->createTestEntity(1);
-        $this->entityData->expects($this->once())
-            ->method('hasEntity')
-            ->with($entity)
-            ->will($this->returnValue(false));
-        $this->fieldData->setSourceEntity($entity);
     }
 
     public function testSetGetMode()
@@ -88,7 +70,7 @@ class FieldDataTest extends \PHPUnit_Framework_TestCase
 
     protected function createTestEntity($id)
     {
-        $result     = new \stdClass();
+        $result = new \stdClass();
         $result->id = $id;
         return $result;
     }

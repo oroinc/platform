@@ -36,7 +36,9 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityMetadata')
             ->will($this->returnValue($metadata));
 
-        $this->target = new MergeMassAction($metadataRegistry);
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+
+        $this->target = new MergeMassAction($metadataRegistry, $translator);
     }
 
     /**
@@ -63,6 +65,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'route'             => 'oro_entity_merge_massaction',
                     'data_identifier'   => 'id',
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
+                    'label'             => null,
                     'route_parameters'  => array()
                 )
             ),
@@ -85,7 +88,8 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'data_identifier'   => 'code',
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
-                    'route_parameters'  => array()
+                    'route_parameters'  => array(),
+                    'label'             => null,
                 )
             )
         );

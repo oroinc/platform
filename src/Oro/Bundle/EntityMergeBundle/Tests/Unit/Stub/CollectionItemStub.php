@@ -14,6 +14,11 @@ class CollectionItemStub
      */
     protected $entityStub;
 
+    /**
+     * @var mixed
+     */
+    private $noGetter;
+
     public function __construct($id = null)
     {
         $this->id = $id;

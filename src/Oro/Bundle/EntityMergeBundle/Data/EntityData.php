@@ -82,29 +82,9 @@ class EntityData
      */
     public function addEntity($entity)
     {
-        if (!$this->hasEntity($entity)) {
-            $this->assertEntityClassMatch($entity);
-            $this->entities[] = $entity;
-        }
+        $this->entities[] = $entity;
 
         return $this;
-    }
-
-    /**
-     * Checks if merge data has entity
-     *
-     * @param object $entity
-     * @return bool
-     */
-    public function hasEntity($entity)
-    {
-        foreach ($this->getEntities() as $currentEntity) {
-            if ($entity === $currentEntity) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -126,31 +106,10 @@ class EntityData
      */
     public function getEntityByOffset($offset)
     {
-        $offset = (int)$offset;
-        if (!isset($this->entities[$offset])) {
-            throw new OutOfBoundsException(sprintf('Illegal offset for getting entity: %d.', $offset));
+        if (!is_numeric($offset) || !isset($this->entities[$offset])) {
+            throw new OutOfBoundsException(sprintf('"%s" is illegal offset for getting entity.', $offset));
         }
         return $this->entities[$offset];
-    }
-
-    /**
-     * Asserts that entity match class in metadata
-     *
-     * @param object $entity
-     * @throws InvalidArgumentException
-     */
-    protected function assertEntityClassMatch($entity)
-    {
-        $entityClass = $this->getClassName();
-        if (!$entity instanceof $entityClass) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    '$entity should be instance of %s, %s given.',
-                    $entityClass,
-                    is_object($entity) ? get_class($entity) : gettype($entity)
-                )
-            );
-        }
     }
 
     /**
@@ -168,13 +127,9 @@ class EntityData
      *
      * @param object $entity
      * @return EntityData
-     * @throws InvalidArgumentException
      */
     public function setMasterEntity($entity)
     {
-        if (!$this->hasEntity($entity)) {
-            throw new InvalidArgumentException('Add entity before setting it as master.');
-        }
         $this->masterEntity = $entity;
 
         return $this;

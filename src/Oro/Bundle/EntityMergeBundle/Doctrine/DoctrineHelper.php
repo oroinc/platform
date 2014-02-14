@@ -36,9 +36,9 @@ class DoctrineHelper
     {
         $repository = $this->getEntityRepository($className);
         $queryBuilder = $repository->createQueryBuilder('entity');
-        $entityIdentifier = $this->getEntityIdentifier($className);
+        $entityIdentifier = $this->getSingleIdentifierFieldName($className);
         $identifierExpression = sprintf('entity.%s', $entityIdentifier);
-        $queryBuilder->add('where', $queryBuilder->expr()->in($identifierExpression, $entityIds));
+        $queryBuilder->where($queryBuilder->expr()->in($identifierExpression, $entityIds));
         $entities = $queryBuilder->getQuery()->execute();
 
         return $entities;
@@ -47,24 +47,17 @@ class DoctrineHelper
     /**
      * @param string $entityName
      * @return EntityRepository
-     * @throws InvalidArgumentException
      */
     public function getEntityRepository($entityName)
     {
-        $repository = $this->entityManager->getRepository($entityName);
-
-        if ($repository->getClassName() != $entityName) {
-            throw new InvalidArgumentException('Incorrect repository returned');
-        }
-
-        return $repository;
+        return $this->entityManager->getRepository($entityName);
     }
 
     /**
      * @param string $className
      * @return string
      */
-    public function getEntityIdentifier($className)
+    public function getSingleIdentifierFieldName($className)
     {
         return $this->entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
     }
@@ -89,10 +82,16 @@ class DoctrineHelper
     /**
      * @param string $entity
      * @return string
+     * @throws InvalidArgumentException
      */
     public function getEntityIdentifierValue($entity)
     {
-        $idValues = $this->entityManager->getClassMetadata(get_class($entity))->getIdentifierValues($entity);
+        $idValues = $this->getMetadataFor(get_class($entity))->getIdentifierValues($entity);
+        if (count($idValues) > 1) {
+            throw new InvalidArgumentException(
+                "Multiple id is not supported."
+            );
+        }
         return current($idValues);
     }
 
@@ -114,7 +113,7 @@ class DoctrineHelper
 
         if (!is_object($other)) {
             throw new InvalidArgumentException(
-                sprintf('$other argument must be an object, "%s" given.', gettype($entity))
+                sprintf('$other argument must be an object, "%s" given.', gettype($other))
             );
         }
 
@@ -130,11 +129,9 @@ class DoctrineHelper
      * @param string $className
      * @return ClassMetadata
      */
-    public function getDoctrineMetadataFor($className)
+    public function getMetadataFor($className)
     {
-        return $this
-            ->getMetadataFactory()
-            ->getMetadataFor($className);
+        return $this->getMetadataFactory()->getMetadataFor($className);
     }
 
     /**

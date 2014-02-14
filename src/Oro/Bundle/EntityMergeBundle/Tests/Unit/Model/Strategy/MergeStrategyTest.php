@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
-use Oro\Bundle\EntityMergeBundle\Model\Accessor\RelationAccessor;
+use Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\MergeStrategy;
 
@@ -19,18 +19,18 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_TestCase
      */
-    protected $entityManager;
+    protected $doctrineHelper;
 
     protected function setUp()
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->doctrineHelper = $this
+            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
             ->disableOriginalConstructor()
-            ->setMethods(['getMetadataFactory', 'getRepository'])
             ->getMock();
 
-        $accessor = new RelationAccessor($this->entityManager);
+        $accessor = new InverseAssociationAccessor($this->doctrineHelper);
 
-        $this->strategy = new MergeStrategy($accessor, $this->entityManager);
+        $this->strategy = new MergeStrategy($accessor, $this->doctrineHelper);
     }
 
     public function testNotSupports()
@@ -89,6 +89,7 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
         $sourceEntity->addCollectionItem($collectionItem2);
 
         $entities = [$masterEntity, $sourceEntity];
+        $relatedEntities = [$collectionItem1, $collectionItem2];
 
         $fieldData
             ->expects($this->once())
@@ -110,33 +111,21 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getMasterEntity')
             ->will($this->returnValue($masterEntity));
 
-        $doctrineMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setMethods([])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
-            ->setMethods([])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadataFactory->expects($this->any())
-            ->method('getMetadataFor')
-            ->will($this->returnValue($doctrineMetadata));
-
-        $doctrineMetadata->expects($this->at(0))
-            ->method('getIdentifierValues')
-            ->will($this->returnValue([1]));
-
-        $doctrineMetadata->expects($this->at(1))
-            ->method('getIdentifierValues')
-            ->will($this->returnValue([2]));
-
-        $this->entityManager->expects($this->any())
-            ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityIdentifierValue')
+            ->will(
+                $this->returnCallback(
+                    function ($value) {
+                        return $value->getId();
+                    }
+                )
+            );
 
         $fieldDoctrineMetadata = $this->createDoctrineMetadata();
+        $fieldDoctrineMetadata->expects($this->any())
+            ->method('getFieldName')
+            ->will($this->returnValue('field_name'));
+
         $fieldMetadataData
             ->expects($this->any())
             ->method('getDoctrineMetadata')
@@ -162,19 +151,20 @@ class MergeStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
             ->will($this->returnValue($repository));
 
         $repository
-            ->expects($this->at(0))
+            ->expects($this->any())
             ->method('findBy')
-            ->will($this->returnValue([$masterEntity->getCollection()->first()]));
-
-        $repository
-            ->expects($this->at(1))
-            ->method('findBy')
-            ->will($this->returnValue([$sourceEntity->getCollection()->first()]));
+            ->will(
+                $this->returnCallback(
+                    function ($values) use ($relatedEntities) {
+                        return [$relatedEntities[$values['field_name']->getId()-1]];
+                    }
+                )
+            );
 
         $this->strategy->merge($fieldData);
 
