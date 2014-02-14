@@ -12,3 +12,4 @@ config:
 
         'oroquerydesigner/js/condition-builder': 'bundles/oroquerydesigner/js/condition-builder.js'
         'oroquerydesigner/js/field-condition': 'bundles/oroquerydesigner/js/field-condition.js'
+        'oroquerydesigner/js/item-container': 'bundles/oroquerydesigner/js/query-designer/item-container.js'
