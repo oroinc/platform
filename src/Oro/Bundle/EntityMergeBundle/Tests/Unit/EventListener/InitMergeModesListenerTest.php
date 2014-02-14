@@ -11,6 +11,7 @@ class InitMergeModesListenerTest extends \PHPUnit_Framework_TestCase
      * @var InitMergeModesListener
      */
     protected $listener;
+
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
