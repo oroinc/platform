@@ -12,9 +12,6 @@ define(['backbone', 'underscore'], function (Backbone, _) {
         defaults: {
             id : null,
             name : null,
-            label: null,
-            func: null,
-            sorting: null
         },
 
         getFieldLabel: function (name) {

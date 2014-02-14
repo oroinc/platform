@@ -104,9 +104,6 @@
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
             <td class="name-cell"><%= name %></td>
-            <td class="label-cell"><%= label %></td>
-            <td class="function-cell"><%= func %></td>
-            <td class="sorting-cell"><%= sorting %></td>
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
                    title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
@@ -205,19 +202,18 @@
             'aCss': 'no-hash btn-primary add-button',
             'label' : 'oro.query_designer.form.action.add'|trans
         }) }}
-        <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
-            <thead>
-            <tr>
-                <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
-                <th class="label-column"><span>{{ 'oro.query_designer.datagrid.column.label'|trans }}</span></th>
-                <th class="function-column"><span>{{ 'oro.query_designer.datagrid.column.function'|trans }}</span></th>
-                <th class="sorting-column"><span>{{ 'oro.query_designer.datagrid.column.sorting'|trans }}</span></th>
-                <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
-            </tr>
-            </thead>
-            <tbody class="grouping-item-container">
-            </tbody>
-        </table>
+        <div class=" grid-container query-designer-grid-container query-designer-columns-grid-container">
+            <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
+                <thead>
+                <tr>
+                    <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
+                    <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
+                </tr>
+                </thead>
+                <tbody class="grouping-item-container">
+                </tbody>
+            </table>
+        </div>
     </div>
     {% set fieldConditionOptions = {
         select2: {
