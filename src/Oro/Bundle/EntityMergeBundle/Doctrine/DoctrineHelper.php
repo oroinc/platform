@@ -34,6 +34,10 @@ class DoctrineHelper
      */
     public function getEntitiesByIds($className, array $entityIds)
     {
+        if (!$entityIds) {
+            return array();
+        }
+
         $repository = $this->getEntityRepository($className);
         $queryBuilder = $repository->createQueryBuilder('entity');
         $entityIdentifier = $this->getSingleIdentifierFieldName($className);

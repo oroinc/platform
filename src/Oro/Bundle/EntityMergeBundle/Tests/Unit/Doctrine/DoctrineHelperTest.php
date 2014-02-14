@@ -140,6 +140,12 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($entities, $this->doctrineHelper->getEntitiesByIds($className, $entityIds));
     }
 
+    public function testGetEntitiesByIdsForEmptyArray()
+    {
+        $className = 'TestEntity';
+        $this->assertEquals(array(), $this->doctrineHelper->getEntitiesByIds($className, array()));
+    }
+
     public function testGetSingleIdentifierFieldName()
     {
         $entityClass = 'stdClass';
