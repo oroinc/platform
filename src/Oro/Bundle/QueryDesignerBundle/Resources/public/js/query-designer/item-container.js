@@ -64,12 +64,12 @@ function($, _, __, DeleteConfirmation) {
             var collection = this.options.collection;
 
             _.each(this.element.find('tr'), function (el, index) {
-                var uiId = $(el).data('id');
+                var cid = $(el).data('id');
                 var model = collection.at(index);
-                if (uiId === model.id) {
+                if (cid === model.cid) {
                     return;
                 }
-                var anotherModel = collection.get(uiId);
+                var anotherModel = collection.get(cid);
                 var anotherIndex = collection.indexOf(anotherModel);
                 collection.remove(model, {silent: true});
                 collection.remove(anotherModel, {silent: true});
@@ -93,19 +93,16 @@ function($, _, __, DeleteConfirmation) {
         },
 
         _onModelChanged: function (model) {
-            this.element.find('[data-id="' + model.id + '"]').outerHTML(this._renderModel(model));
+            this.element.find('[data-id="' + model.cid + '"]').outerHTML(this._renderModel(model));
         },
 
         _onModelDeleted: function (model) {
-            this.element.find('[data-id="' + model.id + '"]').remove();
+            this.element.find('[data-id="' + model.cid + '"]').remove();
         },
 
         _onResetCollection: function () {
             this.element.empty();
-            this.options.collection.each(_.bind(function (model, index) {
-                this.initModel(model, index);
-                this.element.append(this._renderModel(model));
-            }, this));
+            this.options.collection.each(this._onModelAdded, this);
         },
 
         _renderModel: function (model) {
@@ -113,9 +110,7 @@ function($, _, __, DeleteConfirmation) {
             _.each(model.toJSON(), function (value, name) {
                 data[name] = model.getFieldLabel(name, value);
             });
-            if (!data.id) {
-                data.id = model.cid;
-            }
+            data.id = model.cid;
 
             var item = $(this.itemTemplate(data));
             this._bindItemActions(item);
@@ -127,8 +122,8 @@ function($, _, __, DeleteConfirmation) {
             // bind edit button
             var onEdit = _.bind(function (e) {
                 e.preventDefault();
-                var id = $(e.currentTarget).closest('[data-id]').data('id');
-                var model = this.options.collection.get(id);
+                var cid = $(e.currentTarget).closest('[data-id]').data('id');
+                var model = this.options.collection.get(cid);
                 if (model) {
                     model.trigger('edit', model);
                 }
@@ -139,18 +134,18 @@ function($, _, __, DeleteConfirmation) {
             var onDelete = _.bind(function (e) {
                 e.preventDefault();
                 var el = $(e.currentTarget);
-                var id = el.closest('[data-id]').data('id');
+                var cid = el.closest('[data-id]').data('id');
                 var confirm = new DeleteConfirmation({
                     content: el.data('message')
                 });
-                confirm.on('ok', _.bind(this._handleDeleteModel, this, id));
+                confirm.on('ok', _.bind(this._handleDeleteModel, this, cid));
                 confirm.open();
             }, this);
             item.find(this.options.selectors.deleteButton).on('click', onDelete);
         },
 
-        _handleDeleteModel: function (id) {
-            var model = this.options.collection.get(id);
+        _handleDeleteModel: function (cid) {
+            var model = this.options.collection.get(cid);
             if (model) {
                 this.options.collection.remove(model);
             }
