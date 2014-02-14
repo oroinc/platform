@@ -96,19 +96,31 @@
             this._injectDateVariables();
         },
 
+        _getDatevariablesByDatepart: function(datePart) {
+            var dateVars = this.inst.settings.dateVars,
+                result = [];
+
+            // TODO: filter vars based on datePart
+
+            return dateVars;
+        },
+
         /*
          * generate and inject html for date variables into ui datepicker
          */
         _injectDateVariables: function() {
             var $dp = this.inst.dpDiv,
                 o = this.inst.settings,
-                tp_inst = this;
+                tp_inst = this,
+                currentDatePart = ($.datevariables.datePart == 1) ? 'value' : $.datevariables.datePart,
+                dateVars = this._getDatevariablesByDatepart(currentDatePart);
 
             // Prevent displaying twice
             if ($dp.find("div.ui-datevariables-div").length === 0 && o.showDatevariables) {
                 var html = '<div class="ui-datevariables-div'+ (o.isRTL? ' ui-datevariables-rtl' : '') +'"><dl>' +
                         '<dt class="ui_dvars_time_label">Date variables</dt>';
-                for (var varCode in o.dateVars) {
+
+                for (var varCode in dateVars) {
                     html += '<dd class="ui_dvars_content">' +
                         '<a class="ui_dvariable" href="#" data-code="' + varCode + '">{{ ' + o.dateVars[varCode] + ' }}</a></dd>';
                 }
@@ -129,9 +141,7 @@
                 }
 
                 $(".ui-datevariables-div a.ui_dvariable").click(function() {
-                    var code = this.dataset.code,
-                        variable = this.text;
-
+                    var variable = this.text;
                     tp_inst.$input.val(variable);
                     tp_inst.$input.trigger("change");
                 });

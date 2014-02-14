@@ -49,15 +49,22 @@
         <button class="btn btn-primary filter-update" type="button"><%- _.__("Update") %></button>
     </div>
 </script>
+
+<script type="text/template" id="select-field-template">
+    <div class="horizontal clearfix">
+        <select name="<%= name %>" class="filter-select-oro">
+            <% _.each(choices, function (option) { %>
+            <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
+            <% }); %>
+        </select>
+    </div>
+</script>
+
 <script type="text/template" id="date-filter-template">
     <div>
-        <div class="horizontal clearfix">
-            <select name="<%= name %>" class="filter-select-oro">
-                <% _.each(choices, function (option) { %>
-                    <option value="<%= option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
-                <% }); %>
-            </select>
-        </div>
+        <% _.each(parts, function (part) { %>
+            <%= part %>
+        <% }); %>:
         <div>
             <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
             <span class="filter-separator">-</span>

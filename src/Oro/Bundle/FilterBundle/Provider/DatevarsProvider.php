@@ -26,11 +26,13 @@ class DatevarsProvider implements DatevariablesInterface
      */
     public function getDateVariables()
     {
-        return array_map(
+        $result = array_map(
             function ($item) {
                 return self::LABEL_PREFIX . $item;
             },
             $this->varMap
         );
+
+        return $result;
     }
 }

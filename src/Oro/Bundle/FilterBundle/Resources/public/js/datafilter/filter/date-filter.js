@@ -149,6 +149,8 @@ function($, _, __, ChoiceFilter, localeSettings) {
         },
 
         changeFilterType: function (type) {
+            $.datevariables.datePart = type;
+
             type = parseInt(type, 10);
             this.$el.find('.filter-separator').show().end().find('input').show();
             if (this.typeValues.moreThan === type) {
@@ -171,23 +173,33 @@ function($, _, __, ChoiceFilter, localeSettings) {
             var selectedPartLabel   = this._getSelectedChoiceLabel('dateParts', part);
 
             var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
+            var parts = [];
+
+            // add date parts only if embed template used
+            if (this.templateTheme != "") {
+                parts.push(
+                    datePartTemplate({
+                        choices: this.dateParts,
+                        selectedChoice: value.type,
+                        selectedChoiceLabel: selectedPartLabel
+                    })
+                );
+            }
+            
+            parts.push(
+                datePartTemplate({
+                    choices: this.choices,
+                    selectedChoice: value.type,
+                    selectedChoiceLabel: selectedChoiceLabel
+                })
+            );
+
             var $filter = $(
                 this.template({
                     name: this.name,
                     inputClass: this.inputClass,
                     value: this._formatDisplayValue(value),
-                    parts: [
-                        datePartTemplate({
-                            choices: this.dateParts,
-                            selectedChoice: value.type,
-                            selectedChoiceLabel: selectedPartLabel
-                        }),
-                        datePartTemplate({
-                            choices: this.choices,
-                            selectedChoice: value.type,
-                            selectedChoiceLabel: selectedChoiceLabel
-                        })
-                    ]
+                    parts: parts
                 })
             );
             this._wrap($filter);

@@ -40,8 +40,8 @@ class DateRangeFilterType extends AbstractDateFilterType
                 'field_type'       => DateRangeType::NAME,
                 'widget_options'   => [
                     'showDatevariables' => true,
-                    'showTime' => false,
-                    'showTimepicker' => false,
+                    'showTime'          => false,
+                    'showTimepicker'    => false,
                 ],
                 'operator_choices' => $this->getOperatorChoices(),
                 'type_values'      => $this->getTypeValues(),
