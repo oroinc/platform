@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
@@ -52,7 +53,9 @@ class InitCommand extends ContainerAwareCommand
                 $config = Yaml::parse(realpath($path));
 
                 foreach ($config as $className => $entityOptions) {
-                    $className = class_exists($className) ? $className : 'Extend\\Entity\\' . $className;
+                    $className = class_exists($className)
+                        ? $className
+                        : ExtendConfigDumper::ENTITY . $className;
                     $this->parseEntity($className, $entityOptions, $output, false);
                 }
 

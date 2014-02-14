@@ -11,7 +11,7 @@ oro:
         controller:
             channel:
                 message:
-                    saved: Channel succesfully saved
+                    saved: Channel saved
 
         channel_type:
             simple:
