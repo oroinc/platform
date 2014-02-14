@@ -94,7 +94,7 @@ class InverseAssociationAccessorTest extends \PHPUnit_Framework_TestCase
                 'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
             ],
             'reflection' => [
-                'entity' => null, //@todo: approve this
+                'entity' => null,
                 'metadata' => $this->getFieldMetadata('noGetter'),
                 'values' => new ArrayCollection([$this->createRelatedEntity('related-foo')]),
             ],

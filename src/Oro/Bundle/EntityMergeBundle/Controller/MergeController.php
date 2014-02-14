@@ -138,7 +138,7 @@ class MergeController extends Controller
                     'ids' => $this->getDoctineHelper()->getEntityIds($entityData->getEntities()),
                 )
             ),
-            'entityPluralLabel' => $this->getEntityPluralLabel($className),
+            'entityLabel' => $entityData->getMetadata()->get('label'),
             'cancelPath' => $this->generateUrl($this->getEntityIndexRoute($className)),
             'form' => $form->createView()
         );
@@ -164,17 +164,6 @@ class MergeController extends Controller
     protected function getEntityIndexRoute($className)
     {
         return $this->getConfigManager()->getEntityMetadata($className)->routeName;
-    }
-
-    /**
-     * Get plural label by entity name
-     *
-     * @param string $className
-     * @return string
-     */
-    protected function getEntityPluralLabel($className)
-    {
-        return $this->getConfigManager()->getProvider('entity')->getConfig($className)->get('pluralLabel');
     }
 
     /**
