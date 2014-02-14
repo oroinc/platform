@@ -44,6 +44,10 @@ define(['jquery', 'backbone', 'routing', 'oro/translator', 'oro/delete-confirmat
         }
 
         function requestDefaultFormTypeData(formType) {
+            if (!formType) {
+                return;
+            }
+
             var navigation = Navigation.getInstance();
             if (navigation) {
                 navigation.loadingMask.show();
@@ -78,7 +82,10 @@ define(['jquery', 'backbone', 'routing', 'oro/translator', 'oro/delete-confirmat
             },
             startWatching: function (forceDataLoading) {
                 $formTypeField.change(processFormTypeChange);
-                forceDataLoading && $formTypeField.trigger('change');
+
+                if (true === forceDataLoading) {
+                    $formTypeField.trigger('change');
+                }
             }
         });
 
