@@ -1,14 +1,13 @@
 {% block oro_entity_merge_widget %}
     {{ form_javascript(form) }}
-    <table class="table table-striped acl-table table-bordered entity-merge-table">
+    <table class="table table-striped table-bordered entity-merge-table">
         <thead>
-        <tr class="default-field row-click-action">
-            <td class="merge-first-column">
-                <strong>{{ form.masterEntity.vars.label|trans|upper }}</strong>
-            </td>
-            {% for child in form.masterEntity %}
-                <td>
-
+            <tr class="default-field">
+                <td class="merge-first-column">
+                    <strong>{{ form.masterEntity.vars.label|trans|upper }}</strong>
+                </td>
+                {% for child in form.masterEntity %}
+                    <td>
                         <div class="entity-merge-fields-blocks-wrapper">
                             <label class="entity-merge-uppercase entity-merge-inline">
                                 {{ form_widget(child, {'attr': form.vars.attr|merge({'class': 'entity-merge-field-choice'})}) }}
@@ -18,45 +17,38 @@
                                 </strong>
                             </label>
                         </div>
-                </td>
-            {% endfor %}
-        </tr>
-        <tr>
-            <td class="entity-merge-select-all-holder">
-
-            </td>
-            {% for child in form.masterEntity %}
-            <td class="entity-merge-select-all-holder">
-                <a class="entity-merge-select-all" data-entity-key="{{ child.vars.value }}" href="javascript:void(0);">
-                    {{ "oro.entity_merge.form.select_all"|trans }}
-                </a>
-            </td>
-            {% endfor %}
-        </tr>
+                    </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td class="entity-merge-select-all-holder">&nbsp;</td>
+                {% for child in form.masterEntity %}
+                    <td class="entity-merge-select-all-holder">
+                        <a class="entity-merge-select-all" data-entity-key="{{ child.vars.value }}" href="javascript:void(0);">
+                            {{ "oro.entity_merge.form.select_all"|trans }}
+                        </a>
+                    </td>
+                {% endfor %}
+            </tr>
         </thead>
         <tbody>
-        {% for child in form.children.fields %}
-            {{ form_widget(child) }}
-        {% endfor %}
+            {% for child in form.children.fields %}
+                {{ form_widget(child) }}
+            {% endfor %}
         </tbody>
     </table>
+{% endblock %}
 
-<script type="text/javascript">
-    require(['jquery', 'oro/entity-merge/merge-view'],function(){
-        /**
-         * Initialise page javascript
-         */
-        mergeView.init();
-    });
-</script>
+{% block oro_entity_merge_javascript %}
+    <script type="text/javascript">
+        require(['oro/entity-merge/merge-view'],function(){});
+    </script>
 {% endblock %}
 
 {% block oro_entity_merge_field_widget %}
-    <tr class="row-click-action">
+    <tr>
         <td class="merge-first-column">
-            <strong>
-                {{ form_label(form) }}
-            </strong>
+            {{ form_label(form) }}
             {% if form.children.mode.vars.choices is defined %}
                 <div class="entity-merge-strategy-wrapper">
 
@@ -86,7 +78,7 @@
         <div class="entity-merge-inline">{{ form_widget(form, {'attr': form.vars.attr|merge({'class': 'entity-merge-field-choice'})}) }}</div>
         <label data-entity-key="{{ form.vars.name }}" data-entity-field-name="{{ form.vars.full_name }}" class="entity-merge-inline-label merge-entity-representative"
                for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-        {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
+            {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
         </label>
     </div>
 {% endblock %}

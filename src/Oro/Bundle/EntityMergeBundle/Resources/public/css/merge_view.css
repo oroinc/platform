@@ -9,9 +9,12 @@
     vertical-align: top;
     padding-left: 20px;
 }
+.table.entity-merge-table thead td{
+    padding-bottom: 0;
+}
 .table.entity-merge-table td{
     vertical-align: top;
-    padding: 6px 8px 0 12px;
+    padding: 6px 8px 6px 12px;
     cursor: pointer;
 }
 .entity-merge-fields-blocks-wrapper label{
