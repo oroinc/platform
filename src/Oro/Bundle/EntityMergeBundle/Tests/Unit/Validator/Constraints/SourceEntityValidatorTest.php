@@ -36,14 +36,11 @@ class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider invalidArgumentProvider
-     * @param mixed  $value
-     * @param string $exception
-     * @param string $expectedExceptionMessage
      */
-    public function testInvalidArgument($value, $exception, $expectedExceptionMessage)
+    public function testInvalidArgument($value, $expectedExceptionMessage)
     {
         $this->setExpectedException(
-            $exception,
+            'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
             $expectedExceptionMessage
         );
 
@@ -57,43 +54,31 @@ class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
         return [
             'bool'    => [
                 'value'                    => true,
-                'exception'                =>
-                    'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
                 'expectedExceptionMessage' =>
                     'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, boolean given'
             ],
             'string'  => [
                 'value'                    => 'string',
-                'exception'                =>
-                    'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
                 'expectedExceptionMessage' =>
                     'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, string given'
             ],
             'integer' => [
                 'value'                    => 5,
-                'exception'                =>
-                    'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
                 'expectedExceptionMessage' =>
                     'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, integer given'
             ],
             'null'    => [
                 'value'                    => null,
-                'exception'                =>
-                    'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
                 'expectedExceptionMessage' =>
                     'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, NULL given'
             ],
             'object'  => [
                 'value'                    => new \stdClass(),
-                'exception'                =>
-                    'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
                 'expectedExceptionMessage' =>
                     'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, stdClass given'
             ],
             'array'   => [
                 'value'                    => [],
-                'exception'                =>
-                    'Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException',
                 'expectedExceptionMessage' =>
                     'Oro\Bundle\EntityMergeBundle\Data\EntityData supported only, array given'
             ],
@@ -102,10 +87,6 @@ class SourceEntityValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider validArgumentProvider
-     *
-     * @param object $value
-     * @param string $addViolation
-     * @param object $sourceEntity
      */
     public function testValidate($entityData, $addViolation, $sourceEntity)
     {

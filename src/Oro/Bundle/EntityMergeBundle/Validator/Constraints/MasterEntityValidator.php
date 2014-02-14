@@ -9,7 +9,6 @@ use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class MasterEntityValidator extends DoctrineHelperValidator
 {
-
     /**
      * {@inheritdoc}
      */
@@ -35,7 +34,7 @@ class MasterEntityValidator extends DoctrineHelperValidator
         }
 
         $this->context->addViolation(
-        /* @var MasterEntity $constraint */
+            /* @var MasterEntity $constraint */
             $constraint->message
         );
     }

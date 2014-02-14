@@ -9,7 +9,7 @@ class UniqueEntity extends Constraint
     /**
      * @var string
      */
-    public $message = 'Entity already added.';
+    public $message = 'Merge entities should be unique.';
 
     /**
      * {@inheritdoc}
