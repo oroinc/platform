@@ -11,7 +11,10 @@
 	- [How it works](#how-it-works)
 - [Classes Diagram](./classes-diagram.md)
 - [Configuration](./merge-configuration.md)
-
+	- [Entity configuration](./merge-configuration.md#entity-configuration)
+	- [Mass action configuration](./merge-configuration.md#mass-action-configuration)
+	- [Other configurations](./merge-configuration.md#other-configurations)
+	
 ----------
 
 ## What is Entity Merge ##
@@ -22,10 +25,15 @@ Entity merge is a complex solution that allows user to merge different entities 
 
 Entity merge consists of several related entities.
 
-- **Field Meta Data** - contain Field Meta Data with all field options
-- **Entity Meta Data** - contain list of Fields Meta Data and entity options
+- **Field Meta Data** - contain Field Meta Data with all field options.
+- **Entity Meta Data** - contain list of Fields Meta Data and entity options.
 - **Field Data** - representation of field which need to be merge. Contains Field Meta Data.
-- **Entity Data** - representation of entity which need to be merge. Contains Entity Meta Data, list of entities for merge, list of Field Data wizard and Master Entity
+- **Entity Data** - representation of entity which need to be merge. Contains Entity Meta Data, list of entities for merge, list of Field Data wizard and Master Entity.
+- **Strategy** - strategy for entity field merge. For example: merge or replace. Default strategies:
+   - **Merge Strategy** - merge field values into Master Entity. It works only with fields, which represented by the list of entities
+   - **Replace Strategy** - replace Master Entity field value by selected one. 
+- **Step** - one of merge steps. It used in merge strategy
+- **Accessor** - provide access to entity fields 
 
 ## How it works ##
 

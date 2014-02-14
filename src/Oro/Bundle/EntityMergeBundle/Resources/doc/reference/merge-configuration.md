@@ -10,7 +10,10 @@
 	- [How it works](./getting-started.md#how-it-works)
 - [Classes Diagram](./classes-diagram.md)
 - Configuration
-
+	- [Entity configuration](#entity-configuration)
+	- [Mass action configuration](#mass-action-configuration)
+	- [Other configurations](#other-configurations)
+	
 ---------
 
 ## Entity configuration ##
@@ -130,3 +133,33 @@ Example:
 			    	data_identifier: a.id
 			    	label: merge
 			    	icon: edit
+
+
+## Other configurations ##
+
+You can define your own "Strategy", "Steps", "Accessor" in DI by using tags with names "oro_entity_merge.strategy", "oro_entity_merge.step", "oro_entity_merge.accessor".
+
+Example:
+
+    oro_entity_merge.strategy.replace:
+        class: %oro_entity_merge.strategy.replace.class%
+        arguments:
+            - @oro_entity_merge.accessor.delegate
+        tags:
+            - { name: oro_entity_merge.strategy }
+    
+
+
+	oro_entity_merge.step.validate:
+        class: %oro_entity_merge.step.validate.class%
+        arguments:
+            - @validator
+        tags:
+            - { name: oro_entity_merge.step }
+
+	oro_entity_merge.accessor.inverse_association:
+        class: %oro_entity_merge.accessor.inverse_association.class%
+        arguments:
+            - @oro_entity_merge.doctrine_helper
+        tags:
+            - { name: oro_entity_merge.accessor }

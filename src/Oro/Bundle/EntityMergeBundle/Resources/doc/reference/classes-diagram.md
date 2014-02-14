@@ -10,6 +10,9 @@
 	- [How it works](./getting-started.md#how-it-works)
 - Classes Diagram
 - [Configuration](./merge-configuration.md)
+	- [Entity configuration](./merge-configuration.md#entity-configuration)
+	- [Mass action configuration](./merge-configuration.md#mass-action-configuration)
+	- [Other configurations](./merge-configuration.md#other-configurations)
 
 ---------
 
