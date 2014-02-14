@@ -116,7 +116,7 @@ function($, _, __, DeleteConfirmation) {
             _.each(model.toJSON(), function (value, name) {
                 data[name] = model.getFieldLabel(name, value);
             });
-            if (data.id) {
+            if (!data.id) {
                 data.id = model.cid;
             }
 
