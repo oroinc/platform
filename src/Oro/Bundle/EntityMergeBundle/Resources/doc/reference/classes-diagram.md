@@ -1,15 +1,15 @@
-#Class Diagram of Entity Merge bundle#
+#Classes Diagram of Entity Merge bundle#
 
 ---------
 
 ### Table of Contents ###
 
-- [Getting Started](./reference/getting-started.md)
-	- [What is Entity Merge](#what-is-entity-merge "What is Entity Merge")
-	- [Main Entities](#main-entities)
-	- [How it works](#how-it-works)
+- [Getting Started](./getting-started.md)
+	- [What is Entity Merge](./getting-started.md#what-is-entity-merge "What is Entity Merge")
+	- [Main Entities](./getting-started.md#main-entities)
+	- [How it works](./getting-started.md#how-it-works)
 - Classes Diagram
-- [Configuration Reference](./reference/configuration.md)
+- [Configuration](./configuration.md)
 
 ---------
 

@@ -4,12 +4,12 @@
 
 ### Table of Contents ###
 
-- [Getting Started](./reference/getting-started.md)
-	- [What is Entity Merge](#what-is-entity-merge "What is Entity Merge")
-	- [Main Entities](#main-entities)
-	- [How it works](#how-it-works)
-- [Classes Diagram](./reference/classes-diagram.md)
-- Configuration Reference
+- [Getting Started](./getting-started.md)
+	- [What is Entity Merge](./getting-started.md#what-is-entity-merge "What is Entity Merge")
+	- [Main Entities](./getting-started.md#main-entities)
+	- [How it works](./getting-started.md#how-it-works)
+- [Classes Diagram](./classes-diagram.md)
+- Configuration
 
 ---------
 

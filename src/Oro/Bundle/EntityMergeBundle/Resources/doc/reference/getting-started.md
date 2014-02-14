@@ -9,8 +9,8 @@
 	- [What is Entity Merge](#what-is-entity-merge "What is Entity Merge")
 	- [Main Entities](#main-entities)
 	- [How it works](#how-it-works)
-- [Classes Diagram](./reference/classes-diagram.md)
-- [Configuration Reference](./reference/configuration.md)
+- [Classes Diagram](./classes-diagram.md)
+- [Configuration](./configuration.md)
 
 ----------
 
