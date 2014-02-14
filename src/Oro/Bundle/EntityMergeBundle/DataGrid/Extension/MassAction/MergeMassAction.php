@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\AbstractMassAction;
-use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry;
 
 class MergeMassAction extends AbstractMassAction
@@ -15,11 +16,18 @@ class MergeMassAction extends AbstractMassAction
     protected $metadataRegistry;
 
     /**
-     * @param MetadataRegistry $metadataRegistry
+     * @var TranslatorInterface
      */
-    public function __construct(MetadataRegistry $metadataRegistry)
+    protected $translator;
+
+    /**
+     * @param MetadataRegistry    $metadataRegistry
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(MetadataRegistry $metadataRegistry, TranslatorInterface $translator)
     {
         $this->metadataRegistry = $metadataRegistry;
+        $this->translator       = $translator;
     }
 
     /** @var array */
@@ -50,10 +58,20 @@ class MergeMassAction extends AbstractMassAction
         }
 
         if (isset($options['entity_name'])) {
-            $options['max_element_count'] = 10;/*$this
+            $metadata = $this
                 ->metadataRegistry
-                ->getEntityMetadata($options['entity_name'])
-                ->getMaxEntitiesCount();*/
+                ->getEntityMetadata($options['entity_name']);
+
+            $options['max_element_count'] = $metadata->getMaxEntitiesCount();
+
+            $pluralLabel = $this->translator
+                ->trans($metadata->get('label'));
+
+            $options['label'] = $this->translator
+                ->trans(
+                    'oro.entity_merge.action.merge',
+                    ['{{ label }}' => strtolower($pluralLabel)]
+                );
         }
 
         if (!isset($options['route_parameters'])) {
