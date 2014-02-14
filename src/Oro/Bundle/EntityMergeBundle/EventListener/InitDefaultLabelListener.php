@@ -54,11 +54,9 @@ class InitDefaultLabelListener
         $labelCode = 'label';
 
         if ($fieldMetadata->getDoctrineMetadata()->isMappedBySourceEntity()) {
-
             $className = $fieldMetadata->getEntityMetadata()->getClassName();
             $fieldName = $fieldMetadata->getFieldName();
             $labelCode = 'label';
-
         } else {
             $className = $fieldMetadata->getDoctrineMetadata()->get('sourceEntity');
             $fieldName = null;
@@ -68,7 +66,10 @@ class InitDefaultLabelListener
         }
 
         if ($this->entityConfig->hasConfig($className, $fieldName)) {
-            $fieldMetadata->set('label', $this->entityConfig->getConfig($className, $fieldName)->get($labelCode));
+            $fieldMetadata->set(
+                'label',
+                $this->entityConfig->getConfig($className, $fieldName)->get($labelCode)
+            );
         }
     }
 }
