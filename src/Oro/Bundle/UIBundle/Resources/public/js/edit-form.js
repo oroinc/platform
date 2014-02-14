@@ -78,7 +78,7 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
             this.reset();
         },
 
-        _onEditModel: function (e, model) {
+        _onEditModel: function (model) {
             this.reset(model);
         },
 

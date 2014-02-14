@@ -138,7 +138,7 @@ function($, _, __, DeleteConfirmation) {
                 var id = $(e.currentTarget).closest('[data-id]').data('id');
                 var model = this.options.collection.get(id);
                 if (model) {
-                    model.trigger('edit', id);
+                    model.trigger('edit', model);
                 }
             }, this);
             item.find(this.options.selectors.editButton).on('click', onEdit);
