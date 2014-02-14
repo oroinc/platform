@@ -10,7 +10,7 @@
 	- [Main Entities](#main-entities)
 	- [How it works](#how-it-works)
 - [Classes Diagram](./classes-diagram.md)
-- [Configuration](./configuration.md)
+- [Configuration](./merge-configuration.md)
 
 ----------
 

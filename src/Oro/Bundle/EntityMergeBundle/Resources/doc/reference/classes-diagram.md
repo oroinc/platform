@@ -9,7 +9,7 @@
 	- [Main Entities](./getting-started.md#main-entities)
 	- [How it works](./getting-started.md#how-it-works)
 - Classes Diagram
-- [Configuration](./configuration.md)
+- [Configuration](./merge-configuration.md)
 
 ---------
 
