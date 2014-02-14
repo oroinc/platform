@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Doctrine\DoctrineHelper;
 
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,17 +20,12 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
      */
+    private $metadataFactory;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
+     */
     private $metadata;
-
-    /**
-     * @var string
-     */
-    private $identifier = 'id';
-
-    /**
-     * @var string
-     */
-    private $entityRepositoryName = 'testEntityName';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -53,14 +49,10 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->createMocks();
-        $this->setUpMocks();
-        $this->doctrineHelper = new DoctrineHelper($this->entityManager);
-    }
-
-    private function createMocks()
-    {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()->getMock();
 
         $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
@@ -77,101 +69,264 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
 
         $this->expression = $this->getMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
+
+        $this->doctrineHelper = new DoctrineHelper($this->entityManager);
     }
 
-    /**
-     * @return array
-     */
-    private function setUpMocks()
+    public function testGetEntityRepository()
     {
-        $fakeIdentifier = & $this->identifier;
+        $entityName = 'TestEntity';
 
-        $this->metadata->expects($this->any())->method('getSingleIdentifierFieldName')->will(
-            $this->returnCallback(
-                function () use (&$fakeIdentifier) {
-                    return $fakeIdentifier;
-                }
-            )
-        );
-        $this->entityManager->expects($this->any())->method('getClassMetadata')->will(
-            $this->returnValue($this->metadata)
-        );
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->with($entityName)
+            ->will($this->returnValue($this->repository));
 
-        $this->entityManager->expects($this->any())->method('getRepository')->will(
-            $this->returnValue($this->repository)
-        );
-        $fakeEntityRepositoryName = & $this->entityRepositoryName;
-        $this->repository->expects($this->any())->method('getClassName')->will(
-            $this->returnCallback(
-                function () use (&$fakeEntityRepositoryName) {
-                    return $fakeEntityRepositoryName;
-                }
-            )
-        );
-        $this->repository->expects($this->any())->method('createQueryBuilder')->will(
-            $this->returnValue($this->queryBuilder)
-        );
+        $this->assertEquals($this->repository, $this->doctrineHelper->getEntityRepository($entityName));
+    }
 
-        $this->queryMatcher = function () {
-            return true;
-        };
+    public function testGetEntitiesByIds()
+    {
+        $entityIds = array(1, 2, 3);
+        $entities = array(new \stdClass());
+        $identifier = 'id';
 
-        $this->queryBuilder->expects($this->any())
-            ->method('add')
-            ->with(
-                $this->equalTo('where')
-            )->will($this->returnValue($this->queryBuilder));
+        $className = 'TestEntity';
 
-        $this->queryBuilder->expects($this->any())
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->with($className)
+            ->will($this->returnValue($this->repository));
+
+        $this->entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($className)
+            ->will($this->returnValue($this->metadata));
+
+        $this->metadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue($identifier));
+
+        $this->repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('entity')
+            ->will($this->returnValue($this->queryBuilder));
+
+        $this->queryBuilder->expects($this->once())
             ->method('expr')
             ->will($this->returnValue($this->expression));
 
-        $this->query->expects($this->any())
-            ->method('execute')
-            ->will($this->returnValue(array()));
+        $inExpression = $this->getMockBuilder('Doctrine\ORM\Query\Expr\Func')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->queryBuilder->expects($this->any())
+        $this->expression->expects($this->once())
+            ->method('in')
+            ->with('entity.' . $identifier, $entityIds)
+            ->will($this->returnValue($inExpression));
+
+        $this->queryBuilder->expects($this->once())
+            ->method('where')
+            ->with($inExpression);
+
+        $this->queryBuilder->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($this->query));
+
+        $this->query->expects($this->once())
+            ->method('execute')
+            ->will($this->returnValue($entities));
+
+        $this->assertEquals($entities, $this->doctrineHelper->getEntitiesByIds($className, $entityIds));
     }
 
-    public function testGetEntityIdentifierReturnCorrectData()
+    public function testGetSingleIdentifierFieldName()
     {
-        $this->identifier = 'test_primary_key';
+        $entityClass = 'stdClass';
+        $identifier = 'id';
 
-        $actual = $this->doctrineHelper->getEntityIdentifier('testClassName');
+        $this->entityManager->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityClass)
+            ->will($this->returnValue($this->metadata));
 
-        $this->assertEquals('test_primary_key', $actual);
+        $this->metadata->expects($this->once())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue($identifier));
+
+        $this->assertEquals($identifier, $this->doctrineHelper->getSingleIdentifierFieldName($entityClass));
+    }
+
+    public function testGetEntityIdentifierValue()
+    {
+        $entityClass = 'stdClass';
+        $entity = new \stdClass();
+        $identifiers = array('id' => 1);
+
+        $this->entityManager->expects($this->once())
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($this->metadataFactory));
+
+        $this->metadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with($entityClass)
+            ->will($this->returnValue($this->metadata));
+
+        $this->metadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($entity)
+            ->will($this->returnValue($identifiers));
+
+        $this->assertEquals($identifiers['id'], $this->doctrineHelper->getEntityIdentifierValue($entity));
     }
 
     /**
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Incorrect repository returned
+     * @expectedExceptionMessage Multiple id is not supported.
      */
-    public function testGetRepositoryShouldGenerateExceptionIfRepositoryIsIncorrect()
+    public function testGetEntityIdentifierValueFails()
     {
-        $this->entityRepositoryName = 'notThisName';
+        $entityClass = 'stdClass';
+        $entity = new \stdClass();
+        $identifiers = array('id1' => 1, 'id2' => 2);
 
-        $this->doctrineHelper->getEntitiesByIds('testEntityName', array());
+        $this->entityManager->expects($this->once())
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($this->metadataFactory));
+
+        $this->metadataFactory->expects($this->once())
+            ->method('getMetadataFor')
+            ->with($entityClass)
+            ->will($this->returnValue($this->metadata));
+
+        $this->metadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($entity)
+            ->will($this->returnValue($identifiers));
+
+        $this->doctrineHelper->getEntityIdentifierValue($entity);
     }
 
-    public function testGetRepositoryShouldNotGenerateExceptionIfRepositoryIsIncorrect()
+    public function testGetEntityIds()
     {
-        $this->doctrineHelper->getEntitiesByIds('testEntityName', array());
+        $entityClass = 'stdClass';
+        $fooEntity = new \stdClass();
+        $fooEntity->id = 1;
+        $barEntity = new \stdClass();
+        $barEntity->id = 2;
+        $entities = array($fooEntity, $barEntity);
+        $expectedIdentifiers = array($fooEntity->id, $barEntity->id);
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($this->metadataFactory));
+
+        $this->metadataFactory->expects($this->exactly(2))
+            ->method('getMetadataFor')
+            ->with($entityClass)
+            ->will($this->returnValue($this->metadata));
+
+        $this->metadata->expects($this->at(0))
+            ->method('getIdentifierValues')
+            ->with($fooEntity)
+            ->will($this->returnValue(array('id' => $fooEntity->id)));
+
+        $this->metadata->expects($this->at(1))
+            ->method('getIdentifierValues')
+            ->with($barEntity)
+            ->will($this->returnValue(array('id' => $barEntity->id)));
+
+        $this->assertEquals($expectedIdentifiers, $this->doctrineHelper->getEntityIds($entities));
     }
 
-    public function testGetEntitiesByIdsMustTryToAddWhereInExpressionToQueryBuilder()
+    /**
+     * @dataProvider isEntityEqualDataProvider
+     */
+    public function testIsEntityEqualForSameClass($firstObject, $firstId, $secondObject, $secondId, $expected)
     {
-        $this->identifier = 'testIdentifier';
-        $this->expression->expects($this->once())->method('in')->with(
-            $this->equalTo('entity.testIdentifier'),
-            $this->callback(
-                function ($params) {
-                    return $params[0] == 12 && $params[1] == 33 && $params[2] == 55;
-                }
-            )
+        $this->entityManager->expects($this->exactly(2))
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($this->metadataFactory));
+
+        $this->metadataFactory->expects($this->at(0))
+            ->method('getMetadataFor')
+            ->with(get_class($firstObject))
+            ->will($this->returnValue($this->metadata));
+
+        $this->metadata->expects($this->at(0))
+            ->method('getIdentifierValues')
+            ->with($firstObject)
+            ->will($this->returnValue(array('id' => $firstId)));
+
+        $this->metadataFactory->expects($this->at(1))
+            ->method('getMetadataFor')
+            ->with(get_class($secondObject))
+            ->will($this->returnValue($this->metadata));
+
+        $this->metadata->expects($this->at(1))
+            ->method('getIdentifierValues')
+            ->with($secondObject)
+            ->will($this->returnValue(array('id' => $secondId)));
+
+        $this->assertEquals($expected, $this->doctrineHelper->isEntityEqual($firstObject, $secondObject));
+    }
+
+    public function isEntityEqualDataProvider()
+    {
+        return array(
+            'equal_class_equal_id' => array(
+                'firstObject' => new EntityStub(1),
+                'firstId' => 1,
+                'secondObject' => new EntityStub(2),
+                'secondId' => 1,
+                'expected' => true
+            ),
+            'equal_class_not_equal_id' => array(
+                'firstObject' => new EntityStub(1),
+                'firstId' => 1,
+                'secondObject' => new EntityStub(2),
+                'secondId' => 2,
+                'expected' => false
+            ),
         );
+    }
 
-        $this->doctrineHelper->getEntitiesByIds('testEntityName', array('12', '33', '55'));
+    public function testIsEntityEqualForNotSameClass()
+    {
+        $this->assertFalse($this->doctrineHelper->isEntityEqual(new EntityStub(), new \stdClass()));
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage $entity argument must be an object, "string" given.
+     */
+    public function testIsEntityEqualFailsForFirstNotObject()
+    {
+        $this->doctrineHelper->isEntityEqual('scalar', new \stdClass());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage $other argument must be an object, "string" given.
+     */
+    public function testIsEntityEqualFailsForSecondNotObject()
+    {
+        $this->doctrineHelper->isEntityEqual(new \stdClass(), 'scalar');
+    }
+
+    public function testGetAllMetadata()
+    {
+        $className = 'TestEntity';
+        $expectedResult = array($this->metadata);
+
+        $this->entityManager->expects($this->once())
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($this->metadataFactory));
+
+        $this->metadataFactory->expects($this->once())
+            ->method('getAllMetadata')
+            ->will($this->returnValue($expectedResult));
+
+        $this->assertEquals($expectedResult, $this->doctrineHelper->getAllMetadata($className));
     }
 }

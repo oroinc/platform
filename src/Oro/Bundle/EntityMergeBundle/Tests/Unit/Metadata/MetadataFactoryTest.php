@@ -100,7 +100,7 @@ class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->fieldId));
 
         $this->doctrineHelper->expects($this->any())
-            ->method('getDoctrineMetadataFor')
+            ->method('getMetadataFor')
             ->will($this->returnValue($this->doctrineMetadata));
 
         $this->doctrineHelper->expects($this->any())
