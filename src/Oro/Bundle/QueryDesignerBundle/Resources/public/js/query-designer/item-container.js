@@ -107,8 +107,8 @@ function($, _, __, DeleteConfirmation) {
 
         _renderModel: function (model) {
             var data = {};
-            _.each(model.toJSON(), function (value, name) {
-                data[name] = model.getFieldLabel(name, value);
+            $.each(model.toJSON(), function (name) {
+                data[name] = model.getFieldLabel(name);
             });
             data.id = model.cid;
 

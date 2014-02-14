@@ -137,9 +137,10 @@
         'deep-level': 2
     } %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/translator', 'oro/loading-mask', 'routing',
-            'oro/query-designer', 'oro/delete-confirmation', 'oroentity/js/fields-loader'],
-        function($, _, __, LoadingMask, routing, QueryDesigner, DeleteConfirmation) {
+        require(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/loading-mask', 'routing',
+            'oro/query-designer', 'oro/delete-confirmation', 'oro/query-designer/grouping/model',
+            'oroentity/js/fields-loader', 'oroui/js/edit-form', 'oroquerydesigner/js/item-container'],
+        function($, _, Backbone, __, LoadingMask, routing, QueryDesigner, DeleteConfirmation, GroupingModel) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
                 var $entityChoice = $('#oro_report_form_entity');
@@ -182,7 +183,6 @@
                     fieldChoice: fieldChoiceOptions,
                     filters: {{ metadata.filters|json_encode|raw }}
                 });
-                $('#report-grouping-form').find('[data-purpose=column-selector]').fieldChoice(fieldChoiceOptions);
 
                 $('#report-designer').append(loadingMask.render().$el);
 
@@ -207,6 +207,44 @@
                     }|merge(entityFieldsRouteParams))) %};
                 $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
                 {% endif %}
+
+
+                // grouping
+                var $editForm = $('#report-grouping-form');
+                var $groupingFieldChoice = $editForm.find('[data-purpose=column-selector]');
+                GroupingModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
+                GroupingModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
+                $groupingFieldChoice.fieldChoice(fieldChoiceOptions);
+                var $storage = $('#oro_report_form_definition');
+                var load = function () {
+                    var data = JSON.parse($storage.val());
+                    console.log('Load:', data);
+                    return data;
+                };
+                var save = function (data) {
+                    console.log('Save:', data);
+                    $storage.val(JSON.stringify(data));
+                };
+
+                var data = load();
+
+                var collection = new (Backbone.Collection)(data.grouping_columns, {model: GroupingModel});
+                collection.on('add remove sort', function () {
+                    data.grouping_columns = collection.toJSON();
+                    save(data);
+                });
+
+                $editForm.editForm({
+                    namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
+                    collection: collection
+                });
+                $editForm.find('.grouping-item-container').itemContainer({
+                    collection: collection,
+                    itemTemplateSelector: '#report-grouping-item-row'
+                });
+                // end grouping
+
+
 
                 designer.render();
             });
