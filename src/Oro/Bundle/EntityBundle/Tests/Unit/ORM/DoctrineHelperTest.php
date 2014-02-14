@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\Common\Persistence\Proxy;
 
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\__CG__\ItemStubProxy;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
 
 class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,7 +55,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         return array(
             'existing entity' => array(
                 'entity'        => new ItemStub(),
-                'expectedClass' => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
+                'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
             ),
             'entity proxy' => array(
                 'entity'        => new ItemStubProxy(),
@@ -88,7 +88,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         $entity = $this->getMock('FooEntity');
 
         $this->setExpectedException(
-            'Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException',
+            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
             sprintf('Entity class "%s" is not manageable', get_class($entity))
         );
 
@@ -108,7 +108,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         return array(
             'existing entity' => array(
                 'entity' => new ItemStub(),
-                'class'  => 'Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub',
+                'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
             ),
             'entity proxy' => array(
                 'entity' => new ItemStubProxy(),
@@ -117,20 +117,45 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetSingleEntityIdentifier()
+    /**
+     * @param $expected
+     * @param array $actual
+     * @param bool $exception
+     * @dataProvider getSingleEntityIdentifierDataProvider
+     */
+    public function testGetSingleEntityIdentifier($expected, array $actual, $exception = true)
     {
         $entity = new ItemStubProxy();
         $class = 'ItemStubProxy';
-        $identifierArray = array('id' => self::TEST_IDENTIFIER);
 
-        $entityManager = $this->getEntityManagerMockForEntityAndClass($entity, $class, $identifierArray);
+        $entityManager = $this->getEntityManagerMockForEntityAndClass($entity, $class, $actual);
 
         $this->registry->expects($this->any())
             ->method('getManagerForClass')
             ->with($class)
             ->will($this->returnValue($entityManager));
 
-        $this->assertEquals(self::TEST_IDENTIFIER, $this->doctrineHelper->getSingleEntityIdentifier($entity));
+        $this->assertEquals($expected, $this->doctrineHelper->getSingleEntityIdentifier($entity, $exception));
+    }
+
+    public function getSingleEntityIdentifierDataProvider()
+    {
+        return array(
+            'valid identifier' => array(
+                'expected' => self::TEST_IDENTIFIER,
+                'actual' => array('id' => self::TEST_IDENTIFIER),
+            ),
+            'empty identifier, no exception' => array(
+                'expected' => null,
+                'actual' => array('first_id' => 1, 'second_id'),
+                'exception' => false,
+            ),
+            'multiple identifier, no exception' => array(
+                'expected' => null,
+                'actual' => array('first_id' => 1, 'second_id'),
+                'exception' => false,
+            ),
+        );
     }
 
     /**
@@ -152,7 +177,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      * @param array $identifier
      * @dataProvider getSingleEntityIdentifierIncorrectIdentifierDataProvider
      *
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
      * @expectedExceptionMessage Can't get single identifier for the entity
      */
     public function testGetSingleEntityIdentifierIncorrectIdentifier(array $identifier)

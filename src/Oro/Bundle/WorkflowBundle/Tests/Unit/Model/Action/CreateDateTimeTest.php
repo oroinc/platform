@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\CreateDateTime;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CreateDateTimeTest extends \PHPUnit_Framework_TestCase

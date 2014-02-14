@@ -12,10 +12,10 @@
     bottom: 0;
     left: 0;
 }
-.workflow-step-list li:first-child:before{
+.workflow-step-list.more-than-one-step li:first-child:before{
     background-position: 50% 0;
 }
-.workflow-step-list li:last-child:before{
+.workflow-step-list.more-than-one-step li:last-child:before{
     background-position: 50% -4px;
 }
 .workflow-step-list li {
@@ -32,13 +32,13 @@
 li.processed {
     color: #62626f;
 }
-li.processed:before {
+.more-than-one-step li.processed:before {
     background-position: 50% -20px;
 }
-li.processed:first-child:before {
+.more-than-one-step li.processed:first-child:before {
     background-position: 50% -12px;
 }
-li.processed:last-child:before {
+.more-than-one-step li.processed:last-child:before {
     background-position: 50% -16px;
 }
 li.current {
@@ -47,10 +47,10 @@ li.current {
 li.current:before{
     background-position: 50% -24px;
 }
-.workflow-step-list li.current:last-child:before{
+.workflow-step-list.more-than-one-step li.current:last-child:before{
     background-position: 50% -28px;
 }
-.workflow-step-list li.current:first-child:before{
+.workflow-step-list.more-than-one-step li.current:first-child:before{
     background-position: 50% -32px;
 }
 .workflow-steps-container{

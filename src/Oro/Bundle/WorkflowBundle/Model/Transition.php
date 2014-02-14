@@ -62,6 +62,11 @@ class Transition
     protected $formType;
 
     /**
+     * @var string
+     */
+    protected $displayType;
+
+    /**
      * @var array
      */
     protected $formOptions = array();
@@ -431,6 +436,25 @@ class Transition
     public function setUnavailableHidden($unavailableHidden)
     {
         $this->unavailableHidden = $unavailableHidden;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDisplayType()
+    {
+        return $this->displayType;
+    }
+
+    /**
+     * @param string $displayType
+     * @return Transition
+     */
+    public function setDisplayType($displayType)
+    {
+        $this->displayType = $displayType;
+
         return $this;
     }
 }

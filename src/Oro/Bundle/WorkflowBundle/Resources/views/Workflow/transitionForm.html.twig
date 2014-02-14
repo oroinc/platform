@@ -1,0 +1,104 @@
+{% set entity = null %}
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as macros %}
+
+{% set pageParams = transition.frontendOptions.page is defined ?transition.frontendOptions.page : null  %}
+{% if pageParams.title is defined %}
+    {% set title = pageParams.title %}
+{% else %}
+    {% set title = transition.label %}
+{% endif %}
+
+{% if pageParams.parent_label is defined %}
+    {% set indexLabel = pageParams.parent_label %}
+{% else %}
+    {% set indexLabel = workflow.label %}
+{% endif %}
+
+{% if pageParams.parent_route is defined %}
+    {% set indexPath = path(pageParams.parent_route, pageParams.parent_route_parameters is defined ? pageParams.parent_route_parameters : []) %}
+{% else %}
+    {% set indexPath = null %}
+{% endif %}
+
+{% oro_title_set({params : {"%workflow_title%": title ~ ' - ' ~ indexLabel} }) %}
+
+{% block navButtons %}
+    {% if indexPath %}
+        {{ UI.cancelButton(indexPath) }}
+    {% endif %}
+
+    <div class="btn-group">
+        <button
+            type="button"
+            class="btn btn-success"
+            id="save-and-transit"
+            data-transition-url="{{ transitionUrl }}"
+        >{{ 'Submit'|trans }}</button>
+    </div>
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'indexPath': indexPath,
+        'indexLabel': indexLabel,
+        'entityTitle': title|trans
+    } %}
+
+    {% block stats %}{% endblock %}
+
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block breadcrumb %}
+    <ul class="breadcrumb">
+        <li>{{ indexLabel|trans }}</li>
+    </ul>
+{% endblock %}
+
+{% block content_data %}
+    {% set transitionFormWidget %}
+        <div class="form-container">
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': transitionFormUrl,
+            'alias': 'transition-form',
+            'loadingMaskEnabled': false
+        }) }}
+        <script type="text/javascript">
+            require(['jquery', 'oro/widget-manager', 'oro/workflow-transition-executor', 'oro/navigation'],
+            function($, widgetManager, performTransition, Navigation) {
+                var saveAndTransitBtn = $('#save-and-transit');
+                saveAndTransitBtn.on('click', function(e) {
+                    e.preventDefault();
+
+                    if (Navigation.isEnabled()) {
+                        var navigation = Navigation.getInstance();
+                        navigation.beforeRequest();
+                    }
+
+                    widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
+                        widget.once('formSave', function(data) {
+                            performTransition(saveAndTransitBtn, data)
+                        });
+                        widget.form.submit();
+                    });
+                });
+            });
+        </script>
+        </div>
+    {% endset %}
+
+    {% set dataBlocks = [
+        {
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [{'data' : [transitionFormWidget] }]
+        }
+    ] %}
+
+    {% set id = 'transitionPage' %}
+    {% set data = {'dataBlocks': dataBlocks} %}
+
+    {{ parent() }}
+{% endblock content_data %}
