@@ -140,10 +140,11 @@
                     $dp.append($tp);
                 }
 
-                $(".ui-datevariables-div a.ui_dvariable").click(function() {
+                $(".ui-datevariables-div a.ui_dvariable").click(function(e) {
                     var variable = this.text;
                     tp_inst.$input.val(variable);
                     tp_inst.$input.trigger("change");
+                    e.preventDefault();
                 });
             }
         },

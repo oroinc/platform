@@ -18,6 +18,20 @@ define(['jquery', 'underscore', 'oro/datafilter/date-filter', 'oro/locale-settin
         inputClass: 'datetime-visual-element',
 
         /**
+         * Selectors for filter data
+         *
+         * @property
+         */
+        criteriaValueSelectors: {
+            type: 'select[name=datetime]',
+            part: 'select[name=datetime_part]',
+            value: {
+                start: 'input[name="start"]',
+                end:   'input[name="end"]'
+            }
+        },
+
+        /**
          * Datetime widget options
          *
          * @property

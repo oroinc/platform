@@ -31,7 +31,8 @@ function($, _, __, ChoiceFilter, localeSettings) {
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select',
+            type: 'select[name=date]',
+            part: 'select[name=date_part]',
             value: {
                 start: 'input[name="start"]',
                 end:   'input[name="end"]'
@@ -179,15 +180,17 @@ function($, _, __, ChoiceFilter, localeSettings) {
             if (this.templateTheme != "") {
                 parts.push(
                     datePartTemplate({
+                        name: this.name+'_part',
                         choices: this.dateParts,
                         selectedChoice: value.type,
                         selectedChoiceLabel: selectedPartLabel
                     })
                 );
             }
-            
+
             parts.push(
                 datePartTemplate({
+                    name: this.name,
                     choices: this.choices,
                     selectedChoice: value.type,
                     selectedChoiceLabel: selectedChoiceLabel
@@ -196,7 +199,6 @@ function($, _, __, ChoiceFilter, localeSettings) {
 
             var $filter = $(
                 this.template({
-                    name: this.name,
                     inputClass: this.inputClass,
                     value: this._formatDisplayValue(value),
                     parts: parts
@@ -345,6 +347,9 @@ function($, _, __, ChoiceFilter, localeSettings) {
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
             this._setInputValue(this.criteriaValueSelectors.value.end, value.value.end);
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
+            if (value.part) {
+                this._setInputValue(this.criteriaValueSelectors.part, value.part);
+            }
             return this;
         },
 
@@ -354,6 +359,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
         _readDOMValue: function() {
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.type),
+                part: this._getInputValue(this.criteriaValueSelectors.part),
                 value: {
                     start: this._getInputValue(this.criteriaValueSelectors.value.start),
                     end:   this._getInputValue(this.criteriaValueSelectors.value.end)
