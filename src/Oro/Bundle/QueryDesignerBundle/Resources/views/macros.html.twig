@@ -272,18 +272,14 @@
                 data.grouping_columns = collection.toJSON();
                 save(data);
             });
-            collection.on('all', function () {
-                console.log(arguments);
-            });
-            
+
             $editForm.editForm({
                 namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
                 collection: collection
             });
             $editForm.find('.grouping-item-container').itemContainer({
                 collection: collection,
-                itemTemplateSelector: '#report-grouping-item-row',
-                //getFieldLabel: _.bind(this.getFieldLabel, this),
+                itemTemplateSelector: '#report-grouping-item-row'
             });
         });
     </script>

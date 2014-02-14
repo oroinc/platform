@@ -7,12 +7,12 @@ function($, _, __, DeleteConfirmation) {
      * Item container widget
      *
      * Emits events
-     * edit, change, add, remove
+     * edit, sort, add, remove
      *
      * Listens to options.collection events:
      * add, remove, change, reset
      *
-     * Uses options.itemTemplateSelector and options.getFieldLabel for item rendering
+     * Uses options.itemTemplateSelector for item rendering
      */
     $.widget('oroquerydesigner.itemContainer', {
         options: {
@@ -33,7 +33,9 @@ function($, _, __, DeleteConfirmation) {
             collection.on('reset', this._onResetCollection, this);
 
             this._initSorting();
-            this._render();
+
+            this.element.empty();
+            this.options.collection.each(this._onModelAdded, this);
         },
 
         _initSorting: function () {
@@ -52,12 +54,12 @@ function($, _, __, DeleteConfirmation) {
                     return ui;
                 },
                 stop: _.bind(function(e, ui) {
-                    this._syncCollectionWithUi();
+                    this._sortCollection();
                 }, this)
             }).disableSelection();
         },
 
-        _syncCollectionWithUi: function () {
+        _sortCollection: function () {
             var collectionChanged = false;
             var collection = this.options.collection;
 
@@ -84,11 +86,6 @@ function($, _, __, DeleteConfirmation) {
             if (collectionChanged) {
                 collection.trigger('sort');
             }
-        },
-
-        _render: function() {
-            this.element.empty();
-            this.options.collection.each(_.bind(this._onModelAdded, this));
         },
 
         _onModelAdded: function (model) {
