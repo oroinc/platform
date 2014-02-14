@@ -173,9 +173,6 @@ class EntityData
      */
     public function setMasterEntity($entity)
     {
-        if (!$this->hasEntity($entity)) {
-            throw new InvalidArgumentException('Add entity before setting it as master.');
-        }
         $this->masterEntity = $entity;
 
         return $this;

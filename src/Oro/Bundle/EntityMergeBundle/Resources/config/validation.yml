@@ -10,3 +10,6 @@ Oro\Bundle\EntityMergeBundle\Data\EntityData:
     constraints:
         - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount:
             groups: [default, validateCount]
+        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MasterEntity: ~
+        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntity: ~
+        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity: ~

@@ -42,26 +42,8 @@ class FieldDataTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertNull($this->fieldData->getSourceEntity());
         $entity = $this->createTestEntity(1);
-        $this->entityData->expects($this->once())
-            ->method('hasEntity')
-            ->with($entity)
-            ->will($this->returnValue(true));
         $this->assertEquals($this->fieldData, $this->fieldData->setSourceEntity($entity));
         $this->assertEquals($entity, $this->fieldData->getSourceEntity());
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Passed entity must be included to merge data.
-     */
-    public function testSetSourceEntityFails()
-    {
-        $entity = $this->createTestEntity(1);
-        $this->entityData->expects($this->once())
-            ->method('hasEntity')
-            ->with($entity)
-            ->will($this->returnValue(false));
-        $this->fieldData->setSourceEntity($entity);
     }
 
     public function testSetGetMode()

@@ -179,21 +179,6 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->entityData, $this->entityData->setMasterEntity($fooEntity));
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Add entity before setting it as master.
-     */
-    public function testSetMasterEntityFails()
-    {
-        $this->entityClass = 'stdClass';
-
-        $this->entityData->addEntity($fooEntity = $this->createTestEntity(1));
-        $barEntity = $this->createTestEntity(2);
-
-        $this->assertEquals($this->entityData, $this->entityData->setMasterEntity($barEntity));
-        $this->assertEquals($barEntity, $this->entityData->getMasterEntity());
-    }
-
     protected function createTestEntity($id)
     {
         $result = new \stdClass();

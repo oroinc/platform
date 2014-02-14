@@ -80,9 +80,6 @@ class FieldData
      */
     public function setSourceEntity($entity)
     {
-        if (!$this->entityData->hasEntity($entity)) {
-            throw new InvalidArgumentException('Passed entity must be included to merge data.');
-        }
         $this->sourceEntity = $entity;
 
         return $this;
