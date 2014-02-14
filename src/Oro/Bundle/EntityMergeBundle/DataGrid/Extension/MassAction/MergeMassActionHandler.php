@@ -39,7 +39,7 @@ class MergeMassActionHandler implements MassActionHandlerInterface
             throw new InvalidArgumentException('Entity name is missing.');
         }
 
-        $entityIdentifier = $this->doctrineHelper->getEntityIdentifier($options['entity_name']);
+        $entityIdentifier = $this->doctrineHelper->getSingleIdentifierFieldName($options['entity_name']);
         $entityIds = $this->getIdsFromResult($args->getResults(), $entityIdentifier);
 
         $entities = $this->doctrineHelper->getEntitiesByIds(

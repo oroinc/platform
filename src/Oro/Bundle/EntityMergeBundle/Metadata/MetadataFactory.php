@@ -71,7 +71,7 @@ class MetadataFactory
         $metadata = new EntityMetadata(
             $entityMergeConfig->all(),
             $fieldsMetadata,
-            new DoctrineMetadata($className, (array)$this->doctrineHelper->getDoctrineMetadataFor($className))
+            new DoctrineMetadata($className, (array)$this->doctrineHelper->getMetadataFor($className))
         );
 
         $this->eventDispatcher->dispatch(
@@ -91,7 +91,7 @@ class MetadataFactory
     public function createFieldsMetadata($className)
     {
         $fieldsMetadata   = [];
-        $doctrineMetadata = $this->doctrineHelper->getDoctrineMetadataFor($className);
+        $doctrineMetadata = $this->doctrineHelper->getMetadataFor($className);
         $configs          = $this->mergeConfigProvider->getConfigs($className);
 
         if ($configs) {
@@ -142,7 +142,7 @@ class MetadataFactory
             $entity          = $field->getEntity();
             $entityClassName = $entity->getClassName();
 
-            $doctrineMetadata = $this->doctrineHelper->getDoctrineMetadataFor($entityClassName);
+            $doctrineMetadata = $this->doctrineHelper->getMetadataFor($entityClassName);
 
             if ($doctrineMetadata->hasAssociation($fieldName)) {
                 $relatedClassName      = $doctrineMetadata->getName();
