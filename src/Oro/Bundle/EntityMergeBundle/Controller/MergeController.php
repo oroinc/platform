@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -66,9 +67,9 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
-        $constraints = $this->getValidator()->validate($entityData, ['validateCount']);
-        if (count($constraints)) {
-            foreach ($constraints as $violation) {
+        $constraintViolations = $this->getValidator()->validate($entityData, ['validateCount']);
+        if ($constraintViolations->count()) {
+            foreach ($constraintViolations as $violation) {
                 /* @var ConstraintViolation $violation */
                 $this->get('session')->getFlashBag()->add(
                     'error',
@@ -97,11 +98,23 @@ class MergeController extends Controller
             if ($form->isValid()) {
 
                 $merger = $this->getEntityMerger();
-                $this->getEntityManager()->transactional(
-                    function () use ($merger, $entityData) {
-                        $merger->merge($entityData);
+
+                try {
+                    $this->getEntityManager()->transactional(
+                        function () use ($merger, $entityData) {
+                            $merger->merge($entityData);
+                        }
+                    );
+                } catch (ValidationException $exception) {
+                    foreach ($exception->getConstraintViolations() as $violation) {
+                        /* @var ConstraintViolation $violation */
+                        $this->get('session')->getFlashBag()->add(
+                            'error',
+                            $violation->getMessage()
+                        );
                     }
-                );
+                }
+
 
                 $this->get('session')->getFlashBag()->add(
                     'success',

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityMergeBundle\Model\Step;
 use Symfony\Component\Validator\ValidatorInterface;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
-use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 
 class ValidateStep implements MergeStepInterface
 {
@@ -26,18 +26,14 @@ class ValidateStep implements MergeStepInterface
      * Validate data
      *
      * @param EntityData $data
-     * @throws InvalidArgumentException
+     * @throws ValidationException
      */
     public function run(EntityData $data)
     {
-        if (count($data->getEntities()) < 2) {
-            // @todo Add rule to validation.yml
-            throw new InvalidArgumentException('Cannot merge less than 2 entities.');
-        }
+        $constraintViolations = $this->validator->validate($data);
 
-        if (!$data->getMasterEntity()) {
-            // @todo Add rule to validation.yml
-            throw new InvalidArgumentException('Master entity must be set.');
+        if ($constraintViolations->count()) {
+            throw new ValidationException($constraintViolations);
         }
     }
 }
