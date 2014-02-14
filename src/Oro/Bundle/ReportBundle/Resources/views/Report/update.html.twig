@@ -139,7 +139,7 @@
     <script type="text/javascript">
         require(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/loading-mask', 'routing',
             'oro/query-designer', 'oro/delete-confirmation', 'oro/query-designer/grouping/model',
-            'oroentity/js/fields-loader', 'oroui/js/edit-form', 'oroquerydesigner/js/item-container'],
+            'oroentity/js/fields-loader', 'oroquerydesigner/js/edit-form', 'oroquerydesigner/js/item-container'],
         function($, _, Backbone, __, LoadingMask, routing, QueryDesigner, DeleteConfirmation, GroupingModel) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};

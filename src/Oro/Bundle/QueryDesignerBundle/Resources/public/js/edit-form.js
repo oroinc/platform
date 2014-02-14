@@ -11,7 +11,7 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
         }
     }
 
-    $.widget('oroui.editForm', {
+    $.widget('oroquerydesigner.editForm', {
 
         options: {
             prefix: 'entity_',
