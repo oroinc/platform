@@ -490,7 +490,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                 this.renderNoDataBlock();
                 this.renderLoadingMask();
                 this.collection.on('reset', _.bind(function() {
-                    this._updateNoDataBlock();
+                    this.renderNoDataBlock();
                 }, this));
 
                 /**
@@ -545,14 +545,6 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
             },
 
             /**
-             * Render no data block.
-             */
-            renderNoDataBlock: function () {
-                this._defineNoDataBlock();
-                this._updateNoDataBlock();
-            },
-
-            /**
              * Triggers when collection "request" event fired
              *
              * @private
@@ -600,7 +592,7 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
              *
              * @private
              */
-            _updateNoDataBlock: function () {
+            renderNoDataBlock: function () {
                 this._defineNoDataBlock();
                 if (this.collection.models.length > 0 && !this.noColumnsFlag) {
                     this.$(this.selectors.toolbar).show();
