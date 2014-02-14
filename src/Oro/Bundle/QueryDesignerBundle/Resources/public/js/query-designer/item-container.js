@@ -64,7 +64,7 @@ function($, _, __, DeleteConfirmation) {
             var collection = this.options.collection;
 
             _.each(this.element.find('tr'), function (el, index) {
-                var cid = $(el).data('id');
+                var cid = $(el).data('cid');
                 var model = collection.at(index);
                 if (cid === model.cid) {
                     return;
@@ -93,11 +93,11 @@ function($, _, __, DeleteConfirmation) {
         },
 
         _onModelChanged: function (model) {
-            this.element.find('[data-id="' + model.cid + '"]').outerHTML(this._renderModel(model));
+            this.element.find('[data-cid="' + model.cid + '"]').outerHTML(this._renderModel(model));
         },
 
         _onModelDeleted: function (model) {
-            this.element.find('[data-id="' + model.cid + '"]').remove();
+            this.element.find('[data-cid="' + model.cid + '"]').remove();
         },
 
         _onResetCollection: function () {
@@ -110,7 +110,7 @@ function($, _, __, DeleteConfirmation) {
             _.each(model.toJSON(), function (value, name) {
                 data[name] = model.getFieldLabel(name, value);
             });
-            data.id = model.cid;
+            data.cid = model.cid;
 
             var item = $(this.itemTemplate(data));
             this._bindItemActions(item);
@@ -122,7 +122,7 @@ function($, _, __, DeleteConfirmation) {
             // bind edit button
             var onEdit = _.bind(function (e) {
                 e.preventDefault();
-                var cid = $(e.currentTarget).closest('[data-id]').data('id');
+                var cid = $(e.currentTarget).closest('[data-cid]').data('cid');
                 var model = this.options.collection.get(cid);
                 if (model) {
                     model.trigger('edit', model);
@@ -134,7 +134,7 @@ function($, _, __, DeleteConfirmation) {
             var onDelete = _.bind(function (e) {
                 e.preventDefault();
                 var el = $(e.currentTarget);
-                var cid = el.closest('[data-id]').data('id');
+                var cid = el.closest('[data-cid]').data('cid');
                 var confirm = new DeleteConfirmation({
                     content: el.data('message')
                 });
