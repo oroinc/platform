@@ -28,7 +28,7 @@
             {% for child in form.masterEntity %}
             <td class="entity-merge-select-all-holder">
                 <a class="entity-merge-select-all" data-entity-key="{{ child.vars.value }}" href="javascript:void(0);">
-                    {{ "Select all"|trans }}
+                    {{ "oro.entity_merge.form.select_all"|trans }}
                 </a>
             </td>
             {% endfor %}
@@ -43,6 +43,9 @@
 
 <script type="text/javascript">
     require(['jquery', 'oro/entity-merge/merge-view'],function(){
+        /**
+         * Initialise page javascript
+         */
         mergeView.init();
     });
 </script>

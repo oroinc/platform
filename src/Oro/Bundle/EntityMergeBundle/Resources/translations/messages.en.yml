@@ -13,3 +13,4 @@ oro:
         form:
             master_record: Master Record
             strategy: Strategy
+            select_all: Select all
