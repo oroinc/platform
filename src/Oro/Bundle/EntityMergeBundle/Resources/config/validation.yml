@@ -4,7 +4,9 @@ Oro\Bundle\EntityMergeBundle\Data\EntityData:
             - NotBlank: ~
         entities:
             - Count:
+                groups: [default, validateCount]
                 min: 2
                 minMessage: You need minimum {{ limit }} entities to merge.
     constraints:
-        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount: ~
+        - Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCount:
+            groups: [default, validateCount]

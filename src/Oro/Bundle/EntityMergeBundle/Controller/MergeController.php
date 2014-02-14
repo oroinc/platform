@@ -2,21 +2,23 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Doctrine\ORM\EntityManager;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ValidatorInterface;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-
-use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Model\EntityMerger;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @Route("/merge")
@@ -36,7 +38,7 @@ class MergeController extends Controller
 
         $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $this->getRequest());
 
-        $entityData =  $this->getEntityDataFactory()->createEntityData(
+        $entityData = $this->getEntityDataFactory()->createEntityData(
             $response->getOption('entity_name'),
             $response->getOption('entities')
         );
@@ -64,11 +66,15 @@ class MergeController extends Controller
             $className = $entityData->getClassName();
         }
 
-        if (count($entityData->getEntities()) < 2) {
-            $this->get('session')->getFlashBag()->add(
-                'warning',
-                $this->get('translator')->trans('oro.entity_merge.controller.select_error')
-            );
+        $constraints = $this->getValidator()->validate($entityData, ['validateCount']);
+        if (count($constraints)) {
+            foreach ($constraints as $violation) {
+                /* @var ConstraintViolation $violation */
+                $this->get('session')->getFlashBag()->add(
+                    'error',
+                    $violation->getMessage()
+                );
+            }
 
             return $this->redirect(
                 $this->generateUrl(
@@ -196,5 +202,13 @@ class MergeController extends Controller
     protected function getEntityManager()
     {
         return $this->get('doctrine.orm.entity_manager');
+    }
+
+    /**
+     * @return ValidatorInterface
+     */
+    protected function getValidator()
+    {
+        return $this->get('validator');
     }
 }
