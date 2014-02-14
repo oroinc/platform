@@ -1,8 +1,8 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
 {% set formAction = form.vars.value.id ? path('oro_embedded_form_update', { 'id': form.vars.value.id }) : path('oro_embedded_form_create') %}
-
-{% set title = 'New'|trans ~ ' ' ~ 'oro.embedded_form.entity.label'|trans|lower %}
+{% oro_title_set({ params : {"%form.title%": form.vars.value ? form.vars.value.title : null} }) %}
+{% set title = 'New'|trans ~ ' ' ~ 'oro.embeddedform.entity_label'|trans|lower %}
 
 {% block navButtons %}
     {% if form.vars.value.id and resource_granted('oro_embedded_form_delete') %}
@@ -12,7 +12,7 @@
         'aCss': 'no-hash remove-button',
         'id': 'btn-remove-embedded-form',
         'dataId': form.vars.value.id,
-        'entity_label': 'oro.embedded_form.entity.label'|trans,
+        'entity_label': 'oro.embeddedform.entity_label'|trans,
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -29,7 +29,7 @@
         {% set breadcrumbs = {
         'entity':      form.vars.value,
         'indexPath':   path('oro_embedded_form_list'),
-        'indexLabel': 'oro.embedded_form.entity.plural_label'|trans,
+        'indexLabel': 'oro.embeddedform.entity_plural_label'|trans,
         'entityTitle': form.vars.value.title
         } %}
         {{ parent() }}
@@ -51,7 +51,7 @@
     form_row(form.title),
     form_row(form.formType),
     form_row(form.channel),
-    form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embedded_form.css.label'|trans, 'is_translated_label': true}),
+    form_row(form.css, {'attr':{'class': 'span12' }, 'label': 'oro.embeddedform.css.label'|trans, 'is_translated_label': true}),
     form_row(form.successMessage)
     ]
     }

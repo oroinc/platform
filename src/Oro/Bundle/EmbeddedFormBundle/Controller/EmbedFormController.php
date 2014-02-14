@@ -4,9 +4,11 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -17,10 +19,18 @@ class EmbedFormController extends Controller
 {
     /**
      * @Route("/submit/{id}", name="oro_embedded_form_submit", requirements={"id"="[-\d\w]+"})
-     * @Template
      */
     public function formAction(EmbeddedForm $formEntity, Request $request)
     {
+        $response = new Response();
+        $response->setPublic();
+        $response->setMaxAge(30);
+        $response->setLastModified($formEntity->getUpdatedAt());
+        $response->setEtag($formEntity->getId() . $formEntity->getUpdatedAt()->format(\DateTime::ISO8601));
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
+
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
         /** @var EmbeddedFormManager $formManager */
@@ -37,11 +47,17 @@ class EmbedFormController extends Controller
             return $this->redirect($this->generateUrl('oro_embedded_form_success', ['id' => $formEntity->getId()]));
         }
 
-        return [
-            'form'             => $form->createView(),
-            'formEntity'       => $formEntity,
-            'customFormLayout' => $formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
-        ];
+        $this->render(
+            'OroEmbeddedFormBundle:EmbedForm:form.html.twig',
+            [
+                'form'             => $form->createView(),
+                'formEntity'       => $formEntity,
+                'customFormLayout' => $formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
+            ],
+            $response
+        );
+
+        return $response;
     }
 
     /**
