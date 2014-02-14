@@ -36,6 +36,7 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
             });
 
             this.options.collection.on('edit', $.proxy(this._onEditModel, this));
+            this.options.collection.on('remove', $.proxy(this._onRemoveModel, this));
         },
 
         reset: function (model) {
@@ -80,6 +81,12 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
 
         _onEditModel: function (model) {
             this.reset(model);
+        },
+
+        _onRemoveModel: function (model) {
+            if (this.model === model) {
+                this.reset();
+            }
         },
 
         _onCancel: function (e) {
