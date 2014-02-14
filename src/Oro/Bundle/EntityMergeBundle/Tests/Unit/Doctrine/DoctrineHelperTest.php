@@ -9,7 +9,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @var DoctrineHelper $target
      */
-    private $target;
+    private $doctrineHelper;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject $fakeEntityManager
@@ -53,12 +53,12 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->createFakeDependencies();
-        $this->setUpFakeObjects();
-        $this->target = new DoctrineHelper($this->entityManager);
+        $this->createMocks();
+        $this->setUpMocks();
+        $this->doctrineHelper = new DoctrineHelper($this->entityManager);
     }
 
-    private function createFakeDependencies()
+    private function createMocks()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -82,7 +82,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    private function setUpFakeObjects()
+    private function setUpMocks()
     {
         $fakeIdentifier = & $this->identifier;
 
@@ -139,7 +139,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->identifier = 'test_primary_key';
 
-        $actual = $this->target->getEntityIdentifier('testClassName');
+        $actual = $this->doctrineHelper->getEntityIdentifier('testClassName');
 
         $this->assertEquals('test_primary_key', $actual);
     }
@@ -152,12 +152,12 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityRepositoryName = 'notThisName';
 
-        $this->target->getEntitiesByIds('testEntityName', array());
+        $this->doctrineHelper->getEntitiesByIds('testEntityName', array());
     }
 
     public function testGetRepositoryShouldNotGenerateExceptionIfRepositoryIsIncorrect()
     {
-        $this->target->getEntitiesByIds('testEntityName', array());
+        $this->doctrineHelper->getEntitiesByIds('testEntityName', array());
     }
 
     public function testGetEntitiesByIdsMustTryToAddWhereInExpressionToQueryBuilder()
@@ -172,6 +172,6 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->target->getEntitiesByIds('testEntityName', array('12', '33', '55'));
+        $this->doctrineHelper->getEntitiesByIds('testEntityName', array('12', '33', '55'));
     }
 }
