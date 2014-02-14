@@ -118,7 +118,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ),
             'parent configuration id' => array(
                 'inputOptions' => array(
-                    'config_id' => new EntityConfigId(self::TEST_ENTITY_CLASS, 'test'),
+                    'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
                 ),
                 'expectedOptions' => array(
                     'choices' => array(self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL),
@@ -126,7 +126,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ),
             'disabled workflow' => array(
                 'inputOptions' => array(
-                    'config_id' => new EntityConfigId(self::TEST_ENTITY_CLASS, 'test'),
+                    'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
                 ),
                 'expectedOptions' => array(
                     'choices' => array(
