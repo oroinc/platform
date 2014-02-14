@@ -33,33 +33,23 @@ class MergeMassAction extends AbstractMassAction
     /** @var array */
     protected $requiredOptions = ['route', 'entity_name', 'data_identifier', 'max_element_count'];
 
+    /** @var array */
+    protected $defaultOptions = array(
+        'frontend_handle' => 'redirect',
+        'handler' => 'oro_entity_merge.mass_action.data_handler',
+        'icon' => 'random',
+        'frontend_type' => 'merge-mass',
+        'route' => 'oro_entity_merge_massaction',
+        'data_identifier' => 'id',
+        'route_parameters' => array(),
+    );
+
     /**
      * {@inheritdoc}
      */
     public function setOptions(ActionConfiguration $options)
     {
-        if (empty($options['frontend_handle'])) {
-            $options['frontend_handle'] = 'redirect';
-        }
-
-        if (empty($options['handler'])) {
-            $options['handler'] = 'oro_entity_merge.mass_action.data_handler';
-        }
-
-        if (empty($options['icon'])) {
-            $options['icon'] = 'random';
-        }
-
-        if (empty($options['frontend_type'])) {
-            $options['frontend_type'] = 'merge-mass';
-        }
-
-        if (empty($options['route'])) {
-            $options['route'] = 'oro_entity_merge_massaction';
-        }
-        if (empty($options['data_identifier'])) {
-            $options['data_identifier'] = 'id';
-        }
+        $this->setDefaultOptions($options);
 
         if (isset($options['entity_name'])) {
             $metadata = $this
@@ -78,10 +68,18 @@ class MergeMassAction extends AbstractMassAction
                 );
         }
 
-        if (!isset($options['route_parameters'])) {
-            $options['route_parameters'] = array();
-        }
-
         return parent::setOptions($options);
+    }
+
+    /**
+     * @param ActionConfiguration $options
+     */
+    protected function setDefaultOptions(ActionConfiguration $options)
+    {
+        foreach ($this->defaultOptions as $name => $value) {
+            if (!isset($options[$name])) {
+                $options[$name] = $value;
+            }
+        }
     }
 }

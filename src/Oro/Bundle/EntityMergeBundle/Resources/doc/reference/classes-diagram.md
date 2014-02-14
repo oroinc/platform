@@ -1,7 +1,5 @@
 #Classes Diagram of Entity Merge bundle#
 
----------
-
 ### Table of Contents ###
 
 - [Getting Started](./getting-started.md)
@@ -14,8 +12,6 @@
 	- [Mass action configuration](./merge-configuration.md#mass-action-configuration)
 	- [Other configurations](./merge-configuration.md#other-configurations)
 
----------
-
-**Following diagram shows dependencies between Entity Merge bundle classes** 
+**Following diagram shows dependencies between Entity Merge bundle classes**
 
 ![](../images/entity_merge_class_diagramm.png)

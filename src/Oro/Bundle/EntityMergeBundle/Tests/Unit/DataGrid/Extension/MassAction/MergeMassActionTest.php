@@ -64,6 +64,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'frontend_type'     => 'merge-mass',
                     'route'             => 'oro_entity_merge_massaction',
                     'data_identifier'   => 'id',
+                    'icon'              => 'random',
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'label'             => null,
                     'route_parameters'  => array()
@@ -76,6 +77,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
+                    'icon'              => 'custom',
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array()
@@ -86,6 +88,7 @@ class MergeMassActionTest extends \PHPUnit_Framework_TestCase
                     'handler'           => 'oro_entity_merge.mass_action.data_handler',
                     'frontend_type'     => 'custom-merge-mass',
                     'data_identifier'   => 'code',
+                    'icon'              => 'custom',
                     'max_element_count' => self::MAX_ENTITIES_COUNT,
                     'route'             => 'oro_entity_merge_massaction',
                     'route_parameters'  => array(),
