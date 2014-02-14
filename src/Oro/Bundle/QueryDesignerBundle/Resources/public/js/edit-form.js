@@ -14,7 +14,6 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
     $.widget('oroquerydesigner.editForm', {
 
         options: {
-            prefix: 'entity_',
             namePattern: /^([\w\W]*)$/,
             addButton: '.add-button',
             saveButton: '.save-button',
@@ -71,7 +70,6 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
             if (this.model) {
                 this.model.set(attrs);
             } else {
-                attrs.id = _.uniqueId(this.options.prefix);
                 model = new (this.options.collection.model)(attrs);
                 this.options.collection.add(model);
             }

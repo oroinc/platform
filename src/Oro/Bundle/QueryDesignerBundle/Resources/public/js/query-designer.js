@@ -48,8 +48,11 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
         },
 
         isEmpty: function () {
-            return this.columnsView.getCollection().isEmpty() &&
-                _.isEmpty(this.$conditions.conditionBuilder('getValue'));
+            var data;
+            if (this.storageEl && this.storageEl.val() !== '') {
+                data = JSON.parse(this.storageEl.val());
+            }
+            return !data || _.every(data, _.isEmpty);
         },
 
         changeEntity: function (entityName, columns) {
