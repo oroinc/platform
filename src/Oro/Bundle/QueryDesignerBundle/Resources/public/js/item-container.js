@@ -33,9 +33,7 @@ function($, _, __, DeleteConfirmation) {
             collection.on('reset', this._onResetCollection, this);
 
             this._initSorting();
-
-            this.element.empty();
-            this.options.collection.each(this._onModelAdded, this);
+            this._onResetCollection();
         },
 
         _initSorting: function () {
