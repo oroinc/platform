@@ -226,18 +226,21 @@
         util: {}
     } %}
     <script type="text/javascript">
-        require(['jquery', 'oro/query-designer/grouping/collection',
-                'oroquerydesigner/js/field-condition', 'oroui/js/edit-form', 'oroquerydesigner/js/item-container'
-        ], function ($, GroupingCollection) {
+        require(['jquery', 'backbone', 'oro/query-designer/grouping/model',
+                'oroquerydesigner/js/field-condition',
+                'oroui/js/edit-form', 'oroquerydesigner/js/item-container'
+        ], function ($, Backbone, GroupingModel) {
             // @todo names of inputs in form should represent model attribute
             var $elem =$('[name="oro_report_form[grouping][columnNames]"]')
                     .attr('name', 'oro_report_form[grouping][name]');
             $elem.parents('form').submit(function () {
                 $elem.attr('name', 'oro_report_form[grouping][columnNames]');
             });
+            // end
 
 
             var $editForm = $('#{{ attr.id }}');
+            // @todo move into fieldChoice type
             var $fieldChoice = $editForm.find('[data-purpose=column-selector]');
             $fieldChoice.fieldChoice({{ fieldConditionOptions|json_encode|raw }});
             $('#{{ params.entity_choice_id }}')
@@ -249,6 +252,7 @@
                             entity: $(e.target).val()
                         });
                 });
+            // end
 
             var $storage = $('#oro_report_form_definition');
             var load = function () {
@@ -263,7 +267,7 @@
 
             var data = load();
 
-            var collection = new GroupingCollection(data.grouping_columns);
+            var collection = new (Backbone.Collection)(data.grouping_columns, {model: GroupingModel});
             collection.on('add remove sort', function () {
                 data.grouping_columns = collection.toJSON();
                 save(data);
