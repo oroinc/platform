@@ -226,8 +226,9 @@
         util: {}
     } %}
     <script type="text/javascript">
-        require(['oroquerydesigner/js/field-condition', 'oroui/js/edit-form', 'oroquerydesigner/js/item-container'],
-        function ($) {
+        require(['oro/query-designer/grouping/collection', 'oroquerydesigner/js/field-condition', 'oroui/js/edit-form',
+            'oroquerydesigner/js/item-container'],
+        function (GroupingCollection, $) {
             var $editForm = $('#{{ attr.id }}');
             var $fieldChoice = $editForm.find('[data-purpose=column-selector]');
             $fieldChoice.fieldChoice({{ fieldConditionOptions|json_encode|raw }});
@@ -245,9 +246,22 @@
                 namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/
             });
 
+            var $storage = $('#oro_report_form_definition');
+            var load = function () {
+                return JSON.parse($storage.val());
+            };
+            var save = function (data) {
+                $storage.val(JSON.stringify(data));
+            }
+
+            var data = load();
+            console.log('#oro_report_form_definition:', data);
+
+            var collection = new GroupingCollection(data.grouping_columns);
+
             var $groupingItems = $editForm.find('.grouping-item-container');
             $groupingItems.itemContainer({
-                collection: new Backbone.Collection(),
+                collection: collection,
                 itemTemplateSelector: '#report-grouping-item-row',
                 //getFieldLabel: _.bind(this.getFieldLabel, this),
                 //'model:edit': _.bind(this.onModelEdit, this),
