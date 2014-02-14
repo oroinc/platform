@@ -10,8 +10,7 @@ define(['backbone', 'underscore'], function (Backbone, _) {
      */
     return Backbone.Model.extend({
         defaults: {
-            id : null,
-            name : null,
+            name : null
         },
 
         getFieldLabel: function (name) {

@@ -1,6 +1,7 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jquery-outer-html', 'jquery-ui'],
-function($, _, __, DeleteConfirmation) {
+/*jslint nomen: true*/
+define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jquery-outer-html', 'jquery-ui'
+    ], function ($, _, __, DeleteConfirmation) {
     'use strict';
 
     /**
@@ -53,7 +54,7 @@ function($, _, __, DeleteConfirmation) {
                     });
                     return ui;
                 },
-                stop: _.bind(function(e, ui) {
+                stop: _.bind(function (e, ui) {
                     this._sortCollection();
                 }, this)
             }).disableSelection();
