@@ -1,10 +1,8 @@
-{# Dummy for merge template #}
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set title = 'Merge Accounts' %}
 {% oro_title_set({}) %}
-{% set gridName = 'role-users-grid' %}
 
 {% block navButtons %}
     {{ UI.cancelButton(cancelPath) }}

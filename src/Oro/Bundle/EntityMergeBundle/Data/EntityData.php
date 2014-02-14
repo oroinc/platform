@@ -99,7 +99,6 @@ class EntityData
     public function hasEntity($entity)
     {
         foreach ($this->getEntities() as $currentEntity) {
-            // @todo Add more reliable comparing based on Doctrine
             if ($entity === $currentEntity) {
                 return true;
             }

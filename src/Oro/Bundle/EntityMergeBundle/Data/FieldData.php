@@ -76,7 +76,6 @@ class FieldData
      *
      * @param object $entity
      * @return FieldData
-     * @throws InvalidArgumentException If $entity is not an object
      */
     public function setSourceEntity($entity)
     {
