@@ -42,7 +42,7 @@
     {% set breadcrumbs = {
         'indexPath': indexPath,
         'indexLabel': indexLabel,
-        'entityTitle': title
+        'entityTitle': title|trans
     } %}
 
     {% block stats %}{% endblock %}
@@ -52,7 +52,7 @@
 
 {% block breadcrumb %}
     <ul class="breadcrumb">
-        <li>{{ indexLabel }}</li>
+        <li>{{ indexLabel|trans }}</li>
     </ul>
 {% endblock %}
 
@@ -63,14 +63,19 @@
             'widgetType': 'block',
             'url': transitionFormUrl,
             'alias': 'transition-form',
-            'loadingElement': '#main'
+            'loadingMaskEnabled': false
         }) }}
         <script type="text/javascript">
-            require(['jquery', 'oro/widget-manager', 'oro/workflow-transition-executor'],
-            function($, widgetManager, performTransition) {
+            require(['jquery', 'oro/widget-manager', 'oro/workflow-transition-executor', 'oro/navigation'],
+            function($, widgetManager, performTransition, Navigation) {
                 var saveAndTransitBtn = $('#save-and-transit');
                 saveAndTransitBtn.on('click', function(e) {
                     e.preventDefault();
+
+                    if (Navigation.isEnabled()) {
+                        var navigation = Navigation.getInstance();
+                        navigation.beforeRequest();
+                    }
 
                     widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
                         widget.once('formSave', function(data) {
