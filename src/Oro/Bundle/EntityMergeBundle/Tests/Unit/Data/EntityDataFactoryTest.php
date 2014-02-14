@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
+use Oro\Bundle\EntityMergeBundle\MergeEvents;
 
 class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EntityDataFactory $target
+     * @var EntityDataFactory
      */
-    private $target;
+    private $factory;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -39,12 +40,7 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $firstEntity;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $secondEntity;
+    private $eventDispatcher;
 
     /**
      * @var string $entitiesClassName Class name for entities
@@ -54,18 +50,16 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->entitiesClassName = 'testClassNameForEntity';
-        $this->firstEntity = $this
+
+        $this->entities[] = $this
             ->getMockBuilder('stdClass')
             ->setMockClassName($this->entitiesClassName)
             ->getMock();
 
-        $this->secondEntity = $this
+        $this->entities[] = $this
             ->getMockBuilder('stdClass')
             ->setMockClassName($this->entitiesClassName)
             ->getMock();
-
-        $this->entities[] = $this->firstEntity;
-        $this->entities[] = $this->secondEntity;
 
         $this->metadataRegistry = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry')
@@ -96,30 +90,42 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($this->entitiesClassName)
             ->will($this->returnValue($this->metadata));
 
-        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->target = new EntityDataFactory(
+        $this->factory = new EntityDataFactory(
             $this->metadataRegistry,
             $this->doctrineHelper,
-            $eventDispatcher
+            $this->eventDispatcher
         );
     }
 
-    public function testCreateEntityDataShouldReturnCorrectEntities()
+    public function testCreateEntityData()
     {
-        $result = $this->target->createEntityData($this->entitiesClassName, $this->entities);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                MergeEvents::CREATE_ENTITY_DATA,
+                $this->callback(
+                    function ($event) {
+                        self::assertInstanceOf('Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent', $event);
+                        self::assertInstanceOf('Oro\Bundle\EntityMergeBundle\Data\EntityData', $event->getEntityData());
+                        return true;
+                    }
+                )
+            );
+
+        $result = $this->factory->createEntityData($this->entitiesClassName, $this->entities);
         $this->assertEquals($result->getClassName(), $this->entitiesClassName);
         $this->assertEquals($this->metadata, $result->getMetadata());
-        $expected = $this->entities;
-        $this->assertEquals($result->getEntities(), $expected);
+        $this->assertEquals($this->entities, $result->getEntities());
     }
 
-    public function testCreateEntityDataByIdsShouldCallCreateEntityDataWithCorrectData()
+    public function testCreateEntityDataByIds()
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getEntitiesByIds')
             ->with(
-                $this->equalTo($this->entitiesClassName),
+                $this->entitiesClassName,
                 $this->callback(
                     function ($params) {
                         return $params[0] == '12' && $params[1] == '88';
@@ -128,10 +134,8 @@ class EntityDataFactoryTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnValue($this->entities));
 
-        $expected = $this->entities;
+        $result = $this->factory->createEntityDataByIds($this->entitiesClassName, array('12', '88'));
 
-        $result = $this->target->createEntityDataByIds($this->entitiesClassName, array('12', '88'));
-
-        $this->assertEquals($result->getEntities(), $expected);
+        $this->assertEquals($this->entities, $result->getEntities());
     }
 }
