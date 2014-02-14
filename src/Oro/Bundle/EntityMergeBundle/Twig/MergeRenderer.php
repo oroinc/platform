@@ -32,7 +32,7 @@ class MergeRenderer
     /**
      * Render entity label
      *
-     * @param mixed $value
+     * @param mixed $entity
      * @param EntityMetadata $metadata
      * @return string
      */
@@ -116,7 +116,7 @@ class MergeRenderer
             return (string) $value;
         }
 
-        $method = $metadata->get('merge_cast_method') ? : '__toString';
+        $method = $metadata->get('cast_method') ? : '__toString';
 
         if (method_exists($value, $method)) {
             return $value->$method();

@@ -7,11 +7,13 @@
     boolean isListValue   - is value represents list
 #}
 {% if isListValue %}
-    <ul>
-    {% for value in convertedValue %}
-        <li>{{ value }}</li>
-    {% endfor %}
-    </ul>
+    {% if value|length %}
+        <ul>
+            {% for value in convertedValue %}
+                <li>{{ value }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% else %}
     {{ convertedValue }}
 {% endif %}

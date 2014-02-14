@@ -1,7 +1,5 @@
 # Configuration  #
 
----------
-
 ### Table of Contents ###
 
 - [Getting Started](./getting-started.md)
@@ -13,8 +11,6 @@
 	- [Entity configuration](#entity-configuration)
 	- [Mass action configuration](#mass-action-configuration)
 	- [Other configurations](#other-configurations)
-	
----------
 
 ## Entity configuration ##
 
@@ -22,18 +18,27 @@ Entity can be configure on entity level and on fields level
 
 Entity level configuration
 
-         # Options for rendering entity as string in the UI.
-         # If these options are empty __toString will be used (if it's available).
-         #
-         # Method of entity to cast object to string
-         cast_method: ~
-         # Twig template to render object as string
-         template: ~
-         # Enable merge for this entity
-         enable:
-            options:
-                is_bool: true
- 
+```
+oro_entity_config:
+    # Scope of entity merge
+    merge:
+        # Attributes applicable on entity level
+        entity:
+            items:
+                # Options for rendering entity as string in the UI.
+                # If these options are empty __toString will be used (if it's available).
+                #
+                # Method of entity to cast object to string
+                cast_method: ~
+                # Twig template to render object as string
+                template: ~
+                # Enable merge for this entity
+                enable:
+                    options:
+                        is_bool: true
+                # Max entities to merge
+                max_entities_count: 5
+```
 
 Example:
 
@@ -50,7 +55,14 @@ Example:
 
 Fields Level configuration
 
-    # Label of field that should be displayed for this field in merge UI, value will be translated
+```
+oro_entity_config:
+    # Scope of entity merge
+    merge:
+        # Attributes applicable on entity fields level
+        field:
+            items:
+                # Label of field that should be displayed for this field in merge UI, value will be translated
                 label: ~
                 # Enable merge for this field
                 enable:
@@ -95,11 +107,16 @@ Fields Level configuration
                 relation_modes: ~
                 # Same as label but used for relation entity
                 relation_label: ~
+                # Same as cast_method but used for relation entity
+                relation_cast_method: ~
+
+```
 
 Example:
 
-    class Account
-    {
+```
+class Account
+{
      ...
 
     /**
@@ -109,57 +126,62 @@ Example:
      * @ConfigField(defaultValues={"merge"={"enable"=true}})
      */
     protected $name;
+```
 
 
 ## Mass action configuration ##
 
-In merge mass action you can define:
+Example of merge mass action:
 
-1. label - which will be displayed in page with grid
-2. icon - which will be displayed in page with grid
-3. data_identifier - entity identifier
-4. route - route to mass action
-5. frontend_type - frontend part of mass action, which contain validation, etc
-6. frontend_handle - mas action handler
-7. route_parameters - additional route parameters for custom routing
-8. entity_name - name of entity for merge (required)
+```
+datagrid:
 
-Example:
-
-    	   mass_actions:
-			    	merge:
-			    	type: merge
-			    	entity_name: %orocrm_account.account.entity.class%
-			    	data_identifier: a.id
-			    	label: merge
-			    	icon: edit
+    accounts-grid:
+        mass_actions:
+            merge:
+                type: merge
+                entity_name: %orocrm_account.account.entity.class%
+                data_identifier: a.id
+```
 
 
 ## Other configurations ##
 
-You can define your own "Strategy", "Steps", "Accessor" in DI by using tags with names "oro_entity_merge.strategy", "oro_entity_merge.step", "oro_entity_merge.accessor".
+You can define your own "Strategy", "Steps", "Accessor" in DI by using tags with names "oro_entity_merge.strategy",
+"oro_entity_merge.step", "oro_entity_merge.accessor".
 
-Example:
+Tagging merge strategy:
 
+```
+services:
     oro_entity_merge.strategy.replace:
         class: %oro_entity_merge.strategy.replace.class%
         arguments:
             - @oro_entity_merge.accessor.delegate
         tags:
             - { name: oro_entity_merge.strategy }
-    
+```
 
+Tagging merge step:
 
+```
+services:
 	oro_entity_merge.step.validate:
         class: %oro_entity_merge.step.validate.class%
         arguments:
             - @validator
         tags:
             - { name: oro_entity_merge.step }
+```
 
+Tagging accessor:
+
+```
+services:
 	oro_entity_merge.accessor.inverse_association:
         class: %oro_entity_merge.accessor.inverse_association.class%
         arguments:
             - @oro_entity_merge.doctrine_helper
         tags:
             - { name: oro_entity_merge.accessor }
+```

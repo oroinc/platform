@@ -46,6 +46,10 @@ class MergeMassAction extends AbstractMassAction
             $options['handler'] = 'oro_entity_merge.mass_action.data_handler';
         }
 
+        if (empty($options['icon'])) {
+            $options['icon'] = 'random';
+        }
+
         if (empty($options['frontend_type'])) {
             $options['frontend_type'] = 'merge-mass';
         }

@@ -66,3 +66,5 @@ oro_entity_config:
                 relation_modes: ~
                 # Same as label but used for relation entity
                 relation_label: ~
+                # Same as cast_method but used for relation entity
+                relation_cast_method: ~
