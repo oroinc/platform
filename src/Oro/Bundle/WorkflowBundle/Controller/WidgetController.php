@@ -21,9 +21,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 class WidgetController extends Controller
 {
@@ -92,10 +92,7 @@ class WidgetController extends Controller
      */
     public function startTransitionFormAction($transitionName, $workflowName)
     {
-        $entityId = $this->getRequest()->get('entityId');
-        if (!$entityId) {
-            throw new BadRequestHttpException('Entity identifier is required');
-        }
+        $entityId = $this->getRequest()->get('entityId', 0);
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
@@ -270,7 +267,7 @@ class WidgetController extends Controller
         $transitionsData = array();
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $transitions = $workflowManager->getStartTransitions($workflow, $entity);
+        $transitions = $workflowManager->getStartTransitions($workflow);
         /** @var Transition $transition */
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {
@@ -301,9 +298,13 @@ class WidgetController extends Controller
     protected function getEntityReference($entityClass, $entityId)
     {
         /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_workflow.doctrine_helper');
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         try {
-            $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
+            if ($entityId) {
+                $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
+            } else {
+                $entity = $doctrineHelper->createEntityInstance($entityClass);
+            }
         } catch (NotManageableEntityException $e) {
             throw new BadRequestHttpException($e->getMessage(), $e);
         }

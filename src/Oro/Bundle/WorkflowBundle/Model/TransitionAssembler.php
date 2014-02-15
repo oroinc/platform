@@ -113,13 +113,14 @@ class TransitionAssembler extends AbstractAssembler
         $transition->setName($name)
             ->setLabel($options['label'])
             ->setStepTo($steps[$stepToName])
-            ->setMessage($this->getOption($options, 'message', null))
+            ->setMessage($this->getOption($options, 'message'))
             ->setStart($this->getOption($options, 'is_start', false))
             ->setHidden($this->getOption($options, 'is_hidden', false))
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
-            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()));
+            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()))
+            ->setDisplayType($this->getOption($options, 'display_type'));
 
         $definition['pre_conditions'] = $this->addAclPreConditions($options, $definition);
         if (!empty($definition['pre_conditions'])) {
@@ -147,32 +148,29 @@ class TransitionAssembler extends AbstractAssembler
      */
     protected function addAclPreConditions(array $options, array $definition)
     {
-        $aclPreConditionDefinitionParameters = array($this->getOption($options, 'acl_resource', 'EDIT'));
-        if (!$this->getOption($options, 'acl_resource', null)) {
-            $aclPreConditionDefinitionParameters[] = '$.entity';
+        $aclResource = $this->getOption($options, 'acl_resource');
+
+        if ($aclResource) {
+            $aclPreConditionDefinition = array('parameters' => array($aclResource));
+            $aclMessage = $this->getOption($options, 'acl_message');
+            if ($aclMessage) {
+                $aclPreConditionDefinition['message'] = $aclMessage;
+            }
+            $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
+
+            if (empty($definition['pre_conditions'])) {
+                $definition['pre_conditions'] = $aclPreCondition;
+            } else {
+                $definition['pre_conditions'] = array(
+                    '@and' => array(
+                        $aclPreCondition,
+                        $definition['pre_conditions']
+                    )
+                );
+            }
         }
 
-        $aclPreConditionDefinition = array(
-            'parameters' => $aclPreConditionDefinitionParameters
-        );
-        $aclMessage = $this->getOption($options, 'acl_message', null);
-        if ($aclMessage) {
-            $aclPreConditionDefinition['message'] = $aclMessage;
-        }
-
-        $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
-        if (empty($definition['pre_conditions'])) {
-            $definition['pre_conditions'] = $aclPreCondition;
-        } else {
-            $definition['pre_conditions'] = array(
-                '@and' => array(
-                    $aclPreCondition,
-                    $definition['pre_conditions']
-                )
-            );
-        }
-
-        return $definition['pre_conditions'];
+        return !empty($definition['pre_conditions']) ? $definition['pre_conditions'] : array();
     }
 
     /**

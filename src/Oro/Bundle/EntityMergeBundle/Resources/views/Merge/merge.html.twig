@@ -1,0 +1,36 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set title = 'oro.entity_merge.action.merge'|trans({'{{ label }}': entityLabel|trans}) %}
+{% oro_title_set({params : {'{{ label }}': entityLabel|trans }}) %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(cancelPath) }}
+    {{ UI.saveAndStayButton() }}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% include 'OroUIBundle::page_title_block.html.twig' %}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'entity-merge' %}
+
+    {% set dataBlocks = [{
+        'title' : 'oro.entity_merge.form.merge_values'|trans,
+        'subblocks':
+        [
+            {
+                'title' : null,
+                'useSpan': false,
+                'data' : [form_widget(form, { 'attr': {'class': 'select2'} })]
+            }
+        ]
+    }] %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
+{% endblock %}

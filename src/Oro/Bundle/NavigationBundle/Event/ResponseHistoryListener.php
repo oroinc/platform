@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Security\Core\SecurityContextInterface;
-use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
+use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 
 class ResponseHistoryListener
 {
@@ -64,9 +66,8 @@ class ResponseHistoryListener
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        // do not process requests other than in html format
-        // with 200 OK status using GET method and not _internal and _wdt
-        if (!$this->matchRequest($response, $request)) {
+        // check if a current request can be added to a history
+        if (!$this->canAddToHistory($response, $request)) {
             return false;
         }
 
@@ -104,17 +105,28 @@ class ResponseHistoryListener
      * @param  Request  $request
      * @return bool
      */
-    private function matchRequest(Response $response, Request $request)
+    private function canAddToHistory(Response $response, Request $request)
     {
-        $route = $request->get('_route');
+        $result =
+            $response->getStatusCode() == 200
+            && $request->getRequestFormat() == 'html'
+            && $request->getMethod() == 'GET'
+            && (!$request->isXmlHttpRequest()
+                || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
+            && $this->user;
 
-        return !($response->getStatusCode() != 200
-            || $request->getRequestFormat() != 'html'
-            || $request->getMethod() != 'GET'
-            || ($request->isXmlHttpRequest()
-                && !$request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
-            || $route[0] == '_'
-            || $route == 'oro_default'
-            || is_null($this->user));
+        if ($result) {
+            $route = $request->get('_route');
+            $result = $route[0] != '_' && $route != 'oro_default';
+        }
+
+        if ($result && $response->headers->has('Content-Disposition')) {
+            $contentDisposition = $response->headers->get('Content-Disposition');
+            $result =
+                (strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_INLINE) !== 0)
+                && (strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_ATTACHMENT) !== 0);
+        }
+
+        return $result;
     }
 }

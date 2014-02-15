@@ -3,7 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilder
@@ -54,8 +56,12 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
                 ->setEntityAttributeName($entityAttributeName)
                 ->setConfiguration($workflowConfiguration);
 
-            $this->setWorkflowSteps($workflowDefinition);
+            $workflow = $this->workflowAssembler->assemble($workflowDefinition);
+
+            $this->setSteps($workflowDefinition, $workflow);
             $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
+
+            $this->setEntityAcls($workflowDefinition, $workflow);
 
             $workflowDefinitions[] = $workflowDefinition;
         }
@@ -65,11 +71,10 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
 
     /**
      * @param WorkflowDefinition $workflowDefinition
+     * @param Workflow $workflow
      */
-    protected function setWorkflowSteps(WorkflowDefinition $workflowDefinition)
+    protected function setSteps(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
-        $workflow = $this->workflowAssembler->assemble($workflowDefinition);
-
         $workflowSteps = array();
         foreach ($workflow->getStepManager()->getSteps() as $step) {
             $workflowStep = new WorkflowStep();
@@ -82,5 +87,31 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         }
 
         $workflowDefinition->setSteps($workflowSteps);
+    }
+
+    protected function setEntityAcls(WorkflowDefinition $workflowDefinition, Workflow $workflow)
+    {
+        $entityAcls = array();
+        foreach ($workflow->getAttributeManager()->getEntityAttributes() as $attribute) {
+            foreach ($workflow->getStepManager()->getSteps() as $step) {
+                $updatable = $attribute->isEntityUpdateAllowed()
+                    && $step->isEntityUpdateAllowed($attribute->getName());
+                $deletable = $attribute->isEntityDeleteAllowed()
+                    && $step->isEntityDeleteAllowed($attribute->getName());
+
+                if (!$updatable || !$deletable) {
+                    $entityAcl = new WorkflowEntityAcl();
+                    $entityAcl
+                        ->setAttribute($attribute->getName())
+                        ->setStep($workflowDefinition->getStepByName($step->getName()))
+                        ->setEntityClass($attribute->getOption('class'))
+                        ->setUpdatable($updatable)
+                        ->setDeletable($deletable);
+                    $entityAcls[] = $entityAcl;
+                }
+            }
+        }
+
+        $workflowDefinition->setEntityAcls($entityAcls);
     }
 }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class RequestEntityTest extends \PHPUnit_Framework_TestCase
@@ -118,7 +118,7 @@ class RequestEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
      * @expectedExceptionMessage Entity class "\stdClass" is not manageable.
      */
     public function testExecuteNotManageableEntity()

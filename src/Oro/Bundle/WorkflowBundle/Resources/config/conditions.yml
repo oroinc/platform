@@ -53,7 +53,7 @@ services:
 
     oro_workflow.condition.equal_to:
         class: %oro_workflow.condition.equal_to.class%
-        arguments: [@oro_workflow.context_accessor, @oro_workflow.doctrine_helper]
+        arguments: [@oro_workflow.context_accessor, @oro_entity.doctrine_helper]
         tags:
             - { name: oro_workflow.condition, alias: eq|equal }
 
@@ -123,6 +123,6 @@ services:
         arguments:
             - @oro_workflow.context_accessor
             - @oro_security.security_facade
-            - @oro_workflow.doctrine_helper
+            - @oro_entity.doctrine_helper
         tags:
             - { name: oro_workflow.condition, alias: acl_granted }
