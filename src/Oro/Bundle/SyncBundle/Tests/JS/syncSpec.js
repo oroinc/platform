@@ -11,9 +11,9 @@ function (sync, requirejsExposure) {
 
         beforeEach(function () {
             service = jasmine.createSpyObj('service', ['subscribe', 'unsubscribe', 'connect']);
-            service.on = jasmine.createSpy('service.on').andReturn(service);
-            service.once = jasmine.createSpy('service.once').andReturn(service);
-            service.off = jasmine.createSpy('service.off').andReturn(service);
+            service.on = jasmine.createSpy('service.on').and.returnValue(service);
+            service.once = jasmine.createSpy('service.once').and.returnValue(service);
+            service.off = jasmine.createSpy('service.off').and.returnValue(service);
 
             messenger = jasmine.createSpyObj('messenger', ['notificationMessage', 'notificationFlashMessage']);
 
@@ -47,25 +47,25 @@ function (sync, requirejsExposure) {
             var connectionLostHandler;
             beforeEach(function () {
                 sync(service);
-                connectionLostHandler = service.on.mostRecentCall.args[1];
+                connectionLostHandler = service.on.calls.mostRecent().args[1];
             });
 
             it('show message', function () {
                 connectionLostHandler();
                 expect(messenger.notificationMessage).toHaveBeenCalled();
-                expect(messenger.notificationMessage.mostRecentCall.args[2]).toEqual({flash: false});
+                expect(messenger.notificationMessage.calls.mostRecent().args[2]).toEqual({flash: false});
                 connectionLostHandler({retries: 1});
-                expect(messenger.notificationMessage.mostRecentCall.args[2]).toEqual({flash: true});
+                expect(messenger.notificationMessage.calls.mostRecent().args[2]).toEqual({flash: true});
             });
 
             it('setup connection_established handler', function () {
                 connectionLostHandler();
                 expect(service.off).toHaveBeenCalled();
-                expect(service.off.mostRecentCall.args[1]).toEqual(jasmine.any(Function));
+                expect(service.off.calls.mostRecent().args[1]).toEqual(jasmine.any(Function));
                 expect(service.once).toHaveBeenCalledWith('connection_established', jasmine.any(Function));
-                expect(service.once.mostRecentCall.args[1]).toEqual(service.off.mostRecentCall.args[1]);
+                expect(service.once.calls.mostRecent().args[1]).toEqual(service.off.calls.mostRecent().args[1]);
                 // check connection established handler
-                (service.once.mostRecentCall.args[1])();
+                (service.once.calls.mostRecent().args[1])();
                 expect(messenger.notificationFlashMessage).toHaveBeenCalled();
             });
         });
@@ -78,8 +78,8 @@ function (sync, requirejsExposure) {
             beforeEach(function () {
                 exposure.substitute('service').by(service);
                 model = jasmine.createSpyObj('model', ['set']);
-                model.on = jasmine.createSpy('model.on').andReturn(model);
-                model.url = jasmine.createSpy('model.url').andReturn('some/model/1');
+                model.on = jasmine.createSpy('model.on').and.returnValue(model);
+                model.url = jasmine.createSpy('model.url').and.returnValue('some/model/1');
             });
 
             it('subscribe new model', function () {
@@ -94,9 +94,9 @@ function (sync, requirejsExposure) {
                 expect(service.subscribe).toHaveBeenCalledWith(model.url(), jasmine.any(Function));
                 expect(model.on).toHaveBeenCalledWith('remove', unsubscribeModel);
                 // same callback function event
-                setModelAttrsCallback = service.subscribe.mostRecentCall.args[1];
+                setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
                 subscribeModel(model);
-                expect(service.subscribe.mostRecentCall.args[1]).toBe(setModelAttrsCallback);
+                expect(service.subscribe.calls.mostRecent().args[1]).toBe(setModelAttrsCallback);
             });
 
             it('unsubscribe new model', function () {
@@ -109,7 +109,7 @@ function (sync, requirejsExposure) {
                 var setModelAttrsCallback;
                 model.id = 1;
                 subscribeModel(model);
-                setModelAttrsCallback = service.subscribe.mostRecentCall.args[1];
+                setModelAttrsCallback = service.subscribe.calls.mostRecent().args[1];
                 unsubscribeModel(model);
                 expect(service.unsubscribe).toHaveBeenCalledWith(model.url(), setModelAttrsCallback);
             });
@@ -121,7 +121,7 @@ function (sync, requirejsExposure) {
             });
 
             describe('tracking changes', function () {
-                var obj, subscribeModel, unsubscribeModel,
+                var subscribeModel, unsubscribeModel,
                     Backbone = {
                         Model: function () {},
                         Collection: function () {
@@ -143,7 +143,7 @@ function (sync, requirejsExposure) {
                 });
 
                 it('of any object', function () {
-                    obj = {};
+                    var obj = {};
                     sync.keepRelevant(obj);
                     expect(subscribeModel).not.toHaveBeenCalled();
                     sync.stopTracking(obj);
@@ -151,34 +151,35 @@ function (sync, requirejsExposure) {
                 });
 
                 it('of Backbone.Model', function () {
-                    obj = new Backbone.Model();
-                    sync.keepRelevant(obj);
-                    expect(subscribeModel.callCount).toEqual(1);
-                    sync.stopTracking(obj);
-                    expect(unsubscribeModel.callCount).toEqual(1);
+                    var model = new Backbone.Model();
+                    sync.keepRelevant(model);
+                    expect(subscribeModel.calls.count()).toEqual(1);
+                    sync.stopTracking(model);
+                    expect(unsubscribeModel.calls.count()).toEqual(1);
                 });
 
                 describe('of Backbone.Collection', function () {
+                    var collection;
                     beforeEach(function () {
-                        obj = new Backbone.Collection();
-                        obj.url = 'some/model';
-                        obj.models = [new Backbone.Model(), new Backbone.Model(), new Backbone.Model()];
+                        collection = new Backbone.Collection();
+                        collection.url = 'some/model';
+                        collection.models = [new Backbone.Model(), new Backbone.Model(), new Backbone.Model()];
                     });
 
                     it('tracking collection changes', function () {
-                        sync.keepRelevant(obj);
-                        expect(subscribeModel.callCount).toEqual(obj.models.length);
-                        expect(obj.on).toHaveBeenCalled();
-                        sync.stopTracking(obj);
-                        expect(unsubscribeModel.callCount).toEqual(obj.models.length);
-                        expect(obj.off).toHaveBeenCalledWith(obj.on.mostRecentCall.args[0]);
+                        sync.keepRelevant(collection);
+                        expect(subscribeModel.calls.count()).toEqual(collection.models.length);
+                        expect(collection.on).toHaveBeenCalled();
+                        sync.stopTracking(collection);
+                        expect(unsubscribeModel.calls.count()).toEqual(collection.models.length);
+                        expect(collection.off).toHaveBeenCalledWith(collection.on.calls.mostRecent().args[0]);
                     });
 
                     describe('consistency of handling events', function () {
                         var events;
                         beforeEach(function () {
-                            sync.keepRelevant(obj);
-                            events = obj.on.mostRecentCall.args[0];
+                            sync.keepRelevant(collection);
+                            events = collection.on.calls.mostRecent().args[0];
                         });
 
                         it('collection "add" event', function () {
@@ -187,21 +188,21 @@ function (sync, requirejsExposure) {
 
                         it('collection "error" event', function () {
                             expect(events.error).toEqual(jasmine.any(Function));
-                            events.error(obj);
+                            events.error(collection);
                             // remove subscription for each models
-                            expect(unsubscribeModel.callCount).toEqual(obj.models.length);
+                            expect(unsubscribeModel.calls.count()).toEqual(collection.models.length);
                         });
 
                         it('collection "reset" event', function () {
-                            var options = {previousModels: obj.models};
-                            obj.models = [new Backbone.Model(), new Backbone.Model()];
-                            subscribeModel.reset();
+                            var options = {previousModels: collection.models};
+                            collection.models = [new Backbone.Model(), new Backbone.Model()];
+                            subscribeModel.calls.reset();
                             expect(events.reset).toEqual(jasmine.any(Function));
-                            events.reset(obj, options);
+                            events.reset(collection, options);
                             // remove subscription for each previous models
-                            expect(unsubscribeModel.callCount).toEqual(options.previousModels.length);
+                            expect(unsubscribeModel.calls.count()).toEqual(options.previousModels.length);
                             // add subscription for each new models
-                            expect(subscribeModel.callCount).toEqual(obj.models.length);
+                            expect(subscribeModel.calls.count()).toEqual(collection.models.length);
                         });
                     });
                 });
