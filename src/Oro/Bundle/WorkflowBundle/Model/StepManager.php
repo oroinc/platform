@@ -13,9 +13,9 @@ class StepManager
     protected $steps;
 
     /**
-     * @param Collection $steps
+     * @param Collection|Step[] $steps
      */
-    public function __construct(Collection $steps = null)
+    public function __construct($steps = null)
     {
         $this->setSteps($steps);
     }

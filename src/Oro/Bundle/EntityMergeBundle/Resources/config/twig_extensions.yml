@@ -1,0 +1,18 @@
+parameters:
+    oro_entity_merge.twig.extension.class: Oro\Bundle\EntityMergeBundle\Twig\MergeExtension
+    oro_entity_merge.twig.renderer.class: Oro\Bundle\EntityMergeBundle\Twig\MergeRenderer
+
+services:
+    oro_entity_merge.twig.extension:
+        class: %oro_entity_merge.twig.extension.class%
+        arguments:
+            - @oro_entity_merge.accessor
+            - @oro_entity_merge.twig.renderer
+        tags:
+            - { name: twig.extension }
+
+    oro_entity_merge.twig.renderer:
+        class: %oro_entity_merge.twig.renderer.class%
+        arguments:
+            - @twig
+            - 'OroEntityMergeBundle:Form:mergeValue.html.twig'

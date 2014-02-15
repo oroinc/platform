@@ -50,8 +50,8 @@ define(['jquery', 'underscore'], function ($, _) {
             var data = {};
             for (var i = 0 ; i < nvp.length ; i++) {
                 var pair  = nvp[i].split('=');
-                var name  = this._decodeComponent(pair[0]);
-                var value = this._decodeComponent(pair[1]);
+                var name  = this.decodeUriComponent(pair[0]);
+                var value = this.decodeUriComponent(pair[1]);
 
                 var path = name.match(/(^[^\[]+)(\[.*\]$)?/);
                 var first = path[1];
@@ -76,7 +76,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * @return {String}
          * @protected
          */
-        _decodeComponent: function(string) {
+        decodeUriComponent: function(string) {
             var result = string.replace('+', '%20');
             result = decodeURIComponent(result);
             return result;

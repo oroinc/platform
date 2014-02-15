@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityConfigBundle\Event\Events;
-use Oro\Bundle\EntityConfigBundle\Event\NewFieldConfigModelEvent;
+use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
 
 class EntityConfigSubscriber implements EventSubscriberInterface
 {
@@ -16,14 +15,14 @@ class EntityConfigSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            Events::NEW_FIELD_CONFIG_MODEL => 'newField'
+            Events::NEW_FIELD_CONFIG => 'newFieldConfig'
         );
     }
 
     /**
-     * @param NewFieldConfigModelEvent $event
+     * @param FieldConfigEvent $event
      */
-    public function newField(NewFieldConfigModelEvent $event)
+    public function newFieldConfig(FieldConfigEvent $event)
     {
         $configProvider = $event->getConfigManager()->getProvider('entity');
         $config = $configProvider->getConfig($event->getClassName(), $event->getFieldName());

@@ -1,5 +1,6 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as ui %}
+{% oro_title_set({ params : {"%form.title%": entity.title} }) %}
 
 {% block navButtons %}
     {% if resource_granted('oro_embedded_form_delete') %}
@@ -8,7 +9,7 @@
             'dataRedirect': path('oro_embedded_form_list'),
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-embedded-form',
-            'entity_label': 'oro.embedded_form.entity.label'|trans,
+            'entity_label': 'oro.embeddedform.entity_label'|trans,
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -23,7 +24,7 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_embedded_form_list'),
-        'indexLabel': 'oro.embedded_form.entity.plural_label'|trans,
+        'indexLabel': 'oro.embeddedform.entity_plural_label'|trans,
         'entityTitle': entity.title
     } %}
     {{ parent() }}
@@ -39,20 +40,20 @@
     <div class="widget-content">
             <div class="row-fluid form-horizontal">
                 <div class="responsive-block">
-                    {{ ui.renderProperty('oro.embedded_form.title.label'|trans, entity.title) }}
-                    {{ ui.renderProperty('oro.embedded_form.form_type.label'|trans, entity.formType) }}
-                    {{ ui.renderProperty('oro.embedded_form.channel.label'|trans, entity.channel.name) }}
+                    {{ ui.renderProperty('oro.embeddedform.title.label'|trans, entity.title) }}
+                    {{ ui.renderProperty('oro.embeddedform.form_type.label'|trans, entity.formType) }}
+                    {{ ui.renderProperty('oro.embeddedform.channel.label'|trans, entity.channel.name) }}
 
                     {# to display css in a div with vertical scroll #}
                     <div class="control-group">
-                        <label class="control-label">{{ 'oro.embedded_form.css.label'|trans }}</label>
+                        <label class="control-label">{{ 'oro.embeddedform.css.label'|trans }}</label>
 
                         <div class="controls" style="overflow-y: scroll; height: 180px;">
                             {{ entity.css|nl2br }}
                         </div>
                     </div>
 
-                    {{ ui.renderProperty('oro.embedded_form.successMessage.label'|trans, entity.successMessage|escape) }}
+                    {{ ui.renderProperty('oro.embeddedform.success_message.label'|trans, entity.successMessage|escape) }}
                 </div>
             </div>
         </div>

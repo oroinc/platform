@@ -55,7 +55,9 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param string $type
+     * Gets all configuration values for the given config type
+     *
+     * @param string|ConfigIdInterface $type
      * @return array
      */
     public function getItems($type = self::TYPE_ENTITY)
@@ -293,7 +295,9 @@ class PropertyConfigContainer
     }
 
     /**
-     * @param $type
+     * Gets a string represents a type of a config
+     *
+     * @param string|ConfigIdInterface $type
      * @return string
      */
     protected function getConfigType($type)

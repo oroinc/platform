@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EntityAttributeNormalizer implements AttributeNormalizer
 {
@@ -43,7 +43,8 @@ class EntityAttributeNormalizer implements AttributeNormalizer
 
         $this->validateAttributeValue($workflow, $attribute, $attributeValue);
 
-        return $this->doctrineHelper->getEntityIdentifier($attributeValue);
+        $identifier = $this->doctrineHelper->getEntityIdentifier($attributeValue);
+        return $identifier ? : null;
     }
 
     /**

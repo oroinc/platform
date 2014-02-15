@@ -38,7 +38,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
     {
         $className   = 'testClass';
         $scope       = 'testScope';
-        $configId    = new EntityConfigId($className, $scope);
+        $configId    = new EntityConfigId($scope, $className);
         $config      = new Config($configId);
         $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
 
@@ -52,7 +52,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
     {
         $className   = 'testClass';
         $scope       = 'testScope';
-        $configId    = new EntityConfigId($className, $scope);
+        $configId    = new EntityConfigId($scope, $className);
         $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
 
         $this->cacheProvider->expects($this->once())
@@ -75,7 +75,7 @@ class ConfigCacheTest extends \PHPUnit_Framework_TestCase
     {
         $className   = 'testClass';
         $scope       = 'testScope';
-        $configId    = new EntityConfigId($className, $scope);
+        $configId    = new EntityConfigId($scope, $className);
         $config      = new Config($configId);
         $configCache = new ConfigCache($this->cacheProvider, $this->modelCacheProvider);
 

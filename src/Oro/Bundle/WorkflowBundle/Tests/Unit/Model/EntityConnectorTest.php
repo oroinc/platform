@@ -99,4 +99,10 @@ class EntityConnectorTest extends \PHPUnit_Framework_TestCase
     {
         $this->entityConnector->getWorkflowStep(new \DateTime());
     }
+
+    public function testIsWorkflowItemAware()
+    {
+        $this->assertTrue($this->entityConnector->isWorkflowAware(new EntityWithWorkflow()));
+        $this->assertFalse($this->entityConnector->isWorkflowAware(new \DateTime()));
+    }
 }
