@@ -51,9 +51,9 @@ class EntitySecurityMetadataProvider
         CacheProvider $cache = null
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->extendConfigProvider = $extendConfigProvider;
-        $this->cache = $cache;
+        $this->entityConfigProvider   = $entityConfigProvider;
+        $this->extendConfigProvider   = $extendConfigProvider;
+        $this->cache                  = $cache;
     }
 
     /**
@@ -73,7 +73,7 @@ class EntitySecurityMetadataProvider
     /**
      * Gets metadata for all entities marked with the given security type.
      *
-     * @param  string                   $securityType The security type. Defaults to ACL.
+     * @param  string $securityType The security type. Defaults to ACL.
      * @return EntitySecurityMetadata[]
      */
     public function getEntities($securityType = self::ACL_SECURITY_TYPE)
@@ -158,15 +158,13 @@ class EntitySecurityMetadataProvider
             if (!$data) {
                 $securityConfigs = $this->securityConfigProvider->getConfigs();
                 foreach ($securityConfigs as $securityConfig) {
+                    $className = $securityConfig->getId()->getClassName();
                     if ($securityConfig->get('type') === $securityType
-                        && !in_array(
-                            $this->extendConfigProvider->getConfig(
-                                $securityConfig->getId()->getClassName()
-                            )->get('state'),
-                            ExtendManager::$nonShownEntitiesStates
+                        && $this->extendConfigProvider->getConfig($className)->in(
+                            'state',
+                            [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED]
                         )
                     ) {
-                        $className = $securityConfig->getId()->getClassName();
                         $label = '';
                         if ($this->entityConfigProvider->hasConfig($className)) {
                             $label = $this->entityConfigProvider

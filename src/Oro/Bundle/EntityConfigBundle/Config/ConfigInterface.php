@@ -3,48 +3,80 @@
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 interface ConfigInterface extends \Serializable
 {
     /**
+     * Returns id of an object for which an instance of this class stores configuration data.
+     *
      * @return ConfigIdInterface
      */
     public function getId();
 
     /**
-     * @param  string $code
-     * @param  bool   $strict
-     * @return mixed
+     * Gets a value of a configuration parameter.
+     *
+     * @param string $code    The code (name) a configuration parameter
+     * @param bool   $strict  Set to true if this method must raise an exception
+     *                        when the requested parameter does not exist
+     * @return mixed|null     The parameter value of null if the requested parameter does not exist
+     *                        and $strict = false
+     * @throws RuntimeException When $strict = true and the requested parameter does not exist
      */
     public function get($code, $strict = false);
 
     /**
+     * Sets a value of the given configuration parameter.
+     *
      * @param string $code
      * @param mixed  $value
+     * @return $this
      */
     public function set($code, $value);
 
     /**
+     * Checks whether a configuration parameter with the given code exists on not.
+     *
      * @param string $code
      * @return bool
      */
     public function has($code);
 
     /**
+     * Checks id a value of a configuration parameter equals to $value.
+     *
      * @param string $code
-     * @param bool   $value
+     * @param mixed  $value
      * @return bool
      */
     public function is($code, $value = true);
 
     /**
-     * @param callable $filter
+     * Checks if a config value exists in $values array
+     *
+     * @param string $code
+     * @param array  $values
+     * @param bool   $strict If this parameter is set to TRUE then this method also check the types of a config value
+     *                       and items in $values array.
+     * @return bool
+     */
+    public function in($code, array $values, $strict = false);
+
+    /**
+     * Returns parameters is filtered using the given callback function.
+     * Returns all parameters if $filter argument is not specified.
+     *
+     * @param callable|null $filter The callback function to be used to filter parameters
      * @return array
      */
     public function all(\Closure $filter = null);
 
     /**
-     * @param $values
+     * Replace all parameters with parameters specified in $values argument.
+     *
+     * @param array $values
+     * @return $this
      */
     public function setValues($values);
 }

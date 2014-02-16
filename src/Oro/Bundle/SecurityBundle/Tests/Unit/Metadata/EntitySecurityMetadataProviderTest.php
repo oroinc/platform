@@ -28,7 +28,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Config
      */
-    protected $config;
+    protected $extendConfig;
 
     protected function setUp()
     {
@@ -41,8 +41,8 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
         $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->config = new Config(new EntityConfigId('testClass', 'test'));
-        $this->config->set('state', ExtendManager::STATE_ACTIVE);
+        $this->extendConfig = new Config(new EntityConfigId('extend', 'SomeClass'));
+        $this->extendConfig->set('state', ExtendManager::STATE_ACTIVE);
         $this->cache = $this->getMockForAbstractClass(
             'Doctrine\Common\Cache\CacheProvider',
             array(),
@@ -57,7 +57,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($this->config));
+            ->will($this->returnValue($this->extendConfig));
     }
 
     public function testIsProtectedEntity()
@@ -97,31 +97,11 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit_Framework_TestCase
             ->with('SomeClass')
             ->will($this->returnValue($entityConfig));
 
-        $securityConfigId = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityConfigId->expects($this->exactly(2))
-            ->method('getClassName')
-            ->will($this->returnValue('SomeClass'));
-
-        $securityConfig = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityConfig->expects($this->at(0))
-            ->method('get')
-            ->with('type')
-            ->will($this->returnValue(Provider::ACL_SECURITY_TYPE));
-        $securityConfig->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($securityConfigId));
-        $securityConfig->expects($this->at(3))
-            ->method('get')
-            ->with('permissions')
-            ->will($this->returnValue('All'));
-        $securityConfig->expects($this->at(4))
-            ->method('get')
-            ->with('group_name')
-            ->will($this->returnValue('SomeGroup'));
+        $securityConfigId = new EntityConfigId('security', 'SomeClass');
+        $securityConfig = new Config($securityConfigId);
+        $securityConfig->set('type', Provider::ACL_SECURITY_TYPE);
+        $securityConfig->set('permissions', 'All');
+        $securityConfig->set('group_name', 'SomeGroup');
 
         $securityConfigs = array($securityConfig);
         $this->securityConfigProvider->expects($this->any())

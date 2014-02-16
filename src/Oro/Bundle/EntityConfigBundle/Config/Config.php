@@ -33,9 +33,7 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Returns id of an object for which an instance of this class stores configuration data.
-     *
-     * @return ConfigIdInterface
+     * {@inheritdoc}
      */
     public function getId()
     {
@@ -43,14 +41,7 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Gets a value of a configuration parameter.
-     *
-     * @param string $code    The code (name) a configuration parameter
-     * @param bool   $strict  Set to true if this method must raise an exception
-     *                        when the requested parameter does not exist
-     * @return mixed|null     The parameter value of null if the requested parameter does not exist
-     *                        and $strict = false
-     * @throws RuntimeException When $strict = true and the requested parameter does not exist
+     * {@inheritdoc}
      */
     public function get($code, $strict = false)
     {
@@ -66,11 +57,7 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Sets a value of the given configuration parameter.
-     *
-     * @param string $code
-     * @param mixed  $value
-     * @return $this
+     * {@inheritdoc}
      */
     public function set($code, $value)
     {
@@ -80,10 +67,7 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Checks whether a configuration parameter with the given code exists on not.
-     *
-     * @param string $code
-     * @return bool
+     * {@inheritdoc}
      */
     public function has($code)
     {
@@ -91,11 +75,7 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Checks id a value of a configuration parameter equals to $value.
-     *
-     * @param string $code
-     * @param mixed  $value
-     * @return bool
+     * {@inheritdoc}
      */
     public function is($code, $value = true)
     {
@@ -103,11 +83,15 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Returns parameters is filtered using the given callback function.
-     * Returns all parameters if $filter argument is not specified.
-     *
-     * @param callable|null $filter The callback function to be used to filter parameters
-     * @return array
+     * {@inheritdoc}
+     */
+    public function in($code, array $values, $strict = false)
+    {
+        return in_array($this->get($code), $values, $strict);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function all(\Closure $filter = null)
     {
@@ -117,10 +101,7 @@ class Config implements ConfigInterface
     }
 
     /**
-     * Replace all parameters with parameters specified in $values argument.
-     *
-     * @param array $values
-     * @return $this
+     * {@inheritdoc}
      */
     public function setValues($values)
     {

@@ -184,7 +184,7 @@ class ConfigFieldGridController extends Controller
                     $this->get('translator')->trans('oro.entity_extend.controller.config_field.message.saved')
                 );
 
-                if ($extendEntityConfig->get('state') != ExtendManager::STATE_NEW) {
+                if (!$extendEntityConfig->is('state', ExtendManager::STATE_NEW)) {
                     $extendEntityConfig->set('state', ExtendManager::STATE_UPDATED);
                 }
 

@@ -24,7 +24,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Config
      */
-    protected $config;
+    protected $extendConfig;
 
     protected function setUp()
     {
@@ -34,7 +34,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->config               = new Config(new EntityConfigId('testClass', 'test'));
+        $this->extendConfig        = new Config(new EntityConfigId('extend', 'testClass'));
         $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
@@ -173,20 +173,20 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnCallback(
                     function ($param) {
-                        $this->config->set('state', ExtendManager::STATE_ACTIVE);
+                        $this->extendConfig->set('state', ExtendManager::STATE_ACTIVE);
                         if ($param == 'Acme\Entity\Test4') {
-                            $this->config->set('state', ExtendManager::STATE_NEW);
+                            $this->extendConfig->set('state', ExtendManager::STATE_NEW);
                         }
                         if ($param == 'Acme\Entity\Test4') {
-                            $this->config->set('state', ExtendManager::STATE_DELETED);
+                            $this->extendConfig->set('state', ExtendManager::STATE_DELETED);
                         }
-                        return $this->config;
+                        return $this->extendConfig;
                     }
                 )
             );
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
-            ->will($this->returnValue($this->config));
+            ->will($this->returnValue($this->extendConfig));
 
         // sort by plural label
         $result   = $this->provider->getEntities();

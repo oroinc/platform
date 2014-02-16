@@ -33,10 +33,10 @@ class EntityProvider
     /**
      * Constructor
      *
-     * @param ConfigProvider $entityConfigProvider
-     * @param ConfigProvider $extendConfigProvider
+     * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
-     * @param Translator $translator
+     * @param Translator          $translator
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -74,7 +74,7 @@ class EntityProvider
      * Returns entity
      *
      * @param string $entityName Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool $translate    Flag means that label, plural label should be translated
+     * @param bool   $translate  Flag means that label, plural label should be translated
      * @return array contains entity details:
      *                           .    'name'          - entity full class name
      *                           .    'label'         - entity label
@@ -102,22 +102,22 @@ class EntityProvider
      * Adds entities to $result
      *
      * @param array $result
-     * @param bool $translate
+     * @param bool  $translate
      */
     protected function addEntities(array &$result, $translate)
     {
         // only configurable entities are supported
         $configs = $this->entityConfigProvider->getConfigs();
         foreach ($configs as $config) {
-            if (!in_array(
-                $this->extendConfigProvider->getConfig(
-                    $config->getId()->getClassName()
-                )->get('state'),
-                ExtendManager::$nonShownEntitiesStates
-            )) {
+            $className = $config->getId()->getClassName();
+            if ($this->extendConfigProvider->getConfig($className)->in(
+                'state',
+                [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED]
+            )
+            ) {
                 $this->addEntity(
                     $result,
-                    $config->getId()->getClassName(),
+                    $className,
                     $config->get('label'),
                     $config->get('plural_label'),
                     $config->get('icon'),
@@ -130,12 +130,12 @@ class EntityProvider
     /**
      * Adds an entity to $result
      *
-     * @param array $result
+     * @param array  $result
      * @param string $name
      * @param string $label
      * @param string $pluralLabel
      * @param string $icon
-     * @param bool $translate
+     * @param bool   $translate
      */
     protected function addEntity(array &$result, $name, $label, $pluralLabel, $icon, $translate)
     {
