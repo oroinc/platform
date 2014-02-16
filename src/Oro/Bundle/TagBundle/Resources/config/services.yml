@@ -24,6 +24,7 @@ parameters:
 
     oro_tag.owner_assignment_checker.tag.class: Oro\Bundle\TagBundle\Ownership\TagOwnerAssignmentChecker
 
+    oro_tag.event_listener.merge_listener.class: Oro\Bundle\TagBundle\EventListener\MergeListener
 services:
     oro_tag.tag.manager:
         class: %oro_tag.tag.manager.class%
@@ -147,3 +148,13 @@ services:
         class: %oro_tag.owner_assignment_checker.tag.class%
         tags:
             - { name: oro_organization.owner_assignment_checker, entity: Oro\Bundle\TagBundle\Entity\Tag }
+
+    # Merge listener
+    oro_tag.event_listener.merge_listener:
+        class: %oro_tag.event_listener.merge_listener.class%
+        arguments:
+          - @oro_tag.tag.manager
+        tags:
+          - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata }
+          - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
+          - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }

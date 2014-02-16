@@ -1,0 +1,4 @@
+oro_entity_merge:
+    resource:     "@OroEntityMergeBundle/Controller"
+    type:         annotation
+    prefix:       /

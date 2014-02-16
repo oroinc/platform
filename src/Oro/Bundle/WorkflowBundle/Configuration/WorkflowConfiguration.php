@@ -238,8 +238,7 @@ class WorkflowConfiguration implements ConfigurationInterface
                 ->validate()
                     ->always(
                         function ($value) {
-                            if ($value['display_type'] == 'page'
-                                && (!array_key_exists('form_options', $value) || empty($value['form_options']))) {
+                            if ($value['display_type'] == 'page' && empty($value['form_options'])) {
                                 throw new WorkflowException(
                                     'Display type "page" require "form_options" to be set.'
                                 );

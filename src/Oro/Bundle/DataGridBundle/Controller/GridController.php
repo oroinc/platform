@@ -113,15 +113,9 @@ class GridController extends Controller
     {
         $request = $this->getRequest();
 
-        /** @var MassActionParametersParser $massActionParametersParser */
-        $parametersParser = $this->get('oro_datagrid.mass_action.parameters_parser');
-        $parameters       = $parametersParser->parse($request);
-
-        $requestData = array_merge($request->query->all(), $request->request->all());
-
         /** @var MassActionDispatcher $massActionDispatcher */
         $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
-        $response             = $massActionDispatcher->dispatch($gridName, $actionName, $parameters, $requestData);
+        $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
 
         $data = [
             'successful' => $response->isSuccessful(),
