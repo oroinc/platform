@@ -314,4 +314,40 @@ abstract class AbstractDateFilter extends AbstractFilter
 
         return $metadata;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processParams($data)
+    {
+        $type = $data['type'];
+        $part = $data['part'];
+        $value = $data['value'];
+
+        $value['start'] = $this->replaceDateVariables($value['start']);
+        $value['end']   = $this->replaceDateVariables($value['end']);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return string replaced actual datetime value
+     */
+    protected function replaceDateVariables($value)
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        // TODO: we need here value ids intead of var names
+        $value = trim($value, '{} ');
+        switch ($value) {
+            case '':
+                break;
+            default:
+                break;
+        }
+
+        return $value;
+    }
 }

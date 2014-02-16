@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -31,6 +32,9 @@ abstract class AbstractDateFilterType extends AbstractType
 
     /** @var DatevariablesInterface */
     protected $dateVars;
+
+    /** @var null|array */
+    protected $dateVarsChoices = null;
 
     /**
      * @param TranslatorInterface    $translator
@@ -83,14 +87,27 @@ abstract class AbstractDateFilterType extends AbstractType
                     self::PART_DOY     => $t->trans('oro.filter.form.label_date_part.dayofyear'),
                     self::PART_YEAR    => $t->trans('oro.filter.form.label_date_part.year'),
                 ],
-                'date_vars' => array_map(
-                    function ($item) use ($t) {
-                        return $t->trans($item);
-                    },
-                    $this->dateVars->getDateVariables()
-                ),
+                'date_vars' => $this->getDateVariables(),
             ]
         );
+    }
+
+    /**
+     * @return array|null
+     */
+    protected function getDateVariables()
+    {
+        if (is_null($this->dateVarsChoices)) {
+            $t = $this->translator;
+            $this->dateVarsChoices = array_map(
+                function ($item) use ($t) {
+                    return $t->trans($item);
+                },
+                $this->dateVars->getDateVariables()
+            );
+        }
+
+        return $this->dateVarsChoices;
     }
 
     /**
@@ -104,5 +121,14 @@ abstract class AbstractDateFilterType extends AbstractType
         $view->vars['widget_options'] = array_merge($widgetOptions, $options['widget_options']);
         $view->vars['date_parts']     = $options['date_parts'];
         $view->vars['date_vars']      = $options['date_vars'];
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if (!isset($options['date_parts'])) {
+            $options['date_parts'] = [];
+        }
+
+        $builder->add('part', 'choice', ['choices' => $options['date_parts']]);
     }
 }
