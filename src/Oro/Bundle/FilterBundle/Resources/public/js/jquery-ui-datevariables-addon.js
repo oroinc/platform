@@ -88,7 +88,7 @@
         },
 
         _getDatevariablesByDatepart: function(datePart) {
-            var dateVars = this.inst.settings.dateVars,
+            var dateVars = this.inst.settings.dateVarsGetter(datePart),
                 result = [];
 
             // TODO: filter vars based on datePart
@@ -109,11 +109,11 @@
             // Prevent displaying twice
             if ($dp.find("div.ui-datevariables-div").length === 0 && o.showDatevariables) {
                 var html = '<div class="ui-datevariables-div'+ (o.isRTL? ' ui-datevariables-rtl' : '') +'"><dl>' +
-                        '<dt class="ui_dvars_time_label">Date variables</dt>';
+                        '<dt class="ui_dvars_time_label">Available variables</dt>';
 
                 for (var varCode in dateVars) {
                     html += '<dd class="ui_dvars_content">' +
-                        '<a class="ui_dvariable" href="#" data-code="' + varCode + '">{{ ' + o.dateVars[varCode] + ' }}</a></dd>';
+                        '<a class="ui_dvariable" href="#" data-code="' + varCode + '">' + dateVars[varCode] + '</a></dd>';
                 }
                 html += '</dl></div>';
 

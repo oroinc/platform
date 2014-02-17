@@ -110,6 +110,28 @@ function($, _, __, ChoiceFilter, localeSettings) {
          */
         initialize: function () {
             _.extend(this.dateWidgetOptions, this.externalWidgetOptions);
+
+            this.dateWidgetOptions.dateVarsGetter = function(part){
+                var result = {};
+                if (part == 'value') {
+                    for (var i in this.dateVars) {
+                        if (i > 7) {
+                            break;
+                        }
+                        result[i] = this.dateVars[i];
+                    }
+                } else {
+                    for (var i in this.dateVars) {
+                        if (i < 7) {
+                            continue;
+                        }
+                        result[i] = this.dateVars[i];
+                    }
+                }
+
+                return result;
+            };
+
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
@@ -344,11 +366,11 @@ function($, _, __, ChoiceFilter, localeSettings) {
 
             if (mode == 'raw') {
                 for (var varCode in dateVars) {
-                    value = value.replace(new RegExp('{{ ' + dateVars[varCode] + ' }}', 'g'), '{{' + varCode+'}}');
+                    value = value.replace(new RegExp(dateVars[varCode], 'g'), '{{' + varCode+'}}');
                 }
             } else {
                 for (var varCode in dateVars) {
-                    value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), '{{ ' + dateVars[varCode] + ' }}');
+                    value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[varCode]);
                 }
             }
 
