@@ -73,8 +73,8 @@ class JobTest extends \PHPUnit_Framework_TestCase
             'End time after test beginning'
         );
         $this->assertGreaterThanOrEqual(
-            $jobExecution->getEndTime(),
             $jobExecution->getStartTime(),
+            $jobExecution->getEndTime(),
             'End time after start time'
         );
         // No step executed, must be not completed
