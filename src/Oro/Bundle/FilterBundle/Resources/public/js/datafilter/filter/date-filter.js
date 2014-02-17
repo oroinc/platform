@@ -289,6 +289,14 @@ function($, _, __, ChoiceFilter, localeSettings) {
         _formatDisplayValue: function(value) {
             var fromFormat = this.dateWidgetOptions.altFormat;
             var toFormat = this.dateWidgetOptions.dateFormat;
+
+            if (value.value && value.value.start) {
+                value.value.start = this._replaceDateVars(value.value.start, 'display');
+            }
+            if (value.value && value.value.end) {
+                value.value.end = this._replaceDateVars(value.value.end, 'display');
+            }
+
             return this._formatValueDates(value, fromFormat, toFormat);
         },
 
@@ -298,6 +306,14 @@ function($, _, __, ChoiceFilter, localeSettings) {
         _formatRawValue: function(value) {
             var fromFormat = this.dateWidgetOptions.dateFormat;
             var toFormat = this.dateWidgetOptions.altFormat;
+
+            if (value.value && value.value.start) {
+                value.value.start = this._replaceDateVars(value.value.start, 'raw');
+            }
+            if (value.value && value.value.end) {
+                value.value.end = this._replaceDateVars(value.value.end, 'raw');
+            }
+
             return this._formatValueDates(value, fromFormat, toFormat);
         },
 
@@ -317,6 +333,24 @@ function($, _, __, ChoiceFilter, localeSettings) {
             if (value.value && value.value.end) {
                 value.value.end = this._formatDate(value.value.end, fromFormat, toFormat);
             }
+            return value;
+        },
+
+        _replaceDateVars: function(value, mode)
+        {
+            // replace date variables with constant values
+            var dateVars = this.dateWidgetOptions.dateVars;
+
+            if (mode == 'raw') {
+                for (var varCode in dateVars) {
+                    value = value.replace(new RegExp('{{ ' + dateVars[varCode] + ' }}', 'g'), '{{' + varCode+'}}');
+                }
+            } else {
+                for (var varCode in dateVars) {
+                    value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), '{{ ' + dateVars[varCode] + ' }}');
+                }
+            }
+
             return value;
         },
 
