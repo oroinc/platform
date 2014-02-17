@@ -157,11 +157,11 @@ class ExtendConfigDumper
                     }
                 }
 
-                if ($fieldConfig->get('state') != ExtendManager::STATE_DELETED) {
+                if (!$fieldConfig->is('state', ExtendManager::STATE_DELETED)) {
                     $fieldConfig->set('state', ExtendManager::STATE_ACTIVE);
                 }
 
-                if ($fieldConfig->get('state') == ExtendManager::STATE_DELETED) {
+                if ($fieldConfig->is('state', ExtendManager::STATE_DELETED)) {
                     $fieldConfig->set('is_deleted', true);
                 }
 
@@ -172,7 +172,7 @@ class ExtendConfigDumper
         $extendProvider->flush();
 
         $entityConfig->set('state', $entityState);
-        if ($entityConfig->get('state') == ExtendManager::STATE_DELETED) {
+        if ($entityConfig->is('state', ExtendManager::STATE_DELETED)) {
             $entityConfig->set('is_deleted', true);
 
             $extendProvider->map(

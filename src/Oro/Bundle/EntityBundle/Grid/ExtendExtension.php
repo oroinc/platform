@@ -170,10 +170,11 @@ class ExtendExtension extends AbstractExtension
 
             $fieldIds = $entityProvider->getIds($entityName);
             foreach ($fieldIds as $fieldId) {
-                if ($extendProvider->getConfigById($fieldId)->is('owner', ExtendManager::OWNER_CUSTOM)
+                $extendConfig = $extendProvider->getConfigById($fieldId);
+                if ($extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
                     && $datagridProvider->getConfigById($fieldId)->is('is_visible')
-                    && !$extendProvider->getConfigById($fieldId)->is('state', ExtendManager::STATE_NEW)
-                    && !$extendProvider->getConfigById($fieldId)->is('is_deleted')
+                    && !$extendConfig->is('state', ExtendManager::STATE_NEW)
+                    && !$extendConfig->is('is_deleted')
                 ) {
                     $fields[] = $fieldId;
                 }
