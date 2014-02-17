@@ -139,7 +139,7 @@
     <script type="text/javascript">
         require(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/loading-mask', 'routing',
             'oro/query-designer', 'oro/delete-confirmation', 'oro/query-designer/grouping/model',
-            'oroentity/js/fields-loader', 'oroquerydesigner/js/edit-form', 'oroquerydesigner/js/item-container'],
+            'oroentity/js/fields-loader', 'oroui/js/items-manager/editor', 'oroui/js/items-manager/table'],
         function($, _, Backbone, __, LoadingMask, routing, QueryDesigner, DeleteConfirmation, GroupingModel) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
@@ -229,11 +229,11 @@
                     $storage.val(JSON.stringify(data));
                 });
 
-                $editForm.editForm({
+                $editForm.itemsManagerEditor({
                     namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
                     collection: collection
                 });
-                $editForm.find('.grouping-item-container').itemContainer({
+                $editForm.find('.grouping-item-container').itemsManagerTable({
                     collection: collection,
                     itemTemplateSelector: '#report-grouping-item-row'
                 });

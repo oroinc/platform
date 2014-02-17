@@ -11,8 +11,7 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
         }
     }
 
-    $.widget('oroquerydesigner.editForm', {
-
+    $.widget('oroui.itemsManagerEditor', {
         options: {
             namePattern: /^([\w\W]*)$/,
             addButton: '.add-button',

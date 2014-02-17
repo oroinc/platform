@@ -15,7 +15,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
      *
      * Uses options.itemTemplateSelector for item rendering
      */
-    $.widget('oroquerydesigner.itemContainer', {
+    $.widget('oroui.itemsManagerTable', {
         options: {
             itemTemplateSelector: null,
             selectors: {
