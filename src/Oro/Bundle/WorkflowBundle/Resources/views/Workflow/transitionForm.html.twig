@@ -71,19 +71,21 @@
                 var saveAndTransitBtn = $('#save-and-transit');
                 var navigation = Navigation.getInstance();
 
+                widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
+                    if (Navigation.isEnabled()) {
+                        widget.once('beforeContentLoad', function() {
+                            navigation.beforeRequest();
+                        });
+                    }
+
+                    widget.once('formSave', function(data) {
+                        performTransition(saveAndTransitBtn, data)
+                    });
+                });
+
                 saveAndTransitBtn.on('click', function(e) {
                     e.preventDefault();
-
                     widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
-                        if (Navigation.isEnabled()) {
-                            widget.on('beforeContentLoad', function() {
-                                navigation.beforeRequest();
-                            });
-                        }
-
-                        widget.once('formSave', function(data) {
-                            performTransition(saveAndTransitBtn, data)
-                        });
                         widget.form.submit();
                     });
                 });
