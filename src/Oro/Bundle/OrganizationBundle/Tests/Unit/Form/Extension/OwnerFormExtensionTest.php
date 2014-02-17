@@ -115,6 +115,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')
             ->disableOriginalConstructor()
             ->getMock();
+        $config->expects($this->any())->method('getCompound')->will($this->returnValue(true));
         $config->expects($this->any())->method('getDataClass')->will($this->returnValue($this->entityClassName));
         $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
@@ -148,6 +149,29 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetExtendedType()
     {
         $this->assertEquals('form', $this->extension->getExtendedType());
+    }
+
+    public function testNotCompoundForm()
+    {
+        $config = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->any())->method('getCompound')->will($this->returnValue(false));
+
+        $this->builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->builder->expects($this->any())->method('getFormConfig')->will($this->returnValue($config));
+        $this->builder->expects($this->never())
+            ->method('add');
+
+        $this->securityContext->expects($this->never())
+            ->method('getToken');
+
+        $this->ownershipMetadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        $this->extension->buildForm($this->builder, array());
     }
 
     public function testAnonymousUser()

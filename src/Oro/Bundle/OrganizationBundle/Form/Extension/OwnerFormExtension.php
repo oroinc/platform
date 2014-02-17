@@ -151,7 +151,12 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $dataClassName = $builder->getFormConfig()->getDataClass();
+        $formConfig = $builder->getFormConfig();
+        if (!$formConfig->getCompound()) {
+            return;
+        }
+
+        $dataClassName = $formConfig->getDataClass();
         if (!$dataClassName) {
             return;
         }
