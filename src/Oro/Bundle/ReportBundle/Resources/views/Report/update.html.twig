@@ -260,6 +260,8 @@
                 });
                 // end grouping
 
+                ColumnModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
+                ColumnModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
                 var columnCollection = new (Backbone.Collection)(load().columns, {model: ColumnModel});
                 columnCollection.on('add remove sort', function () {

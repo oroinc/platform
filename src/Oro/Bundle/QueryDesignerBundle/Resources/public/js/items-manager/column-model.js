@@ -13,6 +13,11 @@ define(['underscore', 'oroui/js/items-manager/abstract-model'], function (_, Abs
             label: null,
             func: null,
             sorting: null
+        },
+
+        getNameLabel: function () {
+            var name = this.get('name');
+            return name ? this.nameTemplate(this.util.splitFieldId(name)) : '';
         }
     });
 });
