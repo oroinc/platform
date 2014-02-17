@@ -219,7 +219,8 @@
 
                 var $storage = $('#oro_report_form_definition');
                 var load = function () {
-                    return JSON.parse($storage.val());
+                    var data = $storage.val();
+                    return data ? JSON.parse(data) : {};
                 };
 
                 var collection = new (Backbone.Collection)(load().grouping_columns, {model: GroupingModel});
