@@ -39,7 +39,6 @@ abstract class AbstractDateFilter extends AbstractFilter
 
         $this->applyDependingOnType(
             $data['type'],
-            $datePart,
             $ds,
             $dateStartValue,
             $dateEndValue,
