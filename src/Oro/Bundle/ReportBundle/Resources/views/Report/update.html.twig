@@ -186,8 +186,9 @@
     <script type="text/javascript">
         require(['jquery', 'underscore', 'backbone',
             'oro/query-designer', 'oroquerydesigner/js/items-manager/grouping-model',
+            'oroquerydesigner/js/items-manager/column-model',
             'oroui/js/items-manager/editor', 'oroui/js/items-manager/table'],
-        function($, _, Backbone, QueryDesigner,GroupingModel) {
+        function($, _, Backbone, QueryDesigner,GroupingModel, ColumnModel) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
                 {#console.log({{ metadata|json_encode|raw }});#}
@@ -260,8 +261,17 @@
                 // end grouping
 
 
+                var columnCollection = new (Backbone.Collection)(load().columns, {model: ColumnModel});
+                columnCollection.on('add remove sort', function () {
+                    var data = load();
+                    data.columns = columnCollection.toJSON();
+                    $storage.val(JSON.stringify(data));
+                });
 
-                //designer.render();
+                $('.query-designer-columns-grid-container .item-container').itemsManagerTable({
+                    collection: columnCollection,
+                    itemTemplateSelector: '#report-column-row'
+                });
             });
         });
     </script>

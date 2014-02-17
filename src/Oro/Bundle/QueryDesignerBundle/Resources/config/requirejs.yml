@@ -9,6 +9,7 @@ config:
         'oro/query-designer/column/model': 'bundles/oroquerydesigner/js/query-designer/column/model.js'
         'oro/query-designer/column/view': 'bundles/oroquerydesigner/js/query-designer/column/view.js'
         'oro/query-designer/grouping/model': 'bundles/oroquerydesigner/js/query-designer/grouping/model.js'
+        'oro/query-designer/column/model': 'bundles/oroquerydesigner/js/query-designer/column/model.js'
 
         'oroquerydesigner/js/condition-builder': 'bundles/oroquerydesigner/js/condition-builder.js'
         'oroquerydesigner/js/field-condition': 'bundles/oroquerydesigner/js/field-condition.js'
