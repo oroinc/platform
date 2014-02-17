@@ -64,6 +64,14 @@ define(['jquery', 'underscore', 'oro/datafilter/date-filter', 'oro/locale-settin
             var dateToFormat = this.dateWidgetOptions.dateFormat;
             var timeFromFormat = this.dateWidgetOptions.altTimeFormat;
             var timeToFormat = this.dateWidgetOptions.timeFormat;
+
+            if (value.value && value.value.start) {
+                value.value.start = this._replaceDateVars(value.value.start, 'display');
+            }
+            if (value.value && value.value.end) {
+                value.value.end = this._replaceDateVars(value.value.end, 'display');
+            }
+
             return this._formatValueDatetimes(value, dateFromFormat, dateToFormat, timeFromFormat, timeToFormat);
         },
 
@@ -75,6 +83,14 @@ define(['jquery', 'underscore', 'oro/datafilter/date-filter', 'oro/locale-settin
             var dateToFormat = this.dateWidgetOptions.altFormat;
             var timeFromFormat = this.dateWidgetOptions.timeFormat;
             var timeToFormat = this.dateWidgetOptions.altTimeFormat;
+
+            if (value.value && value.value.start) {
+                value.value.start = this._replaceDateVars(value.value.start, 'raw');
+            }
+            if (value.value && value.value.end) {
+                value.value.end = this._replaceDateVars(value.value.end, 'raw');
+            }
+
             return this._formatValueDatetimes(value, dateFromFormat, dateToFormat, timeFromFormat, timeToFormat);
         },
 

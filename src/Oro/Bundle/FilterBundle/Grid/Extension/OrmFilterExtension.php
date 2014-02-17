@@ -82,6 +82,7 @@ class OrmFilterExtension extends AbstractExtension
             if ($value !== false) {
                 $form = $filter->getForm();
                 if (!$form->isSubmitted()) {
+                    $value = $filter->processParams($value);
                     $form->submit($value);
                 }
 

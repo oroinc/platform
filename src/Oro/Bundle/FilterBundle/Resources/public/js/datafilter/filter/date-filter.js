@@ -114,6 +114,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
                     type: (_.isEmpty(this.choices) ? '' : _.first(this.choices).value),
+                    part: 'value',
                     value: {
                         start: '',
                         end: ''

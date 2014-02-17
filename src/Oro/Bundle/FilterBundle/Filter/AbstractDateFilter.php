@@ -403,8 +403,8 @@ abstract class AbstractDateFilter extends AbstractFilter
 
         if (preg_match_all('#{{(\d+)}}#', $value, $matches)) {
             $varsCodes = $matches[1];
-            $values = [];
 
+            // TODO: calculate if few var items passed
             foreach ($varsCodes as $code) {
                 switch ($code) {
                     case DatevariablesInterface::VAR_NOW:
@@ -437,13 +437,12 @@ abstract class AbstractDateFilter extends AbstractFilter
                         $dateValue->firstOfYear();
                         break;
                     default:
-                        $dateValue = '';
+                        $dateValue = Carbon::now(new \DateTimeZone('UTC'));
                         break;
                 }
-
-                $values[] = $dateValue;
             }
-            $value = str_replace($matches[0], $values, $value);
+
+            $value = (string)$dateValue;
         } else {
             $value = '';
         }
