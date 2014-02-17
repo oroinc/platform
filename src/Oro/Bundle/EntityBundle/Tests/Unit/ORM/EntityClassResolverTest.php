@@ -78,9 +78,10 @@ class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManagerInterface')
             ->disableOriginalConstructor()
-            ->getMock();
+            ->setMethods(array('getConfiguration'))
+            ->getMockForAbstractClass();
         $em->expects($this->exactly(2))
             ->method('getConfiguration')
             ->will($this->returnValue($config));

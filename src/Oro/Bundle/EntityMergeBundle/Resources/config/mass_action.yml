@@ -1,0 +1,25 @@
+parameters:
+    oro_entity_merge.mass_action.merge.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassAction
+    oro_entity_merge.mass_action.data_handler.class: Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler
+    oro_entity_merge.mass_action.merge_mass_action_listener.class: Oro\Bundle\EntityMergeBundle\EventListener\DataGrid\MergeMassActionListener
+services:
+    oro_entity_merge.mass_action.merge:
+        class: %oro_entity_merge.mass_action.merge.class%
+        arguments:
+            - @oro_entity_merge.metadata.registry
+            - @translator
+        scope: prototype
+        tags:
+            - { name:  oro_datagrid.extension.mass_action.type, type: merge }
+
+    oro_entity_merge.mass_action.data_handler:
+        class: %oro_entity_merge.mass_action.data_handler.class%
+        arguments:
+            - @oro_entity_merge.doctrine_helper
+
+    oro_entity_merge.mass_action.merge_mass_action_listener:
+       class: %oro_entity_merge.mass_action.merge_mass_action_listener.class%
+       arguments:
+           - @oro_entity_merge.metadata.registry
+       tags:
+           - { name: kernel.event_listener, event: oro_datagrid.datgrid.build.before, method: onBuildBefore }

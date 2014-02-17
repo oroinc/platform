@@ -101,7 +101,7 @@ abstract class AbstractAssembler
      * @param mixed $default
      * @return mixed
      */
-    protected function getOption(array $options, $key, $default)
+    protected function getOption(array $options, $key, $default = null)
     {
         if (isset($options[$key])) {
             return $options[$key];

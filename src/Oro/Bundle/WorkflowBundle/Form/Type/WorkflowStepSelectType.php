@@ -58,10 +58,11 @@ class WorkflowStepSelectType extends AbstractType
                             throw new \Exception('Either "workflow_name" or "workflow_entity_class" must be set');
                         }
 
-                        $qb = function (EntityRepository $er) use ($workflow) {
+                        $definition = $workflow ? $workflow->getDefinition() : null;
+                        $qb = function (EntityRepository $er) use ($definition) {
                             return $er->createQueryBuilder('ws')
                                 ->where('ws.definition = :workflowDefinition')
-                                ->setParameter('workflowDefinition', $workflow->getDefinition())
+                                ->setParameter('workflowDefinition', $definition)
                                 ->orderBy('ws.stepOrder', 'ASC')
                                 ->orderBy('ws.label', 'ASC');
                         };

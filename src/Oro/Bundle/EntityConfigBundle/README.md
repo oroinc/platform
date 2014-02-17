@@ -117,9 +117,10 @@ $configProvider = $this->get('oro_entity_config.provider.extend');
 This class is the central access point to entity configuration functionality. It allows to load/save configuration data from/into the database, manage configuration data, manage configuration data cache, retrieve the configuration provider for particular scope, and other.
 
 ### Events
- - Events::NEW_ENTITY_CONFIG_MODEL - This event is raised when a new configurable entity is found and we are going to add its metadata to the database.
- - Events::NEW_FIELD_CONFIG_MODEL - This event is raised when a new configurable entity field is found and we are going to add its metadata to the database.
- - Events::PRE_PERSIST_CONFIG - This event is raised just before new or changed configuration data is persisted in to the database.
+ - Events::NEW_ENTITY_CONFIG    - This event is raised when a new configurable entity is found and we are going to add its metadata to the database.
+ - Events::UPDATE_ENTITY_CONFIG - This event is raised when we are going to update configurable entity metadata in the database.
+ - Events::NEW_FIELD_CONFIG     - This event is raised when a new configurable entity field is found and we are going to add its metadata to the database.
+ - Events::PRE_PERSIST_CONFIG   - This event is raised just before new or changed configuration data is persisted in to the database.
 
 Initialize configuration data
 -----------------------------

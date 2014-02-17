@@ -1,0 +1,3 @@
+oro_titles:
+    oro_workflow_start_transition_form: %%workflow_title%%
+    oro_workflow_transition_form: %%workflow_title%%
