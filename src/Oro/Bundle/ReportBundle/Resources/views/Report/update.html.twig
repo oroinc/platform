@@ -137,15 +137,61 @@
         'deep-level': 2
     } %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/loading-mask', 'routing',
-            'oro/query-designer', 'oro/delete-confirmation', 'oroquerydesigner/js/items-manager/grouping-model',
-            'oroentity/js/fields-loader', 'oroui/js/items-manager/editor', 'oroui/js/items-manager/table'],
-        function($, _, Backbone, __, LoadingMask, routing, QueryDesigner, DeleteConfirmation, GroupingModel) {
-            $(function() {
-                var entities = {{ entities|json_encode|raw }};
+        require(['jquery', 'underscore', 'oro/translator', 'oro/loading-mask', 'oro/delete-confirmation',
+            'oroentity/js/fields-loader'],
+            function ($, _, __, LoadingMask, DeleteConfirmation) {
                 var $entityChoice = $('#oro_report_form_entity');
                 var loadingMask = new LoadingMask();
-                var designer = new QueryDesigner({
+                var confirm = new DeleteConfirmation({
+                    title: __('Change Entity Confirmation'),
+                    okText: __('Yes, I Agree'),
+                    content: __('Are you sure you want to change entity?')
+                });
+
+                $('#report-designer').append(loadingMask.render().$el);
+
+                $entityChoice
+                    .fieldsLoader({
+                        router: 'oro_api_get_entity_fields',
+                        routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
+                        confirm: confirm,
+                        requireConfirm: function () {
+                            var data = $('#oro_report_form_definition').val();
+                            if (!data) {
+                                return false;
+                            }
+                            try {
+                                data = JSON.parse(data);
+                            } catch (e) {
+                                return false;
+                            }
+                            return _.some(data, function (value) {
+                                return !_.isEmpty(value);
+                            });
+                        }
+                    })
+                    .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
+                    .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
+
+                {% if not form.entity.vars.value is empty %}
+                {% set fieldsData = render(path('oro_api_get_entity_fields', {
+                        'entityName': form.entity.vars.value|replace({'\\': '_'})
+                    }|merge(entityFieldsRouteParams))) %};
+                $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
+                {% endif %}
+            });
+    </script>
+
+
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'backbone',
+            'oro/query-designer', 'oroquerydesigner/js/items-manager/grouping-model',
+            'oroui/js/items-manager/editor', 'oroui/js/items-manager/table'],
+        function($, _, Backbone, QueryDesigner,GroupingModel) {
+            $(function() {
+                var entities = {{ entities|json_encode|raw }};
+                {#console.log({{ metadata|json_encode|raw }});#}
+                /*var designer = new QueryDesigner({
                     el: '#report-designer',
                     storageElementSelector: '#oro_report_form_definition',
                     columnChainTemplateSelector: '#report-column-chain-template',
@@ -161,13 +207,9 @@
                         itemFormSelector: '#report-column-form'
                     },
                     conditionBuilderSelector: '#report-condition-builder'
-                });
-                var confirm = new DeleteConfirmation({
-                    title: __('Change Entity Confirmation'),
-                    okText: __('Yes, I Agree'),
-                    content: __('Are you sure you want to change entity?')
-                });
+                });*/
 
+                // common extra options for field-choice inputs
                 var fieldChoiceOptions = {
                     select2: {
                         formatSelectionTemplate: $('#report-column-chain-template').text()
@@ -178,41 +220,18 @@
                         }
                     }
                 };
+
+                // mixin extra options to condition-builder's field choice
                 var $fieldConditionCriteria = $('#filter-criteria-list').find('[data-criteria=condition-item]');
                 $.extend(true, $fieldConditionCriteria.data('options'), {
                     fieldChoice: fieldChoiceOptions,
                     filters: {{ metadata.filters|json_encode|raw }}
                 });
 
-                $('#report-designer').append(loadingMask.render().$el);
-
-                $entityChoice
-                    .fieldsLoader({
-                        router: 'oro_api_get_entity_fields',
-                        routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
-                        confirm: confirm,
-                        requireConfirm: function () {
-                            return !designer.isEmpty();
-                        }
-                    })
-                    .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
-                    .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask))
-                    .on('fieldsloaderupdate', function (e, fields) {
-                        designer.changeEntity($entityChoice.val(), fields);
-                    });
-
-                {% if not form.entity.vars.value is empty %}
-                {% set fieldsData = render(path('oro_api_get_entity_fields', {
-                        'entityName': form.entity.vars.value|replace({'\\': '_'})
-                    }|merge(entityFieldsRouteParams))) %};
-                $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
-                {% endif %}
-
-
                 // grouping
                 var $editForm = $('#report-grouping-form');
                 var $groupingFieldChoice = $editForm.find('[data-purpose=column-selector]');
-                $groupingFieldChoice.fieldChoice(fieldChoiceOptions);
+                $groupingFieldChoice.fieldChoice(fieldChoiceOptions, {{ metadata.grouping|json_encode|raw }});
 
                 GroupingModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
                 GroupingModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
@@ -242,7 +261,7 @@
 
 
 
-                designer.render();
+                //designer.render();
             });
         });
     </script>

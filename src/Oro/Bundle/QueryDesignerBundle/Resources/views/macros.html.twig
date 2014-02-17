@@ -5,6 +5,7 @@
                 placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
             },
             util: {},
+            fieldsLoaderSelector: '#' ~ params.entity_choice_id
         }
     } %}
     <div class="condition-builder left-panel-container">
@@ -40,12 +41,6 @@
             $('#{{ params.entity_choice_id }}')
                 .on('fieldsloaderupdate', function (e, fields) {
                     $conditions.conditionBuilder('setValue', []);
-                    $.extend(true, $fieldConditionCriteria.data('options'), {
-                        fieldChoice: {
-                            fields: fields,
-                            entity: $(e.target).val()
-                        }
-                    });
                     $fieldConditionCriteria
                         .toggleClass('disabled', $.isEmptyObject(fields));
                 });
@@ -219,7 +214,8 @@
         select2: {
             placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
         },
-        util: {}
+        util: {},
+        fieldsLoaderSelector: '#' ~ params.entity_choice_id
     } %}
     <script type="text/javascript">
         require(['jquery', 'oroentity/js/field-choice'], function ($) {
@@ -233,19 +229,8 @@
             // end
 
 
-            // @todo move into fieldChoice type
-            var $fieldChoice = $('#{{ attr.id }}').find('[data-purpose=column-selector]');
-            $fieldChoice.fieldChoice({{ fieldConditionOptions|json_encode|raw }});
-            $('#{{ params.entity_choice_id }}')
-                .on('fieldsloaderupdate', function (e, fields) {
-                    $fieldChoice
-                        .fieldChoice('setValue', '')
-                        .fieldChoice({
-                            fields: fields,
-                            entity: $(e.target).val()
-                        });
-                });
-            // end
+            $('#{{ attr.id }}').find('[data-purpose=column-selector]')
+                    .fieldChoice({{ fieldConditionOptions|json_encode|raw }});
         });
     </script>
 {% endmacro %}

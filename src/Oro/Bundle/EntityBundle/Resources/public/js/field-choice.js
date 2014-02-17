@@ -31,7 +31,8 @@ define(['jquery', 'underscore', 'oro/entity-field-select-util', 'oro/entity-fiel
                 collapsibleResults: true,
                 dropdownAutoWidth: true
             },
-            exclude: []
+            exclude: [],
+            fieldsLoaderSelector: ''
         },
 
         _create: function () {
@@ -44,23 +45,14 @@ define(['jquery', 'underscore', 'oro/entity-field-select-util', 'oro/entity-fiel
                     }
                 }
             });
+
+            this._bindFieldsLoader();
         },
 
         _init: function () {
             $.extend(this.entityFieldUtil, this.options.util);
-            this.options.fields = this.entityFieldUtil._convertData(this.options.fields, this.options.entity, null);
-            if (!_.isEmpty(this.options.exclude)) {
-                this.options.fields = filterFields(this.options.fields, this.options.exclude);
-            }
-            this.element
-                .data('entity', this.options.entity)
-                .data('data', this.options.fields);
-
             this._processSelect2Options();
-
-            this.element.select2($.extend({
-                data: this.options.fields
-            }, this.options.select2));
+            this._updateData(this.options.entity, this.options.fields);
         },
 
         _setOption: function (key, value) {
@@ -87,6 +79,32 @@ define(['jquery', 'underscore', 'oro/entity-field-select-util', 'oro/entity-fiel
                     return item.id ? template(entityFieldUtil.splitFieldId(item.id)) : '';
                 };
             }
+        },
+
+        _bindFieldsLoader: function () {
+            var self = this, $fieldsLoader;
+            if (!this.options.fieldsLoaderSelector) {
+                return;
+            }
+            $fieldsLoader = $(this.options.fieldsLoaderSelector);
+            $fieldsLoader.on('fieldsloaderupdate', function (e, fields) {
+                self.setValue('');
+                self._updateData($(e.target).val(), fields);
+            });
+            this._updateData($fieldsLoader.val(), $fieldsLoader.data('fields'));
+        },
+
+        _updateData: function (entity, fields) {
+            this.options.entity = entity;
+            this.options.fields = fields;
+            fields = this.entityFieldUtil._convertData(fields, entity, null);
+            if (!_.isEmpty(this.options.exclude)) {
+                fields = filterFields(fields, this.options.exclude);
+            }
+            this.element
+                .data('entity', entity)
+                .data('data', fields);
+            this.element.select2($.extend({data: fields}, this.options.select2));
         },
 
         getApplicableConditions: function (fieldId) {
