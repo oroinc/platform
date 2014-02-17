@@ -185,10 +185,10 @@
 
     <script type="text/javascript">
         require(['jquery', 'underscore', 'backbone',
-            'oro/query-designer', 'oroquerydesigner/js/items-manager/grouping-model',
+            'oroquerydesigner/js/items-manager/grouping-model',
             'oroquerydesigner/js/items-manager/column-model',
             'oroui/js/items-manager/editor', 'oroui/js/items-manager/table'],
-        function($, _, Backbone, QueryDesigner,GroupingModel, ColumnModel) {
+        function($, _, Backbone, GroupingModel, ColumnModel) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
                 {#console.log({{ metadata|json_encode|raw }});#}
