@@ -3,16 +3,16 @@
 <div class="widget-content">
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
-            {% set iconContent = [
-                '<div class="clearfix-oro"><p class="control-label"><i class="',
-                    entity_config.get('icon'),
-                ' hide-text"></i> (',
-                    entity_config.get('icon'),
-                ')</p></div>'
-            ] %}
+            {% set entityIcon = entity_config.get('icon') %}
+            {% set iconContent = null %}
+            {% if entityIcon %}
+                {% set iconContent %}
+                    <i class="{{ entityIcon }} hide-text"></i> ({{ entityIcon }})
+                {% endset %}
+            {% endif %}
 
             {{ ui.renderProperty('Name'|trans, entity_name) }}
-            {{ ui.renderAttribute('Icon'|trans, iconContent|join) }}
+            {{ ui.renderProperty('Icon'|trans, iconContent) }}
             {{ ui.renderProperty(
                 'Label'|trans,
                 (entity_config.get('label') == entity_config.get('label')|trans)
