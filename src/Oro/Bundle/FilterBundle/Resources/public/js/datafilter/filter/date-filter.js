@@ -168,7 +168,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
          */
         render: function () {
             var value = _.extend({}, this.emptyValue, this.value);
-            var part  = _.extend({}, this.emptyPart, this.datePart);
+            var part  = _.extend({}, this.emptyPart, {value: this.value.part, type: this.value.part});
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
             var selectedPartLabel   = this._getSelectedChoiceLabel('dateParts', part);
@@ -182,7 +182,7 @@ function($, _, __, ChoiceFilter, localeSettings) {
                     datePartTemplate({
                         name: this.name+'_part',
                         choices: this.dateParts,
-                        selectedChoice: value.type,
+                        selectedChoice: value.part,
                         selectedChoiceLabel: selectedPartLabel
                     })
                 );
