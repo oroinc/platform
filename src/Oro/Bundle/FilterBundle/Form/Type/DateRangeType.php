@@ -56,6 +56,15 @@ class DateRangeType extends AbstractType
                 $options['end_field_options']
             )
         );
+
+        $builder->add(
+            'start_hidden',
+            'hidden'
+        );
+        $builder->add(
+            'end_hidden',
+            'hidden'
+        );
     }
 
     /**

@@ -67,15 +67,6 @@
             });
 
             tp_inst.$input = $input;
-
-            if (o.altField) {
-                tp_inst.$altInput = $(o.altField).css({
-                    cursor: 'pointer'
-                }).focus(function() {
-                    $input.trigger("focus");
-                });
-            }
-
             tp_inst.$input.bind('focus', function() {
                 tp_inst._onFocus();
             });
@@ -141,8 +132,11 @@
                 }
 
                 $(".ui-datevariables-div a.ui_dvariable").click(function(e) {
-                    var variable = this.text;
+                    var variable = this.text,
+                        code = this.dataset.code;
                     tp_inst.$input.val(variable);
+                    tp_inst.$input.next('input[type=hidden]').val(code);
+
                     tp_inst.$input.trigger("change");
                     e.preventDefault();
                 });
