@@ -447,3 +447,47 @@
     });
 </script>
 {% endblock %}
+
+{% block oro_entity_create_or_select_row %}
+    {{ block('oro_entity_create_or_select_label') }}
+    {{ block('oro_entity_create_or_select_widget') }}
+{% endblock %}
+
+{% block oro_entity_create_or_select_label %}
+    {% spaceless %}
+        {% if label is not sameas(false) %}
+            {% if not compound %}
+                {% set label_attr = label_attr|merge({'for': id}) %}
+            {% endif %}
+            {% if required %}
+                {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+            {% endif %}
+            {% if label is empty %}
+                {% set label = name|humanize %}
+            {% endif %}
+            <h4{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</h4>
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}
+
+{% block oro_entity_create_or_select_widget %}
+    {% set currentMode = form.mode.vars.value|default('create') %}
+    <span>Rendering mode. Allowed modes: create, grid, view. Current mode is <i>{{ currentMode }}</i>.</span>
+    {{ form_widget(form.mode) }}
+
+    <div style="padding:20px;">
+        <span>New entity form</span>
+        {{ form_widget(form.new_entity) }}
+    </div>
+
+    <div style="padding:20px;">
+        <span>Grid to select entity: {{ form.vars.grid_name }}</span>
+    </div>
+
+    <div style="padding:20px;">
+        <span>Existing entity view. Widget options: {{ dump(form.vars.view_widgets) }}</span>
+        {{ form_widget(form.existing_entity) }}
+    </div>
+{% endblock %}
+
+
