@@ -69,15 +69,18 @@
             require(['jquery', 'oro/widget-manager', 'oro/workflow-transition-executor', 'oro/navigation'],
             function($, widgetManager, performTransition, Navigation) {
                 var saveAndTransitBtn = $('#save-and-transit');
+                var navigation = Navigation.getInstance();
+
                 saveAndTransitBtn.on('click', function(e) {
                     e.preventDefault();
 
-                    if (Navigation.isEnabled()) {
-                        var navigation = Navigation.getInstance();
-                        navigation.beforeRequest();
-                    }
-
                     widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
+                        if (Navigation.isEnabled()) {
+                            widget.on('beforeContentLoad', function() {
+                                navigation.beforeRequest();
+                            });
+                        }
+
                         widget.once('formSave', function(data) {
                             performTransition(saveAndTransitBtn, data)
                         });
