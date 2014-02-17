@@ -23,6 +23,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -311,9 +312,14 @@ class ConfigFieldGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
+        $isFieldExist = class_exists($field->getEntity()->getClassName())
+            && property_exists(
+                $field->getEntity()->getClassName(),
+                ExtendConfigDumper::FIELD_PREFIX . $field->getFieldName()
+            );
         $fieldConfig->set(
             'state',
-            class_exists($field->getEntity()->getClassName()) ? ExtendManager::STATE_UPDATED : ExtendManager::STATE_NEW
+            $isFieldExist ? ExtendManager::STATE_UPDATED : ExtendManager::STATE_NEW
         );
 
         $configManager->persist($fieldConfig);
