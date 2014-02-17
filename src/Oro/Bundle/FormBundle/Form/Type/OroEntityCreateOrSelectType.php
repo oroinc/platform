@@ -33,7 +33,13 @@ class OroEntityCreateOrSelectType extends AbstractType
         $builder->add(
             'new_entity',
             $options['create_entity_form_type'],
-            $options['create_entity_form_options']
+            array_merge(
+                $options['create_entity_form_options'],
+                array(
+                    'data_class' => $options['data_class'],
+                    'mapped' => false
+                )
+            )
         );
 
         // existing entity
@@ -43,11 +49,18 @@ class OroEntityCreateOrSelectType extends AbstractType
             array(
                 'class' => $options['data_class'],
                 'multiple' => false,
+                'mapped' => false
             )
         );
 
         // rendering mode
-        $builder->add('mode', 'hidden');
+        $builder->add(
+            'mode',
+            'hidden',
+            array(
+                'mapped' => false
+            )
+        );
     }
 
     /**
