@@ -71,6 +71,9 @@ class WidgetController extends Controller
         if ($workflowDefinition->isStepsDisplayOrdered()) {
             $steps = $workflow->getStepManager()->getOrderedSteps();
         }
+        if (!$steps && $currentStep) {
+            $steps[] = $currentStep;
+        }
 
         return array(
             'steps' => $steps,
