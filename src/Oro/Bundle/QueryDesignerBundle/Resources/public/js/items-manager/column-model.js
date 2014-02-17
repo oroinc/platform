@@ -22,8 +22,7 @@ define(['underscore', 'oroui/js/items-manager/abstract-model'], function (_, Abs
 
         getFuncLabel: function () {
             var func = this.get('func');
-            // TODO: functionManager.getFunctionLabel(func.group_type, func.group_name, func.name);
-            return func ? func.group_type + ':' + func.name + ' (' + func.group_name + ')' : '';
+            return func && (func.group_type + ':' + func.group_name + ':' + func.name);
         }
     });
 });
