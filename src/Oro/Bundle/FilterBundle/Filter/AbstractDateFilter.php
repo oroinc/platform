@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Carbon\Carbon;
+
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Provider\DatevariablesInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 
@@ -22,23 +26,26 @@ abstract class AbstractDateFilter extends AbstractFilter
             return false;
         }
 
-        /** @var $dateStartValue \DateTime */
-        $dateStartValue = $data['date_start'];
-        /** @var $dateEndValue \DateTime */
-        $dateEndValue = $data['date_end'];
-        $type         = $data['type'];
+        $dateStartValue = Carbon::parse($data['date_start'], new \DateTimeZone('UTC'));
+        $dateEndValue   = Carbon::parse($data['date_end'], new \DateTimeZone('UTC'));
+
+        $datePart  = $data['part'];
+        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
+        $fieldName = $this->applyDatePart($datePart, $fieldName, $dateStartValue, $dateEndValue);
 
         $startDateParameterName = $ds->generateParameterName($this->getName());
         $endDateParameterName   = $ds->generateParameterName($this->getName());
 
+
         $this->applyDependingOnType(
-            $type,
+            $data['type'],
+            $datePart,
             $ds,
             $dateStartValue,
             $dateEndValue,
             $startDateParameterName,
             $endDateParameterName,
-            $this->get(FilterUtility::DATA_NAME_KEY)
+            $fieldName
         );
 
         if ($dateStartValue) {
@@ -106,7 +113,8 @@ abstract class AbstractDateFilter extends AbstractFilter
         return array(
             'date_start' => $data['value']['start'],
             'date_end'   => $data['value']['end'],
-            'type'       => $data['type']
+            'type'       => $data['type'],
+            'part'       => $data['part'],
         );
     }
 
@@ -139,6 +147,61 @@ abstract class AbstractDateFilter extends AbstractFilter
     }
 
     /**
+     * @param string                   $part
+     * @param string                   $field
+     *
+     * @param Carbon|\DateTime $dateStart
+     * @param Carbon|\DateTime $dateEnd
+     *
+     * @return mixed
+     */
+    protected function applyDatePart($part, $field, Carbon &$dateStart, Carbon &$dateEnd)
+    {
+        switch ($part) {
+            case AbstractDateFilterType::PART_MONTH:
+                $field = sprintf('MONTH(%s)', $field);
+                $dateStart = $dateStart->month;
+                $dateEnd   = $dateEnd->month;
+                break;
+            case AbstractDateFilterType::PART_DOW:
+                $field = sprintf('DAYOFWEEK(%s)', $field);
+                $dateStart = $dateStart->dayOfWeek;
+                $dateEnd   = $dateEnd->dayOfWeek;
+                break;
+            case AbstractDateFilterType::PART_WEEK:
+                $field = sprintf('WEEK(%s)', $field);
+                $dateStart = $dateStart->weekOfYear;
+                $dateEnd   = $dateEnd->weekOfYear;
+                break;
+            case AbstractDateFilterType::PART_DAY:
+                $field = sprintf('DAY(%s)', $field);
+                $dateStart = $dateStart->day;
+                $dateEnd   = $dateEnd->day;
+                break;
+            case AbstractDateFilterType::PART_QUARTER:
+                $field = sprintf('QUARTER(%s)', $field);
+                $dateStart = $dateStart->quarter;
+                $dateEnd   = $dateEnd->quarter;
+                break;
+            case AbstractDateFilterType::PART_DOY:
+                $field = sprintf('DAYOFYEAR(%s)', $field);
+                $dateStart = $dateStart->dayOfYear;
+                $dateEnd   = $dateEnd->dayOfYear;
+                break;
+            case AbstractDateFilterType::PART_YEAR:
+                $field = sprintf('YEAR(%s)', $field);
+                $dateStart = $dateStart->year;
+                $dateEnd   = $dateEnd->year;
+                break;
+            case AbstractDateFilterType::PART_VALUE:
+            default:
+                break;
+        }
+
+        return $field;
+    }
+
+    /**
      * Apply expression using "between" filtering
      *
      * @param FilterDatasourceAdapterInterface $ds
@@ -146,7 +209,7 @@ abstract class AbstractDateFilter extends AbstractFilter
      * @param string                           $dateEndValue
      * @param string                           $startDateParameterName
      * @param string                           $endDateParameterName
-     * @param string                           $fieldName ,
+     * @param string                           $fieldName
      */
     protected function applyFilterBetween(
         $ds,
@@ -306,7 +369,6 @@ abstract class AbstractDateFilter extends AbstractFilter
         $metadata['typeValues']            = $formView->vars['type_values'];
         $metadata['externalWidgetOptions'] = $formView->vars['widget_options'];
         $metadata['dateParts']             = $formView->vars['date_parts'];
-        //$metadata['dateVars']              = $formView->vars['date_vars'];
         $metadata['externalWidgetOptions'] = array_merge(
             $formView->vars['widget_options'],
             ['dateVars' => $formView->vars['date_vars']]
@@ -320,12 +382,13 @@ abstract class AbstractDateFilter extends AbstractFilter
      */
     public function processParams($data)
     {
-        $type = $data['type'];
-        $part = $data['part'];
-        $value = $data['value'];
+        //$type = $data['type'];
+        //$part = $data['part'];
 
-        $value['start'] = $this->replaceDateVariables($value['start']);
-        $value['end']   = $this->replaceDateVariables($value['end']);
+        $data['value']['start'] = $this->replaceDateVariables($data['value']['start']);
+        $data['value']['end']   = $this->replaceDateVariables($data['value']['end']);
+
+        return $data;
     }
 
     /**
@@ -336,16 +399,54 @@ abstract class AbstractDateFilter extends AbstractFilter
     protected function replaceDateVariables($value)
     {
         if (empty($value)) {
-            return '';
+            $value = '';
         }
 
-        // TODO: we need here value ids intead of var names
-        $value = trim($value, '{} ');
-        switch ($value) {
-            case '':
-                break;
-            default:
-                break;
+        if (preg_match_all('#{{(\d+)}}#', $value, $matches)) {
+            $varsCodes = $matches[1];
+            $values = [];
+
+            foreach ($varsCodes as $code) {
+                switch ($code) {
+                    case DatevariablesInterface::VAR_NOW:
+                        $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
+                        break;
+                    case DatevariablesInterface::VAR_TODAY:
+                    case DatevariablesInterface::VAR_THIS_DAY:
+                        $dateValue = Carbon::parse('today', new \DateTimeZone('UTC'));
+                        break;
+                    case DatevariablesInterface::VAR_SOW:
+                    case DatevariablesInterface::VAR_THIS_WEEK:
+                        $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
+                        $dateValue->startOfWeek();
+                        break;
+                    case DatevariablesInterface::VAR_SOM:
+                    case DatevariablesInterface::VAR_THIS_MONTH:
+                    case DatevariablesInterface::VAR_FMQ:
+                        $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
+                        $dateValue->firstOfMonth();
+                        break;
+                    case DatevariablesInterface::VAR_SOQ:
+                    case DatevariablesInterface::VAR_THIS_QUARTER:
+                    case DatevariablesInterface::VAR_FDQ:
+                        $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
+                        $dateValue->firstOfQuarter();
+                        break;
+                    case DatevariablesInterface::VAR_SOY:
+                    case DatevariablesInterface::VAR_THIS_YEAR:
+                        $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
+                        $dateValue->firstOfYear();
+                        break;
+                    default:
+                        $dateValue = '';
+                        break;
+                }
+
+                $values[] = $dateValue;
+            }
+            $value = str_replace($matches[0], $values, $value);
+        } else {
+            $value = '';
         }
 
         return $value;

@@ -132,11 +132,8 @@
                 }
 
                 $(".ui-datevariables-div a.ui_dvariable").click(function(e) {
-                    var variable = this.text,
-                        code = this.dataset.code;
+                    var variable = this.text;
                     tp_inst.$input.val(variable);
-                    tp_inst.$input.next('input[type=hidden]').val(code);
-
                     tp_inst.$input.trigger("change");
                     e.preventDefault();
                 });

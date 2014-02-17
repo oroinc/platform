@@ -13,7 +13,6 @@ interface DatevariablesInterface
     const VAR_SOM   = 4; // start of the month
     const VAR_SOQ   = 5; // start of the quarter
     const VAR_SOY   = 6; // start of the year
-    const VAR_DAY   = 7;
 
     const VAR_THIS_DAY     = 10;
     const VAR_THIS_WEEK    = 11;
