@@ -1,3 +1,4 @@
 oro:
     search:
         module_name: "Search"
+        result.all: "All"
