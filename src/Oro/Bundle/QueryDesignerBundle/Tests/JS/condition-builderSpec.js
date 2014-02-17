@@ -1,5 +1,5 @@
 /*global define, require, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
-/*browser:true*/
+/*jslint browser: true, nomen: true*/
 define(function (require) {
     'use strict';
 
@@ -33,7 +33,11 @@ define(function (require) {
                 ._onHierarchyChange(null, {sender: sender, item: $item1});
         }
 
-        beforeEach(function () {
+        function initialized() {
+            return $el.data('oroquerydesigner-conditionBuilder').$rootCondition.data('initialized');
+        }
+
+        beforeEach(function (done) {
             window.setFixtures(html);
             $el = $(conditionBuilderSlector);
             toDelete = [];
@@ -58,6 +62,12 @@ define(function (require) {
                 criteriaListSelector: criteriaListSelector,
                 sourceValueSelector: sourceValueSelector
             });
+            var checker = setInterval(function () {
+                if (initialized()) {
+                    clearInterval(checker);
+                    done();
+                }
+            }, 0);
         });
 
         afterEach(function () {
@@ -74,44 +84,40 @@ define(function (require) {
         });
 
         describe('container structure', function () {
-            var groups, matrixConditions, conditionItems, operators;
-            beforeEach(function () {
-                groups = $el.find('[data-criteria=conditions-group]');
-                matrixConditions = $el.find('[data-criteria=matrix-condition]');
-                conditionItems = $el.find('[data-criteria=condition-item]');
-                operators = $el.find('.operator[data-value]');
-            });
-
             describe('groups', function () {
                 it('counts elements', function () {
+                    var groups = $el.find('[data-criteria=conditions-group]');
                     expect(groups).toHaveLength(1);
                 });
 
                 it("checks values", function () {
-                    var values = groups.map(function () {
-                        return $(this).find('>.conditions-group[data-value]').data('value');
-                    }).get();
+                    var groups = $el.find('[data-criteria=conditions-group]'),
+                        values = groups.map(function () {
+                            return $(this).find('>.conditions-group[data-value]').data('value');
+                        }).get();
                     expect(values).toEqual([{equal: 5}, 'OR', {criteria: 'matrix-condition', less: 8}]);
                 });
             });
 
             describe('matrix-conditions', function () {
                 it('counts elements', function () {
+                    var matrixConditions = $el.find('[data-criteria=matrix-condition]');
                     expect(matrixConditions).toHaveLength(2);
                 });
 
                 it('checks if matrixCondition widget appended', function () {
-                    expect($.fn.matrixCondition.calls.length).toEqual(2);
+                    expect($.fn.matrixCondition.calls.count()).toEqual(2);
                 });
 
                 it('checks options of matrixCondition widget', function () {
-                    expect($.fn.matrixCondition.mostRecentCall.args[0]).toEqual({name: 'The Matrix Condition'});
+                    expect($.fn.matrixCondition.calls.mostRecent().args[0]).toEqual({name: 'The Matrix Condition'});
                 });
 
                 it("checks values", function () {
-                    var values = matrixConditions.map(function () {
-                        return $(this).find('>.condition-item[data-value]').data('value');
-                    }).get();
+                    var matrixConditions = $el.find('[data-criteria=matrix-condition]'),
+                        values = matrixConditions.map(function () {
+                            return $(this).find('>.condition-item[data-value]').data('value');
+                        }).get();
                     expect(values).toEqual([
                         {great: 10, criteria: 'matrix-condition'},
                         {less: 8, criteria: 'matrix-condition'}
@@ -121,54 +127,51 @@ define(function (require) {
 
             describe('condition-items', function () {
                 it('counts elements', function () {
+                    var conditionItems = $el.find('[data-criteria=condition-item]');
                     expect(conditionItems).toHaveLength(1);
                 });
 
                 it('checks if conditionItem widget appended', function () {
-                    expect($.fn.conditionItem.calls.length).toEqual(1);
+                    expect($.fn.conditionItem.calls.count()).toEqual(1);
                 });
 
                 it('checks options of conditionItem widget', function () {
-                    expect($.fn.conditionItem.mostRecentCall.args[0]).toEqual({name: 'The Condition Item'});
+                    expect($.fn.conditionItem.calls.mostRecent().args[0]).toEqual({name: 'The Condition Item'});
                 });
 
                 it("checks values", function () {
-                    var values = conditionItems.map(function () {
-                        return $(this).find('>.condition-item[data-value]').data('value');
-                    }).get();
+                    var conditionItems = $el.find('[data-criteria=condition-item]'),
+                        values = conditionItems.map(function () {
+                            return $(this).find('>.condition-item[data-value]').data('value');
+                        }).get();
                     expect(values).toEqual([{equal: 5 }]);
                 });
             });
 
             describe('operators', function () {
                 it('counts elements', function () {
+                    var operators = $el.find('.operator[data-value]');
                     expect(operators).toHaveLength(2);
                 });
 
                 it('checks if dropdownSelect widget appended', function () {
-                    expect($.fn.dropdownSelect.calls.length).toEqual(2);
+                    expect($.fn.dropdownSelect.calls.count()).toEqual(2);
                 });
 
                 it("checks values", function () {
-                    var values = operators.map(function () {
-                        return $(this).data('value');
-                    }).get();
+                    var operators = $el.find('.operator[data-value]'),
+                        values = operators.map(function () {
+                            return $(this).data('value');
+                        }).get();
                     expect(values).toEqual(['AND', 'OR']);
                 });
             });
         });
 
         describe('restructure process', function () {
-            var group, matrixCondition1, matrixCondition2, conditionItems;
-
-            beforeEach(function () {
-                group = $el.find('[data-criteria=conditions-group]');
-                matrixCondition1 = $el.find('[data-criteria=matrix-condition]:first');
-                matrixCondition2 = $el.find('[data-criteria=matrix-condition]:last');
-                conditionItems = $el.find('[data-criteria=condition-item]');
-            });
-
             it('moves group at the beginning', function () {
+                var group = $el.find('[data-criteria=conditions-group]'),
+                    matrixCondition1 = $el.find('[data-criteria=matrix-condition]:first');
                 changeHierarchy(group, 'before', matrixCondition1);
                 expect($el.conditionBuilder('getValue')).toEqual([
                     [
@@ -177,11 +180,13 @@ define(function (require) {
                         {criteria: "matrix-condition", less: 8}
                     ],
                     'AND',
-                    {criteria: "matrix-condition", great:10}
+                    {criteria: "matrix-condition", great: 10}
                 ]);
             });
 
             it('moves condition-item inside group', function () {
+                var matrixCondition2 = $el.find('[data-criteria=matrix-condition]:last'),
+                    conditionItems = $el.find('[data-criteria=condition-item]');
                 changeHierarchy(matrixCondition2, 'before', conditionItems);
                 expect($el.conditionBuilder('getValue')).toEqual([
                     {criteria: 'matrix-condition', great: 10},
@@ -195,6 +200,8 @@ define(function (require) {
             });
 
             it('puts condition-item outside group', function () {
+                var matrixCondition1 = $el.find('[data-criteria=matrix-condition]:first'),
+                    matrixCondition2 = $el.find('[data-criteria=matrix-condition]:last');
                 changeHierarchy(matrixCondition2, 'after', matrixCondition1);
                 expect($el.conditionBuilder('getValue')).toEqual([
                     {criteria: 'matrix-condition', great: 10},
@@ -202,12 +209,14 @@ define(function (require) {
                     {criteria: 'matrix-condition', less: 8},
                     'AND',
                     [
-                        {equal :5}
+                        {equal: 5}
                     ]
                 ]);
             });
 
             it('puts condition-item into group', function () {
+                var matrixCondition1 = $el.find('[data-criteria=matrix-condition]:first'),
+                    matrixCondition2 = $el.find('[data-criteria=matrix-condition]:last');
                 changeHierarchy(matrixCondition1, 'after', matrixCondition2);
                 expect($el.conditionBuilder('getValue')).toEqual([
                     [
@@ -222,24 +231,13 @@ define(function (require) {
         });
 
         describe('add a new condition', function () {
-            var group, matrixCondition1, matrixCondition2, conditionItem,
-                conditionItemCriteria, matrixConditionCriteria, conditionsGroupCriteria;
-
-            beforeEach(function () {
-                group = $el.find('[data-criteria=conditions-group]');
-                matrixCondition1 = $el.find('[data-criteria=matrix-condition]:first');
-                matrixCondition2 = $el.find('[data-criteria=matrix-condition]:last');
-                conditionItem = $el.find('[data-criteria=condition-item]');
-                conditionItemCriteria = $(criteriaListSelector + '>[data-criteria=condition-item]');
-                matrixConditionCriteria = $(criteriaListSelector + '>[data-criteria=matrix-condition]');
-                conditionsGroupCriteria = $(criteriaListSelector + '>[data-criteria=conditions-group]');
-            });
-
             it('adds "matrix condition" into group', function () {
-                var criteria = matrixConditionCriteria.clone().insertAfter(matrixConditionCriteria);
+                var matrixCondition2 = $el.find('[data-criteria=matrix-condition]:last'),
+                    matrixConditionCriteria = $(criteriaListSelector + '>[data-criteria=matrix-condition]'),
+                    criteria = matrixConditionCriteria.clone().insertAfter(matrixConditionCriteria);
                 changeHierarchy(criteria, 'after', matrixCondition2);
-                expect($.fn.matrixCondition.calls.length).toEqual(3);
-                expect($.fn.matrixCondition.mostRecentCall.args[0]).toEqual({name: 'The Matrix Condition'});
+                expect($.fn.matrixCondition.calls.count()).toEqual(3);
+                expect($.fn.matrixCondition.calls.mostRecent().args[0]).toEqual({name: 'The Matrix Condition'});
                 expect($el.conditionBuilder('getValue')).toEqual([
                     {criteria: 'matrix-condition', great: 10},
                     'AND',
@@ -254,10 +252,12 @@ define(function (require) {
             });
 
             it('adds "condition item" before group', function () {
-                var criteria = conditionItemCriteria.clone().insertAfter(conditionItemCriteria);
+                var group = $el.find('[data-criteria=conditions-group]'),
+                    conditionItemCriteria = $(criteriaListSelector + '>[data-criteria=condition-item]'),
+                    criteria = conditionItemCriteria.clone().insertAfter(conditionItemCriteria);
                 changeHierarchy(criteria, 'before', group);
-                expect($.fn.conditionItem.calls.length).toEqual(2);
-                expect($.fn.conditionItem.mostRecentCall.args[0]).toEqual({name : 'The Condition Item'});
+                expect($.fn.conditionItem.calls.count()).toEqual(2);
+                expect($.fn.conditionItem.calls.mostRecent().args[0]).toEqual({name : 'The Condition Item'});
                 expect($el.conditionBuilder('getValue')).toEqual([
                     {criteria: 'matrix-condition', great: 10},
                     'AND',
@@ -272,7 +272,9 @@ define(function (require) {
             });
 
             it('adds a new group inside the group', function () {
-                var criteria = conditionsGroupCriteria.clone().insertAfter(conditionsGroupCriteria);
+                var conditionItem = $el.find('[data-criteria=condition-item]'),
+                    conditionsGroupCriteria = $(criteriaListSelector + '>[data-criteria=conditions-group]'),
+                    criteria = conditionsGroupCriteria.clone().insertAfter(conditionsGroupCriteria);
                 changeHierarchy(criteria, 'before', conditionItem);
                 expect($el.conditionBuilder('getValue')).toEqual([
                     {criteria: 'matrix-condition', great: 10},
@@ -387,7 +389,7 @@ define(function (require) {
                 var conditionsGroup = $el.find('[data-criteria=conditions-group]');
                 conditionsGroup.find('>a.close').trigger('click');
                 expect($el.conditionBuilder('getValue')).toEqual([
-                    {criteria :'matrix-condition', great: 10}
+                    {criteria: 'matrix-condition', great: 10}
                 ]);
             });
         });

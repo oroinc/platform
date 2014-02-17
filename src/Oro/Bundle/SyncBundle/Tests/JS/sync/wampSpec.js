@@ -11,7 +11,7 @@ function(Wamp, Backbone, requirejsExposure) {
             ab = jasmine.createSpyObj('ab', ['debug', 'connect']);
             $ = jasmine.createSpy('$');
             $.on = jasmine.createSpy('$.on');
-            $.andReturn({on: $.on});
+            $.and.returnValue({on: $.on});
             session = jasmine.createSpyObj('session', ['subscribe', 'unsubscribe', 'close']);
             exposure.substitute('ab').by(ab);
             exposure.substitute('$').by($);
@@ -29,7 +29,7 @@ function(Wamp, Backbone, requirejsExposure) {
             it('required options', function () {
                 expect(function () {
                     wamp = new Wamp();
-                }).toThrow('host option is required');
+                }).toThrowError('host option is required');
             });
 
             it('debug mode', function () {
@@ -54,7 +54,7 @@ function(Wamp, Backbone, requirejsExposure) {
                 wamp = new Wamp(options);
                 // connection established
                 wamp.session = session;
-                ab.connect.reset();
+                ab.connect.calls.reset();
                 wamp.connect();
                 expect(ab.connect).not.toHaveBeenCalled();
             });
@@ -70,7 +70,7 @@ function(Wamp, Backbone, requirejsExposure) {
                 expect($).toHaveBeenCalledWith(window);
                 expect($.on).toHaveBeenCalledWith('beforeunload', jasmine.any(Function));
                 // execute callback
-                $.on.mostRecentCall.args[1]();
+                $.on.calls.mostRecent().args[1]();
                 expect(session.close).toHaveBeenCalled();
             });
 
@@ -78,9 +78,9 @@ function(Wamp, Backbone, requirejsExposure) {
                 var onConnect, onHangup;
                 beforeEach(function () {
                     wamp = new Wamp(options);
-                    spyOn(wamp, 'trigger').andCallThrough();
-                    onConnect = ab.connect.mostRecentCall.args[1];
-                    onHangup = ab.connect.mostRecentCall.args[2];
+                    spyOn(wamp, 'trigger').and.callThrough();
+                    onConnect = ab.connect.calls.mostRecent().args[1];
+                    onHangup = ab.connect.calls.mostRecent().args[2];
                 });
 
                 it('on connect with empty channels queue', function () {
@@ -102,7 +102,7 @@ function(Wamp, Backbone, requirejsExposure) {
                     onConnect(session);
                     expect(wamp.session).toBe(session);
                     expect(wamp.trigger).toHaveBeenCalledWith('connection_established');
-                    expect(session.subscribe.callCount).toEqual(3);
+                    expect(session.subscribe.calls.count()).toEqual(3);
                     expect(session.subscribe).toHaveBeenCalledWith('/some/channel/1', callback11);
                     expect(session.subscribe).toHaveBeenCalledWith('/some/channel/1', callback12);
                     expect(session.subscribe).toHaveBeenCalledWith('/some/channel/2', callback21);
@@ -137,14 +137,14 @@ function(Wamp, Backbone, requirejsExposure) {
                 it('subscribe', function () {
                     wamp.subscribe(channel, originalCallback1);
                     expect(session.subscribe).toHaveBeenCalledWith(channel, jasmine.any(Function));
-                    wrappedCallback = session.subscribe.mostRecentCall.args[1];
+                    wrappedCallback = session.subscribe.calls.mostRecent().args[1];
                     expect(wrappedCallback).not.toBe(originalCallback1);
                     expect(wrappedCallback.origCallback).toBe(originalCallback1);
                     expect(wamp.channels[channel]).toEqual(jasmine.any(Array));
                     expect(wamp.channels[channel]).toContain(wrappedCallback);
 
                     wamp.subscribe(channel, originalCallback2);
-                    wrappedCallback = session.subscribe.mostRecentCall.args[1];
+                    wrappedCallback = session.subscribe.calls.mostRecent().args[1];
                     expect(wrappedCallback).not.toBe(originalCallback2);
                     expect(wrappedCallback.origCallback).toBe(originalCallback2);
                     expect(wamp.channels[channel]).toContain(wrappedCallback);
@@ -154,7 +154,7 @@ function(Wamp, Backbone, requirejsExposure) {
                     beforeEach(function () {
                         wamp.subscribe(channel, originalCallback1);
                         wamp.subscribe(channel, originalCallback2);
-                        wrappedCallback = session.subscribe.mostRecentCall.args[1];
+                        wrappedCallback = session.subscribe.calls.mostRecent().args[1];
                     });
 
                     it('with two parameters', function () {

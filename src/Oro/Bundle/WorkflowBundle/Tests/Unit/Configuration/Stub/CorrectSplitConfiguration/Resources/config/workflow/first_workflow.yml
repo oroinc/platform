@@ -1,0 +1,59 @@
+imports:
+    - {resource: 'first_workflow/attributes.yml'}
+
+workflows:
+    first_workflow:
+        label: 'First Workflow'
+        enabled: true
+        entity: First\Entity
+        start_step: first_step
+        entity_attribute: my_entity
+        steps_display_ordered: true
+        steps:
+            first_step:
+                label: 'First Step'
+                order: 1
+                is_final: true
+                entity_acl:
+                    first_attribute:
+                        update: false
+                allowed_transitions:
+                    - first_transition
+        transitions:
+            first_transition:
+                label: 'First Transition'
+                step_to: first_step
+                is_start: true
+                is_hidden: true
+                is_unavailable_hidden: true
+                acl_resource: some_acl
+                acl_message: "Test ACL message"
+                message: "Test message"
+                transition_definition: first_transition_definition
+                frontend_options:
+                    class: foo
+                form_type: custom_workflow_transition
+                display_type: page
+                form_options:
+                    attribute_fields:
+                        first_attribute:
+                            form_type: text
+                            label: 'First Attribute'
+                            options:
+                                required: true
+        transition_definitions:
+            first_transition_definition:
+                pre_conditions:
+                    @true: ~
+                conditions:
+                    @and:
+                        @true: ~
+                        @or:
+                            parameters:
+                                @true: ~
+                                @equals:
+                                    parameters: [1, 1]
+                                    message: "Not equals"
+                        message: "Fail upper level"
+                post_actions:
+                    - @custom_post_action: ~

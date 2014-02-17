@@ -1,0 +1,71 @@
+.table.entity-merge-table input[type="radio"]{
+    margin-top: 0;
+}
+.entity-merge-table tr td.entity-merge-select-all-holder{
+    border-top:none;
+    padding-top: 0;
+}
+.table.entity-merge-table .merge-first-column{
+    vertical-align: top;
+    padding-left: 20px;
+}
+.table.entity-merge-table thead td{
+    padding-bottom: 0;
+}
+.table.entity-merge-table td{
+    vertical-align: top;
+    padding: 6px 8px 6px 12px;
+    cursor: pointer;
+}
+.entity-merge-fields-blocks-wrapper label{
+    margin-bottom: 0;
+}
+.table.entity-merge-table tbody .merge-first-column{
+    background-color: #F6F6F6;
+    width: 265px;
+}
+.table thead td{
+    background-color: #F1F1F1;
+}
+.entity-merge-uppercase{
+    text-transform: uppercase;
+}
+.entity-merge-table thead .entity-merge-inline-label{
+    line-height: 16px;
+}
+.entity-merge-table thead .entity-merge-inline input[type="radio"]{
+    margin-right: 5px;
+}
+.entity-merge-inline-label{
+    float: left;
+    padding-left: 10px;
+}
+.entity-merge-inline{
+    float: left;
+}
+.entity-merge-table ul{
+    list-style: none outside none;
+    margin: 0;
+}
+.entity-merge-strategy-label{
+    padding: 3px 10px 0 0;
+}
+.entity-merge-strategy-wrapper{
+    padding-top:10px;
+}
+.entity-merge-fields-blocks-wrapper {
+    overflow: hidden;
+}
+.entity-merge-header-wrapper{
+    position: relative;
+    padding-bottom: 12px;
+}
+tbody .entity-merge-fields-blocks-wrapper .entity-merge-inline-label{
+    width: calc(100% - 20px);
+}
+.entity-merge-not-selected{
+    color: #CECECE;
+}
+.entity-merge-small-select{
+    width: 150px;
+}
