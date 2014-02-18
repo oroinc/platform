@@ -230,8 +230,8 @@
                 var $groupingFieldChoice = $groupingEditForm.find('[data-purpose=column-selector]');
                 $groupingFieldChoice.fieldChoice(fieldChoiceOptions, {{ metadata.grouping|json_encode|raw }});
 
-                GroupingModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
-                GroupingModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
+                var entityFieldUtil = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
+                var formatSelectionTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
                 var groupingCollection = new (Backbone.Collection)(load().grouping_columns, {model: GroupingModel});
                 groupingCollection.on('add remove sort', function () {
@@ -246,7 +246,12 @@
                 });
                 $groupingEditForm.find('.grouping-item-container').itemsManagerTable({
                     collection: groupingCollection,
-                    itemTemplateSelector: '#report-grouping-item-row'
+                    itemTemplateSelector: '#report-grouping-item-row',
+                    itemRender: function (tmpl, data) {
+                        var name = entityFieldUtil.splitFieldId(data.name);
+                        data.name = formatSelectionTemplate(name);
+                        return tmpl(data);
+                    }
                 });
                 // end grouping
 
@@ -260,9 +265,6 @@
                     aggregates: {{ metadata.aggregates|json_encode|raw }}
                 });
 
-                ColumnModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
-                ColumnModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
-
                 var columnCollection = new (Backbone.Collection)(load().columns, {model: ColumnModel});
                 columnCollection.on('add remove sort', function () {
                     var data = load();
@@ -274,10 +276,19 @@
                     namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/,
                     collection: columnCollection
                 });
-                
+
                 $('.query-designer-columns-grid-container .item-container').itemsManagerTable({
                     collection: columnCollection,
-                    itemTemplateSelector: '#report-column-row'
+                    itemTemplateSelector: '#report-column-row',
+                    itemRender: function (tmpl, data) {
+                        var name = entityFieldUtil.splitFieldId(data.name);
+                        data.name = formatSelectionTemplate(name);
+
+                        var func = data.func;
+                        data.func = func && (func.group_type + ':' + func.group_name + ':' + func.name);
+
+                        return tmpl(data);
+                    }
                 });
                 // end columns
             });
