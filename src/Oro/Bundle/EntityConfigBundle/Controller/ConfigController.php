@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -390,18 +391,19 @@ class ConfigController extends Controller
          * define Entity module and name
          */
         $entityName = $moduleName = '';
-        $className  = explode('\\', $entity->getClassName());
-        if (count($className) > 1) {
-            foreach ($className as $i => $name) {
-                if (count($className) - 1 == $i) {
+        $className  = $entity->getClassName();
+        if (strpos($className, ExtendConfigDumper::ENTITY) === false) {
+            $className = explode('\\', $className);
+            foreach ($className as $index => $name) {
+                if (count($className) - 1 == $index) {
                     $entityName = $name;
-                } elseif (!in_array($name, ['Bundle', 'Entity'])) {
+                } elseif (!in_array($name, array('Bundle', 'Entity'))) {
                     $moduleName .= $name;
                 }
             }
         } else {
-            $entityName = $className[0];
-            $moduleName = 'Custom';
+            $entityName = str_replace(ExtendConfigDumper::ENTITY, '', $className);
+            $moduleName = 'System';
         }
 
         /** @var ConfigProvider $entityConfigProvider */
@@ -413,14 +415,17 @@ class ConfigController extends Controller
 
         /** @var ConfigProvider $ownershipConfigProvider */
         $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
+        $ownerTypes = $this->get('oro_organization.method.get_ownership_type')->execute();
+        $ownerType = $ownershipConfigProvider->getConfig($entity->getClassName())->get('owner_type');
+        $ownerType = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 
         return [
-            'entity'           => $entity,
-            'entity_config'    => $entityConfigProvider->getConfig($entity->getClassName()),
-            'entity_extend'    => $extendConfig,
-            'entity_ownership' => $ownershipConfigProvider->getConfig($entity->getClassName()),
-            'entity_name'      => $entityName,
-            'module_name'      => $moduleName,
+            'entity'            => $entity,
+            'entity_config'     => $entityConfigProvider->getConfig($entity->getClassName()),
+            'entity_extend'     => $extendConfig,
+            'entity_owner_type' => $ownerType,
+            'entity_name'       => $entityName,
+            'module_name'       => $moduleName,
         ];
     }
 
