@@ -10,11 +10,6 @@ define(['oroui/js/items-manager/abstract-model'], function (AbstractModel) {
     return AbstractModel.extend({
         defaults: {
             name : null
-        },
-
-        getNameLabel: function () {
-            var name = this.get('name');
-            return name ? this.nameTemplate(this.util.splitFieldId(name)) : '';
         }
     });
 });

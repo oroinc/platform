@@ -10,11 +10,6 @@ define(['backbone', 'underscore'], function (Backbone, _) {
     return Backbone.Model.extend({
         defaults: {
             /* define list of attributes */
-        },
-
-        getFieldLabel: function (name) {
-            var getter = 'get' + name.charAt(0).toUpperCase() + name.slice(1) + 'Label';
-            return this[getter] ? _.result(this, getter) : this.get(name);
         }
     });
 });

@@ -17,13 +17,18 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
      */
     $.widget('oroui.itemsManagerTable', {
         options: {
-            itemTemplateSelector: null
+            itemTemplate: null
         },
 
         _create: function () {
             this.options.deleteHandler = this.options.deleteHandler || _.bind(this._deleteHandler, this);
+            this.options.itemRender = this.options.itemRender || _.bind(this._itemRender, this);
 
-            this.itemTemplate = _.template($(this.options.itemTemplateSelector).html());
+            if (typeof this.options.itemTemplate === 'function') {
+                this.itemTemplate = this.options.itemTemplate;
+            } else {
+                this.itemTemplate = _.template(this.options.itemTemplate);
+            }
 
             var collection = this.options.collection;
             collection.on('add', this._onModelAdded, this);
@@ -105,13 +110,12 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
         },
 
         _renderModel: function (model) {
-            var data = {};
-            $.each(model.toJSON(), function (name) {
-                data[name] = model.getFieldLabel(name);
-            });
-            data.cid = model.cid;
+            var data = _.extend({ cid: model.cid }, model.toJSON());
+            return this.options.itemRender(this.itemTemplate, data);
+        },
 
-            return $(this.itemTemplate(data));
+        _itemRender: function (tmpl, data) {
+            return tmpl(data);
         },
 
         _onAction: function (ev) {
