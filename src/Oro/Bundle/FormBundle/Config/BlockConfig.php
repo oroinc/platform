@@ -228,12 +228,6 @@ class BlockConfig implements FormConfigInterface
             'description' => $this->description,
             'class'       => $this->class,
             'subblocks'   => $subBlocks
-//            'subblocks'   => array_map(
-//                function (SubBlockConfig $config) {
-//                    return $config->toArray();
-//                },
-//                $this->subBlocks
-//            )
         );
     }
 
