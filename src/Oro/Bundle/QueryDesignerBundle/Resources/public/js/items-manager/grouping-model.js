@@ -1,10 +1,10 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['underscore', 'oroui/js/items-manager/abstract-model'], function (_, AbstractModel) {
+define(['oroui/js/items-manager/abstract-model'], function (AbstractModel) {
     'use strict';
 
     /**
-     * @class   oro.queryDesigner.grouping.Model
+     * @class   oroquerydesigner.itemsManager.GroupingModel
      * @extends oroui.itemsManager.AbstractModel
      */
     return AbstractModel.extend({

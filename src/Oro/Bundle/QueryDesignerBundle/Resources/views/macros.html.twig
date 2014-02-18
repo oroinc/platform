@@ -117,21 +117,35 @@
     </script>
 {% endmacro %}
 
-{% macro query_designer_column_form(form, attr) %}
+{% macro query_designer_column_form(form, attr, params) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
-        {{ form_row(form.name, {
-            'label': 'oro.query_designer.form.column'|trans,
-            'attr': {
-                'data-purpose': 'column-selector'
-            }
-        }) }}
+        {# @todo own formtype for this kind field based on hidden input #}
+        <div class="control-group">
+            <label class="control-label required" for="s2id_autogen2">Column<em>*</em></label>
+            <div class="controls">
+                {% set nameValidation = {
+                    NotBlank: {message: 'Field should be chosen'}
+                } %}
+                {{ form_row(form.name, {
+                    'label': 'oro.query_designer.form.column'|trans,
+                    'attr': {
+                        'data-purpose': 'column-selector',
+                        'data-validation': nameValidation|json_encode
+                    }
+                }) }}
+            </div>
+        </div>
+        {% set labelValidation = {
+            NotBlank: {message: 'Label is required field'}
+        } %}
         {{ form_row(form.label, {
             'label': 'oro.query_designer.form.label'|trans,
             'attr': {
                 'class': 'label-text',
-                'data-purpose': 'label'
+                'data-purpose': 'label',
+                'data-validation': labelValidation|json_encode
             }
         }) }}
         {{ form_row(form.func, {
@@ -163,6 +177,32 @@
             'label' : 'oro.query_designer.form.action.add'|trans
         }) }}
     </div>
+    {% set fieldConditionOptions = {
+        select2: {
+            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+        },
+        util: {},
+        fieldsLoaderSelector: '#' ~ params.entity_choice_id
+    } %}
+    <script type="text/javascript">
+        require(['oroentity/js/field-choice', 'oroquerydesigner/js/function-choice'], function ($) {
+            var $form = $('#{{ attr.id }}'),
+                $fields = $form.find('[data-purpose=column-selector]'),
+                $functions = $form.find('[data-purpose=function-selector]'),
+                $label = $form.find('[data-purpose=label]');
+            $functions.functionChoice({
+                fieldChoiceSelector: $fields
+            });
+            $fields
+                .fieldChoice({{ fieldConditionOptions|json_encode|raw }})
+                .on('change', function (e) {
+                    if (e.added) {
+                        // update label input on field change
+                        $label.val(e.added.text).trigger('change');
+                    }
+                });
+        });
+    </script>
 {% endmacro %}
 
 {% macro query_designer_grouping_form(form, attr, params) %}
@@ -220,7 +260,7 @@
         fieldsLoaderSelector: '#' ~ params.entity_choice_id
     } %}
     <script type="text/javascript">
-        require(['jquery', 'oroentity/js/field-choice'], function ($) {
+        require(['oroentity/js/field-choice'], function ($) {
 
             // @todo names of inputs in form should represent model attribute
             var $elem =$('[name="oro_report_form[grouping][columnNames]"]')
@@ -232,7 +272,7 @@
 
 
             $('#{{ attr.id }}').find('[data-purpose=column-selector]')
-                    .fieldChoice({{ fieldConditionOptions|json_encode|raw }});
+                .fieldChoice({{ fieldConditionOptions|json_encode|raw }});
         });
     </script>
 {% endmacro %}
