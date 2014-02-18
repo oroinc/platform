@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,7 +35,14 @@ class IndexListener
     /**
      * @var array
      */
-    protected $insertEntities = array();
+    protected $insertEntities = [];
+
+    /**
+     * @todo: refactor this in listeners scope story
+     *
+     * @var bool
+     */
+    protected $postFlush = true;
 
     /**
      * Unfortunately, can't use AbstractEngine as a parameter here due to circular reference
@@ -48,6 +56,22 @@ class IndexListener
         $this->container = $container;
         $this->realtime  = $realtime;
         $this->entities  = $entities;
+    }
+
+    /**
+     * @retun void
+     */
+    public function disablePostFlush()
+    {
+        $this->postFlush = false;
+
+        register_shutdown_function(
+            function () {
+                $entityManager = $this->container->get('doctrine.orm.entity_manager');
+
+                $this->flush($entityManager);
+            }
+        );
     }
 
     /**
@@ -97,6 +121,18 @@ class IndexListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->postFlush) {
+            return;
+        }
+
+        $this->flush($args->getEntityManager());
+    }
+
+    /**
+     * @param EntityManager $manager
+     */
+    protected function flush(EntityManager $manager)
+    {
         if (!$this->isActive() || empty($this->insertEntities)) {
             return;
         }
@@ -104,9 +140,10 @@ class IndexListener
         foreach ($this->insertEntities as $entity) {
             $this->getSearchEngine()->save($entity, $this->realtime, true);
         }
-        $this->insertEntities = array();
 
-        $args->getEntityManager()->flush();
+        $this->insertEntities = [];
+
+        $manager->flush();
     }
 
     /**
