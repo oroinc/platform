@@ -1,11 +1,17 @@
-<div id="{{ elementId }}">{% render options.url %}</div>
+<div id="{{ elementId }}">
+    {% if options.elementFirst %}
+        {% render options.url %}
+    {% endif %}
+</div>
 
 <script type="text/javascript">
     require(['jquery', 'oro/{{ widgetType ~ '-widget' }}'],
     function($, Widget){
         $(function(){
             var widget = new Widget({{ options|json_encode|raw }});
+            {% if options.elementFirst %}
             widget.render();
+            {% endif %}
         })
     });
 </script>
