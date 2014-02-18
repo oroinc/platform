@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 class EntitySecurityMetadataProvider
 {
@@ -18,6 +19,11 @@ class EntitySecurityMetadataProvider
      * @var ConfigProvider
      */
     protected $entityConfigProvider;
+
+    /**
+     * @var ConfigProvider
+     */
+    protected $extendConfigProvider;
 
     /**
      * @var CacheProvider
@@ -41,11 +47,13 @@ class EntitySecurityMetadataProvider
     public function __construct(
         ConfigProvider $securityConfigProvider,
         ConfigProvider $entityConfigProvider,
+        ConfigProvider $extendConfigProvider,
         CacheProvider $cache = null
     ) {
         $this->securityConfigProvider = $securityConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->cache = $cache;
+        $this->entityConfigProvider   = $entityConfigProvider;
+        $this->extendConfigProvider   = $extendConfigProvider;
+        $this->cache                  = $cache;
     }
 
     /**
@@ -65,7 +73,7 @@ class EntitySecurityMetadataProvider
     /**
      * Gets metadata for all entities marked with the given security type.
      *
-     * @param  string                   $securityType The security type. Defaults to ACL.
+     * @param  string $securityType The security type. Defaults to ACL.
      * @return EntitySecurityMetadata[]
      */
     public function getEntities($securityType = self::ACL_SECURITY_TYPE)
@@ -150,8 +158,13 @@ class EntitySecurityMetadataProvider
             if (!$data) {
                 $securityConfigs = $this->securityConfigProvider->getConfigs();
                 foreach ($securityConfigs as $securityConfig) {
-                    if ($securityConfig->get('type') === $securityType) {
-                        $className = $securityConfig->getId()->getClassName();
+                    $className = $securityConfig->getId()->getClassName();
+                    if ($securityConfig->get('type') === $securityType
+                        && $this->extendConfigProvider->getConfig($className)->in(
+                            'state',
+                            [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED]
+                        )
+                    ) {
                         $label = '';
                         if ($this->entityConfigProvider->hasConfig($className)) {
                             $label = $this->entityConfigProvider
