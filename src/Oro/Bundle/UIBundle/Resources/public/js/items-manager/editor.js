@@ -14,6 +14,9 @@ define(['jquery', 'jquery-ui'],   function ($) {
     $.widget('oroui.itemsManagerEditor', {
         options: {
             namePattern: /^([\w\W]*)$/,
+            mapping: {
+                /* attrName: elemName */
+            },
             addButton: '.add-button',
             saveButton: '.save-button',
             cancelButton: '.cancel-button',
@@ -160,11 +163,21 @@ define(['jquery', 'jquery-ui'],   function ($) {
 
         _elementsMap: function () {
             var elementsMap = {},
+                $container = this.element,
                 pattern = this.options.namePattern;
 
+            // collect elements using map
+            $.each(this.options.mapping, function (attrName, elemName) {
+                var $elem = $container.find('[name="' + elemName + '"]');
+                if ($elem.length) {
+                    elementsMap[attrName] = $elem;
+                }
+            });
+
+            // collect elements using name pattern
             $.each(this._elements(), function () {
                 var name = this.name && (this.name.match(pattern) || [])[1];
-                if (name) {
+                if (name && !elementsMap[name]) {
                     elementsMap[name] = $(this);
                 }
             });
