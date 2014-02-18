@@ -246,7 +246,7 @@
                 });
                 $groupingEditForm.find('.grouping-item-container').itemsManagerTable({
                     collection: groupingCollection,
-                    itemTemplateSelector: '#report-grouping-item-row',
+                    itemTemplate: $('#report-grouping-item-row').html(),
                     itemRender: function (tmpl, data) {
                         var name = entityFieldUtil.splitFieldId(data.name);
                         data.name = formatSelectionTemplate(name);
@@ -279,7 +279,7 @@
 
                 $('.query-designer-columns-grid-container .item-container').itemsManagerTable({
                     collection: columnCollection,
-                    itemTemplateSelector: '#report-column-row',
+                    itemTemplate: $('#report-column-row').html(),
                     itemRender: function (tmpl, data) {
                         var name = entityFieldUtil.splitFieldId(data.name);
                         data.name = formatSelectionTemplate(name);
