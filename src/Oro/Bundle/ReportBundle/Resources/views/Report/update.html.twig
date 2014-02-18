@@ -89,7 +89,7 @@
 
     {% set dataBlocks = dataBlocks|merge( [{
         'title' : 'oro.report.form.designer'|trans,
-        'content_attr': {'id': 'report-designer', 'data-metadata': metadata|json_encode|raw},
+        'content_attr': {'id': 'report-designer'},
         'subblocks': [
             {
                 'title': 'oro.report.form.columns'|trans,
@@ -187,6 +187,7 @@
     <script type="text/javascript">
         require(['ororeport/js/report'], function (reportManagerInit) {
             reportManagerInit({
+                entityChoice: '#oro_report_form_entity',
                 valueSource: '#oro_report_form_definition',
                 filters: {
                     criteriaList: '#filter-criteria-list',
