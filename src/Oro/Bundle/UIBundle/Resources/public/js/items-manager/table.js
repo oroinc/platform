@@ -34,7 +34,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
             this._initSorting();
             this._onResetCollection();
 
-            this.element.on('click', '.action',  _.bind(this._onAction, this));
+            this.element.on('click', '[data-collection-action]',  _.bind(this._onAction, this));
         },
 
         _initSorting: function () {
@@ -125,18 +125,12 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
             }
 
             var data = $el.data();
-
-            if (data.handle) {
-                this._actionHandler(data.action, model, data);
-            } else {
-                model.trigger('action:' + data.action, model, data);
-            }
-        },
-
-        _actionHandler: function (action, model, data) {
+            var action = data.collectionAction;
             var handler = this.options[action + 'Handler'];
             if (typeof handler === 'function') {
                 handler(model, data);
+            } else {
+                model.trigger('action:' + action, model, data);
             }
         },
 
