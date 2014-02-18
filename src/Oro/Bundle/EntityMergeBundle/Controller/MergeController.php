@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityMergeBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
@@ -13,6 +12,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ValidatorInterface;
 
+use Oro\Bundle\EntityMergeBundle\Exception\ValidationException;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\EntityDataFactory;
@@ -51,8 +51,9 @@ class MergeController extends Controller
      * @Route(name="oro_entity_merge")
      * @Acl(
      *      id="oro_entity_merge",
-     *      label="oro.entity_merge.action.merge",
-     *      type="action"
+     *      label="oro.entity_merge.acl.merge",
+     *      type="action",
+     *      group_name=""
      * )
      * @Template()
      */
