@@ -13,6 +13,7 @@ define(function (require) {
     require('oroui/js/items-manager/table');
 
     defaults = {
+        entityChoice: '',
         valueSource: '',
         filters: {
             criteriaList: '',
@@ -49,12 +50,16 @@ define(function (require) {
     /**
      * Saves data to the input
      *
-     * @param {string} key name of data branch
      * @param {Object} value data from certain control
+     * @param {string=} key name of data branch
      */
-    function save(key, value) {
+    function save(value, key) {
         var data = load();
-        data[key] = value;
+        if (key) {
+            data[key] = value;
+        } else {
+            data = key;
+        }
         $storage.val(JSON.stringify(data));
     }
 
@@ -80,7 +85,7 @@ define(function (require) {
 
         collection = new (Backbone.Collection)(load('grouping_columns'), {model: GroupingModel});
         collection.on('add remove sort', function () {
-            save('grouping_columns', collection.toJSON());
+            save(collection.toJSON(), 'grouping_columns');
         });
 
         $editor.itemsManagerEditor($.extend(options.editor, {
@@ -115,7 +120,7 @@ define(function (require) {
 
         collection = new (Backbone.Collection)(load('columns'), {model: ColumnModel});
         collection.on('add remove sort', function () {
-            save('columns', collection.toJSON());
+            save(collection.toJSON(), 'columns');
         });
 
         $editor.itemsManagerEditor($.extend(options.editor, {
@@ -151,7 +156,7 @@ define(function (require) {
         $builder = $(options.conditionBuilder);
         $builder.conditionBuilder('setValue', load('filters'));
         $builder.on('changed', function () {
-            save('filters', $builder.conditionBuilder('getValue'));
+            save($builder.conditionBuilder('getValue'), 'filters');
         });
     }
 
@@ -167,5 +172,17 @@ define(function (require) {
         initGrouping(options.grouping, options.metadata, fieldChoiceOptions);
         initColumn(options.column, options.metadata, fieldChoiceOptions);
         configureFilters(options.filters, options.metadata, fieldChoiceOptions);
+
+        $(options.entityChoice)
+            .on('fieldsloadercomplete', function () {
+                var data = {columns: [], grouping_columns: [], filters: []};
+                save(data);
+                $(options.grouping.itemContainer).itemsManagerTable('reset');
+                $(options.grouping.form).itemsManagerEditor('reset');
+                $(options.column.itemContainer).itemsManagerTable('reset');
+                $(options.column.form).itemsManagerEditor('reset');
+                $(options.filters.conditionBuilder).conditionBuilder('setValue', data.filters);
+            });
+
     };
 });

@@ -42,6 +42,10 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
             this.element.on('click', '[data-collection-action]',  _.bind(this._onAction, this));
         },
 
+        reset: function () {
+            this.options.collection.reset();
+        },
+
         _initSorting: function () {
             this.element.sortable({
                 cursor: 'move',
