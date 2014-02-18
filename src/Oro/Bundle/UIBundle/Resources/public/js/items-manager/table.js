@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
      * Listens to options.collection events:
      * add, remove, change, reset
      *
-     * Uses options.itemTemplateSelector for item rendering
+     * Uses options.itemTemplate for item rendering
      */
     $.widget('oroui.itemsManagerTable', {
         options: {

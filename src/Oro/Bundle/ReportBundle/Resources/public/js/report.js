@@ -55,14 +55,11 @@ define(function (require) {
     }
 
     function initGrouping(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection;
+        var $editor, $fieldChoice, collection, util, template;
 
         $editor = $(options.form);
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
         $fieldChoice.fieldChoice(fieldChoiceOptions, metadata.grouping);
-
-        GroupingModel.prototype.util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
-        GroupingModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
         collection = new (Backbone.Collection)(load('grouping_columns'), {model: GroupingModel});
         collection.on('add remove sort', function () {
@@ -73,14 +70,23 @@ define(function (require) {
             namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
             collection: collection
         });
+
+        util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
+        template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
+
         $(options.itemContainer).itemsManagerTable({
             collection: collection,
-            itemTemplateSelector: options.itemTemplate
+            itemTemplate: $(options.itemTemplate).html(),
+            itemRender: function (tmpl, data) {
+                var name = util.splitFieldId(data.name);
+                data.name = template(name);
+                return tmpl(data);
+            }
         });
     }
 
     function initColumn(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection;
+        var $editor, $fieldChoice, collection, util, template;
 
         $editor = $(options.form);
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
@@ -90,9 +96,6 @@ define(function (require) {
             converters: metadata.converters,
             aggregates: metadata.aggregates
         });
-
-        ColumnModel.prototype.util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
-        ColumnModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
         collection = new (Backbone.Collection)(load('columns'), {model: ColumnModel});
         collection.on('add remove sort', function () {
@@ -104,9 +107,21 @@ define(function (require) {
             collection: collection
         });
 
+        util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
+        template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
+
         $(options.itemContainer).itemsManagerTable({
             collection: collection,
-            itemTemplateSelector: options.itemTemplate
+            itemTemplate: $(options.itemTemplate).html(),
+            itemRender: function (tmpl, data) {
+                var func = data.func,
+                    name = util.splitFieldId(data.name);
+
+                data.name = template(name);
+                data.func = func && (func.group_type + ':' + func.group_name + ':' + func.name);
+
+                return tmpl(data);
+            }
         });
     }
 
