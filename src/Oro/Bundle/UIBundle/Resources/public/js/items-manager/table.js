@@ -17,14 +17,12 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
      */
     $.widget('oroui.itemsManagerTable', {
         options: {
-            itemTemplateSelector: null,
-            selectors: {
-                editButton: '.edit-button',
-                deleteButton: '.delete-button'
-            }
+            itemTemplateSelector: null
         },
 
         _create: function () {
+            this.options.deleteHandler = this.options.deleteHandler || _.bind(this._deleteHandler, this);
+
             this.itemTemplate = _.template($(this.options.itemTemplateSelector).html());
 
             var collection = this.options.collection;
@@ -35,6 +33,8 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
 
             this._initSorting();
             this._onResetCollection();
+
+            this.element.on('click', '.action',  _.bind(this._onAction, this));
         },
 
         _initSorting: function () {
@@ -111,38 +111,44 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
             });
             data.cid = model.cid;
 
-            var item = $(this.itemTemplate(data));
-            item.find(this.options.selectors.editButton).on('click', _.bind(this._onEditAction, this));
-            item.find(this.options.selectors.deleteButton).on('click', _.bind(this._onDeleteAction, this));
-
-            return item;
+            return $(this.itemTemplate(data));
         },
 
-        _onEditAction: function (e) {
-            e.preventDefault();
-            var cid = $(e.currentTarget).closest('[data-cid]').data('cid');
+        _onAction: function (ev) {
+            ev.preventDefault();
+
+            var $el = $(ev.currentTarget);
+            var cid = $el.closest('[data-cid]').data('cid');
             var model = this.options.collection.get(cid);
-            if (model) {
-                model.trigger('edit', model);
+            if (!model) {
+                return;
+            }
+
+            var data = $el.data();
+
+            if (data.handle) {
+                this._actionHandler(data.action, model, data);
+            } else {
+                model.trigger('action:' + data.action, model, data);
             }
         },
 
-        _onDeleteAction: function (e) {
-            e.preventDefault();
-            var el = $(e.currentTarget);
-            var cid = el.closest('[data-cid]').data('cid');
+        _actionHandler: function (action, model, data) {
+            var handler = this.options[action + 'Handler'];
+            if (typeof handler === 'function') {
+                handler(model, data);
+            }
+        },
+
+        _deleteHandler: function (model, data) {
+            var collection = this.options.collection;
             var confirm = new DeleteConfirmation({
-                content: el.data('message')
+                content: data.message
             });
-            confirm.on('ok', _.bind(this._handleDeleteAction, this, cid));
+            confirm.on('ok', function () {
+                collection.remove(model);
+            });
             confirm.open();
-        },
-
-        _handleDeleteAction: function (cid) {
-            var model = this.options.collection.get(cid);
-            if (model) {
-                this.options.collection.remove(model);
-            }
         }
     });
 

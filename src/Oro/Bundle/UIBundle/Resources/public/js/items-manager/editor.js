@@ -33,7 +33,7 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
                 click: this._onClick
             });
 
-            this.options.collection.on('edit', $.proxy(this._onEditModel, this));
+            this.options.collection.on('action:edit', $.proxy(this._onEditModel, this));
             this.options.collection.on('remove', $.proxy(this._onRemoveModel, this));
         },
 
