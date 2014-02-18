@@ -4,3 +4,4 @@ config:
         'oro/entity-field-choice-util': 'bundles/oroentity/js/entity-field-choice-util.js'
         'oro/entity-field-select-util': 'bundles/oroentity/js/entity-field-select-util.js'
         'oro/entity-field-view': 'bundles/oroentity/js/entity-field-view.js'
+        'oroentity/js/field-choice': 'bundles/oroentity/js/field-choice.js'
