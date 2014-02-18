@@ -1,13 +1,13 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
+define(['jquery', 'jquery-ui'],   function ($) {
     'use strict';
 
     function setValue($elem, value) {
         if ($elem.data('select2')) {
             $elem.select2('val', value);
         } else {
-            $elem.val(value);
+            $elem.val(value).trigger('change');
         }
     }
 
@@ -100,7 +100,7 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
                     result = validator.element(elem);
                 } else {
                     $.each(this._elements(), function () {
-                        result = result && validator.element(this);
+                        result = validator.element(this) && result;
                     });
                     this.validated = true;
                 }
@@ -163,12 +163,13 @@ define(['jquery', 'underscore', 'jquery-ui'],   function ($, _) {
                 pattern = this.options.namePattern;
 
             $.each(this._elements(), function () {
+                console.log(this.name, pattern, this.name.match(pattern));
                 var name = this.name && (this.name.match(pattern) || [])[1];
                 if (name) {
                     elementsMap[name] = $(this);
                 }
             });
-
+console.log(elementsMap);
             return elementsMap;
         },
 

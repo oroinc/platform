@@ -1,14 +1,14 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/query-designer/util'], function($, _, util) {
+/*jslint nomen: true*/
+define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], function ($, _, util) {
     'use strict';
 
     /**
      * Widget that represents all query designer functions
-     *
-     * @export  oro/query-designer/function-choice
      */
     $.widget('oroquerydesigner.functionChoice', {
         options: {
+            fieldChoiceSelector: '',
             optionTemplate: _.template('<option value="<%- name %>" title="<%- title %>" data-group_name="<%- group_name %>" data-group_type="<%- group_type %>">' +
                 '<%- label %>' +
             '</option>'),
@@ -17,35 +17,10 @@ define(['jquery', 'underscore', 'oro/query-designer/util'], function($, _, util)
         },
 
         activeFunctionGroupKey: null,
-        isVisible: false,
 
         _create: function () {
-            this.hide();
-        },
-
-        /**
-         * Returns a control which contains a function selector
-         *
-         * @return {jQuery}
-         */
-        _getContainer: function () {
-            return this.element.closest('.control-group');
-        },
-
-        /**
-         * Shows widget's container
-         */
-        show: function () {
-            this._getContainer().show();
-            this.isVisible = true;
-        },
-
-        /**
-         * Hides widget's container
-         */
-        hide: function () {
-            this._getContainer().hide();
-            this.isVisible = false;
+            this._disable(true);
+            this._bindFieldChoice();
         },
 
         /**
@@ -125,20 +100,9 @@ define(['jquery', 'underscore', 'oro/query-designer/util'], function($, _, util)
                 this.activeFunctionGroupKey = foundGroupKey;
             }
 
-            if (this.isVisible) {
-                if (!foundGroupKey) {
-                    this.hide();
-                }
-            } else {
-                if (foundGroupKey) {
-                    this.show();
-                }
-            }
+            this._disable(!foundGroupKey);
 
-            if (this.isVisible) {
-                this.element.val('');
-                this.element.trigger('change');
-            }
+            this.element.val('').trigger('change');
         },
 
         /**
@@ -159,6 +123,29 @@ define(['jquery', 'underscore', 'oro/query-designer/util'], function($, _, util)
                 }
             }
             return result;
+        },
+
+        _disable: function (flag) {
+            var $elem = this.element;
+            if ($elem.data('select2')) {
+                $elem.select2("enable", !flag);
+            } else {
+                $elem.attr('disabled', flag);
+            }
+            if ($elem.data('uniformed')) {
+                $elem.parent().toggleClass('disabled', flag);
+            }
+        },
+
+        _bindFieldChoice: function () {
+            var $fields, self = this;
+            if (this.options.fieldChoiceSelector) {
+                $fields = $(this.options.fieldChoiceSelector);
+                $fields.change(function (e) {
+                    var criteria = $fields.fieldChoice('getApplicableConditions', $(e.target).val());
+                    self.setActiveFunctions(criteria);
+                });
+            }
         }
     });
 
