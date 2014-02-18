@@ -3,6 +3,8 @@ define(['underscore', 'backbone', 'oro/abstract-widget'],
 function(_, Backbone, AbstractWidget) {
     'use strict';
 
+    var $ = Backbone.$;
+
     /**
      * @export  oro/block-widget
      * @class   oro.BlockWidget
@@ -26,13 +28,15 @@ function(_, Backbone, AbstractWidget) {
             '</div>')
         }),
 
+        widgetContentContainer: null,
+
         initialize: function(options) {
             options = options || {};
 
             if (!_.isFunction(this.options.template)) {
                 this.options.template = _.template(this.options.template);
             }
-            this.widget = Backbone.$(this.options.template({
+            this.widget = $(this.options.template({
                 'title': this.options.title,
                 'contentClasses': this.options.contentClasses
             }));
@@ -75,10 +79,11 @@ function(_, Backbone, AbstractWidget) {
         },
 
         _showStatic: function() {
-            var anchorDiv = Backbone.$('<div/>');
+            var anchorId = '_widget_anchor-' + this.getWid();
+            var anchorDiv = $('<div id="' + anchorId + '"/>');
             anchorDiv.insertAfter(this.$el);
             this.widgetContentContainer.append(this.$el);
-            anchorDiv.replaceWith(Backbone.$(this.widget));
+            $('#' + anchorId).replaceWith($(this.widget));
         },
 
         _showRemote: function() {
