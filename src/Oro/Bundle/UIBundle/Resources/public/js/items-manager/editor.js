@@ -38,6 +38,7 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         reset: function (model) {
+            var self = this;
             var elementsMap, attrs;
             this._hideErrors();
             this.validated = false;
@@ -47,7 +48,7 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 attrs = model.toJSON();
                 $.each(attrs, function (name, value) {
                     if (elementsMap[name]) {
-                        setValue(elementsMap[name], value);
+                        self.options.setPropertyEditor(name, value, elementsMap[name], setValue);
                     }
                 });
             } else {
@@ -149,10 +150,11 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         _collectAttrs: function () {
+            var self = this;
             var arrts = {};
 
             $.each(this._elementsMap(), function (name, $elem) {
-                arrts[name] = $elem.val();
+                arrts[name] = self.options.readPropertyEditor(name, $elem);
             });
 
             return arrts;

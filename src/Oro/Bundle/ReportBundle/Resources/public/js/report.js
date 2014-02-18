@@ -104,7 +104,27 @@ define(function (require) {
 
         $editor.itemsManagerEditor({
             namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/,
-            collection: collection
+            collection: collection,
+            setPropertyEditor: function (name, value, $el, setValue) {
+                if (name === 'func') {
+                    setValue($el, value.name);
+                    $el.data('group_type', value.group_type);
+                    $el.data('group_name', value.group_name);
+                } else {
+                    setValue($el, value);
+                }
+            },
+            readPropertyEditor: function (name, $el) {
+                if (name === 'func') {
+                    return {
+                        name: $el.val(),
+                        group_type: $el.find(":selected").data('group_type'),
+                        group_name: $el.find(":selected").data('group_name')
+                    };
+                } else {
+                    return $el.val();
+                }
+            }
         });
 
         util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
