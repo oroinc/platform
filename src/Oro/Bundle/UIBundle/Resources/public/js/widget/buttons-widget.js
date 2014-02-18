@@ -3,6 +3,8 @@ define(['underscore', 'backbone', 'oro/abstract-widget'],
 function(_, Backbone, AbstractWidget) {
     'use strict';
 
+    var $ = Backbone.$;
+
     /**
      * @export  oro/buttons-widget
      * @class   oro.ButtonsWidget
@@ -47,10 +49,11 @@ function(_, Backbone, AbstractWidget) {
         },
 
         _showStatic: function() {
-            var anchorDiv = Backbone.$('<div/>');
+            var anchorId = '_widget_anchor-' + this.getWid();
+            var anchorDiv = $('<div id="' + anchorId + '"/>');
             var parent = this.widget.parent();
             anchorDiv.insertAfter(parent);
-            anchorDiv.replaceWith(this.widget);
+            $('#' + anchorId).replaceWith($(this.widget));
             parent.remove();
         },
 

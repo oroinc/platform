@@ -53,7 +53,12 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('trans')
             ->will($this->returnArgument(0));
 
-        $entityProvider = new EntityProvider($this->entityConfigProvider, $this->entityClassResolver, $translator);
+        $entityProvider = new EntityProvider(
+            $this->entityConfigProvider,
+            $this->extendConfigProvider,
+            $this->entityClassResolver,
+            $translator
+        );
 
         $this->doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
             ->disableOriginalConstructor()

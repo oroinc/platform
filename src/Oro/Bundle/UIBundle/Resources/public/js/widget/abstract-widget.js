@@ -22,6 +22,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
             wid: null,
             loadingMaskEnabled: true,
             loadingElement: null,
+            container: null,
             submitHandler: function () {
                 this.trigger('adoptedFormSubmit', this.form, this);
             }
@@ -84,6 +85,8 @@ function(_, Backbone, mediator, LoadingMask, layout) {
 
             this.actions = {};
             this.firstRun = true;
+            this.containerFilled = false;
+
             this.loadingElement = $('body');
 
             mediator.trigger('widget_initialize', this);
@@ -542,7 +545,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
                 this.trigger('contentLoad', content, this);
                 this.actionsEl = null;
                 this.actions = {};
-                this.setElement($(content).filter('.widget-content'));
+                this.setElement($(content).filter('.widget-content:first'));
                 layout.init(this.$el);
                 this._show();
                 mediator.trigger('hash_navigation_request:complete');
@@ -562,6 +565,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
             this._adoptWidgetActions();
             this.trigger('renderStart', this.$el, this);
             this.show();
+            this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
         },
 
@@ -574,6 +578,13 @@ function(_, Backbone, mediator, LoadingMask, layout) {
             this._bindSubmitHandler();
             this.trigger('widgetRender', this.$el, this);
             mediator.trigger('widget:render:' + this.getWid(), this.$el, this);
+        },
+
+        _renderInContainer: function() {
+            if (!this.containerFilled && this.options.container) {
+                $(this.options.container).append(this.widget);
+                this.containerFilled = true;
+            }
         },
 
         /**

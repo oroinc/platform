@@ -35,12 +35,23 @@ class EmbedFormController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         /** @var EmbeddedFormManager $formManager */
         $formManager = $this->get('oro_embedded_form.manager');
+        $form        = $formManager->createForm($formEntity->getFormType());
 
-        $form = $formManager->createForm($formEntity->getFormType());
+        // avoid coming empty channel from client side
+        if ($form->has('channel')) {
+            $type = $form->get('channel')->getConfig()->getType()->getInnerType();
+            $configOptions = $form->get('channel')->getConfig()->getOptions();
+
+            $configOptions = array_merge(
+                $configOptions,
+                ['auto_initialize' => false, 'empty_data' => $formEntity->getChannel()]
+            );
+            $form->add('channel', $type, $configOptions);
+        }
+
         $form->handleRequest($request);
         if ($form->isValid()) {
             $entity = $form->getData();
-            $entity->setChannel($formEntity->getChannel());
             $em->persist($entity);
             $em->flush();
 
