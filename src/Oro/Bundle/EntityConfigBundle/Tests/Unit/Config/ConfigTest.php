@@ -25,7 +25,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config(new EntityConfigId('testScope', 'testClass'));
 
-        $values = array('firstKey' => 'firstValue', 'secondKey' => 'secondValue', 'fourthKey' => new \stdClass());
+        $values = array(
+            'firstKey' => 'firstValue',
+            'secondKey' => 'secondValue',
+            'thirdKey' => 3,
+            'fourthKey' => new \stdClass()
+        );
         $config->setValues($values);
 
         $this->assertEquals($values, $config->all());
@@ -43,10 +48,16 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(true, $config->is('secondKey'));
 
-        $this->assertEquals(true, $config->has('secondKey'));
-        $this->assertEquals(false, $config->has('thirdKey'));
+        $this->assertEquals(true, $config->in('thirdKey', ['3']));
+        $this->assertEquals(false, $config->in('thirdKey', ['3'], true));
+        $this->assertEquals(true, $config->in('thirdKey', [3]));
+        $this->assertEquals(true, $config->in('thirdKey', [3], true));
+        $this->assertEquals(false, $config->in('thirdKey', [100]));
 
-        $this->assertEquals(null, $config->get('thirdKey'));
+        $this->assertEquals(true, $config->has('secondKey'));
+        $this->assertEquals(false, $config->has('nonExistKey'));
+
+        $this->assertEquals(null, $config->get('nonExistKey'));
 
         $this->assertEquals($config, unserialize(serialize($config)));
 
@@ -54,7 +65,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('secondValue2', $config->get('secondKey'));
 
         $this->setExpectedException('Oro\Bundle\EntityConfigBundle\Exception\RuntimeException');
-        $config->get('thirdKey', true);
+        $config->get('nonExistKey', true);
     }
 
     public function testSetState()

@@ -74,8 +74,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         ) {
             $entityConfig = $event->getConfigManager()->getProvider($scope)->getConfig($className);
 
-            if ($event->getConfig()->get('state') != ExtendManager::STATE_NEW
-                && $event->getConfig()->get('state') != ExtendManager::STATE_DELETED
+            if ($event->getConfig()->in('state', [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED])
                 && !isset($change['state'])
             ) {
                 $event->getConfig()->set('state', ExtendManager::STATE_UPDATED);
@@ -85,13 +84,13 @@ class ConfigSubscriber implements EventSubscriberInterface
             /**
              * Relations case
              */
-            if ($event->getConfig()->get('state') == ExtendManager::STATE_NEW
+            if ($event->getConfig()->is('state', ExtendManager::STATE_NEW)
                 && in_array($event->getConfig()->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
             ) {
                 $this->createRelation($event->getConfig());
             }
 
-            if ($entityConfig->get('state') != ExtendManager::STATE_NEW) {
+            if (!$entityConfig->is('state', ExtendManager::STATE_NEW)) {
                 $entityConfig->set('state', ExtendManager::STATE_UPDATED);
 
                 $event->getConfigManager()->persist($entityConfig);
