@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 
 class OroEntityCreateOrSelectType extends AbstractType
 {
@@ -15,6 +18,16 @@ class OroEntityCreateOrSelectType extends AbstractType
     const MODE_CREATE = 'create';
     const MODE_GRID   = 'grid';
     const MODE_VIEW   = 'view';
+
+    /**
+     * @var DoctrineHelper
+     */
+    protected $doctrineHelper;
+
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
 
     /**
      * {@inheritDoc}
@@ -29,6 +42,10 @@ class OroEntityCreateOrSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addViewTransformer(
+            new EntityCreateOrSelectTransformer($this->doctrineHelper, $options['class'], $options['mode'])
+        );
+
         // new entity
         $builder->add(
             'new_entity',
@@ -36,8 +53,7 @@ class OroEntityCreateOrSelectType extends AbstractType
             array_merge(
                 $options['create_entity_form_options'],
                 array(
-                    'data_class' => $options['data_class'],
-                    'mapped' => false
+                    'data_class' => $options['class']
                 )
             )
         );
@@ -47,24 +63,22 @@ class OroEntityCreateOrSelectType extends AbstractType
             'existing_entity',
             'oro_entity_identifier',
             array(
-                'class' => $options['data_class'],
-                'multiple' => false,
-                'mapped' => false
+                'class' => $options['class'],
+                'multiple' => false
             )
         );
 
         // rendering mode
         $builder->add(
             'mode',
-            'hidden',
-            array(
-                'mapped' => false
-            )
+            'text', // TODO use hidden
+            array()
         );
     }
 
     /**
      * Important options:
+     * - class - FQCN used for this form type
      * - create_entity_form_type - form type used to render create entity form
      * - create_entity_form_options - options for create entity form
      * - grid_name - name of the grid used to select existing entity
@@ -80,7 +94,7 @@ class OroEntityCreateOrSelectType extends AbstractType
     {
         $resolver->setRequired(
             array(
-                'data_class',
+                'class',
                 'create_entity_form_type',
                 'grid_name',
                 'view_widgets'

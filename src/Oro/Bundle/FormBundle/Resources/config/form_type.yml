@@ -77,7 +77,6 @@ services:
         tags:
             - { name: form.type, alias: oro_multiple_entity }
 
-    # Collections form types
     oro_form.type.collection:
         class: %oro_form.type.collection.class%
         tags:
@@ -85,6 +84,8 @@ services:
 
     oro_form.type.entity_create_or_select:
         class: %oro_form.type.entity_create_or_select.class%
+        arguments:
+            - @oro_entity.doctrine_helper
         tags:
             - { name: form.type, alias: oro_entity_create_or_select }
 

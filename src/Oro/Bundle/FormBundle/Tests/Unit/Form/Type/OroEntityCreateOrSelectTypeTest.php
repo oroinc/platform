@@ -117,13 +117,13 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
         return array(
             'default options' => array(
                 'inputOptions' => array(
-                    'data_class' => self::TEST_ENTITY,
+                    'class' => self::TEST_ENTITY,
                     'create_entity_form_type' => 'text',
                     'grid_name' => 'test-grid-name',
                     'view_widgets' => array('test_entity_widget'),
                 ),
                 'expectedOptions' => array(
-                    'data_class' => self::TEST_ENTITY,
+                    'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_CREATE,
                     'create_entity_form_type' => 'text',
                     'create_entity_form_options' => array(),
@@ -137,7 +137,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
             ),
             'custom options' => array(
                 'inputOptions' => array(
-                    'data_class' => self::TEST_ENTITY,
+                    'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
                     'create_entity_form_type' => 'entity',
                     'create_entity_form_options' => array(
@@ -148,7 +148,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                     'view_widgets' => array('test_entity_widget'),
                 ),
                 'expectedOptions' => array(
-                    'data_class' => self::TEST_ENTITY,
+                    'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
                     'create_entity_form_type' => 'entity',
                     'create_entity_form_options' => array(
