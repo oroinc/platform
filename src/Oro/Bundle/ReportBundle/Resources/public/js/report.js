@@ -2,7 +2,7 @@
 /*jslint nomen: true*/
 define(function (require) {
     'use strict';
-    var defaults,
+    var defaults, $storage,
         $ = require('jquery'),
         _ = require('underscore'),
         Backbone = require('backbone'),
@@ -19,11 +19,13 @@ define(function (require) {
             conditionBuilder: ''
         },
         grouping: {
+            editor: {},
             form: '',
             itemContainer: '',
             itemTemplate: ''
         },
         column: {
+            editor: {},
             form: '',
             itemContainer: '',
             itemTemplate: ''
@@ -33,12 +35,27 @@ define(function (require) {
         metadata: {}
     };
 
+    /**
+     * Loads data from the input
+     *
+     * @param {string=} key name of data branch
+     */
     function load(key) {
-
+        var json = $storage.val(),
+            data = (json && JSON.parse(json)) || {};
+        return key ? data[key] : data;
     }
 
-    function save(key, data) {
-
+    /**
+     * Saves data to the input
+     *
+     * @param {string} key name of data branch
+     * @param {Object} value data from certain control
+     */
+    function save(key, value) {
+        var data = load();
+        data[key] = value;
+        $storage.val(JSON.stringify(data));
     }
 
     function getFieldChoiceOptions(options) {
@@ -66,10 +83,9 @@ define(function (require) {
             save('grouping_columns', collection.toJSON());
         });
 
-        $editor.itemsManagerEditor({
-            namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
+        $editor.itemsManagerEditor($.extend(options.editor, {
             collection: collection
-        });
+        }));
 
         util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
         template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
@@ -102,8 +118,7 @@ define(function (require) {
             save('columns', collection.toJSON());
         });
 
-        $editor.itemsManagerEditor({
-            namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/,
+        $editor.itemsManagerEditor($.extend(options.editor, {
             collection: collection,
             setPropertyEditor: function (name, value, $el, setValue) {
                 if (name === 'func') {
@@ -125,7 +140,7 @@ define(function (require) {
                     return $el.val();
                 }
             }
-        });
+        }));
 
         util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
         template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
@@ -146,17 +161,25 @@ define(function (require) {
     }
 
     function configureFilters(options, metadata, fieldChoiceOptions) {
+        var $fieldCondition, $builder;
         // mixin extra options to condition-builder's field choice
-        var $fieldCondition = $(options.criteriaList).find('[data-criteria=condition-item]');
+        $fieldCondition = $(options.criteriaList).find('[data-criteria=condition-item]');
         $.extend(true, $fieldCondition.data('options'), {
             fieldChoice: fieldChoiceOptions,
             filters: metadata.filters
+        });
+        $builder = $(options.conditionBuilder);
+        $builder.conditionBuilder('setValue', load('filters'));
+        $builder.on('changed', function () {
+            save('filters', $builder.conditionBuilder('getValue'));
         });
     }
 
     return function (options) {
         var fieldChoiceOptions;
         options = $.extend(true, {}, defaults, options);
+
+        $storage = $(options.valueSource);
 
         // common extra options for all field-choice inputs
         fieldChoiceOptions = getFieldChoiceOptions(options);

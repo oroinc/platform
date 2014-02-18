@@ -193,11 +193,19 @@
                     conditionBuilder: '#report-condition-builder'
                 },
                 grouping: {
+                    editor: {
+                        mapping: {
+                            name: 'oro_report_form[grouping][columnNames]'
+                        }
+                    },
                     form: '#report-grouping-form',
                     itemContainer: '#report-grouping-list .grouping-item-container',
                     itemTemplate: '#report-grouping-item-row'
                 },
                 column: {
+                    editor: {
+                        namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/
+                    },
                     form: '#report-column-form',
                     itemContainer: '#report-column-list .item-container',
                     itemTemplate: '#report-column-row'

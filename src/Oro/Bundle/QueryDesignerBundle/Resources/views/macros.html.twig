@@ -268,16 +268,6 @@
     } %}
     <script type="text/javascript">
         require(['oroentity/js/field-choice'], function ($) {
-
-            // @todo names of inputs in form should represent model attribute
-            var $elem =$('[name="oro_report_form[grouping][columnNames]"]')
-                    .attr('name', 'oro_report_form[grouping][name]');
-            $elem.parents('form').submit(function () {
-                $elem.attr('name', 'oro_report_form[grouping][columnNames]');
-            });
-            // end
-
-
             $('#{{ attr.id }}').find('[data-purpose=column-selector]')
                 .fieldChoice({{ fieldConditionOptions|json_encode|raw }});
         });
