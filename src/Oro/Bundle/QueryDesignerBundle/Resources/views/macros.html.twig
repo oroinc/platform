@@ -72,6 +72,25 @@
     </div>
 {% endmacro %}
 
+{% macro query_designer_grouping_list(attr) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
+    <div{{ UI.attributes(attr) }}>
+        <div class="grid-container query-designer-grid-container query-designer-columns-grid-container">
+            <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
+                <thead>
+                <tr>
+                    <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
+                    <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
+                </tr>
+                </thead>
+                <tbody class="grouping-item-container">
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endmacro %}
+
 {% macro query_designer_column_template(id) %}
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
@@ -239,18 +258,6 @@
             'aCss': 'no-hash btn-primary add-button',
             'label' : 'oro.query_designer.form.action.add'|trans
         }) }}
-        <div class=" grid-container query-designer-grid-container query-designer-columns-grid-container">
-            <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
-                <thead>
-                <tr>
-                    <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>
-                    <th class="action-column"><span>{{ 'oro.query_designer.datagrid.column.actions'|trans }}</span></th>
-                </tr>
-                </thead>
-                <tbody class="grouping-item-container">
-                </tbody>
-            </table>
-        </div>
     </div>
     {% set fieldConditionOptions = {
         select2: {

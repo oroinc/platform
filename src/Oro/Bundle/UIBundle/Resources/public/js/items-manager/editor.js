@@ -163,13 +163,11 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 pattern = this.options.namePattern;
 
             $.each(this._elements(), function () {
-                console.log(this.name, pattern, this.name.match(pattern));
                 var name = this.name && (this.name.match(pattern) || [])[1];
                 if (name) {
                     elementsMap[name] = $(this);
                 }
             });
-console.log(elementsMap);
             return elementsMap;
         },
 

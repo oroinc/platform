@@ -97,21 +97,18 @@
                 'data': [
                     QD.query_designer_grouping_form(
                         form.grouping,
-                        {
-                            'id': 'report-grouping-form'
-                        }, {
-                            'entity_choice_id': 'oro_report_form_entity'
-                        }),
+                        {'id': 'report-grouping-form'},
+                        {'entity_choice_id': 'oro_report_form_entity'}
+                    ),
+                    QD.query_designer_grouping_list({'id': 'report-grouping-list'}),
+                    QD.query_designer_grouping_item_template('report-grouping-item-row'),
                     QD.query_designer_column_form(
                         form.column,
-                        {
-                            'id': 'report-column-form'
-                        }, {
-                            'entity_choice_id': 'oro_report_form_entity'
-                        }),
-                    QD.query_designer_column_list(),
-                    QD.query_designer_column_template('report-column-row'),
-                    QD.query_designer_grouping_item_template('report-grouping-item-row')
+                        {'id': 'report-column-form'},
+                        {'entity_choice_id': 'oro_report_form_entity'}
+                    ),
+                    QD.query_designer_column_list({'id': 'report-column-list'}),
+                    QD.query_designer_column_template('report-column-row')
                 ]
             },
             {
@@ -187,99 +184,27 @@
                 {% endif %}
             });
     </script>
-
-
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'backbone',
-            'oroquerydesigner/js/items-manager/grouping-model',
-            'oroquerydesigner/js/items-manager/column-model',
-            'oroentity/js/field-choice',
-            'oroui/js/items-manager/editor', 'oroui/js/items-manager/table'],
-        function($, _, Backbone, GroupingModel, ColumnModel) {
-            $(function() {
-                var entities = {{ entities|json_encode|raw }};
-
-                // common extra options for field-choice inputs
-                var fieldChoiceOptions = {
-                    select2: {
-                        formatSelectionTemplate: $('#report-column-chain-template').text()
-                    },
-                    util: {
-                        findEntity:  function (entityName) {
-                            return _.findWhere(entities, {name: entityName});
-                        }
-                    }
-                };
-
-                // mixin extra options to condition-builder's field choice
-                var $fieldConditionCriteria = $('#filter-criteria-list').find('[data-criteria=condition-item]');
-                $.extend(true, $fieldConditionCriteria.data('options'), {
-                    fieldChoice: fieldChoiceOptions,
-                    filters: {{ metadata.filters|json_encode|raw }}
-                });
-
-                // data loader
-                var $storage = $('#oro_report_form_definition');
-                var load = function () {
-                    var data = $storage.val();
-                    return data ? JSON.parse(data) : {};
-                };
-
-                // grouping
-                var $groupingEditForm = $('#report-grouping-form');
-                var $groupingFieldChoice = $groupingEditForm.find('[data-purpose=column-selector]');
-                $groupingFieldChoice.fieldChoice(fieldChoiceOptions, {{ metadata.grouping|json_encode|raw }});
-
-                GroupingModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
-                GroupingModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
-
-                var groupingCollection = new (Backbone.Collection)(load().grouping_columns, {model: GroupingModel});
-                groupingCollection.on('add remove sort', function () {
-                    var data = load();
-                    data.grouping_columns = groupingCollection.toJSON();
-                    $storage.val(JSON.stringify(data));
-                });
-
-                $groupingEditForm.itemsManagerEditor({
-                    namePattern:  /^oro_report_form\[grouping\]\[([\w\W]*)\]$/,
-                    collection: groupingCollection
-                });
-                $groupingEditForm.find('.grouping-item-container').itemsManagerTable({
-                    collection: groupingCollection,
-                    itemTemplateSelector: '#report-grouping-item-row'
-                });
-                // end grouping
-
-                // columns
-                var $columnEditForm = $('#report-column-form');
-                var $columnFieldChoice = $columnEditForm.find('[data-purpose=column-selector]');
-                $columnFieldChoice.fieldChoice(fieldChoiceOptions);
-
-                $columnEditForm.find('[data-purpose=function-selector]').functionChoice({
-                    converters: {{ metadata.converters|json_encode|raw }},
-                    aggregates: {{ metadata.aggregates|json_encode|raw }}
-                });
-
-                ColumnModel.prototype.util = $groupingFieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
-                ColumnModel.prototype.nameTemplate = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
-
-                var columnCollection = new (Backbone.Collection)(load().columns, {model: ColumnModel});
-                columnCollection.on('add remove sort', function () {
-                    var data = load();
-                    data.columns = columnCollection.toJSON();
-                    $storage.val(JSON.stringify(data));
-                });
-                
-                $columnEditForm.itemsManagerEditor({
-                    namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/,
-                    collection: columnCollection
-                });
-                
-                $('.query-designer-columns-grid-container .item-container').itemsManagerTable({
-                    collection: columnCollection,
-                    itemTemplateSelector: '#report-column-row'
-                });
-                // end columns
+        require(['ororeport/js/report'], function (reportManagerInit) {
+            reportManagerInit({
+                valueSource: '#oro_report_form_definition',
+                filters: {
+                    criteriaList: '#filter-criteria-list',
+                    conditionBuilder: '#report-condition-builder'
+                },
+                grouping: {
+                    form: '#report-grouping-form',
+                    itemContainer: '#report-grouping-list .grouping-item-container',
+                    itemTemplate: '#report-grouping-item-row'
+                },
+                column: {
+                    form: '#report-column-form',
+                    itemContainer: '#report-column-list .item-container',
+                    itemTemplate: '#report-column-row'
+                },
+                select2FormatSelectionTemplate: '#report-column-chain-template',
+                entities: {{ entities|json_encode|raw }},
+                metadata: {{ metadata|json_encode|raw }}
             });
         });
     </script>
