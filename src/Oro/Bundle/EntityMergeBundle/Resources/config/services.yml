@@ -31,7 +31,7 @@ parameters:
     oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener
     oro_entity_merge.listener.init_default_label.class: Oro\Bundle\EntityMergeBundle\EventListener\InitDefaultLabelListener
     oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener\CascadeRemoveAssociationListener
-
+    oro_entity_merge.listener.merge_render.convert_default_value_types.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeRenderListener\ConvertDefaultValueTypesListener
     # Validator
     oro_entity_merge.validator.doctrine_helper.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\DoctrineHelperValidator
     oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator
@@ -156,6 +156,16 @@ services:
           - @oro_entity_merge.doctrine_helper
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_field, method: afterMergeField }
+
+    oro_entity_merge.listener.merge_render.convert_default_value_types:
+        class: %oro_entity_merge.listener.merge_render.convert_default_value_types.class%
+        arguments:
+          - @oro_locale.formatter.address
+          - @oro_locale.formatter.date_time
+          - @oro_locale.formatter.name
+          - @oro_locale.formatter.number
+        tags:
+          - { name: kernel.event_listener, event: oro.entity_merge.after_calculate_field_value_representation, method: afterCalculate }
 
     # Validators
     oro_entity_merge.validator.max_entities_validator:

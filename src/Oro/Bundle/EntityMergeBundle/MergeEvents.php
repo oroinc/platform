@@ -39,4 +39,6 @@ final class MergeEvents
      * Instance of Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent is passed.
      */
     const CREATE_ENTITY_DATA = 'oro.entity_merge.create_entity_data';
+
+    const AFTER_CALCULATE_FIELD_VALUE_REPRESENTATION = 'oro.entity_merge.after_calculate_field_value_representation';
 }

@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Twig;
 
+use Oro\Bundle\EntityMergeBundle\Event\FieldValueRenderEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class MergeRenderer
 {
@@ -14,6 +17,8 @@ class MergeRenderer
      */
     protected $environment;
 
+    protected $eventDispatcherInterface;
+
     /**
      * @var string
      */
@@ -21,11 +26,16 @@ class MergeRenderer
 
     /**
      * @param \Twig_Environment $environment
+     * @param EventDispatcherInterface $eventDispatcherInterface
      * @param string $defaultTemplate
      */
-    public function __construct(\Twig_Environment $environment, $defaultTemplate)
-    {
+    public function __construct(
+        \Twig_Environment $environment,
+        EventDispatcherInterface $eventDispatcherInterface,
+        $defaultTemplate
+    ) {
         $this->environment = $environment;
+        $this->eventDispatcherInterface = $eventDispatcherInterface;
         $this->defaultTemplate = $defaultTemplate;
     }
 
@@ -112,16 +122,26 @@ class MergeRenderer
      */
     protected function convertToString($value, Metadata $metadata)
     {
+        $convertResult = null;
+
         if (null === $value || is_scalar($value)) {
-            return (string) $value;
+            $convertResult = $value;
+        } else {
+            $method = $metadata->get('cast_method') ? : '__toString';
+
+            if (method_exists($value, $method)) {
+                $convertResult = $value->$method();
+            }
         }
 
-        $method = $metadata->get('cast_method') ? : '__toString';
-
-        if (method_exists($value, $method)) {
-            return $value->$method();
+        if ($this->eventDispatcherInterface->hasListeners(MergeEvents::AFTER_CALCULATE_FIELD_VALUE_REPRESENTATION)) {
+            $event = new FieldValueRenderEvent($convertResult, $value, $metadata);
+            $this->eventDispatcherInterface->dispatch(
+                MergeEvents::AFTER_CALCULATE_FIELD_VALUE_REPRESENTATION,
+                $event
+            );
         }
 
-        return '';
+        return (string)$convertResult;
     }
 }
