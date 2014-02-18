@@ -4,13 +4,15 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -20,7 +22,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
  * EntityConfig controller.
@@ -131,23 +132,7 @@ class ConfigController extends Controller
      */
     public function viewAction(EntityConfigModel $entity)
     {
-        /**
-         * define Entity module and name
-         */
-        $entityName = $moduleName = '';
-        $className  = explode('\\', $entity->getClassName());
-        if (count($className) > 1) {
-            foreach ($className as $i => $name) {
-                if (count($className) - 1 == $i) {
-                    $entityName = $name;
-                } elseif (!in_array($name, ['Bundle', 'Entity'])) {
-                    $moduleName .= $name;
-                }
-            }
-        } else {
-            $entityName = $className[0];
-            $moduleName = 'Custom';
-        }
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
 
         /** @var \Oro\Bundle\EntityConfigBundle\Config\ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
@@ -387,24 +372,7 @@ class ConfigController extends Controller
      */
     public function infoAction(EntityConfigModel $entity)
     {
-        /**
-         * define Entity module and name
-         */
-        $entityName = $moduleName = '';
-        $className  = $entity->getClassName();
-        if (strpos($className, ExtendConfigDumper::ENTITY) === false) {
-            $className = explode('\\', $className);
-            foreach ($className as $index => $name) {
-                if (count($className) - 1 == $index) {
-                    $entityName = $name;
-                } elseif (!in_array($name, array('Bundle', 'Entity'))) {
-                    $moduleName .= $name;
-                }
-            }
-        } else {
-            $entityName = str_replace(ExtendConfigDumper::ENTITY, '', $className);
-            $moduleName = 'System';
-        }
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
 
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');

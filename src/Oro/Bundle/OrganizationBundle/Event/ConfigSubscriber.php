@@ -2,20 +2,11 @@
 
 namespace Oro\Bundle\OrganizationBundle\Event;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Oro\Bundle\EntityConfigBundle\Event\FieldConfigEvent;
-use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 
@@ -47,11 +38,10 @@ class ConfigSubscriber implements EventSubscriberInterface
             $ownershipConfig = $ownershipConfigProvider->getConfig($className);
             $ownerType       = $ownershipConfig->get('owner_type');
             if ($ownerType === 'NONE') {
-//                $ownerType = null;
-//                $ownershipConfig-> (
-//                    'owner_field_name',
-//                    ExtendConfigDumper::FIELD_PREFIX . $ownerFieldName
-//                );
+                $ownerType = null;
+                $ownershipConfig->remove('owner_type');
+                $event->getConfigManager()->persist($ownershipConfig);
+                $event->getConfigManager()->calculateConfigChangeSet($ownershipConfig);
             }
             if ($ownerType && !$ownershipConfig->has('owner_field_name')) {
                 $ownerTargetEntity = $this->getOwnerTargetEntity($ownershipConfig->get('owner_type'));

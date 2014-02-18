@@ -6,8 +6,6 @@ oro_entity_config:
                     options:
                         create_only:        true
                         priority:           100
-                    constraints:
-                        - NotBlank:         ~
                     grid:
                         type:               select
                         label:              'Ownership Type'
@@ -21,6 +19,6 @@ oro_entity_config:
                         type:               oro_type_choice_ownership_type
                         options:
                             block:          other
-                            required:       false
+                            required:       true
                             label:          'Ownership Type'
 

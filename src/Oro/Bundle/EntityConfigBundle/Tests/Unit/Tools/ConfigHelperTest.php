@@ -15,6 +15,16 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    /**
+     * @dataProvider getModuleAndEntityNamesProvider
+     */
+    public function testGetModuleAndEntityNames($className, $expectedModuleName, $expectedEntityName)
+    {
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
+        $this->assertEquals($expectedModuleName, $moduleName);
+        $this->assertEquals($expectedEntityName, $entityName);
+    }
+
     public function getTranslationKeyProvider()
     {
         return [
@@ -22,6 +32,29 @@ class ConfigHelperTest extends \PHPUnit_Framework_TestCase
             ['oro.somesomeclass.entity_plural_label', 'plural_label', 'Oro\SomeBundle\SomeClass', null],
             ['oro.somesomeclass.some_field.label', 'label', 'Oro\SomeBundle\SomeClass', 'someField'],
             ['oro.somesomeclass.some_field.plural_label', 'plural_label', 'Oro\SomeBundle\SomeClass', 'someField'],
+        ];
+    }
+
+    public function getModuleAndEntityNamesProvider()
+    {
+        return [
+            ['Oro\SomeBundle\SomeClass', 'OroSomeBundle', 'SomeClass'],
+            ['Oro\Bundle\SomeBundle\Entity\SomeClass', 'OroSomeBundle', 'SomeClass'],
+            ['Acme\SomeBundle\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
+            ['Acme\Bundle\SomeBundle\Entity\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
+            ['Acme\Bundles\SomeBundle\Entity\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
+            ['Acme\Bundle\SomeBundle\Entities\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
+            ['Acme\Bundles\SomeBundle\Entities\SomeClass', 'AcmeSomeBundle', 'SomeClass'],
+            ['Gedmo\Translatable\Entity\Translation', 'GedmoTranslatable', 'Translation'],
+            ['JMS\JobQueueBundle\Entity\Job', 'JMSJobQueueBundle', 'Job'],
+            ['Extend\Entity\SomeClass', 'System', 'SomeClass'],
+            ['Acme\Entity\SomeClass', 'System', 'SomeClass'],
+            ['Acme\Entities\SomeClass', 'System', 'SomeClass'],
+            ['Acme\SomeClass', 'System', 'SomeClass'],
+            ['SomeClass', 'System', 'SomeClass'],
+            ['\SomeClass', 'System', 'SomeClass'],
+            ['', '', ''],
+            [null, '', ''],
         ];
     }
 }
