@@ -1,10 +1,8 @@
 {% extends bap.layout %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
-{% set gridName = 'search-grid' %}
-
-
 {% oro_title_set({ params: { '%keyword%': searchString } }) %}
+{% set gridName = 'search-grid' %}
 
 {% block page_container %}
     {% block content %}
@@ -24,22 +22,29 @@
             <tr>
                 <td class="search-entity-types-column">
                     {% for alias, type in groupedResults %}
-                        {% set config = oro_config_entity(type.class) %}
-                        {% set selected, label, iconClass = alias == from, config.name|trans({}, 'config'), config.icon_class %}
+                        {% set selected = alias == from %}
+                        {% if type.class %}
+                            {% set entityConfig = oro_entity_config(type.class) %}
+                            {% set label = entityConfig.plural_label|default('')|trans({}, 'config') %}
+                            {% set iconClass = entityConfig.icon|default('') %}
+                        {% else %}
+                            {% set label = 'oro.search.result.all'|trans %}
+                            {% set iconClass = 'icon-search' %}
+                        {% endif %}
 
-                        {% if alias == '' %}
-                            {% set label, iconClass = 'All', 'icon-search' %}
+                        {% if iconClass is empty %}
+                            {% set iconClass = 'icon-file' %}
                         {% endif %}
 
                         <div class="entity-type{% if selected %} selected{% endif %}">
                             <i class="{{ iconClass }}"></i>
                             {% if selected %}
-                            {{ label|trans }} ({{ type.count }})
-                            <div class="arrow"><i class="icon-chevron-right"></i></div>
-                            {% else %}
-                            <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
                                 {{ label|trans }} ({{ type.count }})
-                            </a>
+                                <div class="arrow"><i class="icon-chevron-right"></i></div>
+                            {% else %}
+                                <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
+                                    {{ label|trans }} ({{ type.count }})
+                                </a>
                             {% endif %}
                         </div>
                     {% endfor %}
