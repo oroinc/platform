@@ -15,19 +15,21 @@ use Oro\Bundle\LocaleBundle\Model\NameSuffixInterface;
 
 class ConvertDefaultValueTypesListener
 {
-
     /**
      * @var AddressFormatter
      */
     protected $addressFormatter;
+
     /**
      * @var DateTimeFormatter
      */
     protected $dateTimeFormatter;
+
     /**
      * @var NameFormatter
      */
     protected $nameFormatter;
+
     /**
      * @var NumberFormatter
      */
