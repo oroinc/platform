@@ -95,9 +95,9 @@
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
             <td class="name-cell"><%= name %></td>
-            <td class="label-cell"><%= label %></td>
+            <td class="label-cell"><%- label %></td>
             <td class="function-cell"><%= func %></td>
-            <td class="sorting-cell"><%= sorting %></td>
+            <td class="sorting-cell"><%= _.__(sorting) %></td>
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
