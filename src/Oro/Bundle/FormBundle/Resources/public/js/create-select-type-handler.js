@@ -1,6 +1,6 @@
 /* global define */
-define(['oro/widget-manager', 'routing'],
-function (widgetManager, routing) {
+define(['jquery', 'oro/widget-manager', 'routing', 'oro/navigation'],
+function ($, widgetManager, routing, Navigation) {
     'use strict';
 
     /**
@@ -8,7 +8,6 @@ function (widgetManager, routing) {
      * @class   oro.createSelectTypeHandler
      */
     return function (
-        label,
         btnContainer,
         viewContainer,
         currentModeEl,
@@ -17,9 +16,6 @@ function (widgetManager, routing) {
         viewWidgets,
         gridModelId
     ) {
-        var scrollableContainer = label.closest('.scrollable-container');
-        scrollableContainer.attr('data-spy', null);
-
         var entityCreateBlock = viewContainer.find('.entity-create-block');
 
         var setCurrentMode = function (mode) {
@@ -32,8 +28,6 @@ function (widgetManager, routing) {
             } else {
                 entityCreateBlock.attr('data-validation-ignore', true);
             }
-
-            scrollableContainer.scrollTop(label.position().top - 10);
         };
 
         // Render grid and change current mode to grid
