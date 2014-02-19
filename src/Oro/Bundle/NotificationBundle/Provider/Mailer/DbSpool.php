@@ -64,7 +64,7 @@ class DbSpool extends \Swift_ConfigurableSpool
     {
         /** @var SpoolItem $mailObject */
         $mailObject = new $this->entityClass;
-        $mailObject->setMessage(serialize($message));
+        $mailObject->setMessage($message);
         $mailObject->setStatus(self::STATUS_READY);
 
         try {
@@ -114,9 +114,7 @@ class DbSpool extends \Swift_ConfigurableSpool
             $this->em->persist($email);
             $this->em->flush();
 
-            /** @var \Swift_Message $message */
-            $message = unserialize($email->getMessage());
-            $count += $transport->send($message, $failedRecipients);
+            $count += $transport->send($email->getMessage(), $failedRecipients);
             $this->em->remove($email);
             $this->em->flush();
 
