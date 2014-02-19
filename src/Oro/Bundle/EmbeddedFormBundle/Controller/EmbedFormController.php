@@ -4,8 +4,8 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
