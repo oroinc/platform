@@ -20,7 +20,13 @@ define(['jquery', 'jquery-ui'],   function ($) {
             addButton: '.add-button',
             saveButton: '.save-button',
             cancelButton: '.cancel-button',
-            collection: null
+            collection: null,
+            setter: function ($el, name, value) {
+                return value;
+            },
+            getter: function ($el, name, value) {
+                return value;
+            }
         },
 
         _create: function () {
@@ -51,7 +57,8 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 attrs = model.toJSON();
                 $.each(attrs, function (name, value) {
                     if (elementsMap[name]) {
-                        self.options.setPropertyEditor(name, value, elementsMap[name], setValue);
+                        var val = self.options.setter(elementsMap[name], name, value);
+                        setValue(elementsMap[name], val);
                     }
                 });
             } else {
@@ -157,9 +164,8 @@ define(['jquery', 'jquery-ui'],   function ($) {
             var arrts = {};
 
             var t = this._elementsMap();
-            debugger;
             $.each(t, function (name, $elem) {
-                arrts[name] = self.options.readPropertyEditor(name, $elem);
+                arrts[name] = self.options.getter($elem, name, $elem.val());
             });
 
             return arrts;

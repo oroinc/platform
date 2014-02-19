@@ -125,25 +125,25 @@ define(function (require) {
 
         $editor.itemsManagerEditor($.extend(options.editor, {
             collection: collection,
-            setPropertyEditor: function (name, value, $el, setValue) {
+            setter: function ($el, name, value) {
                 if (name === 'func') {
-                    setValue($el, value.name);
                     $el.data('group_type', value.group_type);
                     $el.data('group_name', value.group_name);
-                } else {
-                    setValue($el, value);
+                    return value.name;
                 }
+
+                return value;
             },
-            readPropertyEditor: function (name, $el) {
+            getter: function ($el, name, value) {
                 if (name === 'func') {
                     return {
-                        name: $el.val(),
+                        name: value,
                         group_type: $el.find(":selected").data('group_type'),
                         group_name: $el.find(":selected").data('group_name')
                     };
-                } else {
-                    return $el.val();
                 }
+
+                return value;
             }
         }));
 
