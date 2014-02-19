@@ -459,77 +459,19 @@
     {{ block('oro_entity_create_or_select_widget') }}
 
     <script type="text/javascript">
-        require(['jquery', 'oro/widget-manager', 'routing'],
-        function ($, widgetManager, routing) {
+        require(['jquery', 'oro/create-select-type-handler'],
+        function ($, createSelectTypeHandler) {
             $(function() {
-                var label = $('#{{ labelId}}');
-                var scrollableContainer = label.closest('.scrollable-container');
-                scrollableContainer.attr('data-spy', null);
-                (function (btnContainer, viewContainer, currentModeEl) {
-                    var entityCreateBlock = viewContainer.find('.entity-create-block');
-
-                    var setCurrentMode = function (mode) {
-                        btnContainer.removeClass('create grid view').addClass(mode);
-                        viewContainer.removeClass('create grid view').addClass(mode);
-                        currentModeEl.val(mode);
-
-                        if (mode == 'create') {
-                            entityCreateBlock.removeAttr('data-validation-ignore');
-                        } else {
-                            entityCreateBlock.attr('data-validation-ignore', true);
-                        }
-
-                        scrollableContainer.scrollTop(label.position().top - 10);
-                    };
-
-                    // Render grid and change current mode to grid
-                    btnContainer.find('.entity-select-btn').on('click', function() {
-                        widgetManager.getWidgetInstanceByAlias('{{ gridWidgetAlias }}', function(widget) {
-                            if (widget.firstRun) {
-                                widget.render();
-                            }
-                        });
-                        setCurrentMode('grid');
-                    });
-
-                    // Render create from and change current mode to create
-                    btnContainer.find('.entity-create-btn').on('click', function() {
-                        setCurrentMode('create');
-                    });
-
-                    var loadViewWidgets = function (model) {
-                        var getRouteParameters = function(map, model) {
-                            var parameters = {};
-                            for (var routeParamName in map) if (map.hasOwnProperty(routeParamName)) {
-                                parameters[routeParamName] = model.get(map[routeParamName]);
-                            }
-                            return parameters;
-                        };
-
-                        {% for view_widget in view_widgets %}
-                        widgetManager.getWidgetInstanceByAlias('{{ view_widget.widget_alias }}', function(w) {
-                            w.setUrl(
-                                    routing.generate(
-                                            '{{ view_widget.route_name }}',
-                                            getRouteParameters(
-                                                    {{ view_widget.grid_row_to_route|json_encode|raw }},
-                                                    model
-                                            )
-                                    )
-                            );
-                            w.render();
-                        });
-                        {% endfor %}
-                    };
-
-                    // On grid row select render widgets and change current mode to view
-                    widgetManager.getWidgetInstanceByAlias('{{ gridWidgetAlias }}', function (widget) {
-                        widget.on('grid-row-select', function(data) {
-                            loadViewWidgets(data.model);
-                            setCurrentMode('view');
-                        });
-                    });
-                })($('#{{ btnGroupId }}'), $('#{{ viewsContainerId }}'), $('#{{ form.mode.vars.id }}'));
+                createSelectTypeHandler(
+                    $('#{{ labelId}}'),
+                    $('#{{ btnGroupId }}'),
+                    $('#{{ viewsContainerId }}'),
+                    $('#{{ form.mode.vars.id }}'),
+                    $('#{{ form.existing_entity.vars.id }}'),
+                    {{ gridWidgetAlias|json_encode|raw }},
+                    {{ view_widgets|json_encode|raw }},
+                    {{ form.vars.existing_entity_grid_id|json_encode|raw }}
+                );
             });
         });
     </script>
@@ -588,6 +530,7 @@
             {% endfor %}
         </div>
 
+        {{ form_widget(form.existing_entity) }}
         {{ form_widget(form.mode) }}
     </div>
 {% endblock %}

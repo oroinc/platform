@@ -159,6 +159,7 @@ class OroEntityCreateOrSelectType extends AbstractType
             array(
                 'create_entity_form_options' => array(),
                 'mode' => self::MODE_CREATE,
+                'existing_entity_grid_id' => 'id'
             )
         );
     }
@@ -170,5 +171,6 @@ class OroEntityCreateOrSelectType extends AbstractType
     {
         $view->vars['grid_name']    = $options['grid_name'];
         $view->vars['view_widgets'] = $options['view_widgets'];
+        $view->vars['existing_entity_grid_id'] = $options['existing_entity_grid_id'];
     }
 }
