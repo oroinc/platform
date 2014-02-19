@@ -46,12 +46,14 @@ class EmbedFormController extends Controller
 
             $channel = $formEntity->getChannel();
             $channelClassName = ClassUtils::getClass($channel);
+
             /**
              * @var ClassMetadataInfo $channelMetadata
              */
             $channelMetadata = $this->getDoctrine()
                 ->getManagerForClass($channelClassName)
                 ->getClassMetadata($channelClassName);
+
             $configOptions = array_merge(
                 $configOptions,
                 [
