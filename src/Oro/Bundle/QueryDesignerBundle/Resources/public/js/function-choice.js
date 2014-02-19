@@ -105,26 +105,6 @@ define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], functio
             this.element.val('').trigger('change');
         },
 
-        /**
-         * Returns translated string represents a name of the given function
-         *
-         * @param {String} groupType
-         * @param {String} groupName
-         * @param {String} functionName
-         * @return {String}
-         */
-        getFunctionLabel: function (groupType, groupName, functionName) {
-            var result = functionName;
-            var item = this.options[groupType][groupName];
-            if (item) {
-                var func = _.findWhere(item.functions, { name: functionName });
-                if (func) {
-                    result = func.label;
-                }
-            }
-            return result;
-        },
-
         _disable: function (flag) {
             var $elem = this.element;
             if ($elem.data('select2')) {

@@ -64,5 +64,5 @@ function(_, app) {
         findSelectOption: function ($el, value) {
             return $el.find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]');
         }
-    }
+    };
 });
