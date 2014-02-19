@@ -455,6 +455,7 @@
     {% set gridWidgetAlias = form.vars.id ~ '-grid' %}
     {% set labelId = form.vars.id ~ '-label' %}
 
+    {{ form_errors(form) }}
     {{ block('oro_entity_create_or_select_label') }}
     {{ block('oro_entity_create_or_select_widget') }}
 
@@ -469,7 +470,7 @@
                     $('#{{ form.mode.vars.id }}'),
                     $('#{{ form.existing_entity.vars.id }}'),
                     {{ gridWidgetAlias|json_encode|raw }},
-                    {{ view_widgets|json_encode|raw }},
+                    {{ form.vars.view_widgets|json_encode|raw }},
                     {{ form.vars.existing_entity_grid_id|json_encode|raw }}
                 );
             });
@@ -496,7 +497,6 @@
 
 {% block oro_entity_create_or_select_widget %}
     {% set gridName = form.vars.grid_name %}
-    {% set entityId = form.existing_entity.vars.value %}
 
     <div id="{{ viewsContainerId }}" class="responsive-section entity-visibility {{ currentMode }}">
         <div class="entity-create-block"
@@ -508,23 +508,22 @@
 
         <div class="entity-select-block">
             {{ oro_widget_render({
-            'widgetType': 'block',
-            'elementFirst': currentMode == 'grid',
-            'url': path('oro_datagrid_widget', {'gridName': gridName}),
-            'alias': gridWidgetAlias
+                'widgetType': 'block',
+                'elementFirst': currentMode == 'grid',
+                'url': path('oro_datagrid_widget', {'gridName': gridName}),
+                'alias': gridWidgetAlias
             }) }}
         </div>
 
         <div class="entity-view-block">
             {% for view_widget in view_widgets %}
                 <div class="responsive-block">
-                    {#{% set routeParameters = view_widget.route_parameters %}#}
-                    {% set routeParameters = {'id': entityId} %}
+                    {% set routeParameters = view_widget.route_parameters %}
                     {{ oro_widget_render({
-                    'widgetType': 'block',
-                    'elementFirst': currentMode == 'view',
-                    'url': currentMode == 'view' ? path(view_widget.route_name, routeParameters) : null,
-                    'alias': view_widget.widget_alias
+                        'widgetType': 'block',
+                        'elementFirst': currentMode == 'view',
+                        'url': currentMode == 'view' ? path(view_widget.route_name, routeParameters) : null,
+                        'alias': view_widget.widget_alias
                     }) }}
                 </div>
             {% endfor %}

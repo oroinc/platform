@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OroEntityCreateOrSelectType extends AbstractType
 {
@@ -44,30 +48,31 @@ class OroEntityCreateOrSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // disable validation for new entity in case of existing entity
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($options) {
                 $data = $event->getData();
                 $mode = !empty($data['mode']) ? $data['mode'] : $options['mode'];
-
                 if ($mode != OroEntityCreateOrSelectType::MODE_CREATE) {
                     $this->disableNewEntityValidation($event->getForm(), $options);
                 }
             }
         );
 
+        // transform data from array to entity and vice versa
         $builder->addViewTransformer(
             new EntityCreateOrSelectTransformer($this->doctrineHelper, $options['class'], $options['mode'])
         );
 
-        // new entity
+        // new entity field
         $builder->add(
             'new_entity',
             $options['create_entity_form_type'],
             $this->getNewEntityFormOptions($options)
         );
 
-        // existing entity
+        // existing entity field
         $builder->add(
             'existing_entity',
             'oro_entity_identifier',
@@ -79,11 +84,7 @@ class OroEntityCreateOrSelectType extends AbstractType
         );
 
         // rendering mode
-        $builder->add(
-            'mode',
-            'text', // TODO use hidden
-            array()
-        );
+        $builder->add('mode', 'hidden');
     }
 
     /**
@@ -125,18 +126,17 @@ class OroEntityCreateOrSelectType extends AbstractType
      * - create_entity_form_type - form type used to render create entity form
      * - create_entity_form_options - options for create entity form
      * - grid_name - name of the grid used to select existing entity
+     * - existing_entity_grid_id - grid row field name used as entity identifier
      * - view_widgets - array with list of widgets used to render entity view (YAML formatted example)
      *      - {
      *          'route_name': '',
-     *          'route_parameters':
+     *          'route_parameters': (optional)
      *              <route_parameter_name>: string|PropertyPath
      *              ...
      *          'grid_row_to_route':
      *              <route_parameter_name>: <grid_row_field_name>,
-     *          'widget_alias' => form_id+route_name
+     *          'widget_alias' => 'my_widget_alias' (optional)
      *      }
-     *
-     *
      * - mode - view rendering mode, by default guessed based on data:
      *      - self::MODE_CREATE - entity create form is rendered
      *      - self::MODE_GRID - grid with allowed entities is rendered
@@ -158,8 +158,40 @@ class OroEntityCreateOrSelectType extends AbstractType
         $resolver->setDefaults(
             array(
                 'create_entity_form_options' => array(),
+                'existing_entity_grid_id' => 'id',
                 'mode' => self::MODE_CREATE,
-                'existing_entity_grid_id' => 'id'
+            )
+        );
+
+        $resolver->setNormalizers(
+            array(
+                'view_widgets' => function (Options $options, array $viewWidgets) {
+                    foreach ($viewWidgets as $key => $widgetData) {
+                        if (empty($widgetData['route_name'])) {
+                            throw new InvalidConfigurationException(
+                                'Widget route name is not defined'
+                            );
+                        }
+
+                        if (empty($widgetData['grid_row_to_route'])) {
+                            throw new InvalidConfigurationException(
+                                'Mapping between grid row and route parameters is not defined'
+                            );
+                        }
+
+                        if (!array_key_exists('route_parameters', $widgetData)) {
+                            $widgetData['route_parameters'] = array();
+                        }
+
+                        if (empty($widgetData['widget_alias'])) {
+                            $widgetData['widget_alias'] = self::NAME . '_' . $widgetData['route_name'];
+                        }
+
+                        $viewWidgets[$key] = $widgetData;
+                    }
+
+                    return $viewWidgets;
+                }
             )
         );
     }
@@ -167,10 +199,23 @@ class OroEntityCreateOrSelectType extends AbstractType
     /**
      * {@inheritDoc}
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['grid_name']    = $options['grid_name'];
-        $view->vars['view_widgets'] = $options['view_widgets'];
+        $viewWidgets = $options['view_widgets'];
+        $entity = $form->getData();
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+        foreach ($viewWidgets as $key => $widgetData) {
+            foreach ($widgetData['route_parameters'] as $name => $value) {
+                if ($value instanceof PropertyPath) {
+                    $widgetData['route_parameters'][$name] = $propertyAccessor->getValue($entity, $value);
+                }
+            }
+            $viewWidgets[$key] = $widgetData;
+        }
+
+        $view->vars['view_widgets'] = $viewWidgets;
+        $view->vars['grid_name'] = $options['grid_name'];
         $view->vars['existing_entity_grid_id'] = $options['existing_entity_grid_id'];
     }
 }
