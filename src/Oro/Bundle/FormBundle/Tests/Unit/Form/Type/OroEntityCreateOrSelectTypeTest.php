@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\TestEntity;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
@@ -30,7 +31,15 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
      */
     protected $metadata;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $repository;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineHelper;
 
     protected function setUp()
     {
@@ -76,7 +85,11 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
 
         parent::setUp();
 
-        $this->formType = new OroEntityCreateOrSelectType();
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->formType = new OroEntityCreateOrSelectType($this->doctrineHelper);
     }
 
     protected function getExtensions()
@@ -87,23 +100,30 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
+     * @param object|null $inputEntity
+     * @param array|null $submitData
+     * @param object|null $expectedEntity
      * @param array $inputOptions
      * @param array $expectedOptions
      * @param array $expectedViewVars
      * @dataProvider executeDataProvider
      */
     public function testExecute(
+        $inputEntity,
+        $submitData,
+        $expectedEntity,
         array $inputOptions,
         array $expectedOptions,
         array $expectedViewVars = array()
     ) {
-        $form = $this->factory->create($this->formType, null, $inputOptions);
+        $form = $this->factory->create($this->formType, $inputEntity, $inputOptions);
         foreach ($expectedOptions as $name => $expectedValue) {
             $this->assertTrue($form->getConfig()->hasOption($name));
             $this->assertEquals($expectedValue, $form->getConfig()->getOption($name));
         }
 
-        $form->submit(array());
+        $form->submit($submitData);
+        $this->assertEquals($expectedEntity, $form->getData());
 
         $formView = $form->createView();
         foreach ($expectedViewVars as $name => $expectedValue) {
@@ -116,11 +136,19 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
     {
         return array(
             'default options' => array(
+                'inputEntity' => null,
+                'submitData' => null,
+                'expectedEntity' => null,
                 'inputOptions' => array(
                     'class' => self::TEST_ENTITY,
                     'create_entity_form_type' => 'text',
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array('test_entity_widget'),
+                    'view_widgets' => array(
+                        array(
+                            'route_name' => 'test_route',
+                            'grid_row_to_route' => array('id' => 'id')
+                        )
+                    ),
                 ),
                 'expectedOptions' => array(
                     'class' => self::TEST_ENTITY,
@@ -128,14 +156,30 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                     'create_entity_form_type' => 'text',
                     'create_entity_form_options' => array(),
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array('test_entity_widget'),
+                    'view_widgets' => array(
+                        array(
+                            'route_name' => 'test_route',
+                            'route_parameters' => array(),
+                            'grid_row_to_route' => array('id' => 'id'),
+                            'widget_alias' => 'oro_entity_create_or_select_test_route',
+                        )
+                    ),
                 ),
                 'expectedViewVars' => array(
                     'grid_name' => 'test-grid-name',
-                    'view_widgets' => array('test_entity_widget'),
+                    'existing_entity_grid_id' => 'id',
+                    'view_widgets' => array(
+                        array(
+                            'route_name' => 'test_route',
+                            'route_parameters' => array(),
+                            'grid_row_to_route' => array('id' => 'id'),
+                            'widget_alias' => 'oro_entity_create_or_select_test_route',
+                        )
+                    ),
                 )
             ),
             'custom options' => array(
+                'inputEntity' => null,
                 'inputOptions' => array(
                     'class' => self::TEST_ENTITY,
                     'mode' => OroEntityCreateOrSelectType::MODE_GRID,
