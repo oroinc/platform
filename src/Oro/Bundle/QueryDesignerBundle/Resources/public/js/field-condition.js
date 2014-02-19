@@ -1,8 +1,8 @@
 /*global define, require*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name', 'oro/query-designer/util',
+define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name',
     'oroentity/js/field-choice', 'jquery-ui'
-    ], function ($, _, __, mapFilterModuleName, util) {
+    ], function ($, _, __, mapFilterModuleName) {
     'use strict';
 
     /**
@@ -65,7 +65,8 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
 
         _getApplicableFilterId: function (conditions) {
             var filterId = null,
-                matchedBy = null;
+                matchedBy = null,
+                self = this;
 
             if (!_.isUndefined(conditions.filter)) {
                 // the criteria parameter represents a filter
@@ -77,7 +78,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
 
                 if (!_.isEmpty(filter.applicable)) {
                     // check if a filter conforms the given criteria
-                    matched = util.matchApplicable(filter.applicable, conditions);
+                    matched = self._matchApplicable(filter.applicable, conditions);
                     if (matched && (
                             _.isNull(matchedBy) ||
                             // new rule is more exact
@@ -95,6 +96,14 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             });
 
             return filterId;
+        },
+
+        _matchApplicable: function (applicable, criteria) {
+            return _.find(applicable, function (item) {
+                return _.every(item, function (value, key) {
+                    return criteria[key] === value;
+                });
+            });
         },
 
         _createFilter: function (options) {

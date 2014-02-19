@@ -11,6 +11,7 @@ define(function (require) {
     require('oroentity/js/field-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
+    require('oroquerydesigner/js/condition-builder');
 
     defaults = {
         entityChoice: '',
@@ -31,7 +32,7 @@ define(function (require) {
             itemContainer: '',
             itemTemplate: ''
         },
-        select2FormatSelectionTemplate: '',
+        select2FieldChoiceTemplate: '',
         entities: [],
         metadata: {}
     };
@@ -66,7 +67,7 @@ define(function (require) {
     function getFieldChoiceOptions(options) {
         return {
             select2: {
-                formatSelectionTemplate: $(options.select2FormatSelectionTemplate).text()
+                formatSelectionTemplate: $(options.select2FieldChoiceTemplate).text()
             },
             util: {
                 findEntity:  function (entityName) {
@@ -150,14 +151,15 @@ define(function (require) {
             collection: collection,
             itemTemplate: $(options.itemTemplate).html(),
             itemRender: function (tmpl, data) {
-                var func = data.func,
+                var item, itemFunc,
+                    func = data.func,
                     name = util.splitFieldId(data.name);
 
                 data.name = template(name);
                 if (func) {
-                    var item = metadata[func.group_type][func.group_name];
+                    item = metadata[func.group_type][func.group_name];
                     if (item) {
-                        var itemFunc = _.findWhere(item.functions, { name: func.name });
+                        itemFunc = _.findWhere(item.functions, {name: func.name});
                         if (itemFunc) {
                             data.func = itemFunc.label;
                         }
@@ -178,6 +180,9 @@ define(function (require) {
             filters: metadata.filters
         });
         $builder = $(options.conditionBuilder);
+        $builder.conditionBuilder({
+            criteriaListSelector: options.criteriaList
+        });
         $builder.conditionBuilder('setValue', load('filters'));
         $builder.on('changed', function () {
             save($builder.conditionBuilder('getValue'), 'filters');

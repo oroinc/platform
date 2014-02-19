@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], function ($, _, util) {
+define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
     'use strict';
 
     /**
@@ -9,9 +9,10 @@ define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], functio
     $.widget('oroquerydesigner.functionChoice', {
         options: {
             fieldChoiceSelector: '',
-            optionTemplate: _.template('<option value="<%- name %>" title="<%- title %>" data-group_name="<%- group_name %>" data-group_type="<%- group_type %>">' +
-                '<%- label %>' +
-            '</option>'),
+            optionTemplate: _.template('<option value="<%- name %>" title="<%- title %>" ' +
+                    'data-group_name="<%- group_name %>" data-group_type="<%- group_type %>">' +
+                    '<%- label %>' +
+                '</option>'),
             converters: [],
             aggregates: []
         },
@@ -30,6 +31,7 @@ define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], functio
          * @param {Boolean} convertersOnly
          */
         setActiveFunctions: function (criteria, convertersOnly) {
+            var self = this;
             var options = this.options;
             var foundGroups = [];
             var foundGroupKey = null;
@@ -37,14 +39,14 @@ define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], functio
             var functions = [];
 
             _.each(options.converters, function (item, name) {
-                if (util.isApplicable(item.applicable, criteria)) {
+                if (self._matchApplicable(item.applicable, criteria)) {
                     foundGroups.push({ group_name: name, group_type: 'converters' });
                 }
             });
 
             if (!convertersOnly) {
                 _.each(options.aggregates, function (item, name) {
-                    if (util.isApplicable(item.applicable, criteria)) {
+                    if (self._matchApplicable(item.applicable, criteria)) {
                         foundGroups.push({ group_name: name, group_type: 'aggregates' });
                     }
                 });
@@ -58,7 +60,7 @@ define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], functio
             }
 
             if (foundGroupKey && (foundGroupKey !== this.activeFunctionGroupKey)) {
-                util.clearSelect(this.element);
+                this._clearSelect();
 
                 _.each(foundGroups, function (foundGroup) {
                     _.each(options[foundGroup.group_type][foundGroup.group_name].functions, function (func) {
@@ -103,6 +105,18 @@ define(['jquery', 'underscore', 'oro/query-designer/util', 'jquery-ui'], functio
             this._disable(!foundGroupKey);
 
             this.element.val('').trigger('change');
+        },
+
+        _matchApplicable: function (applicable, criteria) {
+            return _.find(applicable, function (item) {
+                return _.every(item, function (value, key) {
+                    return criteria[key] === value;
+                });
+            });
+        },
+
+        _clearSelect: function () {
+            this.element.find('option').not('[value=""]').remove();
         },
 
         _disable: function (flag) {
