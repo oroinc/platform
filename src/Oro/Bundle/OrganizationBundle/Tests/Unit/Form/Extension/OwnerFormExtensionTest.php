@@ -121,6 +121,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->builder->expects($this->any())->method('getFormConfig')->will($this->returnValue($config));
+        $this->builder->expects($this->any())->method('getOption')->with('required')->will($this->returnValue(true));
         $this->fieldName = RecordOwnerDataListener::OWNER_FIELD_NAME;
         $this->tranlsator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
@@ -460,6 +461,9 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
+        $form->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($this->builder));
         $form->expects($this->any())
             ->method('getParent')
             ->will($this->returnValue(false));

@@ -470,7 +470,10 @@
     <div>
         {% set currentMode = form.mode.vars.value|default('create') %}
 
-        <div class="responsive-section">
+        <div class="responsive-section"
+            {% if not form.vars.required %}data-validation-optional-group=""{% endif %}
+            {% if currentMode != 'create' %}data-validation-ignore=""{% endif %}>
+            {#// TODO: data-validation-ignore must be automatically added on hide and automatically removed on show #}
             {{ form_widget(form.new_entity) }}
         </div>
 

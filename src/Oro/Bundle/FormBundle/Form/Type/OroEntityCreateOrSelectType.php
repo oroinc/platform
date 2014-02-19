@@ -5,6 +5,8 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -42,6 +44,18 @@ class OroEntityCreateOrSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) use ($options) {
+                $data = $event->getData();
+                $mode = !empty($data['mode']) ? $data['mode'] : $options['mode'];
+
+                if ($mode != OroEntityCreateOrSelectType::MODE_CREATE) {
+                    $this->disableNewEntityValidation($event->getForm(), $options);
+                }
+            }
+        );
+
         $builder->addViewTransformer(
             new EntityCreateOrSelectTransformer($this->doctrineHelper, $options['class'], $options['mode'])
         );
@@ -50,12 +64,7 @@ class OroEntityCreateOrSelectType extends AbstractType
         $builder->add(
             'new_entity',
             $options['create_entity_form_type'],
-            array_merge(
-                $options['create_entity_form_options'],
-                array(
-                    'data_class' => $options['class']
-                )
-            )
+            $this->getNewEntityFormOptions($options)
         );
 
         // existing entity
@@ -63,8 +72,9 @@ class OroEntityCreateOrSelectType extends AbstractType
             'existing_entity',
             'oro_entity_identifier',
             array(
+                'required' => $options['required'],
                 'class' => $options['class'],
-                'multiple' => false
+                'multiple' => false,
             )
         );
 
@@ -73,6 +83,39 @@ class OroEntityCreateOrSelectType extends AbstractType
             'mode',
             'text', // TODO use hidden
             array()
+        );
+    }
+
+    /**
+     * @param array $options
+     * @return array
+     */
+    protected function getNewEntityFormOptions(array $options)
+    {
+        return array_merge(
+            $options['create_entity_form_options'],
+            array(
+                'required' => $options['required'],
+                'data_class' => $options['class'],
+            )
+        );
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param array $options
+     */
+    protected function disableNewEntityValidation(FormInterface $form, array $options)
+    {
+        // disable all validation for new entity field
+        $form->remove('new_entity');
+        $form->add(
+            'new_entity',
+            $options['create_entity_form_type'],
+            array_merge(
+                $this->getNewEntityFormOptions($options),
+                array('validation_groups' => false)
+            )
         );
     }
 
@@ -89,8 +132,11 @@ class OroEntityCreateOrSelectType extends AbstractType
      *              <route_parameter_name>: string|PropertyPath
      *              ...
      *          'grid_row_to_route':
-     *              <route_parameter_name>: <grid_row_field_name>
+     *              <route_parameter_name>: <grid_row_field_name>,
+     *          'widget_alias' => form_id+route_name
      *      }
+     *
+     *
      * - mode - view rendering mode, by default guessed based on data:
      *      - self::MODE_CREATE - entity create form is rendered
      *      - self::MODE_GRID - grid with allowed entities is rendered
