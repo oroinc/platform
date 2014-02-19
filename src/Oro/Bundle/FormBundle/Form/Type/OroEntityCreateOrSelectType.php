@@ -208,7 +208,8 @@ class OroEntityCreateOrSelectType extends AbstractType
         foreach ($viewWidgets as $key => $widgetData) {
             foreach ($widgetData['route_parameters'] as $name => $value) {
                 if ($value instanceof PropertyPath) {
-                    $widgetData['route_parameters'][$name] = $propertyAccessor->getValue($entity, $value);
+                    $widgetData['route_parameters'][$name]
+                        = $entity ? $propertyAccessor->getValue($entity, $value) : null;
                 }
             }
             $viewWidgets[$key] = $widgetData;
