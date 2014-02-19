@@ -82,7 +82,15 @@ class OroEntityCreateOrSelectType extends AbstractType
      * - create_entity_form_type - form type used to render create entity form
      * - create_entity_form_options - options for create entity form
      * - grid_name - name of the grid used to select existing entity
-     * - view_widgets - array with list of widgets used to render entity view // TODO: add widget parameters format
+     * - view_widgets - array with list of widgets used to render entity view (YAML formatted example)
+     *      - {
+     *          'route_name': '',
+     *          'route_parameters':
+     *              <route_parameter_name>: string|PropertyPath
+     *              ...
+     *          'grid_row_to_route':
+     *              <route_parameter_name>: <grid_row_field_name>
+     *      }
      * - mode - view rendering mode, by default guessed based on data:
      *      - self::MODE_CREATE - entity create form is rendered
      *      - self::MODE_GRID - grid with allowed entities is rendered
