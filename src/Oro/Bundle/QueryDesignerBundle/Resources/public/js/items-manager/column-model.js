@@ -1,13 +1,13 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['oroui/js/items-manager/abstract-model'], function (AbstractModel) {
+define(['backbone'], function (Backbone) {
     'use strict';
 
     /**
-     * @class   oroquerydesigner.itemsManager.ColumnsModel
-     * @extends oroui.itemsManager.AbstractModel
+     * @class   oroquerydesigner.itemsManager.ColumnModel
+     * @extends Backbone.Model
      */
-    return AbstractModel.extend({
+    return Backbone.Model.extend({
         defaults: {
             name : null,
             label: null,

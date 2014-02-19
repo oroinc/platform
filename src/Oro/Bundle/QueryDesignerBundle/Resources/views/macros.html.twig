@@ -14,7 +14,7 @@
                 <div class="row-fluid">
                     <div class="span3 filter-criteria">
                         <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
-                        <ul class="criteria-list" id="filter-criteria-list">
+                        <ul class="criteria-list" id="{{ params.criteria_list_id }}">
                             <li class="option" data-criteria="condition-item"
                                 data-module="oroquerydesigner/js/field-condition"
                                 data-widget="fieldCondition"
@@ -35,7 +35,7 @@
     </div>
     <script type="text/javascript">
         require(['oroquerydesigner/js/condition-builder'], function ($) {
-            var $fieldConditionCriteria = $('#filter-criteria-list').find('[data-criteria=condition-item]'),
+            var $fieldConditionCriteria = $('#{{ params.criteria_list_id }}').find('[data-criteria=condition-item]'),
                 $conditions = $('#{{ params.id }}');
 
             $('#{{ params.entity_choice_id }}')
@@ -46,7 +46,7 @@
                 });
 
             $conditions.conditionBuilder({
-                criteriaListSelector: '#filter-criteria-list'
+                criteriaListSelector: '#{{ params.criteria_list_id }}'
             });
         });
     </script>

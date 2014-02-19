@@ -7,8 +7,9 @@ define(['jquery', 'jquery-ui'],   function ($) {
         if ($elem.data('select2')) {
             $elem.select2('val', value);
         } else {
-            $elem.val(value).trigger('change');
+            $elem.val(value);
         }
+        $elem.trigger('change');
     }
 
     $.widget('oroui.itemsManagerEditor', {
@@ -47,8 +48,8 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         reset: function (model) {
-            var self = this;
-            var elementsMap, attrs;
+            var elementsMap, attrs,
+                self = this;
             this._hideErrors();
             this.validated = false;
             this.model = model;
@@ -56,9 +57,10 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 elementsMap = this._elementsMap();
                 attrs = model.toJSON();
                 $.each(attrs, function (name, value) {
-                    if (elementsMap[name]) {
-                        var val = self.options.setter(elementsMap[name], name, value);
-                        setValue(elementsMap[name], val);
+                    var $elem = elementsMap[name];
+                    if ($elem) {
+                        value = self.options.setter($elem, name, value);
+                        setValue($elem, value);
                     }
                 });
             } else {
@@ -140,8 +142,8 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         _elements: function () {
-            return this.element.find("input, select, textarea")
-                .not(":submit, :reset, :image, [disabled]");
+            return this.element.find('input, select, textarea')
+                .not(':submit, :reset, :image');
         },
 
         _onElementChange: function (e) {
@@ -160,11 +162,10 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         _collectAttrs: function () {
-            var self = this;
-            var arrts = {};
+            var arrts = {},
+                self = this;
 
-            var t = this._elementsMap();
-            $.each(t, function (name, $elem) {
+            $.each(this._elementsMap(), function (name, $elem) {
                 arrts[name] = self.options.getter($elem, name, $elem.val());
             });
 

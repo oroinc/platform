@@ -127,22 +127,18 @@ define(function (require) {
             collection: collection,
             setter: function ($el, name, value) {
                 if (name === 'func') {
-                    $el.data('group_type', value.group_type);
-                    $el.data('group_name', value.group_name);
-                    return value.name;
+                    value = value.name;
                 }
-
                 return value;
             },
             getter: function ($el, name, value) {
                 if (name === 'func') {
-                    return {
+                    value = {
                         name: value,
                         group_type: $el.find(":selected").data('group_type'),
                         group_name: $el.find(":selected").data('group_name')
                     };
                 }
-
                 return value;
             }
         }));
