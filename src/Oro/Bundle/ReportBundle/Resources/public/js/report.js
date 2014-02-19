@@ -82,7 +82,7 @@ define(function (require) {
 
         $editor = $(options.form);
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
-        $fieldChoice.fieldChoice(fieldChoiceOptions, metadata.grouping);
+        $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, metadata.grouping, {select2: {}}));
 
         collection = new (Backbone.Collection)(load('grouping_columns'), {model: GroupingModel});
         collection.on('add remove sort', function () {
@@ -112,7 +112,7 @@ define(function (require) {
 
         $editor = $(options.form);
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
-        $fieldChoice.fieldChoice(fieldChoiceOptions);
+        $fieldChoice.fieldChoice(_.extend({}, fieldChoiceOptions, {select2: {}}));
 
         $editor.find('[data-purpose=function-selector]').functionChoice({
             converters: metadata.converters,
