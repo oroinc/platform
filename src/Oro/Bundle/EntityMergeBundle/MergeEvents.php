@@ -40,5 +40,9 @@ final class MergeEvents
      */
     const CREATE_ENTITY_DATA = 'oro.entity_merge.create_entity_data';
 
-    const AFTER_CALCULATE_FIELD_VALUE_REPRESENTATION = 'oro.entity_merge.after_calculate_field_value_representation';
+    /**
+     * The BEFORE_VALUE_RENDER event fire before value is rendered to template.
+     * Instance of Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent is passed.
+     */
+    const BEFORE_VALUE_RENDER = 'oro.entity_merge.before_value_render';
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Twig;
 
-use Oro\Bundle\EntityMergeBundle\Event\FieldValueRenderEvent;
+use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
 use Oro\Bundle\EntityMergeBundle\Metadata\Metadata;
@@ -17,7 +17,10 @@ class MergeRenderer
      */
     protected $environment;
 
-    protected $eventDispatcherInterface;
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @var string
@@ -26,16 +29,16 @@ class MergeRenderer
 
     /**
      * @param \Twig_Environment $environment
-     * @param EventDispatcherInterface $eventDispatcherInterface
+     * @param EventDispatcherInterface $eventDispatcher
      * @param string $defaultTemplate
      */
     public function __construct(
         \Twig_Environment $environment,
-        EventDispatcherInterface $eventDispatcherInterface,
+        EventDispatcherInterface $eventDispatcher,
         $defaultTemplate
     ) {
         $this->environment = $environment;
-        $this->eventDispatcherInterface = $eventDispatcherInterface;
+        $this->eventDispatcher = $eventDispatcher;
         $this->defaultTemplate = $defaultTemplate;
     }
 
@@ -134,13 +137,9 @@ class MergeRenderer
             }
         }
 
-        if ($this->eventDispatcherInterface->hasListeners(MergeEvents::AFTER_CALCULATE_FIELD_VALUE_REPRESENTATION)) {
-            $event = new FieldValueRenderEvent($convertResult, $value, $metadata);
-            $this->eventDispatcherInterface->dispatch(
-                MergeEvents::AFTER_CALCULATE_FIELD_VALUE_REPRESENTATION,
-                $event
-            );
-        }
+        $event = new ValueRenderEvent($convertResult, $value, $metadata);
+        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_VALUE_RENDER, $event);
+        $convertResult = $event->getConvertedValue();
 
         return (string)$convertResult;
     }

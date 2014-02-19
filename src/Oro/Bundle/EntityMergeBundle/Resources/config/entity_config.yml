@@ -72,3 +72,6 @@ oro_entity_config:
                 # Default localisation handler support:
                 # decimal, currency, percent, default_style, scientific, ordinal, duration, spellout
                 number_formatter_type: ~
+                //todo: fix me
+                render_date_type: ~
+                render_time_type: ~
