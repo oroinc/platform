@@ -38,6 +38,7 @@ class GridController extends Controller
     {
         return array(
             'gridName' => $gridName,
+            'params' => $this->getRequest()->get('params', array()),
             'renderParams' => $this->getRequest()->get('renderParams', array())
         );
     }
