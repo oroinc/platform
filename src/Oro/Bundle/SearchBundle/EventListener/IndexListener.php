@@ -38,7 +38,7 @@ class IndexListener
     protected $insertEntities = [];
 
     /**
-     * @todo: refactor this in listeners scope story
+     * @todo: refactor in global listeners scope story, see BAP-3285
      *
      * @var bool
      */
@@ -59,7 +59,7 @@ class IndexListener
     }
 
     /**
-     * @retun void
+     * @return void
      */
     public function disablePostFlush()
     {
@@ -67,9 +67,12 @@ class IndexListener
 
         register_shutdown_function(
             function () {
-                $entityManager = $this->container->get('doctrine.orm.entity_manager');
+                if (!$this->postFlush) {
+                    $this->postFlush = true;
+                    $entityManager   = $this->container->get('doctrine.orm.entity_manager');
 
-                $this->flush($entityManager);
+                    $this->flush($entityManager);
+                }
             }
         );
     }
