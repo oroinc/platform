@@ -108,7 +108,7 @@ define(function (require) {
     }
 
     function initColumn(options, metadata, fieldChoiceOptions) {
-        var $editor, $fieldChoice, collection, util, template;
+        var $editor, $fieldChoice, collection, util, template, sortingLabels;
 
         $editor = $(options.form);
         $fieldChoice = $editor.find('[data-purpose=column-selector]');
@@ -144,6 +144,11 @@ define(function (require) {
             }
         }));
 
+        sortingLabels = {};
+        $editor.find('select[name*=sorting]').find('option:not([value=""])').each(function () {
+            sortingLabels[this.value] = $(this).text();
+        });
+
         util = $fieldChoice.data('oroentity-fieldChoice').entityFieldUtil;
         template = _.template(fieldChoiceOptions.select2.formatSelectionTemplate);
 
@@ -166,6 +171,9 @@ define(function (require) {
                     }
                 } else {
                     data.func = '';
+                }
+                if (data.sorting && sortingLabels[data.sorting]) {
+                    data.sorting = sortingLabels[data.sorting];
                 }
 
                 return tmpl(data);
