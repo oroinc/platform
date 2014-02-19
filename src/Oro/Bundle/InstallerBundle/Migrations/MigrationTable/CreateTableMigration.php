@@ -12,6 +12,10 @@ class CreateTableMigration implements Migration
      */
     public function up(Schema $schema)
     {
+        /*$table = $schema->createTable();
+        $table->addColumn();
+        $table->addIndex();
+        $table->*/
         return [
             "CREATE TABLE " . MigrationsLoader::MIGRATION_TABLE . " (
                 id INT NOT NULL AUTO_INCREMENT,

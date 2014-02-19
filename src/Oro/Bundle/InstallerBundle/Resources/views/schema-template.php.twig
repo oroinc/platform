@@ -1,0 +1,82 @@
+<?php
+
+namespace ;
+
+use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader;
+
+class Migration implements Migration
+{
+    /**
+     * @inheritdoc
+     */
+    public function up(Schema $schema)
+    {
+    {% for table in schema.tables %}
+    /** Generate table {{ table.name }} **/
+        $table = $schema->createTable('{{ table.name }}');
+    {% for column in table.columns %}
+    $table->addColumn('{{ column.name }}', '{{ column.type }}', {{ _self.dumpColumnOptions(column) }});
+    {% endfor %}
+
+    {% for index in table.indexes %}
+    $table->addIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}', {{ _self.dumpArray(index.flags) }});
+    {% endfor %}
+
+    {% for foreignKey in table.ForeignKeys %}
+    $table->addForeignKeyConstraint('{{ foreignKey.foreignTableName }}', {{ _self.dumpArray(foreignKey.localColumns) }}, {{ _self.dumpArray(foreignKey.foreignColumns) }}, {{ _self.dumpOptionsArray(foreignKey.options) }},);
+    {% endfor %}
+    /** End of generate table {{ table.name }} **/
+
+    {% endfor %}
+    }
+}
+
+{% macro dumpColumnOptions(column) %}
+{% spaceless %}
+['default' => {{ _self.dumpString(column.default) }}, 'notnull' => {{ _self.dumpBoolean(column.notnull) }}, 'length' => {{ _self.dumpInteger(column.length) }}, 'precision' => {{ _self.dumpInteger(column.precision) }}, 'scale' => {{ _self.dumpInteger(column.scale) }}, 'fixed' => {{ _self.dumpBoolean(column.fixed) }}, 'unsigned' => {{ _self.dumpBoolean(column.unsigned) }}, 'autoincrement' => {{ _self.dumpBoolean(column.autoincrement) }}, 'comment' => {{ _self.dumpString(column.comment) }}]
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpOptionsArray(arrayValues) %}
+{% spaceless %}
+[{% for valueName, value in arrayValues %}{% if value is null %}'{{ valueName }}' => null, {% elseif value is same as(true) %}'{{ valueName }}' => true, {% elseif value is same as(false) %}'{{ valueName }}' => false, {% else  %}'{{ valueName }}' => '{{value  }}', {% endif %}{% endfor %}]
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpArray(arrayValues) %}
+{% spaceless %}
+[{% for value in arrayValues %}'{{ value }}', {% endfor %}]
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpBoolean(value) %}
+{% spaceless %}
+    {% if value %}
+        true
+    {% else %}
+        false
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpString(value) %}
+{% spaceless %}
+    {% if value is not null %}
+        '{{ value }}'
+    {% else %}
+        null
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpInteger(value) %}
+{% spaceless %}
+    {% if value is not null %}
+        {{ value }}
+    {% else %}
+        null
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
