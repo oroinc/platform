@@ -15,8 +15,8 @@ trait ReflectionHelperTrait
     }
 
     /**
+     * @param mixed $interface
      * @param mixed $class
-     * @param mixed $subclass
      */
     public function assertImplementsInterface($interface, $class)
     {

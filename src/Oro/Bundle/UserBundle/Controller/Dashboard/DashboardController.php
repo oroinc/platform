@@ -13,7 +13,7 @@ class DashboardController extends Controller
      * @Route(
      *      "/recent_emails/{widget}/{activeTab}/{contentType}",
      *      name="oro_user_dashboard_recent_emails",
-     *      requirements={"widget"="[\w_-]+", "activeTab"="inbox|sent", "contentType"="full|tab"},
+     *      requirements={"widget"="[\w-]+", "activeTab"="inbox|sent", "contentType"="full|tab"},
      *      defaults={"activeTab" = "inbox", "contentType" = "full"}
      * )
      */

@@ -31,7 +31,7 @@ function ($, mediator, routing, ButtonsWidget) {
                     var transitionsWidget = new ButtonsWidget({
                         'el': containerEl,
                         'elementFirst': false,
-                        'url': routing.generate('oro_workflow_widget_buttons_entity', {
+                        'url': routing.generate('oro_workflow_widget_buttons', {
                             'entityId': elementIdMatch[1],
                             'entityClass': saveBtn.data('entity-class')
                     })

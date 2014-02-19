@@ -26,6 +26,11 @@ class CommandExecutor
     protected $application;
 
     /**
+     * @var int
+     */
+    protected $lastCommandExitCode;
+
+    /**
      * Constructor
      *
      * @param string|null     $env
@@ -44,10 +49,13 @@ class CommandExecutor
      * If '--process-isolation' parameter is specified the command will be launched as a separate process.
      * In this case you can parameter '--process-timeout' to set the process timeout
      * in seconds. Default timeout is 60 seconds.
+     * If '--ignore-errors' parameter is specified any errors are ignored;
+     * otherwise, an exception is raises if an error happened.
      *
      * @param string $command
      * @param array  $params
      * @return CommandExecutor
+     * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
      */
     public function runCommand($command, $params = array())
     {
@@ -60,6 +68,11 @@ class CommandExecutor
         );
         if ($this->env && $this->env !== 'dev') {
             $params['--env'] = $this->env;
+        }
+        $ignoreErrors = false;
+        if (array_key_exists('--ignore-errors', $params)) {
+            $ignoreErrors = true;
+            unset($params['--ignore-errors']);
         }
 
         if (array_key_exists('--process-isolation', $params)) {
@@ -79,12 +92,12 @@ class CommandExecutor
             foreach ($params as $param => $val) {
                 if ($param && '-' === $param[0]) {
                     if ($val === true) {
-                        $pb->add($param);
+                        $this->addParameter($pb, $param);
                     } else {
-                        $pb->add($param . '=' . $val);
+                        $this->addParameter($pb, $param, $val);
                     }
                 } else {
-                    $pb->add($val);
+                    $this->addParameter($pb, $val);
                 }
             }
 
@@ -98,16 +111,63 @@ class CommandExecutor
                     $output->write($data);
                 }
             );
-            $ret = $process->getExitCode();
+            $this->lastCommandExitCode = $process->getExitCode();
         } else {
             $this->application->setAutoExit(false);
-            $ret = $this->application->run(new ArrayInput($params), $this->output);
+            $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
         }
 
-        if (0 !== $ret) {
-            $this->output->writeln(sprintf('<error>The command terminated with an error status (%s)</error>', $ret));
+        if (0 !== $this->lastCommandExitCode) {
+            if ($ignoreErrors) {
+                $this->output->writeln(
+                    sprintf(
+                        '<error>The command terminated with an exit code: %u.</error>',
+                        $this->lastCommandExitCode
+                    )
+                );
+            } else {
+                throw new \RuntimeException(
+                    sprintf('The command terminated with an exit code: %u.', $this->lastCommandExitCode)
+                );
+            }
         }
 
         return $this;
+    }
+
+    /**
+     * Gets an exit code of last executed command
+     *
+     * @return int
+     */
+    public function getLastCommandExitCode()
+    {
+        return $this->lastCommandExitCode;
+    }
+
+    /**
+     * @param ProcessBuilder $processBuilder
+     * @param string $name
+     * @param array|string|null $value
+     */
+    protected function addParameter(ProcessBuilder $processBuilder, $name, $value = null)
+    {
+        $parameters = array();
+
+        if (null !== $value) {
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    $parameters[] = sprintf('%s=%s', $name, $item);
+                }
+            } else {
+                $parameters[] = sprintf('%s=%s', $name, $value);
+            }
+        } else {
+            $parameters[] = $name;
+        }
+
+        foreach ($parameters as $parameter) {
+            $processBuilder->add($parameter);
+        }
     }
 }

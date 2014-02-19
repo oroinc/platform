@@ -11,6 +11,7 @@ parameters:
     oro_config.type.form.class:                                                  Oro\Bundle\ConfigBundle\Form\Type\FormType
     oro_config.type.form_field.class:                                            Oro\Bundle\ConfigBundle\Form\Type\FormFieldType
     oro_config.type.config_checkbox.class:                                       Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+    oro_config.type.parent_scope_checkbox.class:                                 Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox
 
 services:
     oro_config.config_definition_bag:
@@ -21,20 +22,18 @@ services:
     oro_config.user:
         class:                        %oro_config.user.class%
         arguments:
+           - @event_dispatcher
            - @doctrine.orm.entity_manager
            - @oro_config.config_definition_bag
         calls:
              - [setSecurity, ["@security.context"]]
-        tags:
-            -  { name: oro_config.manager }
 
     oro_config.global:
         class:                        %oro_config.global.class%
         arguments:
+           - @event_dispatcher
            - @doctrine.orm.entity_manager
            - @oro_config.config_definition_bag
-        tags:
-            -  { name: oro_config.manager }
 
     oro_config.twig.config_extension:
         class:                        %oro_config.twig_extension.class%
@@ -49,7 +48,7 @@ services:
             - @form.factory
             - @oro_security.security_facade
         tags:
-            -  { name: oro_config.configuration_form_provider }
+            -  { name: oro_config.configuration_provider }
 
     oro_config.form.config_subscriber:
         class: %oro_config.form.config_subscriber.class%
@@ -67,6 +66,11 @@ services:
         class:                        %oro_config.type.form_field.class%
         tags:
             - { name: form.type, alias: oro_config_form_field_type }
+
+    oro_config.type.parent_scope_checkbox:
+        class:                        %oro_config.type.parent_scope_checkbox.class%
+        tags:
+            - { name: form.type, alias: oro_config_parent_scope_checkbox_type }
 
     oro_config.type.config_checkbox:
         class:                        %oro_config.type.config_checkbox.class%

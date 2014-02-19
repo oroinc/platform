@@ -54,7 +54,7 @@ class StringFilter extends AbstractFilter
         }
 
         $data['type'] = isset($data['type']) ? $data['type'] : null;
-        $data['value'] = sprintf($this->getFormatByComparisonType($data['type']), $data['value']);
+        $data['value'] = $this->parseValue($data['type'], $data['value']);
 
         return $data;
     }
@@ -79,30 +79,38 @@ class StringFilter extends AbstractFilter
                 return $ds->expr()->eq($fieldName, $parameterName, true);
             case TextFilterType::TYPE_NOT_CONTAINS:
                 return $ds->expr()->notLike($fieldName, $parameterName, true);
+            case TextFilterType::TYPE_IN:
+                return $ds->expr()->in($fieldName, $parameterName, true);
+            case TextFilterType::TYPE_NOT_IN:
+                return $ds->expr()->notIn($fieldName, $parameterName, true);
             default:
                 return $ds->expr()->like($fieldName, $parameterName, true);
         }
     }
 
     /**
-     * Return value format depending on comparison type
+     * Return a value depending on comparison type
      *
-     * @param $comparisonType
+     * @param int    $comparisonType
+     * @param string $value
      *
-     * @return string
+     * @return mixed
      */
-    protected function getFormatByComparisonType($comparisonType)
+    protected function parseValue($comparisonType, $value)
     {
         switch ($comparisonType) {
             case TextFilterType::TYPE_CONTAINS:
             case TextFilterType::TYPE_NOT_CONTAINS:
-                return '%%%s%%';
+                return sprintf('%%%s%%', $value);
             case TextFilterType::TYPE_STARTS_WITH:
-                return '%s%%';
+                return sprintf('%s%%', $value);
             case TextFilterType::TYPE_ENDS_WITH:
-                return '%%%s';
+                return sprintf('%%%s', $value);
+            case TextFilterType::TYPE_IN:
+            case TextFilterType::TYPE_NOT_IN:
+                return array_map('trim', explode(',', $value));
             default:
-                return '%s';
+                return $value;
         }
     }
 }

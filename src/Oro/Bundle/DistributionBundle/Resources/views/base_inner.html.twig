@@ -1,0 +1,83 @@
+{% extends 'OroDistributionBundle::base.html.twig' %}
+
+    {% block javascripts %}
+        {{ parent() }}
+        <script type="text/javascript" src="/bundles/oroinstaller/lib/jquery-2.0.3.min.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/loader.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/util.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/package.manager.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/bootbox.min.js"></script>
+        <script type="text/javascript" src="/bundles/orodistribution/js/jquery.cookie.js"></script>
+
+        <script type="text/javascript">
+
+            $(function () {
+
+                $(document).ajaxError(function (e) {
+                    loader.displayOriginalElement();
+                    util.error('Ajax error');
+                });
+
+                var Urls = {
+                    install: "{{ path('oro_distribution_package_install') }}",
+                    update: "{{ path('oro_distribution_package_update') }}",
+                    available: "{{ path('oro_distribution_package_listavailable') }}",
+                    installed: "{{ path('oro_distribution_package_listinstalled') }}"
+                };
+
+                var loader = new Loader($('.ajax-loading'));
+                var util = new Util($('#alerts'));
+                var pm = new PackageManager(Urls, util);
+
+                $('.ajax').on('click', function () {
+                    var me = $(this);
+                    var action = me.data('action');
+                    var params = me.data('params');
+                    loader.setClickedElement(me);
+                    loader.displayLoadingProgress();
+                    pm[action](params, function () {
+                        loader.displayOriginalElement();
+                    });
+
+                    return false;
+                });
+
+                util.displayCookieMessage();
+            });
+        </script>
+    {% endblock %}
+
+    {% block page %}
+        <div class="wrapper">
+            <div id="alerts">
+                {% if notWritableSystemPaths|length > 0 %}
+                    <div class="alert fade in alert-notice">
+                        <i class="icon icon-info-sign"></i>
+                        Following directories/files have to be writable by web user:
+                        <ul>
+                            {% for path in notWritableSystemPaths %}
+                                <li>{{ path }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                {% endif %}
+            </div>
+            <div class="content">
+                <img src="/bundles/oroinstaller/img/icon/wait.png" alt="" class="ajax-loading"/>
+
+                <div class="title clearfix">
+                    <h2 class="pull-left">{{ block('title') }}</h2>
+
+                    <div class="menu pull-right ">
+                        {% block menu %} {% endblock %}
+                    </div>
+                </div>
+
+                <div class="body">
+                    {% block body %} {% endblock %}
+                </div>
+            </div>
+        </div>
+    {% endblock %}

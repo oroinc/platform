@@ -4,8 +4,6 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\ImportExportBundle\Reader\EntityReader;
-
 class EntityReaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -19,7 +17,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
     protected $contextRegistry;
 
     /**
-     * @var EntityReader
+     * @var EntityReaderTestAdapter
      */
     protected $reader;
 
@@ -31,7 +29,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $this->reader = new EntityReader($this->contextRegistry, $this->managerRegistry);
+        $this->reader = new EntityReaderTestAdapter($this->contextRegistry, $this->managerRegistry);
     }
 
     public function testReadMockIterator()
@@ -60,7 +58,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $iterator->expects($this->at(10))->method('valid')->will($this->returnValue(false));
         $iterator->expects($this->at(11))->method('valid')->will($this->returnValue(false));
 
-        $this->reader->setSourceIterator($iterator);
+        $this->reader->setSomeSourceIterator($iterator);
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
         $context->expects($this->exactly(3))->method('incrementReadOffset');
@@ -86,7 +84,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
 
         $iterator = new \ArrayIterator(array($fooEntity, $barEntity, $bazEntity));
 
-        $this->reader->setSourceIterator($iterator);
+        $this->reader->setSomeSourceIterator($iterator);
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')->getMock();
         $context->expects($this->exactly(3))->method('incrementReadOffset');

@@ -1,2 +1,2 @@
 bundles:
-    - Oro\Bundle\EmailBundle\OroEmailBundle
+    - { name: Oro\Bundle\EmailBundle\OroEmailBundle, kernel: true }

@@ -61,6 +61,14 @@ class OroBuildCommand extends ContainerAwareCommand
                 self::OPTIMIZER_FILE_PATH . ' -o ' . basename($buildConfigFilePath) . ' 1>&2';
             $process = new Process($command, $webRoot);
             $process->setTimeout($config['building_timeout']);
+            // some workaround when this command is launched from web
+            if (isset($_SERVER['PATH'])) {
+                $env = $_SERVER;
+                if (isset($env['Path'])) {
+                    unset($env['Path']);
+                }
+                $process->setEnv($env);
+            }
             $process->run();
             if (!$process->isSuccessful()) {
                 throw new \RuntimeException($process->getErrorOutput());

@@ -75,6 +75,13 @@ class AddressFormatter
                     $value = $this->getValue($address, 'street');
                 } elseif ('country' == $lowerCaseKey) {
                     $value = $this->getValue($address, 'countryName');
+                } elseif ('region' == $lowerCaseKey) {
+                    $value = $this->getValue($address, 'regionName');
+                } elseif ('region_code' == $lowerCaseKey) {
+                    $value = $this->getValue($address, 'regionCode');
+                    if (!$value) {
+                        $value = $this->getValue($address, 'regionName');
+                    }
                 } else {
                     $value = $this->getValue($address, $lowerCaseKey);
                 }

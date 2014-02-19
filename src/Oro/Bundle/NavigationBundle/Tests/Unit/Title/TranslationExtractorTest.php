@@ -61,14 +61,16 @@ class TranslationExtractorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $repo->expects($this->once())
             ->method('getTitles')
-            ->will($this->returnValue(array(array('title' => 'Test title'))));
+            ->will($this->returnValue(array(array('title' => 'Test title', 'shortTitle' => 'Test short title'))));
 
         $this->titleService->expects($this->once())
             ->method('getStoredTitlesRepository')
             ->will($this->returnValue($repo));
 
-        $messageCatalogue->expects($this->once())
-            ->method('set');
+        $messageCatalogue->expects($this->at(0))
+            ->method('set')->with('Test short title', '__Test short title');
+        $messageCatalogue->expects($this->at(1))
+            ->method('set')->with('Test title', '__Test title');
 
         $this->extractor->setPrefix('__');
         $this->extractor->extract('', $messageCatalogue);

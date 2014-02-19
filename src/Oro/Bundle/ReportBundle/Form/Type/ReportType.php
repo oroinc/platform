@@ -45,10 +45,7 @@ class ReportType extends AbstractQueryDesignerType
             array(
                 'data_class'                  => 'Oro\Bundle\ReportBundle\Entity\Report',
                 'intention'                   => 'report',
-                'cascade_validation'          => true,
-                'grouping_column_choice_type' => 'oro_report_entity_field_choice',
-                'column_column_choice_type'   => 'oro_report_entity_field_choice',
-                'filter_column_choice_type'   => 'oro_report_entity_field_choice'
+                'cascade_validation'          => true
             )
         );
 

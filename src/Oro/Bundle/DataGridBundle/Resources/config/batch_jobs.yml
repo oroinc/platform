@@ -1,0 +1,14 @@
+connector:
+    name: oro_importexport
+    jobs:
+        datagrid_export_to_csv:
+            title: "Datagrid Export to CSV"
+            type: export
+            steps:
+                export:
+                    title:     export
+                    services:
+                        reader:    oro_datagrid.importexport.export_connector
+                        processor: oro_importexport.processor.export_delegate
+                        writer:    oro_importexport.writer.csv
+                    parameters: ~

@@ -9,21 +9,21 @@
 {% set pageTitle = 'Configuration' %}
 
 {% block content %}
-    {% set saveButton = UI.saveAndStayButton('', 'Save Settings'|trans) %}
-    {% set restoreButton = UI.buttonType({
-        type: 'reset',
-        label: 'Restore Defaults'|trans
-    }) %}
+    {% set saveButton = UI.saveAndCloseButton('Save Settings') %}
+    {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Defaults' }) %}
     {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
-    <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post"
-          data-collect="true">
+    <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post" data-collect="true">
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
         {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
     </form>
     {{ oro_form_js_validation(form) }}
 
     <script type="text/javascript">
-        require(['jquery'], function ($) {
+        /* jshint browser:true, devel:true */
+        /* global require */
+        require(['jquery', 'oro/config/form/state', 'oro/config/form/default'], function ($, formState, formDefault) {
+            'use strict';
+
             $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
                 var $form = $(this).closest('form'),
                     $notDefault = $form.find('.parent-scope-checkbox :checkbox:not(:checked)');
@@ -31,16 +31,10 @@
                 $form.get(0).reset();
                 $notDefault.filter(':checked').trigger('change');
             });
-        });
-    </script>
 
-    {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
-    <script type="text/javascript">
-        /* jshint browser:true, devel:true */
-        /* global require */
-        require(['oro/form/state'], function (formState) {
-            'use strict';
             new formState();
+            new formDefault();
         });
     </script>
+    {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
 {% endblock content %}

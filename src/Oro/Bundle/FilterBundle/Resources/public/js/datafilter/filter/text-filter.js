@@ -15,39 +15,18 @@ function($, _, __, AbstractFilter) {
      * @extends oro.datafilter.AbstractFilter
      */
     return AbstractFilter.extend({
-        /** @property */
-        template: _.template(
-            '<button type="button" class="btn filter-criteria-selector oro-drop-opener oro-dropdown-toggle">' +
-                '<% if (showLabel) { %><%= label %>: <% } %>' +
-                '<strong class="filter-criteria-hint"><%= criteriaHint %></strong>' +
-                '<span class="caret"></span>' +
-            '</button>' +
-            '<% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>' +
-            '<div class="filter-criteria dropdown-menu" />'
-        ),
+        wrappable: true,
+
+        wrapperTemplate: '',
+
+        wrapperTemplateSelector: '#filter-wrapper-template',
 
         /**
-         * Template for filter criteria
+         * Template selector for filter criteria
          *
          * @property
          */
-        popupCriteriaTemplate: _.template(
-            '<div>' +
-                '<div>' +
-                    '<input type="text" name="value" value=""/>' +
-                '</div>' +
-                '<div class="oro-action">' +
-                    '<div class="btn-group">' +
-                        '<button type="button" class="btn btn-primary filter-update"><%- _.__("Update") %></button>' +
-                    '</div>' +
-                '</div>' +
-            '</div>'
-        ),
-
-        /**
-         * @property {Boolean}
-         */
-        popupCriteriaShowed: false,
+        templateSelector: '#text-filter-template',
 
         /**
          * Selector to element of criteria hint
@@ -94,7 +73,7 @@ function($, _, __, AbstractFilter) {
          *
          * @param {Object} options
          */
-        initialize: function() {
+        initialize: function (options) {
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
@@ -111,7 +90,7 @@ function($, _, __, AbstractFilter) {
         ensurePopupCriteriaClosed: function () {
             if (this.popupCriteriaShowed) {
                 this._hideCriteria();
-                this.setValue(this._formatRawValue(this._readDOMValue()));
+                this.apply()
             }
         },
 
@@ -122,9 +101,9 @@ function($, _, __, AbstractFilter) {
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
-            if (e.which == 13) {
+            if (e.which === 13) {
                 this._hideCriteria();
-                this.setValue(this._formatRawValue(this._readDOMValue()));
+                this.apply();
             }
         },
 
@@ -136,7 +115,7 @@ function($, _, __, AbstractFilter) {
          */
         _onClickUpdateCriteria: function(e) {
             this._hideCriteria();
-            this.setValue(this._formatRawValue(this._readDOMValue()));
+            this.apply();
         },
 
         /**
@@ -186,7 +165,7 @@ function($, _, __, AbstractFilter) {
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
                 this._hideCriteria();
-                this.setValue(this._formatRawValue(this._readDOMValue()));
+                this.apply();
                 e.stopPropagation();
             }
         },
@@ -197,38 +176,13 @@ function($, _, __, AbstractFilter) {
          * @return {*}
          */
         render: function () {
-            this.$el.empty();
-            this.$el.append(
-                this.template({
-                    label: this.label,
-                    showLabel: this.showLabel,
-                    criteriaHint: this._getCriteriaHint(),
-                    nullLink: this.nullLink,
-                    canDisable: this.canDisable
-                })
-            );
-
-            this._renderCriteria(this.$(this.criteriaSelector));
-            this._clickOutsideCriteriaCallback = _.bind(function(e) {
-                if (this.popupCriteriaShowed) {
-                    this._onClickOutsideCriteria(e);
-                }
-            }, this);
-            $('body').on('click', this._clickOutsideCriteriaCallback);
-
+            var $filter = $(this.template());
+            this._wrap($filter);
             return this;
         },
 
-        /**
-         * Render filter criteria popup
-         *
-         * @param {Object} el
-         * @protected
-         * @return {*}
-         */
-        _renderCriteria: function(el) {
-            $(el).append(this.popupCriteriaTemplate());
-            return this;
+        _wrap: function ($filter) {
+            this.$el.append($filter);
         },
 
         /**

@@ -1,112 +1,64 @@
 {% extends 'OroUIBundle:Form:fields.html.twig' %}
 
-{% block genemu_jqueryselect2_country_row %}
-    {{ block('genemu_jqueryselect2_row') }}
-{% endblock %}
-
-{% block genemu_jqueryselect2_choice_row %}
-    {{ block('genemu_jqueryselect2_row') }}
-{% endblock %}
-
-{% block genemu_jqueryselect2_entity_row %}
-    {{ block('genemu_jqueryselect2_row') }}
-{% endblock %}
-
-{% block genemu_jqueryselect2_row %}
-    {{ form_row(form, { 'attr': {'class': 'select2'} }) }}
+{% block genemu_jqueryselect2_widget %}
+    {{ form_widget(form, { 'attr': {'class': 'select2'} }) }}
     {{ form_javascript(form) }}
-{% endblock %}
-
-{% block percent_row %}
-    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (%)' %}
-    {{ form_row(form, {'type': 'text', 'label': label, '_isTranslatedLabel': true}) }}
-{% endblock %}
-
-{% block percent_widget %}
-    {% set type = type|default('text') %}
-    {{ block('form_widget_simple') }}
 {% endblock %}
 
 {% block genemu_jqueryselect2_javascript %}
     <script type="text/javascript">
-        require(['underscore', 'jquery', 'oro/select2-config', 'jquery.select2'],
-        function(_, $, Select2Config){
+        require(['underscore', 'jquery', 'oro/select2-config'
+            {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
+                {%- for path in configs.extra_modules -%}
+                    , '{{ path }}'
+                {%- endfor -%}
+            {% endif -%}
+            , 'jquery.select2'],
+        function(_, $, Select2Config
+            {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
+                {%- for name in configs.extra_modules|keys -%}
+                    , {{ name }}
+                {%- endfor -%}
+            {% endif -%}
+                ){
             var $field = $('#{{ id }}');
 
             {% block genemu_jqueryselect2_javascript_prototype %}
-            {% set url = '' %}
-            {% if configs.ajax.url is defined and configs.ajax.url%}
-            {% set url = configs.ajax.url %}
-            {% elseif configs.route_name is defined and configs.route_name %}
-            {% set url = path(configs.route_name) %}
-            {% endif %}
+                {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name) : '' %}
+                {% if configs.placeholder is defined %}
+                    {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
+                {% endif %}
+                {% if configs.result_template_twig is defined and configs.result_template_twig %}
+                    {% set configs = configs|merge({'result_template': include(configs.result_template_twig) }) %}
+                {% endif %}
+                {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
+                    {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
+                {% endif %}
 
-            {% if configs.placeholder is defined %}
-            {% set configs = configs|merge({'placeholder': configs.placeholder|trans }) %}
-            {% endif %}
-            {% if configs.result_template_twig is defined and configs.result_template_twig %}
-            {% set configs = configs|merge({'result_template': include(configs.result_template_twig) }) %}
-            {% endif %}
-            {% if configs.selection_template_twig is defined and configs.selection_template_twig %}
-            {% set configs = configs|merge({'selection_template': include(configs.selection_template_twig) }) %}
-            {% endif %}
+                var select2Config = {{ configs|json_encode|raw }};
+                {% if configs.extra_config is defined and configs.extra_config %}
+                    {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
+                {% endif %}
 
-            var select2Config = {{ configs|json_encode|raw }};
-            {% if configs.extra_config is defined and configs.extra_config %}
-            {{ block('oro_combobox_dataconfig_' ~ configs.extra_config) }}
-            {% endif %}
+                {% if excluded is not defined %}
+                    {% set excluded = [] %}
+                {% endif %}
+                if ($field.length) {
+                    var configurator = new Select2Config(
+                        select2Config,
+                        {{ url|json_encode|raw }},
+                        {{ configs.per_page|default(10) }},
+                        {{ excluded|json_encode|raw }}
+                    );
+                    select2Config = configurator.getConfig();
+                }
 
-            {% if excluded is not defined %}
-                {% set excluded = [] %}
-            {% endif %}
-            if ($field.length) {
-                var configurator = new Select2Config(
-                    select2Config,
-                    $field[0].tagName.toLowerCase(),
-                    {{ url|json_encode|raw }},
-                    {{ configs.per_page|default(10) }},
-                    {{ excluded|json_encode|raw }}
-                );
-                select2Config = configurator.getConfig();
-            }
+                $field.select2(select2Config);
 
-            $field.select2(select2Config);
-
-            $field.trigger('select2-init');
+                $field.trigger('select2-init');
             {% endblock %}
         });
     </script>
-{% endblock %}
-
-{% block genemu_jqueryselect2_entity_widget %}
-    {% spaceless %}
-        {% if expanded %}
-            {{ block('choice_widget_expanded') }}
-        {% else %}
-            {{ block('genemu_jqueryselect2_entity_widget_collapsed') }}
-        {% endif %}
-    {% endspaceless %}
-{% endblock %}
-
-{% block genemu_jqueryselect2_entity_widget_collapsed %}
-    {% spaceless %}
-        <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
-            {% if empty_value is not none %}
-                <option {% if value is empty %} selected="selected"{% endif %} value="">
-                    {{ empty_value|trans({}, translation_domain) }}
-                </option>
-            {% endif %}
-            {% if preferred_choices|length > 0 %}
-                {% set options = preferred_choices %}
-                {{ block('choice_widget_options') }}
-                {% if choices|length > 0 and separator is not none %}
-                    <option disabled="disabled">{{ separator }}</option>
-                {% endif %}
-            {% endif %}
-            {% set options = choices %}
-            {{ block('choice_widget_options') }}
-        </select>
-    {% endspaceless %}
 {% endblock %}
 
 {% block oro_ticker_symbol_widget %}
@@ -159,22 +111,7 @@
     {{ form_widget(form) }}
 {% endblock %}
 
-{% block oro_jqueryselect2_hidden_row %}
-    {{ block('genemu_jqueryselect2_row') }}
-{% endblock %}
-
-{% block oro_icon_select_widget %}
-    {{ form_widget(form) }}
-    {{ form_javascript(form) }}
-{% endblock %}
-
 {% block oro_combobox_dataconfig_autocomplete %}
-    {% set url = '' %}
-    {% if configs.ajax.url is defined and configs.ajax.url%}
-    {% set url = configs.ajax.url %}
-    {% elseif configs.route_name is defined and configs.route_name %}
-        {% set url = path(configs.route_name) %}
-    {% endif %}
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
         'data': function (query, page) {
@@ -192,12 +129,6 @@
 {% endblock %}
 
 {% block oro_combobox_dataconfig_relation %}
-    {% set url = '' %}
-    {% if configs.ajax.url is defined and configs.ajax.url%}
-    {% set url = configs.ajax.url %}
-    {% elseif configs.route_name is defined and configs.route_name %}
-        {% set url = path(configs.route_name) %}
-    {% endif %}
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
         'data': function (query, page) {
@@ -215,7 +146,7 @@
 {% endblock %}
 
 {% block oro_combobox_dataconfig_grid %}
-    {% set url = configs.ajax.url is defined ? configs.ajax.url : path(configs.route, {'_format': 'json'}) %}
+    {% set url = configs.route_name is defined and configs.route_name ? path(configs.route_name, {'_format': 'json'}) : '' %}
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
         'data': function (query, page) {
@@ -319,7 +250,7 @@
                     data-content="{{ tooltip }}"
                     data-toggle="popover"></i>
             {%- endif -%}
-            {%- if _isTranslatedLabel is defined and _isTranslatedLabel -%}
+            {%- if is_translated_label is defined and is_translated_label -%}
                 {{ label }}
             {%- else -%}
                 {{ label|trans({}, translation_domain)|capitalize }}
@@ -331,10 +262,20 @@
 
 {% block oro_money_row %}
     {% set label = label|trans({}, translation_domain)|capitalize ~ ' (' ~ currency_symbol ~')' %}
-    {{ form_row(form, {'type': 'text', 'label': label, '_isTranslatedLabel': true}) }}
+    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
 {% endblock %}
 
 {% block oro_money_widget %}
+    {% set type = type|default('text') %}
+    {{ block('form_widget_simple') }}
+{% endblock %}
+
+{% block percent_row %}
+    {% set label = label|trans({}, translation_domain)|capitalize ~ ' (%)' %}
+    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
+{% endblock %}
+
+{% block percent_widget %}
     {% set type = type|default('text') %}
     {{ block('form_widget_simple') }}
 {% endblock %}
@@ -499,7 +440,6 @@
         </script>
     {% endif %}
 {% endmacro %}
-
 
 {% block oro_form_js_validation %}
 <script type="text/javascript">

@@ -124,43 +124,45 @@ class InitCommand extends ContainerAwareCommand
             }
         }
 
-        foreach ($entityOptions['fields'] as $fieldName => $fieldConfig) {
-            if ($this->configManager->hasConfig($className, $fieldName)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Field "%s" for Entity "%s" already added', $className, $fieldName)
+        if (isset($entityOptions['fields'])) {
+            foreach ($entityOptions['fields'] as $fieldName => $fieldConfig) {
+                if ($this->configManager->hasConfig($className, $fieldName)) {
+                    throw new \InvalidArgumentException(
+                        sprintf('Field "%s" for Entity "%s" already added', $fieldName, $className)
+                    );
+                }
+
+                $mode = ConfigModelManager::MODE_DEFAULT;
+                if (isset($fieldConfig['mode'])) {
+                    $mode = $fieldConfig['mode'];
+                }
+
+                $owner = ExtendManager::OWNER_SYSTEM;
+                if (isset($fieldConfig['owner'])) {
+                    $owner = $fieldConfig['owner'];
+                }
+
+                $isExtend = false;
+                if (isset($fieldConfig['is_extend'])) {
+                    $isExtend = $fieldConfig['is_extend'];
+                }
+
+                $extendManager->createField(
+                    $className,
+                    $fieldName,
+                    $fieldConfig,
+                    $owner,
+                    $mode
                 );
+
+                $this->setDefaultConfig($entityOptions, $className, $fieldName);
+
+                $config = $configProvider->getConfig($className, $fieldName);
+                $config->set('state', ExtendManager::STATE_NEW);
+                $config->set('is_extend', $isExtend);
+
+                $this->configManager->persist($config);
             }
-
-            $mode = ConfigModelManager::MODE_DEFAULT;
-            if (isset($fieldConfig['mode'])) {
-                $mode = $fieldConfig['mode'];
-            }
-
-            $owner = ExtendManager::OWNER_SYSTEM;
-            if (isset($fieldConfig['owner'])) {
-                $owner = $fieldConfig['owner'];
-            }
-
-            $isExtend = false;
-            if (isset($fieldConfig['is_extend'])) {
-                $isExtend = $fieldConfig['is_extend'];
-            }
-
-            $extendManager->createField(
-                $className,
-                $fieldName,
-                $fieldConfig,
-                $owner,
-                $mode
-            );
-
-            $this->setDefaultConfig($entityOptions, $className, $fieldName);
-
-            $config = $configProvider->getConfig($className, $fieldName);
-            $config->set('state', ExtendManager::STATE_NEW);
-            $config->set('is_extend', $isExtend);
-
-            $this->configManager->persist($config);
         }
     }
 

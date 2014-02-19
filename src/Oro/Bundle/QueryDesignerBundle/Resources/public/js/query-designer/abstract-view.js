@@ -16,7 +16,6 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         /** @property {Object} */
         options: {
             collection: null,
-            entityName: null,
             itemTemplateSelector: null,
             itemFormSelector: null,
             columnChainTemplateSelector: null,
@@ -138,9 +137,9 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             return this.$el.find(this.selectors.itemContainer);
         },
 
-        changeEntity: function (entityName) {
-            this.options.entityName = entityName;
+        changeEntity: function (entityName, columns) {
             this.getCollection().reset();
+            this.columnSelector.changeEntity(entityName, columns);
         },
 
         initModel: function (model, index) {
@@ -217,10 +216,6 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
 
         handleCancelButton: function() {
             this.resetForm();
-        },
-
-        updateColumnSelector: function (columns) {
-            this.columnSelector.changeEntity(this.options.entityName, columns);
         },
 
         prepareItemTemplateData: function (model) {
@@ -380,27 +375,6 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         createNewModel: function () {
             var modelClass = this.getCollection().model;
             return new modelClass();
-        },
-
-        getFieldApplicableConditions: function (item) {
-            var result = {
-                parent_entity: null,
-                entity: this.options.entityName,
-                field: item.val()
-            };
-            var chain = result.field.split(',');
-            if (_.size(chain) > 1) {
-                var field = _.last(chain).split('::');
-                result.parent_entity = result.entity;
-                result.entity = _.first(field);
-                result.field = _.last(field);
-                if (_.size(chain) > 2) {
-                    var parentField = chain[_.size(chain) - 2].split('::');
-                    result.parent_entity = _.first(parentField);
-                }
-            }
-            _.extend(result, _.pick(item.data(), ['type', 'identifier']));
-            return result;
         },
 
         addFieldLabelGetter: function (callback) {

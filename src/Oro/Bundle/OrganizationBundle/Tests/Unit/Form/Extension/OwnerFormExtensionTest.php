@@ -215,8 +215,8 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Owner',
                 'business_unit_ids' => null,
                 'configs'     => array(
-                    'is_translate_option' => false,
-                    'is_safe'             => true
+                    'is_translated_option' => true,
+                    'is_safe'              => true
                 )
             )
         );

@@ -24,7 +24,7 @@ Country:
         entity:
             label:                  Country
             plural_label:           Countries
-    fields:                                                 # declare fields
+    fields:                                                 # declare fields, at least one required
         id:
             type:                   int
         name:

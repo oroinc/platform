@@ -9,6 +9,7 @@ parameters:
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
     oro_integration.provider.channel_type.simple.class:                   Oro\Bundle\IntegrationBundle\Provider\SimpleChannelType
     oro_integration.provider.simple_transport.class:                      Oro\Bundle\IntegrationBundle\Provider\SimpleTransport
+    oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
 
     oro_integration.job_executor.class:                                   Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor
     oro_integration.writer.persistent_batch_writer.class:                 Oro\Bundle\IntegrationBundle\ImportExport\Writer\PersistentBatchWriter
@@ -45,6 +46,10 @@ services:
         arguments:
             - []
 
+    oro_integration.manager.types_registry.link:
+        tags:
+            - { name: oro_service_link, service: oro_integration.manager.types_registry }
+
     # job executor
     oro_integration.job_executor:
         class: %oro_integration.job_executor.class%
@@ -80,6 +85,12 @@ services:
         class: %oro_integration.provider.simple_transport.class%
         tags:
             - { name: oro_integration.transport, type: simple, channel_type: simple }
+
+    oro_integration.provider.connector_context_mediator:
+        class: %oro_integration.provider.connector_context_mediator.class%
+        arguments:
+            - @oro_integration.manager.types_registry.link
+            - @doctrine.orm.entity_manager
 
     oro_integration.logger.strategy:
         class: %oro_integration.logger.strategy.class%

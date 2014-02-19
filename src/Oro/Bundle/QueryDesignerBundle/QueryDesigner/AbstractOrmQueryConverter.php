@@ -53,9 +53,13 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
         $metadata = $this->getClassMetadata(
             $this->getEntityClassName($this->getJoinIdentifierByTableAlias($joinAlias))
         );
-        $nullable = false;
-        foreach ($metadata->getAssociationMapping($joinFieldName)['joinColumns'] as $joinColumns) {
-            $nullable = ($nullable || $joinColumns['nullable']);
+        $nullable = true;
+        $associationMapping = $metadata->getAssociationMapping($joinFieldName);
+        if (isset($associationMapping['joinColumns'])) {
+            $nullable = false;
+            foreach ($associationMapping['joinColumns'] as $joinColumn) {
+                $nullable = ($nullable || (isset($joinColumn['nullable']) ? $joinColumn['nullable'] : false));
+            }
         }
 
         return !$nullable;

@@ -2,33 +2,27 @@ workflows:
     first_workflow:
         label: 'First Workflow'
         enabled: true
+        entity: First\Entity
         start_step: first_step
+        entity_attribute: my_entity
+        steps_display_ordered: true
         steps:
             first_step:
                 label: 'First Step'
-                template: My:Custom:template.html.twig
                 order: 1
                 is_final: true
                 allowed_transitions:
                     - first_transition
-                form_options:
-                    attribute_fields:
-                        first_attribute:
-                            form_type: text
-                            label: 'First Attribute'
-                            options:
-                                required: true
-                view_attributes:
-                    - { attribute: 'first_attribute', view_type: 'custom_view_type', default: 'Default value' }
-                    - { path: '$first_attribute.name', label: 'Custom label' }
-                    - first_attribute
-
         attributes:
             first_attribute:
                 label: 'First Attribute'
                 type: object
                 options:
                     class: DateTime
+            second_attribute:
+                label: 'Second Attribute'
+                type: string
+                property_path: first_attribute.test
         transitions:
             first_transition:
                 label: 'First Transition'
@@ -36,6 +30,8 @@ workflows:
                 is_start: true
                 is_hidden: true
                 is_unavailable_hidden: true
+                acl_resource: some_acl
+                acl_message: "Test ACL message"
                 message: "Test message"
                 transition_definition: first_transition_definition
                 frontend_options:
@@ -67,15 +63,13 @@ workflows:
     second_workflow:
         label: 'Second Workflow'
         enabled: false
+        entity: Second\Entity
         start_step: second_step
-        type: wizard
         steps:
             second_step:
                 label: 'Second Step'
-                template: ~
                 order: 1
                 is_final: false
-                form_type: custom_workflow_step
                 allowed_transitions: []
         attributes: []
         transitions:

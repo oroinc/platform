@@ -20,6 +20,11 @@ class Attribute
     protected $label;
 
     /**
+     * @var string
+     */
+    protected $propertyPath;
+
+    /**
      * @var array
      */
     protected $options = array();
@@ -145,5 +150,24 @@ class Attribute
     public function hasOption($key)
     {
         return isset($this->options[$key]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPropertyPath()
+    {
+        return $this->propertyPath;
+    }
+
+    /**
+     * @param string $propertyPath
+     * @return Attribute
+     */
+    public function setPropertyPath($propertyPath)
+    {
+        $this->propertyPath = $propertyPath;
+
+        return $this;
     }
 }

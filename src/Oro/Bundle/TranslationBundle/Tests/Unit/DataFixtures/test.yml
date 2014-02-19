@@ -1,0 +1,8 @@
+---
+test: test
+test %num%: tessto presto #%num%
+multi: |-
+  Test l'aide <a href="http://www.orocrm.com/forums"> forums</a>.
+another one: another one string
+'test32': "test3223"
+"test "s" df": test 43

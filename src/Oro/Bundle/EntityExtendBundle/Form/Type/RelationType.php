@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
 
@@ -40,7 +41,13 @@ class RelationType extends AbstractType
         $this->config = $this->configProvider->getConfigById($options['config_id']);
         $this->formFactory = $builder->getFormFactory();
 
-        $builder->add('target_entity', new TargetType($this->configProvider, $options['config_id']));
+        $builder->add(
+            'target_entity',
+            new TargetType($this->configProvider, $options['config_id']),
+            [
+                'constraints' => [new Assert\NotBlank()]
+            ]
+        );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSubmitData'));
         $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'preSubmitData'));
@@ -70,7 +77,10 @@ class RelationType extends AbstractType
                 $this->formFactory->createNamed(
                     'target_field',
                     new TargetFieldType($this->configProvider, $targetEntity),
-                    $targetField
+                    $targetField,
+                    [
+                        'constraints' => [new Assert\NotBlank()]
+                    ]
                 )
             );
         } else {
@@ -85,8 +95,9 @@ class RelationType extends AbstractType
                     new TargetFieldType($this->configProvider, $targetEntity),
                     $targetGrid,
                     [
-                        'multiple' => true,
-                        'label'    => 'Related entity data fields'
+                        'multiple'    => true,
+                        'label'       => 'Related entity data fields',
+                        'constraints' => [new Assert\NotBlank()]
                     ]
                 )
             );
@@ -102,8 +113,9 @@ class RelationType extends AbstractType
                     new TargetFieldType($this->configProvider, $targetEntity),
                     $targetTitle,
                     [
-                        'multiple' => true,
-                        'label'    => 'Related entity info title'
+                        'multiple'    => true,
+                        'label'       => 'Related entity info title',
+                        'constraints' => [new Assert\NotBlank()]
                     ]
                 )
             );
@@ -119,8 +131,9 @@ class RelationType extends AbstractType
                     new TargetFieldType($this->configProvider, $targetEntity),
                     $targetDetailed,
                     [
-                        'multiple' => true,
-                        'label'    => 'Related entity detailed'
+                        'multiple'    => true,
+                        'label'       => 'Related entity detailed',
+                        'constraints' => [new Assert\NotBlank()]
                     ]
                 )
             );

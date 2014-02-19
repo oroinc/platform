@@ -4,18 +4,30 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\AssemblerException;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
 
 class AttributeAssembler extends AbstractAssembler
 {
     /**
+     * @param WorkflowDefinition $definition,
      * @param array $configuration
      * @return ArrayCollection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(array $configuration)
+    public function assemble(WorkflowDefinition $definition, array $configuration)
     {
+        $entityAttributeName = $definition->getEntityAttributeName();
+        if (!array_key_exists($entityAttributeName, $configuration)) {
+            $configuration[$entityAttributeName] = array(
+                'label' => $entityAttributeName,
+                'type' => 'entity',
+                'options' => array(
+                    'class' => $definition->getRelatedEntity(),
+                ),
+            );
+        }
+
         $attributes = new ArrayCollection();
         foreach ($configuration as $name => $options) {
             $attribute = $this->assembleAttribute($name, $options);
@@ -32,33 +44,18 @@ class AttributeAssembler extends AbstractAssembler
      */
     protected function assembleAttribute($name, array $options)
     {
-        $options = $this->addDefaultOptions($options);
-
         $this->assertOptions($options, array('label', 'type'));
 
         $attribute = new Attribute();
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
+        $attribute->setPropertyPath($this->getOption($options, 'property_path', null));
         $attribute->setOptions($this->getOption($options, 'options', array()));
 
         $this->validateAttribute($attribute);
 
         return $attribute;
-    }
-
-    protected function addDefaultOptions(array $options)
-    {
-        if (isset($options['type']) && $options['type'] == 'entity') {
-            $options['options'] = isset($options['options']) && is_array($options['options']) ?
-                $options['options'] : array();
-
-            $options['options'] = array_merge(
-                array('multiple' => false, 'bind' => !empty($options['options']['managed_entity'])),
-                $options['options']
-            );
-        }
-        return $options;
     }
 
     /**
@@ -73,23 +70,6 @@ class AttributeAssembler extends AbstractAssembler
             $this->assertAttributeHasClassOption($attribute);
         } else {
             $this->assertAttributeHasNoOptions($attribute, 'class');
-        }
-
-        if ($attribute->getType() == 'entity') {
-            $managedEntity = $attribute->getOption('managed_entity');
-            $multiple = $attribute->getOption('multiple');
-            $bind = $attribute->getOption('bind');
-            if ($managedEntity && !$multiple && !$bind) {
-                throw new AssemblerException(
-                    sprintf(
-                        'Options "multiple" and "bind" for managed entity in attribute "%s" ' .
-                        'cannot be both false simultaneously',
-                        $attribute->getName()
-                    )
-                );
-            }
-        } else {
-            $this->assertAttributeHasNoOptions($attribute, array('managed_entity', 'bind', 'multiple'));
         }
     }
 

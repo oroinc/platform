@@ -12,19 +12,11 @@ function(_, __, SelectFilter) {
      */
     return SelectFilter.extend({
         /**
-         * Multiselect filter template
+         * Filter selector template
          *
          * @property
          */
-        template: _.template(
-            '<div class="btn filter-select filter-criteria-selector">' +
-                '<% if (showLabel) { %><%= label %>: <% } %>' +
-                '<select multiple>' +
-                    '<% _.each(options, function (option) { %><option value="<%= option.value %>"><%= option.label %></option><% }); %>' +
-                '</select>' +
-            '</div>' +
-            '<% if (canDisable) { %><a href="<%= nullLink %>" class="disable-filter"><i class="icon-remove hide-text"><%- _.__("Close") %></i></a><% } %>'
-        ),
+        templateSelector: '#multiselect-filter-template',
 
         /**
          * Select widget options
