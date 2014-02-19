@@ -42,9 +42,14 @@ class EmbedFormController extends Controller
             $type = $form->get('channel')->getConfig()->getType()->getInnerType();
             $configOptions = $form->get('channel')->getConfig()->getOptions();
 
+            $channel = $formEntity->getChannel();
+            $identifier = $this->getDoctrine()
+                ->getManager()
+                ->getClassMetadata(get_class($channel))
+                ->getIdentifier();
             $configOptions = array_merge(
                 $configOptions,
-                ['auto_initialize' => false, 'empty_data' => $formEntity->getChannel()]
+                ['auto_initialize' => false, 'property' => $identifier[0], 'empty_data' => $channel]
             );
             $form->add('channel', $type, $configOptions);
         }
