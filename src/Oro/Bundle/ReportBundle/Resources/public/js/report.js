@@ -156,7 +156,7 @@ define(function (require) {
                     name = util.splitFieldId(data.name);
 
                 data.name = template(name);
-                if (func) {
+                if (func && func.name) {
                     item = metadata[func.group_type][func.group_name];
                     if (item) {
                         itemFunc = _.findWhere(item.functions, {name: func.name});
@@ -164,6 +164,8 @@ define(function (require) {
                             data.func = itemFunc.label;
                         }
                     }
+                } else {
+                    data.func = '';
                 }
 
                 return tmpl(data);
