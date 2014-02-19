@@ -1,0 +1,140 @@
+<?php
+
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
+
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+
+class WorkflowSelectTypeTest extends FormIntegrationTestCase
+{
+    const TEST_ENTITY_CLASS   = 'Test\Entity\Class';
+    const TEST_WORKFLOW_NAME  = 'test_workflow_name';
+    const TEST_WORKFLOW_LABEL = 'Test Workflow Label';
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $workflowRegistry;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $translator;
+
+    /**
+     * @var WorkflowSelectType
+     */
+    protected $type;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->workflowRegistry = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+            ->getMockForAbstractClass();
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->will($this->returnArgument(0));
+
+        $this->type = new WorkflowSelectType($this->workflowRegistry, $this->translator);
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        unset($this->workflowRegistry);
+        unset($this->type);
+    }
+
+    /**
+     * @param array $inputOptions
+     * @param array $expectedOptions
+     * @param bool $enabled
+     * @dataProvider setDefaultOptionsDataProvider
+     */
+    public function testSetDefaultOptions(array $inputOptions, array $expectedOptions, $enabled = true)
+    {
+        $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $testWorkflow = new Workflow($entityConnector, $aclManager);
+        $testWorkflow->setName(self::TEST_WORKFLOW_NAME)
+            ->setLabel(self::TEST_WORKFLOW_LABEL)
+            ->setEnabled($enabled);
+        $this->workflowRegistry->expects($this->any())
+            ->method('getWorkflowsByEntityClass')
+            ->with(self::TEST_ENTITY_CLASS)
+            ->will($this->returnValue(array($testWorkflow)));
+
+        $form = $this->factory->create($this->type, null, $inputOptions);
+
+        $actualOptions = $form->getConfig()->getOptions();
+        foreach ($expectedOptions as $name => $expectedValue) {
+            $this->assertArrayHasKey($name, $actualOptions);
+            $this->assertEquals($expectedValue, $actualOptions[$name]);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function setDefaultOptionsDataProvider()
+    {
+        return array(
+            'no additional data' => array(
+                'inputOptions' => array(),
+                'expectedOptions' => array(
+                    'entity_class' => null,
+                    'choices' => array(),
+                )
+            ),
+            'custom choices' => array(
+                'inputOptions' => array(
+                    'choices' => array('key' => 'value')
+                ),
+                'expectedOptions' => array(
+                    'choices' => array('key' => 'value'),
+                )
+            ),
+            'custom entity class' => array(
+                'inputOptions' => array(
+                    'entity_class' => self::TEST_ENTITY_CLASS,
+                ),
+                'expectedOptions' => array(
+                    'entity_class' => self::TEST_ENTITY_CLASS,
+                    'choices' => array(self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL),
+                )
+            ),
+            'parent configuration id' => array(
+                'inputOptions' => array(
+                    'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
+                ),
+                'expectedOptions' => array(
+                    'choices' => array(self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL),
+                )
+            ),
+            'disabled workflow' => array(
+                'inputOptions' => array(
+                    'config_id' => new EntityConfigId('test', self::TEST_ENTITY_CLASS),
+                ),
+                'expectedOptions' => array(
+                    'choices' => array(
+                        self::TEST_WORKFLOW_NAME => self::TEST_WORKFLOW_LABEL . ' (oro.workflow.disabled)'
+                    ),
+                ),
+                'enabled' => false
+            ),
+        );
+    }
+}

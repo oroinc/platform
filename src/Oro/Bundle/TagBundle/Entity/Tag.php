@@ -17,7 +17,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TagRepository")
  * @Config(
  *  defaultValues={
- *      "entity"={"label"="Tag", "plural_label"="Tags"},
+ *      "entity"={
+ *          "label"="Tag",
+ *          "plural_label"="Tags",
+ *          "icon"="icon-tag"
+ *      },
  *      "ownership"={
  *          "owner_type"="USER",
  *          "owner_field_name"="owner",

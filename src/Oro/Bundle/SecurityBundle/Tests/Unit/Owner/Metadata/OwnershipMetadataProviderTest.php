@@ -111,7 +111,7 @@ class OwnershipMetadataProviderTest extends \PHPUnit_Framework_TestCase
             null
         );
 
-        $config = new Config(new EntityConfigId('SomeClass', 'ownership'));
+        $config = new Config(new EntityConfigId('ownership', 'SomeClass'));
         $config->set('owner_type', 'USER');
         $config->set('owner_field_name', 'test_field');
         $config->set('owner_column_name', 'test_column');

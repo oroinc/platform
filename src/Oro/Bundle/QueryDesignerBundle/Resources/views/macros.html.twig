@@ -1,10 +1,11 @@
 {% macro query_designer_condition_builder(params) %}
     {% set fieldConditionOptions = {
-        select2: {
-            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
-        },
-        util: {},
-        filterMetadataSelector: '#' ~ params.filters_metadata_holder_id
+        fieldChoice: {
+            select2: {
+                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
+            },
+            util: {},
+        }
     } %}
     <div class="condition-builder left-panel-container">
         <div class="panel-placeholder">
@@ -39,9 +40,11 @@
             $('#{{ params.entity_choice_id }}')
                 .on('fieldsloaderupdate', function (e, fields) {
                     $conditions.conditionBuilder('setValue', []);
-                    $.extend($fieldConditionCriteria.data('options'), {
-                        fields: fields,
-                        entity: $(e.target).val()
+                    $.extend(true, $fieldConditionCriteria.data('options'), {
+                        fieldChoice: {
+                            fields: fields,
+                            entity: $(e.target).val()
+                        }
                     });
                     $fieldConditionCriteria
                         .toggleClass('disabled', $.isEmptyObject(fields));

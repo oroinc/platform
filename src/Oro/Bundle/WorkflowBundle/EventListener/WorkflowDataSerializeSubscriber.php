@@ -10,7 +10,7 @@ use Doctrine\ORM\Events;
 
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**

@@ -39,6 +39,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             'stepTo' => array('stepTo', $this->getStepMock('testStep')),
             'frontendOptions' => array('frontendOptions', array('key' => 'value')),
             'form_type' => array('formType', 'custom_workflow_transition'),
+            'display_type' => array('displayType', 'page'),
             'form_options' => array('formOptions', array('one', 'two')),
             'pre_condition' => array(
                 'preCondition',

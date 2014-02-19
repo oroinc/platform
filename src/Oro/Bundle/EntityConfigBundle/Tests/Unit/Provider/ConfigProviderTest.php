@@ -53,9 +53,9 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entityConfig = new Config(new EntityConfigId(DemoEntity::ENTITY_NAME, 'testScope'));
+        $this->entityConfig = new Config(new EntityConfigId('testScope', DemoEntity::ENTITY_NAME));
         $this->fieldConfig  = new Config(
-            new FieldConfigId(DemoEntity::ENTITY_NAME, 'testScope', 'testField', 'string')
+            new FieldConfigId('testScope', DemoEntity::ENTITY_NAME, 'testField', 'string')
         );
 
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -71,6 +71,15 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->configProvider  = new ConfigProvider($this->configManager, $this->configContainer, 'testScope', array());
     }
 
+    /**
+     * @dataProvider getIdProvider
+     */
+    public function testGetId($className, $fieldName, $fieldType, $expectedResult)
+    {
+        $result = $this->configProvider->getId($className, $fieldName, $fieldType);
+        $this->assertEquals($expectedResult, $result);
+    }
+
     public function testConfig()
     {
         $this->assertEquals($this->configManager, $this->configProvider->getConfigManager());
@@ -78,8 +87,8 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->entityConfig, $this->configProvider->getConfig(DemoEntity::ENTITY_NAME));
         $this->assertEquals('testScope', $this->configProvider->getScope());
 
-        $entityConfigId = new EntityConfigId(DemoEntity::ENTITY_NAME, 'testScope');
-        $fieldConfigId  = new FieldConfigId(DemoEntity::ENTITY_NAME, 'testScope', 'testField', 'string');
+        $entityConfigId = new EntityConfigId('testScope', DemoEntity::ENTITY_NAME);
+        $fieldConfigId  = new FieldConfigId('testScope', DemoEntity::ENTITY_NAME, 'testField', 'string');
 
         $this->assertEquals($entityConfigId, $this->configProvider->getId(DemoEntity::ENTITY_NAME));
         $this->assertEquals(
@@ -87,31 +96,12 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
             $this->configProvider->getId(DemoEntity::ENTITY_NAME, 'testField', 'string')
         );
 
-        $entityConfigIdWithOtherScope = new EntityConfigId(DemoEntity::ENTITY_NAME, 'otherScope');
-        $fieldConfigIdWithOtherScope  = new FieldConfigId(DemoEntity::ENTITY_NAME, 'otherScope', 'testField', 'string');
+        $entityConfigIdWithOtherScope = new EntityConfigId('otherScope', DemoEntity::ENTITY_NAME);
+        $fieldConfigIdWithOtherScope  = new FieldConfigId('otherScope', DemoEntity::ENTITY_NAME, 'testField', 'string');
 
         $this->assertEquals($entityConfigId, $this->configProvider->copyId($entityConfigIdWithOtherScope));
         $this->assertEquals($fieldConfigId, $this->configProvider->copyId($fieldConfigIdWithOtherScope));
         $this->assertEquals($this->entityConfig, $this->configProvider->getConfigById($entityConfigIdWithOtherScope));
-    }
-
-    public function testCreateConfig()
-    {
-        $entityConfig = $this->configProvider->createConfig(
-            new EntityConfigId(DemoEntity::ENTITY_NAME, 'testScope'),
-            array('first' => 'test')
-        );
-
-        $this->entityConfig->set('first', 'test');
-        $this->assertEquals($this->entityConfig, $entityConfig);
-
-        $fieldConfig = $this->configProvider->createConfig(
-            new FieldConfigId(DemoEntity::ENTITY_NAME, 'testScope', 'testField', 'string'),
-            array('first' => 'test')
-        );
-
-        $this->fieldConfig->set('first', 'test');
-        $this->assertEquals($this->fieldConfig, $fieldConfig);
     }
 
     public function testPersistFlush()
@@ -150,7 +140,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
         $this->configManager
             ->expects($this->once())
             ->method('clearCache')
-            ->with(new EntityConfigId(DemoEntity::ENTITY_NAME, 'testScope'))
+            ->with(new EntityConfigId('testScope', DemoEntity::ENTITY_NAME))
             ->will($this->returnValue(true));
 
         $this->configProvider->clearCache(DemoEntity::ENTITY_NAME);
@@ -184,7 +174,7 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $entityConfig = new Config(new EntityConfigId(DemoEntity::ENTITY_NAME, 'testScope'));
+        $entityConfig = new Config(new EntityConfigId('testScope', DemoEntity::ENTITY_NAME));
         $entityConfig->set('key', 'value');
         $this->assertEquals(
             array($entityConfig),
@@ -195,5 +185,14 @@ class ConfigProviderTest extends \PHPUnit_Framework_TestCase
                 DemoEntity::ENTITY_NAME
             )
         );
+    }
+
+    public function getIdProvider()
+    {
+        return [
+            [null, null, null, new EntityConfigId('testScope')],
+            ['TestCls', null, null, new EntityConfigId('testScope', 'TestCls')],
+            ['TestCls', 'fieldName', 'int', new FieldConfigId('testScope', 'TestCls', 'fieldName', 'int')],
+        ];
     }
 }

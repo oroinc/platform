@@ -110,6 +110,10 @@ define(['jquery', 'jquery.select2'], function ($) {
         prototype.prepareOpts = function (options) {
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
+                var matcher = options.matcher || $.fn.select2.defaults.matcher;
+                options.matcher = function (term, text, option) {
+                    return !option.children && matcher.apply(this, arguments);
+                };
             }
             return prepareOpts.call(this, options);
         };

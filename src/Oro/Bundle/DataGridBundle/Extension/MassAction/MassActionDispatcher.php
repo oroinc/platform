@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -36,6 +37,24 @@ class MassActionDispatcher
         $this->container     = $container;
         $this->manager       = $manager;
         $this->requestParams = $requestParams;
+    }
+
+    /**
+     * @param string $datagridName
+     * @param string $actionName
+     * @param Request $request
+     *
+     * @return MassActionResponseInterface
+     */
+    public function dispatchByRequest($datagridName, $actionName, Request $request)
+    {
+        /** @var MassActionParametersParser $massActionParametersParser */
+        $parametersParser = $this->container->get('oro_datagrid.mass_action.parameters_parser');
+        $parameters       = $parametersParser->parse($request);
+
+        $requestData = array_merge($request->query->all(), $request->request->all());
+
+        return $this->dispatch($datagridName, $actionName, $parameters, $requestData);
     }
 
     /**

@@ -20,3 +20,5 @@ oro:
             entity_description:  Represent workflow item
         action:
             general: "Workflow manipulations"
+        enabled: enabled
+        disabled: disabled
