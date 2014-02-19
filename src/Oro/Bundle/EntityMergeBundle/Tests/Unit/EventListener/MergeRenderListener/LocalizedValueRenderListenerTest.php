@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\MergeRenderListe
 
 use Oro\Bundle\EntityMergeBundle\EventListener\MergeRenderListener\LocalizedValueRenderListener;
 
-class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
+class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var LocalizedValueRenderListener
@@ -55,7 +55,7 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
         $this->numberFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NumberFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->event = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Event\FieldValueRenderEvent')
+        $this->event = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent')
             ->disableOriginalConstructor()
             ->getMock();
         $this->metadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataInterface')
@@ -130,7 +130,7 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
         $this->target->afterCalculate($this->event);
     }
 
-    public function testAfterCalculateShouldCallsetConvertedValueIfEntityIsNumberWithCorrectValues()
+    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsNumberWithCorrectValues()
     {
         $entity = '1';
         $localised = '1%';
@@ -151,31 +151,6 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
             ->with($localised);
 
         $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-    public function testAfterCalculateShouldNotChangePreviousRepresentativeIfFormatterReturnFalse()
-    {
-        $entity = '1';
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->once())
-            ->method('format')
-            ->with($entity)->will($this->returnValue(false));
-        $this->event->expects($this->never())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
-
-        $value = 'Not localised representative or localised by previous listener';
-        $this->init($entity, $value);
 
         $this->target->afterCalculate($this->event);
     }
@@ -204,7 +179,7 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
         $this->target->afterCalculate($this->event);
     }
 
-    public function testAfterCalculateShouldCallsetConvertedValueIfEntityIsAddressWithCorrectAddress()
+    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsAddressWithCorrectAddress()
     {
         $localised = 'test localised address';
         $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\AddressInterface');
@@ -223,30 +198,6 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
         $this->event->expects($this->once())
             ->method('setConvertedValue')
             ->with($localised);
-
-        $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-    public function testAfterCalculateShouldNotChangePreviousRepresentativeIfAddressFormatterReturnFalse()
-    {
-        $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\AddressInterface');
-        $this->addressFormatter->expects($this->once())
-            ->method('format')
-            ->withAnyParameters()->will($this->returnValue(false));
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->never())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
 
         $this->init($entity);
 
@@ -278,7 +229,7 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
         $this->target->afterCalculate($this->event);
     }
 
-    public function testAfterCalculateShouldCallsetConvertedValueIfEntityIsDateTimeWithCorrectString()
+    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsDateTimeWithCorrectString()
     {
         $localised = date('d/m/Y H:i:s');
         $entity = new \DateTime();
@@ -304,9 +255,12 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
         $this->target->afterCalculate($this->event);
     }
 
-    public function testAfterCalculateShouldNotChangePreviousRepresentativeIfDateTimeFormatterReturnFalse()
+    public function testAfterCalculateShouldCallFormatterWithAdditionalParametersIfParametersDefined()
     {
         $entity = new \DateTime();
+        $testDateType = 'medium';
+        $testTimeType = 'FULL';
+        $testFormat = 'd_m_y';
         $this->addressFormatter->expects($this->never())
             ->method('format')
             ->withAnyParameters();
@@ -315,17 +269,30 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
             ->withAnyParameters();
         $this->dateTimeFormatter->expects($this->once())
             ->method('format')
-            ->withAnyParameters()
-            ->will($this->returnValue(false));
+            ->with($this->anything(), $testDateType, $testTimeType, $this->anything(), $this->anything(), $testFormat);
         $this->numberFormatter->expects($this->never())
             ->method('format')
             ->withAnyParameters();
-        $this->event->expects($this->never())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
+        $this->metadata->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnCallback(
+                    function ($param) use ($testDateType, $testTimeType, $testFormat) {
+                        switch ($param){
+                            case 'render_date_type':
+                                return $testDateType;
+                            case 'render_time_type':
+                                return $testTimeType;
+                            case 'render_datetime_pattern':
+                                return $testFormat;
+                            default:
+                                return 'failed';
+                        }
+                    }
+                )
+            );
 
-        $value = 'Not localised representative or localised by previous listener';
-        $this->init($entity, $value);
+        $this->init($entity);
 
         $this->target->afterCalculate($this->event);
     }
@@ -354,7 +321,7 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
         $this->target->afterCalculate($this->event);
     }
 
-    public function testAfterCalculateShouldCallsetConvertedValueIfEntityIsNameWithCorrectString()
+    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsNameWithCorrectString()
     {
         $localised = 'Alex Smith';
         $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\FirstNameInterface');
@@ -376,32 +343,6 @@ class ConvertDefaultValueTypesListenerTest extends \PHPUnit_Framework_TestCase
             ->with($localised);
 
         $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-    public function testAfterCalculateShouldNotChangePreviousRepresentativeIfNameFormatterReturnFalse()
-    {
-        $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\FirstNameInterface');
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
-            ->withAnyParameters()
-            ->will($this->returnValue(false));
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->never())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
-
-        $value = 'Not localised representative or localised by previous listener';
-        $this->init($entity, $value);
 
         $this->target->afterCalculate($this->event);
     }

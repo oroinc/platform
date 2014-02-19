@@ -32,6 +32,7 @@ parameters:
     oro_entity_merge.listener.init_default_label.class: Oro\Bundle\EntityMergeBundle\EventListener\InitDefaultLabelListener
     oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener\CascadeRemoveAssociationListener
     oro_entity_merge.listener.merge_render.localized_value_render.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeRenderListener\LocalizedValueRenderListener
+
     # Validator
     oro_entity_merge.validator.doctrine_helper.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\DoctrineHelperValidator
     oro_entity_merge.validator.max_entities_validator.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\MaxEntitiesCountValidator
@@ -165,7 +166,7 @@ services:
           - @oro_locale.formatter.name
           - @oro_locale.formatter.number
         tags:
-          - { name: kernel.event_listener, event: oro.entity_merge.after_calculate_field_value_representation, method: afterCalculate }
+          - { name: kernel.event_listener, event: oro.entity_merge.before_value_render, method: afterCalculate }
 
     # Validators
     oro_entity_merge.validator.max_entities_validator:

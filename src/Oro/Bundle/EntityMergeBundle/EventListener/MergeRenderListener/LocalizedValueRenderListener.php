@@ -74,8 +74,11 @@ class LocalizedValueRenderListener
         } elseif ($originalValue instanceof \DateTime) {
             $dateType = $metadata->get('render_date_type');
             $timeType = $metadata->get('render_time_type');
+
+            $dateTimePattern = $metadata->get('render_datetime_pattern');
+
             $fieldValueEvent->setConvertedValue(
-                $this->dateTimeFormatter->format($originalValue, $dateType, $timeType)
+                $this->dateTimeFormatter->format($originalValue, $dateType, $timeType, null, null, $dateTimePattern)
             );
         } elseif (is_numeric($originalValue)) {
             $numberStyle = $metadata->get('render_number_style');
