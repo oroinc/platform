@@ -15,11 +15,11 @@ class TransitionManager
     protected $transitions;
 
     /**
-     * @param Collection $transitions
+     * @param Collection|Transition[] $transitions
      */
-    public function __construct(Collection $transitions = null)
+    public function __construct($transitions = null)
     {
-        $this->transitions = $transitions ?: new ArrayCollection();
+        $this->setTransitions($transitions);
     }
 
     /**
@@ -45,16 +45,14 @@ class TransitionManager
      */
     public function setTransitions($transitions)
     {
-        if ($transitions instanceof Collection) {
-            $this->transitions = $transitions;
-        } else {
-            $data = array();
+        $data = array();
+        if ($transitions) {
             foreach ($transitions as $transition) {
                 $data[$transition->getName()] = $transition;
             }
             unset($transitions);
-            $this->transitions = new ArrayCollection($data);
         }
+        $this->transitions = new ArrayCollection($data);
 
         return $this;
     }

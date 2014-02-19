@@ -13,9 +13,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\Client;
  */
 class RestSearchApiTest extends WebTestCase
 {
+    protected static $hasLoaded = false;
     /** @var client */
     protected $client;
-    protected static $hasLoaded = false;
 
     public function setUp()
     {
@@ -40,7 +40,11 @@ class RestSearchApiTest extends WebTestCase
             }
         }
 
-        $this->client->request('GET', $this->client->generate('oro_api_get_search'), $request);
+        $this->client->request(
+            'GET',
+            $this->client->generate('oro_api_get_search'),
+            $request
+        );
 
         $result = $this->client->getResponse();
 
@@ -48,16 +52,6 @@ class RestSearchApiTest extends WebTestCase
         $result = json_decode($result->getContent(), true);
         //compare result
         $this->assertEqualsResponse($response, $result);
-    }
-
-    /**
-     * Data provider for REST API tests
-     *
-     * @return array
-     */
-    public function requestsApi()
-    {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
     }
 
     /**
@@ -77,5 +71,15 @@ class RestSearchApiTest extends WebTestCase
                 }
             }
         }
+    }
+
+    /**
+     * Data provider for REST API tests
+     *
+     * @return array
+     */
+    public function requestsApi()
+    {
+        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
     }
 }

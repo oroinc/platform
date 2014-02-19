@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
 class EntityReaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -182,6 +183,9 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $classMetadata->expects($this->once())->method('getAssociationMappings')->will($this->returnValue(array()));
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(['id']));
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
         $entityManager->expects($this->once())->method('getClassMetadata')
@@ -250,7 +254,6 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
         $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-
         $classMetadata->expects($this->once())
             ->method('getAssociationMappings')
             ->will(
@@ -260,12 +263,19 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
                     )
                 )
             );
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(['id']));
+
         $queryBuilder->expects($this->once())
             ->method('addSelect')
             ->with('_test');
         $queryBuilder->expects($this->once())
             ->method('leftJoin')
             ->with('o.test', '_test');
+        $queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->with('o.id', 'ASC');
 
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()

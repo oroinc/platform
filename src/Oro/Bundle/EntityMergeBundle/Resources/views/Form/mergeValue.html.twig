@@ -1,0 +1,19 @@
+{#
+    Available variables:
+
+    Metadata metadata     - metadata of merge
+    mixed convertedValue  - value converted to string
+    mixed value           - original value
+    boolean isListValue   - is value represents list
+#}
+{% if isListValue %}
+    {% if value|length %}
+        <ul>
+            {% for value in convertedValue %}
+                <li>{{ value }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% else %}
+    {{ convertedValue }}
+{% endif %}

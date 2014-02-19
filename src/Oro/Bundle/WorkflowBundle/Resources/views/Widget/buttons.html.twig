@@ -1,10 +1,13 @@
-{% if resource_granted('oro_workflow') and has_workflow(entity) %}
+{% if entity is defined %}
+    {% set entity_class = oro_class_name(entity) %}
+{% endif %}
+{% if entity_class is defined and has_workflow(entity_class) and resource_granted('oro_workflow') %}
     {{
         oro_widget_render({
             'widgetType': 'buttons',
             'url': path('oro_workflow_widget_buttons', {
-                entityClass: oro_class_name(entity),
-                entityId: entity.id
+                entityClass: entity_class,
+                entityId: entity is defined ? entity.id : 0
             }),
             'alias': 'workflow_buttons'
         })

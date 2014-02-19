@@ -1,0 +1,87 @@
+datagrid:
+    embedded-forms-grid:
+        source:
+            acl_resource: oro_embedded_form_view
+            type: orm
+            query:
+                select:
+                    - embedded_form.id
+                    - embedded_form.title
+                    - embedded_form.formType
+                    - channel.name as channelName
+                from:
+                    - { table: Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm, alias: embedded_form }
+                join:
+                    left:
+                        - { join: embedded_form.channel, alias: channel }
+        columns:
+            title:
+                label: oro.embeddedform.title.label
+            formType:
+                label: oro.embeddedform.form_type.label
+                type: embedded_form_type
+            channelName:
+                label: oro.embeddedform.channel.label
+
+        sorters:
+            columns:
+                title:
+                    data_name: embedded_form.title
+                channelName:
+                    data_name: channel.name
+            default:
+                title: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+
+        filters:
+            columns:
+                title:
+                    type:      string
+                    data_name: embedded_form.title
+                formType:
+                    type: choice
+                    data_name: embedded_form.formType
+                    options:
+                        field_options:
+                          choices: @oro_embedded_form.manager->getAll
+                channelName:
+                    type: entity
+                    data_name: channel
+                    options:
+                        field_options:
+                          class: OroIntegrationBundle:Channel
+                          property: name
+
+        properties:
+            id: ~
+            update_link:
+                type:       url
+                route:      oro_embedded_form_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_embedded_form_delete
+                params:     [ id ]
+            view_link:
+                type:       url
+                route:      oro_embedded_form_view
+                params:     [ id ]
+        actions:
+            view:
+                acl_resource: oro_embedded_form_view
+                type: navigate
+                label: View
+                icon: user
+                link: view_link
+                rowAction: true
+            update:
+                acl_resource: oro_embedded_form_edit
+                type: navigate
+                label: Edit
+                icon: edit
+                link: update_link
+            delete:
+                acl_resource: oro_embedded_form_delete
+                type: delete
+                label: Delete
+                icon: trash
+                link: delete_link

@@ -52,18 +52,17 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider workflowDataProvider
-     * @param Workflow|null $result
-     * @param bool $expected
+     * @param bool $result
      */
-    public function testHasWorkflow($result, $expected)
+    public function testHasWorkflow($result)
     {
-        $entity = new \stdClass();
+        $entityClass = '\stdClass';
         $this->workflowManager->expects($this->once())
-            ->method('getApplicableWorkflow')
-            ->with($entity)
+            ->method('hasApplicableWorkflowByEntityClass')
+            ->with($entityClass)
             ->will($this->returnValue($result));
 
-        $this->assertEquals($expected, $this->extension->hasWorkflow($entity));
+        $this->assertEquals($result, $this->extension->hasWorkflow($entityClass));
     }
 
     public function testHasWorkflowNoEntity()
@@ -76,12 +75,9 @@ class WorkflowExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function workflowDataProvider()
     {
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->disableOriginalConstructor()
-            ->getMock();
         return array(
-            array($workflow, true),
-            array(null, false),
+            array(true),
+            array(false),
         );
     }
 

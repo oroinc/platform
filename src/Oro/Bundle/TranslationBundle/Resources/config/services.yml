@@ -2,10 +2,9 @@ parameters:
     translator.class:                                           Oro\Bundle\TranslationBundle\Translation\Translator
     oro_translation.controller.class:                           Oro\Bundle\TranslationBundle\Controller\Controller
     oro_translation.extractor.php_code_extractor.class:         Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
+    oro_translation.database_translation.persister.class:       Oro\Bundle\TranslationBundle\Translation\DatabasePersister
     oro_translation.database_translation.loader.class:          Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader
-    oro_translation.downloadable_translation.loader.class:      Oro\Bundle\TranslationBundle\Translation\DownloadableFakeLoader
     oro_translation.dynamic_translation.metadata.cache.class:   Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache
-    oro_translation.listener.request.class:                     Oro\Bundle\TranslationBundle\EventListener\RequestListener
 
     oro_translation.service_provider.class:                     Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider
     oro_translation.statistic_provider.class:                   Oro\Bundle\TranslationBundle\Provider\TranslationStatisticProvider
@@ -38,8 +37,9 @@ services:
         arguments:
             - @oro_translation.uploader.default_adapter
             - @oro_translation.js_dumper
+            - @translation.loader
+            - @oro_translation.database_translation.persister
             - %kernel.root_dir%
-            - @doctrine.orm.entity_manager
 
     oro_translation.statistic_provider:
         class: %oro_translation.statistic_provider.class%
@@ -69,22 +69,17 @@ services:
         arguments:
             - @oro_translation.database_translation.metadata.cache_impl
 
-    oro_translation.downloadable_translation.metadata.cache:
-        class: %oro_translation.dynamic_translation.metadata.cache.class%
-        arguments:
-            - @oro_translation.downloadable_translation.metadata.cache_impl
-
     oro_translation.database_translation.metadata.cache_impl:
         public: false
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ "oro_database_translation_metadata.cache" ] ]
 
-    oro_translation.downloadable_translation.metadata.cache_impl:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ "oro_downloadable_translation_metadata.cache" ] ]
+    oro_translation.database_translation.persister:
+        class: %oro_translation.database_translation.persister.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_translation.database_translation.metadata.cache
 
     oro_translation.database_translation.loader:
         class: %oro_translation.database_translation.loader.class%
@@ -93,26 +88,10 @@ services:
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 
-    oro_translation.downloadable_translation.loader:
-        class: %oro_translation.downloadable_translation.loader.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-        tags:
-            - { name: translation.loader, alias: oro_downloadable_translation }
-
     oro_translation.cache:
           parent: oro.cache.abstract
           calls:
               - [setNamespace, ['oro_translation.cache']]
-
-    oro_translation.listener.request:
-        class: %oro_translation.listener.request.class%
-        arguments:
-            - @translator
-            - @oro_translation.database_translation.metadata.cache
-            - @oro_translation.downloadable_translation.metadata.cache
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest}
 
     oro_translation.js_dumper:
         class: %oro_translation.js_dumper.class%

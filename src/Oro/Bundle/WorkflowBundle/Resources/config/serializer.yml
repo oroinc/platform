@@ -28,14 +28,14 @@ services:
         class: %oro_workflow.serializer.data.attribute_normalizer.entity.class%
         arguments:
             - @doctrine
-            - @oro_workflow.doctrine_helper
+            - @oro_entity.doctrine_helper
         tags:
             - { name: oro_workflow.attribute_normalizer }
 
     oro_workflow.serializer.handler.workflow_result:
         class: %oro_workflow.serializer.handler.workflow_result.class%
         arguments:
-            - @oro_workflow.doctrine_helper
+            - @oro_entity.doctrine_helper
         tags:
             -
               name: jms_serializer.handler

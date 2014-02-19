@@ -40,34 +40,36 @@ class OptionSetListener
             $schema = $config->get('schema');
             if (isset($schema['relation'])) {
                 foreach ($schema['relation'] as $fieldName) {
-                    /** @var Config $fieldConfig */
-                    $fieldConfig = $configProvider->getConfig($className, $fieldName);
-                    if ($fieldConfig->getId()->getFieldType() == 'optionSet'
-                        && $setData = $entity->{Inflector::camelize('get_' . $fieldName)}()
-                    ) {
-                        $model = $configProvider->getConfigManager()->getConfigFieldModel(
-                            $fieldConfig->getId()->getClassName(),
-                            $fieldConfig->getId()->getFieldName()
-                        );
-
-                        /**
-                         * in case of single select field type, should wrap value in array
-                         */
-                        if ($setData && !is_array($setData)) {
-                            $setData = [$setData];
-                        }
-
-                        foreach ($setData as $option) {
-                            $optionSetRelation = new OptionSetRelation();
-                            $optionSetRelation->setData(
-                                null,
-                                $entity->getId(),
-                                $model,
-                                $em->getRepository(OptionSet::ENTITY_NAME)->find($option)
+                    if ($configProvider->hasConfig($className, $fieldName)) {
+                        /** @var Config $fieldConfig */
+                        $fieldConfig = $configProvider->getConfig($className, $fieldName);
+                        if ($fieldConfig->getId()->getFieldType() == 'optionSet'
+                            && $setData = $entity->{Inflector::camelize('get_' . $fieldName)}()
+                        ) {
+                            $model = $configProvider->getConfigManager()->getConfigFieldModel(
+                                $fieldConfig->getId()->getClassName(),
+                                $fieldConfig->getId()->getFieldName()
                             );
 
-                            $em->persist($optionSetRelation);
-                            $this->needFlush = true;
+                            /**
+                             * in case of single select field type, should wrap value in array
+                             */
+                            if ($setData && !is_array($setData)) {
+                                $setData = [$setData];
+                            }
+
+                            foreach ($setData as $option) {
+                                $optionSetRelation = new OptionSetRelation();
+                                $optionSetRelation->setData(
+                                    null,
+                                    $entity->getId(),
+                                    $model,
+                                    $em->getRepository(OptionSet::ENTITY_NAME)->find($option)
+                                );
+
+                                $em->persist($optionSetRelation);
+                                $this->needFlush = true;
+                            }
                         }
                     }
                 }

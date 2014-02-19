@@ -47,7 +47,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -301,7 +301,7 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             ->with($entity)
             ->will($this->returnValue($entityClass));
         $this->workflowRegistry->expects($this->once())
-            ->method('getWorkflowByEntityClass')
+            ->method('getActiveWorkflowByEntityClass')
             ->with($entityClass)
             ->will($this->returnValue($workflow));
 
@@ -446,9 +446,12 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
             ->getMock();
+        $aclManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Acl\AclManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $worklflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
-            ->setConstructorArgs(array($entityConnector, null, $attributeManager, $transitionManager))
+            ->setConstructorArgs(array($entityConnector, $aclManager, null, $attributeManager, $transitionManager))
             ->setMethods(
                 array(
                     'isTransitionAvailable',
@@ -472,5 +475,21 @@ class WorkflowManagerTest extends \PHPUnit_Framework_TestCase
             array(true),
             array(false)
         );
+    }
+
+    /**
+     * @param bool $result
+     * @dataProvider trueFalseDataProvider
+     */
+    public function testHasApplicableWorkflowByEntityClass($result)
+    {
+        $entityClass = 'TestEntity';
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('hasActiveWorkflowByEntityClass')
+            ->with($entityClass)
+            ->will($this->returnValue($result));
+
+        $this->assertEquals($result, $this->workflowManager->hasApplicableWorkflowByEntityClass($entityClass));
     }
 }

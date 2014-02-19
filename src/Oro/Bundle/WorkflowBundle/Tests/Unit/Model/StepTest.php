@@ -85,4 +85,18 @@ class StepTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->step->isAllowedTransition('test'), 'Expected transition not allowed');
         $this->assertFalse($this->step->isAllowedTransition('test2'), 'Unexpected transition allowed');
     }
+
+    public function testEntityAclAllowed()
+    {
+        $this->assertTrue($this->step->isEntityUpdateAllowed('not_existing_attribute'));
+        $this->assertTrue($this->step->isEntityDeleteAllowed('not_existing_attribute'));
+
+        $this->step->setEntityAcls(array('existing_attribute' => array('update' => false, 'delete' => false)));
+        $this->assertFalse($this->step->isEntityUpdateAllowed('existing_attribute'));
+        $this->assertFalse($this->step->isEntityDeleteAllowed('existing_attribute'));
+
+        $this->step->setEntityAcls(array('existing_attribute' => array('update' => true, 'delete' => true)));
+        $this->assertTrue($this->step->isEntityUpdateAllowed('existing_attribute'));
+        $this->assertTrue($this->step->isEntityDeleteAllowed('existing_attribute'));
+    }
 }

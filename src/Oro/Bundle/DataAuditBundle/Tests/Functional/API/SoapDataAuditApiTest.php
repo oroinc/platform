@@ -47,6 +47,7 @@ class SoapDataAuditApiTest extends WebTestCase
             "owner" => "1"
         );
 
+        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
         $id = $this->client->getSoap()->createUser($request);
         $this->assertInternalType('int', $id, $this->client->getSoap()->__getLastResponse());
         $this->assertGreaterThan(0, $id);

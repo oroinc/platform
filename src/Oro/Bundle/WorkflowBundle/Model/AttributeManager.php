@@ -22,9 +22,9 @@ class AttributeManager
     /**
      * @param Attribute[]|Collection $attributes
      */
-    public function __construct(Collection $attributes = null)
+    public function __construct($attributes = null)
     {
-        $this->attributes = $attributes ?: new ArrayCollection();
+        $this->setAttributes($attributes);
     }
 
     /**
@@ -60,16 +60,14 @@ class AttributeManager
      */
     public function setAttributes($attributes)
     {
-        if ($attributes instanceof Collection) {
-            $this->attributes = $attributes;
-        } else {
-            $data = array();
+        $data = array();
+        if ($attributes) {
             foreach ($attributes as $attribute) {
                 $data[$attribute->getName()] = $attribute;
             }
             unset($attributes);
-            $this->attributes = new ArrayCollection($data);
         }
+        $this->attributes = new ArrayCollection($data);
 
         return $this;
     }
@@ -84,6 +82,8 @@ class AttributeManager
     }
 
     /**
+     * Get related entity attribute
+     *
      * @return Attribute
      * @throws UnknownAttributeException
      */
@@ -94,5 +94,29 @@ class AttributeManager
         }
 
         return $this->attributes->get($this->entityAttributeName);
+    }
+
+    /**
+     * @param string $type
+     * @return Collection|Attribute[]
+     */
+    public function getAttributesByType($type)
+    {
+        return $this->attributes->filter(
+            function ($attribute) use ($type) {
+                /** @var Attribute $attribute */
+                return $attribute->getType() == $type;
+            }
+        );
+    }
+
+    /**
+     * Get list of all attributes with type entity
+     *
+     * @return Collection|Attribute[]
+     */
+    public function getEntityAttributes()
+    {
+        return $this->getAttributesByType('entity');
     }
 }

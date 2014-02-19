@@ -123,22 +123,22 @@ class OroLocaleExtension extends Extension
             $reflection = new \ReflectionClass($bundle);
 
             // read name format files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/name_format.yml')) {
+            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/name_format.yml')) {
                 $externalNameFormat = array_merge($externalNameFormat, Yaml::parse(realpath($file)));
             }
 
             // read address format files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/address_format.yml')) {
+            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/address_format.yml')) {
                 $externalAddressFormat = array_merge($externalAddressFormat, Yaml::parse(realpath($file)));
             }
 
             // read locale data files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/locale_data.yml')) {
+            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/locale_data.yml')) {
                 $externalLocaleData = array_merge($externalLocaleData, Yaml::parse(realpath($file)));
             }
 
             // read currency data files
-            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/currency_data.yml')) {
+            if (file_exists($file = dirname($reflection->getFilename()) . '/Resources/config/oro/currency_data.yml')) {
                 $externalCurrencyData = array_merge($externalCurrencyData, Yaml::parse(realpath($file)));
             }
         }

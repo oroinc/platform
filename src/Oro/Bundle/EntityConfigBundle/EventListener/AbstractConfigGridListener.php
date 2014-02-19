@@ -336,9 +336,9 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
 
     /**
      * @param QueryBuilder $query
-     * @param string       $rootAlias
-     * @param              $joinAlias
-     * @param string       $itemsType
+     * @param string $rootAlias
+     * @param string $joinAlias
+     * @param string $itemsType
      *
      * @return $this
      */
@@ -346,7 +346,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     {
         foreach ($this->configManager->getProviders() as $provider) {
             foreach ($provider->getPropertyConfig()->getItems($itemsType) as $code => $item) {
-                $alias     = $joinAlias . $code;
+                $alias     = $joinAlias . $provider->getScope() . '_' . $code;
                 $fieldName = $provider->getScope() . '_' . $code;
 
                 if (isset($item['grid']['query'])) {

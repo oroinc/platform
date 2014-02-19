@@ -46,6 +46,10 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     {
         $container = $this->getContainer();
         $loader    = $container->get('oro_installer.fixtures.loader');
+
+        $indexListener = $container->get('oro_search.index_listener');
+        $indexListener->disablePostFlush();
+
         $loader->isLoadDemoData($input->getOption('fixtures-type') == 'demo' ? true : false);
         $bundles = $input->getOption('bundles');
         if (!empty($bundles)) {

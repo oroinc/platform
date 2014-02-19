@@ -1,20 +1,21 @@
 <script type="text/javascript">
-    require(['backbone', 'oro/navigation'],
-    function(Backbone, Navigation){
+    require(['jquery', 'backbone', 'oro/navigation'], function ($, Backbone, Navigation) {
         if (Navigation.isEnabled()) {
-            {% set userName = null %}
-            {% if app.security.getToken() and app.security.getToken().getUser() %}
+            $(function () {
+                {% set userName = null %}
+                {% if app.security.getToken() and app.security.getToken().getUser() %}
                 {% set userName = app.security.getToken().getUser().getUserName() %}
-            {% endif %}
+                {% endif %}
 
-            Navigation.setup({
-                baseUrl :  '{{ app.request.getSchemeAndHttpHost() }}',
-                headerId : '{{ oro_hash_navigation_header() }}',
-                userName:   {{ userName|json_encode|raw }}
+                Navigation.setup({
+                    baseUrl :  '{{ app.request.getSchemeAndHttpHost() }}',
+                    headerId : '{{ oro_hash_navigation_header() }}',
+                    userName:   {{ userName|json_encode|raw }}
+                });
+                if (!Backbone.History.started) {
+                    Backbone.history.start();
+                }
             });
-            if (!Backbone.History.started) {
-                Backbone.history.start();
-            }
         }
     });
 </script>

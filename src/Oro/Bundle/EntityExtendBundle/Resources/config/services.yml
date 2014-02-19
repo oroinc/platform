@@ -14,7 +14,7 @@ services:
         arguments:
             - @oro_entity_extend.tools.dumper
         tags:
-            - { name: kernel.cache_warmer }
+            - { name: kernel.cache_warmer,  priority: 30 }
 
     oro_entity_extend.extend.extend_manager:
         class:                                              %oro_entity_extend.extend.extend_manager.class%

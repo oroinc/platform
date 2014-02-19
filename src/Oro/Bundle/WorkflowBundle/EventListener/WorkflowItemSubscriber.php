@@ -8,7 +8,8 @@ use Doctrine\ORM\Events;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Model\EntityConnector;
 
 class WorkflowItemSubscriber implements EventSubscriber
 {
@@ -18,11 +19,18 @@ class WorkflowItemSubscriber implements EventSubscriber
     protected $doctrineHelper;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @var EntityConnector
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    protected $entityConnector;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param EntityConnector $entityConnector
+     */
+    public function __construct(DoctrineHelper $doctrineHelper, EntityConnector $entityConnector)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->entityConnector = $entityConnector;
     }
 
     /**
@@ -32,7 +40,8 @@ class WorkflowItemSubscriber implements EventSubscriber
     {
         return array(
             // @codingStandardsIgnoreStart
-            Events::postPersist
+            Events::postPersist,
+            Events::preRemove,
             // @codingStandardsIgnoreEnd
         );
     }
@@ -56,6 +65,22 @@ class WorkflowItemSubscriber implements EventSubscriber
 
             $unitOfWork = $args->getEntityManager()->getUnitOfWork();
             $unitOfWork->scheduleExtraUpdate($workflowItem, array('entityId' => array(null, $entityId)));
+        }
+    }
+
+    /**
+     * Remove related workflow item
+     *
+     * @param LifecycleEventArgs $args
+     */
+    public function preRemove(LifecycleEventArgs $args)
+    {
+        $entity = $args->getEntity();
+        if ($this->entityConnector->isWorkflowAware($entity)) {
+            $workflowItem = $this->entityConnector->getWorkflowItem($entity);
+            if ($workflowItem) {
+                $args->getEntityManager()->remove($workflowItem);
+            }
         }
     }
 }

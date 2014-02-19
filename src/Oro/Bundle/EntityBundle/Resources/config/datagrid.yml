@@ -10,9 +10,7 @@ datagrid:
                     - ce.id
                 from:
                     - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
-
         columns: ~ # no static columns
-
         properties:
             id: ~
             update_link:
@@ -33,7 +31,6 @@ datagrid:
                 route: oro_entity_delete
                 params:
                     - id
-
         actions:
             # TODO: add dynamic acl_resources
             view:
@@ -52,7 +49,6 @@ datagrid:
                 label: Delete
                 icon: trash
                 link: delete_link
-
         sorters: ~
         filters: ~
 
@@ -75,26 +71,22 @@ datagrid:
                     - ce.id
                 from:
                     - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
-
         columns:
             assigned:
                 frontend_type: boolean
                 label: Assigned
                 editable: true
-
         properties:
             id: ~
-
         sorters:
             columns:
                 assigned:
                     data_name: assigned
             default:
                 assigned: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
-
         filters:
             columns:
                 assigned:
                     type: boolean
                     data_name: assigned
-
+                    filter_by_having: true

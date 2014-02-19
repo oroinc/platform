@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -44,8 +46,8 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected $dbTranslationMetadataCache;
 
     /**
-     * @param ConfigManager               $configManager
-     * @param Translator                  $translator
+     * @param ConfigManager                   $configManager
+     * @param Translator                      $translator
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
@@ -87,7 +89,9 @@ class ConfigSubscriber implements EventSubscriberInterface
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
             if (isset($data[$scope])) {
-                $translatable = $this->getTranslatableValues($configModel, $provider);
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues(
+                    $this->configManager->getConfigIdByModel($configModel, $scope)
+                );
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
                         if ($this->translator->hasTrans($value)) {
@@ -129,7 +133,9 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $config = $provider->getConfig($className, $fieldName);
 
                 // config translations
-                $translatable = $this->getTranslatableValues($configModel, $provider);
+                $translatable = $provider->getPropertyConfig()->getTranslatableValues(
+                    $this->configManager->getConfigIdByModel($configModel, $scope)
+                );
                 foreach ($data[$scope] as $code => $value) {
                     if (in_array($code, $translatable)) {
                         $key = $this->configManager->getProvider('entity')
@@ -137,7 +143,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                             ->get($code);
 
                         if ($event->getForm()->get($scope)->get($code)->isValid()
-                            && $value != $this->translator->trans($config->get($code))) {
+                            && $value != $this->translator->trans($config->get($code))
+                        ) {
                             $locale = $this->translator->getLocale();
                             // save into translation table
                             $this->saveTranslationValue($key, $value, $locale);
@@ -164,22 +171,6 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Get translatable property's codes
-     *
-     * @param AbstractConfigModel $configModel
-     * @param ConfigProvider      $provider
-     * @return array
-     */
-    protected function getTranslatableValues(AbstractConfigModel $configModel, ConfigProvider $provider)
-    {
-        $type = $configModel instanceof FieldConfigModel
-            ? PropertyConfigContainer::TYPE_FIELD
-            : PropertyConfigContainer::TYPE_ENTITY;
-
-        return $provider->getPropertyConfig()->getTranslatableValues($type);
-    }
-
-    /**
      * Update existing translation value or create new one if it is not exist
      *
      * @param string $key
@@ -191,14 +182,20 @@ class ConfigSubscriber implements EventSubscriberInterface
         /** @var TranslationRepository $translationRepo */
         $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
         /** @var Translation $translationValue */
-        $translationValue = $translationRepo->findValue($key, $locale);
+        $translationValue = $translationRepo->findValue(
+            $key,
+            $locale,
+            TranslationRepository::DEFAULT_DOMAIN,
+            Translation::SCOPE_UI
+        );
         if (!$translationValue) {
             $translationValue = new Translation();
             $translationValue
                 ->setKey($key)
                 ->setValue($value)
                 ->setLocale($locale)
-                ->setDomain(TranslationRepository::DEFAULT_DOMAIN);
+                ->setDomain(TranslationRepository::DEFAULT_DOMAIN)
+                ->setScope(Translation::SCOPE_UI);
         } else {
             $translationValue->setValue($value);
         }
