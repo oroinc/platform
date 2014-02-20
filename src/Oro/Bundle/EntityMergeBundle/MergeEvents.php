@@ -29,10 +29,10 @@ final class MergeEvents
     const AFTER_MERGE_FIELD = 'oro.entity_merge.after_merge_field';
 
     /**
-     * The CREATE_METADATA event occurs at metadata creation.
+     * The BUILD_METADATA event occurs at metadata build.
      * Instance of Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent is passed.
      */
-    const CREATE_METADATA = 'oro.entity_merge.create_metadata';
+    const BUILD_METADATA = 'oro.entity_merge.build_metadata';
 
     /**
      * The CREATE_ENTITY_DATA event occurs at EntityData creation.

@@ -8,7 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 
 class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY = 'Namespace\Entity';
+    const CLASS_NAME = 'Namespace\Entity';
 
     /**
      * @var array
@@ -22,14 +22,14 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->doctrineMetadata = new DoctrineMetadata(self::ENTITY);
+        $this->doctrineMetadata = new DoctrineMetadata();
     }
 
     public function testIsField()
     {
         $this->assertTrue($this->doctrineMetadata->isField());
 
-        $this->doctrineMetadata->set('targetEntity', self::ENTITY);
+        $this->doctrineMetadata->set('targetEntity', self::CLASS_NAME);
         $this->assertTrue($this->doctrineMetadata->isField());
 
         $this->doctrineMetadata->set('joinColumns', []);
@@ -40,7 +40,7 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertFalse($this->doctrineMetadata->isAssociation());
 
-        $this->doctrineMetadata->set('targetEntity', self::ENTITY);
+        $this->doctrineMetadata->set('targetEntity', self::CLASS_NAME);
         $this->assertFalse($this->doctrineMetadata->isAssociation());
 
         $this->doctrineMetadata->set('joinColumns', []);
@@ -62,11 +62,14 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->doctrineMetadata->isMappedBySourceEntity());
 
-        $this->doctrineMetadata->set('targetEntity', self::ENTITY);
+        $this->doctrineMetadata->set('targetEntity', self::CLASS_NAME);
         $this->doctrineMetadata->set('joinColumns', []);
         $this->assertFalse($this->doctrineMetadata->isMappedBySourceEntity());
 
-        $this->doctrineMetadata->set('sourceEntity', self::ENTITY);
+        $this->doctrineMetadata->set('mappedBySourceEntity', false);
+        $this->assertFalse($this->doctrineMetadata->isMappedBySourceEntity());
+
+        $this->doctrineMetadata->set('mappedBySourceEntity', true);
         $this->assertTrue($this->doctrineMetadata->isMappedBySourceEntity());
     }
 }

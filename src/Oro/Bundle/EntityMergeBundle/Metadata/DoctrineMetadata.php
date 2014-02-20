@@ -7,21 +7,6 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 class DoctrineMetadata extends Metadata implements MetadataInterface
 {
     /**
-     * @var string
-     */
-    protected $sourceClassName;
-
-    /**
-     * @param string $sourceClassName
-     * @param array $options
-     */
-    public function __construct($sourceClassName, array $options = [])
-    {
-        $this->sourceClassName = $sourceClassName;
-        parent::__construct($options);
-    }
-
-    /**
      * Checks if this field represents simple doctrine field
      *
      * @return bool
@@ -72,13 +57,17 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
     }
 
     /**
-     * Checks if this metadata relates to field that is mapped in entity
+     * Checks if this metadata relates to field that is mapped in source entity
      *
      * @return bool
      */
     public function isMappedBySourceEntity()
     {
-        return $this->isField() || $this->sourceClassName == $this->get('sourceEntity');
+        if ($this->has('mappedBySourceEntity')) {
+            return $this->get('mappedBySourceEntity');
+        } else {
+            return $this->isField();
+        }
     }
 
     /**

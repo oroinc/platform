@@ -33,6 +33,16 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->doctrineMetadata, $this->metadata->getDoctrineMetadata());
     }
 
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Doctrine metadata is not configured.
+     */
+    public function testGetDoctrineMetadataFails()
+    {
+        $metadata = new FieldMetadata();
+        $metadata->getDoctrineMetadata();
+    }
+
     public function testHasDoctrineMetadata()
     {
         $metadata = new FieldMetadata($this->options);

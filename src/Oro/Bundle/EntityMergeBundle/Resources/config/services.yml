@@ -3,6 +3,7 @@ parameters:
     oro_entity_merge.doctrine_helper.class: Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper
 
     # Metadata
+    oro_entity_merge.metadata.builder.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder
     oro_entity_merge.metadata.factory.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory
     oro_entity_merge.metadata.registry.class: Oro\Bundle\EntityMergeBundle\Metadata\MetadataRegistry
 
@@ -30,6 +31,7 @@ parameters:
     # Listeners
     oro_entity_merge.listener.metadata.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\Metadata\InitMergeModesListener
     oro_entity_merge.listener.metadata.init_default_label.class: Oro\Bundle\EntityMergeBundle\EventListener\Metadata\InitDefaultLabelListener
+    oro_entity_merge.listener.metadata.entity_config.class: Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigListener
     oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeField\CascadeRemoveAssociationListener
     oro_entity_merge.listener.render.localized_value_render.class: Oro\Bundle\EntityMergeBundle\EventListener\Render\LocalizedValueRenderListener
 
@@ -53,17 +55,20 @@ services:
             - @oro_entity_merge.doctrine_helper
             - @event_dispatcher
 
-    oro_entity_merge.metadata.factory:
-        class: %oro_entity_merge.metadata.factory.class%
+    oro_entity_merge.metadata.builder:
+        class: %oro_entity_merge.metadata.builder.class%
         arguments:
-            - @oro_entity_config.provider.merge
+            - @oro_entity_merge.metadata.factory
             - @oro_entity_merge.doctrine_helper
             - @event_dispatcher
+
+    oro_entity_merge.metadata.factory:
+        class: %oro_entity_merge.metadata.factory.class%
 
     oro_entity_merge.metadata.registry:
         class: %oro_entity_merge.metadata.registry.class%
         arguments:
-            - @oro_entity_merge.metadata.factory
+            - @oro_entity_merge.metadata.builder
 
     # Merger
     oro_entity_merge.merger:
@@ -141,14 +146,21 @@ services:
     oro_entity_merge.listener.metadata.init_merge_modes:
         class: %oro_entity_merge.listener.metadata.init_merge_modes.class%
         tags:
-          - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata, priority: -1000 }
+          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onCreateMetadata, priority: -1000 }
 
     oro_entity_merge.listener.metadata.init_default_label:
         class: %oro_entity_merge.listener.metadata.init_default_label.class%
         arguments:
           - @oro_entity_config.provider.entity
         tags:
-          - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata, priority: -1000 }
+          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onCreateMetadata, priority: -1000 }
+
+    oro_entity_merge.listener.metadata.entity_config:
+        class: %oro_entity_merge.listener.metadata.entity_config.class%
+        arguments:
+          - @oro_entity_config.config_manager
+        tags:
+          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onCreateMetadata, priority: 1000 }
 
     oro_entity_merge.listener.merge_field.cascade_remove_association:
         class: %oro_entity_merge.listener.merge_field.cascade_remove_association.class%

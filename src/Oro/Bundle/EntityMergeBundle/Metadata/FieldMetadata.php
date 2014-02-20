@@ -20,7 +20,7 @@ class FieldMetadata extends Metadata implements MetadataInterface
      * @param array $options
      * @param DoctrineMetadata $doctrineMetadata
      */
-    public function __construct(array $options, DoctrineMetadata $doctrineMetadata = null)
+    public function __construct(array $options = [], DoctrineMetadata $doctrineMetadata = null)
     {
         parent::__construct($options);
         if ($doctrineMetadata) {
@@ -51,18 +51,23 @@ class FieldMetadata extends Metadata implements MetadataInterface
     public function setDoctrineMetadata(DoctrineMetadata $doctrineMetadata)
     {
         $this->doctrineMetadata = $doctrineMetadata;
-        $this->set('field_name', $doctrineMetadata->get('fieldName'));
     }
 
     /**
      * @return DoctrineMetadata
+     * @throws InvalidArgumentException
      */
     public function getDoctrineMetadata()
     {
+        if (!$this->doctrineMetadata) {
+            throw new InvalidArgumentException('Doctrine metadata is not configured.');
+        }
         return $this->doctrineMetadata;
     }
 
     /**
+     * Checks if object has doctrine metadata
+     *
      * @return bool
      */
     public function hasDoctrineMetadata()
@@ -71,7 +76,10 @@ class FieldMetadata extends Metadata implements MetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get field name
+     *
+     * @return string
+     * @throws InvalidArgumentException
      */
     public function getFieldName()
     {
@@ -80,6 +88,34 @@ class FieldMetadata extends Metadata implements MetadataInterface
         }
 
         return $this->get('field_name');
+    }
+
+    /**
+     * Get source field name
+     *
+     * @return string
+     */
+    public function getSourceFieldName()
+    {
+        if ($this->has('source_field_name')) {
+            return $this->get('source_field_name');
+        }
+
+        return $this->getFieldName();
+    }
+
+    /**
+     * Get source class name
+     *
+     * @return string
+     */
+    public function getSourceClassName()
+    {
+        if ($this->has('source_class_name')) {
+            return $this->get('source_class_name');
+        }
+
+        return $this->getEntityMetadata()->getClassName();
     }
 
     /**
