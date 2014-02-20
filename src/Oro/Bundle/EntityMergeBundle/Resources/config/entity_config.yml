@@ -68,10 +68,10 @@ oro_entity_config:
                 relation_label: ~
                 # Same as cast_method but used for relation entity
                 relation_cast_method: ~
-                # Localisation number type.
+                # Localization number type.
                 # Default localisation handler support:
                 # decimal, currency, percent, default_style, scientific, ordinal, duration, spellout
-                number_formatter_type: ~
+                render_number_style: ~
                 # Type of date formatting, one of the format type constants. Possible values:
                 # NONE
                 # FULL

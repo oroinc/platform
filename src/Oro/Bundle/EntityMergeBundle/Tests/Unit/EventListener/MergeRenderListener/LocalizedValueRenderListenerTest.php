@@ -41,7 +41,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
      */
     protected $metadata;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->addressFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\AddressFormatter')
             ->disableOriginalConstructor()
@@ -69,281 +69,173 @@ class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function init($entity)
+    protected function expectEventCalls($originalValue, $localizedValue = null)
     {
         $this->event->expects($this->any())
             ->method('getOriginalValue')
-            ->withAnyParameters()
-            ->will($this->returnValue($entity));
+            ->will($this->returnValue($originalValue));
+
         $this->event->expects($this->any())
             ->method('getMetadata')
-            ->withAnyParameters()
             ->will($this->returnValue($this->metadata));
-        $this->event->expects($this->any())
-            ->method('getConvertedValue')
-            ->withAnyParameters()
-            ->will($this->returnValue('Not localised representative or localised by previous listener'));
+
+        $this->event->expects($this->never())->method('getConvertedValue');
+
+        if ($localizedValue) {
+            $this->event->expects($this->once())->method('setConvertedValue')->with($localizedValue);
+        } else {
+            $this->event->expects($this->never())->method('setConvertedValue');
+        }
     }
 
-    public function testAfterCalculateShouldNotCallAnyFormatterIfEntityNotAnObjectAndNotANumber()
+    public function testBeforeValueRenderWithString()
     {
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->never())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
-        $entity = 'not need to localise';
+        $originalValue = 'not need to localize';
 
-        $this->init($entity);
+        $this->addressFormatter->expects($this->never())->method($this->anything());
+        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->dateTimeFormatter->expects($this->never())->method($this->anything());
+        $this->numberFormatter->expects($this->never())->method($this->anything());
 
-        $this->target->afterCalculate($this->event);
+        $this->expectEventCalls($originalValue);
+
+        $this->target->beforeValueRender($this->event);
     }
 
-    public function testAfterCalculateShouldCallNumberFormatterIfEntityIsNumber()
+    public function testBeforeValueRenderWithNumber()
     {
-        $entity = '1';
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
+        $originalValue = '1';
+        $localizedValue = '1%';
+
+        $this->addressFormatter->expects($this->never())->method($this->anything());
+        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->dateTimeFormatter->expects($this->never())->method($this->anything());
         $this->numberFormatter->expects($this->once())
             ->method('format')
-            ->with($entity);
+            ->with($originalValue)->will($this->returnValue($localizedValue));
 
-        $this->init($entity, 'Not localised representative or localised by previous listener');
+        $this->expectEventCalls($originalValue, $localizedValue);
 
-        $this->target->afterCalculate($this->event);
+        $this->target->beforeValueRender($this->event);
     }
 
-    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsNumberWithCorrectValues()
+    public function testBeforeValueRenderWithNumberAndParameters()
     {
-        $entity = '1';
-        $localised = '1%';
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
+        $originalValue = '1';
+        $localizedValue = '1%';
+
+        $testNumberStyle = 'number';
+
+        $this->addressFormatter->expects($this->never())->method($this->anything());
+        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->dateTimeFormatter->expects($this->never())->method($this->anything());
         $this->numberFormatter->expects($this->once())
             ->method('format')
-            ->with($entity)->will($this->returnValue($localised));
-        $this->event->expects($this->once())
-            ->method('setConvertedValue')
-            ->with($localised);
+            ->with($originalValue, $testNumberStyle)
+            ->will($this->returnValue($localizedValue));
 
-        $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-    public function testAfterCalculateShouldCallAddressFormatterIfEntityIsAddress()
-    {
-        $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\AddressInterface');
-        $this->addressFormatter->expects($this->once())
-            ->method('format')
-            ->withAnyParameters()->will($this->returnValue('test'));
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->once())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
-
-        $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsAddressWithCorrectAddress()
-    {
-        $localised = 'test localised address';
-        $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\AddressInterface');
-        $this->addressFormatter->expects($this->once())
-            ->method('format')
-            ->withAnyParameters()->will($this->returnValue($localised));
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->once())
-            ->method('setConvertedValue')
-            ->with($localised);
-
-        $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-
-    public function testAfterCalculateShouldCallDateTimeFormatterFormatterIfEntityIsDateTime()
-    {
-        $entity = new \DateTime();
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->once())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->once())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
-
-        $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsDateTimeWithCorrectString()
-    {
-        $localised = date('d/m/Y H:i:s');
-        $entity = new \DateTime();
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->once())
-            ->method('format')
-            ->withAnyParameters()
-            ->will($this->returnValue($localised));
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->once())
-            ->method('setConvertedValue')
-            ->with($localised);
-
-        $this->init($entity);
-
-        $this->target->afterCalculate($this->event);
-    }
-
-    public function testAfterCalculateShouldCallFormatterWithAdditionalParametersIfParametersDefined()
-    {
-        $entity = new \DateTime();
-        $testDateType = 'medium';
-        $testTimeType = 'FULL';
-        $testFormat = 'd_m_y';
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->once())
-            ->method('format')
-            ->with($this->anything(), $testDateType, $testTimeType, $this->anything(), $this->anything(), $testFormat);
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
         $this->metadata->expects($this->any())
             ->method('get')
             ->will(
-                $this->returnCallback(
-                    function ($param) use ($testDateType, $testTimeType, $testFormat) {
-                        switch ($param){
-                            case 'render_date_type':
-                                return $testDateType;
-                            case 'render_time_type':
-                                return $testTimeType;
-                            case 'render_datetime_pattern':
-                                return $testFormat;
-                            default:
-                                return 'failed';
-                        }
-                    }
+                $this->returnValueMap(
+                    array(
+                        array('render_number_style', false, $testNumberStyle),
+                    )
                 )
             );
 
-        $this->init($entity);
+        $this->expectEventCalls($originalValue, $localizedValue);
 
-        $this->target->afterCalculate($this->event);
+        $this->target->beforeValueRender($this->event);
     }
 
-    public function testAfterCalculateShouldCallNameFormatterFormatterIfEntityIsName()
+    public function testBeforeValueRenderWithAddress()
     {
-        $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\FirstNameInterface');
-        $this->addressFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->nameFormatter->expects($this->once())
-            ->method('format')
-            ->withAnyParameters();
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->once())
-            ->method('setConvertedValue')
-            ->withAnyParameters();
+        $originalValue = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\AddressInterface');
+        $localizedValue = 'address';
 
-        $this->init($entity);
+        $this->addressFormatter->expects($this->once())
+            ->method('format')
+            ->with($originalValue)
+            ->will($this->returnValue($localizedValue));
 
-        $this->target->afterCalculate($this->event);
+        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->dateTimeFormatter->expects($this->never())->method($this->anything());
+        $this->numberFormatter->expects($this->never())->method($this->anything());
+
+        $this->expectEventCalls($originalValue, $localizedValue);
+
+        $this->target->beforeValueRender($this->event);
     }
 
-    public function testAfterCalculateShouldCallSetConvertedValueIfEntityIsNameWithCorrectString()
+    public function testBeforeValueRenderWithDateTime()
     {
-        $localised = 'Alex Smith';
-        $entity = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\FirstNameInterface');
-        $this->addressFormatter->expects($this->never())
+        $originalValue = new \DateTime();
+        $localizedValue = date('Y-m-d');
+
+        $this->addressFormatter->expects($this->never())->method($this->anything());
+        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->dateTimeFormatter->expects($this->once())
             ->method('format')
-            ->withAnyParameters();
+            ->with($originalValue)
+            ->will($this->returnValue($localizedValue));
+        $this->numberFormatter->expects($this->never())->method($this->anything());
+
+        $this->expectEventCalls($originalValue, $localizedValue);
+
+        $this->target->beforeValueRender($this->event);
+    }
+
+    public function testBeforeValueRenderWithDateTimeAndParameters()
+    {
+        $originalValue = new \DateTime();
+        $localizedValue = date('Y-m-d');
+
+        $testDateType = 'medium';
+        $testTimeType = 'FULL';
+        $testFormat = 'd_m_y';
+
+        $this->addressFormatter->expects($this->never())->method($this->anything());
+        $this->nameFormatter->expects($this->never())->method($this->anything());
+        $this->dateTimeFormatter->expects($this->once())
+            ->method('format')
+            ->with($originalValue, $testDateType, $testTimeType, null, null, $testFormat)
+            ->will($this->returnValue($localizedValue));
+
+        $this->numberFormatter->expects($this->never())->method($this->anything());
+
+        $this->metadata->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array('render_date_type', false, $testDateType),
+                        array('render_time_type', false, $testTimeType),
+                        array('render_datetime_pattern', false, $testFormat),
+                    )
+                )
+            );
+
+        $this->expectEventCalls($originalValue, $localizedValue);
+
+        $this->target->beforeValueRender($this->event);
+    }
+
+    public function testBeforeValueRenderWithNameEntity()
+    {
+        $originalValue = $this->getMockForAbstractClass('Oro\Bundle\LocaleBundle\Model\FirstNameInterface');
+        $localizedValue = 'name';
+
+        $this->addressFormatter->expects($this->never())->method($this->anything());
         $this->nameFormatter->expects($this->once())
             ->method('format')
-            ->withAnyParameters()
-            ->will($this->returnValue($localised));
-        $this->dateTimeFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->numberFormatter->expects($this->never())
-            ->method('format')
-            ->withAnyParameters();
-        $this->event->expects($this->once())
-            ->method('setConvertedValue')
-            ->with($localised);
+            ->with($originalValue)
+            ->will($this->returnValue($localizedValue));
+        $this->dateTimeFormatter->expects($this->never())->method($this->anything());
+        $this->numberFormatter->expects($this->never())->method($this->anything());
 
-        $this->init($entity);
+        $this->expectEventCalls($originalValue, $localizedValue);
 
-        $this->target->afterCalculate($this->event);
+        $this->target->beforeValueRender($this->event);
     }
 }

@@ -26,7 +26,7 @@ class ValueRenderEventTest extends \PHPUnit_Framework_TestCase
      */
     protected $convertedValue;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->metadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\MetadataInterface')
             ->disableOriginalConstructor()

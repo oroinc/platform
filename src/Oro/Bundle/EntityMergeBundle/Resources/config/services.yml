@@ -166,7 +166,7 @@ services:
           - @oro_locale.formatter.name
           - @oro_locale.formatter.number
         tags:
-          - { name: kernel.event_listener, event: oro.entity_merge.before_value_render, method: afterCalculate }
+          - { name: kernel.event_listener, event: oro.entity_merge.before_value_render, method: beforeValueRender }
 
     # Validators
     oro_entity_merge.validator.max_entities_validator:

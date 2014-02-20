@@ -57,7 +57,7 @@ class LocalizedValueRenderListener
     /**
      * @param ValueRenderEvent $fieldValueEvent
      */
-    public function afterCalculate(ValueRenderEvent $fieldValueEvent)
+    public function beforeValueRender(ValueRenderEvent $fieldValueEvent)
     {
         $originalValue = $fieldValueEvent->getOriginalValue();
         $metadata = $fieldValueEvent->getMetadata();
