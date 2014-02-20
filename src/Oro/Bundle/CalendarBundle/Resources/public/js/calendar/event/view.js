@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/translator', 'oro/dialog-widget', 'oro/loading-mask',
+define(['underscore', 'backbone', 'oro/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
     'orocalendar/js/form-validation', 'oro/delete-confirmation', 'orocalendar/js/calendar/event/model'
     ], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
     'use strict';

@@ -1,6 +1,6 @@
 /* jshint devel:true*/
 /* global define, require */
-define(['underscore', 'backbone', 'oro/mediator', 'oro/loading-mask', 'oro/layout', 'jquery.form'],
+define(['underscore', 'backbone', 'oro/mediator', 'oroui/js/loading-mask', 'oro/layout', 'jquery.form'],
 function(_, Backbone, mediator, LoadingMask, layout) {
     'use strict';
 

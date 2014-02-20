@@ -12,10 +12,10 @@ define(function (require) {
     var mediator = require('oro/mediator');
     var messenger = require('oro/messenger');
     var Modal = require('oro/modal');
-    var LoadingMask = require('oro/loading-mask');
+    var LoadingMask = require('oroui/js/loading-mask');
     var PagestateView = require('oro/navigation/pagestate/view');
     var PagestateModel = require('oro/navigation/pagestate/model');
-    var PageableCollection = require('oro/pageable-collection');
+    var PageableCollection = require('orodatagrid/js/pageable-collection');
     var widgetManager = require('oro/widget-manager');
     var contentManager = require('oro/content-manager');
     var _jqueryForm = require('jquery.form');

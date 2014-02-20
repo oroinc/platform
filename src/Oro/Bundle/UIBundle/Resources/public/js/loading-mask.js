@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone'],
-function($, _, Backbone) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone'
+    ], function ($, _, Backbone) {
     'use strict';
 
     /**
      * Loading mask widget
      *
-     * @export  oro/loading-mask
-     * @class   oro.LoadingMask
+     * @export  oroui/js/loading-mask
+     * @class   oroui.LoadingMask
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -42,15 +42,16 @@ function($, _, Backbone) {
          * @param {Object} options
          * @param {Boolean} [options.liveUpdate] Update position of loading animation on window scroll and resize
          */
-        initialize: function(options) {
-            options = options || {};
+        initialize: function (options) {
+            var updateProxy,
+                opts = options || {};
 
-            if (_.has(options, 'liveUpdate')) {
-                this.liveUpdate = options.liveUpdate;
+            if (_.has(opts, 'liveUpdate')) {
+                this.liveUpdate = opts.liveUpdate;
             }
 
             if (this.liveUpdate) {
-                var updateProxy = $.proxy(this.updatePos, this);
+                updateProxy = $.proxy(this.updatePos, this);
                 $(window).resize(updateProxy).scroll(updateProxy);
             }
             Backbone.View.prototype.initialize.apply(this, arguments);
@@ -61,7 +62,7 @@ function($, _, Backbone) {
          *
          * @return {*}
          */
-        show: function() {
+        show: function () {
             this.$el.show();
             this.displayed = true;
             this.resetPos().updatePos();
@@ -74,7 +75,7 @@ function($, _, Backbone) {
          * @return {*}
          * @protected
          */
-        updatePos: function() {
+        updatePos: function () {
             if (!this.displayed) {
                 return this;
             }
@@ -115,7 +116,7 @@ function($, _, Backbone) {
          * @return {*}
          * @protected
          */
-        resetPos: function() {
+        resetPos: function () {
             this.$('.loading-wrapper').css('height', '100%');
             return this;
         },
@@ -125,7 +126,7 @@ function($, _, Backbone) {
          *
          * @return {*}
          */
-        hide: function() {
+        hide: function () {
             this.$el.hide();
             this.displayed = false;
             this.resetPos();
@@ -137,7 +138,7 @@ function($, _, Backbone) {
          *
          * @return {*}
          */
-        render: function() {
+        render: function () {
             this.$el.empty();
             this.$el.append(this.template({
                 loadingHint: this.loadingHint

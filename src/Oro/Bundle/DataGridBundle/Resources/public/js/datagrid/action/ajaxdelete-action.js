@@ -1,14 +1,14 @@
 /*global define*/
-define(['oro/datagrid/model-action', 'oro/delete-confirmation', 'oro/translator'
+define(['./model-action', 'oro/delete-confirmation', 'oro/translator'
     ], function (ModelAction, DeleteConfirmation, __) {
     'use strict';
 
     /**
      * Ajax delete action, triggers REST AJAX request
      *
-     * @export  oro/datagrid/ajaxdelete-action
-     * @class   oro.datagrid.AjaxDeleteAction
-     * @extends oro.datagrid.ModelAction
+     * @export  orodatagrid/js/datagrid/action/ajaxdelete-action
+     * @class   orodatagrid.datagrid.action.AjaxdeleteAction
+     * @extends orodatagrid.datagrid.action.ModelAction
      */
     return ModelAction.extend({
         confirmation: true,

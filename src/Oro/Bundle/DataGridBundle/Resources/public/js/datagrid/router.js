@@ -1,13 +1,13 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/navigation', 'oro/mediator'],
-function(_, Backbone, Navigation, mediator) {
+/*global define*/
+define(['underscore', 'backbone', 'oro/navigation', 'oro/mediator'
+    ], function (_, Backbone, Navigation, mediator) {
     'use strict';
 
     /**
      * Router for basic datagrid
      *
-     * @export  oro/datagrid/router
-     * @class   oro.datagrid.Router
+     * @export  orodatagrid/js/datagrid/router
+     * @class   orodatagrid.datagrid.Router
      * @extends Backbone.Router
      */
     return Backbone.Router.extend({
@@ -36,13 +36,13 @@ function(_, Backbone, Navigation, mediator) {
          * @param {Object} options
          * @param {oro.PageableCollection} options.collection Collection of models.
          */
-        initialize: function(options) {
-            options = options || {};
-            if (!options.collection) {
+        initialize: function (options) {
+            var opts = options || {};
+            if (!opts.collection) {
                 throw new TypeError("'collection' is required");
             }
 
-            this.collection = options.collection;
+            this.collection = opts.collection;
             this._initState = _.clone(this.collection.state);
 
             this.collection.on('beforeReset', this._handleStateChange, this);
@@ -62,7 +62,7 @@ function(_, Backbone, Navigation, mediator) {
          * @param {Object} options Fetch options
          * @private
          */
-        _handleStateChange: function(collection, options) {
+        _handleStateChange: function (collection, options) {
             options = options || {};
             if (options.ignoreSaveStateInUrl) {
                 return;
@@ -83,7 +83,7 @@ function(_, Backbone, Navigation, mediator) {
          *
          * @param {String} encodedStateData String represents encoded state stored in URL
          */
-        changeState: function(encodedStateData) {
+        changeState: function (encodedStateData) {
             var state = null;
             if (encodedStateData) {
                 state = this.collection.decodeStateData(encodedStateData);

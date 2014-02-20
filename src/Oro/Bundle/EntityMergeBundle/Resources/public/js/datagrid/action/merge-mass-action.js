@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messenger'],
+define(['underscore', 'oro/translator', 'orodatagrid/js/datagrid/action/mass-action', 'oro/messenger'],
     /**
      * @param {underscore} _
      * @param {oro/translator} __

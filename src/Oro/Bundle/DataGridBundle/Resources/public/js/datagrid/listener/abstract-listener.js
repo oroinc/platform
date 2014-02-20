@@ -1,13 +1,14 @@
 /*jslint browser: true, nomen: true*/
 /*global define*/
-define(['underscore', 'jquery', 'backbone'], function (_, $, Backbone) {
+define(['underscore', 'jquery', 'backbone'
+    ], function (_, $, Backbone) {
     'use strict';
 
     /**
      * Abstarct listener for datagrid
      *
-     * @export  oro/datagrid/abstract-listener
-     * @class   oro.datagrid.AbstractListener
+     * @export  orodatagrid/js/datagrid/listener/abstract-listener
+     * @class   orodatagrid.datagrid.listener.AbstractListener
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({

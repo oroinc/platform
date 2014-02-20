@@ -1,14 +1,14 @@
-/* global define */
-define(['underscore', 'oro/mediator', 'oro/datagrid/model-action'],
-function(_, mediator, ModelAction) {
+/*global define*/
+define(['underscore', 'oro/mediator', './model-action'
+    ], function (_, mediator, ModelAction) {
     'use strict';
 
     /**
      * Navigate action. Changes window location to url, from getLink method
      *
-     * @export  oro/datagrid/navigate-action
-     * @class   oro.datagrid.NavigateAction
-     * @extends oro.datagrid.ModelAction
+     * @export  orodatagrid/js/datagrid/action/navigate-action
+     * @class   orodatagrid.datagrid.action.NavigateAction
+     * @extends orodatagrid.datagrid.action.ModelAction
      */
     return ModelAction.extend({
 
@@ -26,7 +26,7 @@ function(_, mediator, ModelAction) {
          * @param {Object} options
          * @param {Boolean} options.useDirectLauncherLink
          */
-        initialize: function(options) {
+        initialize: function (options) {
             ModelAction.prototype.initialize.apply(this, arguments);
 
             if (options.useDirectLauncherLink) {
@@ -46,7 +46,7 @@ function(_, mediator, ModelAction) {
         /**
          * Execute redirect
          */
-        execute: function() {
+        execute: function () {
             window.location.href = this.getLink();
         },
 
@@ -55,7 +55,7 @@ function(_, mediator, ModelAction) {
          *
          * @private
          */
-        _preExecuteSubscriber: function(action, options) {
+        _preExecuteSubscriber: function (action, options) {
             mediator.trigger('grid_action:navigateAction:preExecute', action, options);
         }
     });
