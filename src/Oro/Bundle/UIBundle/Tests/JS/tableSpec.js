@@ -35,7 +35,7 @@ define(function (require) {
                 ])
             });
 
-            expect($el.find('div').length).toEqual(3);
+            expect($el.find('div')).toHaveLength(3);
         });
 
         it('renders attribute of model', function () {
@@ -46,7 +46,7 @@ define(function (require) {
                 ])
             });
 
-            expect($el.find('div').html()).toEqual('a');
+            expect($el.find('div')).toContainText('a');
         });
 
         it('handles adding model to the collection', function () {
@@ -59,7 +59,7 @@ define(function (require) {
 
             collection.add(new Backbone.Model({ name: 'a' }));
 
-            expect($el.find('div').length).toEqual(1);
+            expect($el.find('div')).toHaveLength(1);
         });
 
         it('handles removing model from the collection', function () {
@@ -74,7 +74,7 @@ define(function (require) {
 
             collection.remove(collection.at(1));
 
-            expect($el.find('div').length).toEqual(1);
+            expect($el.find('div')).toHaveLength(1);
         });
 
         it('handles model changing', function () {
@@ -89,7 +89,39 @@ define(function (require) {
 
             collection.at(0).set('name', 'b');
 
-            expect($el.find('div').html()).toEqual('b');
+            expect($el.find('div')).toContainText('b');
+        });
+
+        it('handles collection reset', function () {
+            var collection = new Backbone.Collection([
+                { name: 'a' }, { name: 'b' }, { name: 'c' }
+            ]);
+
+            $el.itemsManagerTable({
+                itemTemplate: '<div><%= name %></div>',
+                collection: collection
+            });
+
+            collection.reset();
+
+            expect($el).toBeEmpty();
+        });
+
+        it('provides render hook', function () {
+            var collection = new Backbone.Collection([
+                { name: '<script>alert(\'a\')</script>' }
+            ]);
+
+            $el.itemsManagerTable({
+                itemTemplate: '<div><%- name %></div>',
+                itemRender: function (tmpl, data) {
+                    data.name = data.name.replace('<script>', '').replace('</script>', '');
+                    return tmpl(data);
+                },
+                collection: collection
+            });
+
+            expect($el.find('div')).toContainText('alert(\'a\')');
         });
     });
 });
