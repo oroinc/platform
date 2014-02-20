@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\DependencyInjection\Container;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 class TargetType extends AbstractType
@@ -96,20 +93,10 @@ class TargetType extends AbstractType
         );
 
         foreach ($entityIds as $entityId) {
-            $entityName = $moduleName = '';
-            if ($entityId->getClassName() != $entityClassName) {
-                $className  = explode('\\', $entityId->getClassName());
-                if (count($className) > 1) {
-                    foreach ($className as $i => $name) {
-                        if (count($className) - 1 == $i) {
-                            $entityName = $name;
-                        } elseif (!in_array($name, array('Bundle', 'Entity'))) {
-                            $moduleName .= $name;
-                        }
-                    }
-                }
-
-                $choices[$entityId->getClassName()] = $moduleName . ':' . $entityName;
+            $className = $entityId->getClassName();
+            if ($className != $entityClassName) {
+                list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
+                $choices[$className] = $moduleName . ':' . $entityName;
             }
         }
 
