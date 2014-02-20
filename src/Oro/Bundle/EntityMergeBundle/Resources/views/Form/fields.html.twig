@@ -70,7 +70,7 @@
 
         </td>
         {% for child in form.children.sourceEntity %}
-            <td>
+            <td class="entity-merge-decision-container">
                 {{ form_widget(child, {entityOffset: loop.index - 1}) }}
             </td>
         {% endfor %}

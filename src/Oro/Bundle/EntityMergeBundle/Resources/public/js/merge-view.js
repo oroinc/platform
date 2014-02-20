@@ -35,7 +35,8 @@ define(['jquery'],
          * @callback
          * @desc {HTMLElement} this
          */
-        entityValueSelectHandler: function () {
+        entityValueSelectHandler: function (event) {
+            event.stopImmediatePropagation();
             var $this = $(this);
             var fieldName = $this.attr('name');
             var entityKey = $this.val();
@@ -56,6 +57,7 @@ define(['jquery'],
         resetViewState: function () {
             $('input[type="radio"]:checked').click();
         },
+
         /**
          * @desc calculate columns width
          */
@@ -69,6 +71,13 @@ define(['jquery'],
         },
 
         /**
+         * @desc select radio button if column clicked
+         */
+        columnClickHandler: function(){
+            $(this).find('.entity-merge-field-choice').click();
+        },
+
+        /**
          * @constructs
          */
         init: function () {
@@ -76,6 +85,7 @@ define(['jquery'],
             $('.entity-merge-field-choice').click(this.entityValueSelectHandler);
             $(document).ready(this.fixTableWidth);
             $(window).resize(this.fixTableWidth);
+            $('.entity-merge-decision-container').click(this.columnClickHandler);
             this.resetViewState();
         }
     };
