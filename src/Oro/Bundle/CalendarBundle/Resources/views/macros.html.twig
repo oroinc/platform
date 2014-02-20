@@ -39,8 +39,8 @@
 
 {% macro renderCalendar(containerSelector, entity, startDate, endDate, calendar, eventsOptions, connectionsOptions, callbackMacro) %}
 <script type="text/javascript">
-    require(['jquery', 'underscore', 'oro/calendar', 'oro/calendar/event/collection',
-        'oro/calendar/connection/collection', 'oro/locale-settings'],
+    require(['jquery', 'underscore', 'orocalendar/js/calendar', 'orocalendar/js/calendar/event/collection',
+        'orocalendar/js/calendar/connection/collection', 'oro/locale-settings'],
     function($, _, Calendar, EventCollection, ConnectionCollection, localeSettings){
         var connections = new ConnectionCollection();
         connections.reset({{ render(path('oro_api_get_calendar_connections', {id: entity.id})) }});

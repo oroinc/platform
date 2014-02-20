@@ -1,7 +1,8 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/util', 'oro/form-validation', 'oro/delete-confirmation',
-    'oro/query-designer/column-selector-view', 'jquery-outer-html'],
-function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
+/*global define*/
+define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/util',
+    'orocalendar/js/form-validation', 'oro/delete-confirmation', 'oro/query-designer/column-selector-view',
+    'jquery-outer-html'
+    ], function (_, Backbone, __, util, FormValidation, DeleteConfirmation,
          ColumnSelectorView) {
     'use strict';
 
@@ -50,7 +51,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         /** @property */
         itemTemplate: null,
 
-        initialize: function() {
+        initialize: function () {
             this.options.collection = this.options.collection || new this.collectionClass();
             this.fieldNames = _.without(_.keys((this.createNewModel()).attributes), 'id');
 
@@ -69,7 +70,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             this.listenTo(this.getCollection(), 'reset', this.onResetCollection);
         },
 
-        render: function() {
+        render: function () {
             this.getContainer().empty();
             this.getCollection().each(_.bind(function (model) {
                 this.onModelAdded(model);
@@ -79,6 +80,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         initForm: function () {
+            var onAdd, onSave, onCancel;
             this.form = $(this.options.itemFormSelector);
             this.columnSelector = new ColumnSelectorView({
                 el: this.form.find(this.selectors.columnSelector),
@@ -88,20 +90,20 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
                 findEntity: this.options.findEntity
             });
 
-            var onAdd = _.bind(function (e) {
+            onAdd = _.bind(function (e) {
                 e.preventDefault();
                 this.handleAddModel();
             }, this);
             this.$el.find(this.selectors.addButton).on('click', onAdd);
 
-            var onSave = _.bind(function (e) {
+            onSave = _.bind(function (e) {
                 e.preventDefault();
                 var id = $(e.currentTarget).data('id');
                 this.handleSaveModel(id);
             }, this);
             this.$el.find(this.selectors.saveButton).on('click', onSave);
 
-            var onCancel = _.bind(function (e) {
+            onCancel = _.bind(function (e) {
                 e.preventDefault();
                 this.handleCancelButton();
             }, this);
@@ -123,17 +125,17 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
                     });
                     return ui;
                 },
-                stop: _.bind(function(e, ui) {
+                stop: _.bind(function (e, ui) {
                     this.syncCollectionWithUi();
                 }, this)
             }).disableSelection();
         },
 
-        getCollection: function() {
+        getCollection: function () {
             return this.options.collection;
         },
 
-        getContainer: function() {
+        getContainer: function () {
             return this.$el.find(this.selectors.itemContainer);
         },
 
@@ -146,30 +148,30 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             model.set('id', _.uniqueId('designer'));
         },
 
-        addModel: function(model) {
+        addModel: function (model) {
             this.initModel(model, this.getCollection().size());
             this.getCollection().add(model);
         },
 
-        deleteModel: function(model) {
+        deleteModel: function (model) {
             this.getCollection().remove(model);
         },
 
-        onModelAdded: function(model) {
+        onModelAdded: function (model) {
             var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
             this.bindItemActions(item);
             this.getContainer().append(item);
             this.trigger('collection:change');
         },
 
-        onModelChanged: function(model) {
+        onModelChanged: function (model) {
             var item = $(this.itemTemplate(this.prepareItemTemplateData(model)));
             this.bindItemActions(item);
             this.getContainer().find('[data-id="' + model.id + '"]').outerHTML(item);
             this.trigger('collection:change');
         },
 
-        onModelDeleted: function(model) {
+        onModelDeleted: function (model) {
             this.getContainer().find('[data-id="' + model.id + '"]').remove();
             this.trigger('collection:change');
         },
@@ -186,18 +188,19 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             this.trigger('collection:change');
         },
 
-        handleAddModel: function() {
+        handleAddModel: function () {
+            var model, data;
             this.beforeFormSubmit();
-            var model = this.createNewModel();
+            model = this.createNewModel();
             if (this.validateFormData()) {
-                var data = this.getFormData();
+                data = this.getFormData();
                 this.clearFormData();
                 model.set(data);
                 this.addModel(model);
             }
         },
 
-        handleSaveModel: function(modelId) {
+        handleSaveModel: function (modelId) {
             this.beforeFormSubmit();
             var model = this.getCollection().get(modelId);
             if (this.validateFormData()) {
@@ -206,7 +209,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             }
         },
 
-        handleDeleteModel: function(modelId) {
+        handleDeleteModel: function (modelId) {
             var model = this.getCollection().get(modelId);
             if (this.$el.find(this.selectors.saveButton).data('id') == modelId) {
                 this.resetForm();
@@ -214,7 +217,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
             this.deleteModel(model);
         },
 
-        handleCancelButton: function() {
+        handleCancelButton: function () {
             this.resetForm();
         },
 
@@ -227,12 +230,13 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         toggleFormButtons: function (modelId) {
+            var addButton, saveButton, cancelButton;
             if (_.isNull(modelId)) {
                 modelId = '';
             }
-            var addButton = this.$el.find(this.selectors.addButton);
-            var saveButton = this.$el.find(this.selectors.saveButton);
-            var cancelButton = this.$el.find(this.selectors.cancelButton);
+            addButton = this.$el.find(this.selectors.addButton);
+            saveButton = this.$el.find(this.selectors.saveButton);
+            cancelButton = this.$el.find(this.selectors.cancelButton);
             saveButton.data('id', modelId);
             if (modelId == '') {
                 cancelButton.hide();
@@ -246,23 +250,26 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         bindItemActions: function (item) {
+            var onEdit, onDelete;
             // bind edit button
-            var onEdit = _.bind(function (e) {
+            onEdit = _.bind(function (e) {
+                var el, id, model;
                 e.preventDefault();
-                var el = $(e.currentTarget);
-                var id = el.closest('[data-id]').data('id');
-                var model = this.getCollection().get(id);
+                el = $(e.currentTarget);
+                id = el.closest('[data-id]').data('id');
+                model = this.getCollection().get(id);
                 this.setFormData(model.attributes);
                 this.toggleFormButtons(id);
             }, this);
             item.find(this.selectors.editButton).on('click', onEdit);
 
             // bind delete button
-            var onDelete = _.bind(function (e) {
+            onDelete = _.bind(function (e) {
+                var el, id, confirm;
                 e.preventDefault();
-                var el = $(e.currentTarget);
-                var id = el.closest('[data-id]').data('id');
-                var confirm = new DeleteConfirmation({
+                el = $(e.currentTarget);
+                id = el.closest('[data-id]').data('id');
+                confirm = new DeleteConfirmation({
                     content: el.data('message')
                 });
                 confirm.on('ok', _.bind(this.handleDeleteModel, this, id));
@@ -272,14 +279,15 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         syncCollectionWithUi: function () {
-            var collectionChanged = false;
-            var collection = this.getCollection();
+            var collectionChanged = false,
+                collection = this.getCollection();
             _.each(this.getContainer().find('tr'), function (el, index) {
-                var uiId = $(el).data('id');
-                var model = collection.at(index);
+                var anotherModel, anotherIndex,
+                    uiId = $(el).data('id'),
+                    model = collection.at(index);
                 if (uiId !== model.id) {
-                    var anotherModel = collection.get(uiId);
-                    var anotherIndex = collection.indexOf(anotherModel);
+                    anotherModel = collection.get(uiId);
+                    anotherIndex = collection.indexOf(anotherModel);
                     collection.remove(model, {silent: true});
                     collection.remove(anotherModel, {silent: true});
                     if (index < anotherIndex) {
@@ -373,8 +381,8 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         createNewModel: function () {
-            var modelClass = this.getCollection().model;
-            return new modelClass();
+            var ModelClass = this.getCollection().model;
+            return new ModelClass();
         },
 
         addFieldLabelGetter: function (callback) {
@@ -385,11 +393,12 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         getFieldLabel: function (name, value) {
-            var result = null;
-            var field = this.findFormField(name);
-            if (field.length == 1) {
-                for (var i = 0; i < this.fieldLabelGetters.length; i++) {
-                    var callback = this.fieldLabelGetters[i];
+            var i, callback,
+                result = null,
+                field = this.findFormField(name);
+            if (field.length === 1) {
+                for (i = 0; i < this.fieldLabelGetters.length; i += 1) {
+                    callback = this.fieldLabelGetters[i];
                     result = callback.call(this, field, name, value);
                     if (result !== null) {
                         break;
@@ -400,7 +409,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         getSelectFieldLabel: function (field, name, value) {
-            if (field.get(0).tagName.toLowerCase() == 'select') {
+            if (field.get(0).tagName.toLowerCase() === 'select') {
                 var opt = util.findSelectOption(field, value);
                 if (opt.length === 1) {
                     return opt.text();
@@ -410,7 +419,7 @@ function(_, Backbone, __, util, FormValidation, DeleteConfirmation,
         },
 
         getColumnFieldLabel: function (field, name, value) {
-            if (field.attr('name') == this.columnSelector.$el.attr('name')) {
+            if (field.attr('name') === this.columnSelector.$el.attr('name')) {
                 return this.columnSelector.getLabel(value);
             }
             return null;

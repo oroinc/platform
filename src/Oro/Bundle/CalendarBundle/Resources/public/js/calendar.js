@@ -1,10 +1,10 @@
 /* jshint devel:true*/
-/* global define */
+/*global define, console*/
 define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oro/loading-mask',
-    'oro/calendar/event/collection', 'oro/calendar/event/model', 'oro/calendar/event/view',
-    'oro/calendar/connection/collection', 'oro/calendar/connection/view', 'oro/calendar/color-manager',
-    'oro/formatter/datetime', 'jquery.fullcalendar'],
-function(_, Backbone, __, app, messenger, LoadingMask,
+    'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
+    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
+    'oro/formatter/datetime', 'jquery.fullcalendar'
+    ], function (_, Backbone, __, app, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
          ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
     'use strict';
@@ -12,8 +12,8 @@ function(_, Backbone, __, app, messenger, LoadingMask,
     var $ = Backbone.$;
 
     /**
-     * @export  oro/calendar
-     * @class   oro.Calendar
+     * @export  orocalendar/js/calendar
+     * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -24,7 +24,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                     '<div class="calendar"></div>' +
                     '<div class="loading-mask"></div>' +
                 '</div>' +
-            '</div>'
+                '</div>'
         ),
 
         /** @property {Object} */
@@ -59,7 +59,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         loadingMask: null,
         colorManager: null,
 
-        initialize: function() {
+        initialize: function () {
             // init event collection
             this.options.collection = this.options.collection || new EventCollection();
             this.options.collection.setCalendar(this.options.calendar);
@@ -92,7 +92,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             return this.eventView;
         },
 
-        handleEventViewRemove: function() {
+        handleEventViewRemove: function () {
             this.eventView = null;
         },
 
@@ -109,29 +109,29 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             return this.loadingMask;
         },
 
-        getCollection: function() {
+        getCollection: function () {
             return this.options.collection;
         },
 
-        getCalendarElement: function() {
+        getCalendarElement: function () {
             if (!this.fullCalendar) {
                 this.fullCalendar = this.$el.find(this.selectors.calendar);
             }
             return this.fullCalendar;
         },
 
-        handleEventViewAdd: function(eventModel) {
+        handleEventViewAdd: function (eventModel) {
             this.getCollection().add(eventModel);
         },
 
-        onEventAdded: function(eventModel){
+        onEventAdded: function (eventModel) {
             var fcEvent = eventModel.toJSON();
             this.prepareViewModel(fcEvent);
 
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
-        onEventChanged: function(eventModel){
+        onEventChanged: function (eventModel) {
             var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.get('id'))[0];
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, _.pick(eventModel.attributes, _.keys(_.omit(fcEvent, ['id']))));
@@ -139,7 +139,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
         },
 
-        onEventDeleted: function(eventModel) {
+        onEventDeleted: function (eventModel) {
             this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
         },
 
@@ -151,7 +151,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
 
         },
 
-        select: function(start, end) {
+        select: function (start, end) {
             if (!this.eventView) {
                 try {
                     // TODO: All date values must be in UTC representation according to config timezone,
@@ -169,7 +169,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             }
         },
 
-        eventClick: function(fcEvent) {
+        eventClick: function (fcEvent) {
             if (!this.eventView) {
                 try {
                     var eventModel = this.getCollection().get(fcEvent.id);
@@ -180,7 +180,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             }
         },
 
-        eventDropOrResize: function(fcEvent) {
+        eventDropOrResize: function (fcEvent) {
             this.showSavingMask();
             try {
                 this.getCollection()
@@ -195,14 +195,15 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                             error: _.bind(function (model, response) {
                                 this.showSaveEventError(response.responseJSON);
                             }, this)
-                        });
+                        }
+                    );
             } catch (err) {
                 this.showLoadEventsError(err);
             }
         },
 
-        loadEvents: function(start, end, callback) {
-            var onEventsLoad = _.bind(function() {
+        loadEvents: function (start, end, callback) {
+            var onEventsLoad = _.bind(function () {
                 var fcEvents = this.getCollection().toJSON();
                 this.prepareViewModels(fcEvents);
                 this._hideMask();
@@ -218,7 +219,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                     // load events from a server
                     this.getCollection().fetch({
                         success: onEventsLoad,
-                        error: _.bind(function(collection, response) {
+                        error: _.bind(function (collection, response) {
                             callback({});
                             this.showLoadEventsError(response.responseJSON);
                         }, this)
@@ -251,15 +252,15 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             return dateTimeFormatter.convertDateTimeToBackendFormat(date);
         },
 
-        showSavingMask: function() {
+        showSavingMask: function () {
             this._showMask(__('Saving...'));
         },
 
-        showLoadingMask: function() {
+        showLoadingMask: function () {
             this._showMask(__('Loading...'));
         },
 
-        _showMask: function(message) {
+        _showMask: function (message) {
             if (this.enableEventLoading) {
                 var loadingMaskInstance = this.getLoadingMask();
                 loadingMaskInstance.$el
@@ -269,7 +270,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             }
         },
 
-        _hideMask: function() {
+        _hideMask: function () {
             if (this.loadingMask) {
                 this.loadingMask.hide();
             }
@@ -305,7 +306,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             messenger.notificationFlashMessage('error', msg);
         },
 
-        initCalendarContainer: function() {
+        initCalendarContainer: function () {
             // init events container
             var eventsContainer = this.$el.find(this.options.eventsOptions.containerSelector);
             if (eventsContainer.length === 0) {
@@ -316,15 +317,16 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         },
 
         initializeFullCalendar: function () {
+            var options, keys, self;
             // prepare options for jQuery FullCalendar control
-            var options = {
+            options = {
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
                 eventClick: _.bind(this.eventClick, this),
                 eventDrop: _.bind(this.eventDropOrResize, this),
                 eventResize: _.bind(this.eventDropOrResize, this),
-                loading: _.bind(function(show) {
+                loading: _.bind(function (show) {
                     if (show) {
                         this.showLoadingMask();
                     } else {
@@ -332,7 +334,8 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                     }
                 }, this)
             };
-            var keys = ['date', 'defaultView', 'editable', 'selectable',
+            keys = [
+                'date', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'allDaySlot', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
@@ -350,7 +353,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             }
 
             //Fix aspect ration to prevent double scroll for week and day views.
-            options.viewRender = _.bind(function(view) {
+            options.viewRender = _.bind(function (view) {
                 if (view.name !== 'month') {
                     this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.0);
                 } else {
@@ -358,13 +361,13 @@ function(_, Backbone, __, app, messenger, LoadingMask,
                 }
             }, this);
 
-            var that = this;
-            options.viewDisplay = function(view) {
-                that.setTimeline();
-                setInterval(function () { that.setTimeline(); }, 5 * 60 * 1000);
+            self = this;
+            options.viewDisplay = function () {
+                self.setTimeline();
+                setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
             };
-            options.windowResize = function(view) {
-                that.setTimeline();
+            options.windowResize = function () {
+                self.setTimeline();
             };
 
             // create jQuery FullCalendar control
@@ -373,13 +376,14 @@ function(_, Backbone, __, app, messenger, LoadingMask,
         },
 
         initializeConnectionsView: function () {
+            var connectionsContainer, connectionsTemplate;
             // init connections container
-            var connectionsContainer = this.$el.find(this.options.connectionsOptions.containerSelector);
+            connectionsContainer = this.$el.find(this.options.connectionsOptions.containerSelector);
             if (connectionsContainer.length === 0) {
                 throw new Error("Cannot find '" + this.options.connectionsOptions.containerSelector + "' element.");
             }
             connectionsContainer.empty();
-            var connectionsTemplate = _.template($(this.options.connectionsOptions.containerTemplateSelector).html());
+            connectionsTemplate = _.template($(this.options.connectionsOptions.containerTemplateSelector).html());
             connectionsContainer.append($(connectionsTemplate()));
 
             // create a view for a list of connections
@@ -408,7 +412,7 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             }, this));
         },
 
-        render: function() {
+        render: function () {
             // init views
             this.initCalendarContainer();
             if (_.isUndefined(this.options.connectionsOptions.containerTemplateSelector)) {
@@ -424,46 +428,47 @@ function(_, Backbone, __, app, messenger, LoadingMask,
             return this;
         },
 
-        setTimeline: function() {
-            var calendarElement = this.getCalendarElement();
-            var curTime = new Date();
-            curTime = new Date(curTime.getTime()
-                + curTime.getTimezoneOffset() * 60000
-                + this.options.eventsOptions.timezoneOffset * 60000);
+        setTimeline: function () {
+            var todayElement, parentDiv, timelineElement, curCalView, percentOfDay, curSeconds, topLoc, dayCol,
+                calendarElement = this.getCalendarElement(),
+                curTime = new Date();
+            curTime = new Date(curTime.getTime() +
+                curTime.getTimezoneOffset() * 60000 +
+                this.options.eventsOptions.timezoneOffset * 60000);
             // this function is called every 5 minutes
-            if (curTime.getHours() == 0 && curTime.getMinutes() <= 5) {
+            if (curTime.getHours() === 0 && curTime.getMinutes() <= 5) {
                 // the day has changed
-                var todayElement = calendarElement.find('.fc-today');
+                todayElement = calendarElement.find('.fc-today');
                 todayElement.removeClass('fc-today');
                 todayElement.removeClass('fc-state-highlight');
                 todayElement.next().addClass('fc-today');
                 todayElement.next().addClass('fc-state-highlight');
             }
 
-            var parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
-            var timelineElement = parentDiv.children('.timeline');
-            if (timelineElement.length == 0) {
+            parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
+            timelineElement = parentDiv.children('.timeline');
+            if (timelineElement.length === 0) {
                 // if timeline isn't there, add it
                 timelineElement = $('<hr>').addClass('timeline');
                 parentDiv.prepend(timelineElement);
             }
 
-            var curCalView = calendarElement.fullCalendar('getView');
+            curCalView = calendarElement.fullCalendar('getView');
             if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
                 timelineElement.show();
             } else {
                 timelineElement.hide();
             }
 
-            var curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
-            var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
-            var topLoc = Math.floor(parentDiv.height() * percentOfDay);
+            curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+            percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
+            topLoc = Math.floor(parentDiv.height() * percentOfDay);
             timelineElement.css('top', topLoc + 'px');
 
-            if (curCalView.name == 'agendaWeek') {
+            if (curCalView.name === 'agendaWeek') {
                 // week view, don't want the timeline to go the whole way across
-                var dayCol = calendarElement.find('.fc-today:visible');
-                if (dayCol.position() != null) {
+                dayCol = calendarElement.find('.fc-today:visible');
+                if (dayCol.position() !== null) {
                     timelineElement.css({
                         left: (dayCol.position().left - 1) + 'px',
                         width: (dayCol.width() + 2) + 'px'
