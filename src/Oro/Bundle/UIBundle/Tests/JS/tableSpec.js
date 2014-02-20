@@ -1,4 +1,4 @@
-/*global define, describe, it, expect */
+/*global define, describe, it, expect, spyOn, beforeEach, afterEach*/
 define(function (require) {
     'use strict';
 
@@ -18,13 +18,31 @@ define(function (require) {
             $el = null;
         });
 
-        it('is jQueryUI widget', function () {
+        it('is $ widget', function () {
             expect(function () {
                 $el.itemsManagerTable({
                     itemTemplate: '',
                     collection: new Backbone.Collection()
                 });
             }).not.toThrow();
+        });
+
+        it('throws exception if itemTemplate not provided', function () {
+            expect(function () {
+                $el.itemsManagerTable({
+                    itemTemplate: undefined,
+                    collection: new Backbone.Collection()
+                });
+            }).toThrow(new Error('itemTemplate option required'));
+        });
+
+        it('throws exception if collection not provided', function () {
+            expect(function () {
+                $el.itemsManagerTable({
+                    itemTemplate: '',
+                    collection: undefined
+                });
+            }).toThrow(new Error('collection option required'));
         });
 
         it('renders each item in collection', function () {
@@ -115,13 +133,72 @@ define(function (require) {
             $el.itemsManagerTable({
                 itemTemplate: '<div><%- name %></div>',
                 itemRender: function (tmpl, data) {
-                    data.name = data.name.replace('<script>', '').replace('</script>', '');
+                    data.name = data.name.replace('<script>', '...').replace('</script>', '...');
                     return tmpl(data);
                 },
                 collection: collection
             });
 
-            expect($el.find('div')).toContainText('alert(\'a\')');
+            expect($el.find('div')).toContainText('...alert(\'a\')...');
+        });
+
+        it('translates action click event to model event with params: model, data-attributes', function () {
+            var collection = new Backbone.Collection([
+                { name: 'a' }
+            ]);
+
+            $el.itemsManagerTable({
+                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="foo"></div>',
+                collection: collection
+            });
+
+            collection.onActionFoo = function () {};
+            spyOn(collection, 'onActionFoo');
+            collection.on('action:foo', collection.onActionFoo, collection);
+
+            $el.find('div').click();
+
+            expect(collection.onActionFoo).toHaveBeenCalledWith(collection.at(0), $el.find('div').data());
+        });
+
+        it('does not translate action click event to model event if corresponding handler provided', function () {
+            var collection = new Backbone.Collection([
+                { name: 'a' }
+            ]);
+
+            $el.itemsManagerTable({
+                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="foo"></div>',
+                collection: collection,
+                fooHandler: function () {}
+            });
+
+            collection.onActionFoo = function () {};
+            spyOn(collection, 'onActionFoo');
+            collection.on('action:foo', collection.onActionFoo, collection);
+
+            $el.find('div').click();
+
+            expect(collection.onActionFoo).not.toHaveBeenCalled();
+        });
+
+        it('handles action click event with params: model, data-attributes, if corresponding handler provided', function () {
+            var collection = new Backbone.Collection([
+                { name: 'a' }
+            ]);
+
+            var options = {
+                itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="bar"></div>',
+                collection: collection,
+                barHandler: function () {}
+            };
+
+            spyOn(options, 'barHandler');
+
+            $el.itemsManagerTable(options);
+
+            $el.find('div').click();
+
+            expect(options.barHandler).toHaveBeenCalledWith(collection.at(0), $el.find('div').data());
         });
     });
 });

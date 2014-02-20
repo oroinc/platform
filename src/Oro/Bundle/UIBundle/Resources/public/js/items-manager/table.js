@@ -7,13 +7,13 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
     /**
      * Item container widget
      *
-     * Emits events
-     * edit, sort, add, remove
-     *
      * Listens to options.collection events:
      * add, remove, change, reset
      *
-     * Uses options.itemTemplate for item rendering
+     * Emits events
+     * action:*, sorts
+     *
+     * Uses options.itemTemplate & options.itemRender for item rendering
      */
     $.widget('oroui.itemsManagerTable', {
         options: {
@@ -21,20 +21,33 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
         },
 
         _create: function () {
-            this.options.deleteHandler = this.options.deleteHandler || _.bind(this._deleteHandler, this);
-            this.options.itemRender = this.options.itemRender || _.bind(this._itemRender, this);
+            var options = this.options;
 
-            if (typeof this.options.itemTemplate === 'function') {
-                this.itemTemplate = this.options.itemTemplate;
-            } else {
-                this.itemTemplate = _.template(this.options.itemTemplate);
+            options.deleteHandler = options.deleteHandler || _.bind(this._deleteHandler, this);
+
+            switch (typeof options.itemTemplate) {
+                case 'function':
+                    this.itemTemplate = options.itemTemplate;
+                    break;
+                case 'string':
+                    this.itemTemplate = _.template(options.itemTemplate);
+                    break;
+                default:
+                    throw new Error('itemTemplate option required');
             }
 
-            var collection = this.options.collection;
-            collection.on('add', this._onModelAdded, this);
-            collection.on('remove', this._onModelDeleted, this);
-            collection.on('change', this._onModelChanged, this);
-            collection.on('reset', this._onResetCollection, this);
+            if (typeof options.itemRender === 'function') {
+                this._itemRender = options.itemRender;
+            }
+
+            if (!options.collection) {
+                throw new Error('collection option required');
+            }
+
+            options.collection.on('add', this._onModelAdded, this);
+            options.collection.on('remove', this._onModelDeleted, this);
+            options.collection.on('change', this._onModelChanged, this);
+            options.collection.on('reset', this._onResetCollection, this);
 
             this._initSorting();
             this._onResetCollection();
@@ -115,7 +128,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
 
         _renderModel: function (model) {
             var data = _.extend({ cid: model.cid }, model.toJSON());
-            return this.options.itemRender(this.itemTemplate, data);
+            return this._itemRender(this.itemTemplate, data);
         },
 
         _itemRender: function (tmpl, data) {
