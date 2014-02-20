@@ -116,7 +116,8 @@ class UpdateCommand extends InitCommand
             $output->writeln('Updating schema...');
             $commands = [
                 'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
-                'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
+                // TODO: this is a temporary solution. Should be uncommented when migrations are finished
+                //'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
             ];
 
             // put system in maintenance mode
@@ -134,6 +135,12 @@ class UpdateCommand extends InitCommand
                 $command->run();
             }
         }
+
+        // TODO: this is a temporary solution. Should be removed when migrations are finished
+        $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($kernel->getRootDir() . '/console');
+        $env     = $kernel->getEnvironment();
+        $schemaUpdateCmd = new Process($console . ' doctrine:schema:update --force --env ' . $env);
+        $schemaUpdateCmd->run();
 
         $output->writeln('<info>DONE</info>');
     }
