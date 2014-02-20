@@ -8,6 +8,7 @@ define(function (require) {
         Backbone = require('backbone'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model');
+    var DeleteConfirmation = require('oro/delete-confirmation');
     require('oroentity/js/field-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
@@ -77,6 +78,16 @@ define(function (require) {
         };
     }
 
+    function deleteHandler(collection, model, data) {
+        var confirm = new DeleteConfirmation({
+            content: data.message
+        });
+        confirm.on('ok', function () {
+            collection.remove(model);
+        });
+        confirm.open();
+    }
+
     function initGrouping(options, metadata, fieldChoiceOptions) {
         var $editor, $fieldChoice, collection, util, template;
 
@@ -103,7 +114,8 @@ define(function (require) {
                 var name = util.splitFieldId(data.name);
                 data.name = template(name);
                 return tmpl(data);
-            }
+            },
+            deleteHandler: _.bind(deleteHandler, null, collection)
         });
     }
 
@@ -177,7 +189,8 @@ define(function (require) {
                 }
 
                 return tmpl(data);
-            }
+            },
+            deleteHandler: _.bind(deleteHandler, null, collection)
         });
     }
 

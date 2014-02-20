@@ -1,7 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jquery-outer-html', 'jquery-ui'
-    ], function ($, _, __, DeleteConfirmation) {
+define(['jquery', 'underscore', 'oro/translator', 'jquery-outer-html', 'jquery-ui'], function ($, _, __) {
     'use strict';
 
     /**
@@ -22,8 +21,6 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
 
         _create: function () {
             var options = this.options;
-
-            options.deleteHandler = options.deleteHandler || _.bind(this._deleteHandler, this);
 
             switch (typeof options.itemTemplate) {
                 case 'function':
@@ -153,17 +150,6 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/delete-confirmation', 'jq
             } else {
                 model.trigger('action:' + action, model, data);
             }
-        },
-
-        _deleteHandler: function (model, data) {
-            var collection = this.options.collection;
-            var confirm = new DeleteConfirmation({
-                content: data.message
-            });
-            confirm.on('ok', function () {
-                collection.remove(model);
-            });
-            confirm.open();
         }
     });
 
