@@ -1,14 +1,14 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/translator', 'oro/dialog-widget','oro/loading-mask', 'oro/form-validation',
-    'oro/delete-confirmation', 'oro/calendar/event/model'],
-function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
+/*global define*/
+define(['underscore', 'backbone', 'oro/translator', 'oro/dialog-widget', 'oro/loading-mask',
+    'orocalendar/js/form-validation', 'oro/delete-confirmation', 'orocalendar/js/calendar/event/model'
+    ], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/calendar/event/view
-     * @class   oro.calendar.event.View
+     * @export  orocalendar/js/calendar/event/view
+     * @class   orocalendar.calendar.event.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -22,7 +22,7 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             calendar: null
         },
 
-        initialize: function() {
+        initialize: function () {
             var templateHtml = $(this.options.formTemplateSelector).html();
             this.template = _.template(templateHtml);
 
@@ -30,30 +30,31 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             this.listenTo(this.model, 'destroy', this.onModelDelete);
         },
 
-        remove: function() {
+        remove: function () {
             this.trigger('remove');
             this._hideMask();
             Backbone.View.prototype.remove.apply(this, arguments);
         },
 
-        onModelSave: function() {
+        onModelSave: function () {
             this.trigger('addEvent', this.model);
             this.eventDialog.remove();
             this.remove();
         },
 
-        onModelDelete: function() {
+        onModelDelete: function () {
             this.eventDialog.remove();
             this.remove();
         },
 
-        render: function() {
+        render: function () {
+            var modelData, eventForm, onDelete;
             // create a dialog
             if (!this.model) {
                 this.model = new EventModel();
             }
-            var modelData = this.model.toJSON();
-            var eventForm = this.template(modelData);
+            modelData = this.model.toJSON();
+            eventForm = this.template(modelData);
             eventForm = this.fillForm(eventForm, modelData);
 
             this.eventDialog = new DialogWidget({
@@ -76,16 +77,17 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             this.eventDialog.render();
 
             // subscribe to 'delete event' event
-            var onDelete = _.bind(function (e) {
+            onDelete = _.bind(function (e) {
+                var el, confirm;
                 e.preventDefault();
-                var el = $(e.target);
-                var confirm = new DeleteConfirmation({
+                el = $(e.target);
+                confirm = new DeleteConfirmation({
                     content: el.data('message')
                 });
                 confirm.on('ok', _.bind(this.deleteModel, this));
                 confirm.open();
             }, this);
-            this.eventDialog.getAction('delete', 'adopted', function(deleteAction) {
+            this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
                 deleteAction.on('click', onDelete);
             });
 
@@ -96,7 +98,7 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             return this;
         },
 
-        saveModel: function() {
+        saveModel: function () {
             this.showSavingMask();
             try {
                 var data = this.getEventFormData();
@@ -111,7 +113,7 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             }
         },
 
-        deleteModel: function() {
+        deleteModel: function () {
             this.showDeletingMask();
             try {
                 this.model.destroy({
@@ -123,15 +125,15 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             }
         },
 
-        showSavingMask: function() {
+        showSavingMask: function () {
             this._showMask(__('Saving...'));
         },
 
-        showDeletingMask: function() {
+        showDeletingMask: function () {
             this._showMask(__('Deleting...'));
         },
 
-        _showMask: function(message) {
+        _showMask: function (message) {
             if (this.loadingMask) {
                 this.loadingMask.$el
                     .find(this.selectors.loadingMaskContent)
@@ -140,13 +142,13 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             }
         },
 
-        _hideMask: function() {
+        _hideMask: function () {
             if (this.loadingMask) {
                 this.loadingMask.hide();
             }
         },
 
-        _handleResponseError: function(model, response) {
+        _handleResponseError: function (model, response) {
             this.showError(response.responseJSON);
         },
 
@@ -157,9 +159,9 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
             }
         },
 
-        fillForm: function(form, modelData) {
+        fillForm: function (form, modelData) {
             form = $(form);
-            _.each(modelData, function(value, key) {
+            _.each(modelData, function (value, key) {
                 var input = form.find('[name$="[' + key + ']"]');
                 if (input.length) {
                     if (input.is(':checkbox')) {
@@ -174,17 +176,16 @@ function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfi
         },
 
         getEventFormData: function () {
-            var fieldNameRegex = /\[(\w+)\]$/;
-            var data = {};
-            var formData = this.eventDialog.form.serializeArray();
+            var fieldNameRegex = /\[(\w+)\]$/,
+                data = {},
+                formData = this.eventDialog.form.serializeArray();
             formData = formData.concat(this.eventDialog.form.find('input[type=checkbox]:not(:checked)')
-                .map(function() {
+                .map(function () {
                     return {"name": this.name, "value": false};
-                }).get()
-            );
+                }).get());
             _.each(formData, function (dataItem) {
                 var fieldNameData = fieldNameRegex.exec(dataItem.name);
-                if (fieldNameData && fieldNameData.length == 2) {
+                if (fieldNameData && fieldNameData.length === 2) {
                     data[fieldNameData[1]] = dataItem.value;
                 }
             });
