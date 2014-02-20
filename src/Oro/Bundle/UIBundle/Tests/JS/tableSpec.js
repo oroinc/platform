@@ -142,7 +142,7 @@ define(function (require) {
             expect($el.find('div')).toContainText('...alert(\'a\')...');
         });
 
-        it('translates action click event to model event with params: model, data-attributes', function () {
+        it('translates action click event into model event with params: model, data-attributes', function () {
             var collection = new Backbone.Collection([
                 { name: 'a' }
             ]);
@@ -161,7 +161,7 @@ define(function (require) {
             expect(collection.onActionFoo).toHaveBeenCalledWith(collection.at(0), $el.find('div').data());
         });
 
-        it('does not translate action click event to model event if corresponding handler provided', function () {
+        it('does not translate action click event into model event if corresponding handler provided', function () {
             var collection = new Backbone.Collection([
                 { name: 'a' }
             ]);
