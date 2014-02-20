@@ -146,21 +146,34 @@ abstract class AbstractConfigModel
      * @param       $scope
      * @param array $values
      * @param array $serializableValues
+     * @throws \RuntimeException
      */
     public function fromArray($scope, array $values, array $serializableValues = array())
     {
         foreach ($values as $code => $value) {
             $serializable = isset($serializableValues[$code]) && (bool)$serializableValues[$code];
 
-            if (!$serializable && is_bool($value)) {
-                $value = (int)$value;
+            if (!$serializable) {
+                if (is_bool($value)) {
+                    $value = (int)$value;
+                }
+                if (!is_string($value)) {
+                    if (null !== $value && !is_scalar($value)) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'The value of "%s" (scope: %s) must be a scalar type. Actual type is "%s".',
+                                $code,
+                                $scope,
+                                is_object($value) ? get_class($value) : gettype($value)
+                            )
+                        );
+                    }
+                    $value = (string)$value;
+                }
             }
 
-            if (!$serializable && !is_string($value)) {
-                $value = (string)$value;
-            }
-
-            if ($configValue = $this->getValue($code, $scope)) {
+            $configValue = $this->getValue($code, $scope);
+            if ($configValue) {
                 $configValue->setValue($value);
             } else {
                 $configValue = new ConfigModelValue($code, $scope, $value, $serializable);
