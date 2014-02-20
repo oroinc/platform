@@ -102,6 +102,7 @@ config:
         'oro/jquery-ui-datepicker-l10n': 'bundles/oroui/js/jquery-ui-datepicker-l10n.js'
         'oro/jquery-ui-timepicker-l10n': 'bundles/oroui/js/jquery-ui-timepicker-l10n.js'
         'oro/layout': 'bundles/oroui/js/layout.js'
+        'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oro/mediator': 'bundles/oroui/js/mediator.js'
         'oro/messenger': 'bundles/oroui/js/messenger.js'
         'oro/modal': 'bundles/oroui/js/modal.js'

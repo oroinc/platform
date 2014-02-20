@@ -6,16 +6,14 @@ define(function (require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('oro/translator');
     var tools = require('oro/tools');
     var mediator = require('oro/mediator');
-    var LoadingMask = require('oro/loading-mask');
-    var PageableCollection = require('oro/pageable-collection');
-    var Grid = require('oro/datagrid/grid');
-    var GridRouter = require('oro/datagrid/router');
-    var GridViewsView = require('oro/datagrid/grid-views/view');
-    var mapActionModuleName = require('orodatagrid/js/map-action-module-name');
-    var mapCellModuleName = require('orodatagrid/js/map-cell-module-name');
+    var PageableCollection = require('./pageable-collection');
+    var Grid = require('./datagrid/grid');
+    var GridRouter = require('./router');
+    var GridViewsView = require('./datagrid/grid-views/view');
+    var mapActionModuleName = require('./map-action-module-name');
+    var mapCellModuleName = require('./map-cell-module-name');
 
     var gridSelector = '[data-type="datagrid"]:not([data-rendered])',
         gridGridViewsSelector = '.page-title > .navbar-extra .span9:last',
@@ -207,8 +205,8 @@ define(function (require) {
     /**
      * Process datagirid's metadata and creates datagrid
      *
-     * @export oro/datagrid-builder
-     * @name   oro.datagridBuilder
+     * @export orodatagrid/js/datagrid-builder
+     * @name   orodatagrid.datagridBuilder
      */
     return function (builders) {
         $(gridSelector).each(function (i, el) {

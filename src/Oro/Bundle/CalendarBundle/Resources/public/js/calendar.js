@@ -1,6 +1,6 @@
 /* jshint devel:true*/
 /*global define, console*/
-define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oro/loading-mask',
+define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oroui/js/loading-mask',
     'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
     'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
     'oro/formatter/datetime', 'jquery.fullcalendar'
