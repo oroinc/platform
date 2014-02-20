@@ -36,6 +36,14 @@ interface ConfigInterface extends \Serializable
     public function set($code, $value);
 
     /**
+     * Removes the given configuration parameter.
+     *
+     * @param string $code
+     * @return $this
+     */
+    public function remove($code);
+
+    /**
      * Checks whether a configuration parameter with the given code exists on not.
      *
      * @param string $code

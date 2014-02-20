@@ -70,7 +70,8 @@ class ConfigType extends AbstractType
 
         foreach ($this->configManager->getProviders() as $provider) {
             if ($provider->getPropertyConfig()->hasForm($configType, $fieldType)) {
-                $config = $provider->getConfig($className, $fieldName);
+                $config = $this->configManager->getConfig($provider->getId($className, $fieldName, $fieldType));
+
                 $builder->add(
                     $provider->getScope(),
                     new ConfigScopeType(

@@ -69,6 +69,16 @@ class Config implements ConfigInterface
     /**
      * {@inheritdoc}
      */
+    public function remove($code)
+    {
+        unset($this->values[$code]);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function has($code)
     {
         return isset($this->values[$code]);
