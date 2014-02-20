@@ -1,11 +1,11 @@
-/* global define */
-define(['backbone', 'routing', 'oro/region/model'],
-function(Backbone, routing, RegionModel) {
+/*global define*/
+define(['backbone', 'routing', 'oroaddress/js/region/model'
+    ], function (Backbone, routing, RegionModel) {
     'use strict';
 
     /**
-     * @export  oro/region/collection
-     * @class   oro.region.Collection
+     * @export  oroaddress/js/region/collection
+     * @class   oroaddress.region.Collection
      * @extends Backbone.Collection
      */
     return Backbone.Collection.extend({
