@@ -86,6 +86,29 @@
 {% endmacro %}
 
 {#
+    Create the link
+    Parameters - array:
+        [
+            'path' - button url
+            'class' - default class
+            'aClass' - additional button class
+            'title' - button title
+            'iClass' - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro link(parameters) %}
+    <a href="{{ parameters.path }}"
+       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aClass is defined? parameters.aClass : '' }}"
+       title="{{ parameters.title|trans }}">
+        {% if parameters.iClass is defined %}
+            <i class="{{ parameters.iClass }} hide-text" >{{ parameters.label|trans }}</i>
+        {% endif %}
+        {{ parameters.label|trans }}
+    </a>
+{% endmacro %}
+
+{#
     Create the button
     Parameters - array:
         [
@@ -98,15 +121,52 @@
 #}
 {% macro button(parameters) %}
     <div class="pull-left btn-group icons-holder">
-        <a href="{{ parameters.path }}"
-           class="btn back icons-holder-text {{ parameters.aClass is defined? parameters.aClass : '' }}"
-           title="{{ parameters.title|trans }}">
-            {% if parameters.iClass is defined %}
-                <i class="{{ parameters.iClass }} hide-text" >{{ parameters.label|trans }}</i>
-            {% endif %}
-            {{ parameters.label|trans }}
-        </a>
+        {{ _self.link(parameters|merge({'class': 'btn back icons-holder-text'})) }}
     </div>
+{% endmacro %}
+
+{#
+    Create dropdown
+    Parameters - array:
+        [
+            'label' - button label
+            'elements' - dropdown elements
+            'html' - html from placeholder
+
+        ]
+#}
+{% macro dropdown(parameters) %}
+    <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            {{ parameters.label|trans }}
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+            {% if parameters.elements is defined and parameters.elements is not empty %}
+                {% for item in parameters.elements %}
+                    {{ _self.dropdownItem(parameters) }}
+                {% endfor %}
+            {% endif %}
+            {% if parameters.html is defined and parameters.html is not empty %}
+                {{ parameters.html }}
+            {% endif %}
+        </ul>
+    </div>
+{% endmacro %}
+
+{#
+    Create the dropdown button item
+    Parameters - array:
+        [
+            'path' - button url
+            'aClass' - additional button class
+            'title' - button title
+            'iClass' - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro dropdownItem(parameters) %}
+    <li>{{ _self.link(parameters) }}</li>
 {% endmacro %}
 
 {#
