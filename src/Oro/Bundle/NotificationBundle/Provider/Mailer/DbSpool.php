@@ -5,6 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
+use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
 class DbSpool extends \Swift_ConfigurableSpool
 {
@@ -19,13 +20,24 @@ class DbSpool extends \Swift_ConfigurableSpool
     protected $em;
 
     /**
+     * @var EntityPool
+     */
+    protected $entityPool;
+
+    /**
      * @var string
      */
     protected $entityClass;
 
-    public function __construct(EntityManager $em, $entityClass)
+    /**
+     * @param EntityManager $em
+     * @param EntityPool $entityPool
+     * @param string $entityClass
+     */
+    public function __construct(EntityManager $em, EntityPool $entityPool, $entityClass)
     {
         $this->em = $em;
+        $this->entityPool = $entityPool;
         $this->entityClass = $entityClass;
     }
 
@@ -54,11 +66,7 @@ class DbSpool extends \Swift_ConfigurableSpool
     }
 
     /**
-     * Queues a message.
-     *
-     * @param \Swift_Mime_Message $message The message to store
-     * @return boolean Whether the operation has succeeded
-     * @throws \Swift_IoException if the persist fails
+     * {@inheritdoc}
      */
     public function queueMessage(\Swift_Mime_Message $message)
     {
@@ -67,29 +75,13 @@ class DbSpool extends \Swift_ConfigurableSpool
         $mailObject->setMessage($message);
         $mailObject->setStatus(self::STATUS_READY);
 
-        try {
-            $this->em->getUnitOfWork()->computeChangeSet(
-                $this->em->getClassMetadata($this->entityClass),
-                $mailObject
-            );
-            $this->em
-                ->getUnitOfWork()
-                ->getEntityPersister($this->entityClass)
-                ->addInsert($mailObject);
-        } catch (\Exception $e) {
-            throw new \Swift_IoException("Unable to persist object for enqueuing message");
-        }
+        $this->entityPool->addPersistEntity($mailObject);
 
         return true;
     }
 
     /**
-     * Sends messages using the given transport instance.
-     *
-     * @param \Swift_Transport $transport         A transport instance
-     * @param string[]        &$failedRecipients  An array of failures by-reference
-     *
-     * @return int The number of sent emails
+     * {@inheritdoc}
      */
     public function flushQueue(\Swift_Transport $transport, &$failedRecipients = null)
     {
