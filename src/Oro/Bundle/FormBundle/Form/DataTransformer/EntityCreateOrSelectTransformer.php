@@ -73,7 +73,7 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if ($value !== null && !is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array or null');
+            throw new UnexpectedTypeException($value, 'array');
         }
 
         if ($value === null) {

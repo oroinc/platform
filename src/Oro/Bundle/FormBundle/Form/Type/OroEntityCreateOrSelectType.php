@@ -11,11 +11,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OroEntityCreateOrSelectType extends AbstractType
 {
@@ -30,6 +30,9 @@ class OroEntityCreateOrSelectType extends AbstractType
      */
     protected $doctrineHelper;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
