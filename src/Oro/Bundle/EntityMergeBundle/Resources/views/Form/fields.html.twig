@@ -7,7 +7,7 @@
                 {{form_label(form.masterEntity)}}
             </td>
             {% for child in form.masterEntity %}
-                <td>
+                <td class="entity-merge-column">
                     <div class="entity-merge-fields-blocks-wrapper">
                         <label class="entity-merge-uppercase entity-merge-inline">
                             {{ form_widget(child, {'attr': form.vars.attr|merge({'class': 'entity-merge-field-choice'})}) }}

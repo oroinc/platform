@@ -51,17 +51,31 @@ define(['jquery'],
 
         /**
          * @desc reset entity values class states
-         * @desc All selected classes will be darker then not selected
+         * @desc All selected classes will have larger weight then not selected
          */
         resetViewState: function () {
             $('input[type="radio"]:checked').click();
         },
+        /**
+         * @desc calculate columns width
+         */
+        fixTableWidth: function(){
+            var columns = $('.entity-merge-column');
+            var master = $('.merge-first-column');
+            var firstColumnWidth = parseInt(master.css('width'));
+            var tableWidth = parseInt($('.entity-merge-table').css('width'));
+            var columnWidth = ((tableWidth - firstColumnWidth)/columns.length);
+            columns.css('width', columnWidth);
+        },
+
         /**
          * @constructs
          */
         init: function () {
             $('.entity-merge-select-all').click(this.entitySelectAllHandler);
             $('.entity-merge-field-choice').click(this.entityValueSelectHandler);
+            $(document).ready(this.fixTableWidth);
+            $(window).resize(this.fixTableWidth);
             this.resetViewState();
         }
     };
