@@ -5,6 +5,9 @@ parameters:
     oro_notification.event_entity.class: Oro\Bundle\NotificationBundle\Entity\Event
     oro_notification.emailnotification.entity.class: Oro\Bundle\NotificationBundle\Entity\EmailNotification
 
+    # Entity spool
+    oro_notification.entity_spool.class: Oro\Bundle\NotificationBundle\Doctrine\EntityPool
+
     # Notification processors
     oro_notification.email_processor.class: Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor
 
@@ -38,6 +41,10 @@ parameters:
     oro_notification.email_notification_entity_provider.class: Oro\Bundle\NotificationBundle\Provider\EmailNotificationEntityProvider
 
 services:
+    # Entity spool
+    oro_notification.entity_spool:
+        class: %oro_notification.entity_spool.class%
+
     # Email notification form services
     oro_notification.form.email_notification:
         class: Symfony\Component\Form\Form
@@ -107,12 +114,14 @@ services:
     # Event listeners
     oro_notification.docrine.event.listener:
         class: %oro_notification.doctrine_listener.class%
-        calls:
-            - [ setEventDispatcher, [ @event_dispatcher ] ]
+        arguments:
+            - @oro_notification.entity_spool
+            - @event_dispatcher
         tags:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: postUpdate }
             - { name: doctrine.event_listener, event: postRemove }
+            - { name: doctrine.event_listener, event: postFlush }
 
     # notification services
     oro_notification.manager:
@@ -124,12 +133,13 @@ services:
     oro_notification.email_processor:
         class: %oro_notification.email_processor.class%
         arguments:
+            - @logger
+            - @doctrine.orm.entity_manager
+            - @oro_notification.entity_spool
             - @oro_email.email_renderer
             - @swiftmailer.mailer.db_spool_mailer
-            - @doctrine.orm.entity_manager
-            - %oro_notification.send_from%
-            - @logger
             - @oro_locale.settings
+            - %oro_notification.send_from%
         calls:
             - [ setEnv, ['prod'] ]
             - [ setMessageLimit, [100] ]
@@ -148,6 +158,7 @@ services:
         class: %oro_notification.mailer.transport.spool_db.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_notification.entity_spool
             - %oro_notification.mailer.transport.spool_entity.class%
 
     oro_notification.mailer.transport.eventdispatcher:
