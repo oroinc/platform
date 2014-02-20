@@ -79,6 +79,20 @@ class EmbeddedFormManager
 
     /**
      * @param string $type
+     *
+     * @return string|null
+     */
+    public function get($type)
+    {
+        if (isset($this->formTypes[$type])) {
+            return $this->formTypes[$type];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $type
      * @return string
      */
     public function getDefaultCssByType($type)
