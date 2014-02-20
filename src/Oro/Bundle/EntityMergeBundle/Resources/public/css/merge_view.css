@@ -85,3 +85,7 @@ thead .merge-first-column label{
     margin-bottom: 0;
     text-transform: uppercase;
 }
+thead .merge-first-column label .popover-content{
+    font-weight: normal;
+    text-transform: none;
+}

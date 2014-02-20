@@ -58,7 +58,6 @@ class MergeFieldType extends AbstractType
                     'multiple' => false,
                     'expanded' => false,
                     'label'    => 'oro.entity_merge.form.strategy',
-                    'attr'     => array('class' => 'entity-merge-small-select'),
                     'tooltip'  => 'oro.entity_merge.form.strategy_tooltip'
                 )
             );
