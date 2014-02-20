@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\EventListener\MergeRenderListener;
+namespace Oro\Bundle\EntityMergeBundle\EventListener\Render;
 
 use Oro\Bundle\EntityMergeBundle\Event\ValueRenderEvent;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;

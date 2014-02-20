@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener;
+namespace Oro\Bundle\EntityMergeBundle\EventListener\MergeField;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;

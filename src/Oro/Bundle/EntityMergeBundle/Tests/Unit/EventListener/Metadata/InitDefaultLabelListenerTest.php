@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
-use Oro\Bundle\EntityMergeBundle\EventListener\InitDefaultLabelListener;
+use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\InitDefaultLabelListener;
 
 class InitDefaultLabelListenerTest extends \PHPUnit_Framework_TestCase
 {

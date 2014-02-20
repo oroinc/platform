@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\MergeRenderListener;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Render;
 
-use Oro\Bundle\EntityMergeBundle\EventListener\MergeRenderListener\LocalizedValueRenderListener;
+use Oro\Bundle\EntityMergeBundle\EventListener\Render\LocalizedValueRenderListener;
 
 class LocalizedValueRenderListenerTest extends \PHPUnit_Framework_TestCase
 {

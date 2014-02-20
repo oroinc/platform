@@ -28,10 +28,10 @@ parameters:
     oro_entity_merge.strategy.unite.class: Oro\Bundle\EntityMergeBundle\Model\Strategy\UniteStrategy
 
     # Listeners
-    oro_entity_merge.listener.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\InitMergeModesListener
-    oro_entity_merge.listener.init_default_label.class: Oro\Bundle\EntityMergeBundle\EventListener\InitDefaultLabelListener
-    oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener\CascadeRemoveAssociationListener
-    oro_entity_merge.listener.merge_render.localized_value_render.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeRenderListener\LocalizedValueRenderListener
+    oro_entity_merge.listener.metadata.init_merge_modes.class: Oro\Bundle\EntityMergeBundle\EventListener\Metadata\InitMergeModesListener
+    oro_entity_merge.listener.metadata.init_default_label.class: Oro\Bundle\EntityMergeBundle\EventListener\Metadata\InitDefaultLabelListener
+    oro_entity_merge.listener.merge_field.cascade_remove_association.class: Oro\Bundle\EntityMergeBundle\EventListener\MergeField\CascadeRemoveAssociationListener
+    oro_entity_merge.listener.render.localized_value_render.class: Oro\Bundle\EntityMergeBundle\EventListener\Render\LocalizedValueRenderListener
 
     # Validator
     oro_entity_merge.validator.doctrine_helper.class: Oro\Bundle\EntityMergeBundle\Validator\Constraints\DoctrineHelperValidator
@@ -138,13 +138,13 @@ services:
             - { name: oro_entity_merge.strategy }
 
     # Listeners
-    oro_entity_merge.listener.init_merge_modes:
-        class: %oro_entity_merge.listener.init_merge_modes.class%
+    oro_entity_merge.listener.metadata.init_merge_modes:
+        class: %oro_entity_merge.listener.metadata.init_merge_modes.class%
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata, priority: -1000 }
 
-    oro_entity_merge.listener.init_default_label:
-        class: %oro_entity_merge.listener.init_default_label.class%
+    oro_entity_merge.listener.metadata.init_default_label:
+        class: %oro_entity_merge.listener.metadata.init_default_label.class%
         arguments:
           - @oro_entity_config.provider.entity
         tags:
@@ -158,8 +158,8 @@ services:
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_field, method: afterMergeField }
 
-    oro_entity_merge.listener.merge_render.localized_value_render:
-        class: %oro_entity_merge.listener.merge_render.localized_value_render.class%
+    oro_entity_merge.listener.render.localized_value_render:
+        class: %oro_entity_merge.listener.render.localized_value_render.class%
         arguments:
           - @oro_locale.formatter.address
           - @oro_locale.formatter.date_time

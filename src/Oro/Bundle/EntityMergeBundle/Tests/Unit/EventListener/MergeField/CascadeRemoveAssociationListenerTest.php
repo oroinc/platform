@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\EventListener\MergeFieldListener;
+namespace Oro\Bundle\EntityMergeBundle\Tests\EventListener\MergeField;
 
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
-use Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener\CascadeRemoveAssociationListener;
+use Oro\Bundle\EntityMergeBundle\EventListener\MergeField\CascadeRemoveAssociationListener;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
