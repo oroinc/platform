@@ -78,7 +78,7 @@ class ConfigScopeType extends AbstractType
                  */
                 if (isset($config['options']['create_only']) && $this->configModel->getId()) {
                     $options['disabled'] = true;
-                    $options['attr']['class'] .= ' disabled-' . $config['form']['type'];
+                    $this->appendClassAttr($options, 'disabled-' . $config['form']['type']);
                 }
 
                 if (isset($config['options']['required_property'])) {
@@ -130,17 +130,15 @@ class ConfigScopeType extends AbstractType
 
                     if ($requireConfig->get($property['code']) != $property['value']) {
                         if ($propertyOnForm) {
-                            $options['attr']['class'] = isset($options['attr']['class'])
-                                ? $options['attr']['class'] . ' hide'
-                                : 'hide';
+                            $this->appendClassAttr($options, 'hide');
                         } else {
                             continue;
                         }
                     }
 
                     if ($propertyOnForm) {
-                        $options['attr']['data-requireProperty'] = $configId->toString() . $property['code'];
-                        $options['attr']['data-requireValue']    = $property['value'];
+                        $this->setAttr($options, 'data-requireProperty', $configId->toString() . $property['code']);
+                        $this->setAttr($options, 'data-requireValue', $property['value']);
                     }
                 }
 
@@ -148,7 +146,7 @@ class ConfigScopeType extends AbstractType
                     $options['constraints'] = $this->parseValidator($config['constraints']);
                 }
 
-                $options['attr']['data-property_id'] = $this->config->getId()->toString() . $code;
+                $this->setAttr($options, 'data-property_id', $this->config->getId()->toString() . $code);
 
                 $builder->add($code, $config['form']['type'], $options);
             }
@@ -208,5 +206,22 @@ class ConfigScopeType extends AbstractType
         }
 
         return $values;
+    }
+
+    protected function appendClassAttr(array &$options, $cssClass)
+    {
+        if (isset($options['attr']['class'])) {
+            $options['attr']['class'] .= ' ' . $cssClass;
+        } else {
+            $this->setAttr($options, 'class', $cssClass);
+        }
+    }
+
+    protected function setAttr(array &$options, $name, $value)
+    {
+        if (!isset($options['attr'])) {
+            $options['attr'] = [];
+        }
+        $options['attr'][$name] = $value;
     }
 }

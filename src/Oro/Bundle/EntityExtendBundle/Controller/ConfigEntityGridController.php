@@ -272,7 +272,10 @@ class ConfigEntityGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $entityConfig->set('state', ExtendManager::STATE_UPDATED);
+        $entityConfig->set(
+            'state',
+            class_exists($entity->getClassName()) ? ExtendManager::STATE_UPDATED : ExtendManager::STATE_NEW
+        );
 
         $configManager->persist($entityConfig);
         $configManager->flush();

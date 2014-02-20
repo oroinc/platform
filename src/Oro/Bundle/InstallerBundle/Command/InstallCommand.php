@@ -135,10 +135,16 @@ class InstallCommand extends ContainerAwareCommand
         $input->setInteractive(false);
 
         $commandExecutor
+            ->runCommand('oro:entity-config:clear')
             ->runCommand('oro:entity-extend:clear')
             ->runCommand(
                 'doctrine:schema:drop',
-                array('--force' => true, '--full-database' => true)
+                array(
+                    '--force' => true,
+                    '--full-database' => true,
+                    '--process-isolation' => true,
+                    '--process-timeout' => 360
+                )
             )
             ->runCommand('doctrine:schema:create')
             ->runCommand('oro:entity-config:init')

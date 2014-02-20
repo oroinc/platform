@@ -4,14 +4,8 @@ oro_entity_config:
             items:
                 owner_type:
                     options:
-                        required_property:
-                            config_id:
-                                scope:      extend
-                            code:           owner
-                            value:          System
-                        priority: 100
-                    constraints:
-                        - NotBlank:         ~
+                        create_only:        true
+                        priority:           100
                     grid:
                         type:               select
                         label:              'Ownership Type'
