@@ -8,10 +8,12 @@ oro:
 
         merge_modes:
             replace: Replace
-            unite: Unite
+            unite: Append
 
         form:
             master_record: Master Record
             strategy: Strategy
-            select_all: Select all
+            select_all: Select All Values
             merge_values: Merge Values
+            strategy_tooltip: Choose merge strategy
+            master_record_tooltip: Choose master record

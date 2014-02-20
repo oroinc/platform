@@ -1,18 +1,14 @@
 .table.entity-merge-table input[type="radio"]{
     margin-top: 0;
 }
-.entity-merge-table tr td.entity-merge-select-all-holder{
-    border-top:none;
-    padding-top: 0;
-}
 .table.entity-merge-table .merge-first-column{
-    vertical-align: top;
     padding-left: 20px;
 }
 .table.entity-merge-table thead td{
-    padding-bottom: 0;
+    padding: 9px 8px 9px 12px;
+    vertical-align: middle;
 }
-.table.entity-merge-table td{
+.table.entity-merge-table tbody td{
     vertical-align: top;
     padding: 6px 8px 6px 12px;
     cursor: pointer;
@@ -21,20 +17,20 @@
     margin-bottom: 0;
 }
 .table.entity-merge-table tbody .merge-first-column{
-    background-color: #F6F6F6;
-    width: 265px;
+    background-color: #FCFCFC;
+    width: 245px;
 }
 .table thead td{
-    background-color: #F1F1F1;
+    background-color: #F0F0F0;
 }
 .entity-merge-uppercase{
     text-transform: uppercase;
 }
-.entity-merge-table thead .entity-merge-inline-label{
-    line-height: 16px;
+.entity-merge-table thead label.entity-merge-inline{
+    line-height: normal;
 }
 .entity-merge-table thead .entity-merge-inline input[type="radio"]{
-    margin-right: 5px;
+    margin: -2px 5px 0 0;
 }
 .entity-merge-inline-label{
     float: left;
@@ -48,7 +44,7 @@
     margin: 0;
 }
 .entity-merge-strategy-label{
-    padding: 3px 10px 0 0;
+    padding: 3px 15px 0 0;
 }
 .entity-merge-strategy-wrapper{
     padding-top:10px;
@@ -62,10 +58,30 @@
 }
 tbody .entity-merge-fields-blocks-wrapper .entity-merge-inline-label{
     width: calc(100% - 20px);
+    font-weight: bold;
 }
-.entity-merge-not-selected{
-    color: #CECECE;
+tbody .entity-merge-fields-blocks-wrapper .entity-merge-inline-label.entity-merge-not-selected{
+    font-weight: normal;
 }
 .entity-merge-small-select{
-    width: 150px;
+    width: 100px;
+}
+tbody tr:hover{
+    background-color: #F5F8FF;
+}
+.entity-merge-strategy-label em, .merge-first-column label em{
+    display: none;
+}
+.entity-merge-table .icon-info-sign{
+    margin: 0 5px 0 0;
+}
+.entity-merge-select-all{
+    font-size: 11px;
+    padding-left: 21px;
+    line-height: normal;
+}
+thead .merge-first-column label{
+    font-weight: bold;
+    margin-bottom: 0;
+    text-transform: uppercase;
 }
