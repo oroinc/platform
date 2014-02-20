@@ -17,3 +17,4 @@ oro:
             merge_values: Merge Values
             strategy_tooltip: Choose merge strategy
             master_record_tooltip: Choose master record
+            merge_button: Merge
