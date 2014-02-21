@@ -230,6 +230,7 @@
 {% macro renderJs() %}
     {{ JS.popupWidget({
         'class': 'view-email-button',
-        'multiple': true
+        'multiple': true,
+        'title': 'Send'|trans ~ ' ' ~ 'oro.email.entity_label'|trans|lower
     }) }}
 {% endmacro %}
