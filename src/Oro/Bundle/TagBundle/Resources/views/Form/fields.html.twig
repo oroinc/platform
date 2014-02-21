@@ -26,7 +26,7 @@
                         {% set tagOverlayId = 'tag-overlay-' ~ random() %}
                         <div class="tags-overlay" id="{{ tagOverlayId }}"></div>
                         <script type="text/javascript">
-                            require(['jquery', 'oro/tag/update-view'],
+                            require(['jquery', 'orotag/js/update-view'],
                                     function($, TagUpdateView) {
                                         $(function() {
                                             new TagUpdateView({

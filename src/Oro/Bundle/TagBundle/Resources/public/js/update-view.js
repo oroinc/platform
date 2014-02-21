@@ -1,12 +1,12 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/tag/view', 'json'],
-function($, _, TagView) {
+/*global define*/
+define(['jquery', 'underscore', './view', 'json'
+    ], function ($, _, TagView) {
     'use strict';
 
     /**
-     * @export  oro/tag/update-view
-     * @class   oro.tag.UpdateView
-     * @extends oro.tag.View
+     * @export  orotag/js/update-view
+     * @class   orotag.UpdateView
+     * @extends orotag.View
      */
     return TagView.extend({
         /** @property */
@@ -38,7 +38,7 @@ function($, _, TagView) {
          * @param {string} options.ownFieldId DomElement ID of hidden field with own tags
          * @throws {TypeError} If mandatory options are undefined
          */
-        initialize: function(options) {
+        initialize: function (options) {
             options = options || {};
 
             if (!options.autocompleteFieldId) {
@@ -60,7 +60,7 @@ function($, _, TagView) {
 
             this._prepareCollections();
 
-            var onCollectionChange = _.bind(function() {
+            var onCollectionChange = _.bind(function () {
                 this.render();
                 this._updateHiddenInputs();
             }, this);
@@ -75,7 +75,7 @@ function($, _, TagView) {
          *
          * @returns {}
          */
-        render: function() {
+        render: function () {
             TagView.prototype.render.apply(this, arguments);
             var _this = this;
 
@@ -117,7 +117,7 @@ function($, _, TagView) {
          * @returns {*}
          * @private
          */
-        _removeItem: function(e) {
+        _removeItem: function (e) {
             e.preventDefault();
             e.stopImmediatePropagation();
 
@@ -135,7 +135,7 @@ function($, _, TagView) {
          * @returns {*}
          * @private
          */
-        _renderOverlay: function() {
+        _renderOverlay: function () {
             this.$tagOverlayId.append(this.tagsOverlayTemplate());
             return this;
         },
@@ -146,7 +146,7 @@ function($, _, TagView) {
          * @returns {*}
          * @private
          */
-        _prepareCollections: function() {
+        _prepareCollections: function () {
             var allTags = $.parseJSON($(this.options.fieldId).val());
             if (!_.isArray(allTags)) {
                 allTags = [];
@@ -161,7 +161,7 @@ function($, _, TagView) {
          *
          * @private
          */
-        _updateHiddenInputs: function() {
+        _updateHiddenInputs: function () {
             $(this.options.fieldId).val(JSON.stringify(this.getCollection()));
             $(this.options.ownFieldId).val(JSON.stringify(this.getCollection().getFilteredCollection('owner')));
         }
