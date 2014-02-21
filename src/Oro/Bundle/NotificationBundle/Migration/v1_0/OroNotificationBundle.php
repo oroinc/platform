@@ -9,24 +9,88 @@ class OroNotificationBundle implements Migration
 {
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        return [
-            "CREATE TABLE oro_notification_email_spool (id INT AUTO_INCREMENT NOT NULL, status INT NOT NULL, message LONGTEXT NOT NULL, INDEX notification_spool_status_idx (status), PRIMARY KEY(id))",
-            "CREATE TABLE oro_notification_emailnotification (id INT AUTO_INCREMENT NOT NULL, recipient_list_id INT DEFAULT NULL, template_id INT DEFAULT NULL, event_id INT DEFAULT NULL, entity_name VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_F3D05A52B9E3E89 (recipient_list_id), INDEX IDX_F3D05A571F7E88B (event_id), INDEX IDX_F3D05A55DA0FB8 (template_id), PRIMARY KEY(id))",
-            "CREATE TABLE oro_notification_event (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, UNIQUE INDEX UNIQ_2E2482DF5E237E06 (name), PRIMARY KEY(id))",
-            "CREATE TABLE oro_notification_recipient_group (recipient_list_id INT NOT NULL, group_id SMALLINT NOT NULL, INDEX IDX_F6E3D23E2B9E3E89 (recipient_list_id), INDEX IDX_F6E3D23EFE54D947 (group_id), PRIMARY KEY(recipient_list_id, group_id))",
-            "CREATE TABLE oro_notification_recipient_list (id INT AUTO_INCREMENT NOT NULL, email VARCHAR(255) DEFAULT NULL, owner TINYINT(1) DEFAULT NULL, PRIMARY KEY(id))",
-            "CREATE TABLE oro_notification_recipient_user (recipient_list_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_CAC79D892B9E3E89 (recipient_list_id), INDEX IDX_CAC79D89A76ED395 (user_id), PRIMARY KEY(recipient_list_id, user_id))",
+        // @codingStandardsIgnoreStart
 
-            "ALTER TABLE oro_notification_emailnotification ADD CONSTRAINT FK_F3D05A52B9E3E89 FOREIGN KEY (recipient_list_id) REFERENCES oro_notification_recipient_list (id)",
-            "ALTER TABLE oro_notification_emailnotification ADD CONSTRAINT FK_F3D05A55DA0FB8 FOREIGN KEY (template_id) REFERENCES oro_email_template (id) ON DELETE SET NULL",
-            "ALTER TABLE oro_notification_emailnotification ADD CONSTRAINT FK_F3D05A571F7E88B FOREIGN KEY (event_id) REFERENCES oro_notification_event (id)",
-            "ALTER TABLE oro_notification_recipient_group ADD CONSTRAINT FK_F6E3D23EFE54D947 FOREIGN KEY (group_id) REFERENCES oro_access_group (id) ON DELETE CASCADE",
-            "ALTER TABLE oro_notification_recipient_group ADD CONSTRAINT FK_F6E3D23E2B9E3E89 FOREIGN KEY (recipient_list_id) REFERENCES oro_notification_recipient_list (id) ON DELETE CASCADE",
-            "ALTER TABLE oro_notification_recipient_user ADD CONSTRAINT FK_CAC79D89A76ED395 FOREIGN KEY (user_id) REFERENCES oro_user (id) ON DELETE CASCADE",
-            "ALTER TABLE oro_notification_recipient_user ADD CONSTRAINT FK_CAC79D892B9E3E89 FOREIGN KEY (recipient_list_id) REFERENCES oro_notification_recipient_list (id) ON DELETE CASCADE"
-        ];
+        /** Generate table oro_notification_email_spool **/
+        $table = $schema->createTable('oro_notification_email_spool');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('status', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('message', 'object', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['status'], 'notification_spool_status_idx', []);
+        /** End of generate table oro_notification_email_spool **/
+
+        /** Generate table oro_notification_emailnotification **/
+        $table = $schema->createTable('oro_notification_emailnotification');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('recipient_list_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('template_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('event_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('entity_name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['recipient_list_id'], 'UNIQ_F3D05A52B9E3E89');
+        $table->addIndex(['event_id'], 'IDX_F3D05A571F7E88B', []);
+        $table->addIndex(['template_id'], 'IDX_F3D05A55DA0FB8', []);
+        /** End of generate table oro_notification_emailnotification **/
+
+        /** Generate table oro_notification_event **/
+        $table = $schema->createTable('oro_notification_event');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('description', 'text', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['name'], 'UNIQ_2E2482DF5E237E06');
+        /** End of generate table oro_notification_event **/
+
+        /** Generate table oro_notification_recipient_group **/
+        $table = $schema->createTable('oro_notification_recipient_group');
+        $table->addColumn('recipient_list_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('group_id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['recipient_list_id', 'group_id']);
+        $table->addIndex(['recipient_list_id'], 'IDX_F6E3D23E2B9E3E89', []);
+        $table->addIndex(['group_id'], 'IDX_F6E3D23EFE54D947', []);
+        /** End of generate table oro_notification_recipient_group **/
+
+        /** Generate table oro_notification_recipient_list **/
+        $table = $schema->createTable('oro_notification_recipient_list');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('email', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('owner', 'boolean', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        /** End of generate table oro_notification_recipient_list **/
+
+        /** Generate table oro_notification_recipient_user **/
+        $table = $schema->createTable('oro_notification_recipient_user');
+        $table->addColumn('recipient_list_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['recipient_list_id', 'user_id']);
+        $table->addIndex(['recipient_list_id'], 'IDX_CAC79D892B9E3E89', []);
+        $table->addIndex(['user_id'], 'IDX_CAC79D89A76ED395', []);
+        /** End of generate table oro_notification_recipient_user **/
+
+        /** Generate foreign keys for table oro_notification_emailnotification **/
+        $table = $schema->getTable('oro_notification_emailnotification');
+        $table->addForeignKeyConstraint($schema->getTable('oro_notification_recipient_list'), ['recipient_list_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        $table->addForeignKeyConstraint($schema->getTable('oro_email_template'), ['template_id'], ['id'], ['onDelete' => 'SET NULL', 'onUpdate' => null]);
+        $table->addForeignKeyConstraint($schema->getTable('oro_notification_event'), ['event_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_notification_emailnotification **/
+
+        /** Generate foreign keys for table oro_notification_recipient_group **/
+        $table = $schema->getTable('oro_notification_recipient_group');
+        $table->addForeignKeyConstraint($schema->getTable('oro_access_group'), ['group_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
+        $table->addForeignKeyConstraint($schema->getTable('oro_notification_recipient_list'), ['recipient_list_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_notification_recipient_group **/
+
+        /** Generate foreign keys for table oro_notification_recipient_user **/
+        $table = $schema->getTable('oro_notification_recipient_user');
+        $table->addForeignKeyConstraint($schema->getTable('oro_user'), ['user_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
+        $table->addForeignKeyConstraint($schema->getTable('oro_notification_recipient_list'), ['recipient_list_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_notification_recipient_user **/
+
+        // @codingStandardsIgnoreEnd
     }
 }
