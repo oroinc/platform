@@ -13,11 +13,11 @@ define(function (require) {
     var messenger = require('oro/messenger');
     var Modal = require('oro/modal');
     var LoadingMask = require('oroui/js/loading-mask');
-    var PagestateView = require('oro/navigation/pagestate/view');
-    var PagestateModel = require('oro/navigation/pagestate/model');
+    var PagestateView = require('./pagestate/view');
+    var PagestateModel = require('./pagestate/model');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var widgetManager = require('oro/widget-manager');
-    var contentManager = require('oro/content-manager');
+    var contentManager = require('./content-manager');
     var _jqueryForm = require('jquery.form');
 
     var Navigation;
@@ -50,8 +50,8 @@ define(function (require) {
     /**
      * Router for hash navigation
      *
-     * @export  oro/navigation
-     * @class   oro.Navigation
+     * @export  oronavigation/js/navigation
+     * @class   oronavigation
      * @extends Backbone.Router
      */
     Navigation = Backbone.Router.extend({
@@ -1113,7 +1113,7 @@ define(function (require) {
     /**
      * Fetches navigation (Oro router) instance
      *
-     * @returns {oro.Navigation}
+     * @returns {oronavigation.Navigation}
      */
     Navigation.getInstance = function() {
         return instance;

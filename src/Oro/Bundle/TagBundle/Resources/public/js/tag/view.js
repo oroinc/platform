@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/navigation', 'oro/translator', 'oro/tag/collection'],
+define(['underscore', 'backbone', 'oronavigation/js/navigation', 'oro/translator', 'oro/tag/collection'],
 function(_, Backbone, Navigation, __, TagCollection) {
     'use strict';
 

@@ -1,12 +1,12 @@
 /* jshint browser:true */
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'backbone', 'oro/app', 'oro/navigation', 'oro/mediator', 'oro/error'],
-function($, _, __, Backbone, app, Navigation, mediator, error) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/translator', 'backbone', 'oro/app', '../navigation', 'oro/mediator', 'oro/error'
+    ], function ($, _, __, Backbone, app, Navigation, mediator, error) {
     'use strict';
 
     /**
-     * @export  oro/navigation/pinbar/item-view
-     * @class   oro.navigation.pinbar.ItemView
+     * @export  oronavigation/js/pinbar/item-view
+     * @class   oronavigation.pinbar.ItemView
      * @extends Backbone.View
      */
     return Backbone.View.extend({

@@ -1,11 +1,11 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/navigation/dotmenu/item-view'],
-function($, _, Backbone, mediator, DotmenuItemView) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'oro/mediator', './item-view'
+    ], function ($, _, Backbone, mediator, DotmenuItemView) {
     'use strict';
 
     /**
-     * @export  oro/navigation/dotmenu/view
-     * @class   oro.navigation.dotmenu.View
+     * @export  oronavigation/js/dotmenu/view
+     * @class   oronavigation.dotmenu.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({

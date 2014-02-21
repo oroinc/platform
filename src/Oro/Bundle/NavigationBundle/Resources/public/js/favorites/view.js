@@ -1,14 +1,14 @@
-/* global define */
+/*global define*/
 define(['underscore', 'backbone', 'oro/app', 'oro/mediator', 'oro/error',
-    'oro/navigation/abstract-view', 'oro/navigation/model', 'oro/navigation/collection'],
-function(_, Backbone, app, mediator, error,
-     AbstractView, NavigationModel, NavigationCollection) {
+        '../abstract-view', '../model', '../collection'
+    ], function (_, Backbone, app, mediator, error,
+        AbstractView, NavigationModel, NavigationCollection) {
     'use strict';
 
     /**
-     * @export  oro/navigation/favorites/view
-     * @class   oro.navigation.favorites.View
-     * @extends oro.navigation.AbstractView
+     * @export  oronavigation/js/favorites/view
+     * @class   oronavigation.favorites.View
+     * @extends oronavigation.AbstractView
      */
     return AbstractView.extend({
         options: {
@@ -25,7 +25,7 @@ function(_, Backbone, app, mediator, error,
         initialize: function() {
             AbstractView.prototype.initialize.apply(this, arguments);
             if (!this.options.collection) {
-                /** @type {oro.navigation.Collection} */
+                /** @type {oronavigation.Collection} */
                 this.options.collection = new NavigationCollection();
             }
 
@@ -78,7 +78,7 @@ function(_, Backbone, app, mediator, error,
                 var itemData = this.getNewItemData(Backbone.$(e.currentTarget));
                 itemData.type = 'favorite';
                 itemData.position = this.getCollection().length;
-                /** @type {oro.navigation.Model} */
+                /** @type {oronavigation.Model} */
                 var currentItem = new NavigationModel(itemData);
                 this.getCollection().unshift(currentItem);
                 currentItem.save();

@@ -1,11 +1,11 @@
-/* global define */
-define(['backbone', 'routing'],
-function(Backbone, routing) {
+/*global define*/
+define(['backbone', 'routing'
+    ], function (Backbone, routing) {
     'use strict';
 
     /**
-     * @export  oro/navigation/pagestate/model
-     * @class   oro.navigation.pagestate.Model
+     * @export  oronavigation/js/pagestate/model
+     * @class   oronavigationpagestate.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
@@ -17,7 +17,7 @@ function(Backbone, routing) {
             }
         },
 
-        url: function(method) {
+        url: function (method) {
             var args = ['oro_api_post_pagestate'];
             if (this.id) {
                 args = ['oro_api_put_pagestate', {id: this.id}];

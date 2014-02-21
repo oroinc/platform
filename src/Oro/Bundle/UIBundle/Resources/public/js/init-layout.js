@@ -13,7 +13,7 @@ require(['oro/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
+require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oronavigation/js/navigation',
     'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
     ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';

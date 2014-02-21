@@ -1,11 +1,11 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'],
-function($, _, Backbone, routing) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'routing', 'bootstrap'
+    ], function ($, _, Backbone, routing) {
     'use strict';
 
     /**
-     * @export  oro/navigation/shortcuts/view
-     * @class   oro.navigation.shortcuts.View
+     * @export  oronavigation/js/shortcuts/view
+     * @class   oronavigation.shortcuts.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({

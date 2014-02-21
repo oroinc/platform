@@ -1,6 +1,6 @@
 /* jshint devel:true */
 /* global define */
-define(['backbone', 'underscore', 'routing', 'oro/translator', 'oro/navigation', 'oro/messenger'],
+define(['backbone', 'underscore', 'routing', 'oro/translator', 'oronavigation/js/navigation', 'oro/messenger'],
 function (Backbone, _, routing, __, Navigation, messenger) {
     var $ = Backbone.$;
 

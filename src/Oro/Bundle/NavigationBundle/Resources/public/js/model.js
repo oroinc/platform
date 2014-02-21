@@ -1,11 +1,11 @@
-/* global define */
-define(['underscore', 'routing', 'backbone'],
-function(_, routing, Backbone) {
+/*global define*/
+define(['underscore', 'routing', 'backbone'
+    ], function (_, routing, Backbone) {
     'use strict';
 
     /**
-     * @export  oro/navigation/model
-     * @class   oro.navigation.Model
+     * @export  oronavigation/js/model
+     * @class   oronavigationModel
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
