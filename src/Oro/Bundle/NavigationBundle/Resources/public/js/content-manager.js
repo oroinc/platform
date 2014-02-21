@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'oro/sync', 'oro/mediator', 'oro/messenger', 'oro/translator'
+define(['underscore', 'orosync/js/sync', 'oro/mediator', 'oro/messenger', 'oro/translator'
     ], function (_, sync, mediator, messenger, __) {
     'use strict';
 
