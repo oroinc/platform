@@ -44,7 +44,7 @@ class DumpDbStructureCommand extends ContainerAwareCommand
 
     }
 
-    protected function dumpPhpSchema($schema, $output)
+    protected function dumpPhpSchema(Schema $schema, $output)
     {
         $visitor = new SchemaDumper();
         $visitor->setTwig($this->getContainer()->get('twig'));
