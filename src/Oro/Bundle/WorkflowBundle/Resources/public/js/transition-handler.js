@@ -1,12 +1,12 @@
-define(['jquery', 'underscore', 'oroui/js/modal', 'oro/workflow-transition-executor'],
+define(['jquery', 'underscore', 'oroui/js/modal', 'oroworkflow/js/transition-executor'],
 function($, _, Modal, performTransition) {
     'use strict';
 
     /**
      * Transition button click handler
      *
-     * @export  oro/workflow-transition-handler
-     * @class   oro.WorkflowTransitionHandler
+     * @export  oroworkflow/js/transition-handler
+     * @class   oroworkflow.WorkflowTransitionHandler
      */
     return function() {
         var element = $(this);
