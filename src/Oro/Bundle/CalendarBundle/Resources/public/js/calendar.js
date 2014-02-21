@@ -3,7 +3,7 @@
 define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oroui/js/loading-mask',
     'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
     'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
-    'oro/formatter/datetime', 'jquery.fullcalendar'
+    'orolocale/js/formatter/datetime', 'jquery.fullcalendar'
     ], function (_, Backbone, __, app, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
          ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
