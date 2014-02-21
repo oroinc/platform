@@ -19,7 +19,7 @@
                 {% endblock %}
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
                 <script type="text/javascript">
-                    require(['oroui/js/init-layout', 'oro/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
+                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
