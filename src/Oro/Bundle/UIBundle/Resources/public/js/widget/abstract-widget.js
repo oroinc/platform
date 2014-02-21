@@ -7,8 +7,8 @@ define(['underscore', 'backbone', 'oroui/js/mediator', '../loading-mask', '../la
     var $ = Backbone.$;
 
     /**
-     * @export  oroui/js/widget/abstract-widget
-     * @class   oroui.widget.AbstractWidget
+     * @export  oro/abstract-widget
+     * @class   oro.AbstractWidget
      * @extends Backbone.View
      */
     return Backbone.View.extend({

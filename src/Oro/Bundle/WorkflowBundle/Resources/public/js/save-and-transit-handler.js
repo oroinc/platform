@@ -1,5 +1,6 @@
-define(['jquery', 'oroui/js/mediator', 'routing', 'oroui/js/widget/buttons-widget'],
-function ($, mediator, routing, ButtonsWidget) {
+/*global define*/
+define(['jquery', 'oroui/js/mediator', 'routing', 'oro/buttons-widget'
+    ], function ($, mediator, routing, ButtonsWidget) {
     'use strict';
 
     /**
