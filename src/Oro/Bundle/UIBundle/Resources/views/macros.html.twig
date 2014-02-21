@@ -300,28 +300,28 @@
 #}
 {% macro clientLink(parameters) %}
     <a href="javascript: void(0);" class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
-            {% if (parameters.id is defined) %}
-                id="{{ parameters.id }}"
-            {% endif %}
-            {% if (parameters.dataId is defined) %}
-                data-id="{{ parameters.dataId }}"
-            {% endif %}
-            {% if (parameters.dataUrl is defined) %}
-                data-url="{{ parameters.dataUrl }}"
-            {% endif %}
-            {% if (parameters.successMessage is defined) %}
-                data-success-message="{{ parameters.successMessage|trans }}"
-            {% endif %}
-            {% if parameters.dataRedirect is defined %}
-                data-redirect="{{ parameters.dataRedirect  }}"
-            {% endif %}
-            {% if (parameters.title is defined) %}
-                title="{{ parameters.title|trans }}"
-            {% endif -%}
-            {% if (parameters.visible is defined and not parameters.visible) %}
-                style="display: none"
-            {% endif -%}
-            ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
+        {% if (parameters.id is defined) %}
+        id="{{ parameters.id }}"
+        {% endif %}
+        {% if (parameters.dataId is defined) %}
+        data-id="{{ parameters.dataId }}"
+        {% endif %}
+        {% if (parameters.dataUrl is defined) %}
+        data-url="{{ parameters.dataUrl }}"
+        {% endif %}
+        {% if (parameters.successMessage is defined) %}
+        data-success-message="{{ parameters.successMessage|trans }}"
+        {% endif %}
+        {% if parameters.dataRedirect is defined %}
+        data-redirect="{{ parameters.dataRedirect  }}"
+        {% endif %}
+        {% if (parameters.title is defined) %}
+        title="{{ parameters.title|trans }}"
+        {% endif -%}
+        {% if (parameters.visible is defined and not parameters.visible) %}
+        style="display: none"
+        {% endif -%}
+        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
     </a>
 {% endmacro %}
 
