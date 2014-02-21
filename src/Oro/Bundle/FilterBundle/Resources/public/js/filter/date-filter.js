@@ -1,14 +1,14 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/datafilter/choice-filter', 'oro/locale-settings'],
-function($, _, __, ChoiceFilter, localeSettings) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale-settings'
+    ], function ($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
 
     /**
      * Date filter: filter type as option + interval begin and end dates
      *
-     * @export  oro/datafilter/date-filter
-     * @class   oro.datafilter.DateFilter
-     * @extends oro.datafilter.ChoiceFilter
+     * @export  orofilter/js/filter/date-filter
+     * @class   orofilter.filter.DateFilter
+     * @extends orofilter.filter.ChoiceFilter
      */
     return ChoiceFilter.extend({
         /**

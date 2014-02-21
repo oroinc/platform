@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/datafilter/date-filter', 'oro/locale-settings', 'jquery-ui-timepicker'],
-    function($, _, DateFilter, localeSettings) {
+/*global define*/
+define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-ui-timepicker'
+    ], function ($, _, DateFilter, localeSettings) {
     'use strict';
     /**
      * Datetime filter: filter type as option + interval begin and end dates
      *
-     * @export  oro/datafilter/datetime-filter
-     * @class   oro.datafilter.DatetimeFilter
-     * @extends oro.datafilter.DateFilter
+     * @export  orofilter/js/filter/datetime-filter
+     * @class   orofilter.filter.DatetimeFilter
+     * @extends orofilter.filter.DateFilter
      */
     return DateFilter.extend({
         /**

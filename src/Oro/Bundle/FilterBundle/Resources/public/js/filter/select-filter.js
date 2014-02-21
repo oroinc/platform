@@ -1,14 +1,14 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/datafilter/abstract-filter', 'oro/multiselect-decorator'],
-function ($, _, __, AbstractFilter, MultiselectDecorator) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/translator', './abstract-filter', '../multiselect-decorator'
+    ], function ($, _, __, AbstractFilter, MultiselectDecorator) {
     'use strict';
 
     /**
      * Select filter: filter value as select option
      *
-     * @export  oro/datafilter/select-filter
-     * @class   oro.datafilter.SelectFilter
-     * @extends oro.datafilter.AbstractFilter
+     * @export  orofilter/js/filter/select-filter
+     * @class   orofilter.filter.SelectFilter
+     * @extends orofilter.filter.AbstractFilter
      */
     return AbstractFilter.extend({
         /**

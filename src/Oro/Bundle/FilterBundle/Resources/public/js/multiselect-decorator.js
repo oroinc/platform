@@ -1,14 +1,14 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/mediator', 'jquery.multiselect', 'jquery.multiselect.filter'],
-function($, _, mediator) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/mediator', 'jquery.multiselect', 'jquery.multiselect.filter'
+    ], function ($, _, mediator) {
     'use strict';
 
     /**
      * Multiselect decorator class.
      * Wraps multiselect widget and provides design modifications
      *
-     * @export oro/multiselect-decorator
-     * @class  oro.MultiselectDecorator
+     * @export orofilter/js/multiselect-decorator
+     * @class  orofilter.MultiselectDecorator
      */
     var MultiselectDecorator = function(options) {
         this.initialize(options);

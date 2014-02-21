@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/app'],
-function($, _, Backbone, app) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'oro/app'
+    ], function ($, _, Backbone, app) {
     'use strict';
 
     /**
      * Basic grid filter
      *
-     * @export  oro/datafilter/abstract-filter
-     * @class   oro.datafilter.AbstractFilter
+     * @export  orofilter/js/filter/abstract-filter
+     * @class   orofilter.filter.AbstractFilter
      * @extends Backbone.View
      */
     return Backbone.View.extend({

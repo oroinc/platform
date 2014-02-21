@@ -1,17 +1,18 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/datafilter/abstract-filter'],
-function($, _, __, AbstractFilter) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/translator', './abstract-filter'
+    ], function ($, _, __, AbstractFilter) {
     'use strict';
 
     /**
-     * None filter: an empty filter implements 'null object' pattern
+     * Text grid filter.
      *
      * Triggers events:
      *  - "disable" when filter is disabled
+     *  - "update" when filter criteria is changed
      *
-     * @export  oro/datafilter/none-filter
-     * @class   oro.datafilter.NoneFilter
-     * @extends oro.datafilter.AbstractFilter
+     * @export  orofilter/js/filter/text-filter
+     * @class   orofilter.filter.TextFilter
+     * @extends orofilter.filter.AbstractFilter
      */
     return AbstractFilter.extend({
         wrappable: true,
@@ -25,7 +26,7 @@ function($, _, __, AbstractFilter) {
          *
          * @property
          */
-        templateSelector: '#none-filter-template',
+        templateSelector: '#text-filter-template',
 
         /**
          * Selector to element of criteria hint
@@ -42,11 +43,16 @@ function($, _, __, AbstractFilter) {
         criteriaSelector: '.filter-criteria',
 
         /**
-         * A value showed as filter's popup hint
+         * Selectors for filter criteria elements
          *
-         * @property {String}
+         * @property {Object}
          */
-        popupHint: 'Choose a value first',
+        criteriaValueSelectors: {
+            value: 'input[name="value"]',
+            nested: {
+                end: 'input'
+            }
+        },
 
         /**
          * View events
@@ -54,6 +60,9 @@ function($, _, __, AbstractFilter) {
          * @property {Object}
          */
         events: {
+            'keyup input': '_onReadCriteriaInputKey',
+            'keydown [type="text"]': '_preventEnterProcessing',
+            'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter'
@@ -65,10 +74,13 @@ function($, _, __, AbstractFilter) {
          * @param {Object} options
          */
         initialize: function (options) {
-            options = _.pick(options || {}, 'popupHint');
-            _.extend(this, options);
+            // init empty value object if it was not initialized so far
+            if (_.isUndefined(this.emptyValue)) {
+                this.emptyValue = {
+                    value: ''
+                };
+            }
 
-            this.label = 'None';
             AbstractFilter.prototype.initialize.apply(this, arguments);
         },
 
@@ -78,7 +90,32 @@ function($, _, __, AbstractFilter) {
         ensurePopupCriteriaClosed: function () {
             if (this.popupCriteriaShowed) {
                 this._hideCriteria();
+                this.applyValue();
             }
+        },
+
+        /**
+         * Handle key press on criteria input elements
+         *
+         * @param {Event} e
+         * @protected
+         */
+        _onReadCriteriaInputKey: function (e) {
+            if (e.which === 13) {
+                this._hideCriteria();
+                this.applyValue();
+            }
+        },
+
+        /**
+         * Handle click on criteria update button
+         *
+         * @param {Event} e
+         * @private
+         */
+        _onClickUpdateCriteria: function (e) {
+            this._hideCriteria();
+            this.applyValue();
         },
 
         /**
@@ -87,7 +124,7 @@ function($, _, __, AbstractFilter) {
          * @param {Event} e
          * @protected
          */
-        _onClickCriteriaSelector: function(e) {
+        _onClickCriteriaSelector: function (e) {
             e.stopPropagation();
             $('body').trigger('click');
             if (!this.popupCriteriaShowed) {
@@ -102,7 +139,7 @@ function($, _, __, AbstractFilter) {
          *
          * @private
          */
-        _onClickCloseCriteria: function() {
+        _onClickCloseCriteria: function () {
             this._hideCriteria();
             this._updateDOMValue();
         },
@@ -112,7 +149,7 @@ function($, _, __, AbstractFilter) {
          *
          * @param {Event} e
          */
-        _onClickDisableFilter: function(e) {
+        _onClickDisableFilter: function (e) {
             e.preventDefault();
             this.disable();
         },
@@ -123,11 +160,12 @@ function($, _, __, AbstractFilter) {
          * @param {Event} e
          * @protected
          */
-        _onClickOutsideCriteria: function(e) {
+        _onClickOutsideCriteria: function (e) {
             var elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
                 this._hideCriteria();
+                this.applyValue();
                 e.stopPropagation();
             }
         },
@@ -138,9 +176,7 @@ function($, _, __, AbstractFilter) {
          * @return {*}
          */
         render: function () {
-            var $filter = $(this.template({
-                popupHint: this._getPopupHint()
-            }));
+            var $filter = $(this.template());
             this._wrap($filter);
             return this;
         },
@@ -154,7 +190,7 @@ function($, _, __, AbstractFilter) {
          *
          * @return {*}
          */
-        remove: function() {
+        remove: function () {
             $('body').off('click', this._clickOutsideCriteriaCallback);
             AbstractFilter.prototype.remove.call(this);
             return this;
@@ -165,10 +201,11 @@ function($, _, __, AbstractFilter) {
          *
          * @protected
          */
-        _showCriteria: function() {
+        _showCriteria: function () {
             this.$(this.criteriaSelector).show();
+            this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
-            setTimeout(_.bind(function() {
+            setTimeout(_.bind(function () {
                 this.popupCriteriaShowed = true;
             }, this), 100);
         },
@@ -178,36 +215,57 @@ function($, _, __, AbstractFilter) {
          *
          * @protected
          */
-        _hideCriteria: function() {
+        _hideCriteria: function () {
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
-            setTimeout(_.bind(function() {
+            setTimeout(_.bind(function () {
                 this.popupCriteriaShowed = false;
             }, this), 100);
         },
 
         /**
+         * Focus filter criteria input
+         *
+         * @protected
+         */
+        _focusCriteria: function () {
+            this.$(this.criteriaSelector + ' input').focus().select();
+        },
+
+        /**
          * @inheritDoc
          */
-        _writeDOMValue: function(value) {
+        _writeDOMValue: function (value) {
+            this._setInputValue(this.criteriaValueSelectors.value, value.value);
             return this;
         },
 
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
-            return {};
+        _readDOMValue: function () {
+            return {
+                value: this._getInputValue(this.criteriaValueSelectors.value)
+            };
         },
 
         /**
-         * Get popup hint value
-         *
-         * @return {String}
-         * @protected
+         * @inheritDoc
          */
-        _getPopupHint: function() {
-            return this.popupHint ? this.popupHint: this.popupHint;
+        _onValueUpdated: function (newValue, oldValue) {
+            AbstractFilter.prototype._onValueUpdated.apply(this, arguments);
+            this._updateCriteriaHint();
+        },
+
+        /**
+         * Updates criteria hint element with actual criteria hint value
+         *
+         * @protected
+         * @return {*}
+         */
+        _updateCriteriaHint: function () {
+            this.$(this.criteriaHintSelector).html(this._getCriteriaHint());
+            return this;
         },
 
         /**
@@ -216,8 +274,9 @@ function($, _, __, AbstractFilter) {
          * @return {String}
          * @protected
          */
-        _getCriteriaHint: function() {
-            return this.criteriaHint ? this.criteriaHint: this.placeholder;
+        _getCriteriaHint: function () {
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            return value.value ? '"' + value.value + '"' : this.placeholder;
         }
     });
 });
