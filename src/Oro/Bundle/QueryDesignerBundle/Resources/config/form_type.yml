@@ -1,4 +1,5 @@
 parameters:
+    oro_query_designer.form.type.field_choice.class:                  Oro\Bundle\QueryDesignerBundle\Form\Type\FieldChoiceType
     oro_query_designer.form.type.function_choice.class:               Oro\Bundle\QueryDesignerBundle\Form\Type\FunctionChoiceType
     oro_query_designer.form.type.sorting_choice.class:                Oro\Bundle\QueryDesignerBundle\Form\Type\SortingChoiceType
     oro_query_designer.form.type.query_designer_column.class:         Oro\Bundle\QueryDesignerBundle\Form\Type\ColumnType
@@ -6,6 +7,11 @@ parameters:
     oro_query_designer.form.type.query_designer_grouping.class:       Oro\Bundle\QueryDesignerBundle\Form\Type\GroupingType
 
 services:
+    oro_query_designer.form.type.field_choice:
+        class: %oro_query_designer.form.type.field_choice.class%
+        tags:
+            - { name: form.type, alias: oro_field_choice }
+
     oro_query_designer.form.type.function_choice:
         class: %oro_query_designer.form.type.function_choice.class%
         tags:

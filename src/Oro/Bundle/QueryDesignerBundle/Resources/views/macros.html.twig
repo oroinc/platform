@@ -141,30 +141,22 @@
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         {# @todo own formtype for this kind field based on hidden input #}
-        <div class="control-group">
-            <label class="control-label required" for="s2id_autogen2">Column<em>*</em></label>
-            <div class="controls">
-                {% set nameValidation = {
-                    NotBlank: {message: 'Field should be chosen'}
-                } %}
-                {{ form_row(form.name, {
-                    'label': 'oro.query_designer.form.column'|trans,
-                    'attr': {
-                        'data-purpose': 'column-selector',
-                        'data-validation': nameValidation|json_encode
-                    }
-                }) }}
-            </div>
-        </div>
-        {% set labelValidation = {
-            NotBlank: {message: 'Label is required field'}
-        } %}
+        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+        {{ form_row(form.name, {
+            'label': 'oro.query_designer.form.column'|trans,
+            'entity_choice_selector': '#' ~ params.entity_choice_id,
+            'attr': {
+                'data-purpose': 'column-selector',
+                'data-validation': { NotBlank: null }|json_encode
+            }
+        }) }}
+        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
         {{ form_row(form.label, {
             'label': 'oro.query_designer.form.label'|trans,
             'attr': {
                 'class': 'label-text',
                 'data-purpose': 'label',
-                'data-validation': labelValidation|json_encode
+                'data-validation': { NotBlank: null }|json_encode
             }
         }) }}
         {{ form_row(form.func, {
@@ -196,13 +188,6 @@
             'label' : 'oro.query_designer.form.action.add'|trans
         }) }}
     </div>
-    {% set fieldConditionOptions = {
-        select2: {
-            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
-        },
-        util: {},
-        fieldsLoaderSelector: '#' ~ params.entity_choice_id
-    } %}
     <script type="text/javascript">
         require(['oroentity/js/field-choice', 'oroquerydesigner/js/function-choice'], function ($) {
             var $form = $('#{{ attr.id }}'),
@@ -213,7 +198,6 @@
                 fieldChoiceSelector: $fields
             });
             $fields
-                .fieldChoice({{ fieldConditionOptions|json_encode|raw }})
                 .on('change', function (e) {
                     if (e.added) {
                         // update label input on field change
@@ -229,21 +213,15 @@
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         {# @todo own formtype for this kind field based on hidden input #}
-        <div class="control-group">
-            <label class="control-label required" for="s2id_autogen2">Grouping columns<em>*</em></label>
-            <div class="controls">
-            {% set validation = {
-                NotBlank: {message: 'Field should be chosen'}
-            } %}
-            {{ form_row(form.columnNames, {
-                'label': 'oro.query_designer.form.grouping_columns'|trans,
-                'attr': {
-                    'data-purpose': 'column-selector',
-                    'data-validation': validation|json_encode
-                }
-            }) }}
-            </div>
-        </div>
+        {# @todo we have to directly set 'data-validation' because JsValidationExtension does not support validation groups #}
+        {{ form_row(form.columnNames, {
+            'label': 'oro.query_designer.form.grouping_columns'|trans,
+            'entity_choice_selector': '#' ~ params.entity_choice_id,
+            'attr': {
+                'data-purpose': 'column-selector',
+                'data-validation': { NotBlank: null }|json_encode
+            }
+        }) }}
         {{ UI.clientButton({
             'aCss': 'no-hash cancel-button',
             'label' : 'oro.query_designer.form.action.cancel'|trans
@@ -259,19 +237,6 @@
             'label' : 'oro.query_designer.form.action.add'|trans
         }) }}
     </div>
-    {% set fieldConditionOptions = {
-        select2: {
-            placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
-        },
-        util: {},
-        fieldsLoaderSelector: '#' ~ params.entity_choice_id
-    } %}
-    <script type="text/javascript">
-        require(['oroentity/js/field-choice'], function ($) {
-            $('#{{ attr.id }}').find('[data-purpose=column-selector]')
-                .fieldChoice({{ fieldConditionOptions|json_encode|raw }});
-        });
-    </script>
 {% endmacro %}
 
 {% macro query_designer_column_chain_template(id) %}

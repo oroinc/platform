@@ -17,6 +17,10 @@ class GroupingType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder
+            ->add('columnNames', 'oro_field_choice', array('required' => true));
+
+        /*
         $factory = $builder->getFormFactory();
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
@@ -31,16 +35,17 @@ class GroupingType extends AbstractType
                         array(
                             'required'           => false,
                             'auto_initialize'    => false,
-                            /*'entity'             => $form->getConfig()->getOption('entity'),
+                            'entity'             => $form->getConfig()->getOption('entity'),
                             'skip_load_entities' => true,
                             'skip_load_data'     => true,
                             'with_relations'     => true,
-                            'multiple'           => true*/
+                            'multiple'           => true
                         )
                     )
                 );
             }
         );
+        */
     }
 
     /**
