@@ -9,7 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
-use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\TestEntityType;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntityType;
 
 class EntityCreateSelectFormExtension extends AbstractExtension
 {

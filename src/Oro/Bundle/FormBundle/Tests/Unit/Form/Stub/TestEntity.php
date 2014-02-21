@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Stub;
 
 class TestEntity
 {

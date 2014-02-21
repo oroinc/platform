@@ -136,7 +136,7 @@ class OroEntityCreateOrSelectType extends AbstractType
      *          'route_parameters': (optional)
      *              <route_parameter_name>: string|PropertyPath
      *              ...
-     *          'grid_row_to_route':
+     *          'grid_row_to_route': (optional)
      *              <route_parameter_name>: <grid_row_field_name>,
      *          'widget_alias' => 'my_widget_alias' (optional)
      *      }
@@ -160,6 +160,7 @@ class OroEntityCreateOrSelectType extends AbstractType
 
         $resolver->setDefaults(
             array(
+                'data_class' => null,
                 'create_entity_form_options' => array(),
                 'existing_entity_grid_id' => 'id',
                 'mode' => self::MODE_CREATE,
