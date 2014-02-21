@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'jquery-outer-html', 'jquery-ui'], function ($, _, __) {
+define(['jquery', 'underscore', 'oro/translator', 'jquery-ui'], function ($, _, __) {
     'use strict';
 
     /**
@@ -111,7 +111,7 @@ define(['jquery', 'underscore', 'oro/translator', 'jquery-outer-html', 'jquery-u
         },
 
         _onModelChanged: function (model) {
-            this.element.find('[data-cid="' + model.cid + '"]').outerHTML(this._renderModel(model));
+            this.element.find('[data-cid="' + model.cid + '"]').parent().html(this._renderModel(model));
         },
 
         _onModelDeleted: function (model) {
