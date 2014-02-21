@@ -12,16 +12,486 @@ class JmsJob implements Migration
      */
     public function up(Schema $schema)
     {
-        return [
-            "CREATE TABLE jms_job_dependencies (source_job_id BIGINT UNSIGNED NOT NULL, dest_job_id BIGINT UNSIGNED NOT NULL, INDEX IDX_8DCFE92CBD1F6B4F (source_job_id), INDEX IDX_8DCFE92C32CF8D4C (dest_job_id), PRIMARY KEY(source_job_id, dest_job_id));",
-            "CREATE TABLE jms_job_related_entities (job_id BIGINT UNSIGNED NOT NULL, related_class VARCHAR(150) NOT NULL, related_id VARCHAR(100) NOT NULL, INDEX IDX_E956F4E2BE04EA9 (job_id), PRIMARY KEY(job_id, related_class, related_id));",
-            "CREATE TABLE jms_job_statistics (job_id BIGINT UNSIGNED NOT NULL, characteristic VARCHAR(30) NOT NULL, createdAt DATETIME NOT NULL, charValue DOUBLE PRECISION NOT NULL, PRIMARY KEY(job_id, characteristic, createdAt))",
-            "CREATE TABLE jms_jobs (id BIGINT UNSIGNED AUTO_INCREMENT NOT NULL, state VARCHAR(255) NOT NULL, createdAt DATETIME NOT NULL, startedAt DATETIME DEFAULT NULL, checkedAt DATETIME DEFAULT NULL, executeAfter DATETIME DEFAULT NULL, closedAt DATETIME DEFAULT NULL, command VARCHAR(255) NOT NULL, args LONGTEXT NOT NULL COMMENT '(DC2Type:json_array)', output LONGTEXT DEFAULT NULL, errorOutput LONGTEXT DEFAULT NULL, exitCode SMALLINT UNSIGNED DEFAULT NULL, maxRuntime SMALLINT UNSIGNED NOT NULL, maxRetries SMALLINT UNSIGNED NOT NULL, stackTrace LONGBLOB DEFAULT NULL COMMENT '(DC2Type:jms_job_safe_object)', runtime SMALLINT UNSIGNED DEFAULT NULL, memoryUsage INT UNSIGNED DEFAULT NULL, memoryUsageReal INT UNSIGNED DEFAULT NULL, originalJob_id BIGINT UNSIGNED DEFAULT NULL, INDEX IDX_704ADB9349C447F1 (originalJob_id), INDEX IDX_704ADB938ECAEAD4 (command), INDEX job_runner (executeAfter, state), PRIMARY KEY(id))",
+        /** Generate table jms_job_dependencies **/
+        $table = $schema->createTable('jms_job_dependencies');
+        $table->addColumn(
+            'source_job_id',
+            'bigint',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'dest_job_id',
+            'bigint',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->setPrimaryKey(['source_job_id', 'dest_job_id']);
+        $table->addIndex(['source_job_id'], 'IDX_8DCFE92CBD1F6B4F', []);
+        $table->addIndex(['dest_job_id'], 'IDX_8DCFE92C32CF8D4C', []);
+        /** End of generate table jms_job_dependencies **/
 
-            "ALTER TABLE jms_job_dependencies ADD CONSTRAINT FK_8DCFE92C32CF8D4C FOREIGN KEY (dest_job_id) REFERENCES jms_jobs (id)",
-            "ALTER TABLE jms_job_dependencies ADD CONSTRAINT FK_8DCFE92CBD1F6B4F FOREIGN KEY (source_job_id) REFERENCES jms_jobs (id)",
-            "ALTER TABLE jms_job_related_entities ADD CONSTRAINT FK_E956F4E2BE04EA9 FOREIGN KEY (job_id) REFERENCES jms_jobs (id)",
-            "ALTER TABLE jms_jobs ADD CONSTRAINT FK_704ADB9349C447F1 FOREIGN KEY (originalJob_id) REFERENCES jms_jobs (id)"
-        ];
+        /** Generate table jms_job_related_entities **/
+        $table = $schema->createTable('jms_job_related_entities');
+        $table->addColumn(
+            'job_id',
+            'bigint',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'related_class',
+            'string',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => 150,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'related_id',
+            'string',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => 100,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->setPrimaryKey(['job_id', 'related_class', 'related_id']);
+        $table->addIndex(['job_id'], 'IDX_E956F4E2BE04EA9', []);
+        /** End of generate table jms_job_related_entities **/
+
+        /** Generate table jms_job_statistics **/
+        $table = $schema->createTable('jms_job_statistics');
+        $table->addColumn(
+            'job_id',
+            'bigint',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'characteristic',
+            'string',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => 30,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'createdAt',
+            'datetime',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'charValue',
+            'float',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->setPrimaryKey(['job_id', 'characteristic', 'createdAt']);
+        /** End of generate table jms_job_statistics **/
+
+        /** Generate table jms_jobs **/
+        $table = $schema->createTable('jms_jobs');
+        $table->addColumn(
+            'id',
+            'bigint',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => true,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'state',
+            'string',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => 255,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'createdAt',
+            'datetime',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'startedAt',
+            'datetime',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'checkedAt',
+            'datetime',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'executeAfter',
+            'datetime',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'closedAt',
+            'datetime',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'command',
+            'string',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => 255,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'args',
+            'json_array',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'output',
+            'text',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'errorOutput',
+            'text',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'exitCode',
+            'smallint',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'maxRuntime',
+            'smallint',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'maxRetries',
+            'smallint',
+            [
+                'default'       => null,
+                'notnull'       => true,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'stackTrace',
+            'jms_job_safe_object',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => false,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'runtime',
+            'smallint',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'memoryUsage',
+            'integer',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'memoryUsageReal',
+            'integer',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->addColumn(
+            'originalJob_id',
+            'bigint',
+            [
+                'default'       => null,
+                'notnull'       => false,
+                'length'        => null,
+                'precision'     => 10,
+                'scale'         => 0,
+                'fixed'         => false,
+                'unsigned'      => true,
+                'autoincrement' => false,
+                'comment'       => ''
+            ]
+        );
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['originalJob_id'], 'IDX_704ADB9349C447F1', []);
+        $table->addIndex(['command'], 'IDX_704ADB938ECAEAD4', []);
+        $table->addIndex(['executeAfter', 'state'], 'job_runner', []);
+        /** End of generate table jms_jobs **/
+
+        /** Generate foreign keys for table jms_job_dependencies **/
+        $table = $schema->getTable('jms_job_dependencies');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('jms_jobs'),
+            ['dest_job_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('jms_jobs'),
+            ['source_job_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        /** End of generate foreign keys for table jms_job_dependencies **/
+
+        /** Generate foreign keys for table jms_job_related_entities **/
+        $table = $schema->getTable('jms_job_related_entities');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('jms_jobs'),
+            ['job_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        /** End of generate foreign keys for table jms_job_related_entities **/
+
+        /** Generate foreign keys for table jms_jobs **/
+        $table = $schema->getTable('jms_jobs');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('jms_jobs'),
+            ['originalJob_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        /** End of generate foreign keys for table jms_jobs **/
     }
 }
