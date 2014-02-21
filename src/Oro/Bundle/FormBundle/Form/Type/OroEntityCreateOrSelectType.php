@@ -176,14 +176,12 @@ class OroEntityCreateOrSelectType extends AbstractType
                             );
                         }
 
-                        if (empty($widgetData['grid_row_to_route'])) {
-                            throw new InvalidConfigurationException(
-                                'Mapping between grid row and route parameters is not defined'
-                            );
+                        if (!array_key_exists('route_parameters', $widgetData)) {
+                            $widgetData['route_parameters'] = array('id' => new PropertyPath('id'));
                         }
 
-                        if (!array_key_exists('route_parameters', $widgetData)) {
-                            $widgetData['route_parameters'] = array();
+                        if (!array_key_exists('grid_row_to_route', $widgetData)) {
+                            $widgetData['grid_row_to_route'] = array('id' => 'id');
                         }
 
                         if (empty($widgetData['widget_alias'])) {
