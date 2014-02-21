@@ -101,9 +101,12 @@ define(function (require) {
 
                 // create grid
                 options = methods.combineGridOptions.call(this);
+                mediator.trigger('datagrid_create_before', options, collection);
                 grid = new Grid(_.extend({collection: collection}, options));
+                mediator.trigger('datagrid_create_after', grid);
                 this.grid = grid;
                 this.$el.append(grid.render().$el);
+                this.$el.data('datagrid', grid);
 
                 if (options.routerEnabled !== false) {
                     // register router
