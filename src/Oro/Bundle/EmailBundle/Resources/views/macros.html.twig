@@ -1,3 +1,5 @@
+{% import 'OroUIBundle:Js:macros.html.twig' as JS %}
+
 {% macro renderAvailableVariablesWidget(entityName, dependentFieldId) %}
     <script type="text/javascript">
         require(['jquery', 'oro/email/variable/view', 'oro/email/variable/model'],
@@ -226,10 +228,8 @@
 {%- endmacro %}
 
 {% macro renderJs() %}
-    <script type="text/javascript">
-        !function() {
-            /* global:require */
-            require(['oro/init-email']);
-        }();
-    </script>
+    {{ JS.popupWidget({
+        'class': 'view-email-button',
+        'multiple': true
+    }) }}
 {% endmacro %}
