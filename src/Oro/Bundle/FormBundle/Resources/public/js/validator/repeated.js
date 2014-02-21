@@ -1,7 +1,7 @@
-/* global define */
+/*global define*/
 /* jshint browser:true */
-define(['jquery', 'underscore', 'oro/translator', 'jquery.validate'],
-function ($, _, __) {
+define(['jquery', 'underscore', 'oro/translator', 'jquery.validate'
+    ], function ($, _, __) {
     'use strict';
 
     var defaultParam = {
@@ -10,7 +10,7 @@ function ($, _, __) {
     };
 
     /**
-     * @export oro/validator/repeated
+     * @export oroform/js/validator/repeated
      */
     return [
         'Repeated',
