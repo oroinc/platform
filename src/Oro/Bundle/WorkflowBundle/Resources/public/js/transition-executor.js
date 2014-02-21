@@ -1,4 +1,4 @@
-define(['jquery', 'oro/messenger', 'oro/translator', 'oro/navigation'],
+define(['jquery', 'oro/messenger', 'oro/translator', 'oronavigation/js/navigation'],
 function($, messenger, __, Navigation) {
     'use strict';
 

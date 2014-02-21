@@ -1,12 +1,12 @@
 /* jshint browser:true */
-/* global define */
-define(['underscore', 'backbone', 'oro/navigation', 'oro/navigation/dotmenu/view'],
-function(_, Backbone, Navigation, DotmenuView) {
+/*global define*/
+define(['underscore', 'backbone', 'oronavigation/js/navigation', './dotmenu/view'
+    ], function (_, Backbone, Navigation, DotmenuView) {
     'use strict';
 
     /**
-     * @export  oro/navigation/abstract-view
-     * @class   oro.navigation.AbstractView
+     * @export  oronavigation/abstract-view
+     * @class   oronavigation.AbstractView
      * @extends Backbone.View
      */
     return Backbone.View.extend({

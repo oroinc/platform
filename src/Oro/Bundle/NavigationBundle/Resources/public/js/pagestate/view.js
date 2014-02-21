@@ -1,14 +1,14 @@
 /* jshint browser:true */
-/* global define, require, base64_encode */
-define(['underscore', 'backbone', 'url', 'routing', 'oro/navigation', 'oro/mediator', 'base64', 'json'],
-function(_, Backbone, Url, routing, Navigation, mediator) {
+/*global define, require, base64_encode*/
+define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation', 'oro/mediator', 'base64', 'json'
+    ], function (_, Backbone, Url, routing, Navigation, mediator) {
     'use strict';
 
     var pageStateTimer;
 
     /**
-     * @export  oro/navigation/pagestate/view
-     * @class   oro.navigation.pagestate.View
+     * @export  oronavigation/js/pagestate/view
+     * @class   oronavigation.pagestate.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -150,7 +150,7 @@ function(_, Backbone, Url, routing, Navigation, mediator) {
             var self = this,
                 url = window.location,
                 // cause that's circular dependency
-                navigation = require('oro/navigation').getInstance();
+                navigation = require('oronavigation/js/navigation').getInstance();
             if (navigation) {
                 url = new Url(navigation.getHashUrl());
                 url.search = url.query.toString();

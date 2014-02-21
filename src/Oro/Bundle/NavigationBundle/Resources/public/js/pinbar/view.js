@@ -1,15 +1,15 @@
 /* jshint browser:true */
-/* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/navigation', 'oro/mediator', 'oro/navigation/abstract-view',
-    'oro/navigation/pinbar/item-view', 'oro/navigation/pinbar/collection', 'oro/navigation/pinbar/model'],
-function($, _, Backbone, Navigation, mediator, AbstractView,
-    PinbarItemView, PinbarCollection, PinbarModel) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'oro/mediator', '../navigation', '../abstract-view',
+        './item-view', './collection', './model'
+    ], function ($, _, Backbone, mediator, Navigation, AbstractView,
+        PinbarItemView, PinbarCollection, PinbarModel) {
     'use strict';
 
     /**
-     * @export  oro/navigation/pinbar/view
-     * @class   oro.navigation.pinbar.View
-     * @extends oro.navigation.AbstractView
+     * @export  oronavigation/js/pinbar/view
+     * @class   oronavigation.pinbar.View
+     * @extends oronavigation.AbstractView
      */
     return AbstractView.extend({
         options: {
@@ -232,7 +232,7 @@ function($, _, Backbone, Navigation, mediator, AbstractView,
         /**
          * Set item position if given or reorder items.
          *
-         * @param {oro.navigation.pinbar.Model} item
+         * @param {oronavigation.pinbar.Model} item
          * @param {number} position
          */
         setItemPosition: function(item, position) {
@@ -263,7 +263,7 @@ function($, _, Backbone, Navigation, mediator, AbstractView,
         /**
          * Choose container and add item to it.
          *
-         * @param {oro.navigation.pinbar.Model} item
+         * @param {oronavigation.pinbar.Model} item
          */
         renderItem: function(item) {
             var position = item.get('position');

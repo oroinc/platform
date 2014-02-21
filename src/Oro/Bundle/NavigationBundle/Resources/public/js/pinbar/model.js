@@ -1,12 +1,12 @@
-/* global define */
-define(['oro/navigation/model'],
-function(NavigationModel) {
+/*global define*/
+define(['../model'
+    ], function (NavigationModel) {
     'use strict';
 
     /**
-     * @export  oro/navigation/pinbar/model
-     * @class   oro.navigation.pinbar.Model
-     * @extends oro.navigation.Model
+     * @export  oronavigation/js/pinbar/model
+     * @class   oronavigation.pinbar.Model
+     * @extends oronavigation.Model
      */
     return NavigationModel.extend({
         defaults: {

@@ -1,12 +1,12 @@
 /* jshint browser:true */
-/* global define */
-define(['jquery', 'underscore', 'backbone'],
-function($, _, Backbone) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone'
+    ], function ($, _, Backbone) {
     'use strict';
 
     /**
-     * @export  oro/navigation/dotmenu/item-view
-     * @class   oro.navigation.dotmenu.ItemView
+     * @export  oronavigation/js/dotmenu/item-view
+     * @class   oronavigation.dotmenu.ItemView
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -19,20 +19,20 @@ function($, _, Backbone) {
             'click span': 'activate'
         },
 
-        initialize: function() {
+        initialize: function () {
             this.listenTo(this.model, 'destroy', this.remove);
         },
 
-        activate: function(e) {
+        activate: function (e) {
             var el = Backbone.$(e.currentTarget);
             window.location.href = el.data('url');
         },
 
-        close: function() {
+        close: function () {
             this.model.destroy({wait: true});
         },
 
-        render: function() {
+        render: function () {
             this.$el.html(
                 this.template(this.model.toJSON())
             );
