@@ -25,30 +25,95 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
 
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        $queries =  [
-            "CREATE TABLE oro_search_index_datetime (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, field VARCHAR(250) NOT NULL, value DATETIME NOT NULL, INDEX IDX_459F212A126F525E (item_id), PRIMARY KEY(id))",
-            "CREATE TABLE oro_search_index_decimal (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, field VARCHAR(250) NOT NULL, value NUMERIC(10, 2) NOT NULL, INDEX IDX_E0B9BB33126F525E (item_id), PRIMARY KEY(id))",
-            "CREATE TABLE oro_search_index_integer (id INT AUTO_INCREMENT NOT NULL, item_id INT NOT NULL, field VARCHAR(250) NOT NULL, value INT NOT NULL, INDEX IDX_E04BA3AB126F525E (item_id), PRIMARY KEY(id))",
-            "CREATE TABLE oro_search_item (id INT AUTO_INCREMENT NOT NULL, entity VARCHAR(255) NOT NULL, alias VARCHAR(255) NOT NULL, record_id INT DEFAULT NULL, title VARCHAR(255) DEFAULT NULL, changed TINYINT(1) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, UNIQUE INDEX IDX_ENTITY (entity, record_id), INDEX IDX_ALIAS (alias), INDEX IDX_ENTITIES (entity), PRIMARY KEY(id))",
-            "CREATE TABLE oro_search_query (id INT AUTO_INCREMENT NOT NULL, entity VARCHAR(250) NOT NULL, query LONGTEXT NOT NULL, result_count INT NOT NULL, created_at DATETIME NOT NULL, PRIMARY KEY(id))",
+        // @codingStandardsIgnoreStart
 
-            "ALTER TABLE oro_search_index_datetime ADD CONSTRAINT FK_459F212A126F525E FOREIGN KEY (item_id) REFERENCES oro_search_item (id)",
-            "ALTER TABLE oro_search_index_decimal ADD CONSTRAINT FK_E0B9BB33126F525E FOREIGN KEY (item_id) REFERENCES oro_search_item (id)",
-            "ALTER TABLE oro_search_index_integer ADD CONSTRAINT FK_E04BA3AB126F525E FOREIGN KEY (item_id) REFERENCES oro_search_item (id)",
+        /** Generate table oro_search_index_datetime **/
+        $table = $schema->createTable('oro_search_index_datetime');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('value', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['item_id'], 'IDX_459F212A126F525E', []);
+        /** End of generate table oro_search_index_datetime **/
 
-            "CREATE TABLE oro_search_index_text (
-                    id INT NOT NULL AUTO_INCREMENT,
-                    item_id INT NOT NULL,
-                    field VARCHAR(250) NOT NULL,
-                    value LONGTEXT NOT NULL,
-                    PRIMARY KEY (id),
-                    INDEX IDX_A0243539126F525E (item_id)
-            )
-            ENGINE=MyISAM;"
-        ];
+        /** Generate table oro_search_index_decimal **/
+        $table = $schema->createTable('oro_search_index_decimal');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('value', 'decimal', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 2, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['item_id'], 'IDX_E0B9BB33126F525E', []);
+        /** End of generate table oro_search_index_decimal **/
+
+        /** Generate table oro_search_index_integer **/
+        $table = $schema->createTable('oro_search_index_integer');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('value', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['item_id'], 'IDX_E04BA3AB126F525E', []);
+        /** End of generate table oro_search_index_integer **/
+
+        /** Generate table oro_search_item **/
+        $table = $schema->createTable('oro_search_item');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('entity', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('alias', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('record_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('title', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('changed', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('created_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('updated_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['entity', 'record_id'], 'IDX_ENTITY');
+        $table->addIndex(['alias'], 'IDX_ALIAS', []);
+        $table->addIndex(['entity'], 'IDX_ENTITIES', []);
+        /** End of generate table oro_search_item **/
+
+        /** Generate table oro_search_query **/
+        $table = $schema->createTable('oro_search_query');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('entity', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('query', 'text', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('result_count', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('created_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        /** End of generate table oro_search_query **/
+
+        /** Generate foreign keys for table oro_search_index_datetime **/
+        $table = $schema->getTable('oro_search_index_datetime');
+        $table->addForeignKeyConstraint($schema->getTable('oro_search_item'), ['item_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_search_index_datetime **/
+
+        /** Generate foreign keys for table oro_search_index_decimal **/
+        $table = $schema->getTable('oro_search_index_decimal');
+        $table->addForeignKeyConstraint($schema->getTable('oro_search_item'), ['item_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_search_index_decimal **/
+
+        /** Generate foreign keys for table oro_search_index_integer **/
+        $table = $schema->getTable('oro_search_index_integer');
+        $table->addForeignKeyConstraint($schema->getTable('oro_search_item'), ['item_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_search_index_integer **/
+
+        /** Generate table oro_search_index_text **/
+        $table = $schema->createTable('oro_search_index_text');
+        $table->addOption('engine' , 'MyISAM');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('value', 'text', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['item_id'], 'IDX_A0243539126F525E', []);
+        /** End of generate table oro_search_index_text **/
+
+        // @codingStandardsIgnoreEnd
 
         // add search fulltext index query
         $connection = $this->container->get('doctrine')->getConnection();
@@ -56,7 +121,7 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
         $configClasses = $this->container->getParameter('oro_search.engine_orm');
         if (isset($configClasses[$config['driver']])) {
             $className = $configClasses[$config['driver']];
-            $queries = array_merge($queries, [$className::getPlainSql()]);
+            $queries = $className::getPlainSql();
         }
 
         return $queries;
