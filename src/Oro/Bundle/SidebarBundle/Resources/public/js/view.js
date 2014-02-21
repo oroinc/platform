@@ -12,20 +12,20 @@ define(function (require) {
     var __ = require('oro/translator');
     var DeleteConfirmation = require('oro/delete-confirmation');
 
-    var constants = require('oro/sidebar/constants');
+    var constants = require('./constants');
 
-    var IconView = require('oro/sidebar/widget-container/icon-view');
-    var WidgetContainerView = require('oro/sidebar/widget-container/view');
-    var WidgetAddView = require('oro/sidebar/widget-container/widget-add-view');
-    var WidgetSetupView = require('oro/sidebar/widget-container/widget-setup-view');
+    var IconView = require('./widget-container/icon-view');
+    var WidgetContainerView = require('./widget-container/view');
+    var WidgetAddView = require('./widget-container/widget-add-view');
+    var WidgetSetupView = require('./widget-container/widget-setup-view');
 
-    var sidebarTemplate = require('text!oro/sidebar/sidebar/template');
+    var sidebarTemplate = require('text!./templates/template.html');
 
     var WIDGET_SORT_DELAY = 100;
 
     /**
-     * @export  oro/sidebar/sidebar/view
-     * @class oro.sidebar.sidebar.View
+     * @export  orosidebar/js/view
+     * @class   orosidebar.View
      * @extends Backbone.View
      */
     var SidebarView = Backbone.View.extend({
