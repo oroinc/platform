@@ -3,21 +3,34 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
     'use strict';
 
     describe('oroquerydesigner/js/field-condition', function () {
-        var $div = null;
+        var $el = null;
 
         beforeEach(function () {
-            $div = $('div');
-            $('body').append($div);
+            $el = $('<div>');
+            $('body').append($el);
         });
 
         afterEach(function () {
-            $div.remove();
-            $div = null;
+            $el.remove();
+            $el = null;
         });
 
-        it('is jQueryUI widget', function () {
+        function waitForFilter(cb) {
+            var html = $el.find('.active-filter').html();
+            function wait() {
+                var current = $el.find('.active-filter').html();
+                if (current !== html) {
+                    cb();
+                } else {
+                    setTimeout(wait, 5);
+                }
+            }
+            setTimeout(wait, 5);
+        }
+
+        it('is $ widget', function () {
             expect(function () {
-                $div.fieldCondition();
+                $el.fieldCondition();
             }).not.toThrow();
         });
     });
