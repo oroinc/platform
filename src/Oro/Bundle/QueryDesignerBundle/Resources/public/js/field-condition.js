@@ -1,6 +1,6 @@
 /*global define, require*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-module-name', 'oroquerydesigner/js/query-designer/util',
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'orofilter/js/map-filter-module-name', 'oroquerydesigner/js/query-designer/util',
     'oroentity/js/field-choice', 'jquery-ui'
     ], function ($, _, __, mapFilterModuleName, util) {
     'use strict';

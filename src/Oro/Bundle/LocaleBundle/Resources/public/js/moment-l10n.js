@@ -1,5 +1,5 @@
 /*global define*/
-define(['moment', 'oro/translator', './locale-settings'
+define(['moment', 'orotranslation/js/translator', './locale-settings'
     ], function (moment, __, localeSettings) {
     'use strict';
 

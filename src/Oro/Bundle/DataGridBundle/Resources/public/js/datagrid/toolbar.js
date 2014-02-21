@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/translator', './pagination-input', './page-size', './actions-panel'
+define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-input', './page-size', './actions-panel'
     ], function (_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
     'use strict';
 

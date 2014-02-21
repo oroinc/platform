@@ -5,7 +5,7 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var __ = require('oro/translator');
+    var __ = require('orotranslation/js/translator');
     var scrollspy = require('oro/scrollspy');
     var _bootstrapTooltip = require('bootstrap-tooltip');
     var _jqueryUI = require('jquery-ui');

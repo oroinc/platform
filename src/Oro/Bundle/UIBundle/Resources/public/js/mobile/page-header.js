@@ -1,7 +1,7 @@
 /*jshint browser: true*/
 /*jslint browser: true*/
 /*global define*/
-define(['jquery', 'oro/mediator', 'oro/translator'], function ($, mediator, __) {
+define(['jquery', 'oro/mediator', 'orotranslation/js/translator'], function ($, mediator, __) {
     'use strict';
 
     function updateButtonsGroup($header) {

@@ -1,5 +1,5 @@
 /*global define, alert*/
-define([ 'underscore', 'backbone', 'oro/translator', 'orolocale/js/formatter/address'
+define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/formatter/address'
     ], function (_, Backbone, __, addressFormatter) {
     'use strict';
 

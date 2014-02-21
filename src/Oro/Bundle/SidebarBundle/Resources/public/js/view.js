@@ -9,7 +9,7 @@ define(function (require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
 
-    var __ = require('oro/translator');
+    var __ = require('orotranslation/js/translator');
     var DeleteConfirmation = require('oro/delete-confirmation');
 
     var constants = require('./constants');

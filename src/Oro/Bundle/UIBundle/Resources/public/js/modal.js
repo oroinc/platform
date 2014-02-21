@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/translator', 'backbone/bootstrap-modal'],
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'backbone/bootstrap-modal'],
 function(_, Backbone, __) {
     'use strict';
 

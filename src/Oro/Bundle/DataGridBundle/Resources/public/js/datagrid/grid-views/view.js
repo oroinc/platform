@@ -1,5 +1,5 @@
 /*global define*/
-define(['backbone', 'underscore', 'oro/translator', './collection'
+define(['backbone', 'underscore', 'orotranslation/js/translator', './collection'
     ], function (Backbone, _, __, GridViewsCollection) {
     'use strict';
     var $ = Backbone.$;

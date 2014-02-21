@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/translator', './abstract-filter'
+define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filter'
     ], function ($, _, __, AbstractFilter) {
     'use strict';
 

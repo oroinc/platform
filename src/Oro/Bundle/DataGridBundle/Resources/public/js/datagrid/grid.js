@@ -6,7 +6,7 @@ define(function (require) {
     var $ = require('jquery'),
         _ = require('underscore'),
         Backgrid = require('backgrid'),
-        __ = require('oro/translator'),
+        __ = require('orotranslation/js/translator'),
         mediator = require('oro/mediator'),
         LoadingMask = require('oroui/js/loading-mask'),
         GridHeader = require('./header'),

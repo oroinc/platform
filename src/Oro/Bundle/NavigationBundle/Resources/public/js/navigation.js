@@ -7,7 +7,7 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var Backbone = require('backbone');
-    var __ = require('oro/translator');
+    var __ = require('orotranslation/js/translator');
     var app = require('oro/app');
     var mediator = require('oro/mediator');
     var messenger = require('oro/messenger');

@@ -25,7 +25,7 @@ Client side validation method is RequireJS module, which should export an array 
 
 Trivial validation rule module would look like:
 ```js
-define(['underscore', 'oro/translator']
+define(['underscore', 'orotranslation/js/translator']
 function (_, __) {
     'use strict';
 

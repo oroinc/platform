@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/translator', 'oroquerydesigner/js/query-designer/util',
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroquerydesigner/js/query-designer/util',
     'orocalendar/js/form-validation', 'oro/delete-confirmation', 'oroquerydesigner/js/query-designer/column-selector-view',
     'jquery-outer-html'
     ], function (_, Backbone, __, util, FormValidation, DeleteConfirmation,

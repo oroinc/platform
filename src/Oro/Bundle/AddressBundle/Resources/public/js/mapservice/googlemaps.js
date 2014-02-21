@@ -1,6 +1,6 @@
 /* jshint browser:true  */
 /*global define, google*/
-define(['underscore', 'backbone', 'oro/translator'
+define(['underscore', 'backbone', 'orotranslation/js/translator'
     ], function (_, Backbone, __) {
     'use strict';
 

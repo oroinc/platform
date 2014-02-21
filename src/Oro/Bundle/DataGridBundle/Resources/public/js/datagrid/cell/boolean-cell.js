@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/translator', 'backgrid'
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'backgrid'
     ], function ($, _, __, Backgrid) {
     'use strict';
 

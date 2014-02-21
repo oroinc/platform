@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'oro/translator', 'oro/delete-confirmation', './mass-action'
+define(['underscore', 'orotranslation/js/translator', 'oro/delete-confirmation', './mass-action'
     ], function (_, __, DeleteConfirmation, MassAction) {
     'use strict';
 
