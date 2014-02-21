@@ -30,9 +30,9 @@ class SpoolItem
     private $status;
 
     /**
-     * @var string
+     * @var \Swift_Mime_Message
      *
-     * @ORM\Column(name="message", type="text")
+     * @ORM\Column(name="message", type="object")
      */
     private $message;
 
@@ -40,7 +40,7 @@ class SpoolItem
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -56,14 +56,14 @@ class SpoolItem
     public function setStatus($status)
     {
         $this->status = $status;
-    
+
         return $this;
     }
 
     /**
      * Get status
      *
-     * @return string 
+     * @return string
      */
     public function getStatus()
     {
@@ -73,20 +73,20 @@ class SpoolItem
     /**
      * Set message
      *
-     * @param string $message
+     * @param \Swift_Mime_Message $message
      * @return SpoolItem
      */
-    public function setMessage($message)
+    public function setMessage(\Swift_Mime_Message $message)
     {
         $this->message = $message;
-    
+
         return $this;
     }
 
     /**
      * Get message
      *
-     * @return string 
+     * @return \Swift_Mime_Message
      */
     public function getMessage()
     {

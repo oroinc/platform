@@ -41,7 +41,7 @@
             <div class="row-fluid form-horizontal">
                 <div class="responsive-block">
                     {{ ui.renderProperty('oro.embeddedform.title.label'|trans, entity.title) }}
-                    {{ ui.renderProperty('oro.embeddedform.form_type.label'|trans, entity.formType) }}
+                    {{ ui.renderProperty('oro.embeddedform.form_type.label'|trans, label|default('N/A')|trans) }}
                     {{ ui.renderProperty('oro.embeddedform.channel.label'|trans, entity.channel.name) }}
 
                     {# to display css in a div with vertical scroll #}

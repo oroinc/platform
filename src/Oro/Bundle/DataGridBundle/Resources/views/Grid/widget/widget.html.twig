@@ -1,0 +1,28 @@
+{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+
+<div class="widget-content">
+    <script type="text/javascript">
+        require(['oro/mediator', 'oro/widget-manager'],
+        function(mediator, widgetManager) {
+            var gridName = {{ gridName|json_encode|raw }};
+            mediator.bind('datagrid_create_before', function(options) {
+                if (options.name == gridName && !options.rowClickAction) {
+                    options.rowClickAction = function(data) {
+                        return {
+                            run: function() {
+                                widgetManager.getWidgetInstance(
+                                    {{ app.request.get('_wid')|json_encode|raw }},
+                                    function(widget) {
+                                        widget.trigger('grid-row-select', data);
+                                    }
+                                );
+                            }
+                        }
+                    };
+                }
+            });
+        });
+    </script>
+
+    {{ dataGrid.renderGrid(gridName, params, renderParams) }}
+</div>
