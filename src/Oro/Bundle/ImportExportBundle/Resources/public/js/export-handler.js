@@ -1,10 +1,10 @@
-/* global define */
-define(['underscore', 'oro/translator', 'oro/messenger'],
-function(_, __, messenger) {
+/*global define*/
+define(['underscore', 'oro/translator', 'oro/messenger'
+    ], function (_, __, messenger) {
     'use strict';
 
     /**
-     * @export oro/export-handler
+     * @export oroimportexport/js/export-handler
      * @name   oro.exportHandler
      */
     return {
