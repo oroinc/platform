@@ -1,14 +1,14 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/datafilter/text-filter'],
-function($, _, __, app, TextFilter) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/translator', 'oro/app', './text-filter'
+    ], function ($, _, __, app, TextFilter) {
     'use strict';
 
     /**
      * Choice filter: filter type as option + filter value as string
      *
-     * @export  oro/datafilter/choice-filter
-     * @class   oro.datafilter.ChoiceFilter
-     * @extends oro.datafilter.TextFilter
+     * @export  orofilter/js/filter/choice-filter
+     * @class   orofilter.filter.ChoiceFilter
+     * @extends orofilter.filter.TextFilter
      */
     return TextFilter.extend({
         /**

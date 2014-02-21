@@ -1,14 +1,14 @@
-/* global define */
-define(['underscore', 'oro/datafilter/abstract-formatter'],
-function(_, AbstractFormatter) {
+/*global define*/
+define(['underscore', './abstract-formatter'
+    ], function (_, AbstractFormatter) {
     'use strict';
 
     /**
      * A floating point number formatter. Doesn't understand notation at the moment.
      *
-     * @export  oro/datafilter/number-formatter
-     * @class   oro.datafilter.NumberFormatter
-     * @extends oro.datafilter.AbstractFormatter
+     * @export  orofilter/js/formatter/number-formatter
+     * @class   orofilter.formatter.NumberFormatter
+     * @extends orofilter.formatter.AbstractFormatter
      * @throws {RangeError} If decimals < 0 or > 20.
      */
     var NumberFormatter = function (options) {
@@ -24,7 +24,7 @@ function(_, AbstractFormatter) {
 
     _.extend(NumberFormatter.prototype, {
         /**
-         * @memberOf oro.datafilter.NumberFormatter
+         * @memberOf orofilter.formatter.NumberFormatter
          * @cfg {Object} options
          *
          * @cfg {number} [options.decimals=2] Number of decimals to display. Must be an integer.
@@ -49,7 +49,7 @@ function(_, AbstractFormatter) {
          * decimals separated by `decimalSeparator`. The number returned is rounded
          * the usual way.
          *
-         * @memberOf oro.datafilter.NumberFormatter
+         * @memberOf orofilter.formatter.NumberFormatter
          * @param {number} number
          * @return {string}
          */
@@ -69,7 +69,7 @@ function(_, AbstractFormatter) {
          * Takes a string, possibly formatted with `orderSeparator` and/or
          * `decimalSeparator`, and convert it back to a number.
          *
-         * @memberOf oro.datafilter.NumberFormatter
+         * @memberOf orofilter.formatter.NumberFormatter
          * @param {string} formattedData
          * @return {number|undefined} Undefined if the string cannot be converted to
          * a number.

@@ -1,5 +1,5 @@
-/* global define */
-define(function() {
+/*global define*/
+define(function () {
     'use strict';
 
     /**
@@ -10,20 +10,20 @@ define(function() {
      * are defined.
      *
      * @abstract
-     * @export  oro/datafilter/abstract-formatter
-     * @class   oro.datafilter.AbstractFormatter
+     * @export  orofilter/js/formatter/abstract-formatter
+     * @class   orofilter.formatter.AbstractFormatter
      */
-    var AbstractFormatter = function() {};
+    var AbstractFormatter = function () {};
 
     AbstractFormatter.prototype = {
         /**
          * Takes a raw value from a model and returns a formatted string for display.
          *
-         * @memberOf oro.datafilter.AbstractFormatter
+         * @memberOf orofilter.formatter.AbstractFormatter
          * @param {*} rawData
          * @return {string}
          */
-        fromRaw: function(rawData) {
+        fromRaw: function (rawData) {
             return rawData;
         },
 
@@ -34,11 +34,11 @@ define(function() {
          * If the user input is invalid or unable to be converted to a raw value
          * suitable for persistence in the model, toRaw must return `undefined`.
          *
-         * @memberOf oro.datafilter.AbstractFormatter
+         * @memberOf orofilter.formatter.AbstractFormatter
          * @param {string} formattedData
          * @return {*|undefined}
          */
-        toRaw: function(formattedData) {
+        toRaw: function (formattedData) {
             return formattedData;
         }
     };

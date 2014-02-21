@@ -1,14 +1,14 @@
-/* global define */
-define(['underscore', 'oro/translator', 'oro/datafilter/select-filter'],
-function(_, __, SelectFilter) {
+/*global define*/
+define(['underscore', 'oro/translator', './select-filter'
+    ], function (_, __, SelectFilter) {
     'use strict';
 
     /**
      * Multiple select filter: filter values as multiple select options
      *
-     * @export  oro/datafilter/multiselect-filter
-     * @class   oro.datafilter.MultiSelectFilter
-     * @extends oro.datafilter.SelectFilter
+     * @export  orofilter/js/filter/multiselect-filter
+     * @class   orofilter.filter.MultiSelectFilter
+     * @extends orofilter.filter.SelectFilter
      */
     return SelectFilter.extend({
         /**

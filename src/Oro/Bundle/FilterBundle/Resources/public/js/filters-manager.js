@@ -1,14 +1,15 @@
 /*jshint devel: true, multistr: true*/
-/* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/multiselect-decorator', 'oro/app', 'oro/datafilter-wrapper'],
-function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/app',
+        './multiselect-decorator', './datafilter-wrapper'
+    ], function ($, _, Backbone, mediator, app, MultiselectDecorator, filterWrapper) {
     'use strict';
 
     /**
      * View that represents all grid filters
      *
-     * @export  oro/datafilter/filters-manager
-     * @class   oro.datafilter.FiltersManager
+     * @export  orofilter/js/filters-manager
+     * @class   orofilter.FiltersManager
      * @extends Backbone.View
      *
      * @event updateList    on update of filter list
@@ -98,8 +99,8 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
             Backbone.View.prototype.initialize.apply(this, arguments);
 
             // destroy events bindings
-            mediator.once('hash_navigation_request:start', function() {
-                _.each(this.filters, function(filter) {
+            mediator.once('hash_navigation_request:start', function () {
+                _.each(this.filters, function (filter) {
                     this.stopListening(filter, "update", this._onFilterUpdated);
                     this.stopListening(filter, "disable", this._onFilterDisabled);
                 }, this);
@@ -113,20 +114,20 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
         /**
          * Triggers when filter is updated
          *
-         * @param {oro.datafilter.AbstractFilter} filter
+         * @param {orofilter.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterUpdated: function(filter) {
+        _onFilterUpdated: function (filter) {
             this.trigger('updateFilter', filter);
         },
 
         /**
          * Triggers when filter is disabled
          *
-         * @param {oro.datafilter.AbstractFilter} filter
+         * @param {orofilter.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterDisabled: function(filter) {
+        _onFilterDisabled: function (filter) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
         },
@@ -134,9 +135,9 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
         /**
          * Returns list of filter raw values
          */
-        getValues: function() {
+        getValues: function () {
             var values = {};
-            _.each(this.filters, function(filter) {
+            _.each(this.filters, function (filter) {
                 if (filter.enabled) {
                     values[filter.name] = filter.getValue();
                 }
@@ -148,8 +149,8 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
         /**
          * Sets raw values for filters
          */
-        setValues: function(values) {
-            _.each(values, function(value, name) {
+        setValues: function (values) {
+            _.each(values, function (value, name) {
                 if (_.has(this.filters, name)) {
                     this.filters[name].setValue(value);
                 }
@@ -161,7 +162,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
          *
          * @protected
          */
-        _onChangeFilterSelect: function() {
+        _onChangeFilterSelect: function () {
             this.trigger('updateList', this);
             this._processFilterStatus();
         },
@@ -169,7 +170,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
         /**
          * Enable filter
          *
-         * @param {oro.datafilter.AbstractFilter} filter
+         * @param {orofilter.filter.AbstractFilter} filter
          * @return {*}
          */
         enableFilter: function(filter) {
@@ -179,10 +180,10 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
         /**
          * Disable filter
          *
-         * @param {oro.datafilter.AbstractFilter} filter
+         * @param {orofilter.filter.AbstractFilter} filter
          * @return {*}
          */
-        disableFilter: function(filter) {
+        disableFilter: function (filter) {
             return this.disableFilters([filter]);
         },
 
@@ -192,13 +193,13 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
          * @param filters []
          * @return {*}
          */
-        enableFilters: function(filters) {
+        enableFilters: function (filters) {
             if (_.isEmpty(filters)) {
                 return this;
             }
             var optionsSelectors = [];
 
-            _.each(filters, function(filter) {
+            _.each(filters, function (filter) {
                 filter.enable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
@@ -221,7 +222,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
          * @param filters []
          * @return {*}
          */
-        disableFilters: function(filters) {
+        disableFilters: function (filters) {
             if (_.isEmpty(filters)) {
                 return this;
             }
@@ -255,7 +256,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
 
             var fragment = document.createDocumentFragment();
 
-            _.each(this.filters, function(filter) {
+            _.each(this.filters, function (filter) {
                 filter.render();
                 if (!filter.enabled) {
                     filter.hide();
@@ -280,7 +281,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
          *
          * @protected
          */
-        _initializeSelectWidget: function() {
+        _initializeSelectWidget: function () {
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: {
@@ -307,7 +308,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
          *
          * @protected
          */
-        _setDropdownWidth: function() {
+        _setDropdownWidth: function () {
             var widget = this.selectWidget.getWidget();
             var requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
@@ -319,13 +320,13 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
          *
          * @protected
          */
-        _processFilterStatus: function() {
+        _processFilterStatus: function () {
             var activeFilters = this.$(this.filterSelector).val();
 
-            _.each(this.filters, function(filter, name) {
-                if (!filter.enabled && _.indexOf(activeFilters, name) != -1) {
+            _.each(this.filters, function (filter, name) {
+                if (!filter.enabled && _.indexOf(activeFilters, name) !== -1) {
                     this.enableFilter(filter);
-                } else if (filter.enabled && _.indexOf(activeFilters, name) == -1) {
+                } else if (filter.enabled && _.indexOf(activeFilters, name) === -1) {
                     this.disableFilter(filter);
                 }
             }, this);
@@ -338,7 +339,7 @@ function($, _, Backbone, mediator, MultiselectDecorator, app, filterWrapper) {
          *
          * @protected
          */
-        _updateDropdownPosition: function() {
+        _updateDropdownPosition: function () {
             var button = this.$(this.buttonSelector);
             var buttonPosition = button.offset();
             var widgetWidth = this.selectWidget.getWidget().outerWidth();

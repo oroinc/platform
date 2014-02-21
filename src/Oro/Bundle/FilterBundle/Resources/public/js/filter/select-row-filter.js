@@ -1,15 +1,15 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/datafilter/select-filter'],
-function(_, Backbone, SelectFilter) {
+/*global define*/
+define(['underscore', 'backbone', './select-filter'
+    ], function (_, Backbone, SelectFilter) {
     'use strict';
 
     /**
      * Fetches information of rows selection
      * and implements filter by selected/Not selected rows
      *
-     * @export  oro/datafilter/select-row-filter
-     * @class   oro.datafilter.SelectRowFilter
-     * @extends oro.datafilter.SelectFilter
+     * @export  orofilter/js/filter/select-row-filter
+     * @class   orofilter.filter.SelectRowFilter
+     * @extends orofilter.filter.SelectFilter
      */
     return SelectFilter.extend({
 
@@ -19,7 +19,7 @@ function(_, Backbone, SelectFilter) {
          *
          * @return {Object}
          */
-        getValue: function() {
+        getValue: function () {
             return this._formatRawValue(_.omit(this.value, 'in', 'out'));
         },
 
@@ -31,7 +31,7 @@ function(_, Backbone, SelectFilter) {
          * @return {Object}
          * @protected
          */
-        _formatRawValue: function(value) {
+        _formatRawValue: function (value) {
             // if a display value already contains raw information assume it's an initialization
             if (_.has(value, 'in') || _.has(value, 'out')) {
                 this._initialSelection(value);
@@ -55,7 +55,7 @@ function(_, Backbone, SelectFilter) {
          * @return {Object}
          * @protected
          */
-        _formatDisplayValue: function(value) {
+        _formatDisplayValue: function (value) {
             return _.omit(value, 'in', 'out');
         },
 
@@ -84,7 +84,7 @@ function(_, Backbone, SelectFilter) {
          * @param {string} value.out comma-separated ids
          * @protected
          */
-        _initialSelection: function(value) {
+        _initialSelection: function (value) {
             var checked = true;
             if (Boolean(parseInt(value.value, 10)) !== _.has(value, 'in')) {
                 this.collection.trigger('backgrid:selectAll');
@@ -92,7 +92,7 @@ function(_, Backbone, SelectFilter) {
             }
             _.each(
                 _.values(_.pick(value, 'in', 'out'))[0].split(',') || [],
-                _.partial(function(collection, id) {
+                _.partial(function (collection, id) {
                     var model = collection.get(id);
                     if (model instanceof Backbone.Model) {
                         model.trigger("backgrid:select", model, checked);
