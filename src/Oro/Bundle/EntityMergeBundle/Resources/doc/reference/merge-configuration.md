@@ -100,15 +100,15 @@ oro_entity_config:
                 # For example there is a Call entity with field referenced to Account using ManyToOne unidirectional relation.
                 # As Account doesn't have access to collection of calls the only possible place to configure calls merging
                 # for account is this field in Call entity
-                relation_enable:
+                inverse_enable:
                     options:
                         is_bool: true
                 # Same as merge_mode but used for relation entity
-                relation_modes: ~
+                inverse_modes: ~
                 # Same as label but used for relation entity
-                relation_label: ~
+                inverse_label: ~
                 # Same as cast_method but used for relation entity
-                relation_cast_method: ~
+                inverse_cast_method: ~
 ```
 
 Example:

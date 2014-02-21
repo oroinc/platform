@@ -38,9 +38,13 @@ class FieldMetadata extends Metadata implements MetadataInterface
 
     /**
      * @return EntityMetadata
+     * @throws InvalidArgumentException
      */
     public function getEntityMetadata()
     {
+        if (!$this->entityMetadata) {
+            throw new InvalidArgumentException('Entity metadata is not configured.');
+        }
         return $this->entityMetadata;
     }
 
@@ -158,7 +162,7 @@ class FieldMetadata extends Metadata implements MetadataInterface
      * Checks if merge mode is available
      *
      * @param string $mode
-     * @return array
+     * @return bool
      */
     public function hasMergeMode($mode)
     {
@@ -166,16 +170,40 @@ class FieldMetadata extends Metadata implements MetadataInterface
     }
 
     /**
+     * Checks if field represents a collection
+     *
      * @return bool
      */
     public function isCollection()
     {
-        if ($this->has('is_collection')) {
-            return (bool)$this->get('is_collection');
+        if (!$this->hasDoctrineMetadata()) {
+            return $this->is('is_collection', true);
         }
-        if ($this->hasDoctrineMetadata()) {
-            return $this->getDoctrineMetadata()->isCollection();
+
+        $doctrineMetadata = $this->getDoctrineMetadata();
+
+        if (!$doctrineMetadata->isAssociation()) {
+            return false;
         }
-        return false;
+
+        if ($doctrineMetadata->isManyToMany()) {
+            return true;
+        }
+
+        if ($this->isDefinedBySourceEntity()) {
+            return $doctrineMetadata->isOneToMany();
+        } else {
+            return $doctrineMetadata->isManyToOne();
+        }
+    }
+
+    /**
+     * Checks if field defined by source entity
+     *
+     * @return bool
+     */
+    public function isDefinedBySourceEntity()
+    {
+        return $this->getSourceClassName() == $this->getEntityMetadata()->getClassName();
     }
 }

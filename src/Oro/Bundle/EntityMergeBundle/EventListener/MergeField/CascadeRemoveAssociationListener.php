@@ -43,9 +43,9 @@ class CascadeRemoveAssociationListener
 
         if (MergeModes::REPLACE != $fieldData->getMode() ||
             !$metadata->hasDoctrineMetadata() ||
-            !$metadata->getDoctrineMetadata()->isMappedBySourceEntity() ||
             !$metadata->getDoctrineMetadata()->isAssociation() ||
-            $metadata->getDoctrineMetadata()->isCollection() ||
+            !$metadata->isDefinedBySourceEntity() ||
+            $metadata->isCollection() ||
             !in_array('remove', (array)$metadata->getDoctrineMetadata()->get('cascade'))
         ) {
             return;

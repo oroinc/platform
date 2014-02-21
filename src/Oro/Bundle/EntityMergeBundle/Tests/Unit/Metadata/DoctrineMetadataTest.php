@@ -25,6 +25,22 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
         $this->doctrineMetadata = new DoctrineMetadata();
     }
 
+    public function testGetFieldName()
+    {
+        $expectedFieldName = 'test';
+        $this->doctrineMetadata->set('fieldName', $expectedFieldName);
+        $this->assertEquals($expectedFieldName, $this->doctrineMetadata->getFieldName());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Option "fieldName" not exists
+     */
+    public function testGetFieldNameFails()
+    {
+        $this->doctrineMetadata->getFieldName();
+    }
+
     public function testIsField()
     {
         $this->assertTrue($this->doctrineMetadata->isField());
@@ -47,29 +63,43 @@ class DoctrineMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->doctrineMetadata->isAssociation());
     }
 
-    public function testIsCollection()
+    public function testIsOneToOne()
     {
-        $this->assertFalse($this->doctrineMetadata->isCollection());
+        $this->assertFalse($this->doctrineMetadata->isOneToOne());
 
-        $this->doctrineMetadata->set('type', ClassMetadataInfo::MANY_TO_ONE);
-        $this->assertFalse($this->doctrineMetadata->isCollection());
-
-        $this->doctrineMetadata->set('type', ClassMetadataInfo::ONE_TO_MANY);
-        $this->assertTrue($this->doctrineMetadata->isCollection());
+        $this->doctrineMetadata->set('type', ClassMetadataInfo::ONE_TO_ONE);
+        $this->assertTrue($this->doctrineMetadata->isOneToOne());
     }
 
-    public function testIsMappedBySourceEntity()
+    public function testIsOneToMany()
     {
-        $this->assertTrue($this->doctrineMetadata->isMappedBySourceEntity());
+        $this->assertFalse($this->doctrineMetadata->isOneToMany());
 
-        $this->doctrineMetadata->set('targetEntity', self::CLASS_NAME);
-        $this->doctrineMetadata->set('joinColumns', []);
-        $this->assertFalse($this->doctrineMetadata->isMappedBySourceEntity());
+        $this->doctrineMetadata->set('type', ClassMetadataInfo::ONE_TO_MANY);
+        $this->assertTrue($this->doctrineMetadata->isOneToMany());
+    }
 
-        $this->doctrineMetadata->set('mappedBySourceEntity', false);
-        $this->assertFalse($this->doctrineMetadata->isMappedBySourceEntity());
+    public function testIsManyToMany()
+    {
+        $this->assertFalse($this->doctrineMetadata->isManyToMany());
 
-        $this->doctrineMetadata->set('mappedBySourceEntity', true);
-        $this->assertTrue($this->doctrineMetadata->isMappedBySourceEntity());
+        $this->doctrineMetadata->set('type', ClassMetadataInfo::MANY_TO_MANY);
+        $this->assertTrue($this->doctrineMetadata->isManyToMany());
+    }
+
+    public function testIsManyToOne()
+    {
+        $this->assertFalse($this->doctrineMetadata->isManyToOne());
+
+        $this->doctrineMetadata->set('type', ClassMetadataInfo::MANY_TO_ONE);
+        $this->assertTrue($this->doctrineMetadata->isManyToOne());
+    }
+
+    public function testIsTypeEqual()
+    {
+        $expectedType = ClassMetadataInfo::ONE_TO_MANY;
+        $this->doctrineMetadata->set('type', $expectedType);
+        $this->assertTrue($this->doctrineMetadata->isTypeEqual($expectedType));
+        $this->assertFalse($this->doctrineMetadata->isTypeEqual(ClassMetadataInfo::ONE_TO_ONE));
     }
 }

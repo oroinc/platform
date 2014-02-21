@@ -2,28 +2,27 @@
 
 namespace Oro\Bundle\EntityMergeBundle\EventListener\Metadata;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
-
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
+
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityConfigListener
 {
-    const MERGE_SCOPE = 'merge';
-    const ENTITY_SCOPE = 'entity';
+    const CONFIG_MERGE_SCOPE = 'merge';
+    const INVERSE_OPTION_PREFIX = 'inverse_';
 
     /**
-     * @var ConfigManager
+     * @var EntityConfigHelper
      */
-    protected $configManager;
+    protected $entityConfigHelper;
 
     /**
-     * @param ConfigManager $configManager
+     * @param EntityConfigHelper $entityConfigHelper
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(EntityConfigHelper $entityConfigHelper)
     {
-        $this->configManager = $configManager;
+        $this->entityConfigHelper = $entityConfigHelper;
     }
 
     /**
@@ -33,39 +32,63 @@ class EntityConfigListener
     {
         $entityMetadata = $event->getEntityMetadata();
 
-        $mergeConfig = $this->configManager->getProvider(self::MERGE_SCOPE);
+        $this->applyEntityMetadataConfig($entityMetadata);
 
-        $this->applyEntityMetadataConfig($entityMetadata, $mergeConfig);
-        $this->applyFieldMetadataConfig($entityMetadata, $mergeConfig);
-    }
-
-    protected function applyEntityMetadataConfig(EntityMetadata $entityMetadata, ConfigProviderInterface $mergeConfig)
-    {
-        $className = $entityMetadata->getClassName();
-
-        if ($mergeConfig->hasConfig($className)) {
-            $entityMetadata->merge($mergeConfig->getConfig($className)->all());
-        }
-    }
-
-    protected function applyFieldMetadataConfig(EntityMetadata $entityMetadata, ConfigProviderInterface $mergeConfig)
-    {
         foreach ($entityMetadata->getFieldsMetadata() as $fieldMetadata) {
-            $className = $fieldMetadata->getSourceClassName();
-            $fieldName = $fieldMetadata->getSourceFieldName();
-
-            // Match simple field
-            if ($mergeConfig->hasConfig($className, $fieldName)) {
-                $fieldMetadata->merge($mergeConfig->getConfig($className, $fieldName)->all());
-            }
+            $this->applyFieldMetadataConfig($fieldMetadata);
         }
     }
 
     /**
-     * @return ConfigProviderInterface
+     * @param EntityMetadata $entityMetadata
      */
-    protected function getEntityConfigProvider()
+    protected function applyEntityMetadataConfig(EntityMetadata $entityMetadata)
     {
-        return $this->configManager->getProvider(self::ENTITY_SCOPE);
+        $className = $entityMetadata->getClassName();
+
+        $mergeConfig = $this->entityConfigHelper->getConfig(self::CONFIG_MERGE_SCOPE, $className, null);
+
+        if ($mergeConfig) {
+            $entityMetadata->merge($mergeConfig->all());
+        }
+    }
+
+    /**
+     * @param FieldMetadata $fieldMetadata
+     */
+    protected function applyFieldMetadataConfig(FieldMetadata $fieldMetadata)
+    {
+        $this->entityConfigHelper->prepareFieldMetadataPropertyPath($fieldMetadata);
+
+        $mergeConfig = $this->entityConfigHelper->getConfigByFieldMetadata(self::CONFIG_MERGE_SCOPE, $fieldMetadata);
+
+        if ($mergeConfig) {
+            $mergeOptions = $mergeConfig->all();
+            $mergeOptions = $this->filterInverseOptions($mergeOptions, $fieldMetadata->isDefinedBySourceEntity());
+
+            $fieldMetadata->merge($mergeOptions);
+        }
+    }
+
+    /**
+     * @param array $options
+     * @param bool $definedBySourceEntity
+     * @return array
+     */
+    protected function filterInverseOptions(array $options, $definedBySourceEntity)
+    {
+        $result = array();
+        $overrideOptions = array();
+
+        foreach ($options as $key => $value) {
+            if (0 === strpos($key, self::INVERSE_OPTION_PREFIX)) {
+                $key = substr($key, strlen(self::INVERSE_OPTION_PREFIX));
+                $overrideOptions[$key] = $value;
+            } else {
+                $result[$key] = $value;
+            }
+        }
+
+        return $definedBySourceEntity ? $result : array_merge($result, $overrideOptions);
     }
 }

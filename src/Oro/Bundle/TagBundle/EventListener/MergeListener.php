@@ -34,7 +34,7 @@ class MergeListener
      *
      * @param EntityMetadataEvent $event
      */
-    public function onCreateMetadata(EntityMetadataEvent $event)
+    public function onBuildMetadata(EntityMetadataEvent $event)
     {
         $entityMetadata = $event->getEntityMetadata();
         if (!$this->isTaggable($entityMetadata)) {
@@ -42,6 +42,7 @@ class MergeListener
         }
 
         $fieldMetadataOptions = [
+            'enable'        => true,
             'getter'        => self::GETTER,
             'setter'        => self::SETTER,
             'field_name'    => self::FIELD_NAME,

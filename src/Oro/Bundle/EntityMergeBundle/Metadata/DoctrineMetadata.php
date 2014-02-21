@@ -27,47 +27,54 @@ class DoctrineMetadata extends Metadata implements MetadataInterface
     }
 
     /**
-     * Checks if this field represented by collections
+     * Checks if association type is equals to
      *
+     * @param int $type
      * @return bool
      */
-    public function isCollection()
+    public function isTypeEqual($type)
     {
-        $sourceCollectionTypes = [
-            ClassMetadataInfo::ONE_TO_MANY,
-            ClassMetadataInfo::MANY_TO_MANY,
-        ];
-
-        $inverseCollectionTypes = [
-            ClassMetadataInfo::MANY_TO_ONE,
-            ClassMetadataInfo::MANY_TO_MANY,
-        ];
-
-        return ($this->isTypeIn($sourceCollectionTypes) && $this->isMappedBySourceEntity()) ||
-            ($this->isTypeIn($inverseCollectionTypes) && !$this->isMappedBySourceEntity());
+        return $this->get('type') == $type;
     }
 
     /**
-     * @param array $types
-     * @return bool
-     */
-    protected function isTypeIn(array $types)
-    {
-        return $this->has('type') && in_array($this->get('type'), $types);
-    }
-
-    /**
-     * Checks if this metadata relates to field that is mapped in source entity
+     * Checks if association type is ONE_TO_MANY
      *
      * @return bool
      */
-    public function isMappedBySourceEntity()
+    public function isOneToMany()
     {
-        if ($this->has('mappedBySourceEntity')) {
-            return $this->get('mappedBySourceEntity');
-        } else {
-            return $this->isField();
-        }
+        return $this->isTypeEqual(ClassMetadataInfo::ONE_TO_MANY);
+    }
+
+    /**
+     * Checks if association type is MANY_TO_MANY
+     *
+     * @return bool
+     */
+    public function isManyToMany()
+    {
+        return $this->isTypeEqual(ClassMetadataInfo::MANY_TO_MANY);
+    }
+
+    /**
+     * Checks if association type is MANY_TO_ONE
+     *
+     * @return bool
+     */
+    public function isManyToOne()
+    {
+        return $this->isTypeEqual(ClassMetadataInfo::MANY_TO_ONE);
+    }
+
+    /**
+     * Checks if association type is ONE_TO_ONE
+     *
+     * @return bool
+     */
+    public function isOneToOne()
+    {
+        return $this->isTypeEqual(ClassMetadataInfo::ONE_TO_ONE);
     }
 
     /**

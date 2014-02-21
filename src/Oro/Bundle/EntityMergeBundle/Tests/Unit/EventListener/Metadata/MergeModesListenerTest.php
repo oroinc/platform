@@ -3,12 +3,12 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
-use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\InitMergeModesListener;
+use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\MergeModesListener;
 
-class InitMergeModesListenerTest extends \PHPUnit_Framework_TestCase
+class MergeModesListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var InitMergeModesListener
+     * @var MergeModesListener
      */
     protected $listener;
 
@@ -25,12 +25,12 @@ class InitMergeModesListenerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->entityMetadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
+            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->fieldMetadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
+            ->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -39,7 +39,7 @@ class InitMergeModesListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldsMetadata')
             ->will($this->returnValue([$this->fieldMetadata]));
 
-        $this->listener = new InitMergeModesListener();
+        $this->listener = new MergeModesListener();
     }
 
     public function testOnCreateMetadata()
