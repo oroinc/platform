@@ -9,21 +9,111 @@ class OroAddressBundle implements Migration
 {
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        return [
-            "CREATE TABLE oro_address (id INT AUTO_INCREMENT NOT NULL, region_code VARCHAR(16) DEFAULT NULL, country_code VARCHAR(2) DEFAULT NULL, `label` VARCHAR(255) DEFAULT NULL, street VARCHAR(500) NOT NULL, street2 VARCHAR(500) DEFAULT NULL, city VARCHAR(255) NOT NULL, postal_code VARCHAR(20) NOT NULL, organization VARCHAR(255) DEFAULT NULL, region_text VARCHAR(255) DEFAULT NULL, name_prefix VARCHAR(255) DEFAULT NULL, first_name VARCHAR(255) DEFAULT NULL, middle_name VARCHAR(255) DEFAULT NULL, last_name VARCHAR(255) DEFAULT NULL, name_suffix VARCHAR(255) DEFAULT NULL, created DATETIME NOT NULL, updated DATETIME NOT NULL, INDEX IDX_C5E99957F026BB7C (country_code), INDEX IDX_C5E99957AEB327AF (region_code), PRIMARY KEY(id))",
-            "CREATE TABLE oro_address_type (name VARCHAR(16) NOT NULL, `label` VARCHAR(255) NOT NULL, UNIQUE INDEX UNIQ_8B3E52E3EA750E8 (`label`), PRIMARY KEY(name))",
-            "CREATE TABLE oro_address_type_translation (id INT AUTO_INCREMENT NOT NULL, foreign_key VARCHAR(16) NOT NULL, content VARCHAR(255) NOT NULL, locale VARCHAR(8) NOT NULL, object_class VARCHAR(255) NOT NULL, field VARCHAR(32) NOT NULL, INDEX address_type_translation_idx (locale, object_class, field, foreign_key), PRIMARY KEY(id))",
-            "CREATE TABLE oro_dictionary_country (iso2_code VARCHAR(2) NOT NULL, iso3_code VARCHAR(3) NOT NULL, name VARCHAR(255) NOT NULL, INDEX country_name_idx (name), PRIMARY KEY(iso2_code));",
-            "CREATE TABLE oro_dictionary_country_translation (id INT AUTO_INCREMENT NOT NULL, foreign_key VARCHAR(2) NOT NULL, content VARCHAR(255) NOT NULL, locale VARCHAR(8) NOT NULL, object_class VARCHAR(255) NOT NULL, field VARCHAR(32) NOT NULL, INDEX country_translation_idx (locale, object_class, field, foreign_key), PRIMARY KEY(id));",
-            "CREATE TABLE oro_dictionary_region (combined_code VARCHAR(16) NOT NULL, country_code VARCHAR(2) DEFAULT NULL, code VARCHAR(32) NOT NULL, name VARCHAR(255) NOT NULL, INDEX IDX_8C71325AF026BB7C (country_code), INDEX region_name_idx (name), PRIMARY KEY(combined_code));",
-            "CREATE TABLE oro_dictionary_region_translation (id INT AUTO_INCREMENT NOT NULL, foreign_key VARCHAR(16) NOT NULL, content VARCHAR(255) NOT NULL, locale VARCHAR(8) NOT NULL, object_class VARCHAR(255) NOT NULL, field VARCHAR(32) NOT NULL, INDEX region_translation_idx (locale, object_class, field, foreign_key), PRIMARY KEY(id));",
+        // @codingStandardsIgnoreStart
 
-            "ALTER TABLE oro_address ADD CONSTRAINT FK_C5E99957AEB327AF FOREIGN KEY (region_code) REFERENCES oro_dictionary_region (combined_code)",
-            "ALTER TABLE oro_address ADD CONSTRAINT FK_C5E99957F026BB7C FOREIGN KEY (country_code) REFERENCES oro_dictionary_country (iso2_code)",
-            "ALTER TABLE oro_dictionary_region ADD CONSTRAINT FK_8C71325AF026BB7C FOREIGN KEY (country_code) REFERENCES oro_dictionary_country (iso2_code)"
-        ];
+        /** Generate table oro_address **/
+        $table = $schema->createTable('oro_address');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('region_code', 'string', ['default' => null, 'notnull' => false, 'length' => 16, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('country_code', 'string', ['default' => null, 'notnull' => false, 'length' => 2, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('label', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('street', 'string', ['default' => null, 'notnull' => true, 'length' => 500, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('street2', 'string', ['default' => null, 'notnull' => false, 'length' => 500, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('city', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('postal_code', 'string', ['default' => null, 'notnull' => true, 'length' => 20, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('organization', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('region_text', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('name_prefix', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('first_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('middle_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('last_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('name_suffix', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('created', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('updated', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['country_code'], 'IDX_C5E99957F026BB7C', []);
+        $table->addIndex(['region_code'], 'IDX_C5E99957AEB327AF', []);
+        /** End of generate table oro_address **/
+
+        /** Generate table oro_address_type **/
+        $table = $schema->createTable('oro_address_type');
+        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 16, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('label', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['name']);
+        $table->addUniqueIndex(['label'], 'UNIQ_8B3E52E3EA750E8');
+        /** End of generate table oro_address_type **/
+
+        /** Generate table oro_address_type_translation **/
+        $table = $schema->createTable('oro_address_type_translation');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('foreign_key', 'string', ['default' => null, 'notnull' => true, 'length' => 16, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('content', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('locale', 'string', ['default' => null, 'notnull' => true, 'length' => 8, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('object_class', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 32, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'address_type_translation_idx', []);
+        /** End of generate table oro_address_type_translation **/
+
+        /** Generate table oro_dictionary_country **/
+        $table = $schema->createTable('oro_dictionary_country');
+        $table->addColumn('iso2_code', 'string', ['default' => null, 'notnull' => true, 'length' => 2, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('iso3_code', 'string', ['default' => null, 'notnull' => true, 'length' => 3, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['iso2_code']);
+        $table->addIndex(['name'], 'country_name_idx', []);
+        /** End of generate table oro_dictionary_country **/
+
+        /** Generate table oro_dictionary_country_translation **/
+        $table = $schema->createTable('oro_dictionary_country_translation');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('foreign_key', 'string', ['default' => null, 'notnull' => true, 'length' => 2, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('content', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('locale', 'string', ['default' => null, 'notnull' => true, 'length' => 8, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('object_class', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 32, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'country_translation_idx', []);
+        /** End of generate table oro_dictionary_country_translation **/
+
+        /** Generate table oro_dictionary_region **/
+        $table = $schema->createTable('oro_dictionary_region');
+        $table->addColumn('combined_code', 'string', ['default' => null, 'notnull' => true, 'length' => 16, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('country_code', 'string', ['default' => null, 'notnull' => false, 'length' => 2, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('code', 'string', ['default' => null, 'notnull' => true, 'length' => 32, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['combined_code']);
+        $table->addIndex(['country_code'], 'IDX_8C71325AF026BB7C', []);
+        $table->addIndex(['name'], 'region_name_idx', []);
+        /** End of generate table oro_dictionary_region **/
+
+        /** Generate table oro_dictionary_region_translation **/
+        $table = $schema->createTable('oro_dictionary_region_translation');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('foreign_key', 'string', ['default' => null, 'notnull' => true, 'length' => 16, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('content', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('locale', 'string', ['default' => null, 'notnull' => true, 'length' => 8, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('object_class', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 32, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'region_translation_idx', []);
+        /** End of generate table oro_dictionary_region_translation **/
+
+        /** Generate foreign keys for table oro_address **/
+        $table = $schema->getTable('oro_address');
+        $table->addForeignKeyConstraint($schema->getTable('oro_dictionary_region'), ['region_code'], ['combined_code'], ['onDelete' => null, 'onUpdate' => null]);
+        $table->addForeignKeyConstraint($schema->getTable('oro_dictionary_country'), ['country_code'], ['iso2_code'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_address **/
+
+        /** Generate foreign keys for table oro_dictionary_region **/
+        $table = $schema->getTable('oro_dictionary_region');
+        $table->addForeignKeyConstraint($schema->getTable('oro_dictionary_country'), ['country_code'], ['iso2_code'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_dictionary_region **/
+
+        // @codingStandardsIgnoreEnd
     }
 }
