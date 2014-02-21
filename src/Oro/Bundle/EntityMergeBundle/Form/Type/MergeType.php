@@ -22,10 +22,11 @@ class MergeType extends AbstractType
             'masterEntity',
             'entity',
             array(
-                'label' => 'oro.entity_merge.form.master_record',
-                'class' => $metadata->getClassName(),
-                'choices' => $options['entities'],
+                'label'    => 'oro.entity_merge.form.master_record',
+                'class'    => $metadata->getClassName(),
+                'choices'  => $options['entities'],
                 'multiple' => false,
+                'tooltip'  => 'oro.entity_merge.form.master_record_tooltip',
                 'expanded' => true
             )
         );

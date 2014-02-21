@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,9 +44,23 @@ class EmbedFormController extends Controller
             $type = $form->get('channel')->getConfig()->getType()->getInnerType();
             $configOptions = $form->get('channel')->getConfig()->getOptions();
 
+            $channel = $formEntity->getChannel();
+            $channelClassName = ClassUtils::getClass($channel);
+
+            /**
+             * @var ClassMetadataInfo $channelMetadata
+             */
+            $channelMetadata = $this->getDoctrine()
+                ->getManagerForClass($channelClassName)
+                ->getClassMetadata($channelClassName);
+
             $configOptions = array_merge(
                 $configOptions,
-                ['auto_initialize' => false, 'empty_data' => $formEntity->getChannel()]
+                [
+                    'auto_initialize' => false,
+                    'property'        => $channelMetadata->getSingleIdentifierFieldName(),
+                    'empty_data'      => $channel
+                ]
             );
             $form->add('channel', $type, $configOptions);
         }
