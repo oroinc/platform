@@ -7,7 +7,7 @@
 
 {% block genemu_jqueryselect2_javascript %}
     <script type="text/javascript">
-        require(['underscore', 'jquery', 'oro/select2-config'
+        require(['underscore', 'jquery', 'oroform/js/select2-config'
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
             {%- for path in configs.extra_modules -%}
             , '{{ path }}'
@@ -192,7 +192,7 @@
 
     <script type="text/javascript">
         require(['jquery',
-            'oro/multiple-entity', 'oro/multiple-entity/collection', 'oro/multiple-entity/model',
+            'oroform/js/multiple-entity', 'oroform/js/multiple-entity/collection', 'oroform/js/multiple-entity/model',
             'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entities.html') }}',
             'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entity.html') }}'
         ],

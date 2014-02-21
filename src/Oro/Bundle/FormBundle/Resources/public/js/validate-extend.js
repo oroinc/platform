@@ -1,6 +1,6 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'jquery.validate'],
-function($, _, __, tools) {
+/*global define, console*/
+define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'jquery.validate'
+    ], function ($, _, __, tools) {
     'use strict';
 
     /**
@@ -64,10 +64,10 @@ function($, _, __, tools) {
     }
 
     // turn off adding rules from attributes
-    $.validator.attributeRules = function () {return {};};
+    $.validator.attributeRules = function () { return {}; };
 
     // turn off adding rules from class
-    $.validator.classRules = function () {return {};};
+    $.validator.classRules = function () { return {}; };
 
     // substitute data rules reader
     $.validator.dataRules = function (element) {
@@ -143,7 +143,7 @@ function($, _, __, tools) {
      */
     $.validator.loadMethod = function (module) {
         tools.loadModules($.makeArray(module), function (validators) {
-            _.each(validators, function(args) {
+            _.each(validators, function (args) {
                 $.validator.addMethod.apply($.validator, args);
             });
         });
@@ -162,7 +162,7 @@ function($, _, __, tools) {
                 .closest('.controls').addClass('validation-error');
             $el.closest('.control-group').find('label').addClass('validation-error');
         },
-        unhighlight: function(element) {
+        unhighlight: function (element) {
             var $el = $(element);
             $el.closest('.error').removeClass('error')
                 .closest('.controls').removeClass('validation-error');
@@ -174,16 +174,16 @@ function($, _, __, tools) {
 
     // general validation methods
     var methods = [
-        'oro/validator/count',
-        'oro/validator/date',
-        'oro/validator/email',
-        'oro/validator/length',
-        'oro/validator/notblank',
-        'oro/validator/notnull',
-        'oro/validator/range',
-        'oro/validator/regex',
-        'oro/validator/repeated',
-        'oro/validator/url'
+        'oroform/js/validator/count',
+        'oroform/js/validator/date',
+        'oroform/js/validator/email',
+        'oroform/js/validator/length',
+        'oroform/js/validator/notblank',
+        'oroform/js/validator/notnull',
+        'oroform/js/validator/range',
+        'oroform/js/validator/regex',
+        'oroform/js/validator/repeated',
+        'oroform/js/validator/url'
     ];
     $.validator.loadMethod(methods);
 
