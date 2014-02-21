@@ -9,16 +9,61 @@ class OroIntegrationBundle implements Migration
 {
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        return [
-            "CREATE TABLE oro_integration_channel (id SMALLINT AUTO_INCREMENT NOT NULL, transport_id SMALLINT DEFAULT NULL, name VARCHAR(255) NOT NULL, type VARCHAR(255) NOT NULL, connectors LONGTEXT NOT NULL COMMENT '(DC2Type:array)', UNIQUE INDEX UNIQ_55B9B9C59909C13F (transport_id), PRIMARY KEY(id))",
-            "CREATE TABLE oro_integration_channel_status (id SMALLINT AUTO_INCREMENT NOT NULL, channel_id SMALLINT NOT NULL, code VARCHAR(255) NOT NULL, connector VARCHAR(255) NOT NULL, message LONGTEXT NOT NULL, date DATETIME NOT NULL, INDEX IDX_C0D7E5FB72F5A1AA (channel_id), PRIMARY KEY(id))",
-            "CREATE TABLE oro_integration_transport (id SMALLINT AUTO_INCREMENT NOT NULL, type VARCHAR(30) NOT NULL, wsdl_url VARCHAR(255) DEFAULT NULL, api_user VARCHAR(255) DEFAULT NULL, api_key VARCHAR(255) DEFAULT NULL, sync_start_date DATE DEFAULT NULL, sync_range VARCHAR(50) DEFAULT NULL, website_id INT DEFAULT NULL, websites LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)', is_extension_installed TINYINT(1) DEFAULT NULL, is_wsi_mode TINYINT(1) DEFAULT NULL, PRIMARY KEY(id))",
+        // @codingStandardsIgnoreStart
 
-            "ALTER TABLE oro_integration_channel ADD CONSTRAINT FK_55B9B9C59909C13F FOREIGN KEY (transport_id) REFERENCES oro_integration_transport (id)",
-            "ALTER TABLE oro_integration_channel_status ADD CONSTRAINT FK_C0D7E5FB72F5A1AA FOREIGN KEY (channel_id) REFERENCES oro_integration_channel (id) ON DELETE CASCADE"
-        ];
+        /** Generate table oro_integration_channel **/
+        $table = $schema->createTable('oro_integration_channel');
+        $table->addColumn('id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('transport_id', 'smallint', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('type', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('connectors', 'array', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:array)']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['transport_id'], 'UNIQ_55B9B9C59909C13F');
+        /** End of generate table oro_integration_channel **/
+
+        /** Generate table oro_integration_channel_status **/
+        $table = $schema->createTable('oro_integration_channel_status');
+        $table->addColumn('id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('channel_id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('code', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('connector', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('message', 'text', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('date', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['channel_id'], 'IDX_C0D7E5FB72F5A1AA', []);
+        /** End of generate table oro_integration_channel_status **/
+
+        /** Generate table oro_integration_transport **/
+        $table = $schema->createTable('oro_integration_transport');
+        $table->addColumn('id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('type', 'string', ['default' => null, 'notnull' => true, 'length' => 30, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('wsdl_url', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('api_user', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('api_key', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('sync_start_date', 'date', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('sync_range', 'string', ['default' => null, 'notnull' => false, 'length' => 50, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('website_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('websites', 'array', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('is_extension_installed', 'boolean', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('is_wsi_mode', 'boolean', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        /** End of generate table oro_integration_transport **/
+
+        /** Generate foreign keys for table oro_integration_channel **/
+        $table = $schema->getTable('oro_integration_channel');
+        $table->addForeignKeyConstraint($schema->getTable('oro_integration_transport'), ['transport_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_integration_channel **/
+
+        /** Generate foreign keys for table oro_integration_channel_status **/
+        $table = $schema->getTable('oro_integration_channel_status');
+        $table->addForeignKeyConstraint($schema->getTable('oro_integration_channel'), ['channel_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_integration_channel_status **/
+
+        // @codingStandardsIgnoreEnd
     }
 }
