@@ -1,4 +1,4 @@
-/* global define */
+/*global define*/
 define(['underscore', 'oro/translator', 'orodatagrid/js/datagrid/action/mass-action', 'oro/messenger'],
     /**
      * @param {underscore} _
@@ -13,10 +13,10 @@ define(['underscore', 'oro/translator', 'orodatagrid/js/datagrid/action/mass-act
         /**
          * Merge mass action class.
          *
-         * @export  oro/entity-merge/merge-mass-action
-         * @class   oro.entityMerge.MergeMassAction
+         * @export  oroentitymerge/js/datagrid/action/merge-mass-action
+         * @class   oroentitymerge.datagrid.action.MergeMassAction
          * @classdesc Merge mass action js part
-         * @extends oro.datagrid.MassAction
+         * @extends orodatagrid.datagrid.action.MassAction
          */
         return MassAction.extend({
 
@@ -56,13 +56,13 @@ define(['underscore', 'oro/translator', 'orodatagrid/js/datagrid/action/mass-act
                     }
 
                     if (length > maxLength) {
-                        options['doExecute'] = false;
+                        options.doExecute = false;
                         var validationMessage = __('oro.entity_merge.mass_action.validation.maximum_records_error', {number: maxLength});
                         messenger.notificationFlashMessage('error', validationMessage);
                     }
 
                     if (length < 2) {
-                        options['doExecute'] = false;
+                        options.doExecute = false;
                         messenger.notificationFlashMessage('error', __('oro.entity_merge.mass_action.validation.minimum_records_error'));
                     }
 
