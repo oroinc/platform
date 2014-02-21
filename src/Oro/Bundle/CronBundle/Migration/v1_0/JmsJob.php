@@ -9,10 +9,11 @@ class JmsJob implements Migration
 {
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        //@codingStandardsIgnoreStart
+        // @codingStandardsIgnoreStart
 
         /** Generate table jms_job_dependencies **/
         $table = $schema->createTable('jms_job_dependencies');

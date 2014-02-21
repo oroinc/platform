@@ -13,7 +13,7 @@ class OroUserBundle implements Migration
      */
     public function up(Schema $schema)
     {
-        //@codingStandardsIgnoreStart
+        // @codingStandardsIgnoreStart
 
         /** Generate table oro_access_group **/
         $table = $schema->createTable('oro_access_group');

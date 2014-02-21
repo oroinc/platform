@@ -9,11 +9,21 @@ class OroCronBundle implements Migration
 {
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        return [
-            "CREATE TABLE oro_cron_schedule (id INT AUTO_INCREMENT NOT NULL, command VARCHAR(50) NOT NULL, definition VARCHAR(100) DEFAULT NULL, UNIQUE INDEX UQ_COMMAND (command), PRIMARY KEY(id))"
-        ];
+        // @codingStandardsIgnoreStart
+
+        /** Generate table oro_cron_schedule **/
+        $table = $schema->createTable('oro_cron_schedule');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('command', 'string', ['default' => null, 'notnull' => true, 'length' => 50, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('definition', 'string', ['default' => null, 'notnull' => false, 'length' => 100, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['command'], 'UQ_COMMAND');
+        /** End of generate table oro_cron_schedule **/
+
+        // @codingStandardsIgnoreEnd
     }
 }
