@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', './item-view'
+define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', './item-view'
     ], function ($, _, Backbone, mediator, DotmenuItemView) {
     'use strict';
 

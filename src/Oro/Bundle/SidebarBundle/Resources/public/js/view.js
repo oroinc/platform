@@ -10,7 +10,7 @@ define(function (require) {
     var Backbone = require('backbone');
 
     var __ = require('orotranslation/js/translator');
-    var DeleteConfirmation = require('oro/delete-confirmation');
+    var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     var constants = require('./constants');
 

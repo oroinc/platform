@@ -29,13 +29,13 @@ Each bundle's javascript module have to be defined in ```paths``` section, where
                     - 'jquery'
         map:
             '*':
-                'jquery': 'oro/jquery-setup'
-            'oro/jquery-setup':
+                'jquery': 'oroui/js/jquery-extend'
+            'oroui/js/jquery-extend':
                 'jquery': 'jquery'
         paths:
             'jquery': 'bundles/oroui/lib/jquery-1.10.2.js'
             'jquery-ui': 'bundles/oroui/lib/jquery-ui.min.js'
-            'oro/jquery-setup': 'bundles/oroui/js/jquery-setup.js'
+            'oroui/js/jquery-extend': 'bundles/oroui/js/jquery-extend.js'
 
 ### Generation
 Main require.js config is generated automatically and embedded in HTML-page. The config is stored in application cache. So if you want, for some reason, renew a require.js configuration, then just clean a cache.

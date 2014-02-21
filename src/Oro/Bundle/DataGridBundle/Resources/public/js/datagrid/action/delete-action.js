@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'oro/messenger', 'orotranslation/js/translator', 'oro/delete-confirmation', './model-action'
+define(['underscore', 'oroui/js/messenger', 'orotranslation/js/translator', 'oroui/js/delete-confirmation', './model-action'
     ], function (_, messenger, __, DeleteConfirmation, ModelAction) {
     'use strict';
 

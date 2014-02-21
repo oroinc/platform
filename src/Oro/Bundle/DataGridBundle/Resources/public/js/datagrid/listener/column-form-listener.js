@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oro/mediator', 'oro/modal', './abstract-listener'
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/modal', './abstract-listener'
     ], function ($, _, __, mediator, Modal, AbstractListener) {
     'use strict';
 

@@ -1,6 +1,6 @@
 /*jshint devel: true, multistr: true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', 'oro/app',
+define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/app',
         './multiselect-decorator', './datafilter-wrapper'
     ], function ($, _, Backbone, mediator, app, MultiselectDecorator, filterWrapper) {
     'use strict';

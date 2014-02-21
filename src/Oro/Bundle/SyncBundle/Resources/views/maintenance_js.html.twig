@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    require(['orosync/js/sync', 'oro/messenger'],
+    require(['orosync/js/sync', 'oroui/js/messenger'],
     function(sync, messenger){
         sync.subscribe('oro/maintenance', function (response) {
             messenger.notificationFlashMessage(response.isOn ? 'error' : 'success', response.msg);

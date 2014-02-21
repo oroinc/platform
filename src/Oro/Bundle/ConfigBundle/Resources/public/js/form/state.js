@@ -1,6 +1,6 @@
 /*jshint browser:true*/
 /*global define, confirm*/
-define(['underscore', 'backbone', 'oro/mediator', 'orotranslation/js/translator'],
+define(['underscore', 'backbone', 'oroui/js/mediator', 'orotranslation/js/translator'],
     function (_, Backbone, mediator, __) {
         'use strict';
 

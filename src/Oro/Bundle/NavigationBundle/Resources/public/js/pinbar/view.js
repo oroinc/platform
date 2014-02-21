@@ -1,6 +1,6 @@
 /* jshint browser:true */
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oro/mediator', '../navigation', '../abstract-view',
+define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', '../navigation', '../abstract-view',
         './item-view', './collection', './model'
     ], function ($, _, Backbone, mediator, Navigation, AbstractView,
         PinbarItemView, PinbarCollection, PinbarModel) {

@@ -48,13 +48,13 @@ For developer which use **PHPStorm** will be usefull couple extensions:
 
 ## Writing
 How to write tests with **Jasmine 2.0** see [documentation](http://jasmine.github.io/2.0/introduction.html).
-Here's just trivial case, that's how look spec for `oro/mediator` module:
+Here's just trivial case, that's how look spec for `oroui/js/mediator` module:
 ```js
-define(['oro/mediator', 'backbone'],
+define(['oroui/js/mediator', 'backbone'],
 function(mediator, Backbone) {
     'use strict';
 
-    describe('oro/mediator', function () {
+    describe('oroui/js/mediator', function () {
         it("compare mediator to Backbone.Events", function() {
             expect(mediator).toEqual(Backbone.Events);
             expect(mediator).not.toBe(Backbone.Events);

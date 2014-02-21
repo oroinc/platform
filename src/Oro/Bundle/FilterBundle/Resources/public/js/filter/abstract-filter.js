@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oro/app'
+define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
     ], function ($, _, Backbone, app) {
     'use strict';
 

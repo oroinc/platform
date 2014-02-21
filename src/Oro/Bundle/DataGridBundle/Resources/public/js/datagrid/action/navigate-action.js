@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'oro/mediator', './model-action'
+define(['underscore', 'oroui/js/mediator', './model-action'
     ], function (_, mediator, ModelAction) {
     'use strict';
 

@@ -8,15 +8,15 @@ define(function (require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
     var __ = require('orotranslation/js/translator');
-    var app = require('oro/app');
-    var mediator = require('oro/mediator');
-    var messenger = require('oro/messenger');
-    var Modal = require('oro/modal');
+    var app = require('oroui/js/app');
+    var mediator = require('oroui/js/mediator');
+    var messenger = require('oroui/js/messenger');
+    var Modal = require('oroui/js/modal');
     var LoadingMask = require('oroui/js/loading-mask');
     var PagestateView = require('./pagestate/view');
     var PagestateModel = require('./pagestate/model');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
-    var widgetManager = require('oro/widget-manager');
+    var widgetManager = require('oroui/js/widget-manager');
     var contentManager = require('./content-manager');
     var _jqueryForm = require('jquery.form');
 

@@ -35,7 +35,7 @@
         {% endblock %}
     </div>
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/widget-manager', 'oronavigation/js/navigation'],
+        require(['jquery', 'underscore', 'oroui/js/widget-manager', 'oronavigation/js/navigation'],
         function($, _, widgetManager, Navigation){
             widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
                 {% if widgetTitle %}

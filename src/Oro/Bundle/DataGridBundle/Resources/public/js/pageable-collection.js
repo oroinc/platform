@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oro/app'
+define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
     ], function (_, Backbone, BackbonePageableCollection, app) {
     'use strict';
 
