@@ -30,7 +30,22 @@ class PlaceholderTokenParser extends \Twig_TokenParser
         $parser = $this->parser;
         $stream = $parser->getStream();
 
-        $name = $stream->expect(\Twig_Token::NAME_TYPE)->getValue();
+        if ($stream->test(\Twig_Token::NAME_TYPE)) {
+            $name = $stream->getCurrent()->getValue();
+            $stream->next();
+        } else {
+            $names = [];
+            while (!$stream->test(\Twig_Token::NAME_TYPE, 'with')
+                && !$stream->test(\Twig_Token::BLOCK_END_TYPE)
+            ) {
+                if ($stream->test(\Twig_Token::STRING_TYPE)) {
+                    $names[] = $stream->getCurrent()->getValue();
+                }
+
+                $stream->next();
+            }
+            $name = implode($names);
+        }
 
         $variables = null;
         if ($stream->test(\Twig_Token::NAME_TYPE, 'with')) {

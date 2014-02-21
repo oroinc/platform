@@ -8,6 +8,7 @@ parameters:
     oro_ui.twig.skype_button.class:      Oro\Bundle\UIBundle\Twig\SkypeButtonExtension
     oro_ui.view.listener.class:          Oro\Bundle\UIBundle\EventListener\TemplateListener
     oro_ui.twig.form.class:              Oro\Bundle\UIBundle\Twig\FormExtension
+    oro_ui.twig.placeholder.class:       Oro\Bundle\UIBundle\Twig\PlaceholderExtension
 
     oro_ui.format_converter.date_time.jquery_ui.class: Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
 
@@ -56,6 +57,14 @@ services:
 
     oro_ui.twig.skype_button_extension:
         class: %oro_ui.twig.skype_button.class%
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.placeholder_extension:
+        class: %oro_ui.twig.placeholder.class%
+        arguments:
+            - @twig
+            - %oro_ui.placeholders%
         tags:
             - { name: twig.extension }
 
