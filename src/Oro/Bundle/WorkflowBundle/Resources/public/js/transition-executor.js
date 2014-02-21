@@ -7,7 +7,7 @@ function($, messenger, __, Navigation) {
     /**
      * Transition executor
      *
-     * @export  oro/workflow-transition-executor
+     * @export  oroworkflow/js/transition-executor
      * @class   oro.WorkflowTransitionExecutor
      */
     return function(element, data) {
