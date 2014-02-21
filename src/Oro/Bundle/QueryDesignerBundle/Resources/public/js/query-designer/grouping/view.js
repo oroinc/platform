@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/app', 'oro/entity-field-view', 'jquery-ui'],
-function(_, Backbone, app, EntityFieldView) {
+/*global define*/
+define(['underscore', 'backbone', 'oro/app', 'oroentity/js/entity-field-view', 'jquery-ui'
+    ], function (_, Backbone, app, EntityFieldView) {
     'use strict';
 
     /**
@@ -29,7 +29,7 @@ function(_, Backbone, app, EntityFieldView) {
          */
         grouping: null,
 
-        initialize: function() {
+        initialize: function () {
             var metadata = this.$el.closest('[data-metadata]').data('metadata');
             metadata = _.extend({grouping: {exclude: []}}, metadata);
             this.grouping = metadata.grouping;
@@ -47,7 +47,7 @@ function(_, Backbone, app, EntityFieldView) {
                 opacity: 0.7,
                 revert: 10,
                 containment: "parent",
-                stop: _.bind(function() {
+                stop: _.bind(function () {
                     this.trigger('grouping:change');
                 }, this)
             });
@@ -61,7 +61,7 @@ function(_, Backbone, app, EntityFieldView) {
         },
 
         isFieldAllowedForGrouping: function (criteria) {
-            var matched = _.find(this.grouping.exclude, function(exclude) {
+            var matched = _.find(this.grouping.exclude, function (exclude) {
                 var res = true;
                 _.each(exclude, function (val, key) {
                     if (!_.has(criteria, key) || !app.isEqualsLoosely(val, criteria[key])) {

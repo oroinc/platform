@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/entity-field-view'],
-function(_, Backbone, EntityFieldView) {
+/*global define*/
+define(['underscore', 'backbone', 'oroentity/js/entity-field-view'
+    ], function (_, Backbone, EntityFieldView) {
     'use strict';
 
     /**
