@@ -1,6 +1,6 @@
 /*jshint browser:true, devel:true*/
 /*global require, alert*/
-require(['jquery', 'oro/translator'], function ($, __) {
+require(['jquery', 'orotranslation/js/translator'], function ($, __) {
     'use strict';
 
     function switchButtons(run) {

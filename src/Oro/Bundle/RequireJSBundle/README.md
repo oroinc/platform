@@ -71,7 +71,7 @@ Or dynamically defines path to translations dictionary (depending on what locale
     require({
         shim: {
             'oro/translations': {
-                deps: ['oro/translator', 'translator'],
+                deps: ['orotranslation/js/translator', 'translator'],
                 init: function(__) {
                     return __;
                 }
@@ -79,10 +79,10 @@ Or dynamically defines path to translations dictionary (depending on what locale
         },
         map: {
             '*': {
-                'oro/translator': 'oro/translations'
+                'orotranslation/js/translator': 'oro/translations'
             },
             'oro/translations': {
-                'oro/translator': 'oro/translator'
+                'orotranslation/js/translator': 'orotranslation/js/translator'
             }
         },
         paths: {

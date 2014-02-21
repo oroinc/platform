@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'oronavigation/js/navigation', 'oro/delete-confirmation'
+define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oro/mediator', 'oronavigation/js/navigation', 'oro/delete-confirmation'
     ], function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
     "use strict";
 

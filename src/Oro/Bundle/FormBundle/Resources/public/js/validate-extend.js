@@ -1,5 +1,5 @@
 /*global define, console*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/tools', 'jquery.validate'
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oro/tools', 'jquery.validate'
     ], function ($, _, __, tools) {
     'use strict';
 

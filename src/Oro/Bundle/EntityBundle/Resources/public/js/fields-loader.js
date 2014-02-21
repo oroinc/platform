@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'routing', 'oro/translator', 'oro/messenger', 'oro/app', 'jquery-ui'
+define(['jquery', 'routing', 'orotranslation/js/translator', 'oro/messenger', 'oro/app', 'jquery-ui'
     ], function ($, routing, __, messenger, app) {
     'use strict';
 

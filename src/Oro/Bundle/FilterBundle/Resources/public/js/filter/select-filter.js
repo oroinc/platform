@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/translator', './abstract-filter', '../multiselect-decorator'
+define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filter', '../multiselect-decorator'
     ], function ($, _, __, AbstractFilter, MultiselectDecorator) {
     'use strict';
 

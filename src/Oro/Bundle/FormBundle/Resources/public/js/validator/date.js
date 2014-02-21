@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'oro/translator', 'orolocale/js/formatter/datetime'
+define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
     ], function (_, __, datetimeFormatter) {
     'use strict';
 

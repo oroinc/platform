@@ -1,6 +1,6 @@
 /* jshint browser:true */
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/messenger'
+define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro/messenger'
     ], function ($, _, Backbone, __, messenger) {
     'use strict';
     var service,

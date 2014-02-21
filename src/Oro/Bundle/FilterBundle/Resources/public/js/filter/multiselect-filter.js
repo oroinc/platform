@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'oro/translator', './select-filter'
+define(['underscore', 'orotranslation/js/translator', './select-filter'
     ], function (_, __, SelectFilter) {
     'use strict';
 

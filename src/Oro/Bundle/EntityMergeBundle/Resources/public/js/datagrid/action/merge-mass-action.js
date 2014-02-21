@@ -1,8 +1,8 @@
-/* global define */
-define(['underscore', 'oro/translator', 'orodatagrid/js/datagrid/action/mass-action', 'oro/messenger'],
+/*global define*/
+define(['underscore', 'orotranslation/js/translator', 'orodatagrid/js/datagrid/action/mass-action', 'oro/messenger'],
     /**
      * @param {underscore} _
-     * @param {oro/translator} __
+     * @param {orotranslation/js/translator} __
      * @param {MassAction} MassAction
      * @param {notificationFlashMessage} messenger
      * @returns {*|Object|void}
