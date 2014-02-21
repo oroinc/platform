@@ -4,7 +4,7 @@ define(['underscore', 'backbone', 'oro/app', 'oroentity/js/entity-field-view', '
     'use strict';
 
     /**
-     * @export  oro/query-designer/grouping/view
+     * @export  oroquerydesigner/js/query-designer/grouping/view
      * @class   oro.queryDesigner.grouping.View
      * @extends Backbone.View
      */

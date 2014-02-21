@@ -6,7 +6,7 @@ function(_, app) {
     /**
      * A set of utility functions for the query designer
      *
-     * @export oro/query-designer/util
+     * @export oroquerydesigner/js/query-designer/util
      * @name oro.queryDesigner.util
      */
     return {

@@ -1,12 +1,12 @@
 /* global define */
-define(['jquery', 'underscore', 'backbone', 'oro/query-designer/util'],
+define(['jquery', 'underscore', 'backbone', 'oroquerydesigner/js/query-designer/util'],
 function($, _, Backbone, util) {
     'use strict';
 
     /**
      * View that represents all query designer functions
      *
-     * @export  oro/query-designer/function-manager
+     * @export  oroquerydesigner/js/query-designer/function-manager
      * @class   oro.queryDesigner.FunctionManager
      * @extends Backbone.View
      */

@@ -1,14 +1,14 @@
 /*global define*/
 /*jslint nomen: true*/
 define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
-    'oro/query-designer/column/view', 'oroquerydesigner/js/condition-builder'
+    'oroquerydesigner/js/query-designer/column/view', 'oroquerydesigner/js/condition-builder'
     ], function (_, Backbone, __, app, messenger, ColumnView) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/query-designer
+     * @export  oroquerydesigner/js/query-designer
      * @class   oro.QueryDesigner
      * @extends Backbone.View
      */

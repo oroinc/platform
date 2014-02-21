@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/util',
-    'orocalendar/js/form-validation', 'oro/delete-confirmation', 'oro/query-designer/column-selector-view',
+define(['underscore', 'backbone', 'oro/translator', 'oroquerydesigner/js/query-designer/util',
+    'orocalendar/js/form-validation', 'oro/delete-confirmation', 'oroquerydesigner/js/query-designer/column-selector-view',
     'jquery-outer-html'
     ], function (_, Backbone, __, util, FormValidation, DeleteConfirmation,
          ColumnSelectorView) {
@@ -9,7 +9,7 @@ define(['underscore', 'backbone', 'oro/translator', 'oro/query-designer/util',
     var $ = Backbone.$;
 
     /**
-     * @export  oro/query-designer/abstract-view
+     * @export  oroquerydesigner/js/query-designer/abstract-view
      * @class   oro.queryDesigner.AbstractView
      * @extends Backbone.View
      */

@@ -4,7 +4,7 @@ define(['underscore', 'backbone', 'oroentity/js/entity-field-view'
     'use strict';
 
     /**
-     * @export  oro/query-designer/column-selector-view
+     * @export  oroquerydesigner/js/query-designer/column-selector-view
      * @class   oro.queryDesigner.ColumnSelectorView
      * @extends oro.EntityFieldView
      */

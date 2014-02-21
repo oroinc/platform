@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/query-designer/util', 'oro/query-designer/abstract-view', 'oro/query-designer/column/collection',
-    'oro/query-designer/grouping/view', 'oro/query-designer/function-manager', 'jquery-ui'],
+define(['underscore', 'backbone', 'oroquerydesigner/js/query-designer/util', 'oroquerydesigner/js/query-designer/abstract-view', 'oroquerydesigner/js/query-designer/column/collection',
+    'oroquerydesigner/js/query-designer/grouping/view', 'oroquerydesigner/js/query-designer/function-manager', 'jquery-ui'],
 function(_, Backbone, util, AbstractView, ColumnCollection,
          GroupingView, FunctionManager) {
     'use strict';
@@ -8,7 +8,7 @@ function(_, Backbone, util, AbstractView, ColumnCollection,
     var $ = Backbone.$;
 
     /**
-     * @export  oro/query-designer/column/view
+     * @export  oroquerydesigner/js/query-designer/column/view
      * @class   oro.queryDesigner.column.View
      * @extends oro.queryDesigner.AbstractView
      */

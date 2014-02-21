@@ -4,7 +4,7 @@ function(Backbone, app) {
     'use strict';
 
     /**
-     * @export  oro/query-designer/column/model
+     * @export  oroquerydesigner/js/query-designer/column/model
      * @class   oro.queryDesigner.column.Model
      * @extends Backbone.Model
      */

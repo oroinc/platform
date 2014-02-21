@@ -1,10 +1,10 @@
 /* global define */
-define(['backbone', 'oro/query-designer/column/model'],
+define(['backbone', 'oroquerydesigner/js/query-designer/column/model'],
 function(Backbone, ColumnModel) {
     'use strict';
 
     /**
-     * @export  oro/query-designer/column/collection
+     * @export  oroquerydesigner/js/query-designer/column/collection
      * @class   oro.queryDesigner.column.Collection
      * @extends Backbone.Collection
      */

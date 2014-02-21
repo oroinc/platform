@@ -131,7 +131,7 @@
     } %}
     <script type="text/javascript">
         require(['jquery', 'underscore', 'oro/translator', 'oroui/js/loading-mask', 'routing',
-            'oro/query-designer', 'oro/delete-confirmation', 'oroentity/js/fields-loader'],
+            'oroquerydesigner/js/query-designer', 'oro/delete-confirmation', 'oroentity/js/fields-loader'],
         function($, _, __, LoadingMask, routing, QueryDesigner, DeleteConfirmation) {
             $(function() {
                 var entities = {{ entities|json_encode|raw }};
