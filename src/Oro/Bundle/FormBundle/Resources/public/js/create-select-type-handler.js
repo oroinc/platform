@@ -1,6 +1,6 @@
 /* global define */
 define(['jquery', 'oro/widget-manager', 'routing', 'oro/navigation'],
-function ($, widgetManager, routing, Navigation) {
+function ($, widgetManager, routing) {
     'use strict';
 
     /**
@@ -16,13 +16,31 @@ function ($, widgetManager, routing, Navigation) {
         viewWidgets,
         gridModelId
     ) {
-        var entityCreateBlock = viewContainer.find('.entity-create-block');
+        var setAltLabel = function (el, mode) {
+            var $labelHolder = el.find('span');
+            var altLabel = $labelHolder.data('alt-label-' + mode);
+            var regularLabel = $labelHolder.data('label');
+            if (altLabel) {
+                if (!regularLabel) {
+                    $labelHolder.data('label', $labelHolder.html());
+                }
+                $labelHolder.html(altLabel);
+            } else if (regularLabel) {
+                $labelHolder.html(regularLabel);
+            }
+        };
 
         var setCurrentMode = function (mode) {
-            btnContainer.removeClass('create grid view').addClass(mode);
-            viewContainer.removeClass('create grid view').addClass(mode);
-            currentModeEl.val(mode);
+            var $btnContainer = $(btnContainer);
+            setAltLabel($btnContainer.find('.entity-select-btn'), mode);
+            setAltLabel($btnContainer.find('.entity-create-btn'), mode);
+            setAltLabel($btnContainer.find('.entity-cancel-btn'), mode);
 
+            var $viewContainer = $(viewContainer);
+            $viewContainer.removeClass('create grid view').addClass(mode);
+            $(currentModeEl).val(mode);
+
+            var entityCreateBlock = $viewContainer.find('.entity-create-block');
             if (mode == 'create') {
                 entityCreateBlock.removeAttr('data-validation-ignore');
             } else {
@@ -30,8 +48,14 @@ function ($, widgetManager, routing, Navigation) {
             }
         };
 
+
         // Render grid and change current mode to grid
-        btnContainer.find('.entity-select-btn').on('click', function() {
+        var $btnContainer = $(btnContainer);
+        var $selectBtn = $btnContainer.find('.entity-select-btn');
+        var $createBtn = $btnContainer.find('.entity-create-btn');
+        var $cancelBtn = $btnContainer.find('.entity-cancel-btn');
+
+        $selectBtn.on('click', function() {
             widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function(widget) {
                 if (widget.firstRun) {
                     widget.render();
@@ -41,8 +65,16 @@ function ($, widgetManager, routing, Navigation) {
         });
 
         // Render create from and change current mode to create
-        btnContainer.find('.entity-create-btn').on('click', function() {
+        $createBtn.on('click', function() {
             setCurrentMode('create');
+        });
+
+        $cancelBtn.on('click', function() {
+            if ($(existingEl).val()) {
+                setCurrentMode('view');
+            } else {
+                setCurrentMode('create');
+            }
         });
 
         var loadViewWidgets = function (model) {
@@ -72,8 +104,11 @@ function ($, widgetManager, routing, Navigation) {
         // On grid row select render widgets and change current mode to view
         widgetManager.getWidgetInstanceByAlias(gridWidgetAlias, function (widget) {
             widget.on('grid-row-select', function(data) {
-                existingEl.val(data.model.get(gridModelId));
-                loadViewWidgets(data.model);
+                var selectedId = data.model.get(gridModelId);
+                if (selectedId != $(existingEl).val()) {
+                    $(existingEl).val(selectedId);
+                    loadViewWidgets(data.model);
+                }
                 setCurrentMode('view');
             });
         });
