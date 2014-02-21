@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\InstallerBundle\Migrations;
 
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\MappingException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -15,8 +17,9 @@ use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\UpdateBundleVersions;
 
 class MigrationsLoader
 {
-    const MIGRATIONS_PATH = 'Migration';
-    const MIGRATION_TABLE = 'oro_installer_migrations';
+    const MIGRATIONS_PATH       = 'Migration';
+    const MIGRATION_TABLE       = 'oro_installer_migrations';
+    const MAX_TABLE_NAME_LENGTH = 30;
 
     /**
      * @var KernelInterface
@@ -147,6 +150,7 @@ class MigrationsLoader
      * @return array
      *   key - class name of migration file
      *   value - array of sql queries from this file
+     * @throws MappingException
      */
     public function getMigrationsQueries()
     {
@@ -159,7 +163,21 @@ class MigrationsLoader
             $fromSchema = $sm->createSchema();
             $toSchema   = clone $fromSchema;
             $queries    = $migration->up($toSchema);
-            $queries    = array_merge($queries, $fromSchema->getMigrateToSql($toSchema, $platform));
+            $comparator = new Comparator();
+            $schemaDiff = $comparator->compare($fromSchema, $toSchema);
+            foreach ($schemaDiff->newTables as $newTable) {
+                if (strlen($newTable->getName()) > self::MAX_TABLE_NAME_LENGTH) {
+                    throw new MappingException(
+                        sprintf(
+                            'Max table name length is %s. Please correct table %s in %s migration',
+                            self::MAX_TABLE_NAME_LENGTH,
+                            $newTable->getName(),
+                            get_class($migration)
+                        )
+                    );
+                }
+            }
+            $queries = array_merge($queries, $schemaDiff->toSql($platform));
 
             $migrationQueries[get_class($migration)] = $queries;
         }
