@@ -187,7 +187,12 @@ class ConfigSubscriber implements EventSubscriberInterface
         $selfFieldType     = $fieldConfig->getId()->getFieldType();
         $selfFieldName     = $fieldConfig->getId()->getFieldName();
         $selfConfig        = $this->extendConfigProvider->getConfig($selfEntityClass);
-        $relationKey       = implode('|', [$selfFieldType, $selfEntityClass, $targetEntityClass, $selfFieldName]);
+        $relationKey       = ExtendHelper::buildRelationKey(
+            $selfEntityClass,
+            $selfFieldName,
+            $selfFieldType,
+            $targetEntityClass
+        );
         $scope             = 'extend';
 
         /**

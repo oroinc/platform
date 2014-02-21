@@ -277,10 +277,9 @@ class ConfigManager
             }
         }
 
-        //local cache
+        // local cache
         $this->localCache[$configKey] = $config;
-
-        //for calculate change set
+        // for calculate change set
         $this->originalConfigs[$configKey] = clone $config;
 
         return $config;
@@ -574,7 +573,12 @@ class ConfigManager
                         $this->getEntityDefaultValues($provider, $className, $metadata)
                     );
 
-                    $this->localCache[$this->buildConfigKey($config->getId())] = $config;
+                    $configKey = $this->buildConfigKey($config->getId());
+
+                    // local cache
+                    $this->localCache[$configKey] = $config;
+                    // for calculate change set
+                    $this->originalConfigs[$configKey] = clone $config;
                 }
 
                 $this->eventDispatcher->dispatch(
@@ -611,7 +615,12 @@ class ConfigManager
                     $this->getFieldDefaultValues($provider, $className, $fieldName, $fieldType, $metadata)
                 );
 
-                $this->localCache[$this->buildConfigKey($config->getId())] = $config;
+                $configKey = $this->buildConfigKey($config->getId());
+
+                // local cache
+                $this->localCache[$configKey] = $config;
+                // for calculate change set
+                $this->originalConfigs[$configKey] = clone $config;
             }
 
             $this->eventDispatcher->dispatch(

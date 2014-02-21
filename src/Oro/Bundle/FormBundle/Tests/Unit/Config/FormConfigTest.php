@@ -66,7 +66,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
             $blockConfig->addSubBlock($subBlock);
 
             $subblocks[] = $subBlock;
-            $subblocksArray[$code] = $subBlock->toArray();
+            $subblocksArray[] = $subBlock->toArray();
         }
 
         $this->formConfig->addBlock($blockConfig);
@@ -84,7 +84,7 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
         /** test toArray() */
         $this->assertEquals(
             array(
-                'testBlock' => array(
+                array(
                     'title'       => 'Test Block',
                     'class'       => 'Oro\Bundle\UserBundle\Entity\User',
                     'subblocks'   => $subblocksArray,

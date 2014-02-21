@@ -1,8 +1,8 @@
 {% block oro_type_choice_ownership_type_widget %}
     {% spaceless %}
-        {% if value %}
+        {% if value or disabled %}
             {% for choice in choices %}
-                {% if choice.value == value %}
+                {% if choice.value == value|default('NONE') %}
                     <p class="control-label">{{ choice.label }}</p>
                 {% endif %}
             {% endfor %}

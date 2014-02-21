@@ -76,9 +76,11 @@ class FormConfig implements FormConfigInterface
      */
     public function toArray()
     {
-        return array_map(function (BlockConfig $block) {
-            return $block->toArray();
-        }, $this->blocks);
+        $result = [];
+        foreach ($this->blocks as $block) {
+            $result[] = $block->toArray();
+        }
+        return $result;
     }
 
     protected function sortBlocks()

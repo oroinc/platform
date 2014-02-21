@@ -68,8 +68,7 @@ class EmbeddedFormController extends Controller
      */
     public function defaultDataAction($formType)
     {
-        /** @var EmbeddedFormManager $formManager */
-        $formManager = $this->get('oro_embedded_form.manager');
+        $formManager = $this->getFormManager();
         $css = $formManager->getDefaultCssByType($formType);
         $successMessage = $formManager->getDefaultSuccessMessageByType($formType);
 
@@ -107,7 +106,8 @@ class EmbeddedFormController extends Controller
     public function viewAction(EmbeddedForm $entity)
     {
         return [
-            'entity' => $entity
+            'entity' => $entity,
+            'label' => $this->getFormManager()->get($entity->getFormType())
         ];
     }
 
@@ -149,13 +149,20 @@ class EmbeddedFormController extends Controller
 
         }
 
-        /** @var EmbeddedFormManager $formManager */
-        $formManager = $this->get('oro_embedded_form.manager');
+        $formManager = $this->getFormManager();
         return array(
             'entity' => $entity,
             'defaultCss' => $formManager->getDefaultCssByType($entity->getFormType()),
             'defaultSuccessMessage' => $formManager->getDefaultSuccessMessageByType($entity->getFormType()),
             'form' => $form->createView()
         );
+    }
+
+    /**
+     * @return EmbeddedFormManager
+     */
+    protected function getFormManager()
+    {
+        return $this->get('oro_embedded_form.manager');
     }
 }

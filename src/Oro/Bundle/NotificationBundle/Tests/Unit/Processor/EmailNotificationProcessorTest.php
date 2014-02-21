@@ -2,60 +2,92 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Processor;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
+use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_ENTITY_CLASS = 'SomeEntity';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityManager;
+    const TEST_FROM_EMAIL = 'admin@example.com';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $twig;
+    const TEST_ENV = 'prod';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $mailer;
+    const TEST_MESSAGE_LIMIT = 10;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $localeSettings;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $logger;
 
-    /** @var EmailNotificationProcessor */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityManager;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityPool;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $emailRenderer;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $twig;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $mailer;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $localeSettings;
+
+    /**
+     * @var EmailNotificationProcessor
+     */
     protected $processor;
 
     protected function setUp()
     {
+        $this->logger = $this->getMockBuilder('Monolog\Logger')
+            ->disableOriginalConstructor()->getMock();
+
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->twig = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
+        $this->entityPool = $this->getMockBuilder('Oro\Bundle\NotificationBundle\Doctrine\EntityPool')
             ->disableOriginalConstructor()->getMock();
 
-        $this->mailer = $this->getMockBuilder('\Swift_Mailer')
+        $this->emailRenderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()->getMock();
 
-        $this->logger = $this->getMockBuilder('Monolog\Logger')
+        $this->mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()->getMock();
 
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()->getMock();
 
         $this->processor = new EmailNotificationProcessor(
-            $this->twig,
-            $this->mailer,
-            $this->entityManager,
-            'a@a.com',
             $this->logger,
-            $this->localeSettings
+            $this->entityManager,
+            $this->entityPool,
+            $this->emailRenderer,
+            $this->mailer,
+            $this->localeSettings,
+            self::TEST_FROM_EMAIL
         );
-        $this->processor->setEnv('prod');
-        $this->processor->setMessageLimit(10);
+
+        $this->processor->setEnv(self::TEST_ENV);
+        $this->processor->setMessageLimit(self::TEST_MESSAGE_LIMIT);
     }
 
     protected function tearDown()
@@ -79,49 +111,56 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $object = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $notification = $this->getMock('Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface');
-        $notifications = [$notification];
+
+        $locale = 'uk_UA';
+        $this->localeSettings->expects($this->once())
+            ->method('getLanguage')
+            ->will($this->returnValue($locale));
 
         $template = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
         $template->expects($this->once())
             ->method('getType')
             ->will($this->returnValue('html'));
 
-        $locale = 'uk_UA';
-        $this->localeSettings->expects($this->once())
-            ->method('getLanguage')
-            ->will($this->returnValue($locale));
         $notification->expects($this->once())
             ->method('getTemplate')
             ->with($locale)
             ->will($this->returnValue($template));
 
-        $this->twig->expects($this->once())
-            ->method('compileMessage')
-            ->with($this->identicalTo($template), $this->equalTo(['entity' => $object]))
-            ->will($this->returnValue(['subject', 'body']));
+        $expectedSubject = 'subject';
+        $expectedBody = 'body';
 
-        $emails = array('email@a.com');
+        $this->emailRenderer->expects($this->once())
+            ->method('compileMessage')
+            ->with($template, array('entity' => $object))
+            ->will($this->returnValue(array($expectedSubject, $expectedBody)));
+
+        $expectedTo = 'recipient@example.com';
         $notification->expects($this->once())
             ->method('getRecipientEmails')
-            ->will($this->returnValue($emails));
+            ->will($this->returnValue(array($expectedTo)));
 
         $this->mailer->expects($this->once())
             ->method('send')
-            ->with($this->isInstanceOf('\Swift_Message'));
+            ->with(
+                $this->callback(
+                    function ($message) use ($expectedSubject, $expectedBody, $expectedTo) {
+                        /** @var \Swift_Message $message */
+                        $this->isInstanceOf('Swift_Message', $message);
+                        $this->assertEquals($expectedSubject, $message->getSubject());
+                        $this->assertEquals($expectedBody, $message->getBody());
+                        $this->assertEquals(array(self::TEST_FROM_EMAIL => null), $message->getFrom());
+                        $this->assertEquals(array($expectedTo => null), $message->getTo());
+                        $this->assertEquals('text/html', $message->getContentType());
 
-        $this->addJob();
+                        return true;
+                    }
+                )
+            );
 
-        $this->processor->process($object, $notifications);
-    }
+        $this->expectAddJob();
 
-    public function testNotify()
-    {
-        $refl = new \ReflectionObject($this->processor);
-        $method = $refl->getMethod('notify');
-        $method->setAccessible(true);
-
-        $params = new ParameterBag();
-        $this->assertFalse($method->invoke($this->processor, $params));
+        $this->processor->process($object, array($notification));
     }
 
     /**
@@ -138,7 +177,7 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('getTemplate')
             ->will($this->returnValue($template));
 
-        $this->twig->expects($this->once())
+        $this->emailRenderer->expects($this->once())
             ->method('compileMessage')
             ->will($this->throwException(new \Twig_Error('bla bla bla')));
 
@@ -151,72 +190,80 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer->expects($this->never())
             ->method('send');
 
-        $basicPersister = $this->getMockBuilder('\Doctrine\ORM\Persisters\BasicEntityPersister')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $basicPersister->expects($this->once())
-            ->method('executeInserts');
-
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow->expects($this->once())
-            ->method('getEntityPersister')
-            ->will($this->returnValue($basicPersister));
-
-        $this->entityManager->expects($this->once())
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
-
         $this->processor->process($object, $notifications);
+
+        $this->entityPool->expects($this->never())
+            ->method($this->anything());
     }
 
     /**
-     * add job assertions
+     * Add job assertions
      */
-    public function addJob()
+    protected function expectAddJob()
     {
-        $query = $this->getMock(
-            'Doctrine\ORM\AbstractQuery',
-            array('getSQL', 'setMaxResults', 'getOneOrNullResult', 'setParameter', '_doExecute'),
-            array(),
-            '',
-            false
-        );
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getSingleScalarResult'))
+            ->getMockForAbstractClass();
 
-        $query->expects($this->once())->method('getOneOrNullResult')
-            ->will($this->returnValue(null));
-        $query->expects($this->exactly(2))
-            ->method('setParameter')
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $queryBuilder->expects($this->at(0))
+            ->method('select')
+            ->with('COUNT(job)')
             ->will($this->returnSelf());
 
-        $this->entityManager->expects($this->once())
-            ->method('createQuery')
+        $queryBuilder->expects($this->at(1))
+            ->method('from')
+            ->with('JMSJobQueueBundle:Job', 'job')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->at(2))
+            ->method('where')
+            ->with('job.command = :command AND job.state <> :state')
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->at(3))
+            ->method('setParameters')
+            ->with(array('command' => EmailNotificationProcessor::SEND_COMMAND, 'state' => Job::STATE_FINISHED))
+            ->will($this->returnSelf());
+
+        $queryBuilder->expects($this->at(4))
+            ->method('getQuery')
             ->will($this->returnValue($query));
 
-        $basicPersister = $this->getMockBuilder('\Doctrine\ORM\Persisters\BasicEntityPersister')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $basicPersister->expects($this->once())
-            ->method('addInsert');
+        $query->expects($this->once())->method('getSingleScalarResult')
+            ->will($this->returnValue('0'));
 
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow->expects($this->once())
-            ->method('computeChangeSet');
         $this->entityManager->expects($this->once())
-            ->method('getClassMetadata')
-            ->will($this->returnValue(new ClassMetadata('JMS\JobQueueBundle\Entity\Job')));
-        $uow->expects($this->exactly(3))
-            ->method('getEntityPersister')
-            ->will($this->returnValue($basicPersister));
-
-        $this->entityManager->expects($this->exactly(4))
-            ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($queryBuilder));
 
         $this->entityManager->expects($this->never())
             ->method('flush');
+
+        $this->entityPool->expects($this->once())
+            ->method('addPersistEntity')
+            ->with(
+                $this->callback(
+                    function ($job) {
+                        /** @var Job $job */
+                        $this->assertInstanceOf('JMS\JobQueueBundle\Entity\Job', $job);
+                        $this->assertEquals(EmailNotificationProcessor::SEND_COMMAND, $job->getCommand());
+                        $this->assertEquals(
+                            array(
+                                '--message-limit=' . self::TEST_MESSAGE_LIMIT,
+                                '--env=' . self::TEST_ENV,
+                                '--mailer=db_spool_mailer',
+                                '--no-debug'
+                            ),
+                            $job->getArgs()
+                        );
+                        return true;
+                    }
+                )
+            );
     }
 }
