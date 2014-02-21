@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backgrid', 'oro/formatter/datetime'
+define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
     ], function (_, Backgrid, DateTimeFormatter) {
     'use strict';
 

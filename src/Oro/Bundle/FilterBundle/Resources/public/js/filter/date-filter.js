@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale-settings'
+define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'orolocale/js/locale-settings'
     ], function ($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
 

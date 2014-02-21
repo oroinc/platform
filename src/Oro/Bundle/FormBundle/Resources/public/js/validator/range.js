@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'oro/translator', 'oro/formatter/number'
+define(['underscore', 'oro/translator', 'orolocale/js/formatter/number'
     ], function (_, __, numberFormatter) {
     'use strict';
 
