@@ -1,6 +1,7 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigation', 'orotranslation/js/translator', 'oro/mediator',
-    'oro/messenger', 'oro/error', 'oro/modal', '../action-launcher'
+define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigation',
+        'orotranslation/js/translator', 'oroui/js/mediator',
+        'oroui/js/messenger', 'oroui/js/error', 'oroui/js/modal', '../action-launcher'
     ], function ($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
     'use strict';
 

@@ -1,5 +1,5 @@
 /*global define, console*/
-define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro/app', 'oro/messenger',
+define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger',
     'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model'
     ], function ($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionModel) {
     'use strict';

@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/app', 'oro/messenger',
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger',
     'oroquerydesigner/js/query-designer/column/view', 'oroquerydesigner/js/condition-builder'
     ], function (_, Backbone, __, app, messenger, ColumnView) {
     'use strict';

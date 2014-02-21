@@ -1,14 +1,14 @@
-/* global define */
-define(['underscore', 'orotranslation/js/translator', 'oro/modal'],
-function(_, __, Modal) {
+/*global define*/
+define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
+    ], function (_, __, Modal) {
     'use strict';
 
     /**
      * Delete confirmation dialog
      *
-     * @export  oro/delete-confirmation
-     * @class   oro.DeleteConfirmation
-     * @extends oro.Modal
+     * @export  oroui/js/delete-confirmation
+     * @class   oroui.DeleteConfirmation
+     * @extends oroui.Modal
      */
     return Modal.extend({
         /** @property {String} */
@@ -20,7 +20,7 @@ function(_, __, Modal) {
         /**
          * @param {Object} options
          */
-        initialize: function(options) {
+        initialize: function (options) {
             options = _.extend({
                 title: __('Delete Confirmation'),
                 okText: __('Yes, Delete')

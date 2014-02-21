@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/app', 'oroentity/js/entity-field-view', 'jquery-ui'
+define(['underscore', 'backbone', 'oroui/js/app', 'oroentity/js/entity-field-view', 'jquery-ui'
     ], function (_, Backbone, app, EntityFieldView) {
     'use strict';
 

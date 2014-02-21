@@ -1,12 +1,12 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/abstract-widget'],
-function(_, Backbone, AbstractWidget) {
+/*global define*/
+define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
+    ], function (_, Backbone, AbstractWidget) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/buttons-widget
+     * @export  oroui/js/widget/buttons-widget
      * @class   oro.ButtonsWidget
      * @extends oro.AbstractWidget
      */

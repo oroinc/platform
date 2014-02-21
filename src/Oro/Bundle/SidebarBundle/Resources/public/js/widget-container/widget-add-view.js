@@ -10,7 +10,7 @@ define(function (require) {
     var widgetAddTemplate = require('text!./templates/widget-add-template.html');
     var WidgetContainerModel = require('./model');
 
-    var Modal = require('oro/modal');
+    var Modal = require('oroui/js/modal');
     var DialogWidget = require('oro/dialog-widget');
     var constants = require('../constants');
 

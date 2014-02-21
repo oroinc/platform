@@ -1,14 +1,14 @@
 /* jshint devel:true*/
-/* global define, require */
-define(['underscore', 'backbone', 'oro/mediator', 'oroui/js/loading-mask', 'oro/layout', 'jquery.form'],
-function(_, Backbone, mediator, LoadingMask, layout) {
+/*global define, require*/
+define(['underscore', 'backbone', 'oroui/js/mediator', '../loading-mask', '../layout', 'jquery.form'
+    ], function (_, Backbone, mediator, LoadingMask, layout) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/abstract-widget
-     * @class   oro.AbstractWidget
+     * @export  oroui/js/widget/abstract-widget
+     * @class   oroui.widget.AbstractWidget
      * @extends Backbone.View
      */
     return Backbone.View.extend({

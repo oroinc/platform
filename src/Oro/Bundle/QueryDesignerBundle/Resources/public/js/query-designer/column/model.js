@@ -1,5 +1,5 @@
 /* global define */
-define(['backbone', 'oro/app'],
+define(['backbone', 'oroui/js/app'],
 function(Backbone, app) {
     'use strict';
 

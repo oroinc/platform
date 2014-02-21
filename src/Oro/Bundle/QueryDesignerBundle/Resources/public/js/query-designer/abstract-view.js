@@ -1,7 +1,7 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroquerydesigner/js/query-designer/util',
-    'orocalendar/js/form-validation', 'oro/delete-confirmation', 'oroquerydesigner/js/query-designer/column-selector-view',
-    'jquery-outer-html'
+        'orocalendar/js/form-validation', 'oroui/js/delete-confirmation',
+        'oroquerydesigner/js/query-designer/column-selector-view', 'jquery-outer-html'
     ], function (_, Backbone, __, util, FormValidation, DeleteConfirmation,
          ColumnSelectorView) {
     'use strict';

@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/app', 'oro/mediator', 'oro/error',
+define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/mediator', 'oroui/js/error',
         '../abstract-view', '../model', '../collection'
     ], function (_, Backbone, app, mediator, error,
         AbstractView, NavigationModel, NavigationCollection) {

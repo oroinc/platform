@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oronavigation/js/navigation', 'oro/mediator'
+define(['underscore', 'backbone', 'oronavigation/js/navigation', 'oroui/js/mediator'
     ], function (_, Backbone, Navigation, mediator) {
     'use strict';
 

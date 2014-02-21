@@ -1,6 +1,6 @@
 /* jshint browser:true */
 /*global define, require, base64_encode*/
-define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation', 'oro/mediator', 'base64', 'json'
+define(['underscore', 'backbone', 'url', 'routing', 'oronavigation/js/navigation', 'oroui/js/mediator', 'base64', 'json'
     ], function (_, Backbone, Url, routing, Navigation, mediator) {
     'use strict';
 

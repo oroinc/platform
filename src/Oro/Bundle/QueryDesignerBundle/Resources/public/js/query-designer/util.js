@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'oro/app'],
+define(['underscore', 'oroui/js/app'],
 function(_, app) {
     'use strict';
 

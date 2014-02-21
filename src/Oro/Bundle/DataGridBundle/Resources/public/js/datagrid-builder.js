@@ -6,8 +6,8 @@ define(function (require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var tools = require('oro/tools');
-    var mediator = require('oro/mediator');
+    var tools = require('oroui/js/tools');
+    var mediator = require('oroui/js/mediator');
     var PageableCollection = require('./pageable-collection');
     var Grid = require('./datagrid/grid');
     var GridRouter = require('./datagrid/router');

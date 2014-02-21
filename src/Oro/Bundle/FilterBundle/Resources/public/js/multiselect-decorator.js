@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/mediator', 'jquery.multiselect', 'jquery.multiselect.filter'
+define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery.multiselect', 'jquery.multiselect.filter'
     ], function ($, _, mediator) {
     'use strict';
 

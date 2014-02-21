@@ -1,6 +1,7 @@
 /* jshint browser:true */
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone', 'oro/app', '../navigation', 'oro/mediator', 'oro/error'
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'backbone',
+        'oroui/js/app', '../navigation', 'oroui/js/mediator', 'oroui/js/error'
     ], function ($, _, __, Backbone, app, Navigation, mediator, error) {
     'use strict';
 

@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/mediator', 'oro/messenger', 'oro/dialog-widget',
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oro/dialog-widget',
     'oroaddress/js/mapservice/googlemaps', 'oroaddress/js/address/view', 'oroaddress/js/address/collection'
     ], function (_, Backbone, __, mediator, messenger, DialogWidget,
      Googlemaps, AddressView, AddressCollection) {
