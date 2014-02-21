@@ -10,7 +10,7 @@ define(function (require) {
     var mediator = require('oro/mediator');
     var PageableCollection = require('./pageable-collection');
     var Grid = require('./datagrid/grid');
-    var GridRouter = require('./router');
+    var GridRouter = require('./datagrid/router');
     var GridViewsView = require('./datagrid/grid-views/view');
     var mapActionModuleName = require('./map-action-module-name');
     var mapCellModuleName = require('./map-cell-module-name');
