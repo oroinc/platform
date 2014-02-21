@@ -9,14 +9,41 @@ class OroConfigBundle implements Migration
 {
     /**
      * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        return [
-            "CREATE TABLE oro_config (id INT AUTO_INCREMENT NOT NULL, entity VARCHAR(255) DEFAULT NULL, record_id INT DEFAULT NULL, UNIQUE INDEX CONFIG_UQ_ENTITY (entity, record_id), PRIMARY KEY(id))",
-            "CREATE TABLE oro_config_value (id INT AUTO_INCREMENT NOT NULL, config_id INT DEFAULT NULL, name VARCHAR(255) NOT NULL, section VARCHAR(50) DEFAULT NULL, text_value LONGTEXT DEFAULT NULL, object_value LONGTEXT DEFAULT NULL COMMENT '(DC2Type:object)', array_value LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)', type VARCHAR(20) NOT NULL, UNIQUE INDEX CONFIG_VALUE_UQ_ENTITY (name, section, config_id), INDEX IDX_DAF6DF5524DB0683 (config_id), PRIMARY KEY(id))",
+        // @codingStandardsIgnoreStart
 
-            "ALTER TABLE oro_config_value ADD CONSTRAINT FK_DAF6DF5524DB0683 FOREIGN KEY (config_id) REFERENCES oro_config (id)"
-        ];
+        /** Generate table oro_config **/
+        $table = $schema->createTable('oro_config');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('entity', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('record_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['entity', 'record_id'], 'CONFIG_UQ_ENTITY');
+        /** End of generate table oro_config **/
+
+        /** Generate table oro_config_value **/
+        $table = $schema->createTable('oro_config_value');
+        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
+        $table->addColumn('config_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('section', 'string', ['default' => null, 'notnull' => false, 'length' => 50, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('text_value', 'text', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('object_value', 'object', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:object)']);
+        $table->addColumn('array_value', 'array', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:object)']);
+        $table->addColumn('type', 'string', ['default' => null, 'notnull' => true, 'length' => 20, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['name', 'section', 'config_id'], 'CONFIG_VALUE_UQ_ENTITY');
+        $table->addIndex(['config_id'], 'IDX_DAF6DF5524DB0683', []);
+        /** End of generate table oro_config_value **/
+
+        /** Generate foreign keys for table oro_config_value **/
+        $table = $schema->getTable('oro_config_value');
+        $table->addForeignKeyConstraint($schema->getTable('oro_config'), ['config_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
+        /** End of generate foreign keys for table oro_config_value **/
+
+        // @codingStandardsIgnoreEnd
     }
 }
