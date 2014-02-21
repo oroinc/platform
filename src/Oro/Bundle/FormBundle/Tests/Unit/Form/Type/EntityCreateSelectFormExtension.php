@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\TestEntityType;
 
 class EntityCreateSelectFormExtension extends AbstractExtension
 {
@@ -23,7 +24,7 @@ class EntityCreateSelectFormExtension extends AbstractExtension
     {
         return array(
             new TextType(),
-            new EntityType($this->registry),
+            new TestEntityType(),
             new EntityIdentifierType($this->registry),
         );
     }
