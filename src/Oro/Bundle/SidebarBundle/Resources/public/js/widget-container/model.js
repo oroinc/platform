@@ -1,11 +1,11 @@
 /*global define*/
 
-define(['backbone', 'oro/sidebar/constants'], function (Backbone, constants) {
+define(['backbone', '../constants'], function (Backbone, constants) {
     'use strict';
 
     /**
-     * @export  oro/sidebar/widget-controller/model
-     * @class oro.sidebar.widget-controller.Model
+     * @export  orosidebar/js/widget-container/model
+     * @class   orosidebar.widgetContainer.Model
      * @extends Backbone.Model
      */
     var WidgetContainerModel = Backbone.Model.extend({

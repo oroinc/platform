@@ -1,12 +1,11 @@
 /*global define*/
-
-define(['backbone', 'routing', 'oro/sidebar/constants'],
-function (Backbone, routing, constants) {
+define(['backbone', 'routing', './constants'
+    ], function (Backbone, routing, constants) {
     'use strict';
 
     /**
-     * @export  oro/sidebar/sidebar/model
-     * @class oro.sidebar.sidebar.Model
+     * @export  orosidebar/js/model
+     * @class   orosidebar.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
