@@ -1,20 +1,20 @@
-/* global define */
-define(['underscore', 'backbone', 'oronavigation/js/navigation', 'oro/translator', 'oro/tag/collection'],
-function(_, Backbone, Navigation, __, TagCollection) {
+/*global define*/
+define(['underscore', 'backbone', 'oronavigation/js/navigation', 'oro/translator', './collection'
+    ], function (_, Backbone, Navigation, __, TagCollection) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/tag/view
-     * @class   oro.tag.View
+     * @export  orotag/js/view
+     * @class   orotag.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({
         options: {
             filter: null
         },
-    
+
         /** @property */
         template: _.template(
             '<ul class="inline tag-list">' +
@@ -32,11 +32,11 @@ function(_, Backbone, Navigation, __, TagCollection) {
                 '<% if (models.length == 0) { %><%= _.__("Not tagged") %><%} %>' +
             '</ul>'
         ),
-    
+
         /**
          * Constructor
          */
-        initialize: function() {
+        initialize: function () {
             this.collection = new TagCollection();
             this.listenTo(this.getCollection(), 'reset', this.render);
             this.listenTo(this, 'filter', this.render);
@@ -46,41 +46,41 @@ function(_, Backbone, Navigation, __, TagCollection) {
             // process filter action binding
             this.$('.tag-sort-actions a').click(_.bind(this.filter, this));
         },
-    
+
         /**
          * Filter collection proxy
          *
          * @returns {*}
          */
-        filter: function(e) {
+        filter: function (e) {
             var $el = $(e.target);
-    
+
             // clear all active links
             $el.parents('ul').find('a.active').removeClass('active');
             // make current filter active
             $el.addClass('active');
-    
+
             this.options.filter = $el.data('type');
             this.trigger('filter');
-    
+
             return this;
         },
-    
+
         /**
          * Get collection object
          *
          * @returns {*}
          */
-        getCollection: function() {
+        getCollection: function () {
             return this.collection;
         },
-    
+
         /**
          * Render widget
          *
          * @returns {}
          */
-        render: function() {
+        render: function () {
             this.$tagsHolder.html(
                 this.template(this.getCollection().getFilteredCollection(this.options.filter))
             );
@@ -89,7 +89,7 @@ function(_, Backbone, Navigation, __, TagCollection) {
             if (navigation) {
                 navigation.processClicks(this.$('.tag-list a'));
             }
-    
+
             return this;
         }
     });

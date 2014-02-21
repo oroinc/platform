@@ -1,11 +1,11 @@
-/* global define */
-define(['backbone', 'oro/tag/model'],
-function(Backbone, TagModel) {
+/*global define*/
+define(['backbone', './model'
+    ], function (Backbone, TagModel) {
     'use strict';
 
     /**
-     * @export  oro/tag/collection
-     * @class   oro.tag.Collection
+     * @export  orotag/js/collection
+     * @class   orotag.Collection
      * @extends Backbone.Collection
      */
     var TagCollection = Backbone.Collection.extend({
