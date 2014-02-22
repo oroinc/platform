@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Migrations;
 
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\MappingException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -15,10 +13,12 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\CreateMigrationTableMigration;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\UpdateBundleVersionMigration;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class MigrationsLoader
 {
-    const MIGRATIONS_PATH       = 'Migration';
-    const MAX_TABLE_NAME_LENGTH = 30;
+    const MIGRATIONS_PATH = 'Migration';
 
     /**
      * @var KernelInterface
@@ -88,8 +88,10 @@ class MigrationsLoader
             $migrations[] = new CreateMigrationTableMigration();
         }
 
-        $includedFiles = $this->includeMigrationFiles($migrationDirectories);
-        $migrations    = $this->createMigrationObjects($includedFiles);
+        $this->createMigrationObjects(
+            $migrations,
+            $this->loadMigrationScripts($migrationDirectories)
+        );
 
         $bundleVersions = $this->getLatestMigrationVersions($migrationDirectories);
         if (!empty($bundleVersions)) {
@@ -100,51 +102,13 @@ class MigrationsLoader
     }
 
     /**
-     * @return array
-     *   key - class name of migration file
-     *   value - array of sql queries from this file
-     * @throws MappingException
-     */
-    public function getMigrationsQueries()
-    {
-        $connection       = $this->em->getConnection();
-        $sm               = $connection->getSchemaManager();
-        $platform         = $connection->getDatabasePlatform();
-        $migrations       = $this->getMigrations();
-        $migrationQueries = [];
-        foreach ($migrations as $migration) {
-            $fromSchema = $sm->createSchema();
-            $toSchema   = clone $fromSchema;
-            $queries    = $migration->up($toSchema);
-            $comparator = new Comparator();
-            $schemaDiff = $comparator->compare($fromSchema, $toSchema);
-            foreach ($schemaDiff->newTables as $newTable) {
-                if (strlen($newTable->getName()) > self::MAX_TABLE_NAME_LENGTH) {
-                    throw new MappingException(
-                        sprintf(
-                            'Max table name length is %s. Please correct table %s in %s migration',
-                            self::MAX_TABLE_NAME_LENGTH,
-                            $newTable->getName(),
-                            get_class($migration)
-                        )
-                    );
-                }
-            }
-            $queries = array_merge($queries, $schemaDiff->toSql($platform));
-
-            $migrationQueries[get_class($migration)] = $queries;
-        }
-
-        return $migrationQueries;
-    }
-
-    /**
      * Gets a list of all directories contain migration scripts
      *
      * @return array
      *      key   = bundle name
      *      value = array
      *      .    key   = a migration version (actually it equals the name of migration directory)
+     *      .            or empty string for root migration directory
      *      .    value = full path to a migration directory
      */
     protected function getMigrationDirectories()
@@ -160,15 +124,19 @@ class MigrationsLoader
                 $bundlePath . '/' . self::MIGRATIONS_PATH
             );
 
-            $finder = new Finder();
-
-            try {
+            if (is_dir($bundleMigrationPath)) {
                 $bundleMigrationDirectories = [];
+
+                // get directories contain versioned migration scripts
+                $finder = new Finder();
                 $finder->directories()->depth(0)->in($bundleMigrationPath);
                 /** @var SplFileInfo $directory */
                 foreach ($finder as $directory) {
                     $bundleMigrationDirectories[$directory->getRelativePathname()] = $directory->getPathname();
                 }
+                // add root migration directory (it may contains an installation script)
+                $bundleMigrationDirectories[''] = $bundleMigrationPath;
+                // sort them by version number (the oldest version first)
                 if (!empty($bundleMigrationDirectories)) {
                     uksort(
                         $bundleMigrationDirectories,
@@ -176,10 +144,9 @@ class MigrationsLoader
                             return version_compare($a, $b);
                         }
                     );
-                    $result[$bundleName] = $bundleMigrationDirectories;
                 }
-            } catch (\Exception $e) {
-                //dir doesn't exists
+
+                $result[$bundleName] = $bundleMigrationDirectories;
             }
         }
 
@@ -190,30 +157,48 @@ class MigrationsLoader
      * Finds migration files and call "include_once" for each file
      *
      * @param array $migrationDirectories
-     *      key   = bundle name
-     *      value = array
-     *      .    key   = a migration version
-     *      .    value = full path to a migration directory
-     * @return string[] included files
+     *               key   = bundle name
+     *               value = array
+     *               .    key   = a migration version or empty string for root migration directory
+     *               .    value = full path to a migration directory
+     * @return array loaded files
+     *               'migrations' => array
+     *               .      key   = full file path
+     *               .      value = array
+     *               .            'bundleName' => bundle name
+     *               .            'version'    => migration version
+     *               'installers' => array
+     *               .      key   = full file path
+     *               .      value = bundle name
+     *               'bundles'    => string[] names of bundles
      */
-    protected function includeMigrationFiles(array $migrationDirectories)
+    protected function loadMigrationScripts(array $migrationDirectories)
     {
-        $result  = [];
+        $migrations = [];
+        $installers = [];
 
-        $fileFinder = new Finder();
-        foreach ($migrationDirectories as $bundleMigrationDirectories) {
-            foreach ($bundleMigrationDirectories as $migrationPath) {
-                $fileFinder->files()->name('*.php')->in($migrationPath);
+        foreach ($migrationDirectories as $bundleName => $bundleMigrationDirectories) {
+            foreach ($bundleMigrationDirectories as $migrationVersion => $migrationPath) {
+                $fileFinder = new Finder();
+                $fileFinder->depth(0)->files()->name('*.php')->in($migrationPath);
                 foreach ($fileFinder as $file) {
                     /** @var SplFileInfo $file */
                     $filePath = $file->getPathname();
                     include_once $filePath;
-                    $result[] = $filePath;
+                    if (empty($migrationVersion)) {
+                        $installers[$filePath] = $bundleName;
+                    } else {
+                        $migrations[$filePath] = ['bundleName' => $bundleName, 'version' => $migrationVersion];
+                    }
                 }
             }
         }
 
-        return $result;
+        return [
+            'migrations' => $migrations,
+            'installers' => $installers,
+            'bundles'    => array_keys($migrationDirectories),
+        ];
     }
 
     /**
@@ -222,7 +207,7 @@ class MigrationsLoader
      * @param array $migrationDirectories
      *      key   = bundle name
      *      value = array
-     *      .    key   = a migration version
+     *      .    key   = a migration version or empty string for root migration directory
      *      .    value = full path to a migration directory
      * @return string[]
      *      key   = bundle name
@@ -232,7 +217,8 @@ class MigrationsLoader
     {
         $result = [];
         foreach ($migrationDirectories as $bundleName => $bundleMigrationDirectories) {
-            $version = array_pop(array_keys($bundleMigrationDirectories));
+            $versions = array_keys($bundleMigrationDirectories);
+            $version  = array_pop($versions);
             if ($version) {
                 $result[$bundleName] = $version;
             }
@@ -242,28 +228,89 @@ class MigrationsLoader
     }
 
     /**
-     * @param string[] $files Full paths to migration scripts
-     * @return Migration[]
+     * Creates an instances of all classes implement migration scripts
+     *
+     * @param Migration[] $result
+     * @param array       $files Files contain migration scripts
+     *                           'migrations' => array
+     *                           .      key   = full file path
+     *                           .      value = array
+     *                           .            'bundleName' => bundle name
+     *                           .            'version'    => migration version
+     *                           'installers' => array
+     *                           .      key   = full file path
+     *                           .      value = bundle name
+     *                           'bundles'    => string[] names of bundles
+     * @throws \RuntimeException if a migration script contains more than one class
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function createMigrationObjects($files)
+    protected function createMigrationObjects(&$result, $files)
     {
-        $declared   = get_declared_classes();
         $migrations = [];
+        $installers = [];
+
+        // load migration objects
+        $declared = get_declared_classes();
         foreach ($declared as $className) {
             $reflClass  = new \ReflectionClass($className);
             $sourceFile = $reflClass->getFileName();
-            if (in_array($sourceFile, $files)) {
+            if (isset($files['migrations'][$sourceFile])) {
                 $migration = new $className;
                 if ($migration instanceof Migration) {
+                    if (isset($migrations[$sourceFile])) {
+                        throw new \RuntimeException('A migration script must contains only one class.');
+                    }
                     if ($migration instanceof ContainerAwareInterface) {
                         $migration->setContainer($this->container);
                     }
-                    $migrations[] = $migration;
+                    $migrations[$sourceFile] = $migration;
+                }
+            } elseif (isset($files['installers'][$sourceFile])) {
+                $installer = new $className;
+                if ($installer instanceof Installation) {
+                    if (isset($migrations[$sourceFile])) {
+                        throw new \RuntimeException('An installation  script must contains only one class.');
+                    }
+                    if ($installer instanceof ContainerAwareInterface) {
+                        $installer->setContainer($this->container);
+                    }
+                    $migrations[$sourceFile] = $installer;
+                    $installers[$sourceFile] = [
+                        'bundleName' => $files['installers'][$sourceFile],
+                        'version'    => $installer->getMigrationVersion(),
+                    ];
                 }
             }
         }
 
-        return $migrations;
+        // remove versioned migrations covered by installers
+        foreach ($installers as $installer) {
+            $installerBundleName = $installer['bundleName'];
+            $installerVersion    = $installer['version'];
+            foreach ($files['migrations'] as $sourceFile => $migration) {
+                if ($migration['bundleName'] === $installerBundleName
+                    && version_compare($migration['version'], $installerVersion) < 1
+                ) {
+                    unset($migrations[$sourceFile]);
+                }
+            }
+        }
+
+        // add migration objects to result tacking into account bundles order
+        foreach ($files['bundles'] as $bundleName) {
+            foreach ($files['installers'] as $sourceFile => $installerBundleName) {
+                if ($installerBundleName === $bundleName && isset($migrations[$sourceFile])) {
+                    $result[] = $migrations[$sourceFile];
+                }
+            }
+            foreach ($files['migrations'] as $sourceFile => $migration) {
+                if ($migration['bundleName'] === $bundleName && isset($migrations[$sourceFile])) {
+                    $result[] = $migrations[$sourceFile];
+                }
+            }
+        }
     }
 
     /**
@@ -272,7 +319,7 @@ class MigrationsLoader
      * @param array $migrationDirectories
      *      key   = bundle name
      *      value = array
-     *      .    key   = a migration version
+     *      .    key   = a migration version or empty string for root migration directory
      *      .    value = full path to a migration directory
      */
     protected function filterMigrations(array &$migrationDirectories)
@@ -285,18 +332,21 @@ class MigrationsLoader
                 CreateMigrationTableMigration::MIGRATION_TABLE
             )
         );
+
         if (!empty($versions)) {
             foreach ($migrationDirectories as $bundleName => $bundleMigrationDirectories) {
-                $bundleVersion = array_filter(
+                $bundleVersion    = array_filter(
                     $versions,
                     function ($val) use ($bundleName) {
                         return ($val['bundle'] == $bundleName);
                     }
                 );
-                $dbVersion     = array_pop($bundleVersion)['version'];
-                foreach (array_keys($bundleMigrationDirectories) as $migrationVersion) {
-                    if (version_compare($migrationVersion, $dbVersion) < 1) {
-                        unset ($migrationDirectories[$bundleName][$migrationVersion]);
+                $installedVersion = empty($bundleVersion) ? null : array_pop($bundleVersion)['version'];
+                if ($installedVersion) {
+                    foreach (array_keys($bundleMigrationDirectories) as $migrationVersion) {
+                        if (empty($migrationVersion) || version_compare($migrationVersion, $installedVersion) < 1) {
+                            unset ($migrationDirectories[$bundleName][$migrationVersion]);
+                        }
                     }
                 }
             }
