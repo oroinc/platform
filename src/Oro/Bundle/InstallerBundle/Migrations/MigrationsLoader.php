@@ -18,7 +18,7 @@ use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\UpdateBundleVersionMigr
  */
 class MigrationsLoader
 {
-    const MIGRATIONS_PATH = 'Migration';
+    const MIGRATIONS_PATH = 'Migrations/Schemas';
 
     /**
      * @var KernelInterface
