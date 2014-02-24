@@ -47,10 +47,11 @@ class PlaceholderExtension extends \Twig_Extension
     /**
      * @param string $name
      * @param array  $parameters
+     * @param string $delimiter
      *
      * @return array
      */
-    public function renderPlaceholders($name, array $parameters = [])
+    public function renderPlaceholders($name, array $parameters = [], $delimiter = '')
     {
         $renderedBlocks = [];
         if (isset($this->placeholders[$name]['items'])) {
@@ -59,7 +60,7 @@ class PlaceholderExtension extends \Twig_Extension
             }
         }
 
-        return implode($renderedBlocks);
+        return implode($delimiter, $renderedBlocks);
     }
 
     /**
