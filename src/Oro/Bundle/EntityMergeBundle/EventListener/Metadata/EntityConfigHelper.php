@@ -109,7 +109,6 @@ class EntityConfigHelper
         return false;
     }
 
-
     /**
      * Removes prefix ExtendConfigDumper::FIELD_PREFIX from the name of field.
      *
