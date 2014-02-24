@@ -49,11 +49,12 @@ class MigrationQueryBuilder
 
             /** @var TableDiff $changedTables */
             $changedTables = $schemaDiff->changedTables;
-            if ($changedTables) {
-                foreach ($changedTables as $tableName => $diff) {
-                    $columns = array_values($diff->addedColumns);
-                    $this->checkColumnsNameLength($tableName, $columns, $migration);
-                }
+            foreach ($changedTables as $tableName => $diff) {
+                $this->checkColumnsNameLength(
+                    $tableName,
+                    array_values($diff->addedColumns),
+                    $migration
+                );
             }
 
             $queries = array_merge(
