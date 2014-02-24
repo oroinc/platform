@@ -489,6 +489,7 @@ class WorkflowDefinition
     public function import(WorkflowDefinition $definition)
     {
         // enabled flag should not be imported
+        // All imported workflows set as system by default
         $this->setName($definition->getName())
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())
@@ -498,7 +499,7 @@ class WorkflowDefinition
             ->setStartStep($definition->getStartStep())
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
             ->setEntityAcls($definition->getEntityAcls())
-            ->setSystem($definition->isSystem());
+            ->setSystem(true);
 
         return $this;
     }
