@@ -16,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @ORM\HasLifecycleCallbacks()
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowDefinition
 {
@@ -62,6 +63,13 @@ class WorkflowDefinition
     protected $enabled;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(type="boolean")
+     */
+    protected $system;
+
+    /**
      * @var array
      *
      * @ORM\Column(name="configuration", type="array")
@@ -106,6 +114,7 @@ class WorkflowDefinition
     public function __construct()
     {
         $this->enabled = false;
+        $this->system = false;
         $this->configuration = array();
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
@@ -488,7 +497,27 @@ class WorkflowDefinition
             ->setSteps($definition->getSteps())
             ->setStartStep($definition->getStartStep())
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
-            ->setEntityAcls($definition->getEntityAcls());
+            ->setEntityAcls($definition->getEntityAcls())
+            ->setSystem($definition->isSystem());
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isSystem()
+    {
+        return $this->system;
+    }
+
+    /**
+     * @param boolean $system
+     * @return WorkflowDefinition
+     */
+    public function setSystem($system)
+    {
+        $this->system = $system;
 
         return $this;
     }

@@ -129,6 +129,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $maximumConfiguration = array(
             'label' => 'Test Workflow',
             'enabled' => false,
+            'system' => true,
             'entity' => 'My\Entity',
             'start_step' => 'test_step',
             'entity_attribute' => 'my_entity',

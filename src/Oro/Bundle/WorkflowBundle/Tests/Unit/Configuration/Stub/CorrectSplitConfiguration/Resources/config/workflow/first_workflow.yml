@@ -5,6 +5,7 @@ workflows:
     first_workflow:
         label: 'First Workflow'
         enabled: true
+        system: true
         entity: First\Entity
         start_step: first_step
         entity_attribute: my_entity

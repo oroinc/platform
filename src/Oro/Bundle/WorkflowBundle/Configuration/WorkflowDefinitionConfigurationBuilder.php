@@ -34,6 +34,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             $this->assertConfigurationOptions($workflowConfiguration, array('label', 'entity'));
 
             $enabled = $this->getConfigurationOption($workflowConfiguration, 'enabled', true);
+            $system = $this->getConfigurationOption($workflowConfiguration, 'system', false);
             $startStepName = $this->getConfigurationOption($workflowConfiguration, 'start_step', null);
             $entityAttributeName = $this->getConfigurationOption(
                 $workflowConfiguration,
@@ -53,6 +54,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
                 ->setRelatedEntity($workflowConfiguration['entity'])
                 ->setStepsDisplayOrdered($stepsDisplayOrdered)
                 ->setEnabled($enabled)
+                ->setSystem($system)
                 ->setEntityAttributeName($entityAttributeName)
                 ->setConfiguration($workflowConfiguration);
 
