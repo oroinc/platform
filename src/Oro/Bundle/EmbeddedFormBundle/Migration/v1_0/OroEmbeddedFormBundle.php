@@ -35,5 +35,7 @@ class OroEmbeddedFormBundle implements Migration
         /** End of generate foreign keys for table oro_embedded_form **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

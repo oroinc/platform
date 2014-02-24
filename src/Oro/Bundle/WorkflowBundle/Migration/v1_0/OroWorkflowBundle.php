@@ -137,5 +137,7 @@ class OroWorkflowBundle implements Migration
         /** End of generate foreign keys for table oro_workflow_entity_acl_identity **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

@@ -71,5 +71,7 @@ class OroCalendarBundle implements Migration
         /** End of generate foreign keys for table oro_calendar_event **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

@@ -155,13 +155,17 @@ class MigrationsLoader
         $platform         = $connection->getDatabasePlatform();
         $migrations       = $this->getMigrations();
         $migrationQueries = [];
+        $fromSchema = $sm->createSchema();
         foreach ($migrations as $migration) {
-            $fromSchema = $sm->createSchema();
             $toSchema   = clone $fromSchema;
             $queries    = $migration->up($toSchema);
-            $queries    = array_merge($queries, $fromSchema->getMigrateToSql($toSchema, $platform));
+            $queries    = array_merge(
+                $fromSchema->getMigrateToSql($toSchema, $platform),
+                $queries
+            );
 
             $migrationQueries[get_class($migration)] = $queries;
+            $fromSchema = $toSchema;
         }
 
         return $migrationQueries;

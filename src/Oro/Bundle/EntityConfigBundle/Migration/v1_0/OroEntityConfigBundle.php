@@ -129,5 +129,7 @@ class OroEntityConfigBundle implements Migration
         /** End of generate foreign keys for table oro_entity_config_log **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

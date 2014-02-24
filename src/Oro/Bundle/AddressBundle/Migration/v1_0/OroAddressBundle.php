@@ -115,5 +115,7 @@ class OroAddressBundle implements Migration
         /** End of generate foreign keys for table oro_dictionary_region **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

@@ -46,5 +46,7 @@ class OroReportBundle implements Migration
         /** End of generate foreign keys for table oro_report **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

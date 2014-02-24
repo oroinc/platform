@@ -28,5 +28,7 @@ class OroTranslationBundle implements Migration
         /** End of generate table oro_translation **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

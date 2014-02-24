@@ -52,5 +52,7 @@ class OroImapBundle implements Migration
         $table->addColumn('imap_password', 'string', ['default' => null, 'notnull' => false, 'length' => 100, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

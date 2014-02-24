@@ -65,5 +65,7 @@ class OroIntegrationBundle implements Migration
         /** End of generate foreign keys for table oro_integration_channel_status **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

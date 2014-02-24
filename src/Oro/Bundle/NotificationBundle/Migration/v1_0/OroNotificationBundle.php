@@ -92,5 +92,7 @@ class OroNotificationBundle implements Migration
         /** End of generate foreign keys for table oro_notification_recipient_user **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

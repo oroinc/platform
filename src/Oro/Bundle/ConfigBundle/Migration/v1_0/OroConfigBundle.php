@@ -32,7 +32,7 @@ class OroConfigBundle implements Migration
         $table->addColumn('section', 'string', ['default' => null, 'notnull' => false, 'length' => 50, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->addColumn('text_value', 'text', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->addColumn('object_value', 'object', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:object)']);
-        $table->addColumn('array_value', 'array', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:object)']);
+        $table->addColumn('array_value', 'array', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('type', 'string', ['default' => null, 'notnull' => true, 'length' => 20, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name', 'section', 'config_id'], 'CONFIG_VALUE_UQ_ENTITY');
@@ -45,5 +45,7 @@ class OroConfigBundle implements Migration
         /** End of generate foreign keys for table oro_config_value **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

@@ -25,5 +25,7 @@ class OroCronBundle implements Migration
         /** End of generate table oro_cron_schedule **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

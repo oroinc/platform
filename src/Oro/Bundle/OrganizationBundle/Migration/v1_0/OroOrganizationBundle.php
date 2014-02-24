@@ -48,5 +48,7 @@ class OroOrganizationBundle implements Migration
         /** End of generate foreign keys for table oro_business_unit **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

@@ -183,5 +183,7 @@ class OroEmailBundle implements Migration
         /** End of generate foreign keys for table oro_email_template_translation **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

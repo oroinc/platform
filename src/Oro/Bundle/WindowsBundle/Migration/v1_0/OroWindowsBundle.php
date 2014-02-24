@@ -32,5 +32,7 @@ class OroWindowsBundle implements Migration
         /** End of generate foreign keys for table oro_windows_state **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

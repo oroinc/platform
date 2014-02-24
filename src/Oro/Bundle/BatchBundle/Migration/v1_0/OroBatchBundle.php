@@ -101,5 +101,7 @@ class OroBatchBundle implements Migration
         /** End of generate foreign keys for table oro_batch_step_execution **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

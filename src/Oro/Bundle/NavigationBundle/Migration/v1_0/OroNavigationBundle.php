@@ -97,5 +97,7 @@ class OroNavigationBundle implements Migration
         /** End of generate foreign keys for table oro_navigation_pagestate **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

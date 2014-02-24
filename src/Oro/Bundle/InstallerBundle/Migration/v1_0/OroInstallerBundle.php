@@ -25,5 +25,7 @@ class OroInstallerBundle implements Migration
         /** End of generate table oro_installer_bundle_version **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

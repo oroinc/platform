@@ -54,5 +54,7 @@ class OroTagBundle implements Migration
         /** End of generate foreign keys for table oro_tag_tagging **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

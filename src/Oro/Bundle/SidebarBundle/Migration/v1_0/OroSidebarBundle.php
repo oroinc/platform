@@ -52,5 +52,7 @@ class OroSidebarBundle implements Migration
         /** End of generate foreign keys for table oro_sidebar_widget **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

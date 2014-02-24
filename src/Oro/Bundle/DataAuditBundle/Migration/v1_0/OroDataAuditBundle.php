@@ -36,5 +36,7 @@ class OroDataAuditBundle implements Migration
         /** End of generate foreign keys for table oro_audit **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }

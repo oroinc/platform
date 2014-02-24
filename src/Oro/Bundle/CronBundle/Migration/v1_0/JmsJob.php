@@ -86,5 +86,7 @@ class JmsJob implements Migration
         /** End of generate foreign keys for table jms_jobs **/
 
         // @codingStandardsIgnoreEnd
+
+        return [];
     }
 }
