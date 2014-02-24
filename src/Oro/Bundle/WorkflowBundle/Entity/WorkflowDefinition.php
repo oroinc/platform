@@ -109,6 +109,20 @@ class WorkflowDefinition
     protected $entityAcls;
 
     /**
+     * @var \DateTime $created
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime $updated
+     *
+     * @ORM\Column(type="datetime")
+     */
+    protected $updatedAt;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -521,5 +535,67 @@ class WorkflowDefinition
         $this->system = $system;
 
         return $this;
+    }
+
+    /**
+     * Get created date/time
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $created
+     * @return WorkflowDefinition
+     */
+    public function setCreatedAt($created)
+    {
+        $this->createdAt = $created;
+
+        return $this;
+    }
+
+    /**
+     * Get last update date/time
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \DateTime $updated
+     * @return WorkflowDefinition
+     */
+    public function setUpdatedAt($updated)
+    {
+        $this->updatedAt = $updated;
+
+        return $this;
+    }
+
+    /**
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     */
+    public function beforeSave()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Pre update event handler
+     * @ORM\PreUpdate
+     */
+    public function beforeUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

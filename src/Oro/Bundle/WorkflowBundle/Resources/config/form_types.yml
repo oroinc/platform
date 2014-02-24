@@ -8,6 +8,8 @@ parameters:
     oro_workflow.form.type.workflow_step_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType
     oro_workflow.form.type.workflow_select.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowSelectType
 
+    oro_workflow.form.type.workflow_definition.class: Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType
+
 services:
     oro_workflow.form.event_listener.default_values:
         class: %oro_workflow.form.event_listener.default_values.class%
@@ -48,3 +50,14 @@ services:
             - @translator
         tags:
             - { name: form.type, alias: oro_workflow_select }
+
+    oro_workflow.form.type.workflow_definition:
+        class: %oro_workflow.form.type.workflow_definition.class%
+        tags:
+            - { name: form.type, alias: "oro_workflow_definition" }
+
+    oro_workflow.form.workflow_definition:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments: ["oro_workflow_definition_form", "oro_workflow_definition", null]
