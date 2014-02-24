@@ -6,6 +6,7 @@ use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
 {
     const LINE = 12;
+
     /**
      * @var \Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser
      */
@@ -67,50 +68,50 @@ class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
         return [
             'name' => [
                 'stream' => new \Twig_TokenStream(
-                        [
-                            new \Twig_Token(\Twig_Token::NAME_TYPE, 'test_position', self::LINE),
-                            new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
-                            new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                            new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                        ]
-                    ),
+                    [
+                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'test_position', self::LINE),
+                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
+                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
+                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
+                    ]
+                ),
                 'getExpressionParser' => 'once',
                 'parseExpression' => 'once'
             ],
             'string' => [
                 'stream' => new \Twig_TokenStream(
-                        [
-                            new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
-                            new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
-                            new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                            new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                        ]
-                    ),
+                    [
+                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
+                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
+                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
+                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
+                    ]
+                ),
                 'getExpressionParser' => 'once',
                 'parseExpression' => 'once'
             ],
             'concat' => [
                 'stream' => new \Twig_TokenStream(
-                        [
-                            new \Twig_Token(\Twig_Token::STRING_TYPE, 'test', self::LINE),
-                            new \Twig_Token(\Twig_Token::OPERATOR_TYPE, '~', self::LINE),
-                            new \Twig_Token(\Twig_Token::STRING_TYPE, '_position', self::LINE),
-                            new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
-                            new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                            new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                        ]
-                    ),
+                    [
+                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test', self::LINE),
+                        new \Twig_Token(\Twig_Token::OPERATOR_TYPE, '~', self::LINE),
+                        new \Twig_Token(\Twig_Token::STRING_TYPE, '_position', self::LINE),
+                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
+                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
+                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
+                    ]
+                ),
                 'getExpressionParser' => 'once',
                 'parseExpression' => 'once'
             ],
             'noparams' => [
                 'stream' => new \Twig_TokenStream(
-                        [
-                            new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
-                            new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                            new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                        ]
-                    ),
+                    [
+                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
+                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
+                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
+                    ]
+                ),
                 'getExpressionParser' => 'never',
                 'parseExpression' => 'never'
             ]
