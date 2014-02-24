@@ -57,10 +57,10 @@ new entity instance, data_class option will be overridden by "class" option of m
 receives value when user clicks on row in existing entity grid, returns instance of existing entity;
 * **mode** - hidden field that contains current mode.
 
-To convert data from complex three field representation to one entity on null value used custom data transformer
-EntityCreateOrSelectTransformer. It defines current mode based in input value (create for not existing entity,
-view for existing entity, default mode from "mode" option for null value) and returns appropriate entity based on
-specified mode (new_entity for create, existing_entity for view, null for grid).
+To convert data from complex three field representation to one entity or null value form type uses custom data
+transformer EntityCreateOrSelectTransformer. It defines current mode based in input value
+(create for not existing entity, view for existing entity, default mode from "mode" option for null value)
+and returns appropriate entity based on specified mode (new_entity for create, existing_entity for view, null for grid).
 
 Also form type has preSubmit listener that disable validation of create new entity field for grid and view modes.
 

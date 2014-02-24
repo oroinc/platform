@@ -29,6 +29,11 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
      */
     protected $defaultMode;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param string $className
+     * @param string $defaultMode
+     */
     public function __construct(DoctrineHelper $doctrineHelper, $className, $defaultMode)
     {
         $this->doctrineHelper = $doctrineHelper;
