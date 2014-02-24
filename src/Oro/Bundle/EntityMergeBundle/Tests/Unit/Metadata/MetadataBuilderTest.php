@@ -83,14 +83,20 @@ class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entityMetadata));
 
         // Test adding doctrine fields
-        $doctrineFieldNames = array('foo_field', 'bar_field');
+        $doctrineFieldNames = array('id', 'foo_field', 'bar_field');
+        $doctrineFieldNamesWithoutId = array('foo_field', 'bar_field');
         $classMetadataCallIndex = 0;
+
+        $idFieldNames = array('id');
+        $this->classMetadata->expects($this->at($classMetadataCallIndex++))
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue($idFieldNames));
 
         $this->classMetadata->expects($this->at($classMetadataCallIndex++))
             ->method('getFieldNames')
             ->will($this->returnValue($doctrineFieldNames));
 
-        foreach ($doctrineFieldNames as $fieldName) {
+        foreach ($doctrineFieldNamesWithoutId as $fieldName) {
             $fieldMapping = array('fieldName' => $fieldName);
 
             $this->classMetadata->expects($this->at($classMetadataCallIndex++))

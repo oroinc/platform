@@ -74,7 +74,11 @@ class MetadataBuilder
      */
     protected function addDoctrineFields(EntityMetadata $entityMetadata, ClassMetadata $classMetadata)
     {
+        $identifierFields = $classMetadata->getIdentifierFieldNames();
         foreach ($classMetadata->getFieldNames() as $fieldName) {
+            if (in_array($fieldName, $identifierFields)) {
+                continue;
+            }
             $fieldMetadata = $this->metadataFactory->createFieldMetadata(
                 array(
                     'field_name' => $fieldName,
