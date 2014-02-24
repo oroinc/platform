@@ -159,6 +159,10 @@ abstract class AbstractConfigModel
                 }
                 if (!is_string($value)) {
                     if (null !== $value && !is_scalar($value)) {
+                        // TODO: this is a temporary solution. Should be removed after a possibility
+                        // to remove obsolete config attributes to oro:entity-config:update command
+                        continue;
+                        /*
                         throw new \RuntimeException(
                             sprintf(
                                 'The value of "%s" (scope: %s) must be a scalar type. Actual type is "%s".',
@@ -167,6 +171,7 @@ abstract class AbstractConfigModel
                                 is_object($value) ? get_class($value) : gettype($value)
                             )
                         );
+                        */
                     }
                     $value = (string)$value;
                 }
