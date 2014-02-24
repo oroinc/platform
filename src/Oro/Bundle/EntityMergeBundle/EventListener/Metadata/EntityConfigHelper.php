@@ -12,6 +12,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityConfigHelper
 {
+    const EXTEND_CONFIG_SCOPE = 'extend';
     const EXTEND_FIELD_PREFIX = ExtendConfigDumper::FIELD_PREFIX;
 
     /**
@@ -20,18 +21,11 @@ class EntityConfigHelper
     protected $configManager;
 
     /**
-     * @var ConfigProviderInterface
-     */
-    protected $extendConfig;
-
-    /**
      * @param ConfigManager $configManager
-     * @param ConfigProviderInterface $extendConfig
      */
-    public function __construct(ConfigManager $configManager, ConfigProviderInterface $extendConfig)
+    public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
-        $this->extendConfig = $extendConfig;
     }
 
     /**
@@ -102,8 +96,9 @@ class EntityConfigHelper
         $extendFieldName = $this->getExtendFieldName($fieldName);
 
         if ($extendFieldName) {
-            return $this->extendConfig->hasConfig($className, $extendFieldName) &&
-                $this->extendConfig->getConfig($className, $extendFieldName)->is('is_extend');
+            $extendConfig = $this->getExtendConfigProvider();
+            return $extendConfig->hasConfig($className, $extendFieldName) &&
+                $extendConfig->getConfig($className, $extendFieldName)->is('is_extend');
         }
 
         return false;
@@ -122,5 +117,13 @@ class EntityConfigHelper
         }
 
         return substr($fieldName, strlen(self::EXTEND_FIELD_PREFIX));
+    }
+
+    /**
+     * @return ConfigProviderInterface
+     */
+    protected function getExtendConfigProvider()
+    {
+        return $this->configManager->getProvider(self::EXTEND_CONFIG_SCOPE);
     }
 }

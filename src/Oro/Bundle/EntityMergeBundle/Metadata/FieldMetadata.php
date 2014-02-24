@@ -177,7 +177,7 @@ class FieldMetadata extends Metadata implements MetadataInterface
     public function isCollection()
     {
         if (!$this->hasDoctrineMetadata()) {
-            return $this->is('is_collection', true);
+            return $this->is('is_collection');
         }
 
         $doctrineMetadata = $this->getDoctrineMetadata();

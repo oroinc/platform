@@ -40,6 +40,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
         $extendFieldName = EntityConfigHelper::EXTEND_FIELD_PREFIX . 'test';
         $fieldName = 'test';
 
+        $this->configManager->expects($this->at(0))
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($this->extendConfigProvider));
+
         $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($className, $fieldName)
@@ -59,7 +64,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
         $mergeConfigProvider = $this->createConfigProvider();
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->at(1))
             ->method('getProvider')
             ->with($scope)
             ->will($this->returnValue($mergeConfigProvider));
@@ -85,6 +90,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Namespace\\Entity';
         $fieldName = 'test';
         $extendFieldName = EntityConfigHelper::EXTEND_FIELD_PREFIX . $fieldName;
+
+        $this->configManager->expects($this->at(0))
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($this->extendConfigProvider));
 
         $fieldMetadata = $this->createFieldMetadata();
         $fieldMetadata->expects($this->once())
@@ -113,7 +123,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
         $mergeConfigProvider = $this->createConfigProvider();
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->at(1))
             ->method('getProvider')
             ->with($scope)
             ->will($this->returnValue($mergeConfigProvider));
@@ -138,6 +148,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
         $className = 'Namespace\\Entity';
         $fieldName = 'test';
         $extendFieldName = EntityConfigHelper::EXTEND_FIELD_PREFIX . $fieldName;
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($this->extendConfigProvider));
 
         $fieldMetadata = $this->createFieldMetadata();
         $fieldMetadata->expects($this->once())

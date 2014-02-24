@@ -63,8 +63,10 @@ class EntityConfigListener
         $mergeConfig = $this->entityConfigHelper->getConfigByFieldMetadata(self::CONFIG_MERGE_SCOPE, $fieldMetadata);
 
         if ($mergeConfig) {
-            $mergeOptions = $mergeConfig->all();
-            $mergeOptions = $this->filterInverseOptions($mergeOptions, $fieldMetadata->isDefinedBySourceEntity());
+            $mergeOptions = $this->filterInverseOptions(
+                $mergeConfig->all(),
+                $fieldMetadata->isDefinedBySourceEntity()
+            );
 
             $fieldMetadata->merge($mergeOptions);
         }
