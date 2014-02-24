@@ -49,7 +49,7 @@ class DataFixturesLoader extends ContainerAwareLoader
             }
         }
 
-        // add a fixture to mark new fixtures as "loaded"
+        // add a special fixture to mark new fixtures as "loaded"
         if (!empty($fixtures)) {
             $toBeLoadFixtureClassNames = [];
             foreach ($fixtures as $fixture) {
@@ -58,7 +58,7 @@ class DataFixturesLoader extends ContainerAwareLoader
 
             $updateFixture = new UpdateDataFixturesFixture();
             $updateFixture->setDataFixtures($toBeLoadFixtureClassNames);
-            $this->addFixture($updateFixture);
+            $fixtures[get_class($updateFixture)] = $updateFixture;
         }
 
         return $fixtures;
@@ -76,11 +76,11 @@ class DataFixturesLoader extends ContainerAwareLoader
             $this->loadedFixtures = [];
 
             $loadedFixtures = $this->em
-                ->getRepository('OroInstallerBundle:DataFixtures')
+                ->getRepository('OroInstallerBundle:DataFixture')
                 ->findAll();
             /** @var DataFixture $fixture */
             foreach ($loadedFixtures as $fixture) {
-                $this->loadedFixtures[$fixture->getClassName()] = $fixture->getLoadedAt();
+                $this->loadedFixtures[$fixture->getClassName()] = true;
             }
         }
 
