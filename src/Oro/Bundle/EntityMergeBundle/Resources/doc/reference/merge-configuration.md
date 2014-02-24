@@ -64,12 +64,8 @@ oro_entity_config:
             items:
                 # Label of field that should be displayed for this field in merge UI, value will be translated
                 label: ~
-                # Enable merge for this field
-                enable:
-                    options:
-                        is_bool: true
-                # Hide field in merge
-                hidden:
+                # Display merge form for this field
+                display:
                     options:
                         is_bool: true
                 # Make field read-only in merge
@@ -96,11 +92,11 @@ oro_entity_config:
                 setter: ~
                 # Method for getting value to entity
                 getter: ~
-                # Can be used if you want to be able to merge this field for entity on other side of relation,
+                # Can be used if you want to be see merge form for this field for entity on other side of relation,
                 # For example there is a Call entity with field referenced to Account using ManyToOne unidirectional relation.
                 # As Account doesn't have access to collection of calls the only possible place to configure calls merging
                 # for account is this field in Call entity
-                inverse_enable:
+                inverse_display:
                     options:
                         is_bool: true
                 # Same as merge_mode but used for relation entity
@@ -109,6 +105,27 @@ oro_entity_config:
                 inverse_label: ~
                 # Same as cast_method but used for relation entity
                 inverse_cast_method: ~
+                # Localization number type.
+                # Default localisation handler support:
+                # decimal, currency, percent, default_style, scientific, ordinal, duration, spellout
+                render_number_style: ~
+                # Type of date formatting, one of the format type constants. Possible values:
+                # NONE
+                # FULL
+                # LONG
+                # MEDIUM
+                # SHORT
+                render_date_type: ~
+                # Type of time formatting, one of the format type constants. Possible values:
+                # NONE
+                # FULL
+                # LONG
+                # MEDIUM
+                # SHORT
+                render_time_type: ~
+                # Date Time pattern
+                # Example m/d/Y
+                render_datetime_pattern: ~
 ```
 
 Example:
@@ -134,7 +151,6 @@ Example of merge mass action:
 
 ```
 datagrid:
-
     accounts-grid:
         mass_actions:
             merge:
