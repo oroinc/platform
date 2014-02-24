@@ -34,7 +34,7 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
             this.$fieldChoice.fieldChoice(this.options.fieldChoice);
 
             if (data && data.columnName) {
-                this.$fieldChoice.fieldChoice('setValue', data.columnName);
+                this.selectField(data.columnName);
                 this._renderFilter(data.columnName);
             }
 
@@ -147,6 +147,10 @@ define(['jquery', 'underscore', 'oro/translator', 'orofilter/js/map-filter-modul
 
             this.element.data('value', value);
             this.element.trigger('changed');
+        },
+
+        selectField: function (name) {
+            this.$fieldChoice.fieldChoice('setValue', name);
         }
     });
 
