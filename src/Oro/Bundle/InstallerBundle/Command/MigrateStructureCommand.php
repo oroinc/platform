@@ -3,6 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Doctrine\DBAL\Connection;
+use Oro\Bundle\InstallerBundle\Migrations\MigrationQueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -49,9 +50,9 @@ class MigrateStructureCommand extends ContainerAwareCommand
     public function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var Connection $connection */
-        $connection = $this->getContainer()->get('doctrine')->getConnection();
+        $connection      = $this->getContainer()->get('doctrine')->getConnection();
         $migrationLoader = $this->getContainer()->get('oro_installer.migrations.loader');
-        $bundles = $input->getOption('bundles');
+        $bundles         = $input->getOption('bundles');
         if (!empty($bundles)) {
             $migrationLoader->setBundles($bundles);
         }
@@ -59,7 +60,8 @@ class MigrateStructureCommand extends ContainerAwareCommand
         if (!empty($excludeBundles)) {
             $migrationLoader->setExcludeBundles($excludeBundles);
         }
-        $queries    = $migrationLoader->getMigrationsQueries();
+        $migrationQueryBuilder = new MigrationQueryBuilder($this->getContainer()->get('doctrine.orm.entity_manager'));
+        $queries               = $migrationQueryBuilder->getQueries($migrationLoader->getMigrations());
         $output->writeln($input->getOption('dry-run') ? 'List of migrations:' : 'Process migrations...');
         foreach ($queries as $migrationClass => $sqlQueries) {
             $output->writeln(sprintf('<comment>> %s</comment>', $migrationClass));
