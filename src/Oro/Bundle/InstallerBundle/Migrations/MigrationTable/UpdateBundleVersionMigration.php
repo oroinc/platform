@@ -30,7 +30,7 @@ class UpdateBundleVersionMigration implements Migration
             $date = new \DateTime();
             foreach ($this->bundleVersions as $bundleName => $bundleVersion) {
                 $versionsSql[] = sprintf(
-                    "INSERT INTO %s SET bundle = '%s', version = '%s', date = '%s'",
+                    "INSERT INTO %s (bundle, version, date) VALUES ('%s', '%s', '%s')",
                     CreateMigrationTableMigration::MIGRATION_TABLE,
                     $bundleName,
                     $bundleVersion,
