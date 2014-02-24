@@ -3,7 +3,6 @@
 namespace Oro\Bundle\InstallerBundle\Migrations;
 
 use Doctrine\DBAL\Schema\Comparator;
-use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
 
@@ -47,7 +46,7 @@ class MigrationQueryBuilder
 
             $this->checkTableNameLengths($schemaDiff->newTables, $migration);
 
-            /** @var TableDiff $changedTables */
+            /** @var \Doctrine\DBAL\Schema\TableDiff $changedTables */
             $changedTables = $schemaDiff->changedTables;
             foreach ($changedTables as $tableName => $diff) {
                 $this->checkColumnsNameLength(
