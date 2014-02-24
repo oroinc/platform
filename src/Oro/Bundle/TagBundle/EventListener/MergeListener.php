@@ -42,7 +42,7 @@ class MergeListener
         }
 
         $fieldMetadataOptions = [
-            'enable'        => true,
+            'display'       => true,
             'getter'        => self::GETTER,
             'setter'        => self::SETTER,
             'field_name'    => self::FIELD_NAME,
