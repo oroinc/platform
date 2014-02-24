@@ -15,7 +15,20 @@ define(['jquery', 'oroquerydesigner/js/field-condition'], function ($) {
             $el = null;
         });
 
-        it('is jQueryUI widget', function () {
+        function waitForFilter(cb) {
+            var html = $el.find('.active-filter').html();
+            function wait() {
+                var current = $el.find('.active-filter').html();
+                if (current !== html) {
+                    cb();
+                } else {
+                    setTimeout(wait, 5);
+                }
+            }
+            setTimeout(wait, 5);
+        }
+
+        it('is $ widget', function () {
             expect(function () {
                 $el.fieldCondition();
             }).not.toThrow();
