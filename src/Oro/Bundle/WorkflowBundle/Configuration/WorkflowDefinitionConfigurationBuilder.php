@@ -83,7 +83,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             $workflowStep
                 ->setName($step->getName())
                 ->setLabel($step->getLabel())
-                ->setStepOrder($step->getOrder());
+                ->setStepOrder($step->getOrder())
+                ->setFinal($step->isFinal());
 
             $workflowSteps[] = $workflowStep;
         }

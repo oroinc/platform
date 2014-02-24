@@ -58,23 +58,23 @@ class WorkflowDefinition
     /**
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(name="enabled", type="boolean")
      */
-    protected $enabled;
+    protected $enabled = false;
 
     /**
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(name="system", type="boolean")
      */
-    protected $system;
+    protected $system = false;
 
     /**
      * @var array
      *
      * @ORM\Column(name="configuration", type="array")
      */
-    protected $configuration;
+    protected $configuration = array();
 
     /**
      * @var WorkflowStep[]|Collection
@@ -113,9 +113,6 @@ class WorkflowDefinition
      */
     public function __construct()
     {
-        $this->enabled = false;
-        $this->system = false;
-        $this->configuration = array();
         $this->steps = new ArrayCollection();
         $this->entityAcls = new ArrayCollection();
     }

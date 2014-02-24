@@ -28,8 +28,6 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
- *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowItem
 {
@@ -68,14 +66,6 @@ class WorkflowItem
      * @ORM\JoinColumn(name="current_step_id", referencedColumnName="id")
      */
     protected $currentStep;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="closed", type="boolean")
-     * @Serializer\Expose()
-     */
-    protected $closed;
 
     /**
      * Corresponding Workflow Definition
@@ -173,7 +163,6 @@ class WorkflowItem
     {
         $this->transitionRecords = new ArrayCollection();
         $this->aclIdentities = new ArrayCollection();
-        $this->closed = false;
         $this->data = new WorkflowData();
         $this->result = new WorkflowResult();
     }
@@ -269,29 +258,6 @@ class WorkflowItem
     public function getEntityId()
     {
         return $this->entityId;
-    }
-
-    /**
-     * Set closed
-     *
-     * @param boolean $closed
-     * @return WorkflowItem
-     */
-    public function setClosed($closed)
-    {
-        $this->closed = (bool)$closed;
-
-        return $this;
-    }
-
-    /**
-     * Is closed
-     *
-     * @return string
-     */
-    public function isClosed()
-    {
-        return $this->closed;
     }
 
     /**
