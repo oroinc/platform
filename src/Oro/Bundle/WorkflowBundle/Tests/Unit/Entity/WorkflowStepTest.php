@@ -51,7 +51,8 @@ class WorkflowStepTest extends \PHPUnit_Framework_TestCase
             array('name', 'test'),
             array('label', 'test'),
             array('stepOrder', 1),
-            array('definition', $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'))
+            array('definition', $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')),
+            array('final', true)
         );
     }
 
@@ -60,6 +61,7 @@ class WorkflowStepTest extends \PHPUnit_Framework_TestCase
         $this->step->setName('test');
         $this->step->setLabel('test');
         $this->step->setStepOrder(1);
+        $this->step->setFinal(true);
 
         $newStep = new WorkflowStep();
         $newStep->import($this->step);
@@ -67,5 +69,6 @@ class WorkflowStepTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $newStep->getName());
         $this->assertEquals('test', $newStep->getLabel());
         $this->assertEquals(1, $newStep->getStepOrder());
+        $this->assertTrue($newStep->isFinal());
     }
 }

@@ -285,15 +285,6 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->method('setCurrentStep')
             ->with($currentStepEntity);
 
-        if ($isFinal || !$hasAllowedTransition) {
-            $workflowItem->expects($this->once())
-                ->method('setClosed')
-                ->with(true);
-        } else {
-            $workflowItem->expects($this->never())
-                ->method('setClosed');
-        }
-
         $preCondition = $this->getMock('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface');
         $preCondition->expects($this->once())
             ->method('isAllowed')

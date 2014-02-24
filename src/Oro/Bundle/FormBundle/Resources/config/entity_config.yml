@@ -1,0 +1,24 @@
+oro_entity_config:
+    form:
+        entity:
+            items:
+                # form type for specific entity
+                form_type:
+                    options:
+                        default_value: null
+                # form options for specific entity
+                form_options:
+                    options:
+                        default_value: null
+                        serializable: true
+        field:
+            items:
+                # form type for specific field
+                form_type:
+                    options:
+                        default_value: null
+                # form options for specific field
+                form_options:
+                    options:
+                        default_value: null
+                        serializable: true

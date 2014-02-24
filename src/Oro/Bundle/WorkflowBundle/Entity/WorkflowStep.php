@@ -46,6 +46,13 @@ class WorkflowStep
     protected $stepOrder = 0;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="final", type="boolean")
+     */
+    protected $final = false;
+
+    /**
      * @var WorkflowDefinition
      *
      * @ORM\ManyToOne(targetEntity="WorkflowDefinition", inversedBy="steps")
@@ -138,6 +145,25 @@ class WorkflowStep
     }
 
     /**
+     * @param boolean $final
+     * @return WorkflowStep
+     */
+    public function setFinal($final)
+    {
+        $this->final = $final;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isFinal()
+    {
+        return $this->final;
+    }
+
+    /**
      * @param WorkflowStep $workflowStep
      * @return WorkflowStep
      */
@@ -145,7 +171,8 @@ class WorkflowStep
     {
         $this->setName($workflowStep->getName())
             ->setLabel($workflowStep->getLabel())
-            ->setStepOrder($workflowStep->getStepOrder());
+            ->setStepOrder($workflowStep->getStepOrder())
+            ->setFinal($workflowStep->isFinal());
 
         return $this;
     }

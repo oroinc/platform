@@ -89,7 +89,7 @@ Each Step has a list of allowed Transitions, and each Transition has list of Con
 Transition can be performed with specific Workflow Item state. If Transition is allowed then user can perform it.
 If Transition has Init Actions they are executed before Transition. If transition has Post Actions then
 these Post Actions will be performed right after Transition. So, user can move through Steps of Workflow until
-he reach the final Step where Workflow will be finished and Workflow Item will be marked as closed.
+he reach the final Step where Workflow will be finished.
 It's also possible that Workflow doesn't have a final step. In this case user can perform transitions until they are
 allowed.
 

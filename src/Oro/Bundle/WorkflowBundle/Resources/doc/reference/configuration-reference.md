@@ -236,7 +236,7 @@ Summarizing all above, step has next configuration:
     This value is used in wizard page to sort steps in UI.
 * **is_final**
     *boolean*
-    If true than workflow instance will be automatically closed after transition to this step will be performed.
+    If true than step will be counted as workflow final step.
 * **view_attributes**
     List of attributes that will be shown when step is selected on Workflow wizard UI. Custom path could be specified
     instead of name of attribute. Each view attribute could have "view_type" option which is used to find Twig block

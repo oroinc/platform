@@ -10,7 +10,6 @@ Table of Contents
  - [Create Entity](#create-entity)
  - [Find Entity](#find-entity)
  - [Start Workflow](#start-workflow)
- - [Close Workflow](#close-workflow)
  - [Redirect](#redirect)
  - [Tree Executor](#tree-executor)
  - [Configurable](#configurable)
@@ -276,25 +275,6 @@ OR
     attribute: $.result.workflowItem
     entity: $.result.opportunity
     transition: develop
-```
-
-Close Workflow
---------------
-
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CloseWorkflow
-
-**Alias:** close_workflow
-
-**Description:** Triggers closing of current workflow item.
-
-**Parameters:**
- - workflow_item / 0 - path to instance of Workflow Item
- - route - name of the route (by default route "oro_workflow_step_edit")
- - route_parameters - additional parameters of route
-
-**Configuration Example**
-```
-- @close_workflow: ~
 ```
 
 Redirect

@@ -52,6 +52,9 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 if (!empty($stepData['entity_acl'])) {
                     $step->setEntityAcls($stepData['entity_acl']);
                 }
+                if (array_key_exists('is_final', $stepData)) {
+                    $step->setFinal($stepData['is_final']);
+                }
                 $steps[] = $step;
             }
         }
@@ -142,6 +145,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                             'update' => false,
                         )
                     ),
+                    'is_final' => true,
                 ),
             ),
             WorkflowConfiguration::NODE_ATTRIBUTES => array(
