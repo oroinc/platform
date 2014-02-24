@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SecurityBundle\Migrations\DataFixtures\ORM\v1_0;
+namespace Oro\Bundle\SecurityBundle\Migrations\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -10,7 +10,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0\LoadRolesData;
+use Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\LoadRolesData;
 
 class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
@@ -29,7 +29,7 @@ class LoadAclRoles extends AbstractFixture implements DependentFixtureInterface,
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0\LoadRolesData'];
+        return ['Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\LoadRolesData'];
     }
 
     /**

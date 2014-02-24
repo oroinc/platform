@@ -1,27 +1,27 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0;
+namespace Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData;
+use Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\LoadOrganizationAndBusinessUnitData;
 
 class LoadRolesData extends AbstractFixture implements DependentFixtureInterface
 {
-    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
-    const ROLE_USER = 'ROLE_USER';
+    const ROLE_ANONYMOUS     = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_USER          = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
-    const ROLE_MANAGER = 'ROLE_MANAGER';
+    const ROLE_MANAGER       = 'ROLE_MANAGER';
 
     /**
      * {@inheritdoc}
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData'];
+        return ['Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\LoadOrganizationAndBusinessUnitData'];
     }
 
     /**
@@ -45,7 +45,7 @@ class LoadRolesData extends AbstractFixture implements DependentFixtureInterface
 
         $defaultBusinessUnit = $manager
             ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(['name' => LoadBusinessUnitData::MAIN_BUSINESS_UNIT]);
+            ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT]);
 
         if ($defaultBusinessUnit) {
             $roleAnonymous->setOwner($defaultBusinessUnit);
