@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\InstallerBundle\Migrations\DataFixturesLoader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class LoadDataFixturesCommand extends ContainerAwareCommand
 {
+    const FIXTURES_PATH           = 'Migrations/DataFixtures/ORM';
+    const DEMO_DATA_FIXTURES_PATH = 'Migrations/DataFixtures/Demo/ORM';
+
     /**
      * @inheritdoc
      */
@@ -45,21 +50,34 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $container = $this->getContainer();
-        $loader    = $container->get('oro_installer.fixtures.loader');
+        /** @var DataFixturesLoader $loader */
+        $loader = $container->get('oro_installer.fixtures.loader');
 
         $indexListener = $container->get('oro_search.index_listener');
         $indexListener->disablePostFlush();
 
-        $loader->isLoadDemoData($input->getOption('fixtures-type') == 'demo' ? true : false);
-        $bundles = $input->getOption('bundles');
-        if (!empty($bundles)) {
-            $loader->setBundles($bundles);
+        $bundles             = $input->getOption('bundles');
+        $excludeBundles      = $input->getOption('exclude');
+        $fixtureRelativePath = $input->getOption('fixtures-type') == 'demo'
+            ? self::FIXTURES_PATH
+            : self::DEMO_DATA_FIXTURES_PATH;
+
+        /** @var BundleInterface $bundle */
+        foreach ($this->getApplication()->getKernel()->getBundles() as $bundle) {
+            if (!empty($bundles) && !in_array($bundle->getName(), $bundles)) {
+                continue;
+            }
+            if (!empty($excludeBundles) && in_array($bundle->getName(), $excludeBundles)) {
+                continue;
+            }
+            $path = $bundle->getPath() . $fixtureRelativePath;
+            if (is_dir($path)) {
+                $loader->loadFromDirectory($path);
+            }
         }
-        $excludeBundles = $input->getOption('exclude');
-        if (!empty($excludeBundles)) {
-            $loader->setExcludeBundles($excludeBundles);
-        }
+
         $fixtures = $loader->getFixtures();
+
         if ($input->getOption('dry-run')) {
             $this->outputFixtures($input, $output, $fixtures);
         } else {
@@ -70,15 +88,15 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     /**
      * Output list of fixtures
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param array $fixtures
+     * @param array           $fixtures
      */
     protected function outputFixtures(InputInterface $input, OutputInterface $output, $fixtures)
     {
         $output->writeln(
             sprintf(
-                'List of %s fixtures data ...',
+                'List of "%s" data fixtures ...',
                 $input->getOption('fixtures-type')
             )
         );
@@ -90,15 +108,15 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     /**
      * Process fixtures
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param array $fixtures
+     * @param array           $fixtures
      */
     protected function processFixtures(InputInterface $input, OutputInterface $output, $fixtures)
     {
         $output->writeln(
             sprintf(
-                'Loading %s fixtures data ...',
+                'Loading "%s" data fixtures ...',
                 $input->getOption('fixtures-type')
             )
         );
