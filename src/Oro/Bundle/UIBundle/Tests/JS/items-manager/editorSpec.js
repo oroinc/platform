@@ -22,7 +22,10 @@ define(function (require) {
                 <textarea id="desc" name="desc"></textarea>\
                 <input id="a" type="submit"></input>\
                 <input id="b" type="submit"></input>\
-                <input id="c" type="submit"></input>');
+                <input id="c" type="submit"></input>\
+                <button class="save-button"></button>\
+                <button class="add-button"></button>\
+                <button class="cancel-button"></button>');
             $('body').append($el);
         });
 
@@ -83,6 +86,88 @@ define(function (require) {
             expect($el.find('#name')).toHaveValue('Name');
             expect($el.find('#choice')).toHaveValue('2');
             expect($el.find('#desc')).toHaveValue('Description');
+        });
+
+        it('updates edited model on button click', function () {
+            var collection = new Backbone.Collection([{
+                name: 'Name',
+                choice: '2',
+                desc: 'Description'
+            }]);
+
+            $el.itemsManagerEditor({
+                collection: collection
+            });
+
+            collection.at(0).trigger('action:edit', collection.at(0));
+
+            $el.find('#name').val('Name2');
+            $el.find('#choice').val(3);
+            $el.find('#desc').val('Description2');
+
+            $el.find('.save-button').click();
+
+            expect(collection.at(0).get('name')).toEqual('Name2');
+            expect(collection.at(0).get('choice')).toEqual('3');
+            expect(collection.at(0).get('desc')).toEqual('Description2');
+        });
+
+        it('does not update edited model on button click', function () {
+            var collection = new Backbone.Collection([{
+                name: 'Name',
+                choice: '2',
+                desc: 'Description'
+            }]);
+
+            $el.itemsManagerEditor({
+                collection: collection
+            });
+
+            collection.at(0).trigger('action:edit', collection.at(0));
+
+            $el.find('#name').val('Name2');
+            $el.find('#choice').val(3);
+            $el.find('#desc').val('Description2');
+
+            $el.find('.cancel-button').click();
+
+            expect(collection.at(0).get('name')).toEqual('Name');
+            expect(collection.at(0).get('choice')).toEqual('2');
+            expect(collection.at(0).get('desc')).toEqual('Description');
+        });
+
+        it('creates model on button click', function () {
+            var collection = new Backbone.Collection();
+
+            $el.itemsManagerEditor({
+                collection: collection
+            });
+
+            $el.find('#name').val('Name');
+            $el.find('#choice').val(1);
+            $el.find('#desc').val('Description');
+
+            $el.find('.add-button').click();
+
+            expect(collection.at(0).get('name')).toEqual('Name');
+            expect(collection.at(0).get('choice')).toEqual('1');
+            expect(collection.at(0).get('desc')).toEqual('Description');
+        });
+
+        it('does not create model on button click', function () {
+            var collection = new Backbone.Collection();
+
+            $el.itemsManagerEditor({
+                collection: collection
+            });
+
+            $el.find('#name').val('Name');
+            $el.find('#choice').val(1);
+            $el.find('#desc').val('Description');
+
+            $el.find('.cancel-button').click();
+
+            expect(collection.length).toEqual(0);
         });
     });
 });
