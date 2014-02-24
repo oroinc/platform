@@ -8,6 +8,7 @@ services:
         arguments:
             - @oro_entity_merge.accessor
             - @oro_entity_merge.twig.renderer
+            - @translator
         tags:
             - { name: twig.extension }
 
@@ -15,4 +16,5 @@ services:
         class: %oro_entity_merge.twig.renderer.class%
         arguments:
             - @twig
+            - @event_dispatcher
             - 'OroEntityMergeBundle:Form:mergeValue.html.twig'

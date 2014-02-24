@@ -50,6 +50,65 @@ class InverseAssociationAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('inverse_association', $this->accessor->getName());
     }
 
+    public function testSupportsFalseWhenDefinedBySourceEntity()
+    {
+        $entity = $this->createEntity();
+        $fieldMetadata = $this->createFieldMetadata();
+
+        $fieldMetadata->expects($this->once())
+            ->method('isDefinedBySourceEntity')
+            ->will($this->returnValue(true));
+
+        $this->assertFalse($this->accessor->supports($entity, $fieldMetadata));
+    }
+
+    public function testSupportsFalseWhenNotHasDoctrineMetadata()
+    {
+        $entity = $this->createEntity();
+        $fieldMetadata = $this->createFieldMetadata();
+
+        $fieldMetadata->expects($this->once())
+            ->method('isDefinedBySourceEntity')
+            ->will($this->returnValue(false));
+
+        $fieldMetadata->expects($this->once())
+            ->method('hasDoctrineMetadata')
+            ->will($this->returnValue(false));
+
+        $this->assertFalse($this->accessor->supports($entity, $fieldMetadata));
+    }
+
+    public function testSupportsTrue()
+    {
+        $entity = $this->createEntity();
+
+        $doctrineMetadata = $this->createDoctrineMetadata();
+
+        $doctrineMetadata->expects($this->once())
+            ->method('isManyToOne')
+            ->will($this->returnValue(false));
+
+        $doctrineMetadata->expects($this->once())
+            ->method('isOneToOne')
+            ->will($this->returnValue(true));
+
+        $fieldMetadata = $this->createFieldMetadata();
+
+        $fieldMetadata->expects($this->once())
+            ->method('isDefinedBySourceEntity')
+            ->will($this->returnValue(false));
+
+        $fieldMetadata->expects($this->once())
+            ->method('hasDoctrineMetadata')
+            ->will($this->returnValue(true));
+
+        $fieldMetadata->expects($this->once())
+            ->method('getDoctrineMetadata')
+            ->will($this->returnValue($doctrineMetadata));
+
+        $this->assertTrue($this->accessor->supports($entity, $fieldMetadata));
+    }
+
     /**
      * @dataProvider getValueDataProvider
      */
@@ -103,14 +162,9 @@ class InverseAssociationAccessorTest extends \PHPUnit_Framework_TestCase
 
     protected function getFieldMetadata($fieldName = null, array $options = [])
     {
-        $result = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $result = $this->createFieldMetadata();
 
-        $doctrineMetadata = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrineMetadata = $this->createDoctrineMetadata();
 
         $doctrineMetadata->expects($this->any())
             ->method('getFieldName')
@@ -143,6 +197,18 @@ class InverseAssociationAccessorTest extends \PHPUnit_Framework_TestCase
             );
 
         return $result;
+    }
+
+    protected function createFieldMetadata()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
+            ->disableOriginalConstructor()->getMock();
+    }
+
+    protected function createDoctrineMetadata()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata')
+            ->disableOriginalConstructor()->getMock();
     }
 
     protected function createEntity($id = null, $parent = null)

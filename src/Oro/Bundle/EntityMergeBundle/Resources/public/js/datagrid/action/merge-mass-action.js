@@ -15,7 +15,6 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
          *
          * @export  oro/entity-merge/merge-mass-action
          * @class   oro.entityMerge.MergeMassAction
-         * @classdesc Merge mass action js part
          * @extends oro.datagrid.MassAction
          */
         return MassAction.extend({
@@ -69,4 +68,5 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
                 }, this);
             }
         });
-    });
+    }
+);
