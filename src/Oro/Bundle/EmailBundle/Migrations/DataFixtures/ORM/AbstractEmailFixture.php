@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\DataFixtures\ORM\v1_0;
+namespace Oro\Bundle\EmailBundle\Migrations\DataFixtures\ORM;
 
 use Symfony\Component\Finder\Finder;
 

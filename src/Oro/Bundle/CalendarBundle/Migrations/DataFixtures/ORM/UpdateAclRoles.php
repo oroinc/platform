@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Migrations\DataFixtures\ORM\v1_0;
+namespace Oro\Bundle\CalendarBundle\Migrations\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -9,7 +9,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0\LoadRolesData;
+use Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\LoadRolesData;
 
 class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
@@ -26,17 +26,17 @@ class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterfac
     /**
      * {@inheritdoc}
      */
-    public function setContainer(ContainerInterface $container = null)
+    public function getDependencies()
     {
-        $this->container = $container;
+        return ['Oro\Bundle\SecurityBundle\Migrations\DataFixtures\ORM\LoadAclRoles'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDependencies()
+    public function setContainer(ContainerInterface $container = null)
     {
-        return ['Oro\Bundle\SecurityBundle\Migrations\DataFixtures\ORM\v1_0\LoadAclRoles'];
+        $this->container = $container;
     }
 
     /**

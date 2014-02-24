@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Migrations\DataFixtures\ORM\v1_0;
+namespace Oro\Bundle\AddressBundle\Migrations\DataFixtures\ORM;
 
 use Symfony\Component\Yaml\Yaml;
 

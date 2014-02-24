@@ -1,12 +1,12 @@
 <?php
-namespace Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM\v1_0;
+namespace Oro\Bundle\UserBundle\Migrations\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\UserBundle\Entity\Group;
-use Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData;
+use Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\LoadOrganizationAndBusinessUnitData;
 
 class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
 {
@@ -15,7 +15,7 @@ class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\v1_0\LoadBusinessUnitData'];
+        return ['Oro\Bundle\OrganizationBundle\Migrations\DataFixtures\ORM\LoadOrganizationAndBusinessUnitData'];
     }
 
     public function load(ObjectManager $manager)
@@ -25,7 +25,7 @@ class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
          */
         $defaultBusinessUnit = $manager
             ->getRepository('OroOrganizationBundle:BusinessUnit')
-            ->findOneBy(['name' => LoadBusinessUnitData::MAIN_BUSINESS_UNIT]);
+            ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT]);
         $administrators = new Group('Administrators');
         //$administrators->addRole($this->getReference('administrator_role'));
         if ($defaultBusinessUnit) {
