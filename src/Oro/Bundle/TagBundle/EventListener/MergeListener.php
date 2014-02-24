@@ -47,6 +47,7 @@ class MergeListener
             'setter'        => self::SETTER,
             'field_name'    => self::FIELD_NAME,
             'is_collection' => true,
+            'label'         => 'oro.tag.entity_plural_label',
             'merge_modes'   => [MergeModes::REPLACE, MergeModes::UNITE]
         ];
 

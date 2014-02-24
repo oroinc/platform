@@ -28,11 +28,12 @@
         </tr>
         </thead>
         <tbody>
-        {% for child in form.children.fields %}
+        {% for child in form.children.fields.children|oro_entity_merge_sort_fields %}
             {{ form_widget(child) }}
         {% endfor %}
         </tbody>
     </table>
+    <p>* {{ 'oro.entity_merge.hint.other_related_entities'|trans }}</p>
 {% endblock %}
 
 {% block oro_entity_merge_javascript %}
