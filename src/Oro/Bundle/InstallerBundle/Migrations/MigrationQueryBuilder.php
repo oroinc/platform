@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping\MappingException;
 
 class MigrationQueryBuilder
 {
-    const MAX_TABLE_NAME_LENGTH = 30;
+    const MAX_TABLE_NAME_LENGTH = 50;
 
     /**
      * @var EntityManager
@@ -37,8 +37,8 @@ class MigrationQueryBuilder
         $connection = $this->em->getConnection();
         $sm         = $connection->getSchemaManager();
         $platform   = $connection->getDatabasePlatform();
+        $fromSchema = $sm->createSchema();
         foreach ($migrations as $migration) {
-            $fromSchema = $sm->createSchema();
             $toSchema   = clone $fromSchema;
             $queries    = $migration->up($toSchema);
             $comparator = new Comparator();
@@ -55,9 +55,13 @@ class MigrationQueryBuilder
                     );
                 }
             }
-            $queries = array_merge($queries, $schemaDiff->toSql($platform));
+            $queries = array_merge(
+                $schemaDiff->toSql($platform),
+                $queries
+            );
 
             $result[get_class($migration)] = $queries;
+            $fromSchema = $toSchema;
         }
 
         return $result;
