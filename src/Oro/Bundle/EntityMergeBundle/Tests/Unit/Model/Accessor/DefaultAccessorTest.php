@@ -45,11 +45,11 @@ class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
                 'metadata' => $this->getFieldMetadata('id', ['getter' => 'getParentId']),
                 'expected' => 'bar',
             ],
-            'field' => [
-                'entity' => $this->createEntity('foo'),
-                'metadata' => $this->getFieldMetadata('id', ['field_name' => 'id']),
-                'expected' => 'foo',
-            ],
+            'property_path' => array(
+                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
+                'metadata' => $this->getFieldMetadata('id', array('property_path' => 'parent.id')),
+                'expected' => 'bar',
+            ),
         ];
     }
 
@@ -77,12 +77,12 @@ class DefaultAccessorTest extends \PHPUnit_Framework_TestCase
                 'value' => 'baz',
                 'expected' => $this->createEntity('foo', $this->createEntity('baz')),
             ],
-            'field' => [
-                'entity' => $this->createEntity('foo'),
-                'metadata' => $this->getFieldMetadata('id', ['field_name' => 'id']),
+            'property_path' => array(
+                'entity' => $this->createEntity('foo', $this->createEntity('bar')),
+                'metadata' => $this->getFieldMetadata('id', array('property_path' => 'parent.id')),
                 'value' => 'baz',
-                'expected' => $this->createEntity('baz'),
-            ],
+                'expected' => $this->createEntity('foo', $this->createEntity('baz')),
+            ),
         ];
     }
 

@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\EventListener;
+namespace Oro\Bundle\EntityMergeBundle\EventListener\Metadata;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
-class InitMergeModesListener
+class MergeModesListener
 {
     /**
      * @param EntityMetadataEvent $event
