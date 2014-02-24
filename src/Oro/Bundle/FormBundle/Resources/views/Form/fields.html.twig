@@ -519,8 +519,8 @@
 
 {% block oro_entity_create_or_select_widget %}
     <div class="entity-create-block"
-         {% if not form.vars.required %}data-validation-optional-group=""{% endif %}
-         {% if currentMode != 'create' %}data-validation-ignore=""{% endif %}
+        {% if not form.vars.required %}data-validation-optional-group=""{% endif %}
+        {% if currentMode != 'create' %}data-validation-ignore=""{% endif %}
     >
         {{ form_widget(form.new_entity) }}
     </div>

@@ -185,10 +185,6 @@ class OroEntityCreateOrSelectType extends AbstractType
                             $widgetData['grid_row_to_route'] = array('id' => 'id');
                         }
 
-                        if (empty($widgetData['widget_alias'])) {
-                            $widgetData['widget_alias'] = self::NAME . '_' . $widgetData['route_name'];
-                        }
-
                         $viewWidgets[$key] = $widgetData;
                     }
 
@@ -218,6 +214,11 @@ class OroEntityCreateOrSelectType extends AbstractType
                     $widgetData['route_parameters'][$name] = $value;
                 }
             }
+
+            if (empty($widgetData['widget_alias'])) {
+                $widgetData['widget_alias'] = $form->getName() . '_' . $widgetData['route_name'];
+            }
+
             $viewWidgets[$key] = $widgetData;
         }
 

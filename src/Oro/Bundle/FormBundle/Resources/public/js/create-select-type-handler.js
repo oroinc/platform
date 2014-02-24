@@ -48,7 +48,6 @@ function ($, widgetManager, routing) {
             }
         };
 
-
         // Render grid and change current mode to grid
         var $btnContainer = $(btnContainer);
         var $selectBtn = $btnContainer.find('.entity-select-btn');

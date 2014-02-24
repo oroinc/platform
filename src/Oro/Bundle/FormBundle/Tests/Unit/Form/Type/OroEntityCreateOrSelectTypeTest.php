@@ -192,7 +192,6 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                             'route_name' => 'test_route',
                             'route_parameters' => array('id' => new PropertyPath('id')),
                             'grid_row_to_route' => array('id' => 'id'),
-                            'widget_alias' => 'oro_entity_create_or_select_test_route',
                         )
                     ),
                 ),
@@ -241,7 +240,6 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                             'route_name' => 'test_route',
                             'route_parameters' => array('id' => new PropertyPath('id')),
                             'grid_row_to_route' => array('id' => 'id'),
-                            'widget_alias' => 'oro_entity_create_or_select_test_route',
                         )
                     ),
                 ),
@@ -297,7 +295,6 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                             'route_name' => 'test_route',
                             'route_parameters' => array('id' => new PropertyPath('id')),
                             'grid_row_to_route' => array('id' => 'id'),
-                            'widget_alias' => 'oro_entity_create_or_select_test_route',
                         )
                     ),
                 ),
@@ -349,7 +346,6 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                             'route_name' => 'test_route',
                             'route_parameters' => array('id' => new PropertyPath('id')),
                             'grid_row_to_route' => array('id' => 'id'),
-                            'widget_alias' => 'oro_entity_create_or_select_test_route',
                         )
                     ),
                 ),
@@ -402,7 +398,6 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
                             'route_name' => 'test_route',
                             'route_parameters' => array('key' => new PropertyPath('id'), 'static' => 'data'),
                             'grid_row_to_route' => array('key' => 'value'),
-                            'widget_alias' => 'oro_entity_create_or_select_test_route',
                         )
                     ),
                 ),
