@@ -71,8 +71,8 @@ class OroEntityConfigBundle implements Migration
         $table->addIndex(['field_id'], 'IDX_CDC152C4443707B0', []);
         /** End of generate table oro_entity_config_optionset **/
 
-        /** Generate table oro_entity_config_optionset_relation **/
-        $table = $schema->createTable('oro_entity_config_optionset_relation');
+        /** Generate table oro_entity_config_optset_rel **/
+        $table = $schema->createTable('oro_entity_config_optset_rel');
         $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
         $table->addColumn('option_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->addColumn('field_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
@@ -80,7 +80,7 @@ class OroEntityConfigBundle implements Migration
         $table->setPrimaryKey(['id']);
         $table->addIndex(['field_id'], 'IDX_797D3D83443707B0', []);
         $table->addIndex(['option_id'], 'IDX_797D3D83A7C41D6F', []);
-        /** End of generate table oro_entity_config_optionset_relation **/
+        /** End of generate table oro_entity_config_optset_rel **/
 
         /** Generate table oro_entity_config_value **/
         $table = $schema->createTable('oro_entity_config_value');
@@ -106,11 +106,11 @@ class OroEntityConfigBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_entity_config_field'), ['field_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_entity_config_optionset **/
 
-        /** Generate foreign keys for table oro_entity_config_optionset_relation **/
-        $table = $schema->getTable('oro_entity_config_optionset_relation');
+        /** Generate foreign keys for table oro_entity_config_optset_rel **/
+        $table = $schema->getTable('oro_entity_config_optset_rel');
         $table->addForeignKeyConstraint($schema->getTable('oro_entity_config_optionset'), ['option_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
         $table->addForeignKeyConstraint($schema->getTable('oro_entity_config_field'), ['field_id'], ['id'], ['onDelete' => null, 'onUpdate' => null]);
-        /** End of generate foreign keys for table oro_entity_config_optionset_relation **/
+        /** End of generate foreign keys for table oro_entity_config_optset_rel **/
 
         /** Generate foreign keys for table oro_entity_config_value **/
         $table = $schema->getTable('oro_entity_config_value');
