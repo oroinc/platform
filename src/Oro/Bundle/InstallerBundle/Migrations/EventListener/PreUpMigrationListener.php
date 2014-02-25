@@ -9,11 +9,6 @@ use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\UpdateBundleVersionMigr
 
 class PreUpMigrationListener
 {
-    protected $transitiveData = [
-        '/MigrationTableData/Oro.yml',
-        '/MigrationTableData/OroCRM.yml',
-    ];
-
     public function onPreUp(PreMigrationEvent $event)
     {
         if ($event->isTableExist(CreateMigrationTableMigration::MIGRATION_TABLE)) {
@@ -30,10 +25,16 @@ class PreUpMigrationListener
         } else {
             $event->addMigration(new CreateMigrationTableMigration());
 
+            // load MigrationTable initial data for BAP and OroCRM bundles installed before migrations is introduced
+            // @todo: this transient solution can be removed in a future
+            // when we ensure RC1 and RC2 are updated for all clients
             if ($event->isTableExist('oro_installer_bundle_version')) {
-                $bundleVersions = [];
-                foreach ($this->transitiveData as $relationPath) {
-                    $bundleVersions = array_merge($bundleVersions, Yaml::parse(realpath(__DIR__ . $relationPath)));
+                $bundleVersions = Yaml::parse(realpath(__DIR__ . '/MigrationTableData/Oro.yml'));
+                if ($event->isTableExist('orocrm_account')) {
+                    $bundleVersions = array_merge(
+                        $bundleVersions,
+                        Yaml::parse(realpath(__DIR__ . '/MigrationTableData/OroCRM.yml'))
+                    );
                 }
                 foreach ($bundleVersions as $bundleName => $version) {
                     $event->setLoadedVersion($bundleName, $version);
