@@ -70,7 +70,10 @@
     }] %}
 
     {% set stepsListWidget %}
-    <h1>Hello</h1>
+        <div class="workflow-definition-steps-list-container"></div>
+        <script type="text/javascript">
+            require(['oro/workflow-definition/step/'])
+        </script>
     {% endset %}
 
     {% set dataBlocks = dataBlocks|merge([{
