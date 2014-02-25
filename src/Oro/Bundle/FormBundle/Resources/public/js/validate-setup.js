@@ -188,25 +188,31 @@ function($, _, __, tools) {
     $.validator.loadMethod(methods);
 
     /**
-     * Extend original dataRules method and implements optional-group validation
+     * Extend original dataRules method and implements
      *
-     * If all fields of optional-group container have empty value - validation is turned off
+     * - optional-group validation:
+     *     if all fields of optional-group container have empty value - validation is turned off
+     * - no validation group:
+     *     if the element inside of the container with turned off validation - no validation rules
      *
      * @type {Function}
      */
     $.validator.dataRules = _.wrap($.validator.dataRules, function (dataRules, element) {
-        var group, validator,
+        var optionalGroup, ignoreGroup, validator,
             rules = dataRules(element);
         if (!$.isEmptyObject(rules)) {
-            group = $(element).parents('[data-validation-optional-group]').get(0);
+            optionalGroup = $(element).parents('[data-validation-optional-group]').get(0);
+            ignoreGroup = $(element).parents('[data-validation-ignore]').get(0);
         }
-        if (group) {
+        if (ignoreGroup) {
+            rules = {};
+        } else if (optionalGroup) {
             validator = $(element.form).data('validator');
             validator.settings.unhighlight(element);
             _.each(rules, function (param) {
                 param.depends = function () {
                     // all fields in a group failed a required rule (have empty value) - stop group validation
-                    return _.some(validator.elementsOf(group), function (elem) {
+                    return _.some(validator.elementsOf(optionalGroup), function (elem) {
                         return $.validator.methods.required.call(validator, validator.elementValue(elem), elem);
                     });
                 };
