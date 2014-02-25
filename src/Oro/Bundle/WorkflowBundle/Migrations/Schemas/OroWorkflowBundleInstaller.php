@@ -1,12 +1,20 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Migrations\Schemas\v1_0;
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schemas;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\InstallerBundle\Migrations\Installation;
 
-class OroWorkflowBundle implements Migration
+class OroWorkflowBundleInstaller implements Installation
 {
+    /**
+     * @inheritdoc
+     */
+    public function getMigrationVersion()
+    {
+        return 'v1_1';
+    }
+
     /**
      * @inheritdoc
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -87,8 +95,8 @@ class OroWorkflowBundle implements Migration
         $table->addIndex(['workflow_step_id'], 'IDX_C54C5E5B71FE882C', []);
         /** End of generate table oro_workflow_entity_acl **/
 
-        /** Generate table oro_workflow_entity_acl_identity **/
-        $table = $schema->createTable('oro_workflow_entity_acl_identity');
+        /** Generate table oro_workflow_entity_acl_ident **/
+        $table = $schema->createTable('oro_workflow_entity_acl_ident');
         $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
         $table->addColumn('workflow_item_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->addColumn('workflow_entity_acl_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
@@ -99,7 +107,7 @@ class OroWorkflowBundle implements Migration
         $table->addIndex(['workflow_entity_acl_id'], 'IDX_367002F1160F68FB', []);
         $table->addIndex(['workflow_item_id'], 'IDX_367002F11023C4EE', []);
         $table->addIndex(['entity_id', 'entity_class'], 'oro_workflow_entity_acl_identity_idx', []);
-        /** End of generate table oro_workflow_entity_acl_identity **/
+        /** End of generate table oro_workflow_entity_acl_ident **/
 
         /** Generate foreign keys for table oro_workflow_definition **/
         $table = $schema->getTable('oro_workflow_definition');
@@ -130,11 +138,11 @@ class OroWorkflowBundle implements Migration
         $table->addForeignKeyConstraint($schema->getTable('oro_workflow_definition'), ['workflow_name'], ['name'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         /** End of generate foreign keys for table oro_workflow_entity_acl **/
 
-        /** Generate foreign keys for table oro_workflow_entity_acl_identity **/
-        $table = $schema->getTable('oro_workflow_entity_acl_identity');
+        /** Generate foreign keys for table oro_workflow_entity_acl_ident **/
+        $table = $schema->getTable('oro_workflow_entity_acl_ident');
         $table->addForeignKeyConstraint($schema->getTable('oro_workflow_item'), ['workflow_item_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
         $table->addForeignKeyConstraint($schema->getTable('oro_workflow_entity_acl'), ['workflow_entity_acl_id'], ['id'], ['onDelete' => 'CASCADE', 'onUpdate' => null]);
-        /** End of generate foreign keys for table oro_workflow_entity_acl_identity **/
+        /** End of generate foreign keys for table oro_workflow_entity_acl_ident **/
 
         // @codingStandardsIgnoreEnd
 

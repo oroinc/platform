@@ -1,12 +1,20 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Migrations\Schemas\v1_0;
+namespace Oro\Bundle\AddressBundle\Migrations\Schemas;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\InstallerBundle\Migrations\Installation;
 
-class OroAddressBundle implements Migration
+class OroAddressBundleInstaller implements Installation
 {
+    /**
+     * @inheritdoc
+     */
+    public function getMigrationVersion()
+    {
+        return 'v1_1';
+    }
+
     /**
      * @inheritdoc
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -68,8 +76,8 @@ class OroAddressBundle implements Migration
         $table->addIndex(['name'], 'country_name_idx', []);
         /** End of generate table oro_dictionary_country **/
 
-        /** Generate table oro_dictionary_country_translation **/
-        $table = $schema->createTable('oro_dictionary_country_translation');
+        /** Generate table oro_dictionary_country_trans **/
+        $table = $schema->createTable('oro_dictionary_country_trans');
         $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
         $table->addColumn('foreign_key', 'string', ['default' => null, 'notnull' => true, 'length' => 2, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->addColumn('content', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
@@ -78,7 +86,7 @@ class OroAddressBundle implements Migration
         $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 32, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'country_translation_idx', []);
-        /** End of generate table oro_dictionary_country_translation **/
+        /** End of generate table oro_dictionary_country_trans **/
 
         /** Generate table oro_dictionary_region **/
         $table = $schema->createTable('oro_dictionary_region');
@@ -91,8 +99,8 @@ class OroAddressBundle implements Migration
         $table->addIndex(['name'], 'region_name_idx', []);
         /** End of generate table oro_dictionary_region **/
 
-        /** Generate table oro_dictionary_region_translation **/
-        $table = $schema->createTable('oro_dictionary_region_translation');
+        /** Generate table oro_dictionary_region_trans **/
+        $table = $schema->createTable('oro_dictionary_region_trans');
         $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
         $table->addColumn('foreign_key', 'string', ['default' => null, 'notnull' => true, 'length' => 16, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->addColumn('content', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
@@ -101,7 +109,7 @@ class OroAddressBundle implements Migration
         $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 32, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'region_translation_idx', []);
-        /** End of generate table oro_dictionary_region_translation **/
+        /** End of generate table oro_dictionary_region_trans **/
 
         /** Generate foreign keys for table oro_address **/
         $table = $schema->getTable('oro_address');
