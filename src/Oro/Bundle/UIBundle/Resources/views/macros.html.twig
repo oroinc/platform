@@ -625,3 +625,35 @@
         <a href="tel:{{ phone|raw }}" title="{{ title|escape }}">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
+
+{#
+    Render tab panel
+    Parameters:
+        aliases - associative array, keys are aliases, values are options
+                  options:
+                      title - tab title
+                      others are same as for oro_widget_render
+#}
+{% macro tabPanel(aliases) %}
+    <ul class="nav nav-tabs">
+        {% for alias, options in aliases %}
+            <li{% if loop.index == 1 %} class="active"{% endif %}>
+                <a href="javascript:void(0);"
+                   data-target="#{{ alias }}"
+                   data-toggle="tab">
+                    {{ options.title|default(alias)|trans }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content">
+        {% for alias, options in aliases %}
+            {% set isfirstLoop = loop.index == 1 %}
+            {% set options = options|merge({'elementFirst': isfirstLoop, 'alias': alias}) %}
+            <div class="tab-pane{% if isfirstLoop %} active{% endif %}" id="{{ alias }}">
+                {{ oro_widget_render(options) }}
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
