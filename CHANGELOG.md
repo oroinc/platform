@@ -1,3 +1,11 @@
+CHANGELOG for 1.0.0-rc3
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-rc3 versions.
+
+* 1.0.0-rc3 (2014-02-25)
+ * Embedded forms
+ * CSV export
+
 CHANGELOG for 1.0.0-rc2
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.0.0-rc2 versions.
