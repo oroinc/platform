@@ -73,13 +73,17 @@
 
                 widgetManager.getWidgetInstanceByAlias('transition-form', function(widget) {
                     if (Navigation.isEnabled()) {
-                        widget.once('beforeContentLoad', function() {
-                            navigation.beforeRequest();
+                        widget.on('beforeContentLoad', function() {
+                            navigation.showLoading();
                         });
                     }
 
-                    widget.once('formSave', function(data) {
+                    widget.on('formSave', function(data) {
                         performTransition(saveAndTransitBtn, data)
+                    });
+
+                    widget.on('formSaveError', function() {
+                        navigation.hideLoading();
                     });
                 });
 

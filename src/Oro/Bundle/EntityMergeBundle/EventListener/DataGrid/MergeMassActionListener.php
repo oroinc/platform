@@ -37,7 +37,7 @@ class MergeMassActionListener
 
         $entityName = $massActions['merge']['entity_name'];
 
-        $entityMergeEnable = $this->metadataRegistry->getEntityMetadata($entityName)->is('enable', true);
+        $entityMergeEnable = $this->metadataRegistry->getEntityMetadata($entityName)->is('enable');
 
         if (!$entityMergeEnable) {
             $config->offsetUnsetByPath('[mass_actions][merge]');

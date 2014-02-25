@@ -2,7 +2,6 @@ parameters:
     oro_tag.tag.entity.class: Oro\Bundle\TagBundle\Entity\Tag
     oro_tag.tagging.entity.class: Oro\Bundle\TagBundle\Entity\Tagging
     oro_tag.tag_listener.class: Oro\Bundle\TagBundle\EventListener\TagListener
-    oro_tag.owner_listener.class: Oro\Bundle\TagBundle\EventListener\OwnerListener
 
     oro_tag.tag.form.type.tag.class: Oro\Bundle\TagBundle\Form\Type\TagType
     oro_tag.tag.form.type.tag.api.class: Oro\Bundle\TagBundle\Form\Type\TagApiType
@@ -155,6 +154,6 @@ services:
         arguments:
           - @oro_tag.tag.manager
         tags:
-          - { name: kernel.event_listener, event: oro.entity_merge.create_metadata, method: onCreateMetadata }
+          - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
           - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }
