@@ -2,15 +2,18 @@
 
 namespace Oro\Bundle\InstallerBundle\Migrations;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
-use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\CreateMigrationTableMigration;
+use Oro\Bundle\InstallerBundle\Migrations\Event\MigrationEvents;
+use Oro\Bundle\InstallerBundle\Migrations\Event\PostMigrationEvent;
+use Oro\Bundle\InstallerBundle\Migrations\Event\PreMigrationEvent;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationTable\UpdateBundleVersionMigration;
 
 /**
@@ -27,19 +30,31 @@ class MigrationsLoader
     protected $kernel;
 
     /**
+     * @var Connection
+     */
+    protected $connection;
+
+    /**
      * @var ContainerInterface
      */
     protected $container;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
+     * @var string An array with already loaded bundle migration versions
+     *             key =   bundle name
+     *             value = latest loaded version
+     */
+    protected $loadedVersions;
+
+    /**
      * @var array An array with bundles we must work from
      */
     protected $bundles;
-
-    /**
-     * @var EntityManager
-     */
-    protected $em;
 
     /**
      * @var array An array with excluded bundles
@@ -48,14 +63,20 @@ class MigrationsLoader
 
     /**
      * @param KernelInterface    $kernel
-     * @param EntityManager      $em
+     * @param Connection         $connection
      * @param ContainerInterface $container
+     * @param EventDispatcher    $eventDispatcher
      */
-    public function __construct(KernelInterface $kernel, EntityManager $em, ContainerInterface $container)
-    {
-        $this->kernel    = $kernel;
-        $this->em        = $em;
-        $this->container = $container;
+    public function __construct(
+        KernelInterface $kernel,
+        Connection $connection,
+        ContainerInterface $container,
+        EventDispatcher $eventDispatcher
+    ) {
+        $this->kernel          = $kernel;
+        $this->connection      = $connection;
+        $this->container       = $container;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -79,23 +100,30 @@ class MigrationsLoader
      */
     public function getMigrations()
     {
-        $migrations = [];
+        // process "pre" migrations
+        $preEvent = new PreMigrationEvent($this->connection);
+        $this->eventDispatcher->dispatch(MigrationEvents::PRE_UP, $preEvent);
+        $migrations           = $preEvent->getMigrations();
+        $this->loadedVersions = $preEvent->getLoadedVersions();
 
+        // process main migrations
         $migrationDirectories = $this->getMigrationDirectories();
-        if ($this->isMigrationTableExist()) {
-            $this->filterMigrations($migrationDirectories);
-        } else {
-            $migrations[] = new CreateMigrationTableMigration();
-        }
-
+        $this->filterMigrations($migrationDirectories);
         $this->createMigrationObjects(
             $migrations,
             $this->loadMigrationScripts($migrationDirectories)
         );
-
         $bundleVersions = $this->getLatestMigrationVersions($migrationDirectories);
         if (!empty($bundleVersions)) {
             $migrations[] = new UpdateBundleVersionMigration($bundleVersions);
+        }
+
+        // process "post" migrations
+        $postEvent = new PostMigrationEvent($this->connection);
+        $this->eventDispatcher->dispatch(MigrationEvents::POST_UP, $postEvent);
+        $postMigrations = $postEvent->getMigrations();
+        foreach ($postMigrations as $migration) {
+            $migrations[] = $migration;
         }
 
         return $migrations;
@@ -324,59 +352,20 @@ class MigrationsLoader
      */
     protected function filterMigrations(array &$migrationDirectories)
     {
-        // get the last installed migrations for all bundles
-        $versions = $this->em->getConnection()->fetchAll(
-            sprintf(
-                'select * from %s where id in (select max(id) from %s group by bundle)',
-                CreateMigrationTableMigration::MIGRATION_TABLE,
-                CreateMigrationTableMigration::MIGRATION_TABLE
-            )
-        );
-
-        if (!empty($versions)) {
+        if (!empty($this->loadedVersions)) {
             foreach ($migrationDirectories as $bundleName => $bundleMigrationDirectories) {
-                $bundleVersion    = array_filter(
-                    $versions,
-                    function ($val) use ($bundleName) {
-                        return ($val['bundle'] == $bundleName);
-                    }
-                );
-                $installedVersion = empty($bundleVersion) ? null : array_pop($bundleVersion)['version'];
-                if ($installedVersion) {
+                $loadedVersion = isset($this->loadedVersions[$bundleName])
+                    ? $this->loadedVersions[$bundleName]
+                    : null;
+                if ($loadedVersion) {
                     foreach (array_keys($bundleMigrationDirectories) as $migrationVersion) {
-                        if (empty($migrationVersion) || version_compare($migrationVersion, $installedVersion) < 1) {
+                        if (empty($migrationVersion) || version_compare($migrationVersion, $loadedVersion) < 1) {
                             unset ($migrationDirectories[$bundleName][$migrationVersion]);
                         }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Check if a table contains migration state exists in db
-     *
-     * @return bool TRUE if a table exists; otherwise, FALSE
-     */
-    protected function isMigrationTableExist()
-    {
-        $result = false;
-        try {
-            $conn = $this->em->getConnection();
-
-            if (!$conn->isConnected()) {
-                $this->em->getConnection()->connect();
-            }
-
-            $result = $conn->isConnected()
-                && (bool)array_intersect(
-                    [CreateMigrationTableMigration::MIGRATION_TABLE],
-                    $this->em->getConnection()->getSchemaManager()->listTableNames()
-                );
-        } catch (\PDOException $e) {
-        }
-
-        return $result;
     }
 
     /**

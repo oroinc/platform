@@ -5,7 +5,7 @@ namespace Oro\Bundle\InstallerBundle\Migrations\Schemas\v1_1;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\InstallerBundle\Migrations\Migration;
 
-class OroInstallerBundle implements Migration
+class DeleteBundleVersionTable implements Migration
 {
     /**
      * @inheritdoc
