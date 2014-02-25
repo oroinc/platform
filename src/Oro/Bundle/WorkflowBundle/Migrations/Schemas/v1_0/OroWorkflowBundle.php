@@ -17,14 +17,14 @@ class OroWorkflowBundle implements Migration
 
         /** Generate table oro_workflow_definition **/
         $table = $schema->createTable('oro_workflow_definition');
-        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('start_step_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('label', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('related_entity', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_attribute_name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('steps_display_ordered', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('enabled', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('configuration', 'array', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('start_step_id', 'integer', ['notnull' => false]);
+        $table->addColumn('label', 'string', ['length' => 255]);
+        $table->addColumn('related_entity', 'string', ['length' => 255]);
+        $table->addColumn('entity_attribute_name', 'string', ['length' => 255]);
+        $table->addColumn('steps_display_ordered', 'boolean', []);
+        $table->addColumn('enabled', 'boolean', []);
+        $table->addColumn('configuration', 'array', ['comment' => '(DC2Type:array)']);
         $table->setPrimaryKey(['name']);
         $table->addIndex(['start_step_id'], 'IDX_6F737C368377424F', []);
         $table->addIndex(['enabled'], 'oro_workflow_definition_enabled_idx', []);
@@ -32,14 +32,14 @@ class OroWorkflowBundle implements Migration
 
         /** Generate table oro_workflow_item **/
         $table = $schema->createTable('oro_workflow_item');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('workflow_name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('current_step_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('closed', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('created', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('updated', 'datetime', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('data', 'text', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('workflow_name', 'string', ['length' => 255]);
+        $table->addColumn('current_step_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('closed', 'boolean', []);
+        $table->addColumn('created', 'datetime', []);
+        $table->addColumn('updated', 'datetime', ['notnull' => false]);
+        $table->addColumn('data', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['entity_id', 'workflow_name'], 'oro_workflow_item_entity_definition_unq');
         $table->addIndex(['current_step_id'], 'IDX_169789AED9BF9B19', []);
@@ -48,11 +48,11 @@ class OroWorkflowBundle implements Migration
 
         /** Generate table oro_workflow_step **/
         $table = $schema->createTable('oro_workflow_step');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('workflow_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('label', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('step_order', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('workflow_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('label', 'string', ['length' => 255]);
+        $table->addColumn('step_order', 'integer', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['workflow_name', 'name'], 'oro_workflow_step_unique_idx');
         $table->addIndex(['workflow_name'], 'IDX_4A35528C1BBC6E3D', []);
@@ -60,12 +60,12 @@ class OroWorkflowBundle implements Migration
 
         /** Generate table oro_workflow_transition_log **/
         $table = $schema->createTable('oro_workflow_transition_log');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('step_to_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('workflow_item_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('step_from_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('transition', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('transition_date', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('step_to_id', 'integer', ['notnull' => false]);
+        $table->addColumn('workflow_item_id', 'integer', ['notnull' => false]);
+        $table->addColumn('step_from_id', 'integer', ['notnull' => false]);
+        $table->addColumn('transition', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('transition_date', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['workflow_item_id'], 'IDX_B3D57B301023C4EE', []);
         $table->addIndex(['step_from_id'], 'IDX_B3D57B30C8335FE4', []);
@@ -74,13 +74,13 @@ class OroWorkflowBundle implements Migration
 
         /** Generate table oro_workflow_entity_acl **/
         $table = $schema->createTable('oro_workflow_entity_acl');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('workflow_step_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('workflow_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('attribute', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_class', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('updatable', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('deletable', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('workflow_step_id', 'integer', ['notnull' => false]);
+        $table->addColumn('workflow_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('attribute', 'string', ['length' => 255]);
+        $table->addColumn('entity_class', 'string', ['length' => 255]);
+        $table->addColumn('updatable', 'boolean', []);
+        $table->addColumn('deletable', 'boolean', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['workflow_name', 'attribute', 'workflow_step_id'], 'oro_workflow_acl_unique_idx');
         $table->addIndex(['workflow_name'], 'IDX_C54C5E5B1BBC6E3D', []);
@@ -89,11 +89,11 @@ class OroWorkflowBundle implements Migration
 
         /** Generate table oro_workflow_entity_acl_identity **/
         $table = $schema->createTable('oro_workflow_entity_acl_identity');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('workflow_item_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('workflow_entity_acl_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_class', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('workflow_item_id', 'integer', ['notnull' => false]);
+        $table->addColumn('workflow_entity_acl_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_class', 'string', ['length' => 255]);
+        $table->addColumn('entity_id', 'integer', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['workflow_entity_acl_id', 'entity_id', 'workflow_item_id'], 'oro_workflow_entity_acl_identity_unique_idx');
         $table->addIndex(['workflow_entity_acl_id'], 'IDX_367002F1160F68FB', []);
