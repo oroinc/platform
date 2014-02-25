@@ -6,325 +6,100 @@ use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 
 class MetadataFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY         = 'Namespace\EntityName';
-    const RELATED_ENTITY = 'Namespace\RelatedEntity';
-
     /**
      * @var MetadataFactory
      */
     protected $factory;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $mergeConfigProvider;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $doctrineHelper;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $eventDispatcher;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $doctrineMetadata;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $repository;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $fieldId;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $config;
-
     protected function setUp()
     {
-        $this->mergeConfigProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->factory = new MetadataFactory();
+    }
 
-        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+    public function testCreateEntityMetadata()
+    {
+        $options = array('foo' => 'bar');
+        $doctrineMetadata = $this->getMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
 
-        $this->config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        $metadata = $this->factory->createEntityMetadata($options, $doctrineMetadata);
+        $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata', $metadata);
+        $this->assertEquals($options, $metadata->all());
+        $this->assertEquals($doctrineMetadata, $metadata->getDoctrineMetadata());
+    }
 
-        $this->doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+    public function testCreateEntityMetadataFromArray()
+    {
+        $options = array('foo' => 'bar');
+        $doctrineMetadata = array('doctrineOption' => 'test');
 
-        $this->repository = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineMetadata = $this
-            ->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setMethods(
-                [
-                    'getName',
-                    'getAssociationsByTargetClass',
-                    'getAssociationMapping',
-                    'getFieldMapping',
-                    'hasAssociation'
-                ]
-            )
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->fieldId = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->config
-            ->expects($this->any())
-            ->method('all')
-            ->will($this->returnValue(['option' => true]));
-
-        $this->config
-            ->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($this->fieldId));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getMetadataFor')
-            ->will($this->returnValue($this->doctrineMetadata));
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityRepository')
-            ->will($this->returnValue($this->repository));
-
-        $this->factory = new MetadataFactory(
-            $this->mergeConfigProvider,
-            $this->doctrineHelper,
-            $this->eventDispatcher
+        $metadata = $this->factory->createEntityMetadata($options, $doctrineMetadata);
+        $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\EntityMetadata', $metadata);
+        $this->assertInstanceOf(
+            'Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata',
+            $metadata->getDoctrineMetadata()
         );
     }
 
+    //@codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Merge config for "Namespace\RelatedEntity" is not exist.
+     * @expectedExceptionMessage $doctrineMetadata must be an array of "Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata", but "stdClass" given.
      */
-    public function testCreateEntityMergeMetadataEmpty()
+    //@codingStandardsIgnoreEnd
+    public function testCreateEntityMetadataFails()
     {
-        $metadata = $this->factory->createEntityMetadata(self::RELATED_ENTITY);
-        $this->assertNull($metadata);
+        $options = array('foo' => 'bar');
+        $doctrineMetadata = new \stdClass();
+
+        $this->factory->createEntityMetadata($options, $doctrineMetadata);
     }
 
-    public function testCreateMergeMetadata()
+    public function testCreateFieldMetadata()
     {
-        $this->mergeConfigProvider
-            ->expects($this->once())
-            ->method('getConfig')
-            ->will($this->returnValue($this->config));
+        $options = array('foo' => 'bar');
+        $doctrineMetadata = $this->getMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
 
-        $metadata = $this->factory->createEntityMetadata(self::ENTITY);
-        $this->assertNotNull($metadata);
+        $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);
+        $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata', $metadata);
+        $this->assertEquals($options, $metadata->all());
+        $this->assertEquals($doctrineMetadata, $metadata->getDoctrineMetadata());
+    }
+
+    public function testCreateFieldMetadataFromArray()
+    {
+        $options = array('foo' => 'bar');
+        $doctrineMetadata = array('doctrineOption' => 'test');
+
+        $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);
+        $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata', $metadata);
         $this->assertInstanceOf(
-            'Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata',
-            $metadata
+            'Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata',
+            $metadata->getDoctrineMetadata()
         );
     }
 
-    public function testCreateFieldsMetadataEmpty()
+    //@codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage $doctrineMetadata must be an array of "Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata", but "stdClass" given.
+     */
+    //@codingStandardsIgnoreEnd
+    public function testCreateFieldMetadataFails()
     {
-        $metadata = $this->factory->createFieldsMetadata(self::ENTITY);
-        $this->assertInternalType('array', $metadata);
-        $this->assertEmpty($metadata);
+        $options = array('foo' => 'bar');
+        $doctrineMetadata = new \stdClass();
+
+        $this->factory->createFieldMetadata($options, $doctrineMetadata);
     }
 
-    public function testCreateFieldsMetadataReturnFieldMetadata()
+    public function testCreateDoctrineMetadata()
     {
-        $this->mergeConfigProvider
-            ->expects($this->once())
-            ->method('getConfigs')
-            ->will($this->returnValue([$this->config, $this->config]));
+        $options = array('foo' => 'bar');
+        $doctrineMetadata = $this->getMock('Oro\\Bundle\\EntityMergeBundle\\Metadata\\DoctrineMetadata');
 
-        $this->fieldId
-            ->expects($this->any())
-            ->method('getFieldType')
-            ->will($this->returnValue('string'));
-
-        $this->fieldId
-            ->expects($this->any())
-            ->method('getFieldName')
-            ->will($this->returnValue('string'));
-
-        $this->doctrineMetadata
-            ->expects($this->any())
-            ->method('getFieldMapping')
-            ->will($this->returnValue(['ref-one' => []]));
-
-        $this->factory = new MetadataFactory(
-            $this->mergeConfigProvider,
-            $this->doctrineHelper,
-            $this->eventDispatcher
-        );
-        $metadata = $this->factory->createFieldsMetadata(self::ENTITY);
-        $this->assertInternalType('array', $metadata);
-        $this->assertNotEmpty($metadata);
-
-        $this->assertInstanceOf(
-            'Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
-            $metadata['string']
-        );
-    }
-
-    public function testCreateFieldsMetadataReturnCollectionMetadata()
-    {
-        $this->mergeConfigProvider
-            ->expects($this->once())
-            ->method('getConfigs')
-            ->will($this->returnValue([$this->config, $this->config]));
-
-        $this->fieldId
-            ->expects($this->any())
-            ->method('getFieldType')
-            ->will($this->returnValue('ref-one'));
-
-        $this->fieldId
-            ->expects($this->any())
-            ->method('getFieldName')
-            ->will($this->returnValue('ref-one'));
-
-        $this->doctrineMetadata
-            ->expects($this->any())
-            ->method('hasAssociation')
-            ->will($this->returnValue(true));
-
-        $this->doctrineMetadata
-            ->expects($this->any())
-            ->method('getAssociationMapping')
-            ->will($this->returnValue(['ref-one' => []]));
-
-        $metadata = $this->factory->createFieldsMetadata(self::ENTITY);
-
-        $this->assertInternalType('array', $metadata);
-        $this->assertNotEmpty($metadata);
-        $this->assertInstanceOf(
-            'Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata',
-            $metadata['ref-one']
-        );
-    }
-
-    public function testCreateMappedOutsideFieldsMetadataByConfigEmpty()
-    {
-        $metadata = $this->factory
-            ->createMappedOutsideFieldsMetadataByConfig(self::ENTITY);
-        $this->assertInternalType('array', $metadata);
-        $this->assertEmpty($metadata);
-    }
-
-    public function testCreateMappedOutsideFieldsMetadataByConfig()
-    {
-        $config = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\ConfigModelValue')
-            ->getMock();
-
-        $configField = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')
-            ->getMock();
-
-        $configEntity = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
-            ->getMock();
-
-        $configEntity
-            ->expects($this->once())
-            ->method('getClassName')
-            ->will($this->returnValue(self::RELATED_ENTITY));
-
-        $configField
-            ->expects($this->once())
-            ->method('getFieldName')
-            ->will($this->returnValue('fieldName'));
-
-        $configField
-            ->expects($this->once())
-            ->method('getEntity')
-            ->will($this->returnValue($configEntity));
-
-        $config
-            ->expects($this->once())
-            ->method('getField')
-            ->will($this->returnValue($configField));
-
-        $this->doctrineMetadata
-            ->expects($this->any())
-            ->method('hasAssociation')
-            ->will($this->returnValue(true));
-
-        $this->doctrineMetadata
-            ->expects($this->any())
-            ->method('getAssociationMapping')
-            ->with('fieldName')
-            ->will($this->returnValue(['targetEntity' => self::ENTITY]));
-
-        $this->mergeConfigProvider
-            ->expects($this->once())
-            ->method('getConfig')
-            ->will($this->returnValue($this->config));
-
-        $this->repository
-            ->expects($this->once())
-            ->method('findBy')
-            ->will($this->returnValue([$config]));
-
-        $metadata = $this->factory
-            ->createMappedOutsideFieldsMetadataByConfig(self::ENTITY);
-        $this->assertInternalType('array', $metadata);
-        $this->assertNotEmpty($metadata);
-    }
-
-    public function testCreateMappedOutsideFieldsMetadataByDoctrineMetadataEmpty()
-    {
-        $metadata = $this->factory
-            ->createMappedOutsideFieldsMetadataByDoctrineMetadata(self::ENTITY);
-        $this->assertInternalType('array', $metadata);
-        $this->assertEmpty($metadata);
-    }
-
-    public function testCreateMappedOutsideFieldsMetadataByDoctrineMetadata()
-    {
-        $this->doctrineMetadata
-            ->expects($this->any())
-            ->method('getAssociationsByTargetClass')
-            ->will(
-                $this->returnValue(
-                    [
-                        'ref-one' => [
-                            'fieldName' => 'field'
-                        ]
-                    ]
-                )
-            );
-
-        $this->doctrineMetadata
-            ->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue(self::RELATED_ENTITY));
-
-        $this->doctrineHelper
-            ->expects($this->any())
-            ->method('getAllMetadata')
-            ->will($this->returnValue([$this->doctrineMetadata]));
-
-        $metadata = $this->factory
-            ->createMappedOutsideFieldsMetadataByDoctrineMetadata(self::ENTITY);
-        $this->assertInternalType('array', $metadata);
-        $this->assertNotEmpty($metadata);
+        $metadata = $this->factory->createFieldMetadata($options, $doctrineMetadata);
+        $this->assertInstanceOf('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata', $metadata);
+        $this->assertEquals($options, $metadata->all());
+        $this->assertEquals($doctrineMetadata, $metadata->getDoctrineMetadata());
     }
 }
