@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\InstallerBundle\Migrations\Visitor\SchemaDumper;
 
-class DumpDbStructureCommand extends ContainerAwareCommand
+class DumpMigrationsCommand extends ContainerAwareCommand
 {
     /**
      * @inheritdoc
@@ -19,8 +19,8 @@ class DumpDbStructureCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('oro:migration:db_dump')
-            ->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Out schema as plain sql quries')
-            ->setDescription('Dump existing db structure.');
+            ->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Out schema as plain sql queries')
+            ->setDescription('Dump existing database structure.');
     }
 
     /**
@@ -30,11 +30,11 @@ class DumpDbStructureCommand extends ContainerAwareCommand
     {
         $connection = $this->getContainer()->get('doctrine')->getConnection();
         /** @var Schema $schema */
-        $schema     = $connection->getSchemaManager()->createSchema();
+        $schema = $connection->getSchemaManager()->createSchema();
 
 
         if ($input->getOption('plain-sql')) {
-            $sqls       = $schema->toSql($connection->getDatabasePlatform());
+            $sqls = $schema->toSql($connection->getDatabasePlatform());
             foreach ($sqls as $sql) {
                 $output->writeln($sql . ';');
             }

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\InstallerBundle\Migrations;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Comparator;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException;
 
 class MigrationQueryBuilder
@@ -11,32 +11,41 @@ class MigrationQueryBuilder
     const MAX_TABLE_NAME_LENGTH = 50;
 
     /**
-     * @var EntityManager
+     * @var Connection
      */
-    protected $em;
+    protected $connection;
 
     /**
-     * @param EntityManager $em
+     * @param Connection $connection
      */
-    public function __construct(EntityManager $em)
+    public function __construct(Connection $connection)
     {
-        $this->em = $em;
+        $this->connection = $connection;
+    }
+
+    /**
+     * Gets a connection object this migration query builder works with
+     *
+     * @return Connection
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
     /**
      * @param Migration[] $migrations
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @return array
-     *   key - class name of migration file
-     *   value - array of sql queries from this file
+     *   'migration' => class name of migration file
+     *   'queries'   => array of sql queries from this file
      */
     public function getQueries(array $migrations)
     {
         $result = [];
 
-        $connection = $this->em->getConnection();
-        $sm         = $connection->getSchemaManager();
-        $platform   = $connection->getDatabasePlatform();
+        $sm         = $this->connection->getSchemaManager();
+        $platform   = $this->connection->getDatabasePlatform();
         $fromSchema = $sm->createSchema();
         foreach ($migrations as $migration) {
             $toSchema   = clone $fromSchema;
@@ -60,7 +69,10 @@ class MigrationQueryBuilder
                 $queries
             );
 
-            $result[get_class($migration)] = $queries;
+            $result[]   = [
+                'migration' => get_class($migration),
+                'queries'   => $queries
+            ];
             $fromSchema = $toSchema;
         }
 
