@@ -46,19 +46,12 @@ class ExtendConfigDumper
 
         $extendProvider = $this->em->getExtendManager()->getConfigProvider();
 
-        if ($className && $extendProvider->hasConfig($className)) {
-            $config = $extendProvider->getConfig($className);
-            if ($config->is('is_extend') && $config->is('upgradeable')) {
-                $this->checkSchema($config);
-            }
-        } else {
-            $configs = $extendProvider->getConfigs();
-            foreach ($configs as $config) {
-                if ($config->is('is_extend') && $config->is('upgradeable')) {
-                    $this->checkSchema($config);
-                }
-            }
+        $configs = $className
+            ? [$extendProvider->getConfig($className)]
+            : $extendProvider->getConfigs();
 
+        foreach ($configs as $config) {
+            $this->checkSchema($config);
         }
 
         $this->clear();
@@ -104,6 +97,10 @@ class ExtendConfigDumper
      */
     protected function checkSchema(ConfigInterface $entityConfig)
     {
+        if (!$entityConfig->is('is_extend') || !$entityConfig->is('upgradeable')) {
+            return;
+        }
+
         $extendProvider = $this->em->getExtendManager()->getConfigProvider();
         $className      = $entityConfig->getId()->getClassName();
         $doctrine       = [];
@@ -160,11 +157,11 @@ class ExtendConfigDumper
                     }
                 }
 
-                if ($fieldConfig->get('state') != ExtendManager::STATE_DELETED) {
+                if (!$fieldConfig->is('state', ExtendManager::STATE_DELETED)) {
                     $fieldConfig->set('state', ExtendManager::STATE_ACTIVE);
                 }
 
-                if ($fieldConfig->get('state') == ExtendManager::STATE_DELETED) {
+                if ($fieldConfig->is('state', ExtendManager::STATE_DELETED)) {
                     $fieldConfig->set('is_deleted', true);
                 }
 
@@ -175,7 +172,7 @@ class ExtendConfigDumper
         $extendProvider->flush();
 
         $entityConfig->set('state', $entityState);
-        if ($entityConfig->get('state') == ExtendManager::STATE_DELETED) {
+        if ($entityConfig->is('state', ExtendManager::STATE_DELETED)) {
             $entityConfig->set('is_deleted', true);
 
             $extendProvider->map(

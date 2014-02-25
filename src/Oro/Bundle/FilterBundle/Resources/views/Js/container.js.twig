@@ -9,8 +9,8 @@
                             <a id="reset-filter-button" href="javascript:void(0);">Reset</a>
                             <select id="add-filter-select" multiple>
                                 <% _.each(filters, function (filter, name) { %>
-                                <option value="<%= name %>" <% if (filter.enabled) { %>selected<% } %>>
-                                <%= filter.label %>
+                                <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                <%- filter.label %>
                                 </option>
                                 <% }); %>
                             </select>
@@ -24,8 +24,8 @@
             <div class="filter-container">
                 <select id="add-filter-select" multiple>
                     <% _.each(filters, function (filter, name) { %>
-                    <option value="<%= name %>" <% if (filter.enabled) { %>selected<% } %>>
-                    <%= filter.label %>
+                    <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                    <%- filter.label %>
                     </option>
                     <% }); %>
                 </select>

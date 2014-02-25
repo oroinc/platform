@@ -97,7 +97,7 @@ function($, _) {
                 }
                 var result = '',
                     highlight = function (str) {
-                        return self.highlightSelection(str, query);
+                        return object.children ? str : self.highlightSelection(str, query);
                     };
                 if (object._html !== undefined) {
                     result = object._html;

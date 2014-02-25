@@ -3,10 +3,16 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class WorkflowItemTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -200,5 +206,83 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->workflowItem, $this->workflowItem->addTransitionRecord($transitionRecord));
         $this->assertEquals(array($transitionRecord), $this->workflowItem->getTransitionRecords()->getValues());
         $this->assertEquals($this->workflowItem, $transitionRecord->getWorkflowItem());
+    }
+
+    public function testEntity()
+    {
+        $entity = new \stdClass();
+        $this->assertSame($this->workflowItem, $this->workflowItem->setEntity($entity));
+        $this->assertEquals($entity, $this->workflowItem->getEntity());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow item entity can not be changed
+     */
+    public function testSetEntityException()
+    {
+        $this->workflowItem->setEntity(new \stdClass());
+        $this->workflowItem->setEntity(new \stdClass());
+    }
+
+    public function testEntityId()
+    {
+        $entityId = 1;
+        $this->assertSame($this->workflowItem, $this->workflowItem->setEntityId($entityId));
+        $this->assertEquals($entityId, $this->workflowItem->getEntityId());
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
+     * @expectedExceptionMessage Workflow item entity ID can not be changed
+     */
+    public function testSetEntityIdException()
+    {
+        $this->workflowItem->setEntityId(1);
+        $this->workflowItem->setEntityId(2);
+    }
+
+    public function testSetGetAclIdentities()
+    {
+        $firstStep = new WorkflowStep();
+        $firstStep->setName('first_step');
+        $secondStep = new WorkflowStep();
+        $secondStep->setName('second_step');
+
+        $firstEntityAcl = new WorkflowEntityAcl();
+        $firstEntityAcl->setStep($firstStep)->setAttribute('first_attribute');
+        $secondEntityAcl = new WorkflowEntityAcl();
+        $secondEntityAcl->setStep($secondStep)->setAttribute('second_attribute');
+
+        $firstAclIdentity = new WorkflowEntityAclIdentity();
+        $firstAclIdentity->setAcl($firstEntityAcl);
+        $alternativeFirstAclIdentity = new WorkflowEntityAclIdentity();
+        $alternativeFirstAclIdentity->setAcl($firstEntityAcl);
+        $secondAclIdentity = new WorkflowEntityAclIdentity();
+        $secondAclIdentity->setAcl($secondEntityAcl);
+
+        // default
+        $this->assertEmpty($this->workflowItem->getAclIdentities()->toArray());
+
+        // adding
+        $this->workflowItem->setAclIdentities(array($firstAclIdentity));
+        $this->assertCount(1, $this->workflowItem->getAclIdentities());
+        $this->assertEquals($firstAclIdentity, $this->workflowItem->getAclIdentities()->first());
+
+        // merging
+        $this->workflowItem->setAclIdentities(array($alternativeFirstAclIdentity, $secondAclIdentity));
+        $this->assertCount(2, $this->workflowItem->getAclIdentities());
+        $aclIdentities = array_values($this->workflowItem->getAclIdentities()->toArray());
+        $this->assertEquals($firstAclIdentity, $aclIdentities[0]);
+        $this->assertEquals($secondAclIdentity, $aclIdentities[1]);
+
+        // removing
+        $this->workflowItem->setAclIdentities(array($secondAclIdentity));
+        $this->assertCount(1, $this->workflowItem->getAclIdentities());
+        $this->assertEquals($secondAclIdentity, $this->workflowItem->getAclIdentities()->first());
+
+        // resetting
+        $this->workflowItem->setAclIdentities(array());
+        $this->assertEmpty($this->workflowItem->getAclIdentities()->toArray());
     }
 }

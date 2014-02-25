@@ -4,6 +4,11 @@ placeholders:
         items:
             workflow_buttons:
                 order: 100
+    index_navButtons_before:
+        label: Workflow Buttons
+        items:
+            workflow_buttons:
+                order: 100
     page_title_before:
         label: Workflow Steps
         items:

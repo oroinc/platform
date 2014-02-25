@@ -26,10 +26,10 @@ class NavigationListener
     protected $translator;
 
     /**
-     * @param SecurityFacade      $securityFacade
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $entityExtendProvider
-     * @param Translator          $translator
+     * @param SecurityFacade $securityFacade
+     * @param ConfigProvider $entityConfigProvider
+     * @param ConfigProvider $entityExtendProvider
+     * @param Translator     $translator
      */
     public function __construct(
         SecurityFacade $securityFacade,
@@ -58,9 +58,9 @@ class NavigationListener
             foreach ($extendConfigs as $extendConfig) {
                 if ($extendConfig->is('is_extend')
                     && $extendConfig->get('owner') == ExtendManager::OWNER_CUSTOM
-                    && in_array(
-                        $extendConfig->get('state'),
-                        array(ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED)
+                    && $extendConfig->in(
+                        'state',
+                        [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED]
                     )
                 ) {
                     $config = $this->entityConfigProvider->getConfig($extendConfig->getId()->getClassname());

@@ -11,7 +11,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Table("oro_address")
  * @ORM\Entity
- * @Config()
+ * @Config(
+ *      defaultValues={
+ *          "entity"={"icon"="icon-map-marker"},
+ *      }
+ * )
  */
 class Address extends AbstractAddress
 {

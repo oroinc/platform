@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class UpdateCommand extends BaseCommand
 {
@@ -50,26 +51,42 @@ class UpdateCommand extends BaseCommand
             );
         }
 
+        $force = $input->getOption('force');
+
         foreach ($doctrineAllMetadata as $doctrineMetadata) {
             $className = $doctrineMetadata->getName();
-            $classMetadata = $configManager->getEntityMetadata($className);
-            if ($classMetadata
-                && $classMetadata->name === $className
-                && $classMetadata->configurable
-            ) {
-                $output->writeln('Update entity "' . $className . '"');
-
-                if ($configManager->hasConfig($classMetadata->name)) {
-                    $configManager->updateConfigEntityModel($className, $input->getOption('force'));
+            if ($this->isConfigurableEntity($className, $configManager)) {
+                if ($configManager->hasConfig($className)) {
+                    $this->logMessage(
+                        $output,
+                        OutputInterface::VERBOSITY_NORMAL,
+                        sprintf('Update config for "%s" entity.', $className)
+                    );
+                    $configManager->updateConfigEntityModel($className, $force);
                 } else {
+                    $this->logMessage(
+                        $output,
+                        OutputInterface::VERBOSITY_NORMAL,
+                        sprintf('Create config for "%s" entity.', $className)
+                    );
                     $configManager->createConfigEntityModel($className);
                 }
 
                 foreach ($doctrineMetadata->getFieldNames() as $fieldName) {
                     $fieldType = $doctrineMetadata->getTypeOfField($fieldName);
                     if ($configManager->hasConfig($className, $fieldName)) {
-                        $configManager->updateConfigFieldModel($className, $fieldName, $input->getOption('force'));
+                        $this->logMessage(
+                            $output,
+                            OutputInterface::VERBOSITY_VERBOSE,
+                            sprintf('  Update config for "%s" field.', $fieldName)
+                        );
+                        $configManager->updateConfigFieldModel($className, $fieldName, $force);
                     } else {
+                        $this->logMessage(
+                            $output,
+                            OutputInterface::VERBOSITY_VERBOSE,
+                            sprintf('  Create config for "%s" field.', $fieldName)
+                        );
                         $configManager->createConfigFieldModel($className, $fieldName, $fieldType);
                     }
                 }
@@ -77,8 +94,18 @@ class UpdateCommand extends BaseCommand
                 foreach ($doctrineMetadata->getAssociationNames() as $fieldName) {
                     $fieldType = $doctrineMetadata->isSingleValuedAssociation($fieldName) ? 'ref-one' : 'ref-many';
                     if ($configManager->hasConfig($className, $fieldName)) {
-                        $configManager->updateConfigFieldModel($className, $fieldName, $input->getOption('force'));
+                        $this->logMessage(
+                            $output,
+                            OutputInterface::VERBOSITY_VERBOSE,
+                            sprintf('  Update config for "%s" field.', $fieldName)
+                        );
+                        $configManager->updateConfigFieldModel($className, $fieldName, $force);
                     } else {
+                        $this->logMessage(
+                            $output,
+                            OutputInterface::VERBOSITY_VERBOSE,
+                            sprintf('  Create config for "%s" field.', $fieldName)
+                        );
                         $configManager->createConfigFieldModel($className, $fieldName, $fieldType);
                     }
                 }
@@ -90,5 +117,36 @@ class UpdateCommand extends BaseCommand
         $configManager->flush();
 
         $output->writeln('Completed');
+    }
+
+    /**
+     * @param string        $className
+     * @param ConfigManager $configManager
+     * @return bool
+     */
+    protected function isConfigurableEntity($className, ConfigManager $configManager)
+    {
+        $classMetadata = $configManager->getEntityMetadata($className);
+        if ($classMetadata) {
+            // check if an entity is marked as configurable
+            return $classMetadata->name === $className && $classMetadata->configurable;
+        } else {
+            // check if it is a custom entity
+            return $configManager->hasConfig($className);
+        }
+    }
+
+    /**
+     * Writes a message to a console
+     *
+     * @param OutputInterface $output
+     * @param int             $verbosity
+     * @param string          $message
+     */
+    protected function logMessage(OutputInterface $output, $verbosity, $message)
+    {
+        if ($output->getVerbosity() >= $verbosity) {
+            $output->writeln($message);
+        }
     }
 }

@@ -15,6 +15,7 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
@@ -88,7 +89,9 @@ class UpdateCommand extends InitCommand
                 }
 
                 foreach ($config as $className => $entityOptions) {
-                    $className = class_exists($className) ? $className : 'Extend\\Entity\\' . $className;
+                    $className = class_exists($className)
+                        ? $className
+                        : ExtendConfigDumper::ENTITY . $className;
                     if ($this->info) {
                         $output->writeln(
                             '-- entity: ' . $className . ' (<comment>'
@@ -113,7 +116,8 @@ class UpdateCommand extends InitCommand
             $output->writeln('Updating schema...');
             $commands = [
                 'update'       => new Process($console . ' oro:entity-extend:update-config --env ' . $env),
-                'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
+                // TODO: this is a temporary solution. Should be uncommented when migrations are finished
+                //'schemaUpdate' => new Process($console . ' doctrine:schema:update --force --env ' . $env),
             ];
 
             // put system in maintenance mode
@@ -131,6 +135,12 @@ class UpdateCommand extends InitCommand
                 $command->run();
             }
         }
+
+        // TODO: this is a temporary solution. Should be removed when migrations are finished
+        $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($kernel->getRootDir() . '/console');
+        $env     = $kernel->getEnvironment();
+        $schemaUpdateCmd = new Process($console . ' doctrine:schema:update --force --env ' . $env);
+        $schemaUpdateCmd->run();
 
         $output->writeln('<info>DONE</info>');
     }

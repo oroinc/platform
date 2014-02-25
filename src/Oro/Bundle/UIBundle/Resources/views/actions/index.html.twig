@@ -1,10 +1,7 @@
 {% extends bap.layout %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% block head_script %}
-    {{ parent() }}
-    {% if gridId is defined %}{% placeholder prepare_grid with {'datagrid': datagrid, 'selector': '#' ~ gridId} %}{% endif %}
-{% endblock %}
+{% set buttonsPlaceholderData = {} %}
 {% block content %}
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">
@@ -15,9 +12,9 @@
                     </div>
                 </div>
                 <div class="pull-right title-buttons-container">
-                    {% placeholder index_navButtons_before %}
+                    {% placeholder index_navButtons_before with buttonsPlaceholderData %}
                     {% block navButtons %}{% endblock navButtons %}
-                    {% placeholder index_navButtons_after %}
+                    {% placeholder index_navButtons_after with buttonsPlaceholderData %}
                 </div>
             </div>
         </div>

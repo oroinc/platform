@@ -13,11 +13,11 @@ class StepManager
     protected $steps;
 
     /**
-     * @param Collection $steps
+     * @param Collection|Step[] $steps
      */
-    public function __construct(Collection $steps = null)
+    public function __construct($steps = null)
     {
-        $this->steps = $steps ?: new ArrayCollection();
+        $this->setSteps($steps);
     }
 
     /**
@@ -37,16 +37,14 @@ class StepManager
      */
     public function setSteps($steps)
     {
-        if ($steps instanceof Collection) {
-            $this->steps = $steps;
-        } else {
-            $data = array();
+        $data = array();
+        if ($steps) {
             foreach ($steps as $step) {
                 $data[$step->getName()] = $step;
             }
             unset($steps);
-            $this->steps = new ArrayCollection($data);
         }
+        $this->steps = new ArrayCollection($data);
 
         return $this;
     }

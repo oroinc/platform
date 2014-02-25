@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\WorkflowBundle\Model\AttributeManager;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
@@ -19,6 +18,9 @@ use JMS\Serializer\Annotation as Serializer;
  *
  * @ORM\Table(
  *      name="oro_workflow_item",
+ *      uniqueConstraints={
+ *          @ORM\UniqueConstraint(name="oro_workflow_item_entity_definition_unq",columns={"entity_id", "workflow_name"})
+ *      },
  *      indexes={
  *          @ORM\Index(name="oro_workflow_item_workflow_name_idx", columns={"workflow_name"})
  *      }
@@ -26,6 +28,8 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class WorkflowItem
 {
@@ -99,6 +103,20 @@ class WorkflowItem
     protected $transitionRecords;
 
     /**
+     * ACL identities of related entities
+     *
+     * @var Collection|WorkflowEntityAclIdentity[]
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="WorkflowEntityAclIdentity",
+     *  mappedBy="workflowItem",
+     *  cascade={"all"},
+     *  orphanRemoval=true
+     * )
+     */
+    protected $aclIdentities;
+
+    /**
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
@@ -154,6 +172,7 @@ class WorkflowItem
     public function __construct()
     {
         $this->transitionRecords = new ArrayCollection();
+        $this->aclIdentities = new ArrayCollection();
         $this->closed = false;
         $this->data = new WorkflowData();
         $this->result = new WorkflowResult();
@@ -431,6 +450,96 @@ class WorkflowItem
         $this->transitionRecords->add($transitionRecord);
 
         return $this;
+    }
+
+    /**
+     * @return WorkflowEntityAclIdentity[]|Collection
+     */
+    public function getAclIdentities()
+    {
+        return $this->aclIdentities;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity[]|Collection $aclIdentities
+     * @return WorkflowItem
+     */
+    public function setAclIdentities($aclIdentities)
+    {
+        $newAttributeSteps = array();
+        foreach ($aclIdentities as $aclIdentity) {
+            $newAttributeSteps[] = $aclIdentity->getAclAttributeStepKey();
+        }
+
+        foreach ($this->aclIdentities as $aclIdentity) {
+            if (!in_array($aclIdentity->getAclAttributeStepKey(), $newAttributeSteps)) {
+                $this->removeEntityAcl($aclIdentity);
+            }
+        }
+
+        foreach ($aclIdentities as $aclIdentity) {
+            $this->addEntityAcl($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity $aclIdentity
+     * @return WorkflowItem
+     */
+    public function addEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
+    {
+        $attributeStep = $aclIdentity->getAclAttributeStepKey();
+
+        if (!$this->hasAclIdentityByAttribute($attributeStep)) {
+            $aclIdentity->setWorkflowItem($this);
+            $this->aclIdentities->add($aclIdentity);
+        } else {
+            $this->getAclIdentityByAttributeStep($attributeStep)->import($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param WorkflowEntityAclIdentity $aclIdentity
+     * @return WorkflowItem
+     */
+    public function removeEntityAcl(WorkflowEntityAclIdentity $aclIdentity)
+    {
+        $attributeStep = $aclIdentity->getAclAttributeStepKey();
+
+        if ($this->hasAclIdentityByAttribute($attributeStep)) {
+            $aclIdentity = $this->getAclIdentityByAttributeStep($attributeStep);
+            $this->aclIdentities->removeElement($aclIdentity);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $attribute
+     * @return bool
+     */
+    public function hasAclIdentityByAttribute($attribute)
+    {
+        return $this->getAclIdentityByAttributeStep($attribute) !== null;
+    }
+
+    /**
+     * @param string $attributeStep
+     * @return null|WorkflowEntityAclIdentity
+     */
+    public function getAclIdentityByAttributeStep($attributeStep)
+    {
+        foreach ($this->aclIdentities as $aclIdentity) {
+            if ($aclIdentity->getAclAttributeStepKey() == $attributeStep) {
+                return $aclIdentity;
+            }
+        }
+
+        return null;
     }
 
     /**

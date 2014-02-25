@@ -64,19 +64,22 @@ class LoadPackageDemoDataCommand extends ContainerAwareCommand
         // prepare data fixture loader
         // we should load only fixtures from the specified packages
         $container = $this->getContainer();
-        $loader = new ContainerAwareLoader($container);
+        $loader    = $container->get('oro_installer.fixtures.loader');
+        $loader->isLoadDemoData(true);
         $hasFixtures = false;
-        foreach ($container->get('kernel')->getBundles() as $bundle) {
-            $fixtureDir = $bundle->getPath() . DIRECTORY_SEPARATOR . 'DataFixtures' . DIRECTORY_SEPARATOR . 'Demo';
+        $bundles = [];
+        foreach ($container->get('kernel')->getBundles() as $bundleName => $bundle) {
+            $fixtureDir = $bundle->getPath();
             if (is_dir($fixtureDir) && $filterByPackage($fixtureDir)) {
-                $output->writeln($fixtureDir);
-                $loader->loadFromDirectory($fixtureDir);
+                $bundles = $bundleName;
                 $hasFixtures = true;
             }
         }
 
+        $bundles = array_unique($bundles);
         // load data fixtures
         if ($hasFixtures) {
+            $loader->setBundles($bundles);
             $output->writeln('Loading data ...');
             $executor = new ORMExecutor($container->get('doctrine.orm.entity_manager'));
             $executor->setLogger(

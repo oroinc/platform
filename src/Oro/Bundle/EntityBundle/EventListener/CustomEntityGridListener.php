@@ -157,7 +157,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         $extendConfigs        = $extendConfigProvider->getConfigs($this->entityClass);
 
         foreach ($extendConfigs as $extendConfig) {
-            if ($extendConfig->get('state') != ExtendManager::STATE_NEW && !$extendConfig->get('is_deleted')) {
+            if (!$extendConfig->is('state', ExtendManager::STATE_NEW) && !$extendConfig->get('is_deleted')) {
                 list($field, $selectField) = $this->getDynamicFieldItem($alias, $extendConfig);
 
                 if (!empty($field)) {

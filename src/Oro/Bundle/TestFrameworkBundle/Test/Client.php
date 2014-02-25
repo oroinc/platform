@@ -3,15 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
-use Oro\Bundle\TestFrameworkBundle\Test\SoapClient;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\TerminableInterface;
+
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
 
 class Client extends BaseClient
 {
-
     const LOCAL_URL = 'http://localhost';
 
     /** @var  SoapClient */
@@ -84,6 +83,11 @@ class Client extends BaseClient
         if (strpos($uri, 'http://') === false) {
             $uri = self::LOCAL_URL . $uri;
         }
+        if ($this->getServerParameter('HTTP_X-WSSE', '') !== '' && !isset($server['HTTP_X-WSSE'])) {
+        //generate new WSSE header
+            parent::setServerParameters(ToolsAPI::generateWsseHeader());
+        }
+
         return parent::request($method, $uri, $parameters, $files, $server, $content, $changeHistory);
     }
 
@@ -126,6 +130,17 @@ class Client extends BaseClient
     public function getSoap()
     {
         return self::$soapClient;
+    }
+
+    /**
+     * @param array $server
+     *
+     * @return $this
+     */
+    public function setServerParameters(array $server)
+    {
+        parent::setServerParameters($server);
+        return $this;
     }
 
     /**

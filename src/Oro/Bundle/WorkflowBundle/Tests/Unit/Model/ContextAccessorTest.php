@@ -4,10 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Zend\Server\Reflection;
 
 class ContextAccessorTest extends \PHPUnit_Framework_TestCase
 {
