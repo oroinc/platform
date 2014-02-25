@@ -17,12 +17,12 @@ class OroTranslationBundle implements Migration
 
         /** Generate table oro_translation **/
         $table = $schema->createTable('oro_translation');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('key', 'string', ['default' => null, 'notnull' => true, 'length' => 500, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('value', 'text', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('locale', 'string', ['default' => null, 'notnull' => true, 'length' => 5, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('domain', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('scope', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('key', 'string', ['length' => 500]);
+        $table->addColumn('value', 'text', ['notnull' => false]);
+        $table->addColumn('locale', 'string', ['length' => 5]);
+        $table->addColumn('domain', 'string', ['length' => 255]);
+        $table->addColumn('scope', 'smallint', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'domain', 'key', 'scope'], 'MESSAGE_IDX', []);
         /** End of generate table oro_translation **/

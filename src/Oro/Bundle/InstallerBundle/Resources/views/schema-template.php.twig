@@ -17,24 +17,22 @@ class Migration implements Migration
         $table = $schema->createTable('{{ table.name }}');
     {% for column in table.columns %}
     $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column) }});
-    {% endfor %}
-
-    {% for index in table.indexes %}
-
+    {% endfor -%}
+    {% for index in table.indexes -%}
     {% if index.isPrimary %}
     $table->setPrimaryKey({{ _self.dumpArray(index.columns) }});
-    {% elseif index.isUnique %}
+    {% elseif index.isUnique -%}
     $table->addUniqueIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}');
-    {% else %}
+    {% else -%}
     $table->addIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}', {{ _self.dumpArray(index.flags) }});
     {% endif %}
-    {% endfor %}
+    {% endfor -%}
     /** End of generate table {{ table.name }} **/
 
     {% endfor %}
 
-
-    {% for table in schema.tables %}
+    {% for table in schema.tables -%}
+    {% if table.ForeignKeys is not empty %}
     /** Generate foreign keys for table {{ table.name }} **/
         $table = $schema->getTable('{{ table.name }}');
     {% for foreignKey in table.ForeignKeys %}
@@ -42,6 +40,7 @@ class Migration implements Migration
     {% endfor %}
     /** End of generate foreign keys for table {{ table.name }} **/
 
+    {% endif -%}
     {% endfor %}
     return [];
     }
@@ -49,7 +48,18 @@ class Migration implements Migration
 
 {% macro dumpColumnOptions(column) %}
 {% spaceless %}
-['default' => {{ _self.dumpString(column.default) }}, 'notnull' => {{ _self.dumpBoolean(column.notnull) }}, 'length' => {{ _self.dumpInteger(column.length) }}, 'precision' => {{ _self.dumpInteger(column.precision) }}, 'scale' => {{ _self.dumpInteger(column.scale) }}, 'fixed' => {{ _self.dumpBoolean(column.fixed) }}, 'unsigned' => {{ _self.dumpBoolean(column.unsigned) }}, 'autoincrement' => {{ _self.dumpBoolean(column.autoincrement) }}, 'comment' => {{ _self.dumpString(column.comment) }}]
+{% set options = getColumnOptions(column) %}
+{% set items = [] %}
+{% if options.default is defined %}{% set items = items|merge(["'default' => " ~ _self.dumpString(options.default)]) %}{% endif -%}
+{% if options.notnull is defined %}{% set items = items|merge(["'notnull' => " ~ _self.dumpBoolean(options.notnull)]) %}{% endif -%}
+{% if options.length is defined %}{% set items = items|merge(["'length' => " ~ _self.dumpInteger(options.length)]) %}{% endif -%}
+{% if options.precision is defined %}{% set items = items|merge(["'precision' => " ~ _self.dumpInteger(options.precision)]) %}{% endif -%}
+{% if options.scale is defined %}{% set items = items|merge(["'scale' => " ~ _self.dumpInteger(options.scale)]) %}{% endif -%}
+{% if options.fixed is defined %}{% set items = items|merge(["'fixed' => " ~ _self.dumpBoolean(options.fixed)]) %}{% endif -%}
+{% if options.unsigned is defined %}{% set items = items|merge(["'unsigned' => " ~ _self.dumpBoolean(options.unsigned)]) %}{% endif -%}
+{% if options.autoincrement is defined %}{% set items = items|merge(["'autoincrement' => " ~ _self.dumpBoolean(options.autoincrement)]) %}{% endif -%}
+{% if options.comment is defined %}{% set items = items|merge(["'comment' => " ~ _self.dumpString(options.comment)]) %}{% endif -%}
+[{% for item in items %}{% if not loop.first %}, {% endif %}{{ item|raw }}{% endfor %}]
 {% endspaceless %}
 {% endmacro %}
 
@@ -61,7 +71,7 @@ class Migration implements Migration
 
 {% macro dumpArray(arrayValues) %}
 {% spaceless %}
-[{% for value in arrayValues %}'{{ value }}', {% endfor %}]
+[{% for value in arrayValues %}{% if not loop.first %}, {% endif %}'{{ value }}'{% endfor %}]
 {% endspaceless %}
 {% endmacro %}
 

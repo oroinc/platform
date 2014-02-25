@@ -33,44 +33,44 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
 
         /** Generate table oro_search_index_datetime **/
         $table = $schema->createTable('oro_search_index_datetime');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('value', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('item_id', 'integer', []);
+        $table->addColumn('field', 'string', ['length' => 250]);
+        $table->addColumn('value', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['item_id'], 'IDX_459F212A126F525E', []);
         /** End of generate table oro_search_index_datetime **/
 
         /** Generate table oro_search_index_decimal **/
         $table = $schema->createTable('oro_search_index_decimal');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('value', 'decimal', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 2, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('item_id', 'integer', []);
+        $table->addColumn('field', 'string', ['length' => 250]);
+        $table->addColumn('value', 'decimal', ['scale' => 2]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['item_id'], 'IDX_E0B9BB33126F525E', []);
         /** End of generate table oro_search_index_decimal **/
 
         /** Generate table oro_search_index_integer **/
         $table = $schema->createTable('oro_search_index_integer');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('value', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('item_id', 'integer', []);
+        $table->addColumn('field', 'string', ['length' => 250]);
+        $table->addColumn('value', 'integer', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['item_id'], 'IDX_E04BA3AB126F525E', []);
         /** End of generate table oro_search_index_integer **/
 
         /** Generate table oro_search_item **/
         $table = $schema->createTable('oro_search_item');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('entity', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('alias', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('record_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('title', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('changed', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('created_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('updated_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('entity', 'string', ['length' => 255]);
+        $table->addColumn('alias', 'string', ['length' => 255]);
+        $table->addColumn('record_id', 'integer', ['notnull' => false]);
+        $table->addColumn('title', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('changed', 'boolean', []);
+        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['entity', 'record_id'], 'IDX_ENTITY');
         $table->addIndex(['alias'], 'IDX_ALIAS', []);
@@ -79,11 +79,11 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
 
         /** Generate table oro_search_query **/
         $table = $schema->createTable('oro_search_query');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('entity', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('query', 'text', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('result_count', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('created_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('entity', 'string', ['length' => 250]);
+        $table->addColumn('query', 'text', []);
+        $table->addColumn('result_count', 'integer', []);
+        $table->addColumn('created_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_search_query **/
 
@@ -105,10 +105,10 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
         /** Generate table oro_search_index_text **/
         $table = $schema->createTable('oro_search_index_text');
         $table->addOption('engine' , 'MyISAM');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('item_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('field', 'string', ['default' => null, 'notnull' => true, 'length' => 250, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('value', 'text', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('item_id', 'integer', []);
+        $table->addColumn('field', 'string', ['length' => 250]);
+        $table->addColumn('value', 'text', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['item_id'], 'IDX_A0243539126F525E', []);
         /** End of generate table oro_search_index_text **/
