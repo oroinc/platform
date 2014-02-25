@@ -13,7 +13,7 @@ class OroEntityConfigBundle implements Migration
     public function up(Schema $schema)
     {
         return [
-            "RENAME TABLE oro_entity_config_optionset_relation TO oro_entity_config_optset_rel;",
+            "ALTER TABLE oro_entity_config_optionset_relation RENAME TO oro_entity_config_optset_rel;",
         ];
     }
 }

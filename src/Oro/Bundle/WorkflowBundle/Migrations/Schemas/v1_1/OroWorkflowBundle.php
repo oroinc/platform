@@ -13,7 +13,7 @@ class OroWorkflowBundle implements Migration
     public function up(Schema $schema)
     {
         return [
-            "RENAME TABLE oro_workflow_entity_acl_identity TO oro_workflow_entity_acl_ident;",
+            "ALTER TABLE oro_workflow_entity_acl_identity RENAME TO oro_workflow_entity_acl_ident;",
         ];
     }
 }
