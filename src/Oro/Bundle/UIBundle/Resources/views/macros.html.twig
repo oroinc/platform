@@ -629,31 +629,46 @@
 {#
     Render tab panel
     Parameters:
-        aliases - associative array, keys are aliases, values are options
-                  options:
-                      title - tab title
-                      others are same as for oro_widget_render
+        aliases     - associative array, keys are aliases, values are options
+                      options:
+                          tabTitle - tab title
+                          others are same as for oro_widget_render
+        lazyLoading - enable lazy loading, load first element only if true, default is false
 #}
-{% macro tabPanel(aliases) %}
-    <ul class="nav nav-tabs">
-        {% for alias, options in aliases %}
-            <li{% if loop.index == 1 %} class="active"{% endif %}>
-                <a href="javascript:void(0);"
-                   data-target="#{{ alias }}"
-                   data-toggle="tab">
-                    {{ options.tabTitle|default(alias)|trans }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+{% macro tabPanel(aliases, lazyLoading) %}
+    {% set lazyLoading = lazyLoading is not empty and lazyLoading %}
+    {% if lazyLoading %}
+        <script type="text/javascript">
+            require(['oro/lazy-loading']);
+        </script>
+    {% endif %}
+    <div class="oro-tabs">
+        <ul class="nav nav-tabs">
+            {% for alias, options in aliases %}
+                <li{% if loop.index == 1 %} class="active"{% endif %}>
+                    <a href="javascript:void(0);"
+                       data-target="#{{ alias }}"
+                       {% if lazyLoading %}data-alias="{{ alias }}" data-lazy-loading="{{ lazyLoading }}"{% endif %}
+                       data-toggle="tab">
+                        {{ options.tabTitle|default(alias)|trans }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
 
-    <div class="tab-content">
-        {% for alias, options in aliases %}
-            {% set isfirstLoop = loop.index == 1 %}
-            {% set options = options|merge({'elementFirst': isfirstLoop, 'alias': alias}) %}
-            <div class="tab-pane{% if isfirstLoop %} active{% endif %}" id="{{ alias }}">
-                {{ oro_widget_render(options) }}
-            </div>
-        {% endfor %}
+        <div class="tab-content">
+            {% for alias, options in aliases %}
+                {% set isfirstLoop = loop.index == 1 %}
+                {% set options = options|merge(
+                {
+                    'elementFirst': lazyLoading ? isfirstLoop : true,
+                    'alias': alias
+                })
+                %}
+                <div class="tab-pane{% if isfirstLoop %} active{% endif %}" id="{{ alias }}">
+                    {{ oro_widget_render(options) }}
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endmacro %}
