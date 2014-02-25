@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\EventListener\MergeFieldListener;
+namespace Oro\Bundle\EntityMergeBundle\EventListener\MergeField;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\FieldDataEvent;
@@ -43,9 +43,9 @@ class CascadeRemoveAssociationListener
 
         if (MergeModes::REPLACE != $fieldData->getMode() ||
             !$metadata->hasDoctrineMetadata() ||
-            !$metadata->getDoctrineMetadata()->isMappedBySourceEntity() ||
             !$metadata->getDoctrineMetadata()->isAssociation() ||
-            $metadata->getDoctrineMetadata()->isCollection() ||
+            !$metadata->isDefinedBySourceEntity() ||
+            $metadata->isCollection() ||
             !in_array('remove', (array)$metadata->getDoctrineMetadata()->get('cascade'))
         ) {
             return;

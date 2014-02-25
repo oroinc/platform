@@ -10,16 +10,16 @@ class MetadataRegistry
     protected $loadedMetadata;
 
     /**
-     * @var MetadataFactory
+     * @var MetadataBuilder
      */
-    protected $factory;
+    protected $metadataBuilder;
 
     /**
-     * @param MetadataFactory $factory
+     * @param MetadataBuilder $metadataBuilder
      */
-    public function __construct(MetadataFactory $factory)
+    public function __construct(MetadataBuilder $metadataBuilder)
     {
-        $this->factory = $factory;
+        $this->metadataBuilder = $metadataBuilder;
     }
 
     /**
@@ -34,6 +34,6 @@ class MetadataRegistry
             return $this->loadedMetadata[$className];
         }
 
-        return $this->loadedMetadata[$className] = $this->factory->createEntityMetadata($className);
+        return $this->loadedMetadata[$className] = $this->metadataBuilder->createEntityMetadataByClass($className);
     }
 }

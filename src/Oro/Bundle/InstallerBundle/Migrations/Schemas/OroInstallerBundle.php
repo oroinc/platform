@@ -20,6 +20,13 @@ class OroInstallerBundle implements Installation
      */
     public function up(Schema $schema)
     {
+        // add oro_installer_data_fixtures table
+        $table = $schema->createTable('oro_installer_data_fixtures');
+        $table->addColumn('id', 'integer', ['notnull' => true, 'autoincrement' => true]);
+        $table->addColumn('class_name', 'string', ['default' => null, 'notnull' => true, 'length' => 255]);
+        $table->addColumn('loaded_at', 'datetime', ['notnull' => true]);
+        $table->setPrimaryKey(['id']);
+
         return [];
     }
 }

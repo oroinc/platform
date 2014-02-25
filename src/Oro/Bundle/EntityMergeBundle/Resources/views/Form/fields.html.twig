@@ -28,11 +28,12 @@
         </tr>
         </thead>
         <tbody>
-        {% for child in form.children.fields %}
+        {% for child in form.children.fields.children|oro_entity_merge_sort_fields %}
             {{ form_widget(child) }}
         {% endfor %}
         </tbody>
     </table>
+    <p>* {{ 'oro.entity_merge.hint.other_related_entities'|trans }}</p>
 {% endblock %}
 
 {% block oro_entity_merge_javascript %}
@@ -83,7 +84,7 @@
         <label data-entity-key="{{ form.vars.name }}" data-entity-field-name="{{ form.vars.full_name }}"
                class="entity-merge-inline-label merge-entity-representative"
                for="{{ id }}" {% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-        {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
+            {{ oro_entity_merge_render_field_value(merge_field_data, merge_entity_offset) }}
         </label>
     </div>
 {% endblock %}
