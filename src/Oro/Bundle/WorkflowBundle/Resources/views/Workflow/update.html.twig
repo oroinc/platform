@@ -55,5 +55,37 @@
 {% endblock stats %}
 
 {% block content_data %}
-    {{ form_row(form) }}
+    {% set dataBlocks = [{
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [
+            {
+            'data': [
+                    form_row(form.label),
+                    form_row(form.related_entity),
+                    form_row(form.steps_display_ordered)
+                ]
+            }
+        ]
+    }] %}
+
+    {% set stepsListWidget %}
+    <h1>Hello</h1>
+    {% endset %}
+
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'Designer'|trans,
+            'subblocks': [
+                {
+                    'title': 'Workflow steps and transitions'|trans,
+                    'data': [stepsListWidget]
+                }
+        ]
+    }] ) %}
+
+    {% set id = 'workflow-designer' %}
+    {% set data = {
+        'dataBlocks': dataBlocks,
+    } %}
+    {{ parent() }}
 {% endblock content_data %}
