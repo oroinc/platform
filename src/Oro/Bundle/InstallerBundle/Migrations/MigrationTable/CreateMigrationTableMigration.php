@@ -14,19 +14,14 @@ class CreateMigrationTableMigration implements Migration
      */
     public function up(Schema $schema)
     {
-        /*$table = $schema->createTable();
-        $table->addColumn();
-        $table->addIndex();
-        $table->*/
-        return [
-            "CREATE TABLE " . self::MIGRATION_TABLE . " (
-                id INT NOT NULL AUTO_INCREMENT,
-                bundle VARCHAR(250) NOT NULL DEFAULT '',
-                version VARCHAR(250) NOT NULL,
-                date DATETIME NOT NULL,
-                PRIMARY KEY (id),
-                INDEX " . self::MIGRATION_TABLE . "_bundle (bundle)
-            );"
-        ];
+        $table = $schema->createTable(self::MIGRATION_TABLE);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('bundle', 'string', ['length' => 250]);
+        $table->addColumn('version', 'string', ['length' => 250]);
+        $table->addColumn('date', 'datetime');
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['bundle'], sprintf('IDX_%s__bundle', self::MIGRATION_TABLE));
+
+        return [];
     }
 }
