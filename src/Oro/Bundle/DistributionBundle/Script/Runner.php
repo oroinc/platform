@@ -120,7 +120,7 @@ class Runner
      */
     public function updateDBSchema()
     {
-        return $this->runCommand('doctrine:schema:update --force');
+        return $this->runCommand('oro:installer:migration:load');
     }
 
     /**
