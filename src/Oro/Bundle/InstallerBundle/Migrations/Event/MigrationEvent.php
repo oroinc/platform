@@ -8,15 +8,30 @@ use Oro\Bundle\InstallerBundle\Migrations\Migration;
 
 class MigrationEvent extends Event
 {
+    /**
+     * @var Migration[]
+     */
     protected $migrations = [];
 
+    /**
+     * @var Connection
+     */
     protected $connection;
 
+    /**
+     * @param Connection $connection
+     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
 
+    /**
+     * Adds a migration
+     *
+     * @param Migration $migration
+     * @param bool      $prepend If TRUE a migration is added to the beginning of the list
+     */
     public function addMigration(Migration $migration, $prepend = false)
     {
         if ($prepend) {
@@ -26,11 +41,24 @@ class MigrationEvent extends Event
         }
     }
 
+    /**
+     * Gets all migrations
+     *
+     * @return Migration[]
+     */
     public function getMigrations()
     {
         return $this->migrations;
     }
 
+    /**
+     * Prepares and executes an SQL query and returns the result as an associative array.
+     *
+     * @param string $sql    The SQL query.
+     * @param array  $params The query parameters.
+     * @param array  $types  The query parameter types.
+     * @return array
+     */
     public function getData($sql, array $params = array(), $types = array())
     {
         $this->ensureConnected();
@@ -61,6 +89,9 @@ class MigrationEvent extends Event
         return $result;
     }
 
+    /**
+     * Makes sure that the connection is open
+     */
     protected function ensureConnected()
     {
         if (!$this->connection->isConnected()) {

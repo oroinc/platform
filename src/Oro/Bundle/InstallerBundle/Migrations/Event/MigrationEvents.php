@@ -6,7 +6,7 @@ class MigrationEvents
 {
     /**
      * This event is raised before a list of migrations are built.
-     * You can use it to add your migrations to the begin of the migration list.
+     * You can use it to add additional migrations to the beginning of the migration list.
      *
      * @var string
      */
@@ -14,7 +14,7 @@ class MigrationEvents
 
     /**
      * This event is raised after a list of migrations are built.
-     * You can use it to add your migrations to the end of the migration list.
+     * You can use it to add additional migrations to the end of the migration list.
      *
      * @var string
      */
