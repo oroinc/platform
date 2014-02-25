@@ -1,25 +1,19 @@
 <?php
 
-namespace Oro\Bundle\InstallerBundle\Migrations\Schemas;
+namespace Oro\Bundle\InstallerBundle\Migrations\Schemas\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Installation;
+use Oro\Bundle\InstallerBundle\Migrations\Migration;
 
-class OroInstallerBundle implements Installation
+class UpdateBundleFixturesTable implements Migration
 {
-    /**
-     * @inheritdoc
-     */
-    public function getMigrationVersion()
-    {
-        return "v1_1";
-    }
-
     /**
      * @inheritdoc
      */
     public function up(Schema $schema)
     {
+        $schema->dropTable('oro_installer_bundle_version');
+
         // add oro_installer_data_fixtures table
         $table = $schema->createTable('oro_installer_data_fixtures');
         $table->addColumn('id', 'integer', ['notnull' => true, 'autoincrement' => true]);
