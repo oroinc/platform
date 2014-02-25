@@ -10,6 +10,7 @@ define(function (require) {
     var _bootstrapTooltip = require('bootstrap-tooltip');
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
+    var _widgetControlInitializer = require('oro/widget-control-initializer');
 
     var layout = {};
 
@@ -56,6 +57,8 @@ define(function (require) {
                     handlePopoverMouseout(e, popover);
                 }, 500);
             });
+
+        _widgetControlInitializer.init(container);
 
         setTimeout(function () {
             scrollspy.top();

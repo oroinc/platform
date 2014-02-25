@@ -97,6 +97,7 @@ config:
         'oro/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oro/error': 'bundles/oroui/js/error.js'
         'oro/init-layout': 'bundles/oroui/js/init-layout.js'
+        'oro/widget-control-initializer': 'bundles/oroui/js/widget-control-initializer.js'
         'oro/jquery-setup': 'bundles/oroui/js/jquery-setup.js'
         'oro/jquery-ui-datepicker-l10n': 'bundles/oroui/js/jquery-ui-datepicker-l10n.js'
         'oro/jquery-ui-timepicker-l10n': 'bundles/oroui/js/jquery-ui-timepicker-l10n.js'

@@ -225,11 +225,3 @@
     {%- endif %}
 {%- endmacro %}
 
-{% macro renderJs() %}
-    {% import 'OroUIBundle:Js:macros.html.twig' as JS %}
-    {{ JS.popupWidget({
-        'class': 'view-email-button',
-        'multiple': true,
-        'title': 'Send'|trans ~ ' ' ~ 'oro.email.entity_label'|trans|lower
-    }) }}
-{% endmacro %}

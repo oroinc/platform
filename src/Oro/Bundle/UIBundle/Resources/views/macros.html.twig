@@ -321,8 +321,20 @@
         {% if (parameters.visible is defined and not parameters.visible) %}
         style="display: none"
         {% endif -%}
+        {% if parameters.widget is defined and parameters.widget|length %}
+            {{ _self.renderWidgetElementAttributes(parameters.widget) }}
+        {% endif %}
         ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
     </a>
+{% endmacro %}
+
+{% macro renderWidgetElementAttributes(options) %}
+    {% for name, value in options %}
+        {% if (value is iterable) %}
+            {% set value = value|json_encode(constant('JSON_FORCE_OBJECT')) %}
+        {% endif %}
+        data-widget-{{ name }}="{{ value }}"
+    {% endfor %}
 {% endmacro %}
 
 {#
