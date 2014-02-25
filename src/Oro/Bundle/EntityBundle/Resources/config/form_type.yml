@@ -6,6 +6,8 @@ parameters:
     oro_entity.form.type.option_select.class:                  Oro\Bundle\EntityBundle\Form\Type\OptionSelectType
     oro_entity.form.type.entity_select.class:                  Oro\Bundle\EntityBundle\Form\Type\EntitySelectType
     oro_entity.form.handler.entity_select.class:               Oro\Bundle\EntityBundle\Form\Handler\EntitySelectHandler
+    oro_entity.form.guesser.form_config.class:                 Oro\Bundle\EntityBundle\Form\Guesser\FormConfigGuesser
+    oro_entity.form.guesser.doctrine_type.class:               Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser
 
 services:
     oro_entity.form.type.custom_entity:
@@ -61,3 +63,36 @@ services:
             - @doctrine.orm.entity_manager
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: entity_select, acl_resource: oro_search }
+
+    oro_entity.form.guesser.form_config:
+        class: %oro_entity.form.guesser.form_config.class%
+        arguments:
+            - @doctrine
+            - @oro_entity_config.provider.entity
+            - @oro_entity_config.provider.form
+        tags:
+            - { name: oro_form.guesser, priority: 10 }
+
+    oro_entityg.form.guesser.doctrine_type:
+        class: %oro_entity.form.guesser.doctrine_type.class%
+        arguments:
+            - @doctrine
+            - @oro_entity_config.provider.entity
+        calls:
+            - [addDoctrineTypeMapping, ["string", "text"]]
+            - [addDoctrineTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["smallint", "integer", { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["bigint", "integer", { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["boolean", "checkbox"]]
+            - [addDoctrineTypeMapping, ["decimal", "number"]]
+            - [addDoctrineTypeMapping, ["date", "oro_date"]]
+            - [addDoctrineTypeMapping, ["time", "time", { model_timezone: "UTC", view_timezone: "UTC" }]]
+            - [addDoctrineTypeMapping, ["datetime", "oro_datetime"]]
+            - [addDoctrineTypeMapping, ["datetimetz", "oro_datetime"]]
+            - [addDoctrineTypeMapping, ["text", "textarea"]]
+            - [addDoctrineTypeMapping, ["float", "number"]]
+            - [addDoctrineTypeMapping, ["guid", "text"]]
+            # cannot set default form types for compound and binary types (array, object, blob)
+        tags:
+            - { name: oro_form.guesser, priority: 0 }
+
