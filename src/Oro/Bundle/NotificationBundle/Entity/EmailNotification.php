@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * EmailNotification
  *
- * @ORM\Table("oro_notification_emailnotification")
+ * @ORM\Table("oro_notification_emailnotif")
  * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\EmailNotificationRepository")
  * @Config(
  *  defaultValues={

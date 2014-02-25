@@ -17,9 +17,9 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_access_group **/
         $table = $schema->createTable('oro_access_group');
-        $table->addColumn('id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('business_unit_owner_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 30, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['length' => 30]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_FEF9EDB75E237E06');
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
@@ -27,10 +27,10 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_access_role **/
         $table = $schema->createTable('oro_access_role');
-        $table->addColumn('id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('business_unit_owner_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('role', 'string', ['default' => null, 'notnull' => true, 'length' => 30, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('label', 'string', ['default' => null, 'notnull' => true, 'length' => 30, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('role', 'string', ['length' => 30]);
+        $table->addColumn('label', 'string', ['length' => 30]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
         $table->addIndex(['business_unit_owner_id'], 'IDX_673F65E759294170', []);
@@ -38,36 +38,36 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_session **/
         $table = $schema->createTable('oro_session');
-        $table->addColumn('id', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('sess_data', 'text', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('sess_time', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'string', ['length' => 255]);
+        $table->addColumn('sess_data', 'text', []);
+        $table->addColumn('sess_time', 'integer', []);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_session **/
 
         /** Generate table oro_user **/
         $table = $schema->createTable('oro_user');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('imap_configuration_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('business_unit_owner_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('status_id', 'smallint', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('username', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('email', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('name_prefix', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('first_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('middle_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('last_name', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('name_suffix', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('birthday', 'date', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('image', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('enabled', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('salt', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('password', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('confirmation_token', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('password_requested', 'datetime', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('last_login', 'datetime', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('login_count', 'integer', ['default' => '0', 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => true, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('createdAt', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('updatedAt', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('imap_configuration_id', 'integer', ['notnull' => false]);
+        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('status_id', 'smallint', ['notnull' => false]);
+        $table->addColumn('username', 'string', ['length' => 255]);
+        $table->addColumn('email', 'string', ['length' => 255]);
+        $table->addColumn('name_prefix', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('middle_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name_suffix', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('birthday', 'date', ['notnull' => false]);
+        $table->addColumn('image', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('enabled', 'boolean', []);
+        $table->addColumn('salt', 'string', ['length' => 255]);
+        $table->addColumn('password', 'string', ['length' => 255]);
+        $table->addColumn('confirmation_token', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('password_requested', 'datetime', ['notnull' => false]);
+        $table->addColumn('last_login', 'datetime', ['notnull' => false]);
+        $table->addColumn('login_count', 'integer', ['default' => '0', 'unsigned' => true]);
+        $table->addColumn('createdAt', 'datetime', []);
+        $table->addColumn('updatedAt', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['username'], 'UNIQ_F82840BCF85E0677');
         $table->addUniqueIndex(['email'], 'UNIQ_F82840BCE7927C74');
@@ -78,8 +78,8 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_user_access_group **/
         $table = $schema->createTable('oro_user_access_group');
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('group_id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('group_id', 'smallint', []);
         $table->setPrimaryKey(['user_id', 'group_id']);
         $table->addIndex(['user_id'], 'IDX_EC003EF3A76ED395', []);
         $table->addIndex(['group_id'], 'IDX_EC003EF3FE54D947', []);
@@ -87,8 +87,8 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_user_access_group_role **/
         $table = $schema->createTable('oro_user_access_group_role');
-        $table->addColumn('group_id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('role_id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('group_id', 'smallint', []);
+        $table->addColumn('role_id', 'smallint', []);
         $table->setPrimaryKey(['group_id', 'role_id']);
         $table->addIndex(['group_id'], 'IDX_E7E7E38EFE54D947', []);
         $table->addIndex(['role_id'], 'IDX_E7E7E38ED60322AC', []);
@@ -96,8 +96,8 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_user_access_role **/
         $table = $schema->createTable('oro_user_access_role');
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('role_id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('role_id', 'smallint', []);
         $table->setPrimaryKey(['user_id', 'role_id']);
         $table->addIndex(['user_id'], 'IDX_290571BEA76ED395', []);
         $table->addIndex(['role_id'], 'IDX_290571BED60322AC', []);
@@ -105,9 +105,9 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_user_api **/
         $table = $schema->createTable('oro_user_api');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('api_key', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('api_key', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['api_key'], 'UNIQ_296B6993C912ED9D');
         $table->addUniqueIndex(['user_id'], 'UNIQ_296B6993A76ED395');
@@ -115,8 +115,8 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_user_business_unit **/
         $table = $schema->createTable('oro_user_business_unit');
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('business_unit_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('business_unit_id', 'integer', []);
         $table->setPrimaryKey(['user_id', 'business_unit_id']);
         $table->addIndex(['user_id'], 'IDX_B190CE8FA76ED395', []);
         $table->addIndex(['business_unit_id'], 'IDX_B190CE8FA58ECB40', []);
@@ -124,19 +124,19 @@ class OroUserBundle implements Migration
 
         /** Generate table oro_user_email **/
         $table = $schema->createTable('oro_user_email');
-        $table->addColumn('id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('email', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('email', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_8600BE16A76ED395', []);
         /** End of generate table oro_user_email **/
 
         /** Generate table oro_user_status **/
         $table = $schema->createTable('oro_user_status');
-        $table->addColumn('id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('status', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('created_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'smallint', ['autoincrement' => true]);
+        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('status', 'string', ['length' => 255]);
+        $table->addColumn('created_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_D8DDF7AAA76ED395', []);
         /** End of generate table oro_user_status **/
@@ -200,7 +200,7 @@ class OroUserBundle implements Migration
 
         /** Add user as owner to oro_email_address table **/
         $table = $schema->getTable('oro_email_address');
-        $table->addColumn('owner_user_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('owner_user_id', 'integer', ['notnull' => false]);
         $table->addIndex(['owner_user_id'], 'IDX_FC9DBBC52B18554A', []);
 
         /** Generate foreign keys for table oro_email_address **/

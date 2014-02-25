@@ -17,20 +17,20 @@ class OroNotificationBundle implements Migration
 
         /** Generate table oro_notification_email_spool **/
         $table = $schema->createTable('oro_notification_email_spool');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('status', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('message', 'object', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('status', 'integer', []);
+        $table->addColumn('message', 'object', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['status'], 'notification_spool_status_idx', []);
         /** End of generate table oro_notification_email_spool **/
 
         /** Generate table oro_notification_emailnotification **/
         $table = $schema->createTable('oro_notification_emailnotification');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('recipient_list_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('template_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('event_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('recipient_list_id', 'integer', ['notnull' => false]);
+        $table->addColumn('template_id', 'integer', ['notnull' => false]);
+        $table->addColumn('event_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['recipient_list_id'], 'UNIQ_F3D05A52B9E3E89');
         $table->addIndex(['event_id'], 'IDX_F3D05A571F7E88B', []);
@@ -39,17 +39,17 @@ class OroNotificationBundle implements Migration
 
         /** Generate table oro_notification_event **/
         $table = $schema->createTable('oro_notification_event');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('description', 'text', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('description', 'text', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'UNIQ_2E2482DF5E237E06');
         /** End of generate table oro_notification_event **/
 
         /** Generate table oro_notification_recipient_group **/
         $table = $schema->createTable('oro_notification_recipient_group');
-        $table->addColumn('recipient_list_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('group_id', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('recipient_list_id', 'integer', []);
+        $table->addColumn('group_id', 'smallint', []);
         $table->setPrimaryKey(['recipient_list_id', 'group_id']);
         $table->addIndex(['recipient_list_id'], 'IDX_F6E3D23E2B9E3E89', []);
         $table->addIndex(['group_id'], 'IDX_F6E3D23EFE54D947', []);
@@ -57,16 +57,16 @@ class OroNotificationBundle implements Migration
 
         /** Generate table oro_notification_recipient_list **/
         $table = $schema->createTable('oro_notification_recipient_list');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('email', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('owner', 'boolean', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('email', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('owner', 'boolean', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_notification_recipient_list **/
 
         /** Generate table oro_notification_recipient_user **/
         $table = $schema->createTable('oro_notification_recipient_user');
-        $table->addColumn('recipient_list_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('recipient_list_id', 'integer', []);
+        $table->addColumn('user_id', 'integer', []);
         $table->setPrimaryKey(['recipient_list_id', 'user_id']);
         $table->addIndex(['recipient_list_id'], 'IDX_CAC79D892B9E3E89', []);
         $table->addIndex(['user_id'], 'IDX_CAC79D89A76ED395', []);

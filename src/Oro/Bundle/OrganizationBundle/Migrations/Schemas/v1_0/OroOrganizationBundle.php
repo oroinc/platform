@@ -17,25 +17,25 @@ class OroOrganizationBundle implements Migration
 
         /** Generate table oro_organization **/
         $table = $schema->createTable('oro_organization');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('currency', 'string', ['default' => null, 'notnull' => true, 'length' => 3, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('currency_precision', 'string', ['default' => null, 'notnull' => true, 'length' => 10, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('currency', 'string', ['length' => 3]);
+        $table->addColumn('currency_precision', 'string', ['length' => 10]);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_organization **/
 
         /** Generate table oro_business_unit **/
         $table = $schema->createTable('oro_business_unit');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('business_unit_owner_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('organization_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('phone', 'string', ['default' => null, 'notnull' => false, 'length' => 100, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('website', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('email', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('fax', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('created_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('updated_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', []);
+        $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('phone', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('website', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('email', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('fax', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('created_at', 'datetime', []);
+        $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['organization_id'], 'IDX_C033B2D532C8A3DE', []);
         $table->addIndex(['business_unit_owner_id'], 'IDX_C033B2D559294170', []);

@@ -17,10 +17,10 @@ class OroSidebarBundle implements Migration
 
         /** Generate table oro_sidebar_state **/
         $table = $schema->createTable('oro_sidebar_state');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('position', 'string', ['default' => null, 'notnull' => true, 'length' => 13, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('state', 'string', ['default' => null, 'notnull' => true, 'length' => 17, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('position', 'string', ['length' => 13]);
+        $table->addColumn('state', 'string', ['length' => 17]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['user_id', 'position'], 'sidebar_state_unique_idx');
         $table->addIndex(['user_id'], 'IDX_AB2BC195A76ED395', []);
@@ -28,13 +28,13 @@ class OroSidebarBundle implements Migration
 
         /** Generate table oro_sidebar_widget **/
         $table = $schema->createTable('oro_sidebar_widget');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('placement', 'string', ['default' => null, 'notnull' => true, 'length' => 50, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('position', 'smallint', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('widget_name', 'string', ['default' => null, 'notnull' => true, 'length' => 50, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('settings', 'array', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('state', 'string', ['default' => null, 'notnull' => true, 'length' => 22, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('user_id', 'integer', []);
+        $table->addColumn('placement', 'string', ['length' => 50]);
+        $table->addColumn('position', 'smallint', []);
+        $table->addColumn('widget_name', 'string', ['length' => 50]);
+        $table->addColumn('settings', 'array', ['notnull' => false]);
+        $table->addColumn('state', 'string', ['length' => 22]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_2FFBEA9CA76ED395', []);
         $table->addIndex(['user_id', 'placement'], 'sidebar_widgets_user_placement_idx', []);

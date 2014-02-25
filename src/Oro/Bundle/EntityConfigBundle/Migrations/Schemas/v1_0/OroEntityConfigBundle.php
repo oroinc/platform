@@ -17,66 +17,66 @@ class OroEntityConfigBundle implements Migration
 
         /** Generate table oro_entity_config **/
         $table = $schema->createTable('oro_entity_config');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('class_name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('created', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('updated', 'datetime', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('mode', 'string', ['default' => null, 'notnull' => true, 'length' => 8, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('class_name', 'string', ['length' => 255]);
+        $table->addColumn('created', 'datetime', []);
+        $table->addColumn('updated', 'datetime', ['notnull' => false]);
+        $table->addColumn('mode', 'string', ['length' => 8]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['class_name'], 'oro_entity_config_uq');
         /** End of generate table oro_entity_config **/
 
         /** Generate table oro_entity_config_field **/
         $table = $schema->createTable('oro_entity_config_field');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('entity_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('field_name', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('type', 'string', ['default' => null, 'notnull' => true, 'length' => 60, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('created', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('updated', 'datetime', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('mode', 'string', ['default' => null, 'notnull' => true, 'length' => 8, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('entity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('field_name', 'string', ['length' => 255]);
+        $table->addColumn('type', 'string', ['length' => 60]);
+        $table->addColumn('created', 'datetime', []);
+        $table->addColumn('updated', 'datetime', ['notnull' => false]);
+        $table->addColumn('mode', 'string', ['length' => 8]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['entity_id'], 'IDX_63EC23F781257D5D', []);
         /** End of generate table oro_entity_config_field **/
 
         /** Generate table oro_entity_config_log **/
         $table = $schema->createTable('oro_entity_config_log');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('user_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('logged_at', 'datetime', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('logged_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_4A4961FBA76ED395', []);
         /** End of generate table oro_entity_config_log **/
 
         /** Generate table oro_entity_config_log_diff **/
         $table = $schema->createTable('oro_entity_config_log_diff');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('log_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('class_name', 'string', ['default' => null, 'notnull' => true, 'length' => 100, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('field_name', 'string', ['default' => null, 'notnull' => false, 'length' => 100, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('scope', 'string', ['default' => null, 'notnull' => false, 'length' => 100, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('diff', 'text', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('log_id', 'integer', ['notnull' => false]);
+        $table->addColumn('class_name', 'string', ['length' => 100]);
+        $table->addColumn('field_name', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('scope', 'string', ['notnull' => false, 'length' => 100]);
+        $table->addColumn('diff', 'text', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['log_id'], 'IDX_D1F6D75AEA675D86', []);
         /** End of generate table oro_entity_config_log_diff **/
 
         /** Generate table oro_entity_config_optionset **/
         $table = $schema->createTable('oro_entity_config_optionset');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('field_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('label', 'string', ['default' => null, 'notnull' => false, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('priority', 'smallint', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('is_default', 'boolean', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('field_id', 'integer', ['notnull' => false]);
+        $table->addColumn('label', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('priority', 'smallint', ['notnull' => false]);
+        $table->addColumn('is_default', 'boolean', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['field_id'], 'IDX_CDC152C4443707B0', []);
         /** End of generate table oro_entity_config_optionset **/
 
         /** Generate table oro_entity_config_optionset_relation **/
         $table = $schema->createTable('oro_entity_config_optionset_relation');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('option_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('field_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('option_id', 'integer', ['notnull' => false]);
+        $table->addColumn('field_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_id', 'integer', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['field_id'], 'IDX_797D3D83443707B0', []);
         $table->addIndex(['option_id'], 'IDX_797D3D83A7C41D6F', []);
@@ -84,13 +84,13 @@ class OroEntityConfigBundle implements Migration
 
         /** Generate table oro_entity_config_value **/
         $table = $schema->createTable('oro_entity_config_value');
-        $table->addColumn('id', 'integer', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => true, 'comment' => '']);
-        $table->addColumn('field_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('entity_id', 'integer', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('code', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('scope', 'string', ['default' => null, 'notnull' => true, 'length' => 255, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('value', 'text', ['default' => null, 'notnull' => false, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
-        $table->addColumn('serializable', 'boolean', ['default' => null, 'notnull' => true, 'length' => null, 'precision' => 10, 'scale' => 0, 'fixed' => false, 'unsigned' => false, 'autoincrement' => false, 'comment' => '']);
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('field_id', 'integer', ['notnull' => false]);
+        $table->addColumn('entity_id', 'integer', ['notnull' => false]);
+        $table->addColumn('code', 'string', ['length' => 255]);
+        $table->addColumn('scope', 'string', ['length' => 255]);
+        $table->addColumn('value', 'text', ['notnull' => false]);
+        $table->addColumn('serializable', 'boolean', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['entity_id'], 'IDX_256E3E9B81257D5D', []);
         $table->addIndex(['field_id'], 'IDX_256E3E9B443707B0', []);
