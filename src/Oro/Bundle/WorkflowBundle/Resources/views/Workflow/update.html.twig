@@ -2,11 +2,11 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
-{% set title = form.vars.value.id
+{% set title = entity.name
     ? entity.name ~ ' - ' ~ 'Update'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
     : 'New'|trans ~ ' ' ~ 'oro.workflow.workflowdefinition.entity_label'|trans
 %}
-{% set formAction = form.vars.value.id ? path('oro_workflow_definition_update', { 'id': form.vars.value.id }) : path('oro_workflow_definition_create')  %}
+{% set formAction = entity.name ? path('oro_workflow_definition_update', { 'name': entity.name }) : path('oro_workflow_definition_create')  %}
 
 {% block head_script %}
     {{ parent() }}
@@ -17,13 +17,13 @@
 {% endblock %}
 
 {% block navButtons %}
-    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
+    {% if entity.name and resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
-            'dataUrl': path('oro_api_delete_lead', {'id': form.vars.value.id}),
+            'dataUrl': path('oro_api_workflow_definitiondelete', {'workflowDefinition': entity.name}),
             'dataRedirect': path('oro_workflow_definition_index'),
             'aCss': 'no-hash remove-button',
-            'id': 'btn-remove-lead',
-            'dataId': form.vars.value.id,
+            'id': 'btn-remove-workflow',
+            'dataId': entity.name,
             'entity_label': 'oro.workflow.workflowdefinition.entity_label'|trans
         }) }}
         {{ UI.buttonSeparator() }}
@@ -36,12 +36,12 @@
 {% endblock %}
 
 {% block pageHeader %}
-    {% if form.vars.value.id %}
+    {% if entity.name %}
         {% set breadcrumbs = {
-        'entity':      form.vars.value,
+        'entity':      entity,
         'indexPath':   path('oro_workflow_definition_index'),
-        'indexLabel': 'oro.worklfow.workflowdefinition.entity_plural_label'|trans,
-        'entityTitle': entity.name
+        'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+        'entityTitle': entity.label
         } %}
         {{ parent() }}
     {% else %}
@@ -50,8 +50,8 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    <li>{{ 'oro.workflow.workflow_definition.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.workflow.workflow_definition.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.workflow_definition.createdAt'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.workflow_definition.updatedAt'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block content_data %}

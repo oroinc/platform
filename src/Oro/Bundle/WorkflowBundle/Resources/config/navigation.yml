@@ -1,7 +1,7 @@
 oro_menu_config:
     items:
         workflow_definition_list:
-            label: 'oro.workflow.workflowdefinition.entity_label'
+            label: 'oro.workflow.workflowdefinition.entity_plural_label'
             extras:
                 description: 'Workflow management UI'
                 routes: ['/^oro_workflow_definition/']

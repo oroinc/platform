@@ -17,6 +17,14 @@ oro:
             entity_label:        Workflow Item
             entity_plural_label: Workflow Items
             entity_description:  Represent workflow item
+        workflowdefinition:
+            entity_label:        Workflow Definition
+            entity_plural_label: Workflow Definitions
+        workflow_definition:
+            createdAt:          Created At
+            updatedAt:          Updated At
+            label:              Label
+            system:             Is system
         action:
             general: "Workflow manipulations"
         enabled: enabled

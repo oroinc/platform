@@ -133,24 +133,25 @@ class WorkflowController extends Controller
 
     /**
      * @Route(
-     *      "/update/{workflowDefinitionName}",
+     *      "/update/{name}",
      *      name="oro_workflow_definition_update"
      * )
-     * @ParamConverter("workflowDefinition", options={"name"="workflowDefinitionName"})
      * @Template("OroWorkflowBundle:Workflow:update.html.twig")
      * @Acl(
      *      id="oro_workflow_definition_update",
      *      type="entity",
      *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="UPDATE"
+     *      permission="EDIT"
      * )
      * @param WorkflowDefinition $workflowDefinition
      * @return array
      */
     public function updateAction(WorkflowDefinition $workflowDefinition)
     {
+        $form = $this->get('oro_workflow.form.workflow_definition');
+        $form->setData($workflowDefinition);
         return array(
-            'form' => $this->get('oro_workflow.form.workflow_definition')->createView(),
+            'form' => $form->createView(),
             'entity' => $workflowDefinition
         );
     }

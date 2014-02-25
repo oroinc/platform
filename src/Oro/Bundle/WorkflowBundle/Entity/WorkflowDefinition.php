@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Entity;
 
+use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Table(
@@ -15,10 +18,25 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
  *      }
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
+ * @Config(
+ *  routeName="oro_workflow_definition_index",
+ *  routeView="oro_workflow_definition_update",
+ *  defaultValues={
+ *      "entity"={
+ *          "label"="Workflow Definition",
+ *          "plural_label"="Workflow Definitions",
+ *          "icon"="icon-exchange"
+ *      },
+ *      "security"={
+ *          "type"="ACL",
+ *          "group_name"=""
+ *      }
+ *  }
+ * )
  * @ORM\HasLifecycleCallbacks()
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class WorkflowDefinition
+class WorkflowDefinition implements DomainObjectInterface
 {
     /**
      * @var string
@@ -510,7 +528,7 @@ class WorkflowDefinition
             ->setStartStep($definition->getStartStep())
             ->setStepsDisplayOrdered($definition->isStepsDisplayOrdered())
             ->setEntityAcls($definition->getEntityAcls())
-            ->setSystem(true);
+            ->setSystem($definition->isSystem());
 
         return $this;
     }
@@ -594,5 +612,15 @@ class WorkflowDefinition
     public function beforeUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Returns a unique identifier for this domain object.
+     *
+     * @return string
+     */
+    public function getObjectIdentifier()
+    {
+        return $this->getName();
     }
 }

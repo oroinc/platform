@@ -22,7 +22,7 @@ class WorkflowDefinitionType extends AbstractType
                 )
             )
             ->add(
-                'entity',
+                'related_entity',
                 'oro_entity_choice',
                 array(
                     'label' => 'Related Entity',
