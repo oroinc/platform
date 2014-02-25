@@ -113,3 +113,6 @@ config:
         'oro/mobile/layout': 'bundles/oroui/js/mobile/layout.js'
         'oro/mobile/page-header': 'bundles/oroui/js/mobile/page-header.js'
         'oro/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'
+
+        'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
+        'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'

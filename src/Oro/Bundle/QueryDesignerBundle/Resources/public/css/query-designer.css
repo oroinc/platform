@@ -1,10 +1,10 @@
 .form-horizontal .query-designer-form .control-group {
     float: left;
 }
-.form-horizontal .query-designer-grouping-form .control-group {
+/*.form-horizontal .query-designer-grouping-form .control-group {
     float: none;
     max-width: none;
-}
+}*/
 .form-horizontal .query-designer-form .control-group label.control-label {
     width: auto;
     margin-left: 10px;
@@ -13,17 +13,17 @@
     margin-left: 10px;
     float: left;
 }
-.form-horizontal .query-designer-grouping-form .control-group .controls {
+/*.form-horizontal .query-designer-grouping-form .control-group .controls {
     margin-left: 140px;
     float: none;
-}
+*/
 .form-horizontal .query-designer-form .select2-container {
     width: 140px !important;
 }
-.form-horizontal .query-designer-grouping-form .select2-container {
+/*.form-horizontal .query-designer-grouping-form .select2-container {
     width: 100% !important;
     max-width: none;
-}
+}*/
 .form-horizontal .query-designer-form input.label-text {
     width: 90px;
 }
