@@ -140,5 +140,4 @@ class OroEntityConfigBundleInstaller implements Installation
 
         return [];
     }
-
-} 
+}
