@@ -642,31 +642,33 @@
             require(['oro/lazy-loading']);
         </script>
     {% endif %}
-    <ul class="nav nav-tabs">
-        {% for alias, options in aliases %}
-            <li{% if loop.index == 1 %} class="active"{% endif %}>
-                <a href="javascript:void(0);"
-                   data-target="#{{ alias }}"
-                   {% if lazyLoading %}data-alias="{{ alias }}" data-lazy-loading="{{ lazyLoading }}"{% endif %}
-                   data-toggle="tab">
-                    {{ options.title|default(alias)|trans }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    <div class="oro-tabs">
+        <ul class="nav nav-tabs">
+            {% for alias, options in aliases %}
+                <li{% if loop.index == 1 %} class="active"{% endif %}>
+                    <a href="javascript:void(0);"
+                       data-target="#{{ alias }}"
+                       {% if lazyLoading %}data-alias="{{ alias }}" data-lazy-loading="{{ lazyLoading }}"{% endif %}
+                       data-toggle="tab">
+                        {{ options.title|default(alias)|trans }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
 
-    <div class="tab-content">
-        {% for alias, options in aliases %}
-            {% set isfirstLoop = loop.index == 1 %}
-            {% set options = options|merge(
+        <div class="tab-content">
+            {% for alias, options in aliases %}
+                {% set isfirstLoop = loop.index == 1 %}
+                {% set options = options|merge(
                 {
                     'elementFirst': lazyLoading ? isfirstLoop : true,
                     'alias': alias
                 })
-            %}
-            <div class="tab-pane{% if isfirstLoop %} active{% endif %}" id="{{ alias }}">
-                {{ oro_widget_render(options) }}
-            </div>
-        {% endfor %}
+                %}
+                <div class="tab-pane{% if isfirstLoop %} active{% endif %}" id="{{ alias }}">
+                    {{ oro_widget_render(options) }}
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endmacro %}
