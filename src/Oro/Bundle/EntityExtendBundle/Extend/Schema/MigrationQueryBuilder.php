@@ -29,7 +29,7 @@ class MigrationQueryBuilder extends BaseMigrationQueryBuilder
         }
         $tables = $sm->listTables();
 
-        return new Schema(
+        return new ExtendSchema(
             $this->extendOptionManager,
             $tables,
             $sequences,

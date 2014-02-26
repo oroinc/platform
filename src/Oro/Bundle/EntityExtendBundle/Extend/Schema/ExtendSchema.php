@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
-use Doctrine\DBAL\Schema\Schema as BaseSchema;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 
-class Schema extends BaseSchema
+class ExtendSchema extends Schema
 {
     /**
      * @var ExtendOptionManager
@@ -28,7 +28,7 @@ class Schema extends BaseSchema
 
         $extendTables = [];
         foreach ($tables as $table) {
-            $extendTables[] = new Table($this->extendOptionManager, $table);
+            $extendTables[] = new ExtendTable($this->extendOptionManager, $table);
         }
 
         parent::__construct($extendTables, $sequences, $schemaConfig);
@@ -47,6 +47,6 @@ class Schema extends BaseSchema
      */
     public function createTable($tableName)
     {
-        return new Table($this->extendOptionManager, parent::createTable($tableName));
+        return new ExtendTable($this->extendOptionManager, parent::createTable($tableName));
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
-use Doctrine\DBAL\Schema\Table as BaseTable;
+use Doctrine\DBAL\Schema\Table;
 
-class Table extends BaseTable
+class ExtendTable extends Table
 {
     const EXTEND_OPTION_PREFIX_NAME = 'oro_extend';
     const EXTEND_OPTION_PREFIX = 'oro_extend:';
@@ -16,9 +16,9 @@ class Table extends BaseTable
 
     /**
      * @param ExtendOptionManager $extendOptionManager
-     * @param BaseTable           $baseTable
+     * @param Table               $baseTable
      */
-    public function __construct(ExtendOptionManager $extendOptionManager, BaseTable $baseTable)
+    public function __construct(ExtendOptionManager $extendOptionManager, Table $baseTable)
     {
         $this->extendOptionManager = $extendOptionManager;
 
