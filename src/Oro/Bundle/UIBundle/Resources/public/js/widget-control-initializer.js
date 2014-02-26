@@ -1,6 +1,6 @@
 /* global define */
-define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager'],
-    function($, _, DialogWidget, WidgetManager) {
+define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/mediator'],
+    function($, _, DialogWidget, WidgetManager, mediator) {
         'use strict';
 
         /**
@@ -17,6 +17,7 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager'],
                 );
             },
             initWidgetControlElement: function (controlElement) {
+                var self = this;
                 controlElement = $(controlElement);
                 if (controlElement.data('widget-initialized')) {
                     return;
@@ -34,7 +35,9 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager'],
                             function (event) {
                                 var widgetOptions     = $.extend(true, {}, controlElement.data('widget-options'));
                                 var allowMultiple     = controlElement.data('widget-multiple');
-                                var reloadWidgetEvent = controlElement.data('widget-reload-widget-event');
+                                var reloadEvent       = controlElement.data('widget-reload-event')
+                                    || 'widget_remove:' + widgetOptions.alias;
+                                var reloadGridName    = controlElement.data('widget-gridname');
                                 var reloadWidgetAlias = controlElement.data('widget-reload-widget-alias');
 
                                 if (!widgetOptions.url && controlElement.data('url')) {
@@ -53,12 +56,18 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager'],
                                 // Create and open widget
                                 var widget = new Widget(widgetOptions);
 
-                                if (reloadWidgetEvent && reloadWidgetAlias) {
-                                    // reload widget with list of contact calls
-                                    widget.on(reloadWidgetEvent, function () {
+                                if (reloadWidgetAlias) {
+                                    mediator.on(reloadEvent, function () {
                                         WidgetManager.getWidgetInstanceByAlias(reloadWidgetAlias, function (widget) {
                                             widget.loadContent();
                                         });
+                                    });
+                                }
+
+                                if (reloadGridName) {
+                                    mediator.on(reloadEvent, function () {
+                                        console.log(reloadGridName)
+                                        mediator.trigger('datagrid:doRefresh:' + reloadGridName);
                                     });
                                 }
 
