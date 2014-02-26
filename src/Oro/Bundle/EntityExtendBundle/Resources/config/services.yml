@@ -1,5 +1,6 @@
 parameters:
     oro_entity_extend.entity.cache.warmer.class:            Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
+    oro_entity_extend.extend.option_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendOptionManager
     oro_entity_extend.extend.extend_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\ExtendManager
     oro_entity_extend.extension.extend_entity.class:        Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                   Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
@@ -15,6 +16,11 @@ services:
             - @oro_entity_extend.tools.dumper
         tags:
             - { name: kernel.cache_warmer,  priority: 30 }
+
+    oro_entity_extend.extend.option_manager:
+        class:                                              %oro_entity_extend.extend.option_manager.class%
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
 
     oro_entity_extend.extend.extend_manager:
         class:                                              %oro_entity_extend.extend.extend_manager.class%

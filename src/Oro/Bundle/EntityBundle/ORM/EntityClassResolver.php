@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
@@ -47,6 +48,27 @@ class EntityClassResolver
         }
 
         return $this->doctrine->getAliasNamespace($split[0]) . '\\' . $split[1];
+    }
+
+    /**
+     * Gets an entity full class name by entity table name
+     *
+     * @param string $tableName
+     * @return string|null
+     */
+    public function getEntityClassByTableName($tableName)
+    {
+        foreach (array_keys($this->doctrine->getManagers()) as $name) {
+            /** @var ClassMetadata[] $allMetadata */
+            $allMetadata = $this->doctrine->getManager($name)->getMetadataFactory()->getAllMetadata();
+            foreach ($allMetadata as $metadata) {
+                if ($metadata->getTableName() === $tableName) {
+                    return $metadata->getReflectionClass()->getName();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
