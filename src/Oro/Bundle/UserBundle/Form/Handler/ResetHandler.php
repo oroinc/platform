@@ -12,7 +12,7 @@ class ResetHandler extends AbstractUserHandler
     protected function onSuccess(User $user)
     {
         $user
-            ->setPlainPassword($this->form->getData()->plainPassword)
+            ->setPlainPassword($this->form->getData()->getPlainPassword())
             ->setConfirmationToken(null)
             ->setPasswordRequestedAt(null)
             ->setEnabled(true);

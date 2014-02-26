@@ -39,4 +39,16 @@ class ExtendHelper
 
         return strtolower('oro_extend_' . $selfClassName . '_' . $targetClassName . '_' . $selfFieldId->getFieldName());
     }
+
+    /**
+     * @param string $entityClass
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param string $targetEntityClass
+     * @return string
+     */
+    public static function buildRelationKey($entityClass, $fieldName, $fieldType, $targetEntityClass)
+    {
+        return implode('|', [$fieldType, $entityClass, $targetEntityClass, $fieldName]);
+    }
 }

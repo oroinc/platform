@@ -186,7 +186,7 @@ class OptionSelectType extends AbstractType
     {
         $entityId = null;
         $formData = $event->getForm()->getRoot()->getData();
-        if ($formData) {
+        if ($formData && method_exists($formData, 'getId')) {
             $entityId = $formData->getId();
         }
 

@@ -58,4 +58,40 @@ class ConfigHelper
 
         return implode('.', $keyArray);
     }
+
+    /**
+     * Extracts module and entity names from the given full class name
+     *
+     * @param string $className
+     * @return array [$moduleName, $entityName]
+     */
+    public static function getModuleAndEntityNames($className)
+    {
+        if (empty($className)) {
+            return ['', ''];
+        }
+
+        $parts = explode('\\', $className);
+        $entityName = $parts[count($parts) - 1];
+
+        $moduleName = null;
+        $isBundle = false;
+        for ($i = 0; $i < count($parts) - 1; $i++) {
+            $part = $parts[$i];
+            if (!in_array($part, array('Bundle', 'Bundles', 'Entity', 'Entities'))) {
+                if (substr($part, -6) === 'Bundle') {
+                    $isBundle = true;
+                }
+                $moduleName .= $part;
+            } elseif (count($parts) >= 4) {
+                $isBundle = true;
+            }
+        }
+
+        if (!$moduleName || !$isBundle) {
+            $moduleName = 'System';
+        }
+
+        return [$moduleName, $entityName];
+    }
 }

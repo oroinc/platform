@@ -70,4 +70,39 @@ class Metadata implements MetadataInterface
 
         return $this->options;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function merge($data, $override = true)
+    {
+        foreach ($this->convertToArray($data) as $code => $value) {
+            if ($override || !$this->has($code)) {
+                $this->set($code, $value);
+            }
+        }
+    }
+
+    /**
+     * Converts $data to array
+     *
+     * @param MetadataInterface|array $data
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    protected function convertToArray($data)
+    {
+        if ($data instanceof MetadataInterface) {
+            $data = $data->all();
+        } elseif (!is_array($data)) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    '$data must be instance of "%s" or array, "%s" given',
+                    'Oro\\Bundle\\EntityMergeBundle\\Metadata\\MetadataInterface',
+                    is_object($data) ? get_class($data) : gettype($data)
+                )
+            );
+        }
+        return $data;
+    }
 }

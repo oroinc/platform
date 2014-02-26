@@ -5,13 +5,21 @@ oro:
             select_error: Select entities to merge.
         action:
             merge: Merge {{ label }}
+        acl:
+            merge: Merge entities
+
+        hint:
+            other_related_entities: All other related entities will be merged using an append strategy
 
         merge_modes:
             replace: Replace
-            unite: Unite
+            unite: Append
 
         form:
             master_record: Master Record
             strategy: Strategy
-            select_all: Select all
+            select_all: Select All Values
             merge_values: Merge Values
+            strategy_tooltip:  “Replace” strategy allows to value of selected field. With “Append” strategy selected value will be appended to master record value.
+            master_record_tooltip: Field values from all records will be merged to Master Record, all other records will be deleted.
+            merge_button: Merge

@@ -4,12 +4,15 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -19,7 +22,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
  * EntityConfig controller.
@@ -130,23 +132,7 @@ class ConfigController extends Controller
      */
     public function viewAction(EntityConfigModel $entity)
     {
-        /**
-         * define Entity module and name
-         */
-        $entityName = $moduleName = '';
-        $className  = explode('\\', $entity->getClassName());
-        if (count($className) > 1) {
-            foreach ($className as $i => $name) {
-                if (count($className) - 1 == $i) {
-                    $entityName = $name;
-                } elseif (!in_array($name, ['Bundle', 'Entity'])) {
-                    $moduleName .= $name;
-                }
-            }
-        } else {
-            $entityName = $className[0];
-            $moduleName = 'Custom';
-        }
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
 
         /** @var \Oro\Bundle\EntityConfigBundle\Config\ConfigManager $configManager */
         $configManager = $this->get('oro_entity_config.config_manager');
@@ -386,23 +372,7 @@ class ConfigController extends Controller
      */
     public function infoAction(EntityConfigModel $entity)
     {
-        /**
-         * define Entity module and name
-         */
-        $entityName = $moduleName = '';
-        $className  = explode('\\', $entity->getClassName());
-        if (count($className) > 1) {
-            foreach ($className as $i => $name) {
-                if (count($className) - 1 == $i) {
-                    $entityName = $name;
-                } elseif (!in_array($name, ['Bundle', 'Entity'])) {
-                    $moduleName .= $name;
-                }
-            }
-        } else {
-            $entityName = $className[0];
-            $moduleName = 'Custom';
-        }
+        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($entity->getClassName());
 
         /** @var ConfigProvider $entityConfigProvider */
         $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
@@ -413,14 +383,17 @@ class ConfigController extends Controller
 
         /** @var ConfigProvider $ownershipConfigProvider */
         $ownershipConfigProvider = $this->get('oro_entity_config.provider.ownership');
+        $ownerTypes = $this->get('oro_organization.method.get_ownership_type')->execute();
+        $ownerType = $ownershipConfigProvider->getConfig($entity->getClassName())->get('owner_type');
+        $ownerType = $ownerTypes[empty($ownerType) ? 'NONE' : $ownerType];
 
         return [
-            'entity'           => $entity,
-            'entity_config'    => $entityConfigProvider->getConfig($entity->getClassName()),
-            'entity_extend'    => $extendConfig,
-            'entity_ownership' => $ownershipConfigProvider->getConfig($entity->getClassName()),
-            'entity_name'      => $entityName,
-            'module_name'      => $moduleName,
+            'entity'            => $entity,
+            'entity_config'     => $entityConfigProvider->getConfig($entity->getClassName()),
+            'entity_extend'     => $extendConfig,
+            'entity_owner_type' => $ownerType,
+            'entity_name'       => $entityName,
+            'module_name'       => $moduleName,
         ];
     }
 
