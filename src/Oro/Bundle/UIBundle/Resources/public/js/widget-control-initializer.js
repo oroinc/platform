@@ -66,7 +66,6 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/
 
                                 if (reloadGridName) {
                                     mediator.on(reloadEvent, function () {
-                                        console.log(reloadGridName)
                                         mediator.trigger('datagrid:doRefresh:' + reloadGridName);
                                     });
                                 }
