@@ -13,9 +13,9 @@ require(['oroui/js/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'orotranslation/js/translator', './app',
-        'oroui/js/mediator', './layout', 'oronavigation/js/navigation',
-        './delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
+        'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
+        'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
         'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
     ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
