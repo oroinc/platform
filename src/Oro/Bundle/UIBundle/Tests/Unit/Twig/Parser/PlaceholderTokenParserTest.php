@@ -5,183 +5,159 @@ use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 
 class PlaceholderTokenParserTest extends \PHPUnit_Framework_TestCase
 {
-    const LINE = 12;
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $parser;
 
     /**
-     * @var \Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $placeholder;
+    protected $expressionParser;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $stream;
+
+    /**
+     * @var PlaceholderTokenParser
+     */
+    protected $tokenParser;
 
     public function setUp()
     {
-        $this->placeholder = new PlaceholderTokenParser(
-            [
-                'test_position' => [
-                    'items' => [
-                        'test_item' => []
-                    ]
-                ]
-            ],
-            'test_class'
-        );
-    }
-
-    /**
-     * @param \Twig_TokenStream $stream
-     * @param string            $getExpressionParser
-     * @param string            $parseExpression
-     *
-     * @dataProvider streamProvider
-     */
-    public function testParse($stream, $getExpressionParser, $parseExpression)
-    {
-        $startToken = new \Twig_Token(\Twig_Token::NAME_TYPE, 'placeholder', self::LINE);
-
-        $this->placeholder->setParser(
-            $this->getParser($stream, $getExpressionParser, $parseExpression)
-        );
-
-        $resultNode = $this->placeholder->parse($startToken);
-
-        $this->assertEquals(self::LINE, $resultNode->getLine());
-        $this->assertEquals('placeholder', $resultNode->getNodeTag());
-    }
-
-    public function streamProvider()
-    {
-        return [
-            'name' => [
-                'stream' => new \Twig_TokenStream(
-                    [
-                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'test_position', self::LINE),
-                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
-                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                    ]
-                ),
-                'getExpressionParser' => 'once',
-                'parseExpression' => 'once'
-            ],
-            'string' => [
-                'stream' => new \Twig_TokenStream(
-                    [
-                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
-                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
-                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                    ]
-                ),
-                'getExpressionParser' => 'once',
-                'parseExpression' => 'once'
-            ],
-            'concat' => [
-                'stream' => new \Twig_TokenStream(
-                    [
-                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test', self::LINE),
-                        new \Twig_Token(\Twig_Token::OPERATOR_TYPE, '~', self::LINE),
-                        new \Twig_Token(\Twig_Token::STRING_TYPE, '_position', self::LINE),
-                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'with', self::LINE),
-                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                    ]
-                ),
-                'getExpressionParser' => 'once',
-                'parseExpression' => 'once'
-            ],
-            'noparams' => [
-                'stream' => new \Twig_TokenStream(
-                    [
-                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
-                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                    ]
-                ),
-                'getExpressionParser' => 'never',
-                'parseExpression' => 'never'
-            ]
-        ];
-    }
-
-    /**
-     * @param \Twig_TokenStream $stream
-     * @param string            $exceptionMessage
-     * @dataProvider wrongStreamProvider
-     */
-    public function testValidation($stream, $exceptionMessage)
-    {
-        $this->setExpectedException(
-            '\Twig_Error_Syntax',
-            $exceptionMessage
-        );
-
-        $startToken = new \Twig_Token(\Twig_Token::NAME_TYPE, 'placeholder', self::LINE);
-
-        $this->placeholder->setParser($this->getParser($stream));
-        $this->placeholder->parse($startToken);
-    }
-
-    public function wrongStreamProvider()
-    {
-        return [
-            'punctuation' => [
-                'stream' => new \Twig_TokenStream(
-                    [
-                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
-                        new \Twig_Token(\Twig_Token::PUNCTUATION_TYPE, '.', self::LINE),
-                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                    ]
-                ),
-                'exceptionMessage' => 'Unexpected token "punctuation" of value "placeholder" at line 12'
-            ],
-            'operator' => [
-                'stream' => new \Twig_TokenStream(
-                    [
-                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
-                        new \Twig_Token(\Twig_Token::OPERATOR_TYPE, 'set', self::LINE),
-                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                    ]
-                ),
-                'exceptionMessage' => 'Unexpected token "operator" of value "placeholder" at line 12'
-            ],
-            'filter' => [
-                'stream' => new \Twig_TokenStream(
-                    [
-                        new \Twig_Token(\Twig_Token::STRING_TYPE, 'test_position', self::LINE),
-                        new \Twig_Token(\Twig_Token::PUNCTUATION_TYPE, '|', self::LINE),
-                        new \Twig_Token(\Twig_Token::NAME_TYPE, 'lower', self::LINE),
-                        new \Twig_Token(\Twig_Token::BLOCK_END_TYPE, '', self::LINE),
-                        new \Twig_Token(\Twig_Token::EOF_TYPE, '', self::LINE),
-                    ]
-                ),
-                'exceptionMessage' => 'Unexpected token "punctuation" of value "placeholder"'
-            ]
-        ];
-    }
-
-    protected function getParser($stream, $getExpressionParser = 'any', $parseExpression = 'any')
-    {
-        $expressionParser = $this->getMockBuilder('\Twig_ExpressionParser')
+        $this->stream = $this->getMockBuilder('Twig_TokenStream')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $parser = $this->getMockBuilder('\Twig_Parser')
+        $this->expressionParser = $this->getMockBuilder('Twig_ExpressionParser')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $parser->expects($this->once())
+        $this->parser = $this->getMockBuilder('Twig_Parser')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->parser->expects($this->any())
             ->method('getStream')
-            ->will($this->returnValue($stream));
+            ->will($this->returnValue($this->stream));
 
-        $parser->expects($this->$getExpressionParser())
+        $this->parser->expects($this->any())
             ->method('getExpressionParser')
-            ->will($this->returnValue($expressionParser));
+            ->will($this->returnValue($this->expressionParser));
 
-        $expressionParser->expects($this->$parseExpression())
+        $this->tokenParser = new PlaceholderTokenParser();
+        $this->tokenParser->setParser($this->parser);
+    }
+
+    public function testParseSimpleNameWithoutVariables()
+    {
+        $expectedLine = 101;
+        $expectedNameExpression = $this->createExpressionNode();
+        $expectedVariablesExpression = new \Twig_Node_Expression_Constant(array(), $expectedLine);
+
+        $actualToken = $this->createToken();
+
+        $this->stream->expects($this->at(0))
+            ->method('test')
+            ->with(\Twig_Token::NAME_TYPE)
+            ->will($this->returnValue(false));
+
+        $this->expressionParser->expects($this->once())
             ->method('parseExpression')
-            ->will($this->returnValue(null));
+            ->will($this->returnValue($expectedNameExpression));
 
-        return $parser;
+        $actualToken->expects($this->atLeastOnce())
+            ->method('getLine')
+            ->will($this->returnValue($expectedLine));
+
+        $this->stream->expects($this->at(1))
+            ->method('nextIf')
+            ->with(\Twig_Token::NAME_TYPE, 'with')
+            ->will($this->returnValue(false));
+
+        $this->stream->expects($this->at(2))
+            ->method('expect')
+            ->with(\Twig_Token::BLOCK_END_TYPE);
+
+        $actualNode = $this->tokenParser->parse($actualToken);
+        $this->assertInstanceOf('Oro\\Bundle\\UIBundle\\Twig\\Node\\PlaceholderNode', $actualNode);
+
+        $this->assertAttributeEquals($expectedLine, 'lineno', $actualNode);
+        $this->assertAttributeEquals('placeholder', 'tag', $actualNode);
+        $this->assertAttributeEquals($expectedNameExpression, 'nameNode', $actualNode);
+        $this->assertAttributeEquals($expectedVariablesExpression, 'variablesNode', $actualNode);
+    }
+
+    public function testParseExpressionNameWithVariables()
+    {
+        $expectedLine = 101;
+        $expectedVariablesExpression = $this->createExpressionNode();
+
+        $actualToken = $this->createToken();
+
+        $this->stream->expects($this->at(0))
+            ->method('test')
+            ->with(\Twig_Token::NAME_TYPE)
+            ->will($this->returnValue(true));
+
+        $nameToken = $this->createToken();
+
+        $this->stream->expects($this->at(1))
+            ->method('getCurrent')
+            ->will($this->returnValue($nameToken));
+
+        $nameTokenValue = 'nameTokenValue';
+        $nameTokenLine = 102;
+        $nameToken->expects($this->once())
+            ->method('getValue')
+            ->will($this->returnValue($nameTokenValue));
+
+        $nameToken->expects($this->once())
+            ->method('getLine')
+            ->will($this->returnValue($nameTokenLine));
+
+        $this->stream->expects($this->at(2))
+            ->method('next');
+
+        $this->stream->expects($this->at(3))
+            ->method('nextIf')
+            ->with(\Twig_Token::NAME_TYPE, 'with')
+            ->will($this->returnValue(true));
+
+        $this->expressionParser->expects($this->once())
+            ->method('parseExpression')
+            ->will($this->returnValue($expectedVariablesExpression));
+
+        $this->stream->expects($this->at(4))
+            ->method('expect')
+            ->with(\Twig_Token::BLOCK_END_TYPE);
+
+        $actualToken->expects($this->atLeastOnce())
+            ->method('getLine')
+            ->will($this->returnValue($expectedLine));
+
+        $actualNode = $this->tokenParser->parse($actualToken);
+        $this->assertInstanceOf('Oro\\Bundle\\UIBundle\\Twig\\Node\\PlaceholderNode', $actualNode);
+
+        $this->assertAttributeEquals($expectedLine, 'lineno', $actualNode);
+        $this->assertAttributeEquals('placeholder', 'tag', $actualNode);
+        $this->assertAttributeInstanceOf('Twig_Node_Expression_Filter_Default', 'nameNode', $actualNode);
+        $this->assertAttributeEquals($expectedVariablesExpression, 'variablesNode', $actualNode);
+    }
+
+    protected function createExpressionNode()
+    {
+        return $this->getMockBuilder('Twig_Node_Expression')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    protected function createToken()
+    {
+        return $this->getMockBuilder('Twig_Token')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

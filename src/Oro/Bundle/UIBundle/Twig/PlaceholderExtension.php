@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
+use Symfony\Component\HttpKernel\Controller\ControllerReference;
+
 class PlaceholderExtension extends \Twig_Extension
 {
+    const HTTP_KERNEL_EXTENSION_NAME = 'http_kernel';
+
     const EXTENSION_NAME = 'oro_placeholder';
 
     /**
@@ -18,10 +23,12 @@ class PlaceholderExtension extends \Twig_Extension
 
     /**
      * @param \Twig_Environment $environment
-     * @param array             $placeholders
+     * @param array $placeholders
      */
-    public function __construct(\Twig_Environment $environment, array $placeholders)
-    {
+    public function __construct(
+        \Twig_Environment $environment,
+        array $placeholders
+    ) {
         $this->environment = $environment;
         $this->placeholders = $placeholders;
     }
@@ -36,7 +43,7 @@ class PlaceholderExtension extends \Twig_Extension
         return array(
             'placeholder' => new \Twig_Function_Method(
                 $this,
-                'renderPlaceholders',
+                'renderPlaceholder',
                 array(
                     'is_safe' => array('html')
                 )
@@ -45,18 +52,35 @@ class PlaceholderExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $name
-     * @param array  $parameters
-     * @param string $delimiter
+     * Render placeholder by name
      *
-     * @return array
+     * @param string $name
+     * @param array $variables
+     * @param string $delimiter
+     * @return string
+     * @throws \RuntimeException If placeholder cannot be rendered.
      */
-    public function renderPlaceholders($name, array $parameters = [], $delimiter = '')
+    public function renderPlaceholder($name, array $variables = array(), $delimiter = '')
     {
         $renderedBlocks = [];
         if (isset($this->placeholders[$name]['items'])) {
             foreach ($this->placeholders[$name]['items'] as $block) {
-                $renderedBlocks[] = $this->environment->render($block['template'], $parameters);
+                if (isset($block['template'])) {
+                    $renderedBlocks[] = $this->environment->render($block['template'], $variables);
+                } elseif (isset($block['action'])) {
+                    /** @var HttpKernelExtension $kernelExtension */
+                    $kernelExtension = $this->environment->getExtension(self::HTTP_KERNEL_EXTENSION_NAME);
+                    $renderedBlocks[] = $kernelExtension->renderFragment(
+                        $kernelExtension->controller($block['action'], $variables)
+                    );
+                } else {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Cannot render placeholder item with keys "%s". Expects "template" or "action" key.',
+                            implode('", "', $block)
+                        )
+                    );
+                }
             }
         }
 
