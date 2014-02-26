@@ -1,13 +1,16 @@
 parameters:
-    oro_installer.scenario.class:                 Oro\Bundle\InstallerBundle\Process\InstallerScenario
-    oro_installer.requirements.class:             Oro\Bundle\InstallerBundle\Requirement\OroRequirements
-    oro_installer.requirements.settings.class:    Oro\Bundle\InstallerBundle\Requirement\SettingsRequirements
-    oro_installer.requirements.extensions.class:  Oro\Bundle\InstallerBundle\Requirement\ExtensionsRequirements
-    oro_installer.requirements.filesystem.class:  Oro\Bundle\InstallerBundle\Requirement\FilesystemRequirements
-    oro_installer.yaml_persister.class:           Oro\Bundle\InstallerBundle\Persister\YamlPersister
-    oro_installer.listener.request.class:         Oro\Bundle\InstallerBundle\EventListener\RequestListener
-    oro_installer.script_manager.class:           Oro\Bundle\InstallerBundle\ScriptManager
-    oro_installer.fixtures.loader.class:          Oro\Bundle\InstallerBundle\Migrations\FixturesLoader
+    oro_installer.scenario.class:                     Oro\Bundle\InstallerBundle\Process\InstallerScenario
+    oro_installer.requirements.class:                 Oro\Bundle\InstallerBundle\Requirement\OroRequirements
+    oro_installer.requirements.settings.class:        Oro\Bundle\InstallerBundle\Requirement\SettingsRequirements
+    oro_installer.requirements.extensions.class:      Oro\Bundle\InstallerBundle\Requirement\ExtensionsRequirements
+    oro_installer.requirements.filesystem.class:      Oro\Bundle\InstallerBundle\Requirement\FilesystemRequirements
+    oro_installer.yaml_persister.class:               Oro\Bundle\InstallerBundle\Persister\YamlPersister
+    oro_installer.listener.request.class:             Oro\Bundle\InstallerBundle\EventListener\RequestListener
+    oro_installer.script_manager.class:               Oro\Bundle\InstallerBundle\ScriptManager
+    oro_installer.fixtures.loader.class:              Oro\Bundle\InstallerBundle\Migrations\DataFixturesLoader
+    oro_installer.migrations.loader.class:            Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader
+    oro_installer.migrations.query_builder.class:     Oro\Bundle\InstallerBundle\Migrations\MigrationQueryBuilder
+    oro_installer.migration.pre_up.listener.class:    Oro\Bundle\InstallerBundle\Migrations\EventListener\PreUpMigrationListener
 
 services:
     oro_installer.scenario:
@@ -32,11 +35,29 @@ services:
 
     oro_installer.script_manager:
         class: %oro_installer.script_manager.class%
-        arguments: [@kernel]
+        arguments:
+            - @kernel
 
     oro_installer.fixtures.loader:
         class: %oro_installer.fixtures.loader.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - @kernel
             - @service_container
+
+    oro_installer.migrations.loader:
+        class: %oro_installer.migrations.loader.class%
+        arguments:
+            - @kernel
+            - @doctrine.dbal.default_connection
+            - @service_container
+            - @event_dispatcher
+
+    oro_installer.migrations.query_builder:
+        class: %oro_installer.migrations.query_builder.class%
+        arguments:
+            - @doctrine.dbal.default_connection
+
+    oro_installer.migration.pre_up.listener:
+        class: %oro_installer.migration.pre_up.listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.pre_up , method: onPreUp }

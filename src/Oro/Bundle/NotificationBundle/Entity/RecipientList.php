@@ -13,7 +13,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 /**
  * EmailNotification
  *
- * @ORM\Table("oro_notification_recipient_list")
+ * @ORM\Table("oro_notification_recipient_lst")
  * @ORM\Entity(repositoryClass="Oro\Bundle\NotificationBundle\Entity\Repository\RecipientListRepository")
  */
 class RecipientList
@@ -30,7 +30,7 @@ class RecipientList
     /**
      * @var User[]
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinTable(name="oro_notification_recipient_user",
+     * @ORM\JoinTable(name="oro_notification_recipient_usr",
      *      joinColumns={@ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
@@ -40,7 +40,7 @@ class RecipientList
     /**
      * @var Group[]
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\Group")
-     * @ORM\JoinTable(name="oro_notification_recipient_group",
+     * @ORM\JoinTable(name="oro_notification_recipient_grp",
      *      joinColumns={@ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id", onDelete="CASCADE")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )

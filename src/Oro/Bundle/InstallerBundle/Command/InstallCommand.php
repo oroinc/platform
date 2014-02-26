@@ -146,7 +146,8 @@ class InstallCommand extends ContainerAwareCommand
                     '--process-timeout' => 360
                 )
             )
-            ->runCommand('doctrine:schema:create')
+            //->runCommand('doctrine:schema:create')
+            ->runCommand('oro:installer:migration:load')
             ->runCommand('oro:entity-config:init')
             ->runCommand('oro:entity-extend:init')
             ->runCommand(

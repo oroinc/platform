@@ -1,2 +1,2 @@
 bundles:
-    - Oro\Bundle\IntegrationBundle\OroIntegrationBundle
+    - { name: Oro\Bundle\IntegrationBundle\OroIntegrationBundle, priority: -40 }
