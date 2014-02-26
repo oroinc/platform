@@ -1,9 +1,5 @@
 /* global define */
-<<<<<<< HEAD
-define(['jquery', 'underscore', 'oro/datafilter/date-filter', 'oro/locale-settings', 'jquery-ui-datevariables'],
-=======
-define(['jquery', 'underscore', 'oro/datafilter/date-filter', 'oro/locale-settings', 'jquery-ui-timepicker'],
->>>>>>> task/BAP-3040
+define(['jquery', 'underscore', 'oro/datafilter/date-filter', 'oro/locale-settings', 'jquery-ui-timepicker', 'jquery-ui-datevariables'],
     function($, _, DateFilter, localeSettings) {
     'use strict';
     /**
