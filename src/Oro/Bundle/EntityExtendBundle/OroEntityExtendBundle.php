@@ -13,6 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
 use Symfony\Component\Process\Process;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 
@@ -36,6 +37,7 @@ class OroEntityExtendBundle extends Bundle
         $this->ensureInitialized();
 
         $container->addCompilerPass(new EntityManagerPass());
+        $container->addCompilerPass(new MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
                 array(

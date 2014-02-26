@@ -15,7 +15,8 @@ class SchemaGenerator
     /** @var  ExtendManager */
     protected $extendManager;
 
-    public function __construct(ConfigManager $configManager, ExtendManager $extendManager) {
+    public function __construct(ConfigManager $configManager, ExtendManager $extendManager)
+    {
         $this->configManager = $configManager;
         $this->extendManager = $extendManager;
     }
@@ -59,8 +60,8 @@ class SchemaGenerator
     }
 
     /**
-     * @param string          $className     Entity's class name
-     * @param array           $entityOptions Entity's options
+     * @param string $className     Entity's class name
+     * @param array  $entityOptions Entity's options
      * @throws \InvalidArgumentException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -181,4 +182,4 @@ class SchemaGenerator
             }
         }
     }
-} 
+}

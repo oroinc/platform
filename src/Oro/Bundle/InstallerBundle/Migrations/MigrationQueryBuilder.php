@@ -4,6 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\MappingException;
 
 class MigrationQueryBuilder
@@ -44,9 +45,8 @@ class MigrationQueryBuilder
     {
         $result = [];
 
-        $sm         = $this->connection->getSchemaManager();
         $platform   = $this->connection->getDatabasePlatform();
-        $fromSchema = $sm->createSchema();
+        $fromSchema = $this->getSchema();
         foreach ($migrations as $migration) {
             $toSchema   = clone $fromSchema;
             $queries    = $migration->up($toSchema);
@@ -78,6 +78,14 @@ class MigrationQueryBuilder
         }
 
         return $result;
+    }
+
+    /**
+     * @return Schema
+     */
+    protected function getSchema()
+    {
+        return $this->connection->getSchemaManager()->createSchema();
     }
 
     /**

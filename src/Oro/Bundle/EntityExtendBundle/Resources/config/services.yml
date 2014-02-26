@@ -1,5 +1,6 @@
 parameters:
     oro_entity_extend.entity.cache.warmer.class:            Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
+    oro_entity_extend.extend.option_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendOptionManager
     oro_entity_extend.extend.extend_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\ExtendManager
     oro_entity_extend.extension.extend_entity.class:        Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                   Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
@@ -7,6 +8,7 @@ parameters:
     oro_entity_extend.listener.config_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.listener.entity_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
     oro_entity_extend.twig.view_extension.class:            Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
+    oro_entity_extend.migration.post_up.listener.class:     Oro\Bundle\EntityExtendBundle\EventListener\PostUpMigrationListener
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -16,6 +18,11 @@ services:
             - @oro_entity_extend.tools.dumper
         tags:
             - { name: kernel.cache_warmer,  priority: 30 }
+
+    oro_entity_extend.extend.option_manager:
+        class:                                              %oro_entity_extend.extend.option_manager.class%
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
 
     oro_entity_extend.extend.extend_manager:
         class:                                              %oro_entity_extend.extend.extend_manager.class%
@@ -40,7 +47,7 @@ services:
         class:                                              %oro_entity_extend.tools.schema_generator.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_entity_extend.tools.dumper
+            - @oro_entity_extend.extend.extend_manager
 
     oro_entity_extend.listener.config_subscriber:
         class:                                              %oro_entity_extend.listener.config_subscriber.class%
@@ -53,3 +60,8 @@ services:
         class:                                              %oro_entity_extend.listener.entity_subscriber.class%
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    oro_entity_extend.migration.post_up.listener:
+        class: %oro_entity_extend.migration.post_up.listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up , method: onPostUp }
