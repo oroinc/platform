@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Guesser;
 
-use Oro\Bundle\FormBundle\Guesser\FormBuildData;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 class DoctrineTypeGuesser extends AbstractFormGuesser
 {
@@ -27,57 +27,48 @@ class DoctrineTypeGuesser extends AbstractFormGuesser
     /**
      * {@inheritDoc}
      */
-    public function guess($class, $field = null)
+    public function guessType($class, $property)
     {
         $metadata = $this->getMetadataForClass($class);
         if (!$metadata) {
-            return null;
+            return $this->createDefaultTypeGuess();
         }
 
-        if ($field) {
-            if ($metadata->hasAssociation($field)) {
-                $targetClass = $metadata->getAssociationTargetClass($field);
-                if ($metadata->isSingleValuedAssociation($field)) {
-                    return $this->getFormBuildDataByEntity($targetClass);
-                } elseif ($metadata->isCollectionValuedAssociation($field)) {
-                    return $this->getFormBuildDataByEntity($targetClass, true);
-                }
-            } else {
-                $fieldType = $metadata->getTypeOfField($field);
-                return $this->getFormBuildDataByDoctrineType($fieldType, $class, $field);
-            }
+        if ($metadata->hasAssociation($property)) {
+            $targetClass = $metadata->getAssociationTargetClass($property);
+            $multiple = $metadata->isCollectionValuedAssociation($property);
+            return $this->getTypeGuessByEntity($targetClass, $multiple);
         } else {
-            return $this->getFormBuildDataByEntity($class);
+            $fieldType = $metadata->getTypeOfField($property);
+            return $this->getTypeGuessByDoctrineType($fieldType, $class, $property);
         }
-
-        return null;
     }
 
     /**
      * @param string $doctrineType
      * @param string $class
      * @param string $field
-     * @return null|FormBuildData
+     * @return TypeGuess
      */
-    protected function getFormBuildDataByDoctrineType($doctrineType, $class, $field)
+    protected function getTypeGuessByDoctrineType($doctrineType, $class, $field)
     {
         if (!isset($this->doctrineTypeMappings[$doctrineType])) {
-            return null;
+            return $this->createDefaultTypeGuess();
         }
 
         $formType = $this->doctrineTypeMappings[$doctrineType]['type'];
         $formOptions = $this->doctrineTypeMappings[$doctrineType]['options'];
         $formOptions = $this->addLabelOption($formOptions, $class, $field);
 
-        return $this->createFormBuildData($formType, $formOptions);
+        return $this->createTypeGuess($formType, $formOptions);
     }
 
     /**
      * @param string $class
      * @param bool $multiple
-     * @return FormBuildData
+     * @return TypeGuess
      */
-    protected function getFormBuildDataByEntity($class, $multiple = false)
+    protected function getTypeGuessByEntity($class, $multiple)
     {
         $formType = 'entity';
         $formOptions = array(
@@ -86,6 +77,6 @@ class DoctrineTypeGuesser extends AbstractFormGuesser
         );
         $formOptions = $this->addLabelOption($formOptions, $class, null, $multiple);
 
-        return $this->createFormBuildData($formType, $formOptions);
+        return $this->createTypeGuess($formType, $formOptions);
     }
 }

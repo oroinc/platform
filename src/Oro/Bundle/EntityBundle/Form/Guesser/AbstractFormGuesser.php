@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Guesser;
 
+use Symfony\Component\Form\FormTypeGuesserInterface;
+use Symfony\Component\Form\Guess\TypeGuess;
+use Symfony\Component\Form\Guess\ValueGuess;
+
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\FormBundle\Guesser\FormBuildData;
-use Oro\Bundle\FormBundle\Guesser\FormGuesserInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
-abstract class AbstractFormGuesser implements FormGuesserInterface
+abstract class AbstractFormGuesser implements FormTypeGuesserInterface
 {
     /**
      * @var ManagerRegistry
@@ -32,6 +34,30 @@ abstract class AbstractFormGuesser implements FormGuesserInterface
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function guessRequired($class, $property)
+    {
+        return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessMaxLength($class, $property)
+    {
+        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function guessPattern($class, $property)
+    {
+        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
      * @param string $class
      * @return ClassMetadata|null
      */
@@ -48,11 +74,19 @@ abstract class AbstractFormGuesser implements FormGuesserInterface
     /**
      * @param string $formType
      * @param array $formOptions
-     * @return FormBuildData
+     * @return TypeGuess
      */
-    protected function createFormBuildData($formType, array $formOptions = array())
+    protected function createTypeGuess($formType, array $formOptions = array())
     {
-        return new FormBuildData($formType, $formOptions);
+        return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+    }
+
+    /**
+     * @return TypeGuess
+     */
+    protected function createDefaultTypeGuess()
+    {
+        return new TypeGuess('text', array(), TypeGuess::LOW_CONFIDENCE);
     }
 
     /**
