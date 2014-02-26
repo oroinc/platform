@@ -9,6 +9,7 @@ function(Backbone, StepModel) {
      * @extends Backbone.Collection
      */
     return Backbone.Collection.extend({
-        model: StepModel
+        model: StepModel,
+        comparator: 'order'
     });
 });

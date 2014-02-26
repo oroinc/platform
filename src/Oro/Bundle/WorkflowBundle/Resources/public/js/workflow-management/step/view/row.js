@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/workflow-management/step/view/row'],
-function(_, Backbone, StepsCollection, StepRowView) {
+define(['underscore', 'backbone', 'oro/workflow-management/transition/view/list-short'],
+function(_, Backbone, TransitionsShortListView) {
     'use strict';
 
     var $ = Backbone.$;
@@ -12,16 +12,22 @@ function(_, Backbone, StepsCollection, StepRowView) {
      */
     return Backbone.View.extend({
         tagName: 'tr',
-        workflow: null,
+        events: {
+            'click .delete-step': 'remove'
+        },
+
         options: {
+            workflow: null,
             template:
-                '<td><%= name %></td>' +
-                '<td><%= transitions %></td>' +
-                '<td>' +
-                    '<a href="#" class="edit-step"><i class="icon-edit"/> Edit</a> ' +
-                    '<a href="#" class="delete-step"><i class="icon-remove"/> Delete</a> ' +
-                    '<a href="#" class="delete-step"><i class="icon-plus-sign"/> Add transition</a> ' +
-                    '</td>'
+                '<td class="step-name"><% if (_isStart) { %><%= label %><% } else { %><a href="#"><%= label %></a><% } %></td>' +
+                '<td class="step-transitions"></td>' +
+                '<td class="step-actions"><div class="pull-right">' +
+                    '<% if (!_isStart) { %>' +
+                    '<a href="#" class="edit-step" title="Edit step"><i class="icon-edit"/></a> ' +
+                    '<a href="#" class="delete-step" title="Delete step"><i class="icon-remove"/></a> ' +
+                    '<% } %>' +
+                    '<a href="#" class="add-step-transition" title="Add transition"><i class="icon-plus-sign"/></a> ' +
+                '</div></td>'
         },
 
         initialize: function() {
@@ -30,13 +36,14 @@ function(_, Backbone, StepsCollection, StepRowView) {
         },
 
         render: function() {
-            var data = this.options.model.toJSON();
-            data.transitions = new TransitionsShortListView(
-                this.options.model.get('allowedTransitions'),
-                this.options.workflow.get('transitions')
-            );
-
-            this.$el.append(this.template(data));
+            var transitionsList = new TransitionsShortListView({
+                'collection': this.model.getAllowedTransitions(this.options.workflow),
+                'workflow': this.options.workflow
+            });
+            var rowHtml = $(this.template(this.model.toJSON()));
+            var transitionsListEl = transitionsList.render().$el;
+            rowHtml.filter('.step-transitions').append(transitionsListEl);
+            this.$el.append(rowHtml);
 
             return this;
         }

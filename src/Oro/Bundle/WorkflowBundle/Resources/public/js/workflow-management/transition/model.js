@@ -17,6 +17,7 @@ function(Backbone) {
             isStart: false,
             formOptions: null,
             message: null,
+            isUnavailableHidden: true,
             transitionDefinition: null,
             preConditions: null,
             conditions: null,

@@ -1,6 +1,7 @@
 /* global define */
-define(['underscore', 'backbone'],
-function(_, Backbone) {
+define(['underscore', 'backbone', 'oro/workflow-management/step/view/list', 'oro/workflow-management/step/model',
+    'oro/workflow-management/transition/collection'],
+function(_, Backbone, StepsListView, StepModel, TransitionCollection) {
     'use strict';
 
     var $ = Backbone.$;
@@ -18,7 +19,13 @@ function(_, Backbone) {
         },
 
         initialize: function() {
-            this.$stepsContainer = $(this.options.stepsEl);
+            var steps = this.model.get('steps');
+            steps.add(this._getStartStep());
+            this.stepListView = new StepsListView({
+                el: this.$(this.options.stepsEl),
+                collection: steps,
+                workflow: this.model
+            });
         },
 
         setFormMetadataToModel: function() {
@@ -34,13 +41,26 @@ function(_, Backbone) {
             }
         },
 
+        _getStartStep: function() {
+            return new StepModel({
+                'label': '(Starting point)',
+                'order': -1,
+                '_isStart': true,
+                'allowedTransitions': new TransitionCollection(this.model.getStartTransitions())
+            });
+        },
+
+        renderSteps: function() {
+            this.stepListView.render();
+        },
+
         _getFormElement: function(form, name) {
             var elId = this.$el.attr('id') + '_' + name;
             return this.$('#' + elId);
         },
 
         render: function() {
-
+            this.renderSteps();
         }
     });
 });

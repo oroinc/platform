@@ -72,7 +72,61 @@
     {% set stepsListWidget %}
         <div class="workflow-definition-steps-list-container"></div>
         <script type="text/javascript">
-            require(['oro/workflow-definition/step/'])
+            require([
+                'oro/workflow-management',
+                'oro/workflow-management/workflow/model',
+                'oro/workflow-management/step/collection',
+                'oro/workflow-management/transition/collection'
+            ],
+            function(
+                WorkflowManagement,
+                WorkflowModel,
+                StepCollection,
+                TransitionCollection
+            ) {
+                // Debug
+                var StepModel = require('oro/workflow-management/step/model');
+                var step2 = new StepModel({
+                    'name': 'step_2',
+                    'label': 'Test step 2',
+                    'order': 2
+                });
+                var step1 = new StepModel({
+                    'name': 'step_1',
+                    'label': 'Test step 1',
+                    'order': 1,
+                    'allowedTransitions': ['test_regular_transition']
+                });
+                var steps = new StepCollection([step2, step1]);
+
+                var TransitionModel = require('oro/workflow-management/transition/model');
+                var startTransition = new TransitionModel({
+                    'name': 'test_start_transition',
+                    'label': 'Start transition',
+                    'stepTo': 'step_1',
+                    'isStart': true
+                });
+                var regularTransition = new TransitionModel({
+                    'name': 'test_regular_transition',
+                    'label': 'Regular transition',
+                    'stepTo': 'step_2',
+                    'isStart': false
+                });
+                var transitions = new TransitionCollection([startTransition, regularTransition]);
+                //Debug end
+
+                var workflowModel = new WorkflowModel({
+                    steps: steps,
+                    transitions: transitions
+                });
+                var workflowManagement = new WorkflowManagement({
+                    el: '#{{ form.vars.id }}',
+                    stepsEl: '.workflow-definition-steps-list-container',
+                    model: workflowModel
+                });
+
+                workflowManagement.render();
+            });
         </script>
     {% endset %}
 
