@@ -13,6 +13,7 @@ parameters:
     oro_organization.form.transformer.business_unit_select.class:       Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTransformer
     oro_organization.form.listener.class:                               Oro\Bundle\OrganizationBundle\Event\FormListener
     oro_organization.twig.get_owner.class:                              Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension
+    oro_organization.listener.config_subscriber.class:                  Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber
     oro_organization.entity_ownership.listener.class:                   Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener
     oro_organization.business_unit.listener.class:                      Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
     oro_organization.twig.business_units.class:                         Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension
@@ -121,6 +122,11 @@ services:
             - @oro_entity_config.provider.ownership
         tags:
             - { name: twig.extension }
+
+    oro_organization.listener.config_subscriber:
+        class: %oro_organization.listener.config_subscriber.class%
+        tags:
+            - { name: kernel.event_subscriber }
 
     oro_organization.entity_ownership.listener:
         class:                        %oro_organization.entity_ownership.listener.class%

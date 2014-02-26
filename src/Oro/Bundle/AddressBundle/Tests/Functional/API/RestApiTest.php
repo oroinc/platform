@@ -85,7 +85,9 @@ class RestApiTest extends WebTestCase
             $this->client->request(
                 'GET',
                 $this->client->generate('oro_api_get_region'),
-                array('id' => $region['combinedCode'])
+                array('id' => $region['combinedCode']),
+                array(),
+                ToolsAPI::generateWsseHeader()
             );
             /** @var $result Response */
             $expectedResult = $this->client->getResponse();

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit;
 
-
 use Oro\Bundle\EmbeddedFormBundle\OroEmbeddedFormBundle;
 
 class OroEmbeddedFormBundleTest extends \PHPUnit_Framework_TestCase
@@ -22,4 +21,3 @@ class OroEmbeddedFormBundleTest extends \PHPUnit_Framework_TestCase
         $bundle->build($container);
     }
 }
- 

@@ -13,7 +13,9 @@ class EmbeddedFormPassTest extends \PHPUnit_Framework_TestCase
     public function shouldImplementCompilerPassInterface()
     {
         $rc = new \ReflectionClass('Oro\Bundle\EmbeddedFormBundle\DependencyInjection\Compiler\EmbeddedFormPass');
-        $this->assertTrue($rc->implementsInterface('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface'));
+        $this->assertTrue(
+            $rc->implementsInterface('Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface')
+        );
     }
 
     /**

@@ -22,6 +22,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
             wid: null,
             loadingMaskEnabled: true,
             loadingElement: null,
+            container: null,
             submitHandler: function () {
                 this.trigger('adoptedFormSubmit', this.form, this);
             }
@@ -84,9 +85,22 @@ function(_, Backbone, mediator, LoadingMask, layout) {
 
             this.actions = {};
             this.firstRun = true;
+            this.containerFilled = false;
+
             this.loadingElement = $('body');
 
             mediator.trigger('widget_initialize', this);
+        },
+
+        /**
+         * Get loading element.
+         *
+         * @returns {HTMLElement}
+         * @private
+         */
+        _getLoadingElement: function() {
+            var loadingElement = this.options.loadingElement || this.loadingElement;
+            return $(loadingElement);
         },
 
         /**
@@ -95,14 +109,14 @@ function(_, Backbone, mediator, LoadingMask, layout) {
          * @private
          */
         _showLoading: function() {
-            if (this.options.loadingMaskEnabled) {
-                var loadingElement = this.options.loadingElement || this.loadingElement;
-                loadingElement = $(loadingElement);
+            var loadingElement = this._getLoadingElement();
+            if (this.options.loadingMaskEnabled && !loadingElement.data('loading-mask-visible')) {
                 if (loadingElement && loadingElement.length) {
                     if (loadingElement[0].tagName.toLowerCase() !== 'body' && loadingElement.css('position') == 'static') {
                         loadingElement.css('position', 'relative');
                     }
                     this.loadingMask = new LoadingMask();
+                    loadingElement.data('loading-mask-visible', true);
                     loadingElement.append(this.loadingMask.render().$el);
                     this.loadingMask.show();
                 }
@@ -116,6 +130,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
          */
         _hideLoading: function() {
             if (this.loadingMask) {
+                this._getLoadingElement().data('loading-mask-visible', false);
                 this.loadingMask.remove();
                 this.loadingMask = null;
             }
@@ -542,7 +557,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
                 this.trigger('contentLoad', content, this);
                 this.actionsEl = null;
                 this.actions = {};
-                this.setElement($(content).filter('.widget-content'));
+                this.setElement($(content).filter('.widget-content:first'));
                 layout.init(this.$el);
                 this._show();
                 mediator.trigger('hash_navigation_request:complete');
@@ -562,6 +577,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
             this._adoptWidgetActions();
             this.trigger('renderStart', this.$el, this);
             this.show();
+            this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
         },
 
@@ -574,6 +590,13 @@ function(_, Backbone, mediator, LoadingMask, layout) {
             this._bindSubmitHandler();
             this.trigger('widgetRender', this.$el, this);
             mediator.trigger('widget:render:' + this.getWid(), this.$el, this);
+        },
+
+        _renderInContainer: function() {
+            if (!this.containerFilled && this.options.container) {
+                $(this.options.container).append(this.widget);
+                this.containerFilled = true;
+            }
         },
 
         /**

@@ -7,7 +7,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 use Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\ItemStub;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 
 class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
 {

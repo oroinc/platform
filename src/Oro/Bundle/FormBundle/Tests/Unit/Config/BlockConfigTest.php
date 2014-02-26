@@ -16,6 +16,8 @@ class BlockConfigTest extends \PHPUnit_Framework_TestCase
     /** @var string form DataBlock code */
     private $blockCode = 'datagrid';
 
+    private $reportingLevel;
+
     private $testCode = 'testCode';
     private $testTitle = 'testTitle';
     private $testDescription = 'testDescription';
@@ -66,7 +68,13 @@ class BlockConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->reportingLevel = error_reporting(E_ALL);
         $this->blockConfig = new BlockConfig($this->blockCode);
+    }
+
+    public function tearDown()
+    {
+        error_reporting($this->reportingLevel);
     }
 
     public function testProperties()

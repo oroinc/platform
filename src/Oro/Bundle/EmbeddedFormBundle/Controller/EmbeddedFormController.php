@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-
 use Doctrine\ORM\EntityManager;
 use FOS\Rest\Util\Codes;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
@@ -69,8 +68,7 @@ class EmbeddedFormController extends Controller
      */
     public function defaultDataAction($formType)
     {
-        /** @var EmbeddedFormManager $formManager */
-        $formManager = $this->get('oro_embedded_form.manager');
+        $formManager = $this->getFormManager();
         $css = $formManager->getDefaultCssByType($formType);
         $successMessage = $formManager->getDefaultSuccessMessageByType($formType);
 
@@ -108,7 +106,8 @@ class EmbeddedFormController extends Controller
     public function viewAction(EmbeddedForm $entity)
     {
         return [
-            'entity' => $entity
+            'entity' => $entity,
+            'label' => $this->getFormManager()->get($entity->getFormType())
         ];
     }
 
@@ -134,7 +133,7 @@ class EmbeddedFormController extends Controller
 
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.embedded_form.controller.saved_message')
+                $this->get('translator')->trans('oro.embeddedform.controller.saved_message')
             );
 
             return $this->get('oro_ui.router')->actionRedirect(
@@ -150,8 +149,7 @@ class EmbeddedFormController extends Controller
 
         }
 
-        /** @var EmbeddedFormManager $formManager */
-        $formManager = $this->get('oro_embedded_form.manager');
+        $formManager = $this->getFormManager();
         return array(
             'entity' => $entity,
             'defaultCss' => $formManager->getDefaultCssByType($entity->getFormType()),
@@ -160,4 +158,11 @@ class EmbeddedFormController extends Controller
         );
     }
 
-} 
+    /**
+     * @return EmbeddedFormManager
+     */
+    protected function getFormManager()
+    {
+        return $this->get('oro_embedded_form.manager');
+    }
+}

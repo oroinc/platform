@@ -227,7 +227,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             return routing.generate(
                 this.route,
                 _.extend(
-                    this.route_parameters,
+                    _.extend([], this.route_parameters),
                     parameters
                 )
             );

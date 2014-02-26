@@ -60,12 +60,17 @@ class WidgetExtension extends \Twig_Extension
             $widgetType = $options['widgetType'];
             unset($options['widgetType']);
         }
+
+        $options['wid'] = $this->getUniqueIdentifier();
+        $elementId = 'widget-container-' . $options['wid'];
         if (!array_key_exists('elementFirst', $options)) {
             $options['elementFirst'] = true;
         }
-        $options['wid'] = $this->getUniqueIdentifier();
-        $elementId = 'widget-container-' . $options['wid'];
-        $options['el'] = '#' . $elementId . ' .widget-content';
+        if ($options['elementFirst']) {
+            $options['el'] = '#' . $elementId . ' .widget-content:first';
+        } else {
+            $options['container'] = '#' . $elementId;
+        }
         $options['url'] = $this->getUrlWithContainer($options['url'], $widgetType, $options['wid']);
 
         return $environment->render(

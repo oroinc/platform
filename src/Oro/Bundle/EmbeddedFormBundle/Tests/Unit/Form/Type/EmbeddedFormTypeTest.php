@@ -44,11 +44,11 @@ class EmbeddedFormTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(3))
             ->method('add')
             ->with('css', 'textarea')
-            ->will($this->returnSelf());;
+            ->will($this->returnSelf());
         $builder->expects($this->at(4))
             ->method('add')
             ->with('successMessage', 'textarea')
-            ->will($this->returnSelf());;
+            ->will($this->returnSelf());
 
         $formType = new EmbeddedFormType();
         $formType->buildForm($builder, []);

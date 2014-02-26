@@ -70,10 +70,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
         $result = array();
         foreach ($columns as $columnName => $column) {
             $val = isset($exportedRecord[$columnName]) ? $exportedRecord[$columnName] : null;
-            $val = $this->applyFrontendFormatting(
-                $val,
-                isset($column['frontend_type']) ? $column['frontend_type'] : null
-            );
+            $val = $this->applyFrontendFormatting($val, $column);
             $result[$this->translator->trans($column['label'])] = $val;
         }
 
@@ -89,13 +86,14 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * @param mixed $val
-     * @param string|null $frontendType
+     * @param mixed       $val
+     * @param array       $options
      * @return string|null
      */
-    protected function applyFrontendFormatting($val, $frontendType)
+    protected function applyFrontendFormatting($val, $options)
     {
         if (null !== $val) {
+            $frontendType = isset($options['frontend_type']) ? $options['frontend_type'] : null;
             switch ($frontendType) {
                 case PropertyInterface::TYPE_DATE:
                     $val = $this->dateTimeFormatter->formatDate($val);
@@ -109,13 +107,44 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
                 case PropertyInterface::TYPE_INTEGER:
                     $val = $this->numberFormatter->formatDecimal($val);
                     break;
+                case PropertyInterface::TYPE_BOOLEAN:
+                    $val = $this->translator->trans((bool)$val ? 'Yes' : 'No', [], 'jsmessages');
+                    break;
                 case PropertyInterface::TYPE_PERCENT:
                     $val = $this->numberFormatter->formatPercent($val);
+                    break;
+                case PropertyInterface::TYPE_CURRENCY:
+                    $val = $this->numberFormatter->formatCurrency($val);
+                    break;
+                case PropertyInterface::TYPE_SELECT:
+                    if (isset($options['choices'][$val])) {
+                        $val = $this->translator->trans($options['choices'][$val]);
+                    }
+                    break;
+                case PropertyInterface::TYPE_HTML:
+                    $val = $this->formatHtmlFrontendType($val);
                     break;
             }
         }
 
         return $val;
+    }
+
+    /**
+     * Converts HTML to its string representation
+     *
+     * @param string $val
+     * @return string
+     */
+    protected function formatHtmlFrontendType($val)
+    {
+        return trim(
+            str_replace(
+                "\xC2\xA0", // non-breaking space (&nbsp;)
+                ' ',
+                html_entity_decode(strip_tags($val))
+            )
+        );
     }
 
     /**

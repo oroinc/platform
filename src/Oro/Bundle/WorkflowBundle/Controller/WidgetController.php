@@ -21,9 +21,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
-use Oro\Bundle\WorkflowBundle\Model\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Bundle\WorkflowBundle\Exception\NotManageableEntityException;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 class WidgetController extends Controller
 {
@@ -71,6 +71,9 @@ class WidgetController extends Controller
         if ($workflowDefinition->isStepsDisplayOrdered()) {
             $steps = $workflow->getStepManager()->getOrderedSteps();
         }
+        if (!$steps && $currentStep) {
+            $steps[] = $currentStep;
+        }
 
         return array(
             'steps' => $steps,
@@ -92,10 +95,10 @@ class WidgetController extends Controller
      */
     public function startTransitionFormAction($transitionName, $workflowName)
     {
-        $entityId = $this->getRequest()->get('entityId');
-        if (!$entityId) {
-            throw new BadRequestHttpException('Entity identifier is required');
-        }
+        $entityId = $this->getRequest()->get('entityId', 0);
+
+        /** @var DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
 
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
@@ -123,9 +126,25 @@ class WidgetController extends Controller
                 // So, serialized data will not contain all required data.
                 $formOptions = $transition->getFormOptions();
                 $attributes = array_keys($formOptions['attribute_fields']);
-                $dataArray = $workflowItem->getData()->getValues() + $workflowItem->getData()->getValues($attributes);
-                $data = $serializer->serialize(new WorkflowData($dataArray), 'json');
 
+                $existingAttributes = $workflowItem->getData()->getValues();
+                $formAttributes = $workflowItem->getData()->getValues($attributes);
+                foreach ($formAttributes as $value) {
+                    // Need to persist all new entities to allow serialization
+                    // and correct passing to API start method of all input data.
+                    // Form validation already performed, so all these entities are valid
+                    // and they can be used in workflow start action.
+                    if (is_object($value) && $doctrineHelper->isManageableEntity($value)) {
+                        $entityManager = $doctrineHelper->getEntityManager($value);
+                        $unitOfWork = $entityManager->getUnitOfWork();
+                        if (!$unitOfWork->isInIdentityMap($value) || $unitOfWork->isScheduledForInsert($value)) {
+                            $entityManager->persist($value);
+                            $entityManager->flush($value);
+                        }
+                    }
+                }
+
+                $data = $serializer->serialize(new WorkflowData($existingAttributes + $formAttributes), 'json');
                 $saved = true;
             }
         }
@@ -270,7 +289,7 @@ class WidgetController extends Controller
         $transitionsData = array();
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
-        $transitions = $workflowManager->getStartTransitions($workflow, $entity);
+        $transitions = $workflowManager->getStartTransitions($workflow);
         /** @var Transition $transition */
         foreach ($transitions as $transition) {
             if (!$transition->isHidden()) {
@@ -301,9 +320,13 @@ class WidgetController extends Controller
     protected function getEntityReference($entityClass, $entityId)
     {
         /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->get('oro_workflow.doctrine_helper');
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         try {
-            $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
+            if ($entityId) {
+                $entity = $doctrineHelper->getEntityReference($entityClass, $entityId);
+            } else {
+                $entity = $doctrineHelper->createEntityInstance($entityClass);
+            }
         } catch (NotManageableEntityException $e) {
             throw new BadRequestHttpException($e->getMessage(), $e);
         }

@@ -19,42 +19,79 @@ class ConfigHelper
      *      oro.user.entity_label
      *      oro.user.group.entity_label
      *
+     * @param string $propertyName property key: label, description, plural_label, etc.
      * @param string $className
      * @param string $fieldName
-     * @param string $propertyName  property key: label, description, plural_label, etc.
      *
      * @return string
+     * @throws \InvalidArgumentException
      */
-    public static function getTranslationKey($className, $fieldName = null, $propertyName = null)
+    public static function getTranslationKey($propertyName, $className, $fieldName = null)
     {
-        $transKey = '';
-        if ($className) {
-            //example: className - OroCRM\Bundle\ContactBundle\Entity\ContactAddress
-            $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $className);
-
-            //example: className - OroCRM\Contact\ContactAddress
-            $classArray = explode('\\', strtolower($class));
-            $classArray = array_filter($classArray);
-
-            $keyArray = [];
-            foreach ($classArray as $item) {
-                if (!in_array(Inflector::camelize($item), $keyArray)) {
-                    $keyArray[] = Inflector::camelize($item);
-                }
-            }
-
-            if ($fieldName) {
-                $keyArray[] = Inflector::tableize($fieldName);
-            }
-
-            if ($propertyName) {
-                $propertyName = Inflector::tableize($propertyName);
-                $keyArray[] = $fieldName ? $propertyName : 'entity_' . $propertyName;
-            }
-
-            $transKey = implode('.', $keyArray);
+        if (empty($propertyName)) {
+            throw new \InvalidArgumentException('$propertyName must not be empty');
+        }
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
         }
 
-        return $transKey;
+        //example: className - OroCRM\Bundle\ContactBundle\Entity\ContactAddress
+        $class      = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $className);
+
+        //example: className - OroCRM\Contact\ContactAddress
+        $classArray = explode('\\', strtolower($class));
+        $classArray = array_filter($classArray);
+
+        $keyArray = [];
+        foreach ($classArray as $item) {
+            if (!in_array(Inflector::camelize($item), $keyArray)) {
+                $keyArray[] = Inflector::camelize($item);
+            }
+        }
+
+        if ($fieldName) {
+            $keyArray[] = Inflector::tableize($fieldName);
+        }
+
+        $propertyName = Inflector::tableize($propertyName);
+        $keyArray[] = $fieldName ? $propertyName : 'entity_' . $propertyName;
+
+        return implode('.', $keyArray);
+    }
+
+    /**
+     * Extracts module and entity names from the given full class name
+     *
+     * @param string $className
+     * @return array [$moduleName, $entityName]
+     */
+    public static function getModuleAndEntityNames($className)
+    {
+        if (empty($className)) {
+            return ['', ''];
+        }
+
+        $parts = explode('\\', $className);
+        $entityName = $parts[count($parts) - 1];
+
+        $moduleName = null;
+        $isBundle = false;
+        for ($i = 0; $i < count($parts) - 1; $i++) {
+            $part = $parts[$i];
+            if (!in_array($part, array('Bundle', 'Bundles', 'Entity', 'Entities'))) {
+                if (substr($part, -6) === 'Bundle') {
+                    $isBundle = true;
+                }
+                $moduleName .= $part;
+            } elseif (count($parts) >= 4) {
+                $isBundle = true;
+            }
+        }
+
+        if (!$moduleName || !$isBundle) {
+            $moduleName = 'System';
+        }
+
+        return [$moduleName, $entityName];
     }
 }

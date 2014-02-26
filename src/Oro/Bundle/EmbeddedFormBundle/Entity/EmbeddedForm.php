@@ -12,6 +12,7 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_embedded_form")
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
  *  routeName="oro_embedded_form_list",
  *  defaultValues={
@@ -73,6 +74,20 @@ class EmbeddedForm
      * @ORM\Column(name="success_message", type="string", length=255)
      */
     protected $successMessage;
+
+    /**
+     * @var \DateTime $created
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime $updated
+     *
+     * @ORM\Column(name="updated_at", type="datetime")
+     */
+    protected $updatedAt;
 
     /**
      * @return int
@@ -160,5 +175,53 @@ class EmbeddedForm
     public function getSuccessMessage()
     {
         return $this->successMessage;
+    }
+
+    /**
+     * @param \DateTime $createdAt
+     */
+    public function setCreatedAt(\DateTime $createdAt)
+    {
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \DateTime $updatedAt
+     */
+    public function setUpdatedAt(\DateTime $updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

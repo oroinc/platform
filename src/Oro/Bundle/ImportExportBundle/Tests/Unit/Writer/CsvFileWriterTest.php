@@ -99,7 +99,13 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
         $this->writer->setStepExecution($stepExecution);
         $this->writer->write($data);
         $this->assertFileExists($expected);
-        $this->assertFileEquals($expected, $options['filePath']);
+        $expectedContent = file_get_contents($expected);
+        $actualContent = file_get_contents($options['filePath']);
+
+        $expectedContent = preg_replace('/\r\n?/', "\n", $expectedContent);
+        $actualContent = preg_replace('/\r\n?/', "\n", $actualContent);
+
+        $this->assertEquals($expectedContent, $actualContent);
     }
 
     public function optionsDataProvider()
@@ -169,7 +175,14 @@ class CsvFileWriterTest extends \PHPUnit_Framework_TestCase
         $this->writer->setClearWriter($clearWriter);
         $this->writer->write($data);
         $this->assertFileExists($expected);
-        $this->assertFileEquals($expected, $options['filePath']);
+
+        $expectedContent = file_get_contents($expected);
+        $actualContent = file_get_contents($options['filePath']);
+
+        $expectedContent = preg_replace('/\r\n?/', "\n", $expectedContent);
+        $actualContent = preg_replace('/\r\n?/', "\n", $actualContent);
+
+        $this->assertEquals($expectedContent, $actualContent);
 
     }
 

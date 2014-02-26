@@ -16,7 +16,7 @@ Main differences from genemu_jqueryselect2_hidden are:
 
 - support of configuration based autocompletition
 - selected value text is shown on entity edit form
-- pre-configured ability to work with doctrine entities, flexible entities and grids
+- pre-configured ability to work with doctrine entities and grids
 
 #### Form Type Configuration
 

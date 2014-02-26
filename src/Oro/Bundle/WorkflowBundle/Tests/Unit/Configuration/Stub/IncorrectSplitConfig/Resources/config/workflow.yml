@@ -1,0 +1,2 @@
+imports:
+    - {resource: 'workflow/first_workflow.yml'}

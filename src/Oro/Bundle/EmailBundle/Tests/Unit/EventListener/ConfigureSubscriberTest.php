@@ -4,8 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\EntityConfigBundle\Event\NewEntityConfigModelEvent;
-use Oro\Bundle\EntityConfigBundle\Event\NewEntityEvent;
+use Oro\Bundle\EntityConfigBundle\Event\EntityConfigEvent;
 use Oro\Bundle\EmailBundle\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 
@@ -70,11 +69,7 @@ class ConfigureSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with('email')
             ->will($this->returnValue($cpMock));
 
-        $entityModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = new NewEntityConfigModelEvent($entityModel, $cmMock);
+        $event = new EntityConfigEvent('Test\Class', $cmMock);
 
         $this->cache->expects($this->exactly((int)$shouldClearCache))->method('delete');
 

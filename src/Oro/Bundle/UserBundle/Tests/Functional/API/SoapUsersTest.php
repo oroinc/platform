@@ -61,9 +61,11 @@ class SoapUsersTest extends WebTestCase
         $request['username'] = 'Updated_' . $request['username'];
         $request['email'] = 'Updated_' . $request['email'];
         unset($request['plainPassword']);
+
         $result = $this->client->getSoap()->updateUser($userId['id'], $request);
         $result = ToolsAPI::classToArray($result);
         ToolsAPI::assertEqualsResponse($response, $result);
+
         $user = $this->client->getSoap()->getUser($userId['id']);
         $user = ToolsAPI::classToArray($user);
         $this->assertEquals($request['username'], $user['username']);
@@ -78,16 +80,16 @@ class SoapUsersTest extends WebTestCase
     {
         $users = $this->client->getSoap()->getUsers(1, 1000);
         $users = ToolsAPI::classToArray($users);
-        $result = false;
-        foreach ($users as $user) {
-            foreach ($user as $userDetails) {
-                $result = $userDetails['username'] == 'Updated_' . $request['username'];
-                if ($result) {
-                    break;
-                }
+
+        $user = array_filter(
+            $users['item'],
+            function ($a) use ($request) {
+                return $a['username'] === 'Updated_' . $request['username'];
             }
-        }
-        $this->assertTrue($result);
+        );
+
+        $this->assertNotEmpty($user, 'Updated user is not in users list');
+
     }
 
     public function testGetUserRoles()
@@ -116,6 +118,8 @@ class SoapUsersTest extends WebTestCase
     /**
      * @dataProvider requestsApi
      * @depends testGetUsers
+     * @expectedException \SoapFault
+     * @expectedExceptionMessage User cannot be found using specified filter
      */
     public function testDeleteUser($request)
     {
@@ -128,21 +132,17 @@ class SoapUsersTest extends WebTestCase
             )
         );
         $userId = ToolsAPI::classToArray($userId);
+
         $result = $this->client->getSoap()->deleteUser($userId['id']);
         $this->assertTrue($result);
-        try {
-            $this->client->getSoap()->getUserBy(
-                array(
-                    'item' => array(
-                        'key' =>'username',
-                        'value' =>'Updated_' . $request['username'])
-                )
-            );
-        } catch (\SoapFault $e) {
-            if ($e->faultcode != 'NOT_FOUND') {
-                throw $e;
-            }
-        }
+
+        $this->client->getSoap()->getUserBy(
+            array(
+                'item' => array(
+                    'key' =>'username',
+                    'value' =>'Updated_' . $request['username'])
+            )
+        );
     }
 
     /**

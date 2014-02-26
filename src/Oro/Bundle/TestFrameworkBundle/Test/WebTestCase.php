@@ -4,8 +4,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
+
 use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * Class WebTestCase
@@ -80,6 +82,8 @@ abstract class WebTestCase extends BaseWebTestCase
                     }
                 }
             }
+        } else {
+            self::$internalClient->setServerParameters($server);
         }
 
         return self::$internalClient;

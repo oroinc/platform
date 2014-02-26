@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
 class EntityProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,17 +13,29 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
     private $entityConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $extendConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $entityClassResolver;
 
     /** @var EntityProvider */
     private $provider;
+
+    /**
+     * @var Config
+     */
+    protected $extendConfig;
 
     protected function setUp()
     {
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->entityClassResolver  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->extendConfig        = new Config(new EntityConfigId('extend', 'testClass'));
+        $this->entityClassResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityClassResolver->expects($this->any())
@@ -40,7 +53,12 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
             ->method('trans')
             ->will($this->returnArgument(0));
-        $this->provider = new EntityProvider($this->entityConfigProvider, $this->entityClassResolver, $translator);
+        $this->provider = new EntityProvider(
+            $this->entityConfigProvider,
+            $this->extendConfigProvider,
+            $this->entityClassResolver,
+            $translator
+        );
     }
 
     public function testGetEntity()
@@ -80,6 +98,8 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         $entityClassName1 = 'Acme\Entity\Test1';
         $entityClassName2 = 'Acme\Entity\Test2';
         $entityClassName3 = 'Acme\Entity\Test3';
+        $entityClassName4 = 'Acme\Entity\Test4';
+        $entityClassName5 = 'Acme\Entity\Test5';
 
         $entityConfig1 = $this->getEntityConfig(
             $entityClassName1,
@@ -105,6 +125,22 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                 'icon'         => 'icon-test3',
             ]
         );
+        $entityConfig4 = $this->getEntityConfig(
+            $entityClassName4,
+            [
+                'label'        => 'A',
+                'plural_label' => 'C',
+                'icon'         => 'icon-test3',
+            ]
+        );
+        $entityConfig5 = $this->getEntityConfig(
+            $entityClassName5,
+            [
+                'label'        => 'A',
+                'plural_label' => 'C',
+                'icon'         => 'icon-test3',
+            ]
+        );
 
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
@@ -114,6 +150,8 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                         [$entityClassName1, $entityConfig1],
                         [$entityClassName2, $entityConfig2],
                         [$entityClassName3, $entityConfig3],
+                        [$entityClassName4, $entityConfig4],
+                        [$entityClassName5, $entityConfig5],
                     ]
                 )
             );
@@ -129,8 +167,29 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnCallback(
+                    function ($param) {
+                        $this->extendConfig->set('state', ExtendManager::STATE_ACTIVE);
+                        if ($param == 'Acme\Entity\Test4') {
+                            $this->extendConfig->set('state', ExtendManager::STATE_NEW);
+                        }
+                        if ($param == 'Acme\Entity\Test4') {
+                            $this->extendConfig->set('state', ExtendManager::STATE_DELETED);
+                        }
+                        return $this->extendConfig;
+                    }
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($this->extendConfig));
+
         // sort by plural label
-        $result = $this->provider->getEntities();
+        $result   = $this->provider->getEntities();
         $expected = [
             [
                 'name'         => $entityClassName2,
@@ -154,7 +213,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
 
         // sort by label
-        $result = $this->provider->getEntities(false);
+        $result   = $this->provider->getEntities(false);
         $expected = [
             [
                 'name'         => $entityClassName3,
@@ -180,7 +239,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getEntityConfig($entityClassName, $values)
     {
-        $entityConfigId = new EntityConfigId($entityClassName, 'entity');
+        $entityConfigId = new EntityConfigId('entity', $entityClassName);
         $entityConfig   = new Config($entityConfigId);
         $entityConfig->setValues($values);
 

@@ -1,0 +1,3 @@
+config:
+    paths:
+        'ororeport/js/report': 'bundles/ororeport/js/report.js'

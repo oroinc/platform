@@ -6,11 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository")
- * @ORM\Table(name="oro_translation")
+ * @ORM\Table(name="oro_translation", indexes={
+ *      @ORM\Index(name="MESSAGE_IDX", columns={"locale", "domain", "`key`", "scope"})
+ * })
  */
 class Translation
 {
     const ENTITY_NAME = 'OroTranslationBundle:Translation';
+
+    const SCOPE_SYSTEM = 1;
+    const SCOPE_UI     = 2;
 
     /**
      * @ORM\Id
@@ -20,7 +25,7 @@ class Translation
     protected $id;
 
     /**
-     * @ORM\Column(name="trans_key", type="string", length=255)
+     * @ORM\Column(name="`key`", type="string", length=500)
      */
     protected $key;
 
@@ -38,6 +43,13 @@ class Translation
      * @ORM\Column(type="string", length=255)
      */
     protected $domain;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="scope", type="smallint")
+     */
+    protected $scope = self::SCOPE_SYSTEM;
 
     /**
      * @return mixed
@@ -121,5 +133,25 @@ class Translation
     public function getDomain()
     {
         return $this->domain;
+    }
+
+    /**
+     * @param integer $scope
+     *
+     * @return $this
+     */
+    public function setScope($scope)
+    {
+        $this->scope = $scope;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScope()
+    {
+        return $this->scope;
     }
 }

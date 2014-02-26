@@ -56,7 +56,7 @@ class BackLinkExtension extends \Twig_Extension
         preg_match($backLinkRegexp, $string, $matches);
         list($placeholder, $linkText) = array_pad($matches, 2, '');
         if (!$linkText) {
-            $linkText = 'oro.embedded_form.back_link_default_text';
+            $linkText = 'oro.embeddedform.back_link_default_text';
         }
         $translatedLinkText = $this->translator->trans($linkText);
         $url = $this->router->generate('oro_embedded_form_submit', ['id' => $id]);
