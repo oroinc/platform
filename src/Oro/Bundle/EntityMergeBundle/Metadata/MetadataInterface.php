@@ -35,4 +35,12 @@ interface MetadataInterface
      * @return array
      */
     public function all(\Closure $filter = null);
+
+    /**
+     * Merges values of this object with another set of data
+     *
+     * @param MetadataInterface|array $data
+     * @param bool $override
+     */
+    public function merge($data, $override = true);
 }

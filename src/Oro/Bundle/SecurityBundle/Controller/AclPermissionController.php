@@ -15,7 +15,7 @@ class AclPermissionController extends Controller
      */
     public function aclAccessLevelsAction($oid)
     {
-        if (strpos($oid, 'entity') !== false) {
+        if (strpos($oid, 'entity:') === 0) {
             $oid = str_replace('_', '\\', $oid);
         }
 

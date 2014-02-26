@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -41,8 +39,9 @@ class InverseAssociationAccessor implements AccessorInterface
      */
     public function supports($entity, FieldMetadata $metadata)
     {
-        return $metadata->hasDoctrineMetadata() &&
-            $this->isInverseAssociationTypeToOne($metadata->getDoctrineMetadata());
+        return !$metadata->isDefinedBySourceEntity() &&
+            $metadata->hasDoctrineMetadata() &&
+            $this->isAssociationTypeToOne($metadata->getDoctrineMetadata());
     }
 
     /**
@@ -51,11 +50,9 @@ class InverseAssociationAccessor implements AccessorInterface
      * @param DoctrineMetadata $metadata
      * @return bool
      */
-    protected function isInverseAssociationTypeToOne(DoctrineMetadata $metadata)
+    protected function isAssociationTypeToOne(DoctrineMetadata $metadata)
     {
-        return !$metadata->isMappedBySourceEntity() &&
-            ($metadata->get('type') == ClassMetadataInfo::MANY_TO_ONE ||
-            $metadata->get('type') == ClassMetadataInfo::ONE_TO_ONE);
+        return $metadata->isManyToOne() || $metadata->isOneToOne();
     }
 
     /**
@@ -64,8 +61,8 @@ class InverseAssociationAccessor implements AccessorInterface
     public function getValue($entity, FieldMetadata $metadata)
     {
         $doctrineMetadata = $metadata->getDoctrineMetadata();
-        $fieldName        = $doctrineMetadata->getFieldName();
-        $className        = $doctrineMetadata->get('sourceEntity');
+        $fieldName = $doctrineMetadata->getFieldName();
+        $className = $doctrineMetadata->get('sourceEntity');
 
         return $this->doctrineHelper->getEntityRepository($className)->findBy([$fieldName => $entity]);
     }
