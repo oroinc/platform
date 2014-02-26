@@ -22,7 +22,7 @@ class MigrationConfigPass implements CompilerPassInterface
         ) {
             $container->setParameter(
                 self::MIGRATIONS_QUERY_BUILDER_CLASS_PARAM,
-                'Oro\Bundle\EntityExtendBundle\Extend\Schema\MigrationQueryBuilder'
+                'Oro\Bundle\EntityExtendBundle\Migration\ExtendMigrationQueryBuilder'
             );
             $serviceDef = $container->getDefinition(self::MIGRATIONS_QUERY_BUILDER_SERVICE);
             $serviceDef->addMethodCall(

@@ -146,18 +146,7 @@ class InstallCommand extends ContainerAwareCommand
                     '--process-timeout' => 360
                 )
             )
-            //->runCommand('doctrine:schema:create')
             ->runCommand('oro:installer:migration:load')
-            ->runCommand('oro:entity-config:init')
-            ->runCommand('oro:entity-extend:init')
-            ->runCommand(
-                'oro:entity-extend:update-config',
-                array('--process-isolation' => true)
-            )
-            ->runCommand(
-                'doctrine:schema:update',
-                array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
-            )
             ->runCommand(
                 'oro:workflow:definitions:load',
                 array('--process-isolation' => true)

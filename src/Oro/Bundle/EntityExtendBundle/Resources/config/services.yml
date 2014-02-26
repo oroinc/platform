@@ -67,4 +67,4 @@ services:
             - @oro_entity_extend.tools.schema_generator
             - @oro_entity_extend.tools.dumper
         tags:
-            - { name: kernel.event_listener, event: oro_migration.post_up , method: onPostUp }
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: 100 }

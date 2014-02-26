@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
+namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\InstallerBundle\Migrations\MigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;

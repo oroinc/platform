@@ -87,6 +87,10 @@ class ExtendTable extends Table
             }
         }
 
+        if (in_array($typeName, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
+            return null;
+        }
+
         return parent::addColumn($columnName, $typeName, $options);
     }
 }
