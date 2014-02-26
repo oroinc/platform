@@ -155,8 +155,8 @@ class InstallCommand extends ContainerAwareCommand
                 array('--process-isolation' => true)
             )
             ->runCommand(
-                'oro:installer:migration:load',
-                array('--process-isolation' => true, '--no-interaction' => true)
+                'doctrine:schema:update',
+                array('--process-isolation' => true, '--force' => true, '--no-interaction' => true)
             )
             ->runCommand(
                 'oro:workflow:definitions:load',

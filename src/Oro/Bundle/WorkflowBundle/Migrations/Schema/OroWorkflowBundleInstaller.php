@@ -1,0 +1,41 @@
+<?php
+
+namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
+
+use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\InstallerBundle\Migrations\Installation;
+use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_0\OroWorkflowBundle;
+
+class OroWorkflowBundleInstaller implements Installation
+{
+    /**
+     * @inheritdoc
+     */
+    public function getMigrationVersion()
+    {
+        return 'v1_1';
+    }
+
+    /**
+     * @inheritdoc
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function up(Schema $schema)
+    {
+        OroWorkflowBundle::oroWorkflowDefinitionTable($schema);
+        OroWorkflowBundle::oroWorkflowItemTable($schema);
+        OroWorkflowBundle::oroWorkflowStepTable($schema);
+        OroWorkflowBundle::oroWorkflowTransitionLogTable($schema);
+        OroWorkflowBundle::oroWorkflowEntityAclTable($schema);
+        OroWorkflowBundle::oroWorkflowEntityAclIdentityTable($schema, 'oro_workflow_entity_acl_ident');
+
+        OroWorkflowBundle::oroWorkflowDefinitionForeignKeys($schema);
+        OroWorkflowBundle::oroWorkflowItemForeignKeys($schema);
+        OroWorkflowBundle::oroWorkflowStepForeignKeys($schema);
+        OroWorkflowBundle::oroWorkflowTransitionLogForeignKeys($schema);
+        OroWorkflowBundle::oroWorkflowEntityAclForeignKeys($schema);
+        OroWorkflowBundle::oroWorkflowEntityAclIdentityForeignKeys($schema, 'oro_workflow_entity_acl_ident');
+
+        return [];
+    }
+}

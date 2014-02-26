@@ -17,8 +17,8 @@ class LoadDataFixturesCommand extends ContainerAwareCommand
     const MAIN_FIXTURES_TYPE = 'main';
     const DEMO_FIXTURES_TYPE = 'demo';
 
-    const MAIN_FIXTURES_PATH = 'Migrations/DataFixtures/ORM';
-    const DEMO_FIXTURES_PATH = 'Migrations/DataFixtures/Demo/ORM';
+    const MAIN_FIXTURES_PATH = 'Migrations/Data/ORM';
+    const DEMO_FIXTURES_PATH = 'Migrations/Data/Demo/ORM';
 
     /**
      * @inheritdoc
