@@ -8,37 +8,56 @@ use Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormGuesserCompilerPass;
 
 class FormGuesserCompilerPassTest extends \PHPUnit_Framework_TestCase
 {
+    public function testProcessNoDefinition()
+    {
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $container->expects($this->once())
+            ->method('hasDefinition')
+            ->with('form.extension')
+            ->will($this->returnValue(false));
+        $container->expects($this->never())
+            ->method('getDefinition');
+
+        $compiler = new FormGuesserCompilerPass();
+        $compiler->process($container);
+    }
+
     public function testProcess()
     {
         $guesserTags = array(
-            'third.guesser' => array(array('priority' => 10)),
-            'first.guesser' => array(array('priority' => 30)),
-            'second.guesser' => array(array('priority' => 20)),
+            'third.guesser' => array(array()),
+            'first.guesser' => array(array('priority' => 20)),
+            'second.guesser' => array(array('priority' => 10)),
+        );
+        $expectedGuessers = array(
+            'first.guesser',
+            'second.guesser',
+            'third.guesser'
         );
 
-        $chainGuesser = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $formExtension = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-        $chainGuesser->expects($this->at(0))
-            ->method('addMethodCall')
-            ->with('addGuesser', array(new Reference('first.guesser')));
-        $chainGuesser->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with('addGuesser', array(new Reference('second.guesser')));
-        $chainGuesser->expects($this->at(2))
-            ->method('addMethodCall')
-            ->with('addGuesser', array(new Reference('third.guesser')));
+        $formExtension->expects($this->once())
+            ->method('replaceArgument')
+            ->with(3, $expectedGuessers);
 
         $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $container->expects($this->once())
+            ->method('hasDefinition')
+            ->with('form.extension')
+            ->will($this->returnValue(true));
+        $container->expects($this->once())
             ->method('getDefinition')
-            ->with(FormGuesserCompilerPass::CHAIN_GUESSER)
-            ->will($this->returnValue($chainGuesser));
+            ->with('form.extension')
+            ->will($this->returnValue($formExtension));
         $container->expects($this->once())
             ->method('findTaggedServiceIds')
-            ->with(FormGuesserCompilerPass::GUESSER_TAG)
+            ->with('form.type_guesser')
             ->will($this->returnValue($guesserTags));
 
         $compiler = new FormGuesserCompilerPass();
