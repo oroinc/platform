@@ -36,7 +36,7 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/
                                 var widgetOptions     = $.extend(true, {}, controlElement.data('widget-options'));
                                 var allowMultiple     = controlElement.data('widget-multiple');
                                 var reloadEvent       = controlElement.data('widget-reload-event')
-                                    || 'widget_remove:' + widgetOptions.alias;
+                                    || 'widget_success:' + widgetOptions.alias;
                                 var reloadGridName    = controlElement.data('widget-gridname');
                                 var reloadWidgetAlias = controlElement.data('widget-reload-widget-alias');
 
