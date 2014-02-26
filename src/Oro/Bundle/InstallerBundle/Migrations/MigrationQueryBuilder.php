@@ -38,8 +38,8 @@ class MigrationQueryBuilder
      * @param Migration[] $migrations
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @return array
-     *   'migration' => class name of migration file
-     *   'queries'   => array of sql queries from this file
+     *   'migration' => class name of a migration
+     *   'queries'   => a list of sql queries (a query can be a string or instance of MigrationQuery)
      */
     public function getQueries(array $migrations)
     {

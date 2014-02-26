@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\Tools\SchemaGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
 
 class InitCommand extends ContainerAwareCommand
 {
@@ -40,7 +40,7 @@ class InitCommand extends ContainerAwareCommand
         /** @var ConfigManager $configManager */
         $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
 
-        /** @var SchemaGenerator $schemaGenerator */
+        /** @var ExtendSchemaGenerator $schemaGenerator */
         $schemaGenerator = $this->getContainer()->get('oro_entity_extend.tools.schema_generator');
 
         $configs = [];

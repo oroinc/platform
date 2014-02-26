@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 
 use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
 
-class SchemaGenerator
+class ExtendSchemaGenerator
 {
     /** @var  ConfigManager */
     protected $configManager;

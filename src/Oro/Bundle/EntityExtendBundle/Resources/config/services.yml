@@ -4,7 +4,7 @@ parameters:
     oro_entity_extend.extend.extend_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\ExtendManager
     oro_entity_extend.extension.extend_entity.class:        Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                   Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
-    oro_entity_extend.tools.schema_generator.class:         Oro\Bundle\EntityExtendBundle\Tools\SchemaGenerator
+    oro_entity_extend.tools.schema_generator.class:         Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator
     oro_entity_extend.listener.config_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.listener.entity_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
     oro_entity_extend.twig.view_extension.class:            Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
@@ -57,11 +57,14 @@ services:
             - { name: kernel.event_subscriber}
 
     oro_entity_extend.listener.entity_subscriber:
-        class:                                              %oro_entity_extend.listener.entity_subscriber.class%
+        class: %oro_entity_extend.listener.entity_subscriber.class%
         tags:
             - { name: doctrine.event_subscriber, connection: default }
 
     oro_entity_extend.migration.post_up.listener:
         class: %oro_entity_extend.migration.post_up.listener.class%
+        arguments:
+            - @oro_entity_extend.tools.schema_generator
+            - @oro_entity_extend.tools.dumper
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up , method: onPostUp }

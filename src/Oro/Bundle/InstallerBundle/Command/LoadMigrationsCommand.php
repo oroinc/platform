@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\InstallerBundle\Migrations\MigrationQuery;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -63,12 +64,21 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                 $queries               = $migrationQueryBuilder->getQueries($migrations);
                 foreach ($queries as $item) {
                     $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
-                    foreach ($item['queries'] as $sqlQuery) {
+                    foreach ($item['queries'] as $query) {
                         if ($input->getOption('show-queries')) {
-                            $output->writeln(sprintf('    <info>%s</info>', $sqlQuery));
+                            $descriptions = $query instanceof MigrationQuery
+                                ? $query->getDescription()
+                                : $query;
+                            foreach ((array)$descriptions as $description) {
+                                $output->writeln(sprintf('    <info>%s</info>', $description));
+                            }
                         }
                         if (!$input->getOption('dry-run')) {
-                            $migrationQueryBuilder->getConnection()->executeQuery($sqlQuery);
+                            if ($query instanceof MigrationQuery) {
+                                $query->execute();
+                            } else {
+                                $migrationQueryBuilder->getConnection()->executeQuery($query);
+                            }
                         }
                     }
                 }
