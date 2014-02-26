@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use Doctrine\DBAL\Schema\Table;
 
 class ExtendSchema extends Schema
 {
@@ -47,6 +48,15 @@ class ExtendSchema extends Schema
      */
     public function createTable($tableName)
     {
-        return new ExtendTable($this->extendOptionManager, parent::createTable($tableName));
+        $baseTable = new Table($tableName);
+        $table = new ExtendTable($this->extendOptionManager, $baseTable);
+
+        $this->_addTable($table);
+
+        foreach ($this->_schemaConfig->getDefaultTableOptions() as $name => $value) {
+            $table->addOption($name, $value);
+        }
+
+        return $table;
     }
 }
