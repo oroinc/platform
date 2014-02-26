@@ -19,7 +19,10 @@ function(_, Backbone, TransitionsShortListView) {
         options: {
             workflow: null,
             template:
-                '<td class="step-name"><% if (_isStart) { %><%= label %><% } else { %><a href="#"><%= label %></a><% } %></td>' +
+                '<td class="step-name">' +
+                    '<% if (_isStart) { %><%= label %><% } else { %><a href="#"><%= label %></a><% } %>' +
+                    '<% if (isFinal) { %>&nbsp;<span class="label">Final</span><% } %>' +
+                '</td>' +
                 '<td class="step-transitions"></td>' +
                 '<td class="step-actions"><div class="pull-right">' +
                     '<% if (!_isStart) { %>' +
