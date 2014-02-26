@@ -32,7 +32,7 @@ function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
                 var filtersList = new FiltersManager(options);
                 this.$el.prepend(filtersList.render().$el);
                 mediator.trigger('datagrid_filters:rendered', this.collection);
-                if (this.collection.length === 0) {
+                if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
                     filtersList.$el.hide();
                 }
             },

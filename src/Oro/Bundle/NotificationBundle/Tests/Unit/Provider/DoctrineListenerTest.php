@@ -16,21 +16,40 @@ class DoctrineListenerTest extends TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $entityPool;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
     protected $eventDispatcher;
 
     public function setUp()
     {
-        $this->listener = new DoctrineListener();
+        $this->entityPool = $this->getMock('Oro\Bundle\NotificationBundle\Doctrine\EntityPool');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->listener->setEventDispatcher($this->eventDispatcher);
-        $this->assertEquals($this->eventDispatcher, $this->listener->getEventDispatcher());
+        $this->listener = new DoctrineListener($this->entityPool, $this->eventDispatcher);
     }
 
-    public function tearDown()
+    public function testPostFlush()
     {
-        unset($this->listener);
-        unset($this->eventDispatcher);
+        $args = $this->getMockBuilder('Doctrine\ORM\Event\PostFlushEventArgs')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $args->expects($this->once())
+            ->method('getEntityManager')
+            ->will($this->returnValue($entityManager));
+
+        $this->entityPool->expects($this->once())
+            ->method('persistAndFlush')
+            ->with($entityManager);
+
+        $this->listener->postFlush($args);
     }
 
     /**

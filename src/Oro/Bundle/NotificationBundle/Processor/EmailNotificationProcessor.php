@@ -12,55 +12,67 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
 {
     const SEND_COMMAND = 'swiftmailer:spool:send';
 
-    /** @var EmailRenderer */
+    /**
+     * @var EmailRenderer
+     */
     protected $renderer;
 
-    /** @var \Swift_Mailer */
+    /**
+     * @var \Swift_Mailer
+     */
     protected $mailer;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $sendFrom;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $messageLimit = 100;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $env = 'prod';
 
     /**
      * @var LocaleSettings
      */
-    private $localeSettings;
+    protected $localeSettings;
 
     /**
      * Constructor
      *
-     * @param EmailRenderer                                 $emailRenderer
-     * @param \Swift_Mailer                                 $mailer
-     * @param EntityManager                                 $em
-     * @param string                                        $sendFrom
-     * @param LoggerInterface                               $logger
+     * @param LoggerInterface $logger
+     * @param EntityManager $em
+     * @param EntityPool $entityPool
+     * @param EmailRenderer $emailRenderer
+     * @param \Swift_Mailer $mailer
+     * @param string $sendFrom
      * @param LocaleSettings $localeSettings
      */
     public function __construct(
+        LoggerInterface $logger,
+        EntityManager $em,
+        EntityPool $entityPool,
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
-        EntityManager $em,
-        $sendFrom,
-        LoggerInterface $logger,
-        LocaleSettings $localeSettings
+        LocaleSettings $localeSettings,
+        $sendFrom
     ) {
-        parent::__construct($logger, $em);
-
+        parent::__construct($logger, $em, $entityPool);
         $this->renderer = $emailRenderer;
-        $this->mailer   = $mailer;
-        $this->sendFrom = $sendFrom;
+        $this->mailer = $mailer;
         $this->localeSettings = $localeSettings;
+        $this->sendFrom = $sendFrom;
     }
 
     /**
@@ -106,15 +118,15 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
                     $emailTemplate,
                     array('entity' => $object)
                 );
-            } catch (\Twig_Error $ex) {
+            } catch (\Twig_Error $e) {
                 $logger->error(
                     sprintf(
                         'Rendering of email template "%s"%s failed. %s',
                         $emailTemplate->getSubject(),
                         method_exists($emailTemplate, 'getId') ? sprintf(' (id: %d)', $emailTemplate->getId()) : '',
-                        $ex->getMessage()
+                        $e->getMessage()
                     ),
-                    array('exception' => $ex)
+                    array('exception' => $e)
                 );
 
                 continue;
@@ -134,45 +146,26 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $this->notify($params);
             $this->addJob(self::SEND_COMMAND);
         }
-
-        /**
-         * Usage of EntityManager->flush is not safe here, cause this can happen in
-         * event listener postUpdate, onFlush, etc
-         */
-        $this->getEntityPersister(AbstractNotificationProcessor::JOB_ENTITY)
-             ->executeInserts();
     }
 
     /**
      * Process with actual notification
      *
      * @param ParameterBag $params
-     * @return bool
      */
     protected function notify(ParameterBag $params)
     {
         $recipients = $params->get('to');
-        if (empty($recipients)) {
-            return false;
+        if ($recipients) {
+            foreach ($recipients as $email) {
+                $message = \Swift_Message::newInstance()
+                    ->setSubject($params->get('subject'))
+                    ->setFrom($params->get('from'))
+                    ->setTo($email)
+                    ->setBody($params->get('body'), $params->get('type'));
+                $this->mailer->send($message);
+            }
         }
-
-        foreach ($recipients as $email) {
-            $message = \Swift_Message::newInstance()
-                ->setSubject($params->get('subject'))
-                ->setFrom($params->get('from'))
-                ->setTo($email)
-                ->setBody($params->get('body'), $params->get('type'));
-            $this->mailer->send($message);
-        }
-
-        /**
-         * Usage of EntityManager->flush is not safe here, cause this can happen in
-         * event listener postUpdate, onFlush, etc
-         */
-        $this->getEntityPersister(AbstractNotificationProcessor::SPOOL_ITEM_ENTITY)
-             ->executeInserts();
-
-        return true;
     }
 
     /**
@@ -182,7 +175,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * @param array  $commandArgs
      * @return Job
      */
-    protected function addJob($command, $commandArgs = [])
+    protected function createJob($command, $commandArgs = [])
     {
         $commandArgs = array_merge(
             [
@@ -197,6 +190,6 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
             $commandArgs[] = '--no-debug';
         }
 
-        return parent::addJob($command, $commandArgs);
+        return parent::createJob($command, $commandArgs);
     }
 }

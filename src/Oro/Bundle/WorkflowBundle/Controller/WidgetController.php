@@ -97,6 +97,9 @@ class WidgetController extends Controller
     {
         $entityId = $this->getRequest()->get('entityId', 0);
 
+        /** @var DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+
         /** @var WorkflowManager $workflowManager */
         $workflowManager = $this->get('oro_workflow.manager');
         $workflow = $workflowManager->getWorkflow($workflowName);
@@ -123,9 +126,25 @@ class WidgetController extends Controller
                 // So, serialized data will not contain all required data.
                 $formOptions = $transition->getFormOptions();
                 $attributes = array_keys($formOptions['attribute_fields']);
-                $dataArray = $workflowItem->getData()->getValues() + $workflowItem->getData()->getValues($attributes);
-                $data = $serializer->serialize(new WorkflowData($dataArray), 'json');
 
+                $existingAttributes = $workflowItem->getData()->getValues();
+                $formAttributes = $workflowItem->getData()->getValues($attributes);
+                foreach ($formAttributes as $value) {
+                    // Need to persist all new entities to allow serialization
+                    // and correct passing to API start method of all input data.
+                    // Form validation already performed, so all these entities are valid
+                    // and they can be used in workflow start action.
+                    if (is_object($value) && $doctrineHelper->isManageableEntity($value)) {
+                        $entityManager = $doctrineHelper->getEntityManager($value);
+                        $unitOfWork = $entityManager->getUnitOfWork();
+                        if (!$unitOfWork->isInIdentityMap($value) || $unitOfWork->isScheduledForInsert($value)) {
+                            $entityManager->persist($value);
+                            $entityManager->flush($value);
+                        }
+                    }
+                }
+
+                $data = $serializer->serialize(new WorkflowData($existingAttributes + $formAttributes), 'json');
                 $saved = true;
             }
         }

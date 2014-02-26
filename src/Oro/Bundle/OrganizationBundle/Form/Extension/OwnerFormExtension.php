@@ -7,6 +7,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -151,7 +152,12 @@ class OwnerFormExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $dataClassName = $builder->getFormConfig()->getDataClass();
+        $formConfig = $builder->getFormConfig();
+        if (!$formConfig->getCompound()) {
+            return;
+        }
+
+        $dataClassName = $formConfig->getDataClass();
         if (!$dataClassName) {
             return;
         }
@@ -316,7 +322,7 @@ class OwnerFormExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param FormBuilderInterface|FormInterface  $builder
+     * @param FormBuilderInterface|FormInterface $builder
      * @param $dataClass
      * @param string $permission
      * @param array $data
@@ -329,12 +335,15 @@ class OwnerFormExtension extends AbstractTypeExtension
          * granted.
          */
         if ($this->isAssignGranted || $permission == 'ASSIGN') {
+            $formBuilder = $builder instanceof FormInterface ? $builder->getConfig() : $builder;
+            $isRequired = $formBuilder->getOption('required');
+
             $builder->add(
                 $this->fieldName,
                 'oro_user_acl_select',
                 array(
                     'required' => true,
-                    'constraints' => array(new NotBlank()),
+                    'constraints' => $isRequired ? array(new NotBlank()) : array(),
                     'autocomplete_alias' => 'acl_users',
                     'data' => $data,
                     'configs' => [

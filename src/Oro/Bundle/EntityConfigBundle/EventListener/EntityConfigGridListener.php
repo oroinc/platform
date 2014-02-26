@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
 class EntityConfigGridListener extends AbstractConfigGridListener
 {
@@ -84,24 +84,9 @@ class EntityConfigGridListener extends AbstractConfigGridListener
 
             $options = ['name' => [], 'module' => []];
             foreach ((array) $result as $value) {
-                $className = explode('\\', $value['className']);
-
-                $options['name'][$value['className']]   = '';
-                $options['module'][$value['className']] = '';
-
-                if (strpos($value['className'], ExtendConfigDumper::ENTITY) === false) {
-                    foreach ($className as $index => $name) {
-                        if (count($className) - 1 == $index) {
-                            $options['name'][$value['className']] = $name;
-                        } elseif (!in_array($name, array('Bundle', 'Entity'))) {
-                            $options['module'][$value['className']] .= $name;
-                        }
-                    }
-                } else {
-                    $options['name'][$value['className']]   =
-                        str_replace(ExtendConfigDumper::ENTITY, '', $value['className']);
-                    $options['module'][$value['className']] = 'System';
-                }
+                list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($value['className']);
+                $options['module'][$value['className']] = $moduleName;
+                $options['name'][$value['className']]   = $entityName;
             }
 
             $this->filterChoices = $options;
