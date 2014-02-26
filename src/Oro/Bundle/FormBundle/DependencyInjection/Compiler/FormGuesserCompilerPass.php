@@ -8,18 +8,18 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class FormGuesserCompilerPass implements CompilerPassInterface
 {
-    const GUESSER_TAG   = 'oro_form.guesser';
-    const CHAIN_GUESSER = 'oro_form.guesser.chain';
-
     /**
      * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
-        $chainGuesser = $container->getDefinition(self::CHAIN_GUESSER);
+        if (!$container->hasDefinition('form.extension')) {
+            return;
+        }
 
+        // need to sort guessers according to priority
         $guessers = array();
-        foreach ($container->findTaggedServiceIds(self::GUESSER_TAG) as $id => $attributes) {
+        foreach ($container->findTaggedServiceIds('form.type_guesser') as $id => $attributes) {
             foreach ($attributes as $eachTag) {
                 $priority = !empty($eachTag['priority']) ? $eachTag['priority'] : 0;
                 $guessers[$id] = $priority;
@@ -28,8 +28,7 @@ class FormGuesserCompilerPass implements CompilerPassInterface
 
         arsort($guessers, SORT_NUMERIC);
 
-        foreach (array_keys($guessers) as $id) {
-            $chainGuesser->addMethodCall('addGuesser', array(new Reference($id)));
-        }
+        $formExtension = $container->getDefinition('form.extension');
+        $formExtension->replaceArgument(3, array_keys($guessers));
     }
 }
