@@ -29,9 +29,8 @@ abstract class AbstractDateFilter extends AbstractFilter
         $dateStartValue = Carbon::parse($data['date_start'], new \DateTimeZone('UTC'));
         $dateEndValue   = Carbon::parse($data['date_end'], new \DateTimeZone('UTC'));
 
-        $datePart  = $data['part'];
         $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-        $fieldName = $this->applyDatePart($datePart, $fieldName, $dateStartValue, $dateEndValue);
+        $fieldName = $this->applyDatePart($data['part'], $fieldName, $dateStartValue, $dateEndValue);
 
         $startDateParameterName = $ds->generateParameterName($this->getName());
         $endDateParameterName   = $ds->generateParameterName($this->getName());
