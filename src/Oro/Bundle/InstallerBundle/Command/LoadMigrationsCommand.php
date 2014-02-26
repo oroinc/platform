@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,6 +51,39 @@ class LoadMigrationsCommand extends ContainerAwareCommand
     {
         $output->writeln($input->getOption('dry-run') ? 'List of migrations:' : 'Process migrations...');
 
+        $migrationLoader = $this->getMigrationLoader($input);
+        $migrations      = $migrationLoader->getMigrations();
+        if (!empty($migrations)) {
+            if ($input->getOption('dry-run') && !$input->getOption('show-queries')) {
+                foreach ($migrations as $migration) {
+                    $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
+                }
+            } else {
+                $migrationQueryBuilder = $this->getMigrationQueryBuilder($input);
+                $queries               = $migrationQueryBuilder->getQueries($migrations);
+                foreach ($queries as $item) {
+                    $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
+                    foreach ($item['queries'] as $sqlQuery) {
+                        if ($input->getOption('show-queries')) {
+                            $output->writeln(sprintf('    <info>%s</info>', $sqlQuery));
+                        }
+                        if (!$input->getOption('dry-run')) {
+                            $migrationQueryBuilder->getConnection()->executeQuery($sqlQuery);
+                        }
+                    }
+                }
+            }
+        }
+
+        $output->writeln('Done.');
+    }
+
+    /**
+     * @param InputInterface $input
+     * @return MigrationsLoader
+     */
+    protected function getMigrationLoader(InputInterface $input)
+    {
         $migrationLoader = $this->getContainer()->get('oro_installer.migrations.loader');
         $bundles         = $input->getOption('bundles');
         if (!empty($bundles)) {
@@ -61,23 +94,15 @@ class LoadMigrationsCommand extends ContainerAwareCommand
             $migrationLoader->setExcludeBundles($excludeBundles);
         }
 
-        $migrations = $migrationLoader->getMigrations();
-        if (!empty($migrations)) {
-            $migrationQueryBuilder = $this->getContainer()->get('oro_installer.migrations.query_builder');
-            $queries               = $migrationQueryBuilder->getQueries($migrations);
-            foreach ($queries as $item) {
-                $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
-                foreach ($item['queries'] as $sqlQuery) {
-                    if ($input->getOption('show-queries')) {
-                        $output->writeln(sprintf('    <info>%s</info>', $sqlQuery));
-                    }
-                    if (!$input->getOption('dry-run')) {
-                        $migrationQueryBuilder->getConnection()->executeQuery($sqlQuery);
-                    }
-                }
-            }
-        }
+        return $migrationLoader;
+    }
 
-        $output->writeln('Done.');
+    /**
+     * @param InputInterface $input
+     * @return MigrationQueryBuilder
+     */
+    protected function getMigrationQueryBuilder(InputInterface $input)
+    {
+        return $this->getContainer()->get('oro_installer.migrations.query_builder');
     }
 }

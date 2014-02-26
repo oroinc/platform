@@ -35,6 +35,14 @@ class Schema extends BaseSchema
     }
 
     /**
+     * @return array
+     */
+    public function getExtendOptions()
+    {
+        return $this->extendOptionManager->getExtendOptions();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function createTable($tableName)

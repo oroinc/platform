@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendOptionBuilder
 {
@@ -34,7 +35,7 @@ class ExtendOptionBuilder
         if (!isset($this->result[$entityClassName]['fields'])) {
             $this->result[$entityClassName]['fields'] = [];
         }
-        $result[$entityClassName]['fields'][$this->getFieldName($columnName, $options)] = [
+        $this->result[$entityClassName]['fields'][$columnName] = [
             'type'    => $columnType,
             'configs' => $options
         ];
@@ -56,17 +57,5 @@ class ExtendOptionBuilder
         }
 
         return $this->tableToEntityMap[$tableName];
-    }
-
-    protected function getFieldName($columnName, array &$options)
-    {
-        if (isset($options['entity']['field_name'])) {
-            $fieldName = $options['entity']['field_name'];
-            unset($options['entity']['field_name']);
-
-            return $fieldName;
-        }
-
-        return str_replace(" ", "", lcfirst(ucwords(strtr($columnName, "_-", "  "))));
     }
 }

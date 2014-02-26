@@ -6,8 +6,8 @@ use Doctrine\DBAL\Schema\Table as BaseTable;
 
 class Table extends BaseTable
 {
-    const EXTEND_OPTION_PREFIX_NAME = 'extend';
-    const EXTEND_OPTION_PREFIX = 'extend:';
+    const EXTEND_OPTION_PREFIX_NAME = 'oro_extend';
+    const EXTEND_OPTION_PREFIX = 'oro_extend:';
 
     /**
      * @var ExtendOptionManager
@@ -16,19 +16,19 @@ class Table extends BaseTable
 
     /**
      * @param ExtendOptionManager $extendOptionManager
-     * @param BaseTable           $table
+     * @param BaseTable           $baseTable
      */
-    public function __construct(ExtendOptionManager $extendOptionManager, BaseTable $table)
+    public function __construct(ExtendOptionManager $extendOptionManager, BaseTable $baseTable)
     {
         $this->extendOptionManager = $extendOptionManager;
 
         parent::__construct(
-            $table->getName(),
-            $table->getColumns(),
-            $table->getIndexes(),
-            $table->getForeignKeys(),
+            $baseTable->getName(),
+            $baseTable->getColumns(),
+            $baseTable->getIndexes(),
+            $baseTable->getForeignKeys(),
             false,
-            $table->getOptions()
+            $baseTable->getOptions()
         );
     }
 
