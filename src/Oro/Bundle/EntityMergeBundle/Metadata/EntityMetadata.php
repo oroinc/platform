@@ -16,20 +16,18 @@ class EntityMetadata extends Metadata implements MetadataInterface
     /**
      * @var FieldMetadata[]
      */
-    protected $fieldsMetadata;
+    protected $fieldsMetadata = array();
 
     /**
      * @param array $options
-     * @param FieldMetadata[] $fieldsMetadata
      * @param DoctrineMetadata $doctrineMetadata
      */
-    public function __construct(array $options, array $fieldsMetadata, DoctrineMetadata $doctrineMetadata)
+    public function __construct(array $options = array(), DoctrineMetadata $doctrineMetadata = null)
     {
         parent::__construct($options);
-        foreach ($fieldsMetadata as $fieldMetadata) {
-            $this->addFieldMetadata($fieldMetadata);
+        if ($doctrineMetadata) {
+            $this->setDoctrineMetadata($doctrineMetadata);
         }
-        $this->doctrineMetadata = $doctrineMetadata;
     }
 
     /**
@@ -42,10 +40,23 @@ class EntityMetadata extends Metadata implements MetadataInterface
     }
 
     /**
+     * @param DoctrineMetadata $doctrineMetadata
      * @return DoctrineMetadata
+     */
+    public function setDoctrineMetadata(DoctrineMetadata $doctrineMetadata)
+    {
+        $this->doctrineMetadata = $doctrineMetadata;
+    }
+
+    /**
+     * @return DoctrineMetadata
+     * @throws InvalidArgumentException
      */
     public function getDoctrineMetadata()
     {
+        if (!$this->doctrineMetadata) {
+            throw new InvalidArgumentException('Doctrine metadata is not configured.');
+        }
         return $this->doctrineMetadata;
     }
 
