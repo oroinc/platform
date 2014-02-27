@@ -139,7 +139,7 @@ class UpdateCommand extends InitCommand
         // TODO: this is a temporary solution. Should be removed when migrations are finished
         $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($kernel->getRootDir() . '/console');
         $env     = $kernel->getEnvironment();
-        $schemaUpdateCmd = new Process($console . ' oro:installer:migration:load --env ' . $env);
+        $schemaUpdateCmd = new Process($console . ' oro:migration:load --env ' . $env);
         $schemaUpdateCmd->run();
 
         $output->writeln('<info>DONE</info>');

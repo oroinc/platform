@@ -8,7 +8,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
-use Oro\Bundle\InstallerBundle\Migrations\DataFixturesLoader;
+use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
+use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
 
 class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
 {
@@ -62,7 +63,7 @@ class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
         // prepare data fixture loader
         // we should load only fixtures from the specified packages
         /** @var DataFixturesLoader $loader */
-        $loader = $this->getContainer()->get('oro_installer.fixtures.loader');
+        $loader = $this->getContainer()->get('oro_migration.data_fixtures.loader');
         $fixtureRelativePath = $this->getFixtureRelativePath($input);
 
         /** @var BundleInterface $bundle */

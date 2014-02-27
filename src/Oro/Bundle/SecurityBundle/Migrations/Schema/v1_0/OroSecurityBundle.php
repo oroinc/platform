@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
-use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 
 class OroSecurityBundle implements Migration, ContainerAwareInterface
 {

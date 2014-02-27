@@ -3,7 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 
 class OroNotificationBundle implements Migration
 {
