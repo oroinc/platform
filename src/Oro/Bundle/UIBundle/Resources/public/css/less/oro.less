@@ -3580,9 +3580,10 @@ i.pin-status {
   .nav-tabs > li > a:focus {
     color: @gray;
     background-color: #fafafa;
-    border: none;
-    border-right: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-left: none;
     border-radius: 0px;
     margin-right: 0px;
   }
@@ -3594,9 +3595,15 @@ i.pin-status {
     background-color: transparent;
   }
 
+  .nav-tabs > li:first-child > a,
+  .nav-tabs > li:first-child > a:hover,
+  .nav-tabs > li:first-child > a:focus {
+    border-left: 1px solid #ddd;
+  }
+
   .nav-tabs {
     margin-bottom: 0px;
-    border: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
   }
 
   .tab-content {
