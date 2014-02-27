@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Carbon\Carbon;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
-use Oro\Bundle\FilterBundle\Provider\DatevariablesInterface;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 
@@ -157,42 +157,42 @@ abstract class AbstractDateFilter extends AbstractFilter
     protected function applyDatePart($part, $field, Carbon &$dateStart, Carbon &$dateEnd)
     {
         switch ($part) {
-            case AbstractDateFilterType::PART_MONTH:
+            case DateModifierInterface::PART_MONTH:
                 $field = sprintf('MONTH(%s)', $field);
                 $dateStart = $dateStart->month;
                 $dateEnd   = $dateEnd->month;
                 break;
-            case AbstractDateFilterType::PART_DOW:
+            case DateModifierInterface::PART_DOW:
                 $field = sprintf('DAYOFWEEK(%s)', $field);
                 $dateStart = $dateStart->dayOfWeek;
                 $dateEnd   = $dateEnd->dayOfWeek;
                 break;
-            case AbstractDateFilterType::PART_WEEK:
+            case DateModifierInterface::PART_WEEK:
                 $field = sprintf('WEEK(%s)', $field);
                 $dateStart = $dateStart->weekOfYear;
                 $dateEnd   = $dateEnd->weekOfYear;
                 break;
-            case AbstractDateFilterType::PART_DAY:
+            case DateModifierInterface::PART_DAY:
                 $field = sprintf('DAY(%s)', $field);
                 $dateStart = $dateStart->day;
                 $dateEnd   = $dateEnd->day;
                 break;
-            case AbstractDateFilterType::PART_QUARTER:
+            case DateModifierInterface::PART_QUARTER:
                 $field = sprintf('QUARTER(%s)', $field);
                 $dateStart = $dateStart->quarter;
                 $dateEnd   = $dateEnd->quarter;
                 break;
-            case AbstractDateFilterType::PART_DOY:
+            case DateModifierInterface::PART_DOY:
                 $field = sprintf('DAYOFYEAR(%s)', $field);
                 $dateStart = $dateStart->dayOfYear;
                 $dateEnd   = $dateEnd->dayOfYear;
                 break;
-            case AbstractDateFilterType::PART_YEAR:
+            case DateModifierInterface::PART_YEAR:
                 $field = sprintf('YEAR(%s)', $field);
                 $dateStart = $dateStart->year;
                 $dateEnd   = $dateEnd->year;
                 break;
-            case AbstractDateFilterType::PART_VALUE:
+            case DateModifierInterface::PART_VALUE:
             default:
                 break;
         }
@@ -407,32 +407,32 @@ abstract class AbstractDateFilter extends AbstractFilter
             // TODO: calculate if few var items passed
             foreach ($varsCodes as $code) {
                 switch ($code) {
-                    case DatevariablesInterface::VAR_NOW:
+                    case DateModifierInterface::VAR_NOW:
                         $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                         break;
-                    case DatevariablesInterface::VAR_TODAY:
-                    case DatevariablesInterface::VAR_THIS_DAY:
+                    case DateModifierInterface::VAR_TODAY:
+                    case DateModifierInterface::VAR_THIS_DAY:
                         $dateValue = Carbon::parse('today', new \DateTimeZone('UTC'));
                         break;
-                    case DatevariablesInterface::VAR_SOW:
-                    case DatevariablesInterface::VAR_THIS_WEEK:
+                    case DateModifierInterface::VAR_SOW:
+                    case DateModifierInterface::VAR_THIS_WEEK:
                         $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                         $dateValue->startOfWeek();
                         break;
-                    case DatevariablesInterface::VAR_SOM:
-                    case DatevariablesInterface::VAR_THIS_MONTH:
-                    case DatevariablesInterface::VAR_FMQ:
+                    case DateModifierInterface::VAR_SOM:
+                    case DateModifierInterface::VAR_THIS_MONTH:
+                    case DateModifierInterface::VAR_FMQ:
                         $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                         $dateValue->firstOfMonth();
                         break;
-                    case DatevariablesInterface::VAR_SOQ:
-                    case DatevariablesInterface::VAR_THIS_QUARTER:
-                    case DatevariablesInterface::VAR_FDQ:
+                    case DateModifierInterface::VAR_SOQ:
+                    case DateModifierInterface::VAR_THIS_QUARTER:
+                    case DateModifierInterface::VAR_FDQ:
                         $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                         $dateValue->firstOfQuarter();
                         break;
-                    case DatevariablesInterface::VAR_SOY:
-                    case DatevariablesInterface::VAR_THIS_YEAR:
+                    case DateModifierInterface::VAR_SOY:
+                    case DateModifierInterface::VAR_THIS_YEAR:
                         $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                         $dateValue->firstOfYear();
                         break;

@@ -88,12 +88,8 @@
         },
 
         _getDatevariablesByDatepart: function(datePart) {
-            var dateVars = this.inst.settings.dateVarsGetter(datePart),
-                result = [];
-
-            // TODO: filter vars based on datePart
-
-            return dateVars;
+            var dateVars = this.inst.settings.dateVarsGetter(datePart);
+            return dateVars[datePart] ? dateVars[datePart] : dateVars['value'];
         },
 
         /*
@@ -103,7 +99,7 @@
             var $dp = this.inst.dpDiv,
                 o = this.inst.settings,
                 tp_inst = this,
-                currentDatePart = ($.datevariables.datePart == 1) ? 'value' : $.datevariables.datePart,
+                currentDatePart = this.inst.settings.part,
                 dateVars = this._getDatevariablesByDatepart(currentDatePart);
 
             // Prevent displaying twice
