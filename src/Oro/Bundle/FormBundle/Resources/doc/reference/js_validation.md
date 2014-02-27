@@ -25,7 +25,7 @@ Client side validation method is RequireJS module, which should export an array 
 
 Trivial validation rule module would look like:
 ```js
-define(['underscore', 'orotranslation/js/translator']
+define(['underscore', 'oro/translator']
 function (_, __) {
     'use strict';
 
@@ -87,44 +87,44 @@ After that, validation for sub-entinty works only if some of fields is not blank
 
 ## Conformity server side validations to client once
 ```
-+--------------+---------+-----+-------------------------------+---------+
-| Server side  | Symfony | Oro |       Client side             | Coment. |
-+--------------+---------+-----+-------------------------------+---------+
-| All          |    √    |     |                               |   (2)   |
-| Blank        |    √    |     |                               |   (2)   |
-| Callback     |    √    |     |                               |   (2)   |
-| Choice       |    √    |     |                               |   (2)   |
-| Collection   |    √    |     |                               |   (2)   |
-| Count        |         |  √  | oroform/js/validator/count    |   (1)   |
-| Country      |    √    |     |                               |         |
-| DateTime     |    √    |  √  |                               |         |
-| Date         |    √    |  √  | oroform/js/validator/date     |         |
-| Email        |    √    |     | oroform/js/validator/email    |         |
-| False        |    √    |     |                               |   (2)   |
-| File         |    √    |     |                               |   (2)   |
-| Image        |    √    |     |                               |   (2)   |
-| Ip           |    √    |     |                               |         |
-| Language     |    √    |     |                               |         |
-| Length       |    √    |     | oroform/js/validator/length   |         |
-| Locale       |    √    |     |                               |         |
-| MaxLength    |    √    |     |                               |         |
-| Max          |    √    |  √  |                               |         |
-| MinLength    |    √    |     |                               |         |
-| Min          |    √    |  √  |                               |         |
-| NotBlank     |    √    |     | oroform/js/validator/notblank |   (3)   |
-| NotNull      |    √    |  √  | oroform/js/validator/notnull  |   (3)   |
-| Null         |    √    |     |                               |   (2)   |
-| Range        |    √    |  √  | oroform/js/validator/range    |         |
-| Regex        |    √    |     | oroform/js/validator/regex    |         |
-| Repeated     |    √    |     | oroform/js/validator/repeated |         |
-| SizeLength   |    √    |     |                               |         |
-| Size         |    √    |  √  |                               |         |
-| Time         |    √    |     |                               |         |
-| True         |    √    |     |                               |   (2)   |
-| Type         |    √    |     |                               |   (2)   |
-| UniqueEntity |    √    |     |                               |         |
-| Url          |    √    |     | oroform/js/validator/url      |         |
-+--------------+---------+-----+-------------------------------+---------+
++--------------+---------+-----+------------------------+---------+
+| Server side  | Symfony | Oro |       Client side      | Coment. |
++--------------+---------+-----+------------------------+---------+
+| All          |    √    |     |                        |   (2)   |
+| Blank        |    √    |     |                        |   (2)   |
+| Callback     |    √    |     |                        |   (2)   |
+| Choice       |    √    |     |                        |   (2)   |
+| Collection   |    √    |     |                        |   (2)   |
+| Count        |         |  √  | oro/validator/count    |   (1)   |
+| Country      |    √    |     |                        |         |
+| DateTime     |    √    |  √  |                        |         |
+| Date         |    √    |  √  | oro/validator/date     |         |
+| Email        |    √    |     | oro/validator/email    |         |
+| False        |    √    |     |                        |   (2)   |
+| File         |    √    |     |                        |   (2)   |
+| Image        |    √    |     |                        |   (2)   |
+| Ip           |    √    |     |                        |         |
+| Language     |    √    |     |                        |         |
+| Length       |    √    |     | oro/validator/length   |         |
+| Locale       |    √    |     |                        |         |
+| MaxLength    |    √    |     |                        |         |
+| Max          |    √    |  √  |                        |         |
+| MinLength    |    √    |     |                        |         |
+| Min          |    √    |  √  |                        |         |
+| NotBlank     |    √    |     | oro/validator/notblank |   (3)   |
+| NotNull      |    √    |  √  | oro/validator/notnull  |   (3)   |
+| Null         |    √    |     |                        |   (2)   |
+| Range        |    √    |  √  | oro/validator/range    |         |
+| Regex        |    √    |     | oro/validator/regex    |         |
+| Repeated     |    √    |     | oro/validator/repeated |         |
+| SizeLength   |    √    |     |                        |         |
+| Size         |    √    |  √  |                        |         |
+| Time         |    √    |     |                        |         |
+| True         |    √    |     |                        |   (2)   |
+| Type         |    √    |     |                        |   (2)   |
+| UniqueEntity |    √    |     |                        |         |
+| Url          |    √    |     | oro/validator/url      |         |
++--------------+---------+-----+------------------------+---------+
 ```
 
  1. supports only group of checkboxes with same name (like `user[role][]`)

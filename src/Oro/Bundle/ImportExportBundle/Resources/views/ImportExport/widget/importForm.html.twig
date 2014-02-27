@@ -28,7 +28,7 @@
     </div>
 
     <script type="text/javascript">
-        require(['oroui/js/widget-manager', 'oroui/js/messenger'],
+        require(['oro/widget-manager', 'oro/messenger'],
         function(WidgetManager, Messanger) {
             WidgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                 widget.getAction('form_submit', 'adopted', function(action) {

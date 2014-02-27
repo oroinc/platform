@@ -1,15 +1,14 @@
 /*jslint nomen: true, vars: true*/
 /*global define, requirejs*/
 
-define(['jquery', 'underscore', 'backbone', '../constants',
-    'text!./templates/widget-min-template.html',
-    'text!./templates/widget-max-template.html'
+define(['jquery', 'underscore', 'backbone', 'oro/sidebar/constants', 'text!oro/sidebar/widget-container/widget-min-template',
+    'text!oro/sidebar/widget-container/widget-max-template'
     ], function ($, _, Backbone, constants, widgetMinTemplate, widgetMaxTemplate) {
     'use strict';
 
     /**
-     * @export  orosidebar/js/widget-container/view
-     * @class   orosidebar.widgetContainer.View
+     * @export  oro/sidebar/widget-controller/view
+     * @class oro.sidebar.widget-controller.View
      * @extends Backbone.View
      */
     var WidgetView = Backbone.View.extend({

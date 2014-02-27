@@ -7,7 +7,7 @@
 
 {% block genemu_jqueryselect2_javascript %}
     <script type="text/javascript">
-        require(['underscore', 'jquery', 'oroform/js/select2-config'
+        require(['underscore', 'jquery', 'oro/select2-config'
             {%- if configs.extra_modules is defined and not configs.extra_modules is empty %}
             {%- for path in configs.extra_modules -%}
             , '{{ path }}'
@@ -192,7 +192,7 @@
 
     <script type="text/javascript">
         require(['jquery',
-            'oroform/js/multiple-entity', 'oroform/js/multiple-entity/collection', 'oroform/js/multiple-entity/model',
+            'oro/multiple-entity', 'oro/multiple-entity/collection', 'oro/multiple-entity/model',
             'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entities.html') }}',
             'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entity.html') }}'
         ],
@@ -295,7 +295,7 @@
     <input type="text" {{ block('widget_attributes') }} />
 
     <script type="text/javascript">
-        require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui'],
+        require(['jquery', 'oro/formatter/datetime', 'jquery-ui'],
                 function($, datetimeFormatter) {
                     var selector = $("#{{ selector_id }}");
                     var actual = $("#{{ actual_id }}");
@@ -342,7 +342,7 @@
     <input type="text" {{ block('widget_attributes') }} />
 
     <script type="text/javascript">
-        require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui-timepicker'],
+        require(['jquery', 'oro/formatter/datetime', 'jquery-ui-timepicker'],
                 function($, datetimeFormatter) {
                     var selector = $("#{{ selector_id }}");
                     var actual = $("#{{ actual_id }}");

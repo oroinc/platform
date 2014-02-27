@@ -15,7 +15,7 @@
          {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
          data-metadata="{{ metaData|json_encode|raw|escape }}"></div>
     <script type="text/javascript">
-        require(['jquery', 'orodatagrid/js/datagrid-builder'].concat({{ metaData.requireJSModules|json_encode|raw }}),
+        require(['jquery', 'oro/datagrid-builder'].concat({{ metaData.requireJSModules|json_encode|raw }}),
         function ($, datagridBuilder) {
             var builders = _.toArray(arguments).slice(2);
             $(function () {

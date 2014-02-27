@@ -1,6 +1,6 @@
-/*global define*/
-define(['underscore', './number'
-    ], function (_, numberValidator) {
+/* global define */
+define(['underscore', 'oro/validator/number'],
+function (_, numberValidator) {
     'use strict';
 
     var defaultParam = {
@@ -10,7 +10,7 @@ define(['underscore', './number'
     };
 
     /**
-     * @export oroform/js/validator/length
+     * @export oro/validator/length
      */
     return [
         'Length',

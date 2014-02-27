@@ -1,9 +1,9 @@
 /*jshint browser:true*/
 /*jslint nomen: true*/
 /*global define, require*/
-define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator',
-        './map-filter-module-name', './collection-filters-manager'
-    ], function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
+define(['jquery', 'underscore', 'oro/tools', 'oro/mediator', 'orofilter/js/map-filter-module-name',
+    'oro/datafilter/collection-filters-manager'],
+function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
     var initialized = false,

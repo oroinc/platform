@@ -1,7 +1,6 @@
 /* jshint browser:true */
-/*global define*/
-define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger'
-    ], function ($, _, Backbone, __, messenger) {
+define(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/messenger'],
+function ($, _, Backbone, __, messenger) {
     'use strict';
     var service,
         subscriptions = [],
@@ -17,8 +16,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
          *
          * @var {Function} sync protected shortcut for Oro.Synchronizer
          *
-         * @export orosync/js/sync
-         * @name   orosync.sync
+         * @export oro/sync
+         * @name   oro.sync
          */
         sync = function (serv) {
             if (!(_.isObject(serv) && _.isFunction(serv.subscribe) && _.isFunction(serv.unsubscribe))) {

@@ -1,5 +1,5 @@
-/*global define*/
-define(['underscore', '../content-manager'], function (_, ContentManager) {
+/* global define */
+define(['underscore', 'oro/content-manager'], function (_, ContentManager) {
     'use strict';
 
     var initialized = false,

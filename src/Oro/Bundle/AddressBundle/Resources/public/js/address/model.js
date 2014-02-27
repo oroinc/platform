@@ -1,10 +1,11 @@
-/*global define*/
-define(['backbone'], function (Backbone) {
+/* global define */
+define(['backbone'],
+function(Backbone) {
     'use strict';
 
     /**
-     * @export  oroaddress/js/address/model
-     * @class   oroaddress.address.Model
+     * @export  oro/address/model
+     * @class   oro.address.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
@@ -31,7 +32,7 @@ define(['backbone'], function (Backbone) {
             active: false
         },
 
-        getSearchableString: function () {
+        getSearchableString: function() {
             return this.get('country') + ', ' +
                 this.get('city') + ', ' +
                 this.get('street') + ' ' + (this.get('street2') || '');

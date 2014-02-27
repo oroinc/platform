@@ -5,7 +5,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
     'use strict';
 
     /**
-     * @export  orosidebar/widget/hello-world
+     * @export  oro/sidebar/widget/hello-world
      */
     var helloWorld = {};
 

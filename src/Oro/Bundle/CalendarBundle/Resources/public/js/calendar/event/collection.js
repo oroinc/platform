@@ -1,11 +1,11 @@
-/*global define*/
-define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
-    ], function (Backbone, routing, EventModel) {
+/* global define */
+define(['backbone', 'routing', 'oro/calendar/event/model'],
+function(Backbone, routing, EventModel) {
     'use strict';
 
     /**
-     * @export  orocalendar/js/calendar/event/collection
-     * @class   orocalendar.calendar.event.Collection
+     * @export  oro/calendar/event/collection
+     * @class   oro.calendar.event.Collection
      * @extends Backbone.Collection
      */
     return Backbone.Collection.extend({
@@ -43,7 +43,7 @@ define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
          *
          * @param {int} calendarId
          */
-        setCalendar: function (calendarId) {
+        setCalendar: function(calendarId) {
             this.calendar = calendarId;
         },
 
@@ -52,7 +52,7 @@ define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
          *
          * @return {int} The calendar id
          */
-        getCalendar: function () {
+        getCalendar: function() {
             return this.calendar;
         }
     });

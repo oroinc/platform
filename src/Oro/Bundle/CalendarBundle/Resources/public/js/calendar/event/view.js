@@ -1,14 +1,14 @@
-/*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model'
-    ], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
+/* global define */
+define(['underscore', 'backbone', 'oro/translator', 'oro/dialog-widget','oro/loading-mask', 'oro/form-validation',
+    'oro/delete-confirmation', 'oro/calendar/event/model'],
+function(_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  orocalendar/js/calendar/event/view
-     * @class   orocalendar.calendar.event.View
+     * @export  oro/calendar/event/view
+     * @class   oro.calendar.event.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -22,7 +22,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             calendar: null
         },
 
-        initialize: function () {
+        initialize: function() {
             var templateHtml = $(this.options.formTemplateSelector).html();
             this.template = _.template(templateHtml);
 
@@ -30,31 +30,30 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             this.listenTo(this.model, 'destroy', this.onModelDelete);
         },
 
-        remove: function () {
+        remove: function() {
             this.trigger('remove');
             this._hideMask();
             Backbone.View.prototype.remove.apply(this, arguments);
         },
 
-        onModelSave: function () {
+        onModelSave: function() {
             this.trigger('addEvent', this.model);
             this.eventDialog.remove();
             this.remove();
         },
 
-        onModelDelete: function () {
+        onModelDelete: function() {
             this.eventDialog.remove();
             this.remove();
         },
 
-        render: function () {
-            var modelData, eventForm, onDelete;
+        render: function() {
             // create a dialog
             if (!this.model) {
                 this.model = new EventModel();
             }
-            modelData = this.model.toJSON();
-            eventForm = this.template(modelData);
+            var modelData = this.model.toJSON();
+            var eventForm = this.template(modelData);
             eventForm = this.fillForm(eventForm, modelData);
 
             this.eventDialog = new DialogWidget({
@@ -77,17 +76,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             this.eventDialog.render();
 
             // subscribe to 'delete event' event
-            onDelete = _.bind(function (e) {
-                var el, confirm;
+            var onDelete = _.bind(function (e) {
                 e.preventDefault();
-                el = $(e.target);
-                confirm = new DeleteConfirmation({
+                var el = $(e.target);
+                var confirm = new DeleteConfirmation({
                     content: el.data('message')
                 });
                 confirm.on('ok', _.bind(this.deleteModel, this));
                 confirm.open();
             }, this);
-            this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
+            this.eventDialog.getAction('delete', 'adopted', function(deleteAction) {
                 deleteAction.on('click', onDelete);
             });
 
@@ -98,7 +96,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             return this;
         },
 
-        saveModel: function () {
+        saveModel: function() {
             this.showSavingMask();
             try {
                 var data = this.getEventFormData();
@@ -113,7 +111,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             }
         },
 
-        deleteModel: function () {
+        deleteModel: function() {
             this.showDeletingMask();
             try {
                 this.model.destroy({
@@ -125,15 +123,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             }
         },
 
-        showSavingMask: function () {
+        showSavingMask: function() {
             this._showMask(__('Saving...'));
         },
 
-        showDeletingMask: function () {
+        showDeletingMask: function() {
             this._showMask(__('Deleting...'));
         },
 
-        _showMask: function (message) {
+        _showMask: function(message) {
             if (this.loadingMask) {
                 this.loadingMask.$el
                     .find(this.selectors.loadingMaskContent)
@@ -142,13 +140,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             }
         },
 
-        _hideMask: function () {
+        _hideMask: function() {
             if (this.loadingMask) {
                 this.loadingMask.hide();
             }
         },
 
-        _handleResponseError: function (model, response) {
+        _handleResponseError: function(model, response) {
             this.showError(response.responseJSON);
         },
 
@@ -159,9 +157,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             }
         },
 
-        fillForm: function (form, modelData) {
+        fillForm: function(form, modelData) {
             form = $(form);
-            _.each(modelData, function (value, key) {
+            _.each(modelData, function(value, key) {
                 var input = form.find('[name$="[' + key + ']"]');
                 if (input.length) {
                     if (input.is(':checkbox')) {
@@ -176,16 +174,17 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         getEventFormData: function () {
-            var fieldNameRegex = /\[(\w+)\]$/,
-                data = {},
-                formData = this.eventDialog.form.serializeArray();
+            var fieldNameRegex = /\[(\w+)\]$/;
+            var data = {};
+            var formData = this.eventDialog.form.serializeArray();
             formData = formData.concat(this.eventDialog.form.find('input[type=checkbox]:not(:checked)')
-                .map(function () {
+                .map(function() {
                     return {"name": this.name, "value": false};
-                }).get());
+                }).get()
+            );
             _.each(formData, function (dataItem) {
                 var fieldNameData = fieldNameRegex.exec(dataItem.name);
-                if (fieldNameData && fieldNameData.length === 2) {
+                if (fieldNameData && fieldNameData.length == 2) {
                     data[fieldNameData[1]] = dataItem.value;
                 }
             });

@@ -1,10 +1,10 @@
 /* jshint devel:true*/
-/*global define, console*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger', 'oroui/js/loading-mask',
-    'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
-    'orolocale/js/formatter/datetime', 'jquery.fullcalendar'
-    ], function (_, Backbone, __, app, messenger, LoadingMask,
+/* global define */
+define(['underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger', 'oro/loading-mask',
+    'oro/calendar/event/collection', 'oro/calendar/event/model', 'oro/calendar/event/view',
+    'oro/calendar/connection/collection', 'oro/calendar/connection/view', 'oro/calendar/color-manager',
+    'oro/formatter/datetime', 'jquery.fullcalendar'],
+function(_, Backbone, __, app, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
          ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
     'use strict';
@@ -12,8 +12,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
     var $ = Backbone.$;
 
     /**
-     * @export  orocalendar/js/calendar
-     * @class   orocalendar.Сalendar
+     * @export  oro/calendar
+     * @class   oro.Calendar
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -24,7 +24,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                     '<div class="calendar"></div>' +
                     '<div class="loading-mask"></div>' +
                 '</div>' +
-                '</div>'
+            '</div>'
         ),
 
         /** @property {Object} */
@@ -59,7 +59,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         loadingMask: null,
         colorManager: null,
 
-        initialize: function () {
+        initialize: function() {
             // init event collection
             this.options.collection = this.options.collection || new EventCollection();
             this.options.collection.setCalendar(this.options.calendar);
@@ -92,7 +92,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             return this.eventView;
         },
 
-        handleEventViewRemove: function () {
+        handleEventViewRemove: function() {
             this.eventView = null;
         },
 
@@ -109,29 +109,29 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             return this.loadingMask;
         },
 
-        getCollection: function () {
+        getCollection: function() {
             return this.options.collection;
         },
 
-        getCalendarElement: function () {
+        getCalendarElement: function() {
             if (!this.fullCalendar) {
                 this.fullCalendar = this.$el.find(this.selectors.calendar);
             }
             return this.fullCalendar;
         },
 
-        handleEventViewAdd: function (eventModel) {
+        handleEventViewAdd: function(eventModel) {
             this.getCollection().add(eventModel);
         },
 
-        onEventAdded: function (eventModel) {
+        onEventAdded: function(eventModel){
             var fcEvent = eventModel.toJSON();
             this.prepareViewModel(fcEvent);
 
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
-        onEventChanged: function (eventModel) {
+        onEventChanged: function(eventModel){
             var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.get('id'))[0];
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, _.pick(eventModel.attributes, _.keys(_.omit(fcEvent, ['id']))));
@@ -139,7 +139,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
         },
 
-        onEventDeleted: function (eventModel) {
+        onEventDeleted: function(eventModel) {
             this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
         },
 
@@ -151,7 +151,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
 
         },
 
-        select: function (start, end) {
+        select: function(start, end) {
             if (!this.eventView) {
                 try {
                     // TODO: All date values must be in UTC representation according to config timezone,
@@ -169,7 +169,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             }
         },
 
-        eventClick: function (fcEvent) {
+        eventClick: function(fcEvent) {
             if (!this.eventView) {
                 try {
                     var eventModel = this.getCollection().get(fcEvent.id);
@@ -180,7 +180,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             }
         },
 
-        eventDropOrResize: function (fcEvent) {
+        eventDropOrResize: function(fcEvent) {
             this.showSavingMask();
             try {
                 this.getCollection()
@@ -195,15 +195,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                             error: _.bind(function (model, response) {
                                 this.showSaveEventError(response.responseJSON);
                             }, this)
-                        }
-                    );
+                        });
             } catch (err) {
                 this.showLoadEventsError(err);
             }
         },
 
-        loadEvents: function (start, end, callback) {
-            var onEventsLoad = _.bind(function () {
+        loadEvents: function(start, end, callback) {
+            var onEventsLoad = _.bind(function() {
                 var fcEvents = this.getCollection().toJSON();
                 this.prepareViewModels(fcEvents);
                 this._hideMask();
@@ -219,7 +218,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                     // load events from a server
                     this.getCollection().fetch({
                         success: onEventsLoad,
-                        error: _.bind(function (collection, response) {
+                        error: _.bind(function(collection, response) {
                             callback({});
                             this.showLoadEventsError(response.responseJSON);
                         }, this)
@@ -252,15 +251,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             return dateTimeFormatter.convertDateTimeToBackendFormat(date);
         },
 
-        showSavingMask: function () {
+        showSavingMask: function() {
             this._showMask(__('Saving...'));
         },
 
-        showLoadingMask: function () {
+        showLoadingMask: function() {
             this._showMask(__('Loading...'));
         },
 
-        _showMask: function (message) {
+        _showMask: function(message) {
             if (this.enableEventLoading) {
                 var loadingMaskInstance = this.getLoadingMask();
                 loadingMaskInstance.$el
@@ -270,7 +269,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             }
         },
 
-        _hideMask: function () {
+        _hideMask: function() {
             if (this.loadingMask) {
                 this.loadingMask.hide();
             }
@@ -306,7 +305,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             messenger.notificationFlashMessage('error', msg);
         },
 
-        initCalendarContainer: function () {
+        initCalendarContainer: function() {
             // init events container
             var eventsContainer = this.$el.find(this.options.eventsOptions.containerSelector);
             if (eventsContainer.length === 0) {
@@ -317,16 +316,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         initializeFullCalendar: function () {
-            var options, keys, self;
             // prepare options for jQuery FullCalendar control
-            options = {
+            var options = {
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
                 eventClick: _.bind(this.eventClick, this),
                 eventDrop: _.bind(this.eventDropOrResize, this),
                 eventResize: _.bind(this.eventDropOrResize, this),
-                loading: _.bind(function (show) {
+                loading: _.bind(function(show) {
                     if (show) {
                         this.showLoadingMask();
                     } else {
@@ -334,8 +332,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                     }
                 }, this)
             };
-            keys = [
-                'date', 'defaultView', 'editable', 'selectable',
+            var keys = ['date', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'allDaySlot', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
@@ -353,7 +350,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             }
 
             //Fix aspect ration to prevent double scroll for week and day views.
-            options.viewRender = _.bind(function (view) {
+            options.viewRender = _.bind(function(view) {
                 if (view.name !== 'month') {
                     this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.0);
                 } else {
@@ -361,13 +358,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
                 }
             }, this);
 
-            self = this;
-            options.viewDisplay = function () {
-                self.setTimeline();
-                setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
+            var that = this;
+            options.viewDisplay = function(view) {
+                that.setTimeline();
+                setInterval(function () { that.setTimeline(); }, 5 * 60 * 1000);
             };
-            options.windowResize = function () {
-                self.setTimeline();
+            options.windowResize = function(view) {
+                that.setTimeline();
             };
 
             // create jQuery FullCalendar control
@@ -376,14 +373,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
         },
 
         initializeConnectionsView: function () {
-            var connectionsContainer, connectionsTemplate;
             // init connections container
-            connectionsContainer = this.$el.find(this.options.connectionsOptions.containerSelector);
+            var connectionsContainer = this.$el.find(this.options.connectionsOptions.containerSelector);
             if (connectionsContainer.length === 0) {
                 throw new Error("Cannot find '" + this.options.connectionsOptions.containerSelector + "' element.");
             }
             connectionsContainer.empty();
-            connectionsTemplate = _.template($(this.options.connectionsOptions.containerTemplateSelector).html());
+            var connectionsTemplate = _.template($(this.options.connectionsOptions.containerTemplateSelector).html());
             connectionsContainer.append($(connectionsTemplate()));
 
             // create a view for a list of connections
@@ -412,7 +408,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             }, this));
         },
 
-        render: function () {
+        render: function() {
             // init views
             this.initCalendarContainer();
             if (_.isUndefined(this.options.connectionsOptions.containerTemplateSelector)) {
@@ -428,47 +424,46 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app'
             return this;
         },
 
-        setTimeline: function () {
-            var todayElement, parentDiv, timelineElement, curCalView, percentOfDay, curSeconds, topLoc, dayCol,
-                calendarElement = this.getCalendarElement(),
-                curTime = new Date();
-            curTime = new Date(curTime.getTime() +
-                curTime.getTimezoneOffset() * 60000 +
-                this.options.eventsOptions.timezoneOffset * 60000);
+        setTimeline: function() {
+            var calendarElement = this.getCalendarElement();
+            var curTime = new Date();
+            curTime = new Date(curTime.getTime()
+                + curTime.getTimezoneOffset() * 60000
+                + this.options.eventsOptions.timezoneOffset * 60000);
             // this function is called every 5 minutes
-            if (curTime.getHours() === 0 && curTime.getMinutes() <= 5) {
+            if (curTime.getHours() == 0 && curTime.getMinutes() <= 5) {
                 // the day has changed
-                todayElement = calendarElement.find('.fc-today');
+                var todayElement = calendarElement.find('.fc-today');
                 todayElement.removeClass('fc-today');
                 todayElement.removeClass('fc-state-highlight');
                 todayElement.next().addClass('fc-today');
                 todayElement.next().addClass('fc-state-highlight');
             }
 
-            parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
-            timelineElement = parentDiv.children('.timeline');
-            if (timelineElement.length === 0) {
+            var parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
+            var timelineElement = parentDiv.children('.timeline');
+            if (timelineElement.length == 0) {
                 // if timeline isn't there, add it
                 timelineElement = $('<hr>').addClass('timeline');
                 parentDiv.prepend(timelineElement);
             }
 
-            curCalView = calendarElement.fullCalendar('getView');
+            var curCalView = calendarElement.fullCalendar('getView');
             if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
                 timelineElement.show();
             } else {
                 timelineElement.hide();
             }
 
-            curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
-            percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
-            topLoc = Math.floor(parentDiv.height() * percentOfDay);
+            var curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+            var percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
+            var topLoc = Math.floor(parentDiv.height() * percentOfDay);
             timelineElement.css('top', topLoc + 'px');
 
-            if (curCalView.name === 'agendaWeek') {
+            if (curCalView.name == 'agendaWeek') {
                 // week view, don't want the timeline to go the whole way across
-                dayCol = calendarElement.find('.fc-today:visible');
-                if (dayCol.position() !== null) {
+                var dayCol = calendarElement.find('.fc-today:visible');
+                if (dayCol.position() != null) {
                     timelineElement.css({
                         left: (dayCol.position().left - 1) + 'px',
                         width: (dayCol.width() + 2) + 'px'

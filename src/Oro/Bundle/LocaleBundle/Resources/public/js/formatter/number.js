@@ -1,13 +1,13 @@
-/*global define*/
-define(['numeral', '../locale-settings'
-    ], function (numeral, localeSettings) {
+/* global define */
+define(['numeral', 'oro/locale-settings'],
+function(numeral, localeSettings) {
     'use strict';
 
     /**
      * Number Formatter
      *
-     * @export orolocale/js/formatter/number
-     * @name   orolocale.formatter.number
+     * @export oro/formatter/number
+     * @name   oro.formatter.number
      */
     var NumberFormatter = function() {
         var createFormat = function(options) {

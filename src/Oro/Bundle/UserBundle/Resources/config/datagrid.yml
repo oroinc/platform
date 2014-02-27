@@ -352,7 +352,7 @@ datagrid:
 
         options:
             requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
+              - oro/datagrid/column-form-listener
             columnListener:
                 dataField: id
                 columnName: has_role
@@ -416,7 +416,7 @@ datagrid:
 
         options:
             requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
+              - oro/datagrid/column-form-listener
             columnListener:
                 dataField: id
                 columnName: has_group

@@ -45,7 +45,7 @@ function($, _) {
         };
 
         /**
-         * @export oroui/js/messenger
+         * @export oro/messenger
          * @name   oro.messenger
          */
         return {

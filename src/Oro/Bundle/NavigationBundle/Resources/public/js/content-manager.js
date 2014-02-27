@@ -1,6 +1,6 @@
-/*global define*/
-define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'
-    ], function (_, sync, mediator, messenger, __) {
+/* global define */
+define(['underscore', 'oro/sync', 'oro/mediator', 'oro/messenger', 'oro/translator'],
+function (_, sync, mediator, messenger, __) {
     'use strict';
 
     /**
@@ -12,8 +12,8 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
      *  - listing sever messages for content update;
      *  - shows notification for outdated content;
      *
-     * @export oronavigation/js/content-manager
-     * @name   oronavigation.contentManager
+     * @export oro/content-manager
+     * @name   oro.contentManager
      * @type {Object}
      */
     var contentManager,
@@ -119,10 +119,10 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
     function onUpdate(tags) {
         tags = prepareTags(tags);
 
-        _.each(pagesTags, function (items, url) {
+        _.each(pagesTags, function(items, url) {
             var handler, callbacks = [];
             // collect callbacks for outdated contents
-            _.each(items, function (options) {
+            _.each(items, function(options) {
                 if (_.intersection(options.tags, tags).length) {
                     callbacks.push(options.callback || defaultCallback);
                 }
@@ -141,7 +141,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
 
             } else {
                 // cached page is outdated - setup page changing handler
-                handler = function (obj) {
+                handler = function(obj) {
                     if (url === obj.url) {
                         _.each(callbacks, function (callback) {
                             callback(url);
@@ -175,7 +175,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
     }
 
     // handles page changing
-    mediator.on('hash_navigation_request:start', function (navigation) {
+    mediator.on('hash_navigation_request:start', function(navigation) {
         changeUrl(navigation.url);
         if (notifier) {
             notifier.close();
@@ -188,8 +188,8 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
     /**
      * Router for hash navigation
      *
-     * @export oronavigation/js/content-manager
-     * @name   oronavigation.contentManager
+     * @export  oro/content-manager
+     * @class   oro.contentManager
      */
     contentManager = {
         /**
@@ -229,7 +229,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          *
          * @param {?string} url
          */
-        clearCache: function (url) {
+        clearCache: function(url) {
             if (!_.isUndefined(url)) {
                 url = clearUrl(url);
                 delete pagesCache[url];
@@ -245,7 +245,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          * @param {string} url
          * @param {Object} page
          */
-        addPage: function (url, page) {
+        addPage: function(url, page) {
             pagesCache[clearUrl(url)] = page;
         },
 
@@ -255,7 +255,7 @@ define(['underscore', 'orosync/js/sync', 'oroui/js/mediator', 'oroui/js/messenge
          * @param {string} url
          * @return {Object}
          */
-        getPage: function (url) {
+        getPage: function(url) {
             return pagesCache[clearUrl(url)] || false;
         }
     };

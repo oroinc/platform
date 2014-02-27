@@ -213,7 +213,7 @@ class OrmTotalsExtension extends AbstractExtension
         $totals = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $metaData
             ->offsetAddToArray('state', ['totals' => $totals])
-            ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orodatagrid/js/totals-builder']);
+            ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['oro/datagrid/totals-builder']);
     }
 
     /**

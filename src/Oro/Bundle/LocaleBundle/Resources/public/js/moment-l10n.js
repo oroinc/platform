@@ -1,6 +1,6 @@
-/*global define*/
-define(['moment', 'orotranslation/js/translator', './locale-settings'
-    ], function (moment, __, localeSettings) {
+/* global define */
+define(['moment', 'oro/translator', 'oro/locale-settings'],
+function(moment, __, localeSettings) {
     'use strict';
 
     var locale = localeSettings.getLocale();

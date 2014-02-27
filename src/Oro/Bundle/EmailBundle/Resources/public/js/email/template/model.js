@@ -1,11 +1,11 @@
-/*global define*/
-define(['backbone'
-    ], function (Backbone) {
+/* global define */
+define(['backbone'],
+function(Backbone) {
     'use strict';
 
     /**
-     * @export  oroemail/js/email/template/model
-     * @class   oroemail.email.template.Model
+     * @export  oro/email/template/model
+     * @class   oro.email.template.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
