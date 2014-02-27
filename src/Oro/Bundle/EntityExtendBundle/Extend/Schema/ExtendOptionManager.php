@@ -23,6 +23,11 @@ class ExtendOptionManager
         $this->entityClassResolver = $entityClassResolver;
     }
 
+    public function getEntityClassResolver()
+    {
+        return $this->entityClassResolver;
+    }
+
     public function addTableOptions($tableName, $options)
     {
         $this->setOptions($tableName, $options);

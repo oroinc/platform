@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendSchema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;

@@ -48,7 +48,7 @@ class MigrationQueryBuilder
         $platform   = $this->connection->getDatabasePlatform();
         $fromSchema = $this->getSchema();
         foreach ($migrations as $migration) {
-            $toSchema   = clone $fromSchema;
+            $toSchema   = $this->cloneSchema($fromSchema);
             $queries    = $migration->up($toSchema);
             $comparator = new Comparator();
             $schemaDiff = $comparator->compare($fromSchema, $toSchema);
@@ -78,6 +78,11 @@ class MigrationQueryBuilder
         }
 
         return $result;
+    }
+
+    protected function cloneSchema(Schema $schema)
+    {
+        return clone $schema;
     }
 
     /**

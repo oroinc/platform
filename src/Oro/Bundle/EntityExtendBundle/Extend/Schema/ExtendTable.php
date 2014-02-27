@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -15,12 +17,17 @@ class ExtendTable extends Table
      */
     protected $extendOptionManager;
 
+    /** @var  ExtendSchema */
+    protected $schema;
+
     /**
+     * @param ExtendSchema $schema
      * @param ExtendOptionManager $extendOptionManager
-     * @param Table               $baseTable
+     * @param Table $baseTable
      */
-    public function __construct(ExtendOptionManager $extendOptionManager, Table $baseTable)
+    public function __construct(ExtendSchema $schema, ExtendOptionManager $extendOptionManager, Table $baseTable)
     {
+        $this->schema = $schema;
         $this->extendOptionManager = $extendOptionManager;
 
         parent::__construct(
@@ -65,6 +72,44 @@ class ExtendTable extends Table
      */
     public function addColumn($columnName, $typeName, array $options = array())
     {
+        switch ($typeName) {
+            case 'manyToOne':
+
+                break;
+            case 'oneToMany':
+                $selfColumnName = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
+                $selfTableName = $this->getName();
+                $selfClassName =
+                    $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
+                $selfClassNameParts = explode('\\', $selfClassName);
+
+                $targetTableName = $options[self::EXTEND_OPTION_PREFIX_NAME]['extend']['target']['table_name'];
+                if (!$this->schema->hasTable($targetTableName)) {
+                    throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
+                }
+                $targetTable = $this->schema->getTable($targetTableName);
+                $targetColumnName =
+                    ExtendConfigDumper::FIELD_PREFIX .
+                    strtolower(array_pop($selfClassNameParts)) .
+                    '_' .
+                    $columnName .
+                    '_id';
+
+                parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
+                parent::addForeignKeyConstraint(
+                    $targetTableName,
+                    [$selfColumnName],
+                    $targetTable->getPrimaryKey()->getColumns()
+                );
+                $targetTable->addColumn($targetColumnName, 'integer', ['notnull' => false]);
+                $targetTable->addForeignKeyConstraint($selfTableName, [$targetColumnName], [$selfColumnName]);
+
+                break;
+            case 'manyToMany':
+
+                break;
+        }
+
         foreach ($options as $name => $value) {
             if ($name === self::EXTEND_OPTION_PREFIX_NAME) {
                 $this->extendOptionManager->addColumnOptions(
@@ -85,5 +130,10 @@ class ExtendTable extends Table
         }
 
         return parent::addColumn($columnName, $typeName, $options);
+    }
+
+    public function setSchema(ExtendSchema $schema)
+    {
+        $this->schema = $schema;
     }
 }
