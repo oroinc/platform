@@ -3,11 +3,10 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ExtendOptionManager
 {
-    const NAME_DELIMITER = '.';
-
     /**
      * @var EntityClassResolver
      */
@@ -33,19 +32,9 @@ class ExtendOptionManager
         $this->setOptions($tableName, $options);
     }
 
-    public function addTableOption($tableName, $name, $value)
-    {
-        $this->setOption($tableName, $name, $value);
-    }
-
     public function addColumnOptions($tableName, $columnName, $columnType, $options)
     {
         $this->setOptions(sprintf('%s!%s!%s', $tableName, $columnName, $columnType), $options);
-    }
-
-    public function addColumnOption($tableName, $columnName, $columnType, $name, $value)
-    {
-        $this->setOption(sprintf('%s!%s!%s', $tableName, $columnName, $columnType), $name, $value);
     }
 
     public function getExtendOptions()
@@ -73,9 +62,11 @@ class ExtendOptionManager
         return $builder->get();
     }
 
-    public function isConfigurableEntity($tableName)
+    public function isCustomEntity($tableName)
     {
-        return isset($this->options[$tableName]);
+        return isset($this->options[$tableName])
+            && isset($this->options[$tableName]['extend']['owner'])
+            && $this->options[$tableName]['extend']['owner'] === ExtendScope::OWNER_CUSTOM;
     }
 
     protected function setOptions($objectKey, $options)
@@ -98,30 +89,6 @@ class ExtendOptionManager
                 } else {
                     $this->options[$objectKey][$scope] = $values;
                 }
-            }
-        }
-    }
-
-    protected function setOption($objectKey, $name, $value)
-    {
-        if (!isset($this->options[$objectKey])) {
-            $this->options[$objectKey] = [];
-        }
-        $options       = & $this->options[$objectKey];
-        $nameParts     = explode(self::NAME_DELIMITER, $name);
-        $namePartCount = count($nameParts);
-        for ($i = 0; $i < $namePartCount; $i++) {
-            $namePart = $nameParts[$i];
-            if (empty($namePart)) {
-                throw new \InvalidArgumentException(sprintf('Invalid option name: %s.', $name));
-            }
-            if ($i === $namePartCount - 1) {
-                $options[$namePart] = $value;
-            } else {
-                if (!isset($options[$namePart])) {
-                    $options[$namePart] = [];
-                }
-                $options = & $options[$namePart];
             }
         }
     }

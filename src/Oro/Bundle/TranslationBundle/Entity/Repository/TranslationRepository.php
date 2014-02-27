@@ -45,4 +45,35 @@ class TranslationRepository extends EntityRepository
             ]
         );
     }
+
+    /**
+     * Update existing translation value or create new one if it does not exist
+     *
+     * @param string $key
+     * @param string $value
+     * @param string $locale
+     * @param string $domain
+     * @param int    $scope
+     */
+    public function saveValue(
+        $key,
+        $value,
+        $locale,
+        $domain = self::DEFAULT_DOMAIN,
+        $scope = Translation::SCOPE_SYSTEM
+    ) {
+        $translationValue = $this->findValue($key, $locale, $domain, $scope);
+        if (!$translationValue) {
+            $translationValue = new Translation();
+            $translationValue
+                ->setKey($key)
+                ->setValue($value)
+                ->setLocale($locale)
+                ->setDomain($domain)
+                ->setScope($scope);
+        } else {
+            $translationValue->setValue($value);
+        }
+        $this->getEntityManager()->persist($translationValue);
+    }
 }

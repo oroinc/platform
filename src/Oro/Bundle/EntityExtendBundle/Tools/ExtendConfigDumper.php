@@ -14,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 class ExtendConfigDumper
 {
     const ENTITY         = 'Extend\\Entity\\';
+    const TABLE_PREFIX   = 'oro_extend_';
     const FIELD_PREFIX   = 'field_';
     const DEFAULT_PREFIX = 'default_';
 
@@ -29,7 +30,7 @@ class ExtendConfigDumper
 
     /**
      * @param OroEntityManager $em
-     * @param string $cacheDir
+     * @param string           $cacheDir
      */
     public function __construct(OroEntityManager $em, $cacheDir)
     {
@@ -46,12 +47,12 @@ class ExtendConfigDumper
 
         $extendProvider = $this->em->getExtendConfigProvider();
 
-        $configs = $className
+        $extendConfigs = $className
             ? [$extendProvider->getConfig($className)]
             : $extendProvider->getConfigs();
 
-        foreach ($configs as $config) {
-            $this->checkSchema($config);
+        foreach ($extendConfigs as $extendConfig) {
+            $this->checkSchema($extendConfig);
         }
 
         $this->clear();
@@ -61,11 +62,11 @@ class ExtendConfigDumper
     {
         $schemas        = [];
         $extendProvider = $this->em->getExtendConfigProvider();
-        $configs        = $extendProvider->getConfigs();
-        foreach ($configs as $config) {
-            $schema = $config->get('schema');
+        $extendConfigs  = $extendProvider->getConfigs();
+        foreach ($extendConfigs as $extendConfig) {
+            $schema = $extendConfig->get('schema');
             if ($schema) {
-                $schemas[$config->getId()->getClassName()] = $schema;
+                $schemas[$extendConfig->getId()->getClassName()] = $schema;
             }
         }
 
@@ -89,34 +90,39 @@ class ExtendConfigDumper
     }
 
     /**
-     * @param ConfigInterface $entityConfig
+     * @param ConfigInterface $extendConfig
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function checkSchema(ConfigInterface $entityConfig)
+    protected function checkSchema(ConfigInterface $extendConfig)
     {
-        if (!$entityConfig->is('is_extend') || !$entityConfig->is('upgradeable')) {
+        if (!$extendConfig->is('is_extend') || !$extendConfig->is('upgradeable')) {
             return;
         }
 
         $extendProvider = $this->em->getExtendConfigProvider();
-        $className      = $entityConfig->getId()->getClassName();
+        $className      = $extendConfig->getId()->getClassName();
         $doctrine       = [];
 
         if (strpos($className, self::ENTITY) !== false) {
-            $entityName            = $className;
-            $type                  = 'Custom';
+            $type       = 'Custom';
+            $entityName = $className;
+            $tableName  = $extendConfig->get('table');
+            if (!$tableName) {
+                $tableName = self::TABLE_PREFIX
+                    . strtolower(str_replace('\\', '', str_replace(self::ENTITY, '', $entityName)));
+            }
             $doctrine[$entityName] = [
                 'type'   => 'entity',
-                'table'  => 'oro_extend_' . strtolower(str_replace('\\', '', $entityName)),
+                'table'  => $tableName,
                 'fields' => [
                     'id' => ['type' => 'integer', 'id' => true, 'generator' => ['strategy' => 'AUTO']]
                 ],
             ];
         } else {
-            $entityName            = $entityConfig->get('extend_class');
+            $entityName            = $extendConfig->get('extend_class');
             $type                  = 'Extend';
             $doctrine[$entityName] = [
                 'type'   => 'mappedSuperclass',
@@ -124,9 +130,9 @@ class ExtendConfigDumper
             ];
         }
 
-        $entityState = $entityConfig->get('state');
+        $entityState = $extendConfig->get('state');
 
-        $schema             = $entityConfig->get('schema');
+        $schema             = $extendConfig->get('schema');
         $properties         = array();
         $relationProperties = $schema ? $schema['relation'] : array();
         $defaultProperties  = array();
@@ -171,9 +177,9 @@ class ExtendConfigDumper
 
         $extendProvider->flush();
 
-        $entityConfig->set('state', $entityState);
-        if ($entityConfig->is('state', ExtendScope::STATE_DELETED)) {
-            $entityConfig->set('is_deleted', true);
+        $extendConfig->set('state', $entityState);
+        if ($extendConfig->is('state', ExtendScope::STATE_DELETED)) {
+            $extendConfig->set('is_deleted', true);
 
             $extendProvider->map(
                 function (Config $config) use ($extendProvider) {
@@ -183,10 +189,10 @@ class ExtendConfigDumper
                 $className
             );
         } else {
-            $entityConfig->set('state', ExtendScope::STATE_ACTIVE);
+            $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         }
 
-        $relations = $entityConfig->get('relation') ? : [];
+        $relations = $extendConfig->get('relation') ? : [];
         foreach ($relations as &$relation) {
             if ($relation['field_id']) {
                 $relation['assign'] = true;
@@ -204,7 +210,7 @@ class ExtendConfigDumper
                 $this->checkRelation($relation['target_entity'], $relation['field_id']);
             }
         }
-        $entityConfig->set('relation', $relations);
+        $extendConfig->set('relation', $relations);
 
         $schema = [
             'class'     => $className,
@@ -222,9 +228,9 @@ class ExtendConfigDumper
             $schema['inherit'] = get_parent_class($schema['parent']);
         }
 
-        $entityConfig->set('schema', $schema);
+        $extendConfig->set('schema', $schema);
 
-        $extendProvider->persist($entityConfig);
+        $extendProvider->persist($extendConfig);
         $extendProvider->flush();
     }
 

@@ -8,8 +8,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendTable extends Table
 {
-    const EXTEND_OPTION_PREFIX_NAME = 'oro_options';
-    const EXTEND_OPTION_PREFIX      = 'oro_options:';
+    const ORO_OPTIONS_NAME              = 'oro_options';
+    const AUTO_GENERATED_ID_COLUMN_NAME = 'id';
 
     /**
      * @var ExtendOptionManager
@@ -44,23 +44,23 @@ class ExtendTable extends Table
      */
     public function addOption($name, $value)
     {
-        if (0 === strpos($name, self::EXTEND_OPTION_PREFIX_NAME)) {
-            if (strlen(self::EXTEND_OPTION_PREFIX_NAME) === strlen($name)) {
-                $this->extendOptionManager->addTableOptions(
-                    $this->getName(),
-                    $value
-                );
-
-                return $this;
-            } elseif (0 === strpos($name, self::EXTEND_OPTION_PREFIX)) {
-                $this->extendOptionManager->addTableOption(
-                    $this->getName(),
-                    substr($name, strlen(self::EXTEND_OPTION_PREFIX)),
-                    $value
-                );
-
-                return $this;
+        if ($name === self::ORO_OPTIONS_NAME) {
+            if (isset($value['extend']['entity_name'])) {
+                // add a table name to options
+                $value['extend']['table'] = $this->getName();
             }
+            $this->extendOptionManager->addTableOptions(
+                $this->getName(),
+                $value
+            );
+
+            if (isset($value['extend']['entity_name'])) {
+                // add a primary key for new custom entity
+                $this->addColumn(self::AUTO_GENERATED_ID_COLUMN_NAME, 'integer', ['autoincrement' => true]);
+                $this->setPrimaryKey([self::AUTO_GENERATED_ID_COLUMN_NAME]);
+            }
+
+            return $this;
         }
 
         return parent::addOption($name, $value);
@@ -79,7 +79,7 @@ class ExtendTable extends Table
                     $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
                 $selfClassNameParts = explode('\\', $selfClassName);
 
-                $targetTableName = $options[self::EXTEND_OPTION_PREFIX_NAME]['extend']['target']['table_name'];
+                $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
                 if (!$this->schema->hasTable($targetTableName)) {
                     throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
                 }
@@ -113,7 +113,7 @@ class ExtendTable extends Table
             case 'manyToOne':
                 $selfColumnName = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
 
-                $targetTableName = $options[self::EXTEND_OPTION_PREFIX_NAME]['extend']['target']['table_name'];
+                $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
                 if (!$this->schema->hasTable($targetTableName)) {
                     throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
                 }
@@ -131,25 +131,25 @@ class ExtendTable extends Table
                 break;
 
             case 'manyToMany':
-                $selfColumnName = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
-                $selfTableName = $this->getName();
-                $selfClassName =
+                $selfColumnName     = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
+                $selfTableName      = $this->getName();
+                $selfClassName      =
                     $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
                 $selfClassNameParts = explode('\\', $selfClassName);
-                $selfName = strtolower(array_pop($selfClassNameParts));
+                $selfName           = strtolower(array_pop($selfClassNameParts));
 
-                $targetTableName = $options[self::EXTEND_OPTION_PREFIX_NAME]['extend']['target']['table_name'];
+                $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
                 if (!$this->schema->hasTable($targetTableName)) {
                     throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
                 }
-                $targetTable = $this->schema->getTable($targetTableName);
-                $targetClassName =
+                $targetTable          = $this->schema->getTable($targetTableName);
+                $targetClassName      =
                     $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($targetTableName);
                 $targetClassNameParts = explode('\\', $targetClassName);
-                $targetName = strtolower(array_pop($targetClassNameParts));
+                $targetName           = strtolower(array_pop($targetClassNameParts));
 
                 parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
-                parent::addUniqueIndex([$selfColumnName], 'UNIQ_'.$selfColumnName);
+                parent::addUniqueIndex([$selfColumnName], 'UNIQ_' . $selfColumnName);
                 parent::addForeignKeyConstraint(
                     $targetTable,
                     [$selfColumnName],
@@ -158,10 +158,10 @@ class ExtendTable extends Table
                 );
                 parent::addIndex([$selfColumnName], 'IDX_' . $selfColumnName, ['KEY']);
 
-                $relationsTableName = 'oro_' . $selfName. '_' . $targetName. '_' . $columnName;
-                $relationsTable = $this->schema->createTable($relationsTableName);
+                $relationsTableName = 'oro_' . $selfName . '_' . $targetName . '_' . $columnName;
+                $relationsTable     = $this->schema->createTable($relationsTableName);
                 $relationsTable->addColumn($selfName . '_id', 'integer');
-                $relationsTable->addIndex([$selfName . '_id'], 'IDX_'. $selfName . '_id');
+                $relationsTable->addIndex([$selfName . '_id'], 'IDX_' . $selfName . '_id');
                 $relationsTable->addForeignKeyConstraint(
                     $this,
                     [$selfName . '_id'],
@@ -169,7 +169,7 @@ class ExtendTable extends Table
                     ['onDelete' => 'CASCADE']
                 );
                 $relationsTable->addColumn($targetName . '_id', 'integer');
-                $relationsTable->addIndex([$targetName . '_id'], 'IDX_'. $targetName . '_id');
+                $relationsTable->addIndex([$targetName . '_id'], 'IDX_' . $targetName . '_id');
                 $relationsTable->addForeignKeyConstraint(
                     $targetTable,
                     [$targetName . '_id'],
@@ -181,14 +181,17 @@ class ExtendTable extends Table
                 break;
         }
 
-        if (!isset($options[self::EXTEND_OPTION_PREFIX_NAME])
-            && $this->extendOptionManager->isConfigurableEntity($this->getName())
+        if (!isset($options[self::ORO_OPTIONS_NAME])
+            && $this->extendOptionManager->isCustomEntity($this->getName())
+            && $columnName !== self::AUTO_GENERATED_ID_COLUMN_NAME
         ) {
-            $options[self::EXTEND_OPTION_PREFIX_NAME] = [];
+            $options[self::ORO_OPTIONS_NAME] = [
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
+            ];
         }
 
         foreach ($options as $name => $value) {
-            if ($name === self::EXTEND_OPTION_PREFIX_NAME) {
+            if ($name === self::ORO_OPTIONS_NAME) {
                 $this->extendOptionManager->addColumnOptions(
                     $this->getName(),
                     $columnName,

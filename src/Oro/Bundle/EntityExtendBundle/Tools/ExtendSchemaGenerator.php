@@ -53,8 +53,8 @@ class ExtendSchemaGenerator
     }
 
     /**
-     * @param string $className     Entity's class name
-     * @param array  $options Entity's options
+     * @param string $className Entity's class name
+     * @param array  $options   Entity's options
      * @throws \InvalidArgumentException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -108,12 +108,7 @@ class ExtendSchemaGenerator
             }
         }
 
-        foreach ($configOptions as $scope => $values) {
-            $config = $this->configManager->getProvider($scope)->getConfig($className);
-            foreach ($values as $key => $value) {
-                $config->set($key, $value);
-            }
-        }
+        $this->updateConfigs($configOptions, $className);
     }
 
     protected function createFieldModel($className, $fieldName, $fieldType, $mode, array $configOptions)
@@ -127,7 +122,7 @@ class ExtendSchemaGenerator
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, $mode);
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
-        $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
+        $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
         $extendConfig->set('state', ExtendScope::STATE_NEW);
         $extendConfig->set('extend', true);
         if (isset($fieldConfig['options'])) {
@@ -138,11 +133,21 @@ class ExtendSchemaGenerator
         $this->configManager->persist($extendConfig);
 
         if (isset($configOptions['configs'])) {
-            foreach ($configOptions['configs'] as $scope => $values) {
-                $config = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
-                foreach ($values as $key => $value) {
-                    $config->set($key, $value);
-                }
+            $this->updateConfigs($configOptions['configs'], $className, $fieldName);
+        }
+    }
+
+    /**
+     * @param array       $options
+     * @param string      $className
+     * @param string|null $fieldName
+     */
+    protected function updateConfigs(array $options, $className, $fieldName = null)
+    {
+        foreach ($options as $scope => $values) {
+            $config = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
+            foreach ($values as $key => $value) {
+                $config->set($key, $value);
             }
         }
     }
