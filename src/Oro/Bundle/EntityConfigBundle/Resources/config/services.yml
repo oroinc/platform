@@ -132,4 +132,4 @@ services:
         arguments:
             - @oro_entity_config.tools.dumper
         tags:
-            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: 120 }
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -80 }

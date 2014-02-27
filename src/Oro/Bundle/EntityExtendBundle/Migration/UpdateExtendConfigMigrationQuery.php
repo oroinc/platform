@@ -41,7 +41,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
             if (isset($entityOptions['fields'])) {
                 foreach ($entityOptions['fields'] as $fieldName => $fieldOptions) {
                     $result[] = sprintf(
-                        'UPDATE EXTEND FIELD %s FOR %s',
+                        'CREATE EXTEND FIELD %s FOR %s',
                         $fieldName,
                         $entityClassName
                     );
