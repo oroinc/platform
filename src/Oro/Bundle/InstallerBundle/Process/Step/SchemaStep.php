@@ -24,7 +24,7 @@ class SchemaStep extends AbstractStep
                     array('--force' => true, '--full-database' => true)
                 );
             case 'schema-update':
-                return $this->handleAjaxAction('oro:migration:load');
+                return $this->handleAjaxAction('doctrine:schema:update', array('--force' => true));
             case 'fixtures':
                 return $this->handleAjaxAction(
                     'oro:migration:data:load',
