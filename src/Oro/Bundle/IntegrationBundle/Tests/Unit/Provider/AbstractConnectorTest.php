@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Symfony\Component\HttpKernel\Log\NullLogger;
 
-use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;

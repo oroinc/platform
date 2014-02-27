@@ -3,9 +3,9 @@
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Step;
 
 use Oro\Bundle\BatchBundle\Step\ItemStep;
-use Oro\Bundle\BatchBundle\Job\BatchStatus;
-use Oro\Bundle\BatchBundle\Event\EventInterface;
-use Oro\Bundle\BatchBundle\Item\InvalidItemException;
+use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Akeneo\Bundle\BatchBundle\Event\EventInterface;
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 
 /**
  * Tests related to the ItemStep class
@@ -36,7 +36,7 @@ class ItemStepTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->eventDispatcher = $this->getMock('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface');
-        $this->jobRepository   = $this->getMock('Oro\\Bundle\\BatchBundle\\Job\\JobRepositoryInterface');
+        $this->jobRepository   = $this->getMock('Akeneo\\Bundle\\BatchBundle\\Job\\JobRepositoryInterface');
 
         $this->itemStep = new ItemStep(self::STEP_NAME);
 
