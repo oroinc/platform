@@ -33,6 +33,7 @@ class ExtendOptionBuilder
     {
         $entityClassName = $this->getEntityClassName($tableName);
 
+
         var_dump($entityClassName);
 
         if (!isset($this->result[$entityClassName])) {
@@ -45,6 +46,7 @@ class ExtendOptionBuilder
             'type'    => $columnType,
             'configs' => $options
         ];
+
 
         var_dump($this->result);
     }

@@ -108,10 +108,8 @@ class ExtendTable extends Table
                 );
 
                 break;
-
             case 'manyToOne':
                 $selfColumnName = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
-
                 $targetTableName = $options[self::EXTEND_OPTION_PREFIX_NAME]['extend']['target']['table_name'];
                 if (!$this->schema->hasTable($targetTableName)) {
                     throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
@@ -128,7 +126,6 @@ class ExtendTable extends Table
                 );
 
                 break;
-
             case 'manyToMany':
                 $selfColumnName = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
                 $selfTableName = $this->getName();
@@ -205,5 +202,20 @@ class ExtendTable extends Table
     public function setSchema(ExtendSchema $schema)
     {
         $this->schema = $schema;
+    }
+
+    protected function addRelationOneToMany()
+    {
+
+    }
+
+    protected function addRelationManyToMany()
+    {
+
+    }
+
+    protected function addRelationManyToOne()
+    {
+
     }
 }
