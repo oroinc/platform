@@ -24,7 +24,7 @@ function(_, Backbone) {
 
         render: function() {
             var data = this.model.toJSON();
-            var stepTo = this.options.workflow.getStepByName(data.stepTo);
+            var stepTo = this.options.workflow.getStepByName(data.step_to);
             data.stepToLabel = stepTo ? stepTo.get('label') : '';
 
             this.$el.html(this.template(data));

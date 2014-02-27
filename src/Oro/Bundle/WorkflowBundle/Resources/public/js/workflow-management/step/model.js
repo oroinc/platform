@@ -12,14 +12,14 @@ function(_, Backbone, TransitionCollection) {
         defaults: {
             name: '',
             label: '',
-            isFinal: false,
+            is_final: false,
             order: 0,
-            allowedTransitions: null,
-            _isStart: false
+            allowed_transitions: null,
+            _is_start: false
         },
 
         getAllowedTransitions: function(workflowModel) {
-            var allowedTransitionsAttr = this.get('allowedTransitions');
+            var allowedTransitionsAttr = this.get('allowed_transitions');
             if (allowedTransitionsAttr instanceof Backbone.Collection) {
                 return allowedTransitionsAttr;
             } else {

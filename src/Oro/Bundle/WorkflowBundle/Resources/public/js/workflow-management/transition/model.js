@@ -12,16 +12,16 @@ function(Backbone) {
         defaults: {
             name: '',
             label: '',
-            displayType: 'dialog',
-            stepTo: null,
-            isStart: false,
-            formOptions: null,
+            display_type: 'dialog',
+            step_to: null,
+            is_start: false,
+            form_options: null,
             message: null,
-            isUnavailableHidden: true,
-            transitionDefinition: null,
-            preConditions: null,
+            is_unavailable_hidden: true,
+            transition_definition: null,
+            pre_conditions: null,
             conditions: null,
-            postActions: null
+            post_actions: null
         }
     });
 });

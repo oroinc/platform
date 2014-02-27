@@ -12,12 +12,12 @@ function(_, Backbone, StepCollection, TransitionCollection) {
         defaults: {
             name: '',
             label: '',
-            relatedEntity: '',
-            startStep: null,
-            stepsDisplayOrdered: false,
+            related_entity: '',
+            start_step: null,
+            steps_display_ordered: false,
             steps: null,
             transitions: null,
-            transitionDefinitions: null
+            transition_definitions: null
         },
 
         initialize: function() {
@@ -38,11 +38,11 @@ function(_, Backbone, StepCollection, TransitionCollection) {
         },
 
         getTransitionDefinitionByName: function(name) {
-            return this._getByName('transitionDefinitions', name);
+            return this._getByName('transition_definitions', name);
         },
 
         getStartTransitions: function() {
-            return this.get('transitions').where({'isStart': true});
+            return this.get('transitions').where({'is_start': true});
         },
 
         _getByName: function(item, name) {

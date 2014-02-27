@@ -74,47 +74,30 @@
         <script type="text/javascript">
             require([
                 'oro/workflow-management',
-                'oro/workflow-management/workflow/model',
-                'oro/workflow-management/step/collection',
-                'oro/workflow-management/transition/collection'
+                'oro/workflow-management/workflow/model'
             ],
-            function(
-                WorkflowManagement,
-                WorkflowModel,
-                StepCollection,
-                TransitionCollection
-            ) {
-                // Debug
-                var StepModel = require('oro/workflow-management/step/model');
-                var step2 = new StepModel({
-                    'name': 'step_2',
-                    'label': 'Test step 2',
-                    'order': 2,
-                    'isFinal': false
-                });
-                var step1 = new StepModel({
-                    'name': 'step_1',
-                    'label': 'Test step 1',
-                    'order': 1,
-                    'allowedTransitions': ['test_regular_transition']
-                });
-                var steps = new StepCollection([step2, step1]);
+            function(WorkflowManagement, WorkflowModel) {
+                var StepModel = require('oro/workflow-management/step/model'),
+                    TransitionModel = require('oro/workflow-management/transition/model'),
+                    StepCollection = require('oro/workflow-management/step/collection'),
+                    TransitionCollection = require('oro/workflow-management/transition/collection');
 
-                var TransitionModel = require('oro/workflow-management/transition/model');
-                var startTransition = new TransitionModel({
-                    'name': 'test_start_transition',
-                    'label': 'Start transition',
-                    'stepTo': 'step_1',
-                    'isStart': true
-                });
-                var regularTransition = new TransitionModel({
-                    'name': 'test_regular_transition',
-                    'label': 'Regular transition',
-                    'stepTo': 'step_2',
-                    'isStart': false
-                });
-                var transitions = new TransitionCollection([startTransition, regularTransition]);
-                //Debug end
+                var steps = new StepCollection(),
+                    transitions = new TransitionCollection();
+
+                {% if entity.configuration.steps is defined %}
+                    {% for stepName, stepConfig in entity.configuration.steps %}
+                        {% set stepConfig = stepConfig|merge({name: stepName}) %}
+                        steps.add(new StepModel({{ stepConfig|json_encode|raw }}));
+                    {% endfor %}
+                {% endif %}
+
+                {% if entity.configuration.transitions is defined %}
+                    {% for transitionName, transitionConfig in entity.configuration.transitions %}
+                        {% set transitionConfig = transitionConfig|merge({name: transitionName}) %}
+                        transitions.add(new TransitionModel({{ transitionConfig|json_encode|raw }}));
+                    {% endfor %}
+                {% endif %}
 
                 var workflowModel = new WorkflowModel({
                     steps: steps,

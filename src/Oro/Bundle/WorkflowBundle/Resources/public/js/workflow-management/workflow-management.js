@@ -45,8 +45,8 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection) {
             return new StepModel({
                 'label': '(Starting point)',
                 'order': -1,
-                '_isStart': true,
-                'allowedTransitions': new TransitionCollection(this.model.getStartTransitions())
+                '_is_start': true,
+                'allowed_transitions': new TransitionCollection(this.model.getStartTransitions())
             });
         },
 
