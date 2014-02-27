@@ -1,0 +1,30 @@
+parameters:
+    oro_migration.data_fixtures.loader.class:         Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
+    oro_migration.migrations.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
+    oro_migration.migrations.query_builder.class:     Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder
+    oro_migration.migration.pre_up.listener.class:    Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
+
+services:
+    oro_migration.data_fixtures.loader:
+        class: %oro_migration.data_fixtures.loader.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @service_container
+
+    oro_migration.migrations.loader:
+        class: %oro_migration.migrations.loader.class%
+        arguments:
+            - @kernel
+            - @doctrine.dbal.default_connection
+            - @service_container
+            - @event_dispatcher
+
+    oro_migration.migrations.query_builder:
+        class: %oro_migration.migrations.query_builder.class%
+        arguments:
+            - @doctrine.dbal.default_connection
+
+    oro_migration.migration.pre_up.listener:
+        class: %oro_migration.migration.pre_up.listener.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }

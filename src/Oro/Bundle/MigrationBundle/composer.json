@@ -1,0 +1,22 @@
+{
+    "name": "oro/migration-bundle",
+    "type": "symfony-bundle",
+    "description": "Schema and data migration for BAP",
+    "keywords": ["BAP", "Migration", "Schema", "Data", "Fixtures"],
+    "homepage": "https://github.com/laboro/MigrationBundle",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/framework-bundle": "2.3.*"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\MigrationBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/MigrationBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

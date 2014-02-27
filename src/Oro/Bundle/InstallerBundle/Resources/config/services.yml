@@ -7,27 +7,23 @@ parameters:
     oro_installer.yaml_persister.class:               Oro\Bundle\InstallerBundle\Persister\YamlPersister
     oro_installer.listener.request.class:             Oro\Bundle\InstallerBundle\EventListener\RequestListener
     oro_installer.script_manager.class:               Oro\Bundle\InstallerBundle\ScriptManager
-    oro_installer.fixtures.loader.class:              Oro\Bundle\InstallerBundle\Migrations\DataFixturesLoader
-    oro_installer.migrations.loader.class:            Oro\Bundle\InstallerBundle\Migrations\MigrationsLoader
-    oro_installer.migrations.query_builder.class:     Oro\Bundle\InstallerBundle\Migrations\MigrationQueryBuilder
-    oro_installer.migration.pre_up.listener.class:    Oro\Bundle\InstallerBundle\Migrations\EventListener\PreUpMigrationListener
 
 services:
     oro_installer.scenario:
-        class:                                    %oro_installer.scenario.class%
+        class: %oro_installer.scenario.class%
         calls:
           - [ setContainer, ["@service_container"] ]
         tags:
           - { name: sylius.process.scenario, alias: oro_installer }
 
     oro_installer.yaml_persister:
-        class:                                    %oro_installer.yaml_persister.class%
+        class: %oro_installer.yaml_persister.class%
         arguments:
             - %kernel.root_dir%/config
             - %kernel.environment%
 
     kernel.listener.install.event:
-        class:                                    %oro_installer.listener.request.class%
+        class: %oro_installer.listener.request.class%
         arguments:
             - "@router"
             - %installed%
@@ -37,27 +33,3 @@ services:
         class: %oro_installer.script_manager.class%
         arguments:
             - @kernel
-
-    oro_installer.fixtures.loader:
-        class: %oro_installer.fixtures.loader.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-            - @service_container
-
-    oro_installer.migrations.loader:
-        class: %oro_installer.migrations.loader.class%
-        arguments:
-            - @kernel
-            - @doctrine.dbal.default_connection
-            - @service_container
-            - @event_dispatcher
-
-    oro_installer.migrations.query_builder:
-        class: %oro_installer.migrations.query_builder.class%
-        arguments:
-            - @doctrine.dbal.default_connection
-
-    oro_installer.migration.pre_up.listener:
-        class: %oro_installer.migration.pre_up.listener.class%
-        tags:
-            - { name: kernel.event_listener, event: oro_migration.pre_up , method: onPreUp }
