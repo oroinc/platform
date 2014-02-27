@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\InstallerBundle\Migrations;
+namespace Oro\Bundle\MigrationBundle\Migration;
 
 interface MigrationQuery
 {

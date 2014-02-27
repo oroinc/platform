@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
 
 class UpdateEntityConfigMigration implements Migration

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Oro\Bundle\InstallerBundle\Migrations\MigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
 
 class UpdateEntityConfigMigrationQuery implements MigrationQuery

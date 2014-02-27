@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
 
 class LoadMigrationsCommand extends ContainerAwareCommand

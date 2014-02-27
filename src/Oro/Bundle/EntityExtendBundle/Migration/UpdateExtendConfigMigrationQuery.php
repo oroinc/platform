@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Oro\Bundle\InstallerBundle\Migrations\MigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
 

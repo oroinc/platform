@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendOptionManager;
 use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendSchema;
-use Oro\Bundle\InstallerBundle\Migrations\MigrationQueryBuilder;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
 
 class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
 {

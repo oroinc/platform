@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
-use Oro\Bundle\InstallerBundle\Migrations\Event\PostMigrationEvent;
+use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class PostUpMigrationListener
 {
