@@ -29,7 +29,7 @@ class ExtendSchema extends Schema
 
         $extendTables = [];
         foreach ($tables as $table) {
-            $extendTables[] = new ExtendTable($this->extendOptionManager, $table);
+            $extendTables[] = new ExtendTable($this, $this->extendOptionManager, $table);
         }
 
         parent::__construct($extendTables, $sequences, $schemaConfig);
@@ -49,7 +49,7 @@ class ExtendSchema extends Schema
     public function createTable($tableName)
     {
         $baseTable = new Table($tableName);
-        $table = new ExtendTable($this->extendOptionManager, $baseTable);
+        $table = new ExtendTable($this, $this->extendOptionManager, $baseTable);
 
         $this->_addTable($table);
 

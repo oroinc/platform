@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
+use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\InstallerBundle\Migrations\MigrationQueryBuilder as BaseMigrationQueryBuilder;
 
 class MigrationQueryBuilder extends BaseMigrationQueryBuilder
@@ -35,5 +36,19 @@ class MigrationQueryBuilder extends BaseMigrationQueryBuilder
             $sequences,
             $sm->createSchemaConfig()
         );
+    }
+
+    protected function cloneSchema(Schema $schema)
+    {
+        /** @var ExtendSchema $result */
+        $result = parent::cloneSchema($schema);
+
+        /** @var ExtendTable[] $tables */
+        $tables = $result->getTables();
+        foreach ($tables as $table) {
+            $table->setSchema($result);
+        }
+
+        return $result;
     }
 }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendOptionBuilder
 {

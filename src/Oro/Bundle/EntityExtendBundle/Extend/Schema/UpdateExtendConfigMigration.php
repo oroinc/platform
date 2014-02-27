@@ -14,7 +14,7 @@ class UpdateExtendConfigMigration implements Migration
     {
         if ($schema instanceof ExtendSchema) {
             $options = $schema->getExtendOptions();
-            var_dump($options);
+            //print_r($options);
         }
 
         return [];
