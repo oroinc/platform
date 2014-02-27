@@ -1,21 +1,20 @@
 <?php
 
-namespace Migration\v1_1;
+namespace TestPackage\src;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 
-class Test1BundleMigration11 implements Migration
+class WrongTableNameMigration implements Migration
 {
     /**
      * @inheritdoc
      */
     public function up(Schema $schema)
     {
-        $table = $schema->createTable('test1table');
+        $table = $schema->createTable('extra_long_table_name_bigger_than_30_chars');
         $table->addColumn('id', 'integer');
-        return [
-            "ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL",
-        ];
+
+        return [];
     }
 }
