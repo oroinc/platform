@@ -111,7 +111,7 @@ define(['jquery', 'underscore', 'oro/translator', 'jquery-ui'], function ($, _, 
         },
 
         _onModelChanged: function (model) {
-            this.element.find('[data-cid="' + model.cid + '"]').parent().html(this._renderModel(model));
+            this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
         },
 
         _onModelDeleted: function (model) {

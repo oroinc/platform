@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Processor;
 
-use Oro\Bundle\BatchBundle\Item\ItemProcessorInterface;
-use Oro\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 interface StepExecutionAwareProcessor extends ItemProcessorInterface, StepExecutionAwareInterface
 {
