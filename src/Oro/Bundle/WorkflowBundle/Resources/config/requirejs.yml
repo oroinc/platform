@@ -3,3 +3,20 @@ config:
         'oro/workflow-transition-handler': 'bundles/oroworkflow/js/transition-handler.js'
         'oro/workflow-save-and-transit-handler': 'bundles/oroworkflow/js/save-and-transit-handler.js'
         'oro/workflow-transition-executor': 'bundles/oroworkflow/js/transition-executor.js'
+
+        'oro/workflow-management':                            'bundles/oroworkflow/js/workflow-management/workflow-management.js'
+        'oro/workflow-management/workflow/model':             'bundles/oroworkflow/js/workflow-management/workflow/model.js'
+
+        'oro/workflow-management/step/model':                 'bundles/oroworkflow/js/workflow-management/step/model.js'
+        'oro/workflow-management/step/collection':            'bundles/oroworkflow/js/workflow-management/step/collection.js'
+        'oro/workflow-management/step/view/list':             'bundles/oroworkflow/js/workflow-management/step/view/list.js'
+        'oro/workflow-management/step/view/row':              'bundles/oroworkflow/js/workflow-management/step/view/row.js'
+        'oro/workflow-management/step/view/add':              'bundles/oroworkflow/js/workflow-management/step/view/add.js'
+
+        'oro/workflow-management/transition/model':           'bundles/oroworkflow/js/workflow-management/transition/model.js'
+        'oro/workflow-management/transition/collection':      'bundles/oroworkflow/js/workflow-management/transition/collection.js'
+        'oro/workflow-management/transition/view/list':       'bundles/oroworkflow/js/workflow-management/transition/view/list.js'
+        'oro/workflow-management/transition/view/row':        'bundles/oroworkflow/js/workflow-management/transition/view/row.js'
+        'oro/workflow-management/transition/view/list-short': 'bundles/oroworkflow/js/workflow-management/transition/view/list-short.js'
+        'oro/workflow-management/transition/view/row-short':  'bundles/oroworkflow/js/workflow-management/transition/view/row-short.js'
+        'oro/workflow-management/transition/view/add':        'bundles/oroworkflow/js/workflow-management/transition/view/add.js'
