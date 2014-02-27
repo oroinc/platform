@@ -2,13 +2,15 @@ parameters:
     oro_entity_config.config_manager.class:                     Oro\Bundle\EntityConfigBundle\Config\ConfigManager
     oro_entity_config.config_model_manager.class:               Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
     oro_entity_config.config_audit_mamanger.class:              Oro\Bundle\EntityConfigBundle\Audit\AuditManager
+    oro_entity_config.tools.dumper.class:                       Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper
     oro_entity_config.cache.cache.class:                        Oro\Bundle\EntityConfigBundle\Config\ConfigCache
     oro_entity_config.provider_bag.class:                       Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag
     oro_entity_config.event_listener.option_set_listener.class:        Oro\Bundle\EntityConfigBundle\EventListener\OptionSetListener
     oro_entity_config.event_listener.entityconfig_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigGridListener
     oro_entity_config.event_listener.entityfields_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
-    oro_entity_config.twig.extension.dynamic_fields.class: Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtension
-    oro_entity_config.twig.extension.config.class:         Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
+    oro_entity_config.twig.extension.dynamic_fields.class:      Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtension
+    oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
+    oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
 
 services:
     oro_entity_config.link.entity_manager:
@@ -50,6 +52,11 @@ services:
         arguments:
             - @oro_entity_config.link.config_manager
             - @oro_entity_config.link.security_context
+
+    oro_entity_config.tools.dumper:
+        class: %oro_entity_config.tools.dumper.class%
+        arguments:
+            - @oro_entity_config.config_manager
 
     oro_entity_config.provider_bag:
         class:                                                  %oro_entity_config.provider_bag.class%
@@ -119,3 +126,10 @@ services:
             - @router
         tags:
             - { name: twig.extension }
+
+    oro_entity_config.migration.post_up.listener:
+        class: %oro_entity_config.migration.post_up.listener.class%
+        arguments:
+            - @oro_entity_config.tools.dumper
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -80 }

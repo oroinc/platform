@@ -3,11 +3,12 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Doctrine\DBAL\Schema\Table;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendTable extends Table
 {
-    const EXTEND_OPTION_PREFIX_NAME = 'oro_extend';
-    const EXTEND_OPTION_PREFIX = 'oro_extend:';
+    const EXTEND_OPTION_PREFIX_NAME = 'oro_options';
+    const EXTEND_OPTION_PREFIX      = 'oro_options:';
 
     /**
      * @var ExtendOptionManager
@@ -65,26 +66,22 @@ class ExtendTable extends Table
     public function addColumn($columnName, $typeName, array $options = array())
     {
         foreach ($options as $name => $value) {
-            if (0 === strpos($name, self::EXTEND_OPTION_PREFIX_NAME)) {
-                if (strlen(self::EXTEND_OPTION_PREFIX_NAME) === strlen($name)) {
-                    $this->extendOptionManager->addColumnOptions(
-                        $this->getName(),
-                        $columnName,
-                        $typeName,
-                        $value
-                    );
-                    unset($options[$name]);
-                } elseif (0 === strpos($name, self::EXTEND_OPTION_PREFIX)) {
-                    $this->extendOptionManager->addColumnOption(
-                        $this->getName(),
-                        $columnName,
-                        $typeName,
-                        substr($name, strlen(self::EXTEND_OPTION_PREFIX)),
-                        $value
-                    );
-                    unset($options[$name]);
-                }
+            if ($name === self::EXTEND_OPTION_PREFIX_NAME) {
+                $this->extendOptionManager->addColumnOptions(
+                    $this->getName(),
+                    $columnName,
+                    $typeName,
+                    $value
+                );
+                unset($options[$name]);
+
+                $columnName         = ExtendConfigDumper::FIELD_PREFIX . $columnName;
+                $options['notnull'] = false;
             }
+        }
+
+        if (in_array($typeName, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
+            return null;
         }
 
         return parent::addColumn($columnName, $typeName, $options);

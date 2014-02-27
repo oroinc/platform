@@ -1,10 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
+namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Oro\Bundle\InstallerBundle\Migrations\MigrationQueryBuilder as BaseMigrationQueryBuilder;
+use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendOptionManager;
+use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendSchema;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
 
-class MigrationQueryBuilder extends BaseMigrationQueryBuilder
+class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
 {
     /**
      * @var ExtendOptionManager

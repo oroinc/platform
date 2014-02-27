@@ -8,9 +8,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class MigrationConfigPass implements CompilerPassInterface
 {
-    const MIGRATIONS_QUERY_BUILDER_SERVICE     = 'oro_installer.migrations.query_builder';
     const EXTEND_OPTION_MANAGER_SERVICE        = 'oro_entity_extend.extend.option_manager';
-    const MIGRATIONS_QUERY_BUILDER_CLASS_PARAM = 'oro_installer.migrations.query_builder.class';
+    const MIGRATIONS_QUERY_BUILDER_SERVICE     = 'oro_migration.migrations.query_builder';
+    const MIGRATIONS_QUERY_BUILDER_CLASS_PARAM = 'oro_migration.migrations.query_builder.class';
 
     /**
      * {@inheritdoc}
@@ -22,7 +22,7 @@ class MigrationConfigPass implements CompilerPassInterface
         ) {
             $container->setParameter(
                 self::MIGRATIONS_QUERY_BUILDER_CLASS_PARAM,
-                'Oro\Bundle\EntityExtendBundle\Extend\Schema\MigrationQueryBuilder'
+                'Oro\Bundle\EntityExtendBundle\Migration\ExtendMigrationQueryBuilder'
             );
             $serviceDef = $container->getDefinition(self::MIGRATIONS_QUERY_BUILDER_SERVICE);
             $serviceDef->addMethodCall(
