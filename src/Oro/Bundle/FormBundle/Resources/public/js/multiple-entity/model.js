@@ -1,11 +1,11 @@
-/*global define*/
+/* global define */
 define(['backbone'],
-    function (Backbone) {
+    function(Backbone) {
         'use strict';
 
         /**
-         * @export  oroform/js/multiple-entity/model
-         * @class   oroform.MultipleEntity.Model
+         * @export  oro/multiple-entity/model
+         * @class   oro.MultipleEntity.Model
          * @extends Backbone.Model
          */
         return Backbone.Model.extend({

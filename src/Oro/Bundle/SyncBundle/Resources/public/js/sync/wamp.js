@@ -1,7 +1,6 @@
 /* jshint browser:true */
-/*global define*/
-define(['jquery', 'underscore', 'backbone', 'autobahn'
-    ], function ($, _, Backbone, ab) {
+define(['jquery', 'underscore', 'backbone', 'autobahn'],
+function ($, _, Backbone, ab) {
     'use strict';
     var defaultOptions = {
             port: 80,
@@ -11,8 +10,8 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
         /**
          * Wraps callback in order to make it compatible with autobahn event callback
          */
-        wrapCallback = function (callback) {
-            var wrapper = function (channel, attributes) {
+        wrapCallback = function(callback) {
+            var wrapper = function(channel, attributes) {
                 callback(attributes);
             };
             wrapper.origCallback = callback;
@@ -23,11 +22,11 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          * Handler on start connection
          * if list of subscriptions is not empty, auto subscribe all of them
          */
-        onConnect = function (session) {
+        onConnect = function(session){
             this.session = session;
             this.trigger('connection_established');
-            _.each(this.channels, function (callbacks, channel) {
-                _.each(callbacks, function (callback) {
+            _.each(this.channels, function(callbacks, channel) {
+                _.each(callbacks, function(callback) {
                     session.subscribe(channel, callback);
                 });
             });
@@ -50,7 +49,7 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          * @param {number} details.maxretries max number of attempts
          * @param {number} details.retries number of scheduled attempt
          */
-        onHangup = function (code, msg, details) {
+        onHangup = function(code, msg, details) {
             if (code !== 0) {
                 this.trigger('connection_lost', _.extend({code: code}, details || {}));
             }
@@ -70,8 +69,8 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          * @param {boolean=} options.skipSubprotocolAnnounce, default is false
          * @param {boolean=} options.debug, default is false
          *
-         * @export  orosync/js/sync/wamp
-         * @class   orosync.sync.Wamp
+         * @export  oro/sync/wamp
+         * @class   oro.sync.Wamp
          */
         Wamp = function (options) {
             this.options = _.extend({}, defaultOptions, options);
@@ -84,7 +83,7 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
             }
             this.connect();
             // fixes premature connection close in FF on page reload
-            $(window).on('beforeunload', _.bind(function () {
+            $(window).on('beforeunload', _.bind(function() {
                 this.session.close();
             }, this));
         };
@@ -93,7 +92,7 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
         /**
          * Initiate connection process
          */
-        connect: function () {
+        connect: function() {
             if (!this.session) {
                 var wsuri = 'ws://' + this.options.host + ':' + this.options.port;
                 ab.connect(wsuri, _.bind(onConnect, this), _.bind(onHangup, this), this.options);
@@ -104,7 +103,7 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          * Subscribes update callback function on a channel
          *
          * @param {string} channel is an URL which broadcasts updates
-         * @param {function (Object)} callback is a function which accepts JSON
+         * @param {function(Object)} callback is a function which accepts JSON
          *      with attributes' values and performs update
          */
         subscribe: function (channel, callback) {
@@ -119,7 +118,7 @@ define(['jquery', 'underscore', 'backbone', 'autobahn'
          * Removes subscription of update callback function for a channel
          *
          * @param {string} channel is an URL which broadcasts updates
-         * @param {function (Object)=} callback an optional parameter,
+         * @param {function(Object)=} callback an optional parameter,
          *      if was no function corresponded then removes all callbacks for a channel
          */
         unsubscribe: function (channel, callback) {

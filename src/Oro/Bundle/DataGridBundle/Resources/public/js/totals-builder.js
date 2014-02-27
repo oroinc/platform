@@ -1,6 +1,6 @@
 /* jshint browser:true */
 /* global define, require */
-define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator'],
+define(['jquery', 'underscore', 'oro/tools', 'oro/mediator'],
 function($, _, tools,  mediator) {
     'use strict';
     var initialized = false,

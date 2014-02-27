@@ -1,6 +1,6 @@
-/*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate'
-    ], function ($, _, __) {
+/* global define */
+define(['jquery', 'underscore', 'oro/translator', 'jquery.validate'],
+function ($, _, __) {
     'use strict';
 
     var defaultParam = {
@@ -8,7 +8,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
     };
 
     /**
-     * @export oroform/js/validator/notblank
+     * @export oro/validator/notblank
      */
     return [
         'NotBlank',

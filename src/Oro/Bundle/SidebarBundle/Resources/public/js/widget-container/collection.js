@@ -4,12 +4,13 @@
 define(function (require) {
     'use strict';
 
+    var _ = require('underscore');
     var Backbone = require('backbone');
-    var WidgetContainerModel = require('./model');
+    var WidgetContainerModel = require('oro/sidebar/widget-container/model');
 
     /**
-     * @export  orosidebar/js/widget-container/collection
-     * @class   orosidebar.widgetContainer.Collection
+     * @export  oro/sidebar/widget-controller/collection
+     * @class oro.sidebar.widget-controller.Collection
      * @extends Backbone.Collection
      */
     var WidgetContainerCollection = Backbone.Collection.extend({

@@ -1,7 +1,7 @@
 /*global define*/
 define(function () {
     'use strict';
-    var moduleNameTemplate = 'orofilter/js/filter/{{type}}-filter',
+    var moduleNameTemplate = 'oro/datafilter/{{type}}-filter',
         types = {
             string:      'choice',
             choice:      'select',

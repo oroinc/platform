@@ -1,6 +1,6 @@
 /* jshint browser:true */
 /* global require */
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal'],
+require(['jquery', 'underscore', 'oro/translator', 'oro/modal'],
 function($, _, __, Modal) {
     'use strict';
     $(function() {

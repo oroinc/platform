@@ -80,7 +80,7 @@ datagrid:
         options:
             entityHint: account
             requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
+              - oro/datagrid/column-form-listener
             columnListener:
                 dataField: id
                 columnName: isAssigned    # frontend column name

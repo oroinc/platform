@@ -1,6 +1,6 @@
-/*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+/* global define */
+define(['jquery', 'underscore', 'backbone'],
+function($, _, Backbone) {
     'use strict';
 
     /**
@@ -9,8 +9,8 @@ define(['jquery', 'underscore', 'backbone'
      * Events:
      * click: Fired when launcher was clicked
      *
-     * @export  orodatagrid/js/datagrid/action-launcher
-     * @class   orodatagrid.datagrid.ActionLauncher
+     * @export  oro/datagrid/action-launcher
+     * @class   oro.datagrid.ActionLauncher
      * @extends Backbone.View
      */
     return Backbone.View.extend({

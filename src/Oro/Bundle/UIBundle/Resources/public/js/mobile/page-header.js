@@ -1,7 +1,7 @@
 /*jshint browser: true*/
 /*jslint browser: true*/
 /*global define*/
-define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator'], function ($, mediator, __) {
+define(['jquery', 'oro/mediator', 'oro/translator'], function ($, mediator, __) {
     'use strict';
 
     function updateButtonsGroup($header) {
@@ -39,7 +39,7 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator'], function
     /**
      * Initializes mobile layout for page-header
      *
-     * @export oroui/js/mobile/page-header
+     * @export oro/mobile/page-header
      * @name oro.mobile.pageHeader
      */
     return {

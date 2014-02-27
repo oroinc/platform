@@ -1,5 +1,5 @@
 /* global require */
-require(['jquery', 'underscore', 'routing', 'oroui/js/mediator'],
+require(['jquery', 'underscore', 'routing', 'oro/mediator'],
 function($, _, routing, mediator) {
   'use strict';
       $(function() {

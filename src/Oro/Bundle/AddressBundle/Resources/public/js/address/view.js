@@ -1,13 +1,14 @@
-/*global define, alert*/
-define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/formatter/address'
-    ], function (_, Backbone, __, addressFormatter) {
+/* jshint devel:true */
+/* global define */
+define([ 'underscore', 'backbone', 'oro/translator', 'oro/formatter/address'],
+function( _, Backbone, __, addressFormatter) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oroaddress/js/address/view
-     * @class   oroaddress.address.View
+     * @export  oro/address/view
+     * @class   oro.address.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -23,17 +24,17 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
             'click button:has(.icon-pencil)': 'edit'
         },
 
-        initialize: function () {
+        initialize: function() {
             this.template = _.template($("#template-addressbook-item").html());
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:active', this.toggleActive);
         },
 
-        activate: function () {
+        activate: function() {
             this.model.set('active', true);
         },
 
-        toggleActive: function () {
+        toggleActive: function() {
             if (this.model.get('active')) {
                 this.$el.addClass('active');
             } else {
@@ -41,11 +42,11 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
             }
         },
 
-        edit: function (e) {
+        edit: function(e) {
             this.trigger('edit', this, this.model);
         },
 
-        close: function () {
+        close: function() {
             if (this.model.get('primary')) {
                 alert(__('Primary address can not be removed'));
             } else {
@@ -53,7 +54,7 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
             }
         },
 
-        render: function () {
+        render: function() {
             var data = this.model.toJSON();
             data.formatted_address = addressFormatter.format({
                 prefix: data.namePrefix,

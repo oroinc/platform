@@ -1,14 +1,14 @@
-/*global define*/
-define(['./abstract-action'
-    ], function (AbstractAction) {
+/* global define */
+define(['oro/datagrid/abstract-action'],
+function(AbstractAction) {
     'use strict';
 
     /**
      * Resets collection to initial state
      *
-     * @export  orodatagrid/js/datagrid/action/reset-collection-action
-     * @class   orodatagrid.datagrid.action.ResetCollectionAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/reset-collection-action
+     * @class   oro.datagrid.ResetCollectionAction
+     * @extends oro.datagrid.AbstractAction
      */
     return AbstractAction.extend({
 
@@ -22,13 +22,13 @@ define(['./abstract-action'
          * @param {oro.PageableCollection} options.collection Collection
          * @throws {TypeError} If collection is undefined
          */
-        initialize: function (options) {
-            var opts = options || {};
+        initialize: function(options) {
+            options = options || {};
 
-            if (!opts.datagrid) {
+            if (!options.datagrid) {
                 throw new TypeError("'datagrid' is required");
             }
-            this.collection = opts.datagrid.collection;
+            this.collection = options.datagrid.collection;
 
             AbstractAction.prototype.initialize.apply(this, arguments);
         },
@@ -36,7 +36,7 @@ define(['./abstract-action'
         /**
          * Execute reset collection
          */
-        execute: function () {
+        execute: function() {
             this.collection.updateState(this.collection.initialState);
             this.collection.fetch();
         }

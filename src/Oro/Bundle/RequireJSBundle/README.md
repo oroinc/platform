@@ -29,13 +29,13 @@ Each bundle's javascript module have to be defined in ```paths``` section, where
                     - 'jquery'
         map:
             '*':
-                'jquery': 'oroui/js/jquery-extend'
-            'oroui/js/jquery-extend':
+                'jquery': 'oro/jquery-setup'
+            'oro/jquery-setup':
                 'jquery': 'jquery'
         paths:
             'jquery': 'bundles/oroui/lib/jquery-1.10.2.js'
             'jquery-ui': 'bundles/oroui/lib/jquery-ui.min.js'
-            'oroui/js/jquery-extend': 'bundles/oroui/js/jquery-extend.js'
+            'oro/jquery-setup': 'bundles/oroui/js/jquery-setup.js'
 
 ### Generation
 Main require.js config is generated automatically and embedded in HTML-page. The config is stored in application cache. So if you want, for some reason, renew a require.js configuration, then just clean a cache.
@@ -71,7 +71,7 @@ Or dynamically defines path to translations dictionary (depending on what locale
     require({
         shim: {
             'oro/translations': {
-                deps: ['orotranslation/js/translator', 'translator'],
+                deps: ['oro/translator', 'translator'],
                 init: function(__) {
                     return __;
                 }
@@ -79,10 +79,10 @@ Or dynamically defines path to translations dictionary (depending on what locale
         },
         map: {
             '*': {
-                'orotranslation/js/translator': 'oro/translations'
+                'oro/translator': 'oro/translations'
             },
             'oro/translations': {
-                'orotranslation/js/translator': 'orotranslation/js/translator'
+                'oro/translator': 'oro/translator'
             }
         },
         paths: {

@@ -1,10 +1,10 @@
 /* global define */
-define(['oroui/js/mediator'],
+define(['oro/mediator'],
 function(mediator) {
     'use strict';
 
     /**
-     * @export oroui/js/widget-manager
+     * @export oro/widget-manager
      * @name   oro.widgetManager
      */
     var widgetManager = {

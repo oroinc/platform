@@ -5,7 +5,7 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var app = require('oroui/js/app');
+    var app = require('oro/app');
 
     var scrollspy = {};
 

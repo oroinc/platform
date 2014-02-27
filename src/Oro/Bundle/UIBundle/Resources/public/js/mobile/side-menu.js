@@ -1,7 +1,7 @@
 /*jshint browser: true*/
 /*jslint browser: true*/
 /*global define*/
-define(['jquery', 'backbone', 'oroui/js/mediator', 'jquery-ui'], function ($, Backbone, mediator) {
+define(['jquery', 'backbone', 'oro/mediator', 'jquery-ui'], function ($, Backbone, mediator) {
     'use strict';
 
     $.widget('oro.sideMenu', {
