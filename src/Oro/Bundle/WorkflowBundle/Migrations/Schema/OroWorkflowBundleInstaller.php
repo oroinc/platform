@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_0\OroWorkflowBundle;
 
 class OroWorkflowBundleInstaller implements Installation

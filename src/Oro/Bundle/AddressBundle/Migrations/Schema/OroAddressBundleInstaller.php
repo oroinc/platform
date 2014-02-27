@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Installation;
+use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\AddressBundle\Migrations\Schema\v1_0\OroAddressBundle;
 
 class OroAddressBundleInstaller implements Installation
