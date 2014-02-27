@@ -1,6 +1,6 @@
 {% macro renderAvailableVariablesWidget(entityName, dependentFieldId) %}
     <script type="text/javascript">
-        require(['jquery', 'oro/email/variable/view', 'oro/email/variable/model'],
+        require(['jquery', 'oroemail/js/email/variable/view', 'oroemail/js/email/variable/model'],
         function($, View, Model){
             $(function() {
                 'use strict';
@@ -42,7 +42,7 @@
 
 {% macro renderPreviewDialog(formName, title) %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/translator', 'oro/modal'],
+        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal'],
         function($, _, __, Modal){
             $(function () {
                 var showEmailPreviewDialog = function(el) {
@@ -227,9 +227,6 @@
 
 {% macro renderJs() %}
     <script type="text/javascript">
-        !function() {
-            /* global:require */
-            require(['oro/init-email']);
-        }();
+        require(['oroemail/js/init-email']);
     </script>
 {% endmacro %}

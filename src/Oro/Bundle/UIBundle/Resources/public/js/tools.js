@@ -1,11 +1,10 @@
-/* global define, require*/
-define(['underscore'],
-function (_) {
+/*global define, require*/
+define(['underscore'], function (_) {
     'use strict';
 
     /**
-     * @export oro/tools
-     * @name   oro.tools
+     * @export oroui/js/tools
+     * @name   oroui.tools
      */
     return {
         /**

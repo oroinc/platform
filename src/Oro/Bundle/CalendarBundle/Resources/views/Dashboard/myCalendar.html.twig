@@ -23,7 +23,7 @@
     {{ c.renderCalendar('#' ~ calendarId, entity, startDate, endDate, calendar, eventsOptions) }}
 
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oro/widget-manager'],
+        require(['jquery', 'underscore', 'oroui/js/widget-manager'],
         function($, _, widgetManager){
             widgetManager.getWidgetInstance({{ widgetId|json_encode|raw }}, function(widget) {
                 widget.on('renderComplete', function(el) {

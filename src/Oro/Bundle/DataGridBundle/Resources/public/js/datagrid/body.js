@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'backgrid', 'oro/datagrid/row'],
-function(_, Backgrid, Row) {
+/*global define*/
+define(['underscore', 'backgrid', './row'
+    ], function (_, Backgrid, Row) {
     'use strict';
 
     /**
@@ -9,8 +9,8 @@ function(_, Backgrid, Row) {
      * Triggers events:
      *  - "rowClicked" when row of body is clicked
      *
-     * @export  oro/datagrid/body
-     * @class   oro.datagrid.Body
+     * @export  orodatagrid/js/datagrid/body
+     * @class   orodatagrid.datagrid.Body
      * @extends Backgrid.Body
      */
     return Backgrid.Body.extend({
@@ -23,15 +23,15 @@ function(_, Backgrid, Row) {
         /**
          * @inheritDoc
          */
-        initialize: function(options) {
-            options = options || {};
+        initialize: function (options) {
+            var opts = options || {};
 
-            if (!options.row) {
-                options.row = this.row;
+            if (!opts.row) {
+                opts.row = this.row;
             }
 
-            if (options.rowClassName) {
-                this.rowClassName = options.rowClassName;
+            if (opts.rowClassName) {
+                this.rowClassName = opts.rowClassName;
             }
 
             Backgrid.Body.prototype.initialize.apply(this, arguments);
@@ -42,7 +42,7 @@ function(_, Backgrid, Row) {
         /**
          * @inheritDoc
          */
-        refresh: function() {
+        refresh: function () {
             Backgrid.Body.prototype.refresh.apply(this, arguments);
             this._listenToRowsEvents(this.rows);
             return this;
@@ -51,7 +51,7 @@ function(_, Backgrid, Row) {
         /**
          * @inheritDoc
          */
-        insertRow: function(model, collection, options) {
+        insertRow: function (model, collection, options) {
             Backgrid.Body.prototype.insertRow.apply(this, arguments);
             var index = collection.indexOf(model);
             if (index < this.rows.length) {
@@ -65,8 +65,8 @@ function(_, Backgrid, Row) {
          * @param {Array} rows
          * @private
          */
-        _listenToRowsEvents: function(rows) {
-            _.each(rows, function(row) {
+        _listenToRowsEvents: function (rows) {
+            _.each(rows, function (row) {
                 this._listenToOneRowEvents(row);
             }, this);
         },
@@ -77,8 +77,8 @@ function(_, Backgrid, Row) {
          * @param {Backgrid.Row} row
          * @private
          */
-        _listenToOneRowEvents: function(row) {
-            this.listenTo(row, 'clicked', function(row, e) {
+        _listenToOneRowEvents: function (row) {
+            this.listenTo(row, 'clicked', function (row, e) {
                 this.trigger('rowClicked', row, e);
             });
         },
@@ -86,7 +86,7 @@ function(_, Backgrid, Row) {
         /**
          * @inheritDoc
          */
-        render: function() {
+        render: function () {
             Backgrid.Body.prototype.render.apply(this, arguments);
             if (this.rowClassName) {
                 this.$('> *').addClass(this.rowClassName);

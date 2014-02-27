@@ -1,13 +1,13 @@
-/* global define */
-define(['oro/locale-settings', 'oro/formatter/name'],
-function(localeSettings, nameFormatter) {
+/*global define*/
+define(['../locale-settings', './name'
+    ], function (localeSettings, nameFormatter) {
     'use strict';
 
     /**
      * Address formatter
      *
-     * @export  oro/formatter/address
-     * @name    oro.formatter.address
+     * @export  orolocale/js/formatter/address
+     * @name    orolocale.formatter.address
      */
     return {
         /**
@@ -21,7 +21,7 @@ function(localeSettings, nameFormatter) {
          * @param {string} newLine
          * @returns {string}
          */
-        format: function(address, country, newLine) {
+        format: function (address, country, newLine) {
             if (!country) {
                 if (localeSettings.isFormatAddressByAddressCountry()) {
                     country = address.country_iso2;
@@ -68,7 +68,7 @@ function(localeSettings, nameFormatter) {
          * @param {string} country ISO2 code
          * @returns {*}
          */
-        getAddressFormat: function(country) {
+        getAddressFormat: function (country) {
             if (!this.formats.hasOwnProperty(country)) {
                 country = localeSettings.getCountry();
             }

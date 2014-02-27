@@ -1,7 +1,6 @@
-/* global define */
-define(['underscore', 'backbone', 'oro/translator', 'oro/datagrid/pagination-input',
-    'oro/datagrid/page-size', 'oro/datagrid/actions-panel'],
-function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
+/*global define*/
+define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-input', './page-size', './actions-panel'
+    ], function (_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -9,8 +8,8 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
     /**
      * Datagrid toolbar widget
      *
-     * @export oro/datagrid/toolbar
-     * @class   oro.datagrid.Toolbar
+     * @export  orodatagrid/js/datagrid/toolbar
+     * @class   orodatagrid.datagrid.Toolbar
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -64,16 +63,16 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
                 this.extraActionsPanel.setActions(options.extraActions);
             }
 
-            if (options.enable == false) {
-                this.disable();
-            }
-            if (options.hide == true) {
-                this.hide();
-            }
-
             this.massActionsPanel = new this.massActionsPanel();
             if (options.massActions) {
                 this.massActionsPanel.setActions(options.massActions);
+            }
+
+            if (!options.enable) {
+                this.disable();
+            }
+            if (options.hide) {
+                this.hide();
             }
 
             this.template = _.template($(options.template || this.template).html());
@@ -86,7 +85,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
          *
          * @return {*}
          */
-        enable: function() {
+        enable: function () {
             this.pagination.enable();
             this.pageSize.enable();
             this.actionsPanel.enable();
@@ -100,7 +99,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
          *
          * @return {*}
          */
-        disable: function() {
+        disable: function () {
             this.pagination.disable();
             this.pageSize.disable();
             this.actionsPanel.disable();
@@ -114,7 +113,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
          *
          * @return {*}
          */
-        hide: function() {
+        hide: function () {
             this.$el.hide();
             return this;
         },
@@ -122,7 +121,7 @@ function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
         /**
          * Render toolbar with pager and other views
          */
-        render: function() {
+        render: function () {
             this.$el.empty();
             this.$el.append(this.template());
             var $pagination = this.pagination.render().$el.attr('class', this.$('.pagination').attr('class'));
