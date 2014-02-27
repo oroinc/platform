@@ -20,7 +20,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->stepExecutionMock = $this->getMockBuilder('Oro\\Bundle\\BatchBundle\\Entity\\StepExecution')
+        $this->stepExecutionMock = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Entity\\StepExecution')
             ->setMethods(['getExecutionContext'])
             ->disableOriginalConstructor()->getMock();
         $this->transportSettings = $this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport');
