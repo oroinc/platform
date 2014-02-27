@@ -3,8 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Installation;
-use Oro\Bundle\InstallerBundle\Migrations\Schema\v1_1\UpdateBundleFixturesTable;
+use Oro\Bundle\MigrationBundle\Migration\Installation;
 
 class OroInstallerBundle implements Installation
 {
@@ -21,9 +20,6 @@ class OroInstallerBundle implements Installation
      */
     public function up(Schema $schema)
     {
-        // add oro_installer_data_fixtures table
-        UpdateBundleFixturesTable::oroInstallerDataFixturesTable($schema);
-
         return [];
     }
 }

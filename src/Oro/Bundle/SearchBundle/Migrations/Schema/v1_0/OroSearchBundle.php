@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 
 class OroSearchBundle implements Migration, ContainerAwareInterface
 {

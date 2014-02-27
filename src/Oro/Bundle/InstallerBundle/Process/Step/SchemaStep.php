@@ -32,10 +32,10 @@ class SchemaStep extends AbstractStep
             case 'update-config':
                 return $this->handleAjaxAction('oro:entity-extend:update-config');
             case 'schema-update':
-                return $this->handleAjaxAction('oro:installer:migration:load');
+                return $this->handleAjaxAction('oro:migration:load');
             case 'fixtures':
                 return $this->handleAjaxAction(
-                    'oro:installer:fixtures:load',
+                    'oro:migration:data:load',
                     array('--no-interaction' => true)
                 );
             case 'workflows':

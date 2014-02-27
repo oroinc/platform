@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CronBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\InstallerBundle\Migrations\Migration;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 
 class JmsJob implements Migration
 {

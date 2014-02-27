@@ -120,7 +120,7 @@ class Runner
      */
     public function updateDBSchema()
     {
-        return $this->runCommand('oro:installer:migration:load');
+        return $this->runCommand('oro:migration:load');
     }
 
     /**
@@ -153,7 +153,7 @@ class Runner
      */
     public function loadFixtures(array $packages)
     {
-        return $this->runCommand('oro:installer:fixtures:load');
+        return $this->runCommand('oro:migration:data:load');
     }
 
     /**
