@@ -18,31 +18,30 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
         OroNotificationBundle::oroNotificationEmailSpoolTable($schema);
-        OroNotificationBundle::oroNotificationEmailnotificationTable($schema, 'oro_notification_emailnotif');
+        OroNotificationBundle::oroNotificationEmailNotificationTable($schema, 'oro_notification_email_notif');
         OroNotificationBundle::oroNotificationEventTable($schema);
-        OroNotificationBundle::oroNotificationRecipientGroupTable($schema, 'oro_notification_recipient_grp');
-        OroNotificationBundle::oroNotificationRecipientListTable($schema, 'oro_notification_recipient_lst');
-        OroNotificationBundle::oroNotificationRecipientUserTable($schema, 'oro_notification_recipient_usr');
+        OroNotificationBundle::oroNotificationRecipientGroupTable($schema, 'oro_notification_recip_group');
+        OroNotificationBundle::oroNotificationRecipientListTable($schema, 'oro_notification_recip_list');
+        OroNotificationBundle::oroNotificationRecipientUserTable($schema, 'oro_notification_recip_user');
 
-        OroNotificationBundle::oroNotificationEmailnotificationForeignKeys(
+        OroNotificationBundle::oroNotificationEmailNotificationForeignKeys(
             $schema,
-            'oro_notification_emailnotif',
-            'oro_notification_recipient_lst'
+            'oro_notification_email_notif',
+            'oro_notification_recip_list'
         );
         OroNotificationBundle::oroNotificationRecipientGroupForeignKeys(
             $schema,
-            'oro_notification_recipient_grp',
-            'oro_notification_recipient_lst'
+            'oro_notification_recip_group',
+            'oro_notification_recip_list'
         );
         OroNotificationBundle::oroNotificationRecipientUserForeignKeys(
             $schema,
-            'oro_notification_recipient_usr',
-            'oro_notification_recipient_lst'
+            'oro_notification_recip_user',
+            'oro_notification_recip_list'
         );
 
         return [];

@@ -18,7 +18,6 @@ class OroWorkflowBundleInstaller implements Installation
 
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {

@@ -9,7 +9,6 @@ class OroAddressBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
@@ -20,6 +19,7 @@ class OroAddressBundle implements Migration
         self::oroDictionaryCountryTranslationTable($schema);
         self::oroDictionaryRegion($schema);
         self::oroDictionaryRegionTranslationTable($schema);
+
         self::addForeignKeys($schema);
 
         return [];
@@ -110,12 +110,10 @@ class OroAddressBundle implements Migration
         /** End of generate table oro_dictionary_country **/
     }
 
-    public static function oroDictionaryCountryTranslationTable(
-        Schema $schema,
-        $tableName = 'oro_dictionary_country_translation'
-    ) {
+    public static function oroDictionaryCountryTranslationTable(Schema $schema, $tableName = null)
+    {
         /** Generate table oro_dictionary_country_translation **/
-        $table = $schema->createTable($tableName);
+        $table = $schema->createTable($tableName ? : 'oro_dictionary_country_translation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 2]);
         $table->addColumn('content', 'string', ['length' => 255]);
@@ -141,12 +139,10 @@ class OroAddressBundle implements Migration
         /** End of generate table oro_dictionary_region **/
     }
 
-    public static function oroDictionaryRegionTranslationTable(
-        Schema $schema,
-        $tableName = 'oro_dictionary_region_translation'
-    ) {
+    public static function oroDictionaryRegionTranslationTable(Schema $schema, $tableName = null)
+    {
         /** Generate table oro_dictionary_region_translation **/
-        $table = $schema->createTable($tableName);
+        $table = $schema->createTable($tableName ? : 'oro_dictionary_region_translation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 16]);
         $table->addColumn('content', 'string', ['length' => 255]);

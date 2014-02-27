@@ -18,7 +18,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
@@ -29,6 +28,7 @@ class OroAddressBundleInstaller implements Installation
         OroAddressBundle::oroDictionaryCountryTranslationTable($schema, 'oro_dictionary_country_trans');
         OroAddressBundle::oroDictionaryRegion($schema);
         OroAddressBundle::oroDictionaryRegionTranslationTable($schema, 'oro_dictionary_region_trans');
+
         OroAddressBundle::addForeignKeys($schema);
 
         return [];
