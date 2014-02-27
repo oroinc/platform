@@ -4,6 +4,8 @@ parameters:
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
+    oro_workflow.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
+
     oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
 
 services:
@@ -26,3 +28,26 @@ services:
             - @doctrine
             - @oro_workflow.registry
             - @oro_entity.doctrine_helper
+
+    oro_workflow.attribute_guesser:
+        class: %oro_workflow.attribute_guesser.class%
+        arguments:
+            - @doctrine
+            - @oro_entity_config.provider.entity
+        calls:
+            - [addDoctrineTypeMapping, ["string", "string"]]
+            - [addDoctrineTypeMapping, ["integer", "integer"]]
+            - [addDoctrineTypeMapping, ["smallint", "integer"]]
+            - [addDoctrineTypeMapping, ["bigint", "integer"]]
+            - [addDoctrineTypeMapping, ["boolean", "checkbox"]]
+            - [addDoctrineTypeMapping, ["decimal", "float"]]
+            - [addDoctrineTypeMapping, ["date", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["time", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["datetime", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["datetimetz", "object", { class: "DateTime" }]]
+            - [addDoctrineTypeMapping, ["text", "string"]]
+            - [addDoctrineTypeMapping, ["array", "array"]]
+            - [addDoctrineTypeMapping, ["simple_array", "array"]]
+            - [addDoctrineTypeMapping, ["json_array", "array"]]
+            - [addDoctrineTypeMapping, ["float", "float"]]
+            - [addDoctrineTypeMapping, ["guid", "string"]]
