@@ -13,13 +13,13 @@ class OroNotificationBundle implements Migration
     public function up(Schema $schema)
     {
         self::oroNotificationEmailSpoolTable($schema);
-        self::oroNotificationEmailnotificationTable($schema);
+        self::oroNotificationEmailNotificationTable($schema);
         self::oroNotificationEventTable($schema);
         self::oroNotificationRecipientGroupTable($schema);
         self::oroNotificationRecipientListTable($schema);
         self::oroNotificationRecipientUserTable($schema);
 
-        self::oroNotificationEmailnotificationForeignKeys($schema);
+        self::oroNotificationEmailNotificationForeignKeys($schema);
         self::oroNotificationRecipientGroupForeignKeys($schema);
         self::oroNotificationRecipientUserForeignKeys($schema);
 
@@ -47,12 +47,12 @@ class OroNotificationBundle implements Migration
      * Generate table oro_notification_emailnotification
      *
      * @param Schema $schema
-     * @param string $emailNotif
+     * @param string $tableName
      */
-    public static function oroNotificationEmailnotificationTable(Schema $schema, $emailNotif = '')
+    public static function oroNotificationEmailNotificationTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_notification_emailnotification **/
-        $table = $schema->createTable($emailNotif ? : 'oro_notification_emailnotification');
+        $table = $schema->createTable($tableName ? : 'oro_notification_emailnotification');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('recipient_list_id', 'integer', ['notnull' => false]);
         $table->addColumn('template_id', 'integer', ['notnull' => false]);
@@ -86,12 +86,12 @@ class OroNotificationBundle implements Migration
      * Generate table oro_notification_recipient_group
      *
      * @param Schema $schema
-     * @param string $recipientGroup
+     * @param string $tableName
      */
-    public static function oroNotificationRecipientGroupTable(Schema $schema, $recipientGroup = '')
+    public static function oroNotificationRecipientGroupTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_notification_recipient_group **/
-        $table = $schema->createTable($recipientGroup ? : 'oro_notification_recipient_group');
+        $table = $schema->createTable($tableName ? : 'oro_notification_recipient_group');
         $table->addColumn('recipient_list_id', 'integer', []);
         $table->addColumn('group_id', 'smallint', []);
         $table->setPrimaryKey(['recipient_list_id', 'group_id']);
@@ -104,12 +104,12 @@ class OroNotificationBundle implements Migration
      * Generate table oro_notification_recipient_list
      *
      * @param Schema $schema
-     * @param string $recipientList
+     * @param string $tableName
      */
-    public static function oroNotificationRecipientListTable(Schema $schema, $recipientList = '')
+    public static function oroNotificationRecipientListTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_notification_recipient_list **/
-        $table = $schema->createTable($recipientList ? : 'oro_notification_recipient_list');
+        $table = $schema->createTable($tableName ? : 'oro_notification_recipient_list');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('email', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('owner', 'boolean', ['notnull' => false]);
@@ -121,12 +121,12 @@ class OroNotificationBundle implements Migration
      * Generate table oro_notification_recipient_user
      *
      * @param Schema $schema
-     * @param string $recipientUser
+     * @param string $tableName
      */
-    public static function oroNotificationRecipientUserTable(Schema $schema, $recipientUser = '')
+    public static function oroNotificationRecipientUserTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_notification_recipient_user **/
-        $table = $schema->createTable($recipientUser ? : 'oro_notification_recipient_user');
+        $table = $schema->createTable($tableName ? : 'oro_notification_recipient_user');
         $table->addColumn('recipient_list_id', 'integer', []);
         $table->addColumn('user_id', 'integer', []);
         $table->setPrimaryKey(['recipient_list_id', 'user_id']);
@@ -139,18 +139,18 @@ class OroNotificationBundle implements Migration
      * Generate foreign keys for table oro_notification_emailnotification
      *
      * @param Schema $schema
-     * @param string $emailNotif
-     * @param string $recipientList
+     * @param string $tableName
+     * @param string $recipientListTableName
      */
-    public static function oroNotificationEmailnotificationForeignKeys(
+    public static function oroNotificationEmailNotificationForeignKeys(
         Schema $schema,
-        $emailNotif = '',
-        $recipientList = ''
+        $tableName = null,
+        $recipientListTableName = null
     ) {
         /** Generate foreign keys for table oro_notification_emailnotification **/
-        $table = $schema->getTable($emailNotif ? : 'oro_notification_emailnotification');
+        $table = $schema->getTable($tableName ? : 'oro_notification_emailnotification');
         $table->addForeignKeyConstraint(
-            $schema->getTable($recipientList ? : 'oro_notification_recipient_list'),
+            $schema->getTable($recipientListTableName ? : 'oro_notification_recipient_list'),
             ['recipient_list_id'],
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
@@ -174,16 +174,16 @@ class OroNotificationBundle implements Migration
      * Generate foreign keys for table oro_notification_recipient_group
      *
      * @param Schema $schema
-     * @param string $recipientGroup
-     * @param string $recipientList
+     * @param string $tableName
+     * @param string $recipientListTableName
      */
     public static function oroNotificationRecipientGroupForeignKeys(
         Schema $schema,
-        $recipientGroup = '',
-        $recipientList = ''
+        $tableName = null,
+        $recipientListTableName = null
     ) {
         /** Generate foreign keys for table oro_notification_recipient_group **/
-        $table = $schema->getTable($recipientGroup ? : 'oro_notification_recipient_group');
+        $table = $schema->getTable($tableName ? : 'oro_notification_recipient_group');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_access_group'),
             ['group_id'],
@@ -191,7 +191,7 @@ class OroNotificationBundle implements Migration
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
-            $schema->getTable($recipientList ? : 'oro_notification_recipient_list'),
+            $schema->getTable($recipientListTableName ? : 'oro_notification_recipient_list'),
             ['recipient_list_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
@@ -203,16 +203,16 @@ class OroNotificationBundle implements Migration
      * Generate foreign keys for table oro_notification_recipient_user
      *
      * @param Schema $schema
-     * @param string $recipientUser
-     * @param string $recipientList
+     * @param string $tableName
+     * @param string $recipientListTableName
      */
     public static function oroNotificationRecipientUserForeignKeys(
         Schema $schema,
-        $recipientUser = '',
-        $recipientList = ''
+        $tableName = null,
+        $recipientListTableName = null
     ) {
         /** Generate foreign keys for table oro_notification_recipient_user **/
-        $table = $schema->getTable($recipientUser ? : 'oro_notification_recipient_user');
+        $table = $schema->getTable($tableName ? : 'oro_notification_recipient_user');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_id'],
@@ -220,7 +220,7 @@ class OroNotificationBundle implements Migration
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
-            $schema->getTable($recipientList ? : 'oro_notification_recipient_list'),
+            $schema->getTable($recipientListTableName ? : 'oro_notification_recipient_list'),
             ['recipient_list_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
