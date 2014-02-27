@@ -36,8 +36,13 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     public function getDescription()
     {
         $result = [];
-
         foreach ($this->options as $entityClassName => $entityOptions) {
+            if (isset($entityOptions['configs'])) {
+                $result[] = sprintf(
+                    'CREATE EXTEND ENTITY %s',
+                    $entityClassName
+                );
+            }
             if (isset($entityOptions['fields'])) {
                 foreach ($entityOptions['fields'] as $fieldName => $fieldOptions) {
                     $result[] = sprintf(

@@ -1,7 +1,6 @@
 parameters:
     oro_entity_extend.entity.cache.warmer.class:            Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
     oro_entity_extend.extend.option_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendOptionManager
-    oro_entity_extend.extend.extend_manager.class:          Oro\Bundle\EntityExtendBundle\Extend\ExtendManager
     oro_entity_extend.extension.extend_entity.class:        Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
     oro_entity_extend.tools.dumper.class:                   Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
     oro_entity_extend.tools.schema_generator.class:         Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator
@@ -13,46 +12,39 @@ parameters:
 services:
     oro_entity_extend.entity.cache.warmer:
         public: false
-        class:                                              %oro_entity_extend.entity.cache.warmer.class%
+        class: %oro_entity_extend.entity.cache.warmer.class%
         arguments:
             - @oro_entity_extend.tools.dumper
         tags:
             - { name: kernel.cache_warmer,  priority: 30 }
 
     oro_entity_extend.extend.option_manager:
-        class:                                              %oro_entity_extend.extend.option_manager.class%
+        class: %oro_entity_extend.extend.option_manager.class%
         arguments:
             - @oro_entity.orm.entity_class_resolver
 
-    oro_entity_extend.extend.extend_manager:
-        class:                                              %oro_entity_extend.extend.extend_manager.class%
-        arguments:
-            - @oro_entity_config.provider.extend
-
     oro_entity_extend.extension.extend_entity:
-        class:                                              %oro_entity_extend.extension.extend_entity.class%
+        class: %oro_entity_extend.extension.extend_entity.class%
         arguments:
-            - @oro_entity_extend.extend.extend_manager
             - @oro_entity_config.config_manager
         tags:
             - { name: form.type_extension, alias: form }
 
     oro_entity_extend.tools.dumper:
-        class:                                              %oro_entity_extend.tools.dumper.class%
+        class: %oro_entity_extend.tools.dumper.class%
         arguments:
             - @doctrine.orm.entity_manager
             - %kernel.cache_dir%
 
     oro_entity_extend.tools.schema_generator:
-        class:                                              %oro_entity_extend.tools.schema_generator.class%
+        class: %oro_entity_extend.tools.schema_generator.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_entity_extend.extend.extend_manager
 
     oro_entity_extend.listener.config_subscriber:
-        class:                                              %oro_entity_extend.listener.config_subscriber.class%
+        class: %oro_entity_extend.listener.config_subscriber.class%
         arguments:
-            - @oro_entity_extend.extend.extend_manager
+            - @oro_entity_config.provider.extend
         tags:
             - { name: kernel.event_subscriber}
 

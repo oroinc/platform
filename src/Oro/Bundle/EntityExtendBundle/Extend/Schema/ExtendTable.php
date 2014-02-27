@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Doctrine\DBAL\Schema\Table;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendTable extends Table
@@ -19,13 +20,13 @@ class ExtendTable extends Table
     protected $schema;
 
     /**
-     * @param ExtendSchema $schema
+     * @param ExtendSchema        $schema
      * @param ExtendOptionManager $extendOptionManager
-     * @param Table $baseTable
+     * @param Table               $baseTable
      */
     public function __construct(ExtendSchema $schema, ExtendOptionManager $extendOptionManager, Table $baseTable)
     {
-        $this->schema = $schema;
+        $this->schema              = $schema;
         $this->extendOptionManager = $extendOptionManager;
 
         parent::__construct(
@@ -72,9 +73,9 @@ class ExtendTable extends Table
     {
         switch ($typeName) {
             case 'oneToMany':
-                $selfColumnName = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
-                $selfTableName = $this->getName();
-                $selfClassName =
+                $selfColumnName     = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
+                $selfTableName      = $this->getName();
+                $selfClassName      =
                     $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
                 $selfClassNameParts = explode('\\', $selfClassName);
 
@@ -82,7 +83,7 @@ class ExtendTable extends Table
                 if (!$this->schema->hasTable($targetTableName)) {
                     throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
                 }
-                $targetTable = $this->schema->getTable($targetTableName);
+                $targetTable      = $this->schema->getTable($targetTableName);
                 $targetColumnName =
                     ExtendConfigDumper::FIELD_PREFIX .
                     strtolower(array_pop($selfClassNameParts)) .
@@ -178,6 +179,12 @@ class ExtendTable extends Table
                 $relationsTable->setPrimaryKey([$selfName . '_id', $targetName . '_id']);
 
                 break;
+        }
+
+        if (!isset($options[self::EXTEND_OPTION_PREFIX_NAME])
+            && $this->extendOptionManager->isConfigurableEntity($this->getName())
+        ) {
+            $options[self::EXTEND_OPTION_PREFIX_NAME] = [];
         }
 
         foreach ($options as $name => $value) {
