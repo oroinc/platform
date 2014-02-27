@@ -743,13 +743,6 @@ footer {
 .min-window {
   width: 300px !important;
 }
-#window-holder {
-  position: absolute;
-  min-height: 42px;
-  bottom: 0;
-  left:0;
-  background: #e3e3e3;
-}
 .input-prepend-right {
   input[type="text"] {
     width: 180px;
@@ -1526,52 +1519,6 @@ footer {
 .oro-drop-holder {
   display: none;
 }
-#oro-drop-frame {
-  position: absolute;
-  height: 1px;
-  z-index: 999;
-  display: none;
-}
-#oro-drop-frame .list-oro {
-  font-size: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-#oro-drop-frame .list-oro a {
-  display: block;
-}
-#oro-drop-frame .drop-frame {
-  padding: 10px;
-}
-#oro-drop-frame #oro-drop-content {
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0;
-  padding: 0;
-  background-color: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  -webkit-border-radius: 6px;
-  border-radius: 6px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  input[type="radio"],
-  input[type="checkbox"] {
-    margin: 0;
-  }
-}
-#oro-drop-frame #oro-drop-content > div {
-  -webkit-box-shadow:  0px 2px 6px 1px rgba(0, 0, 0, 0.6);
-  box-shadow:  0px 2px 6px 1px rgba(0, 0, 0, 0.6);
-}
-#oro-drop-frame #oro-drop-content.oro-drop-right {
-  left: auto;
-  right: 0;
-
-}
-#oro-drop-content.pin-menus {
-  width: 375px !important;
-}
 .oro-drop > .btn {
   display: inline-block;
   vertical-align: top;
@@ -1589,23 +1536,6 @@ footer {
   padding: 4px 2px 0;
   line-height: 28px;
   #gradient > .vertical(#ffffff, #e6e6e6);
-}
-.one-row {
-  width: 100%;
-}
-.one-row:after {
-  content: "";
-  display: block;
-  clear: both;
-}
-.one-row > * {
-  float: left;
-  margin-right:10px !important;
-  line-height: 30px;
-}
-.one-row input[type="radio"],
-.one-row input[type="checkbox"] {
-  margin-top: 8px !important;
 }
 
 .modal {
@@ -2006,31 +1936,6 @@ footer {
   }
 }
 
-.form-info {
-  padding: 0 0 0 30px;
-  line-height: 18px;
-  .sub-title {
-    font-size: 17px;
-    color: #999;
-    float: left;
-  }
-  .separator {
-    float: left;
-    padding: 0 3px;
-    color: #999;
-    font-size: 18px;
-  }
-  .form-info-name {
-    margin: 0 0 5px;
-    font-size: 19px;
-    line-height: 22px;
-    float: left;
-    font: bold 17px/18px 'HelveticaNeue bold', Helvetica, Arial, sans-serif;
-  }
-}
-.form-info-edit {
-  padding-left: 0;
-}
 .sub-title a { color:#888; }
 .customer-info {
   padding-top:3px;
@@ -2225,15 +2130,7 @@ ul.inline-extra > li:first-child {
   height: 0;
   clear: both;
 }
-.scroll-content {
-  height: 350px;
-  overflow: auto;
-  position: relative;
-}
 
-.form-padding {
-  padding: 30px 0;
-}
 label.required em,
 .form-horizontal label.required em {
   color: #c30b25;
@@ -2261,9 +2158,6 @@ textarea {
   resize: vertical;
   text-align: justify;
   vertical-align: top;
-}
-.scroll-content .scrollspy-example {
-  position: relative;
 }
 .scrollspy-title {
   border:1px solid #e5e5e5;
@@ -2335,8 +2229,6 @@ textarea {
 }
 .filter-box .filter-item .filter-criteria {
   top: 125%;
-
-
 }
 .filter-box .filter-item .filter-criteria:before {
   border-bottom: 9px solid rgba(0, 0, 0, 0.2);
@@ -2539,17 +2431,8 @@ div.selector.active {
   background-position: -483px -156px;
 }
 
-div.selector:active span,
-div.selector.active span {
-}
-
 div.selector.focus, div.selector.hover, div.selector:hover {
   background-position: -483px -182px;
-}
-
-div.selector.focus span,
-div.selector.hover span,
-div.selector:hover span {
 }
 
 div.selector.focus:active,
@@ -2557,12 +2440,6 @@ div.selector.focus.active,
 div.selector:hover:active,
 div.selector.active:hover {
   background-position: -483px -208px;
-}
-
-div.selector.focus:active span,
-div.selector:hover:active span,
-div.selector.active:hover span,
-div.selector.focus.active span {
 }
 
 div.selector.disabled span {
@@ -2573,9 +2450,6 @@ div.selector.disabled span {
 }
 
 
-.oro-tree .form-actions button {
-  float: right;
-}
 /* bootstrapSwitch v1.2 */
 .has-switch {
   display: inline-block;
@@ -2903,19 +2777,10 @@ h5.user-fiedset {
     border-bottom:1px solid #ddd;
   }
 }*/
-.oro-form-contains-address {
-  .pull-left[class*="span"] {
-    margin-left: 0;
-  }
-}
 .page-size .dropdown-menu {
   min-width: 20px;
 }
 
-.pull-right-extra {
-  clear: right;
-  padding: 10px 0 0;
-}
 input:focus:invalid:focus,
 textarea:focus:invalid:focus,
 select:focus:invalid:focus,
@@ -2945,6 +2810,7 @@ div.uploader.focus,
   margin-bottom: 0;
 }
 #flash-messages {
+  overflow: hidden;
   .alert {
     margin: 3px 0 0;
     background-color: @warningBackground;
@@ -2986,9 +2852,6 @@ div.uploader.focus,
   .alert-empty {
     display: none;
   }
-}
-#flash-messages{
-  overflow: hidden;
 }
 .flash-messages-frame {
   position: fixed;
@@ -3059,24 +2922,6 @@ label.validation-error {
   }
 }
 
-.info-tooltip {
-  font-size:0;
-  text-indent:-9999em;
-  &:before {
-    display: inline-block;
-    margin-left:8px;
-    font:normal 18px/1em 'FontAwesome';
-    font-style: normal;
-    text-decoration: inherit;
-    -webkit-font-smoothing: antialiased;
-    content: "\f06a";
-    color: #0000ff;
-    text-decoration: inherit;
-    text-indent:0;
-    speak: none;
-  }
-}
-
 .validation-error .validation-tooltip {
   display: inline-block;
 }
@@ -3102,9 +2947,6 @@ label.radio.error {
     font-size: 20px;
     padding: 0;
   }
-}
-.oro-padding {
-  padding-top: 5px;
 }
 /* search */
 .search-header h2 {
@@ -3132,33 +2974,25 @@ label.radio.error {
   position: relative;
   top: -2px;
 }
-#historyDatagridBody .toolbar label.control-label {
-  white-space: nowrap;
-  padding-right: 10px;
-}
-#historyDatagridBody .grid-toolbar .pagination-centered {
-  width: auto;
-  margin: 0;
-}
 /* main-menu */
 #main-menu .nav-tabs > li > a.empty {
   padding: 0 5px;
+  .icon-home {
+    vertical-align: top;
+    margin-top: 5px;
+  }
 }
-#main-menu .nav-tabs > li > a.empty .icon-home {
-  vertical-align: top;
-  margin-top: 5px;
-}
-.collection-fields-list input[type='email'],
-.collection-fields-list input[type='text'],
-.collection-fields-list select,
-.collection-fields-list .selector,
-.collection-fields-list button {
-  float: left;
-}
-.collection-fields-list .selector,
-.collection-fields-list select,
-.collection-fields-list button {
-  margin: 0 0 0 4px;
+.collection-fields-list {
+  input[type='email'],
+  input[type='text'] {
+    float: left;
+  }
+  select,
+  .selector,
+  button {
+    float: left;
+    margin: 0 0 0 4px;
+  }
 }
 button.filter-update {
   margin: 0 0 0 6px;
@@ -3203,48 +3037,43 @@ button.filter-update {
   top: -3px;
 }
 
-#orocrm_contact_form_addresses_collection.oro-item-collection > div {
+#orocrm_contact_form_addresses_collection.oro-item-collection {
+  &>div {
     position: relative;
     padding: 10px 0 0;
     margin: 0 0 10px;
     border: 1px dashed #ededed;
-}
-#orocrm_contact_form_addresses_collection.oro-item-collection .add-list-item {
-  margin-left: 183px;
-}
-#orocrm_contact_form_addresses_collection.oro-item-collection .removeRow {
-  position: absolute;
-  top: 0;
-  right: 10px;
-}
-
-.oro-item-collection > div {
-  position: relative;
-  padding: 0;
-  margin: 0;
-  border: none;
+  }
+  .add-list-item {
+    margin-left: 183px;
+  }
+  .removeRow {
+    position: absolute;
+    top: 0;
+    right: 10px;
+  }
 }
 
-.oro-item-collection .add-list-item {
-  margin-left: 183px;
+.oro-item-collection {
+  &>div {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+  .add-list-item {
+    margin-left: 183px;
+  }
+  .removeRow {
+    position: absolute;
+    top: 0;
+    right: 10px;
+  }
+  .row-oro.oro-multiselect-holder {
+    margin: 0 0 5px
+  }
 }
 
-.oro-item-collection .removeRow {
-  position: absolute;
-  top: 0;
-  right: 10px;
-}
-
-.oro-item-collection .row-oro.oro-multiselect-holder {
-  margin: 0 0 5px
-}
-
-#users-grid #loading-wrapper {
-  z-index: 888;
-}
-#users-grid #loading-frame {
-  z-index: 889;
-}
 .form-horizontal .control-group {
   margin: 0;
   max-width:700px;
@@ -3254,11 +3083,6 @@ button.filter-update {
 }
 
 
-
-.page-refresh {
-  cursor: pointer;
-  color: #064EB1;
-}
 .breadcrumb {
   float: left;
   background: none;
@@ -3315,10 +3139,6 @@ button.filter-update {
   }
 }
 
-.small-well {
-  margin: 0 0 25px;
-  padding: 13px;
-}
 .box-type1 {
   background-color: #fff;
   .title {
@@ -3335,51 +3155,7 @@ button.filter-update {
   }
 }
 
-.contact-info-col-set {
-  padding: 13px 13px 0 0;
-  .contact-info-col {
-    padding: 0 0 13px 13px;
-    .contact-info {
-      min-height:420px;
-      .forScreen(@mediumScreen, min-height, initial);
-      > *{
-        padding-right: 30px;
-      }
-    }
-    .control-group {
-      > .control-label { width:120px; }
-      .controls {
-        margin-left:130px;
-        .control-label { width:100%; }
-        .tag-view { width:100%; }
-      }
-    }
-  }
-  .contact-info-row {
-    margin: 0 0 13px 13px;
-  }
-}
-
-.pull-absolute-right {
-  position: absolute;
-  right: 20px;
-}
 #orocrm_contact_address_form { min-width:400px; }
-.well-small-bottom {
-  margin-bottom: 10px;
-}
-.left-holder {
-  padding: 0 0 0 15px;
-  float: left;
-  line-height: 16px;
-  .date {
-    display: block;
-    clear: both;
-  }
-}
-.dark-bg {
-  background-color: #f1f1f1;
-}
 .email-holder {
   float: left;
   .removeRow {
@@ -3451,20 +3227,18 @@ iframe.email-body {
   display: inline-block;
   width: 30%;
   margin-bottom:25px;
+  &>div {
+    display: inline-block;
+    margin-right: 20px;
+    min-width: 250px;
+  }
+  input[type="checkbox"]{
+    margin: 0;
+  }
 }
 
 .security-permission {
   width: 120px;
-}
-
-.security-row > div {
-  display: inline-block;
-  margin-right: 20px;
-  min-width: 250px;
-}
-
-.security-row input[type="checkbox"]{
-  margin: 0;
 }
 
 .acl-table .a-center {
@@ -3495,9 +3269,6 @@ span.validation-faled {
   display: block;
   line-height: @baseLineHeight;
   padding-left: 10px;
-}
-.input-addon{
-  width: 258px;
 }
 .dashboard-contailer .page-title{
   border-bottom: 1px solid #F2F2F2;
