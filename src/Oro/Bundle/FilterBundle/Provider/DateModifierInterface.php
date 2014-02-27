@@ -3,9 +3,10 @@
 namespace Oro\Bundle\FilterBundle\Provider;
 
 
-interface DatevariablesInterface
+interface DateModifierInterface
 {
-    const LABEL_PREFIX = 'oro.filter.form.label_date_var.';
+    const LABEL_VAR_PREFIX  = 'oro.filter.form.label_date_var.';
+    const LABEL_PART_PREFIX = 'oro.filter.form.label_date_part.';
 
     const VAR_NOW   = 1;
     const VAR_TODAY = 2;
@@ -21,4 +22,13 @@ interface DatevariablesInterface
     const VAR_THIS_YEAR    = 14;
     const VAR_FDQ          = 15; // first day of quarter
     const VAR_FMQ          = 16; // first month of quarter
+
+    const PART_VALUE   = 'value';
+    const PART_DOW     = 'dayofweek';
+    const PART_WEEK    = 'week';
+    const PART_DAY     = 'day';
+    const PART_MONTH   = 'month';
+    const PART_QUARTER = 'quarter';
+    const PART_DOY     = 'dayofyear';
+    const PART_YEAR    = 'year';
 }

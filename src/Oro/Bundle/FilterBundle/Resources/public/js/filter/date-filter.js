@@ -195,6 +195,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
             var selectedPartLabel   = this._getSelectedChoiceLabel('dateParts', part);
+            this.dateWidgetOptions.part = part.type;
 
             var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
             var parts = [];
@@ -365,12 +366,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             var dateVars = this.dateWidgetOptions.dateVars;
 
             if (mode == 'raw') {
-                for (var varCode in dateVars) {
-                    value = value.replace(new RegExp(dateVars[varCode], 'g'), '{{' + varCode+'}}');
+                for (var part in dateVars) {
+                    for (var varCode in dateVars[part]) {
+                        value = value.replace(new RegExp(dateVars[part][varCode], 'g'), '{{' + varCode+'}}');
+                    }
                 }
             } else {
-                for (var varCode in dateVars) {
-                    value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[varCode]);
+                for (var part in dateVars) {
+                    for (var varCode in dateVars[part]) {
+                        value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[part][varCode]);
+                    }
                 }
             }
 

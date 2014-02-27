@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\FilterBundle\Provider\DatevariablesInterface;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
 abstract class AbstractDateFilterType extends AbstractType
 {
@@ -18,32 +18,26 @@ abstract class AbstractDateFilterType extends AbstractType
     const TYPE_MORE_THAN   = 3;
     const TYPE_LESS_THAN   = 4;
 
-    const PART_VALUE   = 'value';
-    const PART_DOW     = 'dayofweek';
-    const PART_WEEK    = 'week';
-    const PART_DAY     = 'day';
-    const PART_MONTH   = 'month';
-    const PART_QUARTER = 'quarter';
-    const PART_DOY     = 'dayofyear';
-    const PART_YEAR    = 'year';
-
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var DatevariablesInterface */
-    protected $dateVars;
+    /** @var DateModifierInterface */
+    protected $dateModifiers;
 
     /** @var null|array */
     protected $dateVarsChoices = null;
 
+    /** @var null|array */
+    protected $datePartsChoices = null;
+
     /**
      * @param TranslatorInterface    $translator
-     * @param DatevariablesInterface $dateVars
+     * @param DateModifierInterface  $dateModifiers
      */
-    public function __construct(TranslatorInterface $translator, DatevariablesInterface $dateVars)
+    public function __construct(TranslatorInterface $translator, DateModifierInterface $dateModifiers)
     {
         $this->translator = $translator;
-        $this->dateVars = $dateVars;
+        $this->dateModifiers = $dateModifiers;
     }
 
     /**
@@ -74,22 +68,30 @@ abstract class AbstractDateFilterType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $t = $this->translator;
         $resolver->setDefaults(
             [
-                'date_parts' => [
-                    self::PART_VALUE   => $t->trans('oro.filter.form.label_date_part.value'),
-                    self::PART_DOW     => $t->trans('oro.filter.form.label_date_part.dayofweek'),
-                    self::PART_WEEK    => $t->trans('oro.filter.form.label_date_part.week'),
-                    self::PART_DAY     => $t->trans('oro.filter.form.label_date_part.day'),
-                    self::PART_MONTH   => $t->trans('oro.filter.form.label_date_part.month'),
-                    self::PART_QUARTER => $t->trans('oro.filter.form.label_date_part.quarter'),
-                    self::PART_DOY     => $t->trans('oro.filter.form.label_date_part.dayofyear'),
-                    self::PART_YEAR    => $t->trans('oro.filter.form.label_date_part.year'),
-                ],
+                'date_parts' => $this->getDateParts(),
                 'date_vars' => $this->getDateVariables(),
             ]
         );
+    }
+
+    /**
+     * @return array|null
+     */
+    protected function getDateParts()
+    {
+        if (is_null($this->datePartsChoices)) {
+            $t = $this->translator;
+            $this->datePartsChoices = array_map(
+                function ($item) use ($t) {
+                    return $t->trans($item);
+                },
+                $this->dateModifiers->getDateParts()
+            );
+        }
+
+        return $this->datePartsChoices;
     }
 
     /**
@@ -99,12 +101,17 @@ abstract class AbstractDateFilterType extends AbstractType
     {
         if (is_null($this->dateVarsChoices)) {
             $t = $this->translator;
-            $this->dateVarsChoices = array_map(
-                function ($item) use ($t) {
-                    return $t->trans($item);
-                },
-                $this->dateVars->getDateVariables()
-            );
+            $result = $this->dateModifiers->getDateVariables();
+
+            foreach ($result as $part => $vars) {
+                $result[$part] = array_map(
+                    function ($item) use ($t) {
+                        return $t->trans($item);
+                    },
+                    $vars
+                );
+            }
+            $this->dateVarsChoices = $result;
         }
 
         return $this->dateVarsChoices;
