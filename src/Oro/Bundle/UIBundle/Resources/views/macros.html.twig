@@ -650,15 +650,35 @@
     Render tab panel
     Tabs - array:
         [
-            alias          - widget alias
-            url            - widget url
-            widgetType     - widget type
-            label          - tab label
-
-            see _self.clientLink for more options
+            name           - tab name
+            options        - route options
         ]
 #}
-{% macro tabPanel(tabs) %}
+{% macro dynamicTabPanel(name, options) %}
+    {% set menu = oro_menu_get(name, {}, options) %}
+    {% set tabs = {} %}
+    {% for child in menu.children %}
+        {% set tabs = tabs|merge([{
+            'alias': child.name,
+            'url': path(child.extras.routes.0, options),
+            'label': child.label,
+            'widgetType': child.extras.widgetType
+        }]) %}
+    {% endfor %}
+    {{ _self.tabPanel(tabs, options) }}
+{% endmacro %}
+
+{#
+    Render tab panel
+    Tabs - array:
+        [
+            alias      - widget alias
+            url        - wiget url
+            label      - tab label
+            widgetType - wiget type
+        ]
+#}
+{% macro tabPanel(tabs, options) %}
     {% set containerAlias = 'tab' %}
     {% for tab in tabs %}
         {% set containerAlias = containerAlias ~ '-' ~ tab.alias %}
@@ -669,25 +689,21 @@
             {% for tab in tabs %}
                 {% set isFirstLoop = loop.index == 1 %}
                 <li{% if isFirstLoop %} class="active"{% endif %}>
-                    {% set widgetOptions =
-                        {
-                            'type': 'block',
-                            'multiple': false,
-                            'options': {
-                                'container': '#' ~ tab.alias,
-                                'loadingElement': '#' ~ containerAlias,
-                                'alias': tab.alias,
-                            }
+                    {% set widgetOptions = {
+                        'type': 'block',
+                        'multiple': false,
+                        'options': {
+                            'container': '#' ~ tab.alias,
+                            'loadingElement': '#' ~ containerAlias,
+                            'alias': tab.alias,
                         }
-                    %}
+                    } %}
 
-                    {% set dataAttributes =
-                        {
-                            'target': '#' ~ tab.alias,
-                            'toggle': 'tab',
-                            'url': tab.url
-                        }
-                    %}
+                    {% set dataAttributes = {
+                        'target': '#' ~ tab.alias,
+                        'toggle': 'tab',
+                        'url': tab.url
+                    } %}
 
                     {% if isFirstLoop %}
                         {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
@@ -695,7 +711,8 @@
 
                     {% set options = tab|merge({
                         'widget': widgetOptions,
-                        'dataAttributes': dataAttributes
+                        'dataAttributes': dataAttributes,
+                        'label': tab.label
                     }) %}
 
                     {{ _self.clientLink(options) }}
