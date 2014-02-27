@@ -659,6 +659,11 @@
         ]
 #}
 {% macro tabPanel(tabs) %}
+    {% set containerAlias = 'tab' %}
+    {% for tab in tabs %}
+        {% set containerAlias = containerAlias ~ '-' ~ tab.alias %}
+    {% endfor %}
+
     <div class="oro-tabs">
         <ul class="nav nav-tabs">
             {% for tab in tabs %}
@@ -670,6 +675,7 @@
                             'multiple': false,
                             'options': {
                                 'container': '#' ~ tab.alias,
+                                'loadingElement': '#' ~ containerAlias,
                                 'alias': tab.alias,
                             }
                         }
@@ -697,7 +703,7 @@
             {% endfor %}
         </ul>
 
-        <div class="tab-content">
+        <div class="tab-content" id="{{ containerAlias }}">
             {% for tab in tabs %}
                 {% set isFirstLoop = loop.index == 1 %}
                 <div class="tab-pane{% if isFirstLoop %} active{% endif %}" id="{{ tab.alias }}">

@@ -84,7 +84,7 @@ function($, _, Backbone) {
             var loadingHeight = $loadingEl.height();
             var loadingWidth = $loadingEl.width();
             var containerWidth = $containerEl.outerWidth();
-            var containerHeight = $containerEl.outerHeight();
+            var containerHeight = $('.loading-wrapper').outerHeight();
             if (loadingHeight > containerHeight) {
                 $containerEl.css('height', loadingHeight + 'px');
             }
