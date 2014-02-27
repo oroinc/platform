@@ -22,4 +22,12 @@ class OroBatchBundle extends Bundle
             ->addCompilerPass(new Compiler\PushBatchLogHandlerPass())
             ->addCompilerPass(new Compiler\RegisterJobsPass());
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'AkeneoBatchBundle';
+    }
 }
