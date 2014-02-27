@@ -55,7 +55,9 @@ class ExtendOptionManager
             $columnName = count($keyParts) > 1 ? $keyParts[1] : null;
             $columnType = count($keyParts) > 1 ? $keyParts[2] : null;
 
-            if ($columnName) {
+            if (!$columnName) {
+                $builder->addTableOptions($tableName, $this->options[$objectKey]);
+            } else {
                 $builder->addColumnOptions($tableName, $columnName, $columnType, $this->options[$objectKey]);
             }
         }

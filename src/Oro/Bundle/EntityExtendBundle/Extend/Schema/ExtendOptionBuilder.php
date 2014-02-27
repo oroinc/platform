@@ -22,7 +22,11 @@ class ExtendOptionBuilder
 
     public function addTableOptions($tableName, $options)
     {
-
+        $entityClassName = $this->getEntityClassName($tableName);
+        if (!isset($this->result[$entityClassName])) {
+            $this->result[$entityClassName] = [];
+        }
+        $this->result[$entityClassName]['configs'] = $options;
     }
 
     public function addColumnOptions($tableName, $columnName, $columnType, $options)
