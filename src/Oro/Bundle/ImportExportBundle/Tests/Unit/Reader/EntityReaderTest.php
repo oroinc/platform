@@ -109,7 +109,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
     {
         $this->managerRegistry->expects($this->never())->method($this->anything());
 
-        $stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
         $stepExecution->expects($this->never())->method($this->anything());
@@ -307,7 +307,7 @@ class EntityReaderTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockStepExecution($context)
     {
-        $stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
 

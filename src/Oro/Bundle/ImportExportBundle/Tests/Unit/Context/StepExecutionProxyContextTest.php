@@ -19,7 +19,7 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->stepExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\StepExecution')
+        $this->stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
             ->disableOriginalConstructor()
             ->getMock();
         $this->context = new StepExecutionProxyContext($this->stepExecution);
@@ -73,7 +73,7 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
     {
         $expectedCount = 1;
 
-        $executionContext = $this->getMock('Oro\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
 
         $this->stepExecution->expects($this->exactly(2))
             ->method('getExecutionContext')
@@ -111,7 +111,7 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
     {
         $expectedCount = 1;
 
-        $executionContext = $this->getMock('Oro\Bundle\BatchBundle\Item\ExecutionContext');
+        $executionContext = $this->getMock('Akeneo\Bundle\BatchBundle\Item\ExecutionContext');
 
         $this->stepExecution->expects($this->once())
             ->method('getExecutionContext')
@@ -164,14 +164,14 @@ class StepExecutionProxyContextTest extends \PHPUnit_Framework_TestCase
 
     protected function expectGetRawConfiguration(array $expectedConfiguration, $count = 1)
     {
-        $jobInstance = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\JobInstance')
+        $jobInstance = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\JobInstance')
             ->disableOriginalConstructor()
             ->getMock();
 
         $jobInstance->expects($this->exactly($count))->method('getRawConfiguration')
             ->will($this->returnValue($expectedConfiguration));
 
-        $jobExecution = $this->getMockBuilder('Oro\Bundle\BatchBundle\Entity\JobExecution')
+        $jobExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\JobExecution')
             ->disableOriginalConstructor()
             ->getMock();
 
