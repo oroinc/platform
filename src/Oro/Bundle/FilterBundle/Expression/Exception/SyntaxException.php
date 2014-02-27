@@ -2,6 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Expression\Exception;
 
-class UnexpectedTokenException extends \LogicException
+class SyntaxException extends \LogicException
 {
 }
