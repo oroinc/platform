@@ -1,6 +1,6 @@
-/*global define*/
-define(['underscore', 'backbone', 'oro/abstract-widget'
-    ], function (_, Backbone, AbstractWidget) {
+/* global define */
+define(['underscore', 'backbone', 'oro/abstract-widget'],
+function(_, Backbone, AbstractWidget) {
     'use strict';
 
     var $ = Backbone.$;

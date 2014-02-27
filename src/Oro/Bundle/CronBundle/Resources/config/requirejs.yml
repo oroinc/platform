@@ -1,7 +1,7 @@
 config:
     paths:
-        'orocron/js/init-job': 'bundles/orocron/js/init-job.js'
+        'oro/init-job': 'bundles/orocron/js/init-job.js'
 
 build:
     paths:
-        'orocron/js/init-job': 'empty:'
+        'oro/init-job': 'empty:'

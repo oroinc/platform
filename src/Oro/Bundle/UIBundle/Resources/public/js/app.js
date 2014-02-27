@@ -5,8 +5,8 @@ define(['jquery', 'underscore'], function ($, _) {
     /**
      * Main Application
      *
-     * @export oroui/js/app
-     * @name oroui.app
+     * @export oro/app
+     * @name oro.app
      */
     return {
         /** @type {boolean} */

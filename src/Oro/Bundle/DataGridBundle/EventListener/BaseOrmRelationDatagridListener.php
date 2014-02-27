@@ -18,7 +18,7 @@ class BaseOrmRelationDatagridListener
 {
     /**
      * Included/excluded param names
-     * populated by orodatagrid/js/datagrid/listener/column-form-listener on frontend
+     * populated by oro/datagrid/column-form-listener on frontend
      */
     const GRID_PARAM_DATA_IN     = 'data_in';
     const GRID_PARAM_DATA_NOT_IN = 'data_not_in';

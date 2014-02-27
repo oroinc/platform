@@ -1,12 +1,12 @@
-/*global define, console*/
-define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/app', 'oroui/js/messenger',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/model'
-    ], function ($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionModel) {
+/* global define */
+define(['jquery', 'underscore', 'backbone', 'oro/translator', 'oro/app', 'oro/messenger',
+    'oro/calendar/connection/collection', 'oro/calendar/connection/model'],
+function($, _, Backbone, __, app, messenger, ConnectionCollection, ConnectionModel) {
     'use strict';
 
     /**
-     * @export  orocalendar/js/calendar/connection/view
-     * @class   orocalendar.calendar.connection.View
+     * @export  oro/calendar/connection/view
+     * @class   oro.calendar.connection.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -30,7 +30,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             newOwnerSelector: '#new_calendar_owner'
         },
 
-        initialize: function () {
+        initialize: function() {
             this.options.collection = this.options.collection || new ConnectionCollection();
             this.options.collection.setCalendar(this.options.calendar);
             this.template = _.template($(this.options.itemTemplateSelector).html());
@@ -54,20 +54,19 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }, this));
         },
 
-        getCollection: function () {
+        getCollection: function() {
             return this.options.collection;
         },
 
-        onModelAdded: function (model) {
-            var el,
-                viewModel = model.toJSON();
+        onModelAdded: function(model){
+            var viewModel = model.toJSON();
             // init text/background colors
             this.options.colorManager.applyColors(viewModel, _.bind(function () {
                 return this.$el.find(this.selectors.lastItem).attr(this.attrs.backgroundColor);
             }, this));
             this.options.colorManager.setCalendarColors(viewModel.calendar, viewModel.color, viewModel.backgroundColor);
 
-            el = $(this.template(viewModel));
+            var el = $(this.template(viewModel));
             // set 'data-' attributes
             _.each(this.attrs, function (value, key) {
                 el.attr(value, viewModel[key]);
@@ -82,26 +81,25 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.trigger('connectionAdd', model);
         },
 
-        onModelChanged: function (model) {
+        onModelChanged: function(model){
             this.options.colorManager.setCalendarColors(model.get('calendar'), model.get('color'), model.get('backgroundColor'));
             this.trigger('connectionChange', model);
         },
 
-        onModelDeleted: function (model) {
+        onModelDeleted: function(model) {
             this.options.colorManager.removeCalendarColors(model.get('calendar'));
             this.$el.find(this.selectors.findItemByCalendar(model.get('calendar'))).remove();
             this.trigger('connectionRemove', model);
         },
 
         addModel: function (ownerId) {
-            var savingMsg, model,
-                el = this.$el.find(this.selectors.findItemByOwner(ownerId));
+            var el = this.$el.find(this.selectors.findItemByOwner(ownerId));
             if (el.length > 0) {
                 messenger.notificationFlashMessage('warning', __('This calendar already exists.'));
             } else {
-                savingMsg = messenger.notificationMessage('warning', __('Adding the calendar, please wait ...'));
+                var savingMsg = messenger.notificationMessage('warning', __('Adding the calendar, please wait ...'));
                 try {
-                    model = new ConnectionModel();
+                    var model = new ConnectionModel();
                     model.set('owner', ownerId);
                     this.getCollection().create(model, {
                         wait: true,
@@ -122,10 +120,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         deleteModel: function (calendarId) {
-            var model,
-                deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
+            var deletingMsg = messenger.notificationMessage('warning', __('Excluding the calendar, please wait ...'));
             try {
-                model = this.getCollection().get(calendarId);
+                var model = this.getCollection().get(calendarId);
                 model.destroy({
                     wait: true,
                     success: _.bind(function () {

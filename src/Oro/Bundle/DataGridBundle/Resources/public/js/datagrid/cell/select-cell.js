@@ -1,13 +1,13 @@
-/*global define*/
-define(['underscore', 'backgrid'
-    ], function (_, Backgrid) {
+/* global define */
+define(['underscore', 'backgrid'],
+function(_, Backgrid) {
     'use strict';
 
     /**
      * Select column cell. Added missing behaviour.
      *
-     * @export  orodatagrid/js/datagrid/cell/select-cell
-     * @class   orodatagrid.datagrid.cell.SelectCell
+     * @export  oro/datagrid/select-cell
+     * @class   oro.datagrid.SelectCell
      * @extends Backgrid.SelectCell
      */
     return Backgrid.SelectCell.extend({
@@ -17,7 +17,7 @@ define(['underscore', 'backgrid'
         initialize: function (options) {
             if (this.choices) {
                 this.optionValues = [];
-                _.each(this.choices, function (value, key) {
+                _.each(this.choices, function(value, key) {
                     this.optionValues.push([value, key]);
                 }, this);
             }

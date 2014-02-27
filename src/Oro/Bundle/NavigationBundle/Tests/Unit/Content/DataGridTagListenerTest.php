@@ -56,7 +56,7 @@ class DataGridTagListenerTest extends \PHPUnit_Framework_TestCase
         $this->listener->buildAfter($event);
 
         $this->assertContains(
-            'oronavigation/js/content/grid-builder',
+            'oro/content/grid-builder',
             $config->offsetGetByPath(
                 sprintf('%s[%s]', ToolbarExtension::OPTIONS_PATH, MetadataObject::REQUIRED_MODULES_KEY)
             ),

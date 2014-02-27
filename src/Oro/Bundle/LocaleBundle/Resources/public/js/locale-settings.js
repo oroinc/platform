@@ -1,12 +1,12 @@
-/*global define*/
-define(['underscore', 'orolocale/js/locale-settings/data'
-    ], function (_, settings) {
+/* global define */
+define(['underscore', 'oro/locale-settings/data'],
+function(_, settings) {
     'use strict';
 
     /**
      * Locale settings
      *
-     * @export  orolocale/js/locale-settings
+     * @export  oro/locale-settings
      * @class   oro.LocaleSettings
      */
     var localeSettings = {

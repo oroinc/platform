@@ -1,13 +1,13 @@
-/*global define*/
-define(['jquery', 'underscore', 'backbone', 'backgrid'
-    ], function ($, _, Backbone, Backgrid) {
+/* global define */
+define(['jquery', 'underscore', 'backbone', 'backgrid'],
+function ($, _, Backbone, Backgrid) {
     "use strict";
 
     /**
      * Datagrid footer cell
      *
-     * @exports orodatagrid/js/datagrid/footer/footer-cell
-     * @class orodatagrid.datagrid.footer.FooterCell
+     * @export  oro/datagrid/footer
+     * @class   FooterCell
      * @extends Backbone.View
      */
     return Backgrid.FooterCell = Backbone.View.extend({
@@ -15,7 +15,7 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
         tagName: "th",
 
         /** @property */
-        template: _.template(
+        template:_.template(
             '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>' // wrap label into span otherwise underscore will not render it
         ),
 

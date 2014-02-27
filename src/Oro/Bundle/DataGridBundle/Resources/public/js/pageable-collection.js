@@ -1,6 +1,6 @@
-/*global define*/
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
-    ], function (_, Backbone, BackbonePageableCollection, app) {
+/* global define */
+define(['underscore', 'backbone', 'backbone/pageable-collection', 'oro/app'],
+function(_, Backbone, BackbonePageableCollection, app) {
     'use strict';
 
     /**
@@ -11,8 +11,8 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
      * updateState: Fired when collection state is updated using updateState method
      * beforeFetch: Fired when collection starts to fetch, before request is formed
      *
-     * @export  orodatagrid/js/pageable-collection
-     * @class   orodatagrid.PageableCollection
+     * @export  oro/pageable-collection
+     * @class   oro.PageableCollection
      * @extends Backbone.PageableCollection
      */
     var PageableCollection = BackbonePageableCollection.extend({

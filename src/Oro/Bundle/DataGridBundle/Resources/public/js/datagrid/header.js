@@ -1,13 +1,13 @@
-/*global define*/
-define(['backbone', 'backgrid', './header-cell/header-cell'
-    ], function (Backbone, Backgrid, HeaderCell) {
+/* global define */
+define(['backbone', 'backgrid', 'oro/datagrid/header-cell'],
+function (Backbone, Backgrid, HeaderCell) {
     "use strict";
 
     /**
      * Datagrid header widget
      *
-     * @export  orodatagrid/js/datagrid/header
-     * @class   orodatagrid.datagrid.Header
+     * @export  oro/datagrid/header
+     * @class   oro.datagrid.Header
      * @extends Backgrid.Header
      */
     return Backgrid.Header.extend({

@@ -1,11 +1,11 @@
-/*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+/* global define */
+define(['jquery', 'underscore', 'backbone'],
+function($, _, Backbone) {
     'use strict';
 
     /**
-     * @export  oroemail/js/email/template/view
-     * @class   oroemail.email.template.View
+     * @export  oro/email/template/view
+     * @class   oro.email.template.View
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -41,7 +41,7 @@ define(['jquery', 'underscore', 'backbone'
             }
         },
 
-        render: function () {
+        render: function() {
             $(this.target).val('').trigger('change');
             $(this.target).find('option[value!=""]').remove();
             if (this.collection.models.length > 0) {

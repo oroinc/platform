@@ -4,7 +4,7 @@
 define(function (require) {
     'use strict';
 
-    var Modal = require('oroui/js/modal');
+    var Modal = require('oro/modal');
 
     /**
      * @export  oro/sidebar/widget-controller/widget-setup-view

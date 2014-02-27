@@ -1,14 +1,14 @@
-/*global define*/
-define(['jquery', 'underscore', './pagination', 'jquery.numeric'
-    ], function ($, _, Pagination) {
+/* global define */
+define(['jquery', 'underscore', 'oro/datagrid/pagination', 'jquery.numeric'],
+function($, _, Pagination) {
     'use strict';
 
     /**
      * Datagrid pagination with input field
      *
-     * @export  orodatagrid/js/datagrid/pagination-input
-     * @class   orodatagrid.datagrid.PaginationInput
-     * @extends orodatagrid.datagrid.Pagination
+     * @export  oro/datagrid/pagination-input
+     * @class   oro.datagrid.PaginationInput
+     * @extends oro.datagrid.Pagination
      */
     return Pagination.extend({
         /** @property */
@@ -19,8 +19,8 @@ define(['jquery', 'underscore', './pagination', 'jquery.numeric'
             "click a": "onChangePage",
             "blur input": "onChangePageByInput",
             "change input": "onChangePageByInput",
-            'keyup input': function (e) {
-                if (e.which === 13) {
+            'keyup input': function(e) {
+                if (e.which == 13) {
                     // fix for IE 8, bacause change event is not fired when enter is pressed
                     this.onChangePageByInput(e);
                 }
@@ -35,10 +35,10 @@ define(['jquery', 'underscore', './pagination', 'jquery.numeric'
          *
          * @param {Event} e
          */
-        onChangePageByInput: function (e) {
+        onChangePageByInput: function(e) {
             e.preventDefault();
 
-            var pageIndex = parseInt($(e.target).val(), 10);
+            var pageIndex = parseInt($(e.target).val());
             var collection = this.collection;
             var state = collection.state;
 
@@ -69,6 +69,8 @@ define(['jquery', 'underscore', './pagination', 'jquery.numeric'
          */
         makeHandles: function () {
             var handles = [];
+            var collection = this.collection;
+            var ffConfig = this.fastForwardHandleConfig;
 
             handles.push({
                 type: 'input'
@@ -79,7 +81,7 @@ define(['jquery', 'underscore', './pagination', 'jquery.numeric'
         /**
          * Render pagination view and add validation for input with positive integer value
          */
-        render: function () {
+        render: function() {
             Pagination.prototype.render.apply(this, arguments);
             this.$('input').numeric({ decimal: false, negative: false });
             return this;

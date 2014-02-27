@@ -14,7 +14,7 @@ sidebar: {
         {
             title: 'Hello world',
             icon: 'bundles/orosidebar/img/hello-world.ico',
-            module: 'orosidebar/widget/hello-world'
+            module: 'oro/sidebar/widget/hello-world'
         }
     ]
 },
@@ -24,7 +24,7 @@ widgets: [
         id: 1,
         title: 'Hello world',
         icon: 'bundles/orosidebar/img/hello-world.ico',
-        module: 'orosidebar/widget/hello-world',
+        module: 'oro/sidebar/widget/hello-world',
         settings: {
             content: 'Hello, World!!!'
         }

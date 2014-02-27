@@ -1,13 +1,12 @@
-/*global define*/
-define(['jquery', 'underscore', 'backbone', 'backgrid'
-    ], function ($, _, Backbone, Backgrid) {
+/* global define */
+define(['jquery', 'underscore', 'backbone', 'backgrid'],
+function ($, _, Backbone, Backgrid) {
     "use strict";
 
     /**
      * FooterRow is a controller for a row of footer cells.
      *
-     * @exports orodatagrid/js/datagrid/footer/footer-row
-     * @class orodatagrid.datagrid.footer.FooterRow
+     * @class FooterRow
      * @extends Backgrid.Row
      */
     return Backgrid.FooterRow = Backgrid.Row.extend({
@@ -19,11 +18,11 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
         },
 
         makeCell: function (column, options) {
-            var FooterCell = column.get("footerCell") || options.footerCell || Backgrid.FooterCell;
-            return new FooterCell({
+            var footerCell = column.get("footerCell") || options.footerCell || Backgrid.FooterCell;
+            return new footerCell({
                 column: column,
                 collection: this.collection
             });
         }
-    });
+    })
 });

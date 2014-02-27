@@ -24,14 +24,14 @@
     {% endif %}
     {% import _self as pinbar %}
     <script type="text/javascript">
-        require(['jquery', 'oronavigation/js/pinbar/view', 'oronavigation/js/navigation', 'oroui/js/app'],
+        require(['jquery', 'oro/navigation/pinbar/view', 'oro/navigation', 'oro/app'],
                 function ($, PinbarView, Navigation, app) {
             if (app.isMobile()) {
                 return;
             }
 
             $(function () {
-                /** @type {oronavigation.pinbar.View} */
+                /** @type {oro.navigation.pinbar.View} */
                 var pinbarView = new PinbarView({{- pinbar.get_options(['maxPinbarItems', 'el', 'listBar', 'tabTitle', 'tabIcon', 'minimizeButton', 'closeButton', 'defaultUrl'], options) -}});
                 Navigation.registerPinbarView(pinbarView);
 

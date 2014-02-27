@@ -1,14 +1,14 @@
-/*global define*/
-define(['./string-cell', '../formatter/datetime-formatter'
-    ], function (StringCell, DatagridDateTimeFormatter) {
+/* global define */
+define(['oro/datagrid/string-cell', 'oro/datagrid/datetime-formatter'],
+function(StringCell, DatagridDateTimeFormatter) {
     'use strict';
 
     /**
      * Datetime column cell
      *
-     * @export  orodatagrid/js/datagrid/cell/datetime-cell
-     * @class   orodatagrid.datagrid.cell.DateTimeCell
-     * @extends orodatagrid.datagrid.cell.StringCell
+     * @export  oro/datagrid/datetime-cell
+     * @class   oro.datagrid.DateTimeCell
+     * @extends oro.datagrid.StringCell
      */
     return StringCell.extend({
         /**

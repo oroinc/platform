@@ -1,13 +1,13 @@
-/*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+/* global define */
+define(['jquery', 'underscore', 'backbone', 'oro/translator'],
+function($, _, Backbone, __) {
     'use strict';
 
     /**
      * Datagrid page size widget
      *
-     * @export  orodatagrid/js/datagrid/page-size
-     * @class   orodatagrid.datagrid.PageSize
+     * @export oro/datagrid/page-size
+     * @class   oro.datagrid.PageSize
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -63,7 +63,7 @@ define(['jquery', 'underscore', 'backbone'
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             this.enabled = false;
             this.render();
             return this;
@@ -74,7 +74,7 @@ define(['jquery', 'underscore', 'backbone'
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             this.enabled = true;
             this.render();
             return this;
@@ -87,27 +87,27 @@ define(['jquery', 'underscore', 'backbone'
          */
         onChangePageSize: function (e) {
             e.preventDefault();
-            var pageSize = parseInt($(e.target).data('size'), 10);
+            var pageSize = parseInt($(e.target).data('size'));
             if (pageSize !== this.collection.state.pageSize) {
                 this.changePageSize(pageSize);
             }
         },
 
-        changePageSize: function (pageSize) {
+        changePageSize: function(pageSize) {
             this.collection.state.pageSize = pageSize;
             this.collection.fetch();
 
             return this;
         },
 
-        render: function () {
+        render: function() {
             this.$el.empty();
 
             var currentSizeLabel = _.filter(
                 this.items,
                 _.bind(
-                    function (item) {
-                        return item.size === undefined ? this.collection.state.pageSize == item : this.collection.state.pageSize == item.size;
+                    function(item) {
+                        return item.size == undefined ? this.collection.state.pageSize == item : this.collection.state.pageSize == item.size;
                     },
                     this
                 )

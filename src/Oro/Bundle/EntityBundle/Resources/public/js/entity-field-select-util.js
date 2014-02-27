@@ -1,6 +1,6 @@
-/*global define*/
-define(['underscore'
-    ], function (_) {
+/* global define */
+define(['underscore'],
+function(_) {
     'use strict';
 
     // define a constructor
@@ -9,8 +9,8 @@ define(['underscore'
     };
 
     /**
-     * @export  oroentity/js/entity-field-select-util
-     * @class   oroentity.EntityFieldSelectUtil
+     * @export  oro/entity-field-select-util
+     * @class   oro.EntityFieldSelectUtil
      */
     entityFieldUtil.prototype = {
         findEntity: function (entity) {

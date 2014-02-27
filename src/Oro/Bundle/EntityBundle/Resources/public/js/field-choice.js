@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', './entity-field-select-util', './entity-field-view',
+define(['jquery', 'underscore', 'oro/entity-field-select-util', 'oro/entity-field-view',
     'jquery-ui', 'jquery.select2'
     ], function ($, _, EntityFieldUtil, EntityFieldView) {
     'use strict';

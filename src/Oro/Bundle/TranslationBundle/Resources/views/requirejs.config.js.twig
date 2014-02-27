@@ -1,7 +1,7 @@
 require({
     shim: {
         'oro/translations': {
-            deps: ['orotranslation/js/translator', 'translator'],
+            deps: ['oro/translator', 'translator'],
             init: function(__) {
                 return __;
             }
@@ -9,10 +9,10 @@ require({
     },
     map: {
         '*': {
-            'orotranslation/js/translator': 'oro/translations'
+            'oro/translator': 'oro/translations'
         },
         'oro/translations': {
-            'orotranslation/js/translator': 'orotranslation/js/translator'
+            'oro/translator': 'oro/translator'
         }
     },
     paths: {

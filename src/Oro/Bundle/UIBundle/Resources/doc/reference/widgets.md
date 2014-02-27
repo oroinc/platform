@@ -27,7 +27,7 @@ Each widget on page has it's own unique widget identifier.
 
 RequireJS services
 ------------------
- - **oroui/js/widget-manager** - Widget manager
+ - **oro/widget-manager** - Widget manager
  - **oro/block-widget** - Block widget
  - **oro/buttons-widget** - Buttons widget
  - **oro/dialog-widget** - Dialog widget
@@ -275,7 +275,7 @@ Let's assume that widget need to trigger *formSave* event when form successfully
 ```html
 <div id="poll-widget"></div>
 <script type="text/javascript">
-require(['oroui/js/widget-manager', 'oro/block-widget'],
+require(['oro/widget-manager', 'oro/block-widget'],
 function(widgetManager, BlockWidget) {
     var widgetInstance = new BlockWidget({
         el: '#poll-widget',
@@ -308,7 +308,7 @@ function(widgetManager, BlockWidget) {
 
     {% if isSaved %}
     <script type="text/javascript">
-        require(['oroui/js/widget-manager'],
+        require(['oro/widget-manager'],
         function(widgetManager) {
             widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                 widget.trigger('formSave');

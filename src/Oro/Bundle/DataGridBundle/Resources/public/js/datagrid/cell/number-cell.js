@@ -1,48 +1,48 @@
-/*global define*/
-define(['underscore', 'backgrid', '../formatter/number-formatter'
-    ], function (_, Backgrid, NumberFormatter) {
-    'use strict';
-
-    /**
-     * Number column cell.
-     *
-     * @export  orodatagrid/js/datagrid/cell/number-cell
-     * @class   orodatagrid.datagrid.cell.NumberCell
-     * @extends Backgrid.NumberCell
-     */
-    return Backgrid.NumberCell.extend({
-        /** @property {oro.datagrid.NumberFormatter} */
-        formatterPrototype: NumberFormatter,
-
-        /** @property {String} */
-        style: 'decimal',
+/* global define */
+define(['underscore', 'backgrid', 'oro/datagrid/number-formatter'],
+    function(_, Backgrid, NumberFormatter) {
+        'use strict';
 
         /**
-         * @inheritDoc
-         */
-        initialize: function (options) {
-            _.extend(this, options);
-            Backgrid.Cell.prototype.initialize.apply(this, arguments);
-            this.formatter = this.createFormatter();
-        },
-
-        /**
-         * Creates number cell formatter
+         * Number column cell.
          *
-         * @return {oro.datagrid.NumberFormatter}
+         * @export  oro/datagrid/number-cell
+         * @class   oro.datagrid.NumberCell
+         * @extends Backgrid.NumberCell
          */
-        createFormatter: function () {
-            return new this.formatterPrototype({style: this.style});
-        },
+        return Backgrid.NumberCell.extend({
+            /** @property {oro.datagrid.NumberFormatter} */
+            formatterPrototype: NumberFormatter,
 
-        /**
-         * @inheritDoc
-         */
-        enterEditMode: function (e) {
-            if (this.column.get("editable")) {
-                e.stopPropagation();
+            /** @property {String} */
+            style: 'decimal',
+
+            /**
+             * @inheritDoc
+             */
+            initialize: function (options) {
+                _.extend(this, options);
+                Backgrid.Cell.prototype.initialize.apply(this, arguments);
+                this.formatter = this.createFormatter();
+            },
+
+            /**
+             * Creates number cell formatter
+             *
+             * @return {oro.datagrid.NumberFormatter}
+             */
+            createFormatter: function() {
+                return new this.formatterPrototype({style: this.style});
+            },
+
+            /**
+             * @inheritDoc
+             */
+            enterEditMode: function (e) {
+                if (this.column.get("editable")) {
+                    e.stopPropagation();
+                }
+                return Backgrid.NumberCell.prototype.enterEditMode.apply(this, arguments);
             }
-            return Backgrid.NumberCell.prototype.enterEditMode.apply(this, arguments);
-        }
+        });
     });
-});
