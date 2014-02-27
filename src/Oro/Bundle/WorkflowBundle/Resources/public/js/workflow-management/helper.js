@@ -1,0 +1,29 @@
+/* global define */
+define(function() {
+    'use strict';
+
+    /**
+     * @export  oro/workflow-management/helper
+     * @class   oro.WorkflowManagement.Helper
+     */
+    return {
+        getNameByString: function(str, prefix) {
+            str = (prefix || '') + str;
+            return str
+                .toLowerCase() // To lower case conversion
+                .replace(/\s+|\-+/g, '_') //Replace spaces and - with underscore
+                .replace(/[\u0250-\ue007]/g, '') //Remove all non latin symbols
+                .replace(/__+/g, '_') //Remove duplicated underscores; //Convert to lowercase
+        },
+
+        getFormData: function(form) {
+            var data = form.serializeArray();
+            var result = {};
+            for (var i = 0; i < data.length; i++) {
+                var field = data[i];
+                result[field.name] = field.value;
+            }
+            return result;
+        }
+    };
+});

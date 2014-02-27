@@ -13,12 +13,12 @@ function(_, Backbone) {
 
         options: {
             workflow: null,
-            template:
-                '<a href="#"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>'
+            template: null
         },
 
         initialize: function() {
-            this.template = _.template(this.options.template);
+            var template = this.options.template || $('#transition-row-short-template').html();
+            this.template = _.template(template);
             this.listenTo(this.options.model, 'destroy', this.remove);
         },
 

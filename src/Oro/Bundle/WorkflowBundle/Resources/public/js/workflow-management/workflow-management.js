@@ -1,10 +1,8 @@
 /* global define */
 define(['underscore', 'backbone', 'oro/workflow-management/step/view/list', 'oro/workflow-management/step/model',
-    'oro/workflow-management/transition/collection'],
-function(_, Backbone, StepsListView, StepModel, TransitionCollection) {
+    'oro/workflow-management/transition/collection', 'oro/workflow-management/step/view/edit'],
+function(_, Backbone, StepsListView, StepModel, TransitionCollection, StepEditView) {
     'use strict';
-
-    var $ = Backbone.$;
 
     /**
      * @export  oro/workflow-management
@@ -12,6 +10,10 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection) {
      * @extends Backbone.View
      */
     return Backbone.View.extend({
+        events: {
+            'click .add-step-btn': 'addNewStep'
+        },
+
         options: {
             stepsEl: null,
             metadataFormEl: null,
@@ -19,26 +21,14 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection) {
         },
 
         initialize: function() {
-            var steps = this.model.get('steps');
-            steps.add(this._getStartStep());
+            this.model.get('steps').add(this._getStartStep());
             this.stepListView = new StepsListView({
                 el: this.$(this.options.stepsEl),
-                collection: steps,
+                collection: this.model.get('steps'),
                 workflow: this.model
             });
-        },
 
-        setFormMetadataToModel: function() {
-            var metadataElements = {
-                'label': 'label',
-                'related_entity': 'relatedEntity',
-                'steps_display_ordered': 'stepsDisplayOrdered'
-            };
-
-            for (var elName in metadataElements) if (metadataElements.hasOwnProperty(elName)) {
-                var el = this._getFormElement(this.$el, elName);
-                this.model.set(metadataElements[elName], el.val());
-            }
+            this.listenTo(this.stepListView, 'stepEdit', this.editStep);
         },
 
         _getStartStep: function() {
@@ -52,6 +42,36 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection) {
 
         renderSteps: function() {
             this.stepListView.render();
+        },
+
+        addNewStep: function() {
+            this.openManageStepForm(
+                new StepModel()
+            );
+        },
+
+        editStep: function(stepName) {
+            this.openManageStepForm(
+                this.model.getStepByName(stepName)
+            );
+        },
+
+        openManageStepForm: function(step) {
+            var stepEditView = new StepEditView({
+                model: step
+            });
+            stepEditView.on(
+                'stepAdd',
+                _.bind(this.addStep, this)
+            );
+            stepEditView.render();
+        },
+
+        addStep: function(step) {
+            if (!this.model.getStepByName(step.get('name'))) {
+                this.model.get('steps').add(step);
+            }
+            this.renderSteps();
         },
 
         _getFormElement: function(form, name) {

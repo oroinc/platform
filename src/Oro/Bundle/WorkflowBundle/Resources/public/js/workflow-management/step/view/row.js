@@ -6,8 +6,8 @@ function(_, Backbone, TransitionsShortListView) {
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/step/view/list
-     * @class   oro.WorkflowManagement.StepsListView
+     * @export  oro/workflow-management/step/view/row
+     * @class   oro.WorkflowManagement.StepRowView
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -18,23 +18,12 @@ function(_, Backbone, TransitionsShortListView) {
 
         options: {
             workflow: null,
-            template:
-                '<td class="step-name">' +
-                    '<% if (_is_start) { %><%= label %><% } else { %><a href="#"><%= label %></a><% } %>' +
-                    '<% if (is_final) { %>&nbsp;<span class="label">Final</span><% } %>' +
-                '</td>' +
-                '<td class="step-transitions"></td>' +
-                '<td class="step-actions"><div class="pull-right">' +
-                    '<% if (!_is_start) { %>' +
-                    '<a href="#" class="edit-step" title="Edit step"><i class="icon-edit"/></a> ' +
-                    '<a href="#" class="delete-step" title="Delete step"><i class="icon-remove"/></a> ' +
-                    '<% } %>' +
-                    '<a href="#" class="add-step-transition" title="Add transition"><i class="icon-plus-sign"/></a> ' +
-                '</div></td>'
+            template: null
         },
 
         initialize: function() {
-            this.template = _.template(this.options.template);
+            var template = this.options.template || $('#step-row-template').html();
+            this.template = _.template(template);
             this.listenTo(this.model, 'destroy', this.remove);
         },
 

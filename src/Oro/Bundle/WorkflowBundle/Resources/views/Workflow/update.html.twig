@@ -55,6 +55,84 @@
 {% endblock stats %}
 
 {% block content_data %}
+    <script type="text/template" id="step-form-template">
+        {% set stepNameConstraints = {
+            'NotBlank': null
+        } %}
+
+        <form action="#">
+            <div class="row-fluid">
+                <div class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label required">{{ "Name"|trans }} <em>*</em></label>
+                        <div class="controls">
+                            <input type="text" name="label" value="<%= label %>" data-validation="{{ stepNameConstraints|json_encode }}">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">{{ "Order"|trans }}</label>
+                        <div class="controls">
+                            <input type="text" name="order" value="<%= order %>">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">{{ "Final"|trans }}</label>
+                        <div class="controls">
+                            <input type="checkbox" name="is_final" <% if (is_final) { %>checked="checked"<% } %>>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transitions-list-container"></div>
+            </div>
+
+            <div class="widget-actions">
+                <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
+                <button type="submit" class="btn btn-success">{{ "Ok"|trans }}</button>
+            </div>
+        </form>
+    </script>
+
+    <script type="text/template" id="step-list-template">
+        <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <thead>
+                <th>{{ "Step name"|trans }}</th>
+                <th>{{ "Transitions"|trans }}</th>
+                <th>{{ "Poisition"|trans }}</th>
+                <th>{{ "Actions"|trans }}</th>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </script>
+
+    <script type="text/template" id="step-row-template">
+        <td class="step-name">
+            <% if (_is_start) { %>
+                <%= label %>
+            <% } else { %>
+                <a href="#" class="edit-step" data-step-name="<%= name %>"><%= label %></a>
+            <% } %>
+            <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
+        </td>
+        <td class="step-transitions"></td>
+        <td><%= order %></td>
+        <td class="step-actions">
+            <div class="pull-right">
+                <% if (!_is_start) { %>
+                    <a href="#" class="edit-step" title="Edit step" data-step-name="<%= name %>"><i class="icon-edit"/></a>
+                    <a href="#" class="delete-step" title="Delete step" data-step-name="<%= name %>"><i class="icon-remove"/></a>
+                <% } %>
+                <a href="#" class="add-step-transition" title="Add transition" data-step-name="<%= name %>"><i class="icon-plus-sign"/></a>
+            </div>
+        </td>
+    </script>
+
+    <script type="text/template" id="transition-row-short-template">
+        <a href="#"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
+    </script>
+
     {% set dataBlocks = [{
         'title': 'General'|trans,
         'class': 'active',
@@ -71,6 +149,12 @@
 
     {% set stepsListWidget %}
         <div class="workflow-definition-steps-list-container"></div>
+        <div class="workflow-definition-buttons">
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
+            </div>
+        </div>
+
         <script type="text/javascript">
             require([
                 'oro/workflow-management',

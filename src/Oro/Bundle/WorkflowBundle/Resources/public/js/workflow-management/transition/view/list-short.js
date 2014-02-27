@@ -17,8 +17,6 @@ function(_, Backbone, TransitionsShortRowView) {
         },
 
         initialize: function() {
-            this.addAllItems(this.getCollection().models);
-
             this.listenTo(this.getCollection(), 'add', this.addItem);
             this.listenTo(this.getCollection(), 'reset', this.addAllItems);
         },
@@ -40,6 +38,8 @@ function(_, Backbone, TransitionsShortRowView) {
         },
 
         render: function() {
+            this.addAllItems(this.getCollection().models);
+
             return this;
         }
     });

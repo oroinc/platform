@@ -11,28 +11,48 @@ function(_, Backbone, StepRowView) {
      * @extends Backbone.View
      */
     return Backbone.View.extend({
+        events: {
+            'click .edit-step': 'editStep',
+            'click .delete-step': 'removeStep',
+            'click .add-step-transition': 'addStepTransition'
+        },
+
         options: {
             listElBodyEl: 'tbody',
-            template: '<table class="grid table-hover table table-bordered table-condensed">' +
-                '<thead>' +
-                '<th>Step name</th>' +
-                '<th>Transitions</th>' +
-                '<th>Actions</th>' +
-                '</thead><tbody></tbody>' +
-                '</table>',
-            collection: null,
+            template: null,
             workflow: null
         },
 
         initialize: function() {
-            this.template = _.template(this.options.template);
+            var template = this.options.template || $('#step-list-template').html();
+            this.template = _.template(template);
             this.$listEl = $(this.template());
             this.$listElBody = this.$listEl.find(this.options.listElBodyEl);
 
-            this.addAllItems(this.getCollection().models);
-
+            this.listenTo(this.getCollection(), 'change', this.render);
             this.listenTo(this.getCollection(), 'add', this.addItem);
             this.listenTo(this.getCollection(), 'reset', this.addAllItems);
+        },
+
+        editStep: function(e) {
+            e.preventDefault();
+            var stepName = $(e.target).closest('.edit-step').data('step-name');
+
+            this.trigger('stepEdit', stepName);
+        },
+
+        removeStep: function(e) {
+            e.preventDefault();
+            var stepName = $(e.target).closest('.edit-step').data('step-name');
+
+            this.trigger('stepRemove', stepName);
+        },
+
+        addStepTransition: function(e) {
+            e.preventDefault();
+            var stepName = $(e.target).closest('.edit-step').data('step-name');
+
+            this.trigger('stepAddTransition', stepName);
         },
 
         addItem: function(item) {
@@ -48,10 +68,13 @@ function(_, Backbone, StepRowView) {
         },
 
         getCollection: function() {
-            return this.options.collection;
+            return this.options.workflow.get('steps');
         },
 
         render: function() {
+            this.getCollection().sort();
+            this.$listElBody.empty();
+            this.addAllItems(this.getCollection().models);
             this.$el.html(this.$listEl);
 
             return this;
