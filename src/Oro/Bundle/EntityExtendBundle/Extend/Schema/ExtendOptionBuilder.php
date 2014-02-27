@@ -24,9 +24,9 @@ class ExtendOptionBuilder
     public function addTableOptions($tableName, $options)
     {
         $entityName = null;
-        if (isset($options['entity']['name'])) {
-            $entityName = $options['entity']['name'];
-            unset($options['entity']['name']);
+        if (isset($options['extend']['entity_name'])) {
+            $entityName = $options['extend']['entity_name'];
+            unset($options['extend']['entity_name']);
         }
         $entityClassName = $this->getEntityClassName($tableName, $entityName);
         if (!isset($this->result[$entityClassName])) {
@@ -39,8 +39,6 @@ class ExtendOptionBuilder
     {
         $entityClassName = $this->getEntityClassName($tableName);
 
-        var_dump($entityClassName);
-
         if (!isset($this->result[$entityClassName])) {
             $this->result[$entityClassName] = [];
         }
@@ -51,8 +49,6 @@ class ExtendOptionBuilder
             'type'    => $columnType,
             'configs' => $options
         ];
-
-        var_dump($this->result);
     }
 
     /**
