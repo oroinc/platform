@@ -1,13 +1,13 @@
-/* global define */
-define(['underscore', 'backbone'],
-function(_, Backbone) {
+/*global define*/
+define(['underscore', 'backbone'
+    ], function (_, Backbone) {
     'use strict';
 
     /**
      * Panel with action buttons
      *
-     * @export  oro/datagrid/actions-panel
-     * @class   oro.datagrid.ActionsPanel
+     * @export  orodatagrid/js/datagrid/actions-panel
+     * @class   orodatagrid.datagrid.ActionsPanel
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -26,11 +26,11 @@ function(_, Backbone) {
          * @param {Object} options
          * @param {Array} [options.actions] List of actions
          */
-        initialize: function(options) {
-            options = options || {};
+        initialize: function (options) {
+            var opts = options || {};
 
-            if (options.actions) {
-                this.setActions(options.actions);
+            if (opts.actions) {
+                this.setActions(opts.actions);
             }
 
             Backbone.View.prototype.initialize.apply(this, arguments);
@@ -44,7 +44,7 @@ function(_, Backbone) {
         render: function () {
             this.$el.empty();
 
-            _.each(this.launchers, function(launcher) {
+            _.each(this.launchers, function (launcher) {
                 this.$el.append(launcher.render().$el);
             }, this);
 
@@ -63,10 +63,10 @@ function(_, Backbone) {
          *
          * @param {Array.<oro.datagrid.AbstractAction>} actions
          */
-        setActions: function(actions) {
+        setActions: function (actions) {
             this.actions = [];
             this.launchers = [];
-            _.each(actions, function(action) {
+            _.each(actions, function (action) {
                 this.addAction(action);
             }, this);
         },
@@ -76,7 +76,7 @@ function(_, Backbone) {
          *
          * @param {oro.datagrid.AbstractAction} action
          */
-        addAction: function(action) {
+        addAction: function (action) {
             this.actions.push(action);
             this.launchers.push(action.createLauncher());
         },
@@ -86,8 +86,8 @@ function(_, Backbone) {
          *
          * @return {*}
          */
-        disable: function() {
-            _.each(this.launchers, function(launcher) {
+        disable: function () {
+            _.each(this.launchers, function (launcher) {
                 launcher.disable();
             });
 
@@ -99,8 +99,8 @@ function(_, Backbone) {
          *
          * @return {*}
          */
-        enable: function() {
-            _.each(this.launchers, function(launcher) {
+        enable: function () {
+            _.each(this.launchers, function (launcher) {
                 launcher.enable();
             });
 
