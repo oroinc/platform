@@ -146,7 +146,7 @@ define(function (require) {
             },
             getter: function ($el, name, value) {
                 if (name === 'func') {
-                    value = {
+                    value = value && {
                         name: value,
                         group_type: $el.find(":selected").data('group_type'),
                         group_name: $el.find(":selected").data('group_name')
