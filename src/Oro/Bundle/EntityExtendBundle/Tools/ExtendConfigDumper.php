@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 
 class ExtendConfigDumper
@@ -44,7 +44,7 @@ class ExtendConfigDumper
     {
         $this->clear();
 
-        $extendProvider = $this->em->getExtendManager()->getConfigProvider();
+        $extendProvider = $this->em->getExtendConfigProvider();
 
         $configs = $className
             ? [$extendProvider->getConfig($className)]
@@ -60,7 +60,7 @@ class ExtendConfigDumper
     public function dump()
     {
         $schemas        = [];
-        $extendProvider = $this->em->getExtendManager()->getConfigProvider();
+        $extendProvider = $this->em->getExtendConfigProvider();
         $configs        = $extendProvider->getConfigs();
         foreach ($configs as $config) {
             $schema = $config->get('schema');
@@ -101,7 +101,7 @@ class ExtendConfigDumper
             return;
         }
 
-        $extendProvider = $this->em->getExtendManager()->getConfigProvider();
+        $extendProvider = $this->em->getExtendConfigProvider();
         $className      = $entityConfig->getId()->getClassName();
         $doctrine       = [];
 
@@ -157,11 +157,11 @@ class ExtendConfigDumper
                     }
                 }
 
-                if (!$fieldConfig->is('state', ExtendManager::STATE_DELETED)) {
-                    $fieldConfig->set('state', ExtendManager::STATE_ACTIVE);
+                if (!$fieldConfig->is('state', ExtendScope::STATE_DELETED)) {
+                    $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
                 }
 
-                if ($fieldConfig->is('state', ExtendManager::STATE_DELETED)) {
+                if ($fieldConfig->is('state', ExtendScope::STATE_DELETED)) {
                     $fieldConfig->set('is_deleted', true);
                 }
 
@@ -172,7 +172,7 @@ class ExtendConfigDumper
         $extendProvider->flush();
 
         $entityConfig->set('state', $entityState);
-        if ($entityConfig->is('state', ExtendManager::STATE_DELETED)) {
+        if ($entityConfig->is('state', ExtendScope::STATE_DELETED)) {
             $entityConfig->set('is_deleted', true);
 
             $extendProvider->map(
@@ -183,7 +183,7 @@ class ExtendConfigDumper
                 $className
             );
         } else {
-            $entityConfig->set('state', ExtendManager::STATE_ACTIVE);
+            $entityConfig->set('state', ExtendScope::STATE_ACTIVE);
         }
 
         $relations = $entityConfig->get('relation') ? : [];
@@ -230,7 +230,7 @@ class ExtendConfigDumper
 
     protected function checkRelation($targetClass, $fieldId)
     {
-        $extendProvider = $this->em->getExtendManager()->getConfigProvider();
+        $extendProvider = $this->em->getExtendConfigProvider();
         $targetConfig   = $extendProvider->getConfig($targetClass);
 
         $relations = $targetConfig->get('relation') ? : [];

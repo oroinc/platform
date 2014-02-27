@@ -38,7 +38,7 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 /**
  * @SuppressWarnings(PHPMD)
@@ -877,7 +877,7 @@ class ConfigManager
         $extendProvider = $this->getProvider('extend');
         if ($extendProvider && $extendProvider->hasConfig($className, $fieldName)) {
             $result = $extendProvider->getConfig($className, $fieldName)
-                ->is('owner', ExtendManager::OWNER_CUSTOM);
+                ->is('owner', ExtendScope::OWNER_CUSTOM);
         }
 
         return $result;

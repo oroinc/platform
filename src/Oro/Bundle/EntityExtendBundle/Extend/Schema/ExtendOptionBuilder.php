@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendOptionBuilder
 {
@@ -22,7 +23,12 @@ class ExtendOptionBuilder
 
     public function addTableOptions($tableName, $options)
     {
-        $entityClassName = $this->getEntityClassName($tableName);
+        $entityName = null;
+        if (isset($options['entity']['name'])) {
+            $entityName = $options['entity']['name'];
+            unset($options['entity']['name']);
+        }
+        $entityClassName = $this->getEntityClassName($tableName, $entityName);
         if (!isset($this->result[$entityClassName])) {
             $this->result[$entityClassName] = [];
         }
@@ -44,17 +50,37 @@ class ExtendOptionBuilder
         ];
     }
 
+    /**
+     * Returns extend options
+     *
+     * @return array
+     */
     public function get()
     {
         return $this->result;
     }
 
-    protected function getEntityClassName($tableName)
+    /**
+     * Gets an entity class name by its table name
+     *
+     * @param string $tableName
+     * @param string $customEntityName The name of custom entity
+     * @return string|null
+     * @throws \RuntimeException
+     */
+    protected function getEntityClassName($tableName, $customEntityName = null)
     {
         if (!isset($this->tableToEntityMap[$tableName])) {
             $entityClassName = $this->entityClassResolver->getEntityClassByTableName($tableName);
             if (empty($entityClassName)) {
-                throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
+                if (empty($customEntityName)) {
+                    throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
+                }
+                if (!preg_match('/^[A-Z][a-zA-Z\d]+$/', $customEntityName)) {
+                    throw new \RuntimeException(sprintf('Invalid entity name: "%s".', $customEntityName));
+                }
+
+                $entityClassName = ExtendConfigDumper::ENTITY . $customEntityName;
             }
             $this->tableToEntityMap[$tableName] = $entityClassName;
         }

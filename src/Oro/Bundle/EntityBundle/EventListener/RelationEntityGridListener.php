@@ -8,7 +8,7 @@ use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class RelationEntityGridListener extends CustomEntityGridListener
@@ -138,7 +138,7 @@ class RelationEntityGridListener extends CustomEntityGridListener
             $entityConfig         = $entityConfigProvider->getConfig($this->entityClass, $fieldName);
 
             $label = $entityConfig->get('label') ? : $fieldName;
-            $code  = $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
+            $code  = $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                 ? ExtendConfigDumper::FIELD_PREFIX . $fieldName
                 : $fieldName;
 

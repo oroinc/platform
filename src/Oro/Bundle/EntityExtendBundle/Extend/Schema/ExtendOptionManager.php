@@ -52,22 +52,30 @@ class ExtendOptionManager
     {
         $builder = new ExtendOptionBuilder($this->entityClassResolver);
 
-        $keys = array_keys($this->options);
-        sort($keys);
-        foreach ($keys as $objectKey) {
-            $keyParts   = explode('!', $objectKey);
-            $tableName  = $keyParts[0];
-            $columnName = count($keyParts) > 1 ? $keyParts[1] : null;
-            $columnType = count($keyParts) > 1 ? $keyParts[2] : null;
+        $objectKeys = array_keys($this->options);
 
-            if (!$columnName) {
-                $builder->addTableOptions($tableName, $this->options[$objectKey]);
-            } else {
-                $builder->addColumnOptions($tableName, $columnName, $columnType, $this->options[$objectKey]);
+        // at first all table's options should be processed,
+        // because it is possible that a reference to new table is created
+        foreach ($objectKeys as $objectKey) {
+            if (!strpos($objectKey, '!')) {
+                $builder->addTableOptions($objectKey, $this->options[$objectKey]);
+            }
+        }
+
+        // next column's options for all tables can be processed
+        foreach ($objectKeys as $objectKey) {
+            if (strpos($objectKey, '!')) {
+                $keyParts = explode('!', $objectKey);
+                $builder->addColumnOptions($keyParts[0], $keyParts[1], $keyParts[2], $this->options[$objectKey]);
             }
         }
 
         return $builder->get();
+    }
+
+    public function isConfigurableEntity($tableName)
+    {
+        return isset($this->options[$tableName]);
     }
 
     protected function setOptions($objectKey, $options)

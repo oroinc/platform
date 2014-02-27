@@ -16,7 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\EventListener\AbstractConfigGridListener;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class CustomEntityGridListener extends AbstractConfigGridListener
@@ -157,7 +157,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
         $extendConfigs        = $extendConfigProvider->getConfigs($this->entityClass);
 
         foreach ($extendConfigs as $extendConfig) {
-            if (!$extendConfig->is('state', ExtendManager::STATE_NEW) && !$extendConfig->get('is_deleted')) {
+            if (!$extendConfig->is('state', ExtendScope::STATE_NEW) && !$extendConfig->get('is_deleted')) {
                 list($field, $selectField) = $this->getDynamicFieldItem($alias, $extendConfig);
 
                 if (!empty($field)) {
@@ -225,7 +225,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
             );
 
             $label = $entityConfig->get('label') ?: $fieldConfig->getFieldName();
-            $code  = $extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
+            $code  = $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                 ? ExtendConfigDumper::FIELD_PREFIX . $fieldConfig->getFieldName()
                 : $fieldConfig->getFieldName();
 

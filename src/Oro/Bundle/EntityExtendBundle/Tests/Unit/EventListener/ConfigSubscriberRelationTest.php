@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,8 +28,8 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
         $eventConfig   = new Config($fieldConfigId);
         $eventConfig->setValues(
             [
-                'owner'           => ExtendManager::OWNER_CUSTOM,
-                'state'           => ExtendManager::STATE_NEW,
+                'owner'           => ExtendScope::OWNER_CUSTOM,
+                'state'           => ExtendScope::STATE_NEW,
                 'is_extend'       => true,
                 'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
                 'target_title'    => ['username'],
@@ -43,8 +43,8 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
         $selfEntityConfig   = new Config($selfEntityConfigId);
         $selfEntityConfig->setValues(
             [
-                'owner'       => ExtendManager::OWNER_CUSTOM,
-                'state'       => ExtendManager::STATE_NEW,
+                'owner'       => ExtendScope::OWNER_CUSTOM,
+                'state'       => ExtendScope::STATE_NEW,
                 'is_extend'   => true,
                 'is_deleted'  => false,
                 'upgradeable' => false,
@@ -76,8 +76,8 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
         $targetEntityConfig   = new Config($targetEntityConfigId);
         $targetEntityConfig->setValues(
             [
-                'owner'       => ExtendManager::OWNER_SYSTEM,
-                'state'       => ExtendManager::STATE_ACTIVE,
+                'owner'       => ExtendScope::OWNER_SYSTEM,
+                'state'       => ExtendScope::STATE_ACTIVE,
                 'is_extend'   => true,
                 'is_deleted'  => false,
                 'upgradeable' => false,
@@ -108,7 +108,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
         $this->runPersistConfig(
             $eventConfig,
             $selfEntityConfig,
-            ['state' => [0 => null, 1 => ExtendManager::STATE_NEW]]
+            ['state' => [0 => null, 1 => ExtendScope::STATE_NEW]]
         );
 
         /** @var ConfigManager $cm */
@@ -118,7 +118,7 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
             [
                 'extend_TestClass' => $this->getEntityConfig(
                         [
-                            'state' => ExtendManager::STATE_UPDATED,
+                            'state' => ExtendScope::STATE_UPDATED,
                             'relation' => [
                                 'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
                                     'assign' => false,
@@ -177,21 +177,13 @@ class ConfigSubscriberRelationTest extends \PHPUnit_Framework_TestCase
 
         $this->event = new PersistConfigEvent($eventConfig, $configManager);
 
-        $extendManager = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Extend\ExtendManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $extendConfigProvider = clone $configProvider;
         $extendConfigProvider
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($eventConfig));
-        $extendManager
-            ->expects($this->any())
-            ->method('getConfigProvider')
-            ->will($this->returnValue($extendConfigProvider));
 
-        $this->configSubscriber = new ConfigSubscriber($extendManager);
+        $this->configSubscriber = new ConfigSubscriber($extendConfigProvider);
         $this->configSubscriber->persistConfig($this->event);
     }
 }

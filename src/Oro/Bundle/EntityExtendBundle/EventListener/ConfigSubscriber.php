@@ -19,7 +19,7 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -29,17 +29,11 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected $extendConfigProvider;
 
     /**
-     * @var  ExtendManager
+     * @param ConfigProvider $extendConfigProvider
      */
-    protected $extendManager;
-
-    /**
-     * @param ExtendManager $extendManager
-     */
-    public function __construct(ExtendManager $extendManager)
+    public function __construct(ConfigProvider $extendConfigProvider)
     {
-        $this->extendConfigProvider = $extendManager->getConfigProvider();
-        $this->extendManager        = $extendManager;
+        $this->extendConfigProvider = $extendConfigProvider;
     }
 
     /**
@@ -69,29 +63,29 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         if ($scope == 'extend'
             && $event->getConfig()->getId() instanceof FieldConfigId
-            && $event->getConfig()->is('owner', ExtendManager::OWNER_CUSTOM)
+            && $event->getConfig()->is('owner', ExtendScope::OWNER_CUSTOM)
             && count(array_intersect_key(array_flip(['length', 'precision', 'scale', 'state']), $change))
         ) {
             $entityConfig = $event->getConfigManager()->getProvider($scope)->getConfig($className);
 
-            if ($event->getConfig()->in('state', [ExtendManager::STATE_ACTIVE, ExtendManager::STATE_UPDATED])
+            if ($event->getConfig()->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED])
                 && !isset($change['state'])
             ) {
-                $event->getConfig()->set('state', ExtendManager::STATE_UPDATED);
+                $event->getConfig()->set('state', ExtendScope::STATE_UPDATED);
                 $event->getConfigManager()->calculateConfigChangeSet($event->getConfig());
             }
 
             /**
              * Relations case
              */
-            if ($event->getConfig()->is('state', ExtendManager::STATE_NEW)
+            if ($event->getConfig()->is('state', ExtendScope::STATE_NEW)
                 && in_array($event->getConfig()->getId()->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])
             ) {
                 $this->createRelation($event->getConfig());
             }
 
-            if (!$entityConfig->is('state', ExtendManager::STATE_NEW)) {
-                $entityConfig->set('state', ExtendManager::STATE_UPDATED);
+            if (!$entityConfig->is('state', ExtendScope::STATE_NEW)) {
+                $entityConfig->set('state', ExtendScope::STATE_UPDATED);
 
                 $event->getConfigManager()->persist($entityConfig);
             }
