@@ -32,6 +32,9 @@ class ExtendOptionBuilder
     public function addColumnOptions($tableName, $columnName, $columnType, $options)
     {
         $entityClassName = $this->getEntityClassName($tableName);
+
+        var_dump($entityClassName);
+
         if (!isset($this->result[$entityClassName])) {
             $this->result[$entityClassName] = [];
         }
@@ -42,6 +45,8 @@ class ExtendOptionBuilder
             'type'    => $columnType,
             'configs' => $options
         ];
+
+        var_dump($this->result);
     }
 
     public function get()
