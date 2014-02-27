@@ -93,19 +93,30 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
         },
 
         /**
+         * Get loading element.
+         *
+         * @returns {HTMLElement}
+         * @private
+         */
+        _getLoadingElement: function() {
+            var loadingElement = this.options.loadingElement || this.loadingElement;
+            return $(loadingElement);
+        },
+
+        /**
          * Show loading indicator
          *
          * @private
          */
         _showLoading: function() {
-            if (this.options.loadingMaskEnabled) {
-                var loadingElement = this.options.loadingElement || this.loadingElement;
-                loadingElement = $(loadingElement);
+            var loadingElement = this._getLoadingElement();
+            if (this.options.loadingMaskEnabled && !loadingElement.data('loading-mask-visible')) {
                 if (loadingElement && loadingElement.length) {
                     if (loadingElement[0].tagName.toLowerCase() !== 'body' && loadingElement.css('position') == 'static') {
                         loadingElement.css('position', 'relative');
                     }
                     this.loadingMask = new LoadingMask();
+                    loadingElement.data('loading-mask-visible', true);
                     loadingElement.append(this.loadingMask.render().$el);
                     this.loadingMask.show();
                 }
@@ -119,6 +130,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
          */
         _hideLoading: function() {
             if (this.loadingMask) {
+                this._getLoadingElement().data('loading-mask-visible', false);
                 this.loadingMask.remove();
                 this.loadingMask = null;
             }

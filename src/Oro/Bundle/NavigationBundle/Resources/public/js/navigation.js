@@ -583,11 +583,23 @@ define(function (require) {
             }
         },
 
+        showLoading: function() {
+            if (this.loadingMask) {
+                this.loadingMask.show();
+            }
+        },
+
+        hideLoading: function() {
+            if (this.loadingMask) {
+                this.loadingMask.hide();
+            }
+        },
+
         /**
          *  Triggered before hash navigation ajax request
          */
         beforeRequest: function() {
-            this.loadingMask.show();
+            this.showLoading();
             this.gridRoute = ''; //clearing grid router
             this.tempCache = '';
             /**
@@ -611,7 +623,7 @@ define(function (require) {
          */
         renderLoadingMask: function() {
             this.getCached$('loadingMask').append(this.loadingMask.render().$el);
-            this.loadingMask.hide();
+            this.hideLoading();
         },
 
         refreshPage: function() {
@@ -735,7 +747,7 @@ define(function (require) {
                         }
                         this.hideActiveDropdowns();
                         mediator.trigger("hash_navigation_request:refresh", this);
-                        this.loadingMask.hide();
+                        this.hideLoading();
                     }
                 }
             }
@@ -747,7 +759,7 @@ define(function (require) {
                     document.body.innerHTML = rawData;
                 } else {
                     messenger.notificationMessage('error', __('Sorry, page was not loaded correctly'));
-                    this.loadingMask.hide();
+                    this.hideLoading();
                 }
             }
             this.triggerCompleteEvent();
@@ -803,7 +815,7 @@ define(function (require) {
 
             this.handleResponse(XMLHttpRequest.responseText);
             this.addErrorClass();
-            this.loadingMask.hide();
+            this.hideLoading();
         },
 
         /**
