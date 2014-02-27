@@ -1,8 +1,8 @@
-/* global define */
-define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messenger'],
+/*global define*/
+define(['underscore', 'orotranslation/js/translator', 'orodatagrid/js/datagrid/action/mass-action', 'oroui/js/messenger'],
     /**
      * @param {underscore} _
-     * @param {oro/translator} __
+     * @param {orotranslation/js/translator} __
      * @param {MassAction} MassAction
      * @param {notificationFlashMessage} messenger
      * @returns {*|Object|void}
@@ -13,9 +13,10 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
         /**
          * Merge mass action class.
          *
-         * @export  oro/entity-merge/merge-mass-action
-         * @class   oro.entityMerge.MergeMassAction
-         * @extends oro.datagrid.MassAction
+         * @export  oroentitymerge/js/datagrid/action/merge-mass-action
+         * @class   oroentitymerge.datagrid.action.MergeMassAction
+         * @classdesc Merge mass action js part
+         * @extends orodatagrid.datagrid.action.MassAction
          */
         return MassAction.extend({
 
@@ -55,18 +56,17 @@ define(['underscore', 'oro/translator', 'oro/datagrid/mass-action', 'oro/messeng
                     }
 
                     if (length > maxLength) {
-                        options['doExecute'] = false;
+                        options.doExecute = false;
                         var validationMessage = __('oro.entity_merge.mass_action.validation.maximum_records_error', {number: maxLength});
                         messenger.notificationFlashMessage('error', validationMessage);
                     }
 
                     if (length < 2) {
-                        options['doExecute'] = false;
+                        options.doExecute = false;
                         messenger.notificationFlashMessage('error', __('oro.entity_merge.mass_action.validation.minimum_records_error'));
                     }
 
                 }, this);
             }
         });
-    }
-);
+    });

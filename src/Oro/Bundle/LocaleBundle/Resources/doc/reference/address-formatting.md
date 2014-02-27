@@ -153,7 +153,7 @@ Possible address object parameters are:
 Example:
 
 ```javascript
-require(['oro/formatter/address'],
+require(['orolocale/js/formatter/address'],
 function(addressFormatter) {
     var data = this.model.toJSON();
     data.formatted_address = addressFormatter.format({

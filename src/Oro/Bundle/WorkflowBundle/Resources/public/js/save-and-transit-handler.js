@@ -1,12 +1,13 @@
-define(['jquery', 'oro/mediator', 'routing', 'oro/buttons-widget'],
-function ($, mediator, routing, ButtonsWidget) {
+/*global define*/
+define(['jquery', 'oroui/js/mediator', 'routing', 'oro/buttons-widget'
+    ], function ($, mediator, routing, ButtonsWidget) {
     'use strict';
 
     /**
      * Save and transit button click handler
      *
-     * @export  oro/workflow-save-and-transit-handler
-     * @class   oro.WorkflowSaveAndTransitHandler
+     * @export  oroworkflow/js/save-and-transit-handler
+     * @class   oroworkflow.WorkflowSaveAndTransitHandler
      */
     return function() {
         var saveBtn = $(this);

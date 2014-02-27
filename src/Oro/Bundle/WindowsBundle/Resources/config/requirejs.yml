@@ -6,5 +6,5 @@ config:
     paths:
         'jquery.dialog.extended': 'bundles/orowindows/lib/jquery.dialog.extended.js'
         'oro/dialog-widget': 'bundles/orowindows/js/dialog-widget.js'
-        'oro/dialog/state/collection': 'bundles/orowindows/js/dialog/state/collection.js'
-        'oro/dialog/state/model': 'bundles/orowindows/js/dialog/state/model.js'
+        'orowindows/js/dialog/state/collection': 'bundles/orowindows/js/dialog/state/collection.js'
+        'orowindows/js/dialog/state/model': 'bundles/orowindows/js/dialog/state/model.js'

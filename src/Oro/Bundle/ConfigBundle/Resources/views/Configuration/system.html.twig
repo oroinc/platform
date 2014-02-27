@@ -21,7 +21,8 @@
     <script type="text/javascript">
         /* jshint browser:true, devel:true */
         /* global require */
-        require(['jquery', 'oro/config/form/state', 'oro/config/form/default'], function ($, formState, formDefault) {
+        require(['jquery', 'oroconfig/js/form/state', 'oroconfig/js/form/default'
+            ], function ($, FormState, FormDefault) {
             'use strict';
 
             $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
@@ -32,8 +33,8 @@
                 $notDefault.filter(':checked').trigger('change');
             });
 
-            new formState();
-            new formDefault();
+            new FormState();
+            new FormDefault();
         });
     </script>
     {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}

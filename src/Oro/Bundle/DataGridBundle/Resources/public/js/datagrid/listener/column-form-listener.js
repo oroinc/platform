@@ -1,14 +1,14 @@
 /*global define*/
-define(['jquery', 'underscore', 'oro/translator', 'oro/mediator', 'oro/modal', 'oro/datagrid/abstract-listener'],
-function($, _, __, mediator, Modal, AbstractListener) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/modal', './abstract-listener'
+    ], function ($, _, __, mediator, Modal, AbstractListener) {
     'use strict';
 
     /**
      * Listener for entity edit form and datagrid
      *
-     * @export  oro/datagrid/column-form-listener
-     * @class   oro.datagrid.ColumnFormListener
-     * @extends oro.datagrid.AbstractListener
+     * @export  orodatagrid/js/datagrid/listener/column-form-listener
+     * @class   orodatagrid.datagrid.listener.ColumnFormListener
+     * @extends orodatagrid.datagrid.listener.AbstractListener
      */
     var ColumnFormListener = AbstractListener.extend({
 
@@ -59,7 +59,7 @@ function($, _, __, mediator, Modal, AbstractListener) {
          * @param {Backbone.Model} model
          * @protected
          */
-        _processValue: function(id, model) {
+        _processValue: function (id, model) {
             var original = this.get('original');
             var included = this.get('included');
             var excluded = this.get('excluded');
@@ -132,11 +132,11 @@ function($, _, __, mediator, Modal, AbstractListener) {
          * @return {Array}
          * @private
          */
-        _explode: function(string) {
+        _explode: function (string) {
             if (!string) {
                 return [];
             }
-            return _.map(string.split(','), function(val) {return val ? parseInt(val, 10) : null});
+            return _.map(string.split(','), function (val) { return val ? parseInt(val, 10) : null; });
         },
 
         /**
@@ -153,14 +153,14 @@ function($, _, __, mediator, Modal, AbstractListener) {
             }
             if (this.selectors.excluded && $(this.selectors.excluded).length) {
                 excluded = this._explode($(this.selectors.excluded).val());
-                this.set('excluded', excluded)
+                this.set('excluded', excluded);
             }
             if (included || excluded) {
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_in', included);
                 mediator.trigger('datagrid:setParam:' + this.gridName, 'data_not_in', excluded);
                 mediator.trigger('datagrid:restoreState:' + this.gridName, this.columnName, this.dataField, included, excluded);
             }
-         },
+        },
 
         /**
          * Confirms refresh action that before it will be executed
@@ -183,7 +183,7 @@ function($, _, __, mediator, Modal, AbstractListener) {
          * @param {Object} options
          * @private
          */
-        _onExecuteResetAction: function(e, action, options) {
+        _onExecuteResetAction: function (e, action, options) {
             this._confirmAction(action, options, 'reset', {
                 title: __('Reset Confirmation'),
                 content: __('Your local changes will be lost. Are you sure you want to reset grid?')
@@ -199,7 +199,7 @@ function($, _, __, mediator, Modal, AbstractListener) {
          * @param {Object} confirmModalOptions Options for confirm dialog
          * @private
          */
-        _confirmAction: function(action, actionOptions, type, confirmModalOptions) {
+        _confirmAction: function (action, actionOptions, type, confirmModalOptions) {
             this.confirmed = this.confirmed || {};
             if (!this.confirmed[type] && this._hasChanges()) {
                 actionOptions.doExecute = false; // do not execute action until it's confirmed
@@ -220,14 +220,14 @@ function($, _, __, mediator, Modal, AbstractListener) {
          * @return {Boolean}
          * @private
          */
-        _hasChanges: function() {
+        _hasChanges: function () {
             return !_.isEmpty(this.get('included')) || !_.isEmpty(this.get('excluded'));
         },
 
         /**
          * Opens confirm modal dialog
          */
-        _openConfirmDialog: function(type, options, callback) {
+        _openConfirmDialog: function (type, options, callback) {
             this.confirmModal = this.confirmModal || {};
             if (!this.confirmModal[type]) {
                 this.confirmModal[type] = new Modal(_.extend({

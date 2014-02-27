@@ -83,7 +83,7 @@ function(_, Translator) {
     /**
      * Shortcut for Translator.get() method call
      *
-     * @export oro/translator
+     * @export orotranslation/js/translator
      * @returns {string}
      */
     return _.__;

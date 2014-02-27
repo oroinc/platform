@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone'],
-function($, _, Backbone) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone'
+    ], function ($, _, Backbone) {
     'use strict';
 
     /**
      * Datagrid pagination widget
      *
-     * @export  oro/datagrid/pagination
-     * @class   oro.datagrid.Pagination
+     * @export  orodatagrid/js/datagrid/pagination
+     * @class   orodatagrid.datagrid.Pagination
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -72,7 +72,7 @@ function($, _, Backbone) {
          *
          * @return {*}
          */
-        disable: function() {
+        disable: function () {
             this.enabled = false;
             this.render();
             return this;
@@ -83,7 +83,7 @@ function($, _, Backbone) {
          *
          * @return {*}
          */
-        enable: function() {
+        enable: function () {
             this.enabled = true;
             this.render();
             return this;
@@ -185,7 +185,7 @@ function($, _, Backbone) {
          *
          * @return {*}
          */
-        render: function() {
+        render: function () {
             this.$el.empty();
 
             var state = this.collection.state;
