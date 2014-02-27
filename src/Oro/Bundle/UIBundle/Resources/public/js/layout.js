@@ -6,8 +6,8 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
 
-    var __ = require('orotranslation/js/translator');
-    var scrollspy = require('oroui/js/scrollspy');
+    var __ = require('oro/translator');
+    var scrollspy = require('oro/scrollspy');
     var _bootstrapTooltip = require('bootstrap-tooltip');
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');

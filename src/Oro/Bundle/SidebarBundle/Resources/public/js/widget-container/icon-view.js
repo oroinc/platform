@@ -1,5 +1,6 @@
 /*jslint nomen: true, vars: true*/
 /*global define*/
+
 define(function (require) {
     'use strict';
 
@@ -7,12 +8,12 @@ define(function (require) {
     var _ = require('underscore');
     var Backbone = require('backbone');
 
-    var iconTemplate = require('text!./templates/icon-template.html');
-    var constants = require('../constants');
+    var iconTemplate = require('text!oro/sidebar/widget-container/icon-template');
+    var constants = require('oro/sidebar/constants');
 
     /**
-     * @export  orosidebar/js/widget-container/icon-view
-     * @class   orosidebar.widgetContainer.IconView
+     * @export  oro/sidebar/widget-controller/icon-view
+     * @class oro.sidebar.widget-controller.IconView
      * @extends Backbone.View
      */
     var IconView = Backbone.View.extend({

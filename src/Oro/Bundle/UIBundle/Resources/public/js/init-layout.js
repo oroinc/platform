@@ -1,11 +1,9 @@
 /*jshint browser: true*/
 /*jslint browser: true, nomen: true, vars: true*/
 /*global require*/
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
-    'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
-    'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
-    'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
+require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
+    'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 
     /* ============================================================

@@ -1,10 +1,10 @@
-/*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+/* global define */
+define(['jquery', 'underscore', 'backbone'],
+function($, _, Backbone) {
     'use strict';
 
     /**
-     * @export  oroemail/js/email/variable/view
+     * @export  oro/email/variable/view
      * @class   oro.email.variable.View
      * @extends Backbone.View
      */
@@ -47,7 +47,7 @@ define(['jquery', 'underscore', 'backbone'
          *
          * @returns {*}
          */
-        render: function () {
+        render: function() {
             var html = _.template(this.options.template.html(), {
                 userVars: this.model.get('user'),
                 entityVars: this.model.get('entity')
@@ -64,7 +64,7 @@ define(['jquery', 'underscore', 'backbone'
          * @param e
          * @returns {*}
          */
-        addVariable: function (e) {
+        addVariable: function(e) {
             if (!_.isNull(this.lastElement) && this.lastElement.is(':visible')) {
                 this.lastElement.val(this.lastElement.val() + $(e.currentTarget).html());
             }
@@ -79,7 +79,7 @@ define(['jquery', 'underscore', 'backbone'
          * @private
          * @returns {*}
          */
-        _updateElementsMetaData: function (e) {
+        _updateElementsMetaData: function(e) {
             this.lastElement = $(e.currentTarget);
 
             return this;

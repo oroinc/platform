@@ -1,13 +1,13 @@
-/*global define*/
-define(['underscore', 'backbone'
-    ], function (_, Backbone) {
+/* global define */
+define(['underscore', 'backbone'],
+function(_, Backbone) {
     'use strict';
 
     /**
      * Panel with action buttons
      *
-     * @export  orodatagrid/js/datagrid/actions-panel
-     * @class   orodatagrid.datagrid.ActionsPanel
+     * @export  oro/datagrid/actions-panel
+     * @class   oro.datagrid.ActionsPanel
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -26,11 +26,11 @@ define(['underscore', 'backbone'
          * @param {Object} options
          * @param {Array} [options.actions] List of actions
          */
-        initialize: function (options) {
-            var opts = options || {};
+        initialize: function(options) {
+            options = options || {};
 
-            if (opts.actions) {
-                this.setActions(opts.actions);
+            if (options.actions) {
+                this.setActions(options.actions);
             }
 
             Backbone.View.prototype.initialize.apply(this, arguments);
@@ -44,7 +44,7 @@ define(['underscore', 'backbone'
         render: function () {
             this.$el.empty();
 
-            _.each(this.launchers, function (launcher) {
+            _.each(this.launchers, function(launcher) {
                 this.$el.append(launcher.render().$el);
             }, this);
 
@@ -63,10 +63,10 @@ define(['underscore', 'backbone'
          *
          * @param {Array.<oro.datagrid.AbstractAction>} actions
          */
-        setActions: function (actions) {
+        setActions: function(actions) {
             this.actions = [];
             this.launchers = [];
-            _.each(actions, function (action) {
+            _.each(actions, function(action) {
                 this.addAction(action);
             }, this);
         },
@@ -76,7 +76,7 @@ define(['underscore', 'backbone'
          *
          * @param {oro.datagrid.AbstractAction} action
          */
-        addAction: function (action) {
+        addAction: function(action) {
             this.actions.push(action);
             this.launchers.push(action.createLauncher());
         },
@@ -86,8 +86,8 @@ define(['underscore', 'backbone'
          *
          * @return {*}
          */
-        disable: function () {
-            _.each(this.launchers, function (launcher) {
+        disable: function() {
+            _.each(this.launchers, function(launcher) {
                 launcher.disable();
             });
 
@@ -99,8 +99,8 @@ define(['underscore', 'backbone'
          *
          * @return {*}
          */
-        enable: function () {
-            _.each(this.launchers, function (launcher) {
+        enable: function() {
+            _.each(this.launchers, function(launcher) {
                 launcher.enable();
             });
 

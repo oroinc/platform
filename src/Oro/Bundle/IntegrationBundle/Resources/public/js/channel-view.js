@@ -1,11 +1,11 @@
-/*global define*/
-define(['jquery', 'backbone', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oronavigation/js/navigation', 'oroui/js/delete-confirmation'
-    ], function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
+/* global define */
+define(['jquery', 'backbone', 'underscore', 'oro/translator', 'oro/mediator', 'oro/navigation', 'oro/delete-confirmation'],
+function ($, Backbone, _, __, mediator, Navigation, DeleteConfirmation) {
     "use strict";
 
     /**
-     * @export  orointegration/js/channel-view
-     * @class   orointegration.channelView
+     * @export  oro/integration/channel-view
+     * @class   oro.integration.channelView
      * @extends Backbone.View
      */
     return Backbone.View.extend({

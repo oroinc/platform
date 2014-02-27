@@ -19,12 +19,12 @@
                 {% endblock %}
                 {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
                 <script type="text/javascript">
-                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
+                    require(['oro/init-layout', 'oro/init-user', 'oro/widget-manager', 'jquery.uniform']);
                 {% if isMobileVersion() %}
-                    require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
+                    require(['oro/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
                 {% if app.debug %}
-                    require(['oroui/js/app'], function(app){app.debug = true;});
+                    require(['oro/app'], function(app){app.debug = true;});
                 {% endif %}
                 </script>
                 {% block hash_nav %}
@@ -107,7 +107,7 @@
                                     </div>
                                 </script>
                                 <script type="text/javascript">
-                                    require(['jquery', 'oroui/js/messenger'],
+                                    require(['jquery', 'oro/messenger'],
                                             function($, messenger) {
                                                 messenger.setup({
                                                     container: '#flash-messages .flash-messages-holder',

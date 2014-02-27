@@ -1,11 +1,11 @@
-/*global define*/
-define(['underscore', 'backbone'
-    ], function (_, Backbone) {
+/* global define */
+define(['underscore', 'backbone'],
+function(_, Backbone) {
     'use strict';
 
     /**
-     * @export  oroentity/js/entity-field-view
-     * @class   oroentity.EntityFieldView
+     * @export  oro/entity-field-view
+     * @class   oro.EntityFieldView
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -20,7 +20,7 @@ define(['underscore', 'backbone'
         /** @property {Object} */
         util: null,
 
-        initialize: function () {
+        initialize: function() {
             this.util = this.$el.data('entity-field-util');
             this.util.fieldsLabel = this.options.fieldsLabel;
             this.util.relatedLabel = this.options.relatedLabel;
@@ -46,7 +46,7 @@ define(['underscore', 'backbone'
         },
 
         getFieldData: function (fieldId) {
-            return this.util.getFieldData(fieldId);
+            return this.util.getFieldData(fieldId)
         },
 
         getFieldApplicableConditions: function (fieldId) {

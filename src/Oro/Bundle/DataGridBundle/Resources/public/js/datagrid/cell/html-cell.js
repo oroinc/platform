@@ -1,14 +1,14 @@
-/*global define*/
-define(['./string-cell'
-    ], function (StringCell) {
+/* global define */
+define(['oro/datagrid/string-cell'],
+function(StringCell) {
     'use strict';
 
     /**
      * Html column cell. Added missing behaviour.
      *
-     * @export  orodatagrid/js/datagrid/cell/html-cell
-     * @class   orodatagrid.datagrid.cell.HtmlCell
-     * @extends orodatagrid.datagrid.cell.StringCell
+     * @export  oro/datagrid/html-cell
+     * @class   oro.datagrid.HtmlCell
+     * @extends oro.datagrid.StringCell
      */
     return StringCell.extend({
         /**

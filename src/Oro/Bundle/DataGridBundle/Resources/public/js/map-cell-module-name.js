@@ -1,7 +1,7 @@
 /*global define*/
 define(function () {
     'use strict';
-    var moduleNameTemplate = 'orodatagrid/js/datagrid/cell/{{type}}-cell',
+    var moduleNameTemplate = 'oro/datagrid/{{type}}-cell',
         types = {
             integer:   'number',
             decimal:   'number',

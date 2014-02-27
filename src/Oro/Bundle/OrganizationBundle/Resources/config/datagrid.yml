@@ -182,7 +182,7 @@ datagrid:
         options:
             entityHint: user
             requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
+              - oro/datagrid/column-form-listener
             columnListener:
                 dataField: id
                 columnName: hasCurrentBusinessUnit

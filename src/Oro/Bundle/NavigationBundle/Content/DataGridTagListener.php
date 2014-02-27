@@ -51,7 +51,7 @@ class DataGridTagListener
                 ? $options[MetadataObject::REQUIRED_MODULES_KEY] : [];
             $config->offsetSetByPath(
                 sprintf('%s[%s]', ToolbarExtension::OPTIONS_PATH, MetadataObject::REQUIRED_MODULES_KEY),
-                array_merge($modules, ['oronavigation/js/content/grid-builder'])
+                array_merge($modules, ['oro/content/grid-builder'])
             );
         }
     }

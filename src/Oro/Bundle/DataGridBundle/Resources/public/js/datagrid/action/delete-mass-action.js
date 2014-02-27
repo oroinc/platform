@@ -1,14 +1,14 @@
-/*global define*/
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/delete-confirmation', './mass-action'
-    ], function (_, __, DeleteConfirmation, MassAction) {
+/* global define */
+define(['underscore', 'oro/translator', 'oro/delete-confirmation', 'oro/datagrid/mass-action'],
+function(_, __, DeleteConfirmation, MassAction) {
     'use strict';
 
     /**
      * Delete mass action class.
      *
-     * @export  orodatagrid/js/datagrid/action/delete-mass-action
-     * @class   orodatagrid.datagrid.action.DeleteMassAction
-     * @extends orodatagrid.datagrid.action.MassAction
+     * @export  oro/datagrid/delete-mass-action
+     * @class   oro.datagrid.DeleteMassAction
+     * @extends oro.datagrid.MassAction
      */
     return MassAction.extend({
         /** @property {Function} */

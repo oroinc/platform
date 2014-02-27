@@ -1,10 +1,11 @@
-/*global define*/
-define(['underscore'], function (_) {
+/* global define */
+define(['underscore'],
+function(_) {
     'use strict';
 
     /**
-     * @export  orocalendar/js/calendar/color-manager
-     * @class   orocalendar.calendar.colorManager
+     * @export  oro/calendar/color-manager
+     * @class   oro.calendar.ColorManager
      */
     var ColorManager = {
         /**
@@ -26,7 +27,7 @@ define(['underscore'], function (_) {
         /** @property {Object} */
         calendarColors: null,
 
-        initialize: function () {
+        initialize: function() {
             this.defaultColors = this.findColors('4986E7');
             this.calendarColors = {};
         },
@@ -65,7 +66,7 @@ define(['underscore'], function (_) {
                 return this.findColors(this.defaultColors[1]);
             }
             bgColor = bgColor.toUpperCase();
-            var result = _.find(this.colors, function (item) { return item[1] === bgColor; });
+            var result = _.find(this.colors, function(item) { return item[1] === bgColor; });
             if (_.isUndefined(result)) {
                 result = this.findColors(this.defaultColors[1]);
             }
@@ -78,7 +79,7 @@ define(['underscore'], function (_) {
             }
             bgColor = bgColor.toUpperCase();
             var i = -1;
-            _.each(this.colors, function (item, index) {
+            _.each(this.colors, function(item, index) {
                 if (item[1] === bgColor) {
                     i = index;
                 }
@@ -97,5 +98,5 @@ define(['underscore'], function (_) {
         var obj = _.extend({}, ColorManager);
         obj.initialize();
         return obj;
-    };
+    }
 });

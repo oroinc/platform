@@ -1,6 +1,6 @@
-/*global define*/
-define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
-    ], function (_, __, datetimeFormatter) {
+/* global define */
+define(['underscore', 'oro/translator', 'oro/formatter/datetime'],
+function (_, __, datetimeFormatter) {
     'use strict';
 
     var defaultParam = {
@@ -8,7 +8,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/da
     };
 
     /**
-     * @export oroform/js/validator/date
+     * @export oro/validator/date
      */
     return [
         'Date',

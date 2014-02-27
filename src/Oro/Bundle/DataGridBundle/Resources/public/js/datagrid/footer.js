@@ -1,13 +1,13 @@
-/*global define*/
-define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
-    ], function (Backbone, Backgrid, FooterRow, FooterCell) {
+/* global define */
+define(['backbone', 'backgrid' ,'oro/datagrid/footer-row', 'oro/datagrid/footer-cell'],
+function (Backbone, Backgrid , FooterRow, FooterCell) {
     "use strict";
 
     /**
      * Datagrid footer widget
      *
-     * @export  orodatagrid/js/datagrid/footer
-     * @class   orodatagrid.datagrid.Footer
+     * @export  oro/datagrid/footer
+     * @class   oro.datagrid.Footer
      * @extends Backgrid.Footer
      */
     return Backgrid.Footer.extend({

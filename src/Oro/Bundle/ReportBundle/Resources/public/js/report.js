@@ -8,7 +8,7 @@ define(function (require) {
         Backbone = require('backbone'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
+    var DeleteConfirmation = require('oro/delete-confirmation');
     require('oroentity/js/field-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');
@@ -146,7 +146,7 @@ define(function (require) {
             },
             getter: function ($el, name, value) {
                 if (name === 'func') {
-                    value = {
+                    value = value && {
                         name: value,
                         group_type: $el.find(":selected").data('group_type'),
                         group_name: $el.find(":selected").data('group_name')

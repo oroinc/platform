@@ -1,15 +1,15 @@
-/*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oro/dialog-widget',
-    'oroaddress/js/mapservice/googlemaps', 'oroaddress/js/address/view', 'oroaddress/js/address/collection'
-    ], function (_, Backbone, __, mediator, messenger, DialogWidget,
+/* global define */
+define(['underscore', 'backbone', 'oro/translator', 'oro/mediator', 'oro/messenger', 'oro/dialog-widget',
+    'oro/mapservice/googlemaps', 'oro/address/view', 'oro/address/collection'],
+function(_, Backbone, __, mediator, messenger, dialogWidget,
      Googlemaps, AddressView, AddressCollection) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oroaddress/js/address-book
-     * @class   oroaddress.AddressBook
+     * @export  oro/address-book
+     * @class   oro.AddressBook
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -28,7 +28,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             'class': 'map-box'
         },
 
-        initialize: function () {
+        initialize: function() {
             this.options.collection = this.options.collection || new AddressCollection();
             this.options.collection.url = this._getUrl('addressListUrl');
 
@@ -45,18 +45,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             });
         },
 
-        _getUrl: function (optionsKey) {
+        _getUrl: function(optionsKey) {
             if (_.isFunction(this.options[optionsKey])) {
                 return this.options[optionsKey].apply(this, Array.prototype.slice.call(arguments, 1));
             }
             return this.options[optionsKey];
         },
 
-        getCollection: function () {
+        getCollection: function() {
             return this.options.collection;
         },
 
-        onAddressRemove: function () {
+        onAddressRemove: function() {
             if (!this.getCollection().where({active: true}).length) {
                 var primaryAddress = this.getCollection().where({primary: true});
                 if (primaryAddress.length) {
@@ -67,23 +67,23 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             }
         },
 
-        _activateFirstAddress: function () {
+        _activateFirstAddress: function() {
             this.getCollection().at(0).set('active', true);
         },
 
-        addAll: function (items) {
+        addAll: function(items) {
             this.$adressesContainer.empty();
-            items.each(function (item) {
+            items.each(function(item) {
                 this.addAddress(item);
             }, this);
-            if (items.length === 1) {
+            if (items.length == 1) {
                 this._activateFirstAddress();
             } else {
                 this._activatePreviousAddress();
             }
         },
 
-        _activatePreviousAddress: function () {
+        _activatePreviousAddress: function() {
             if (this.activeAddress !== undefined) {
                 var previouslyActive = this.getCollection().where({id: this.activeAddress.get('id')});
                 if (previouslyActive.length) {
@@ -92,7 +92,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             }
         },
 
-        addAddress: function (address) {
+        addAddress: function(address) {
             var addressView = new AddressView({
                 model: address
             });
@@ -100,17 +100,17 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             this.$adressesContainer.append(addressView.render().$el);
         },
 
-        editAddress: function (addressView, address) {
+        editAddress: function(addressView, address) {
             this._openAddressEditForm(__('Update Address'), this._getUrl('addressUpdateUrl', address));
         },
 
-        createAddress: function () {
+        createAddress: function() {
             this._openAddressEditForm(__('Add Address'), this._getUrl('addressCreateUrl'));
         },
 
-        _openAddressEditForm: function (title, url) {
+        _openAddressEditForm: function(title, url) {
             if (!this.addressEditDialog) {
-                this.addressEditDialog = new DialogWidget({
+                this.addressEditDialog = new dialogWidget({
                     'url': url,
                     'title': title,
                     'regionEnabled': false,
@@ -119,8 +119,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
                         'modal': true,
                         'resizable': false,
                         'width': 475,
-                        'autoResize': true,
-                        'close': _.bind(function () {
+                        'autoResize':true,
+                        'close': _.bind(function() {
                             delete this.addressEditDialog;
                         }, this)
                     }
@@ -134,7 +134,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
                         }
                     }, this)
                 );
-                this.addressEditDialog.on('formSave', _.bind(function () {
+                this.addressEditDialog.on('formSave', _.bind(function() {
                     this.addressEditDialog.remove();
                     messenger.notificationFlashMessage('success', __('Address saved'));
                     this.reloadAddresses();
@@ -142,11 +142,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/medi
             }
         },
 
-        reloadAddresses: function () {
+        reloadAddresses: function() {
             this.getCollection().fetch({reset: true});
         },
 
-        activateAddress: function (address) {
+        activateAddress: function(address) {
             if (!address.get('primary')) {
                 this.activeAddress = address;
             }

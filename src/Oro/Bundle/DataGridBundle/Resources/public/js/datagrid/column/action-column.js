@@ -1,13 +1,13 @@
-/*global define*/
-define(['underscore', 'backgrid', '../cell/action-cell'
-    ], function (_, Backgrid, ActionCell) {
+/* global define */
+define(['underscore', 'backgrid', 'oro/datagrid/action-cell'],
+function(_, Backgrid, ActionCell) {
     'use strict';
 
     /**
      * Column of grid that contains row actions
      *
-     * @export  orodatagrid/js/datagrid/column/action-column
-     * @class   orodatagrid.datagrid.column.ActionColumn
+     * @export  oro/datagrid/action-column
+     * @class   oro.datagrid.ActionColumn
      * @extends Backgrid.Column
      */
     return Backgrid.Column.extend({
@@ -28,8 +28,8 @@ define(['underscore', 'backgrid', '../cell/action-cell'
         /**
          * {@inheritDoc}
          */
-        initialize: function (attributes) {
-            var attrs = attributes || {};
+        initialize: function (attrs) {
+            attrs = attrs || {};
             if (!attrs.cell) {
                 attrs.cell = this.defaults.cell;
             }

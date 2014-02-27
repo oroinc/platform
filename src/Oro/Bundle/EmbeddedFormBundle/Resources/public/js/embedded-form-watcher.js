@@ -1,5 +1,4 @@
-/*global define*/
-define(['jquery', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/js/delete-confirmation', 'oronavigation/js/navigation'],
+define(['jquery', 'backbone', 'routing', 'oro/translator', 'oro/delete-confirmation', 'oro/navigation'],
     function ($, Backbone, routing, __, DeleteConfirmation, Navigation) {
 
         var $formTypeField;

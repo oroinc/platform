@@ -1,7 +1,7 @@
-/*global define*/
-define(['underscore', 'backbone', 'oroui/js/app', 'oroui/js/error',
-        'oro/abstract-widget', 'orowindows/js/dialog/state/model', 'jquery.dialog.extended'
-    ], function (_, Backbone, app, error, AbstractWidget, StateModel) {
+/* global define */
+define(['underscore', 'backbone', 'oro/app', 'oro/error', 'oro/abstract-widget', 'oro/dialog/state/model',
+    'jquery.dialog.extended'],
+function(_, Backbone, app, error, AbstractWidget, StateModel) {
     'use strict';
 
     /**

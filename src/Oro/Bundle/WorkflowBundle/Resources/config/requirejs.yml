@@ -1,5 +1,5 @@
 config:
     paths:
-        'oroworkflow/js/transition-handler': 'bundles/oroworkflow/js/transition-handler.js'
-        'oroworkflow/js/save-and-transit-handler': 'bundles/oroworkflow/js/save-and-transit-handler.js'
-        'oroworkflow/js/transition-executor': 'bundles/oroworkflow/js/transition-executor.js'
+        'oro/workflow-transition-handler': 'bundles/oroworkflow/js/transition-handler.js'
+        'oro/workflow-save-and-transit-handler': 'bundles/oroworkflow/js/save-and-transit-handler.js'
+        'oro/workflow-transition-executor': 'bundles/oroworkflow/js/transition-executor.js'

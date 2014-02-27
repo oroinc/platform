@@ -1,6 +1,6 @@
 /* jshint browser:true */
-/*global define*/
-define(['jquery', 'underscore'], function ($, _) {
+/* global define, require */
+define(['jquery', 'underscore'], function($, _) {
     'use strict';
 
     return {

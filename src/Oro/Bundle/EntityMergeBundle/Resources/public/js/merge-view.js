@@ -1,4 +1,3 @@
-/*global define*/
 define(['jquery'],
 
     /**
@@ -12,7 +11,7 @@ define(['jquery'],
      * @function entityValueSelectHandler
      * @function resetViewState
      * @function init
-     * @export oroentitymerge/js/merge-view
+     * @export oro/entity-merge/merge-view
      * @type {object}
      */
     /**
