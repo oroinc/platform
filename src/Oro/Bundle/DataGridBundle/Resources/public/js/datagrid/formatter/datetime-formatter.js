@@ -1,13 +1,13 @@
-/* global define */
-define(['underscore', 'backgrid', 'oro/formatter/datetime'],
-function(_, Backgrid, DateTimeFormatter) {
+/*global define*/
+define(['underscore', 'backgrid', 'orolocale/js/formatter/datetime'
+    ], function (_, Backgrid, DateTimeFormatter) {
     'use strict';
 
     /**
      * Date formatter for date cell
      *
-     * @export  oro/datagrid/date-formatter
-     * @class   oro.datagrid.DateTimeFormatter
+     * @export  orodatagrid/js/datagrid/formatter/datetime-formatter
+     * @class   orodatagrid.datagrid.formatter.DateTimeFormatter
      * @extends Backgrid.CellFormatter
      */
     var DatagridDateTimeFormatter = function (options) {
@@ -27,7 +27,7 @@ function(_, Backgrid, DateTimeFormatter) {
          * @inheritDoc
          */
         fromRaw: function (rawData) {
-            if (rawData == null || rawData == '') {
+            if (rawData === null || rawData === '') {
                 return '';
             }
             // Call one of formatDate formatTime formatDateTime
@@ -38,7 +38,7 @@ function(_, Backgrid, DateTimeFormatter) {
          * @inheritDoc
          */
         toRaw: function (formattedData) {
-            if (formattedData == null || formattedData == '') {
+            if (formattedData === null || formattedData === '') {
                 return null;
             }
 
@@ -52,7 +52,7 @@ function(_, Backgrid, DateTimeFormatter) {
          * @returns {Function}
          * @private
          */
-        _getFormatterFunction: function(prefix, suffix) {
+        _getFormatterFunction: function (prefix, suffix) {
             suffix = suffix || '';
 
             function capitaliseFirstLetter(string) {
@@ -60,9 +60,9 @@ function(_, Backgrid, DateTimeFormatter) {
             }
 
             var functionName = prefix + capitaliseFirstLetter(this.type) + suffix;
-            if (!DateTimeFormatter.hasOwnProperty(functionName)
-                || typeof DateTimeFormatter[functionName] != 'function'
-                ) {
+            if (!DateTimeFormatter.hasOwnProperty(functionName) ||
+                    typeof DateTimeFormatter[functionName] !== 'function'
+                    ) {
                 throw new Error('Can\'t use formatter function with name ' + functionName);
             }
 

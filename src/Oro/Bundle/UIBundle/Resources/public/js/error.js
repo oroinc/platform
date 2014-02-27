@@ -1,6 +1,6 @@
-/* global define */
-define(['underscore', 'backbone', 'routing', 'oro/app', 'oro/modal'],
-function(_, Backbone, routing, app, Modal) {
+/*global define*/
+define(['underscore', 'backbone', 'routing', 'oroui/js/app', 'oroui/js/modal'
+    ], function (_, Backbone, routing, app, Modal) {
     'use strict';
 
     var defaults = {
@@ -9,8 +9,8 @@ function(_, Backbone, routing, app, Modal) {
         },
 
         /**
-         * @export oro/error
-         * @name oro.error
+         * @export oroui/js/error
+         * @name oroui.error
          */
         error = {
             dispatch: function(model, xhr, options) {

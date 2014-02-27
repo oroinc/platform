@@ -66,7 +66,8 @@
             'loadingMaskEnabled': false
         }) }}
         <script type="text/javascript">
-            require(['jquery', 'oro/widget-manager', 'oro/workflow-transition-executor', 'oro/navigation'],
+            require(['jquery', 'oroui/js/widget-manager', 'oroworkflow/js/transition-executor',
+                    'oronavigation/js/navigation'],
             function($, widgetManager, performTransition, Navigation) {
                 var saveAndTransitBtn = $('#save-and-transit');
                 var navigation = Navigation.getInstance();
