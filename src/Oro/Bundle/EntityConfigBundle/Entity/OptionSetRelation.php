@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRelationRepository")
- * @ORM\Table(name="oro_entity_config_optionset_relation")
+ * @ORM\Table(name="oro_entity_config_optset_rel")
  * @ORM\HasLifecycleCallbacks
  */
 class OptionSetRelation

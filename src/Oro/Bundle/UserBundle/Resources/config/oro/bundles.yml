@@ -1,2 +1,2 @@
 bundles:
-    - Oro\Bundle\UserBundle\OroUserBundle
+    - { name: Oro\Bundle\UserBundle\OroUserBundle, priority: -50 }
