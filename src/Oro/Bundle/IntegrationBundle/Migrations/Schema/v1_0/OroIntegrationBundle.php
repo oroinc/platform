@@ -4,14 +4,14 @@ namespace Oro\Bundle\IntegrationBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroIntegrationBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -65,7 +65,5 @@ class OroIntegrationBundle implements Migration
         /** End of generate foreign keys for table oro_integration_channel_status **/
 
         // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }

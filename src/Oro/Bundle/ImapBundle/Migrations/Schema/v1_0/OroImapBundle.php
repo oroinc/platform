@@ -4,14 +4,14 @@ namespace Oro\Bundle\ImapBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroImapBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -52,7 +52,5 @@ class OroImapBundle implements Migration
         $table->addColumn('imap_password', 'string', ['notnull' => false, 'length' => 100]);
 
         // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }

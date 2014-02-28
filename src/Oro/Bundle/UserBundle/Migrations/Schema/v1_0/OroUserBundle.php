@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroUserBundle implements Migration
 {
@@ -11,7 +12,7 @@ class OroUserBundle implements Migration
      * @inheritdoc
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -209,7 +210,5 @@ class OroUserBundle implements Migration
         /** End of generate foreign keys for table oro_email_address **/
 
         // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }

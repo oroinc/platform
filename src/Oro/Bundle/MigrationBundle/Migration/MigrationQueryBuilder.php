@@ -47,9 +47,12 @@ class MigrationQueryBuilder
         $sm         = $this->connection->getSchemaManager();
         $platform   = $this->connection->getDatabasePlatform();
         $fromSchema = $sm->createSchema();
+        $queryBag   = new QueryBag();
         foreach ($migrations as $migration) {
-            $toSchema   = clone $fromSchema;
-            $queries    = $migration->up($toSchema);
+            $toSchema = clone $fromSchema;
+
+            $migration->up($toSchema, $queryBag);
+
             $comparator = new Comparator();
             $schemaDiff = $comparator->compare($fromSchema, $toSchema);
 
@@ -66,15 +69,18 @@ class MigrationQueryBuilder
             }
 
             $queries = array_merge(
+                $queryBag->getPreSqls(),
                 $schemaDiff->toSql($platform),
-                $queries
+                $queryBag->getPostSqls()
             );
 
             $result[]   = [
                 'migration' => get_class($migration),
                 'queries'   => $queries
             ];
+
             $fromSchema = $toSchema;
+            $queryBag->clear();
         }
 
         return $result;
@@ -82,7 +88,7 @@ class MigrationQueryBuilder
 
     /**
      * @param \Doctrine\DBAL\Schema\Table[] $tables
-     * @param Migration $migration
+     * @param Migration                     $migration
      * @throws \Doctrine\ORM\Mapping\MappingException
      */
     protected function checkTableNameLengths($tables, Migration $migration)
@@ -104,9 +110,9 @@ class MigrationQueryBuilder
     }
 
     /**
-     * @param string $tableName
+     * @param string                         $tableName
      * @param \Doctrine\DBAL\Schema\Column[] $columns
-     * @param Migration $migration
+     * @param Migration                      $migration
      * @throws \Doctrine\ORM\Mapping\MappingException
      */
     protected function checkColumnsNameLength($tableName, $columns, Migration $migration)
