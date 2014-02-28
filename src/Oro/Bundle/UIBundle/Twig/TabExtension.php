@@ -1,0 +1,129 @@
+<?php
+
+namespace Oro\Bundle\UIBundle\Twig;
+
+use Knp\Menu\MenuItem;
+use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
+
+class TabExtension extends \Twig_Extension
+{
+    const TEMPLATE = 'OroUIBundle::tab_panel.html.twig';
+    const DEFAULT_WIDGET_TYPE = 'block';
+
+    /**
+     * @var MenuExtension
+     */
+    protected $menuExtension;
+
+    /**
+     * @var RouterInterface
+     */
+    protected $router;
+
+    public function __construct(MenuExtension $menuExtension, RouterInterface $router)
+    {
+        $this->menuExtension = $menuExtension;
+        $this->router = $router;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFunctions()
+    {
+        return [
+            'menuTabPanel' => new \Twig_Function_Method(
+                $this,
+                'menuTabPanel',
+                [
+                    'is_safe' => ['html'],
+                    'needs_environment' => true
+                ]
+            ),
+            'tabPanel' => new \Twig_Function_Method(
+                $this,
+                'tabPanel',
+                [
+                    'is_safe' => ['html'],
+                    'needs_environment' => true
+                ]
+            )
+        ];
+    }
+
+    /**
+     * @param \Twig_Environment $environment
+     * @param string $menuName
+     * @param array $options
+     * @return string
+     */
+    public function menuTabPanel(\Twig_Environment $environment, $menuName, $options = [])
+    {
+        /* @var MenuItem $menu */
+        $menu = $this->menuExtension->getMenu($menuName, [], $options);
+
+        $tabs = [];
+        foreach ($menu->getChildren() as $child) {
+            if (!$url = $child->getUri()) {
+                if ($route = $child->getExtra('widgetRoute')) {
+                    $routeParameters = array_merge(
+                        $child->getExtra('routeParameters', []),
+                        $options
+                    );
+
+                    $routeParametersMap = $child->getExtra('routeParametersMap', []);
+                    foreach ($routeParametersMap as $routeParameter => $optionParameter) {
+                        if (isset($options[$optionParameter])) {
+                            $routeParameters[$routeParameter] = $options[$optionParameter];
+                        }
+                    }
+
+                    $url = $this->router->generate($route, $routeParameters);
+                } else {
+                    throw new InvalidArgumentException(
+                        sprintf('Extra parameter "widgetRoute" should be defined for %s', $child->getName())
+                    );
+                }
+            }
+
+            $tabs[] = [
+                'alias'      => $child->getName(),
+                'label'      => $child->getLabel(),
+                'widgetType' => $child->getExtra('widgetType', self::DEFAULT_WIDGET_TYPE),
+                'url'        => $url
+            ];
+        }
+
+        return $environment->render(
+            self::TEMPLATE,
+            [
+                'tabs' => $tabs
+            ]
+        );
+    }
+
+    /**
+     * @param \Twig_Environment $environment
+     * @param array $tabs
+     * @return string
+     */
+    public function tabPanel(\Twig_Environment $environment, $tabs)
+    {
+        return $environment->render(
+            self::TEMPLATE,
+            [
+                'tabs' => $tabs
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'oro_ui.tab_panel';
+    }
+}

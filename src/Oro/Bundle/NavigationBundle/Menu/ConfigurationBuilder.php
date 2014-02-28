@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\ItemInterface;
+
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ConfigurationBuilder implements BuilderInterface
 {
@@ -68,10 +68,6 @@ class ConfigurationBuilder implements BuilderInterface
 
                 if (empty($itemOptions['name'])) {
                     $itemOptions['name'] = $itemCode;
-                }
-
-                if (empty($itemOptions['route']) && empty($itemOptions['uri'])) {
-                    $itemOptions['route'] = $itemCode;
                 }
 
                 if (!empty($itemData['position'])) {
