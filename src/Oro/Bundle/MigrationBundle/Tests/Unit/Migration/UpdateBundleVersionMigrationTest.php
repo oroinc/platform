@@ -4,20 +4,22 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\CreateMigrationTableMigration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
 
 class UpdateBundleVersionMigrationTest extends \PHPUnit_Framework_TestCase
 {
     public function testBundleVersions()
     {
-        $schema = new Schema();
+        $schema         = new Schema();
+        $queryBag       = new QueryBag();
         $bundleVersions = [
-            'testBundle' => 'v1_0',
+            'testBundle'  => 'v1_0',
             'test1Bundle' => 'v1_1'
         ];
 
         $updateMigration = new UpdateBundleVersionMigration($bundleVersions);
-        $queries = $updateMigration->up($schema);
+        $updateMigration->up($schema, $queryBag);
 
         $assertQueries = [];
         foreach ($bundleVersions as $bundleName => $version) {
@@ -29,8 +31,10 @@ class UpdateBundleVersionMigrationTest extends \PHPUnit_Framework_TestCase
             );
         }
 
+        $this->assertEmpty($queryBag->getPreSqls());
+        $postSqls = $queryBag->getPostSqls();
         foreach ($assertQueries as $index => $query) {
-            $this->assertTrue(strpos($queries[$index], $query) === 0);
+            $this->assertTrue(strpos($postSqls[$index], $query) === 0);
         }
     }
 }

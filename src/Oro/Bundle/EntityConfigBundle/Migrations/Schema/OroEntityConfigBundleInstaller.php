@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_0\OroEntityConfigBundle;
 
 class OroEntityConfigBundleInstaller implements Installation
@@ -19,7 +20,7 @@ class OroEntityConfigBundleInstaller implements Installation
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         OroEntityConfigBundle::oroEntityConfigTable($schema);
         OroEntityConfigBundle::oroEntityConfigFieldTable($schema);
@@ -35,7 +36,5 @@ class OroEntityConfigBundleInstaller implements Installation
         OroEntityConfigBundle::oroEntityConfigValueForeignKeys($schema);
         OroEntityConfigBundle::oroEntityConfigFieldForeignKeys($schema);
         OroEntityConfigBundle::oroEntityConfigLogForeignKeys($schema);
-
-        return [];
     }
 }

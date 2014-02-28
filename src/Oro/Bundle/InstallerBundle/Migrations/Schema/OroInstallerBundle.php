@@ -4,6 +4,7 @@ namespace Oro\Bundle\InstallerBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroInstallerBundle implements Installation
 {
@@ -18,8 +19,7 @@ class OroInstallerBundle implements Installation
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
-        return [];
     }
 }

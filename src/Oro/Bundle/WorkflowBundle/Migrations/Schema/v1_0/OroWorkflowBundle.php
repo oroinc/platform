@@ -4,13 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroWorkflowBundle implements Migration
 {
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         self::oroWorkflowDefinitionTable($schema);
         self::oroWorkflowItemTable($schema);
@@ -25,8 +26,6 @@ class OroWorkflowBundle implements Migration
         self::oroWorkflowTransitionLogForeignKeys($schema);
         self::oroWorkflowEntityAclForeignKeys($schema);
         self::oroWorkflowEntityAclIdentityForeignKeys($schema);
-
-        return [];
     }
 
     /**

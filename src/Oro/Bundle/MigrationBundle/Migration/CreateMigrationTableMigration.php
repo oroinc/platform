@@ -11,7 +11,7 @@ class CreateMigrationTableMigration implements Migration
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable(self::MIGRATION_TABLE);
         $table->addColumn('id', 'integer', ['notnull' => true, 'autoincrement' => true]);
@@ -20,7 +20,5 @@ class CreateMigrationTableMigration implements Migration
         $table->addColumn('loaded_at', 'datetime', ['notnull' => true]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['bundle'], 'idx_oro_migrations', []);
-
-        return [];
     }
 }

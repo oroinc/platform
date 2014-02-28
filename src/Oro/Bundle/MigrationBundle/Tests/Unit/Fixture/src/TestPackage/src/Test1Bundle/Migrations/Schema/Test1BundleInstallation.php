@@ -4,6 +4,7 @@ namespace Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class Test1BundleInstallation implements Installation
 {
@@ -18,10 +19,8 @@ class Test1BundleInstallation implements Installation
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
-        return [
-            "CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)",
-        ];
+        $queries->addSql('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
     }
 }

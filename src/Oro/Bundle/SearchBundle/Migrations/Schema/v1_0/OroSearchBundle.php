@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroSearchBundle implements Migration, ContainerAwareInterface
 {
@@ -27,7 +28,7 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
      * @inheritdoc
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -116,15 +117,12 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
         // @codingStandardsIgnoreEnd
 
         // add search fulltext index query
-        $queries = [];
         $connection = $this->container->get('doctrine')->getConnection();
         $config = $connection->getParams();
         $configClasses = $this->container->getParameter('oro_search.engine_orm');
         if (isset($configClasses[$config['driver']])) {
             $className = $configClasses[$config['driver']];
-            $queries[] = $className::getPlainSql();
+            $queries->addSql($className::getPlainSql());
         }
-
-        return $queries;
     }
 }

@@ -11,7 +11,7 @@ class OroConfigBundle implements Migration
      * @inheritdoc
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -45,7 +45,5 @@ class OroConfigBundle implements Migration
         /** End of generate foreign keys for table oro_config_value **/
 
         // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }
