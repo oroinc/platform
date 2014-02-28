@@ -9,7 +9,8 @@ function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
     var initialized = false,
         methods = {
             initBuilder: function () {
-                this.metadata = _.extend({filters: {}}, this.$el.data('metadata'));
+                this.metadata = _.extend({state: {filters: []}, filters: {}}, this.$el.data('metadata'));
+                console.log(this.metadata);
                 this.modules = {};
                 methods.collectModules.call(this);
                 tools.loadModules(this.modules, _.bind(methods.build, this));
