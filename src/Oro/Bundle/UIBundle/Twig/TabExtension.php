@@ -61,6 +61,23 @@ class TabExtension extends \Twig_Extension
      */
     public function menuTabPanel(\Twig_Environment $environment, $menuName, $options = [])
     {
+        return $environment->render(
+            self::TEMPLATE,
+            [
+                'tabs' => $this->getTabs($menuName, $options)
+            ]
+        );
+    }
+
+    /**
+     * @param string $menuName
+     * @param array  $options
+     *
+     * @throws \Symfony\Component\Validator\Exception\InvalidArgumentException
+     * @return array
+     */
+    public function getTabs($menuName, $options = [])
+    {
         /* @var MenuItem $menu */
         $menu = $this->menuExtension->getMenu($menuName, [], $options);
 
@@ -77,6 +94,8 @@ class TabExtension extends \Twig_Extension
                     foreach ($routeParametersMap as $routeParameter => $optionParameter) {
                         if (isset($options[$optionParameter])) {
                             $routeParameters[$routeParameter] = $options[$optionParameter];
+
+                            unset($routeParameters[$optionParameter]);
                         }
                     }
 
@@ -96,12 +115,7 @@ class TabExtension extends \Twig_Extension
             ];
         }
 
-        return $environment->render(
-            self::TEMPLATE,
-            [
-                'tabs' => $tabs
-            ]
-        );
+        return $tabs;
     }
 
     /**
