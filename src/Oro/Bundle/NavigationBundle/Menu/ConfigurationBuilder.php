@@ -4,8 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Knp\Menu\ItemInterface;
 
-use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
-
 class ConfigurationBuilder implements BuilderInterface
 {
     /**

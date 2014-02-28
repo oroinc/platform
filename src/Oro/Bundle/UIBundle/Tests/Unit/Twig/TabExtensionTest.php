@@ -143,7 +143,7 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 'options' => [
                     'name' => 'item',
                     'widgetRoute' => 'route',
-                    'routeParameters' => ['type' => 'code'],
+                    'widgetRouteParameters' => ['type' => 'code'],
                 ],
                 'tab' => [
                     'alias' => 'item',
@@ -157,8 +157,8 @@ class TabExtensionTest extends \PHPUnit_Framework_TestCase
                 'options' => [
                     'name' => 'item',
                     'widgetRoute' => 'route',
-                    'routeParameters' => ['type' => 'code'],
-                    'routeParametersMap' => ['type' => 'type2'],
+                    'widgetRouteParameters' => ['type' => 'code'],
+                    'widgetRouteParametersMap' => ['type' => 'type2'],
                 ],
                 'tab' => [
                     'alias' => 'item',

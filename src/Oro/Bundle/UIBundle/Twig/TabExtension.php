@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Knp\Menu\MenuItem;
-use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
+
+use Knp\Menu\MenuItem;
+
+use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
 
 class TabExtension extends \Twig_Extension
 {
@@ -86,11 +88,11 @@ class TabExtension extends \Twig_Extension
             if (!$url = $child->getUri()) {
                 if ($route = $child->getExtra('widgetRoute')) {
                     $routeParameters = array_merge(
-                        $child->getExtra('routeParameters', []),
+                        $child->getExtra('widgetRouteParameters', []),
                         $options
                     );
 
-                    $routeParametersMap = $child->getExtra('routeParametersMap', []);
+                    $routeParametersMap = $child->getExtra('widgetRouteParametersMap', []);
                     foreach ($routeParametersMap as $routeParameter => $optionParameter) {
                         if (isset($options[$optionParameter])) {
                             $routeParameters[$routeParameter] = $options[$optionParameter];

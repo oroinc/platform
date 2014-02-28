@@ -323,7 +323,7 @@
         style="display: none"
         {% endif -%}
         {% if parameters.widget is defined and parameters.widget|length %}
-            {{ _self.renderWidgetElementAttributes(parameters.widget) }}
+            {{ _self.renderWidgetDataAttributes(parameters.widget) }}
         {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
@@ -332,7 +332,7 @@
     </a>
 {% endmacro %}
 
-{% macro renderWidgetElementAttributes(options) %}
+{% macro renderWidgetDataAttributes(options) %}
     {{ _self.renderAttributes(options, 'widget') }}
 {% endmacro %}
 
