@@ -75,6 +75,7 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
+            - @oro_locale.settings
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: date }
 
@@ -83,6 +84,7 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
+            - @oro_locale.settings
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: datetime }
 

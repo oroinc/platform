@@ -152,10 +152,10 @@ define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale
         },
 
         changeFilterType: function (type) {
-            if (this.dateWidgets.start) {
+            if (this.dateWidgets.start && this.dateWidgets.start.data('datepicker')) {
                 this.dateWidgets.start.data('datepicker').settings.part = type;
             }
-            if (this.dateWidgets.end) {
+            if (this.dateWidgets.end && this.dateWidgets.end.data('datepicker')) {
                 this.dateWidgets.end.data('datepicker').settings.part = type;
             }
 
