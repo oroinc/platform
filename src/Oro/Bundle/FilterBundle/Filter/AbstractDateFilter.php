@@ -409,8 +409,18 @@ abstract class AbstractDateFilter extends AbstractFilter
     {
         $compiler = new Compiler();
 
-        $data['value']['start'] = (string)$compiler->compile($data['value']['start']);
-        $data['value']['end']   = (string)$compiler->compile($data['value']['end']);
+        $start = $compiler->compile($data['value']['start']);
+        $end   = $compiler->compile($data['value']['start']);
+
+        if ($start instanceof Carbon) {
+            $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
+        }
+        if ($end instanceof Carbon) {
+            $end->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
+        }
+
+        $data['value']['start'] = (string)$start;
+        $data['value']['end']   = (string)$end;
 
         return $data;
     }

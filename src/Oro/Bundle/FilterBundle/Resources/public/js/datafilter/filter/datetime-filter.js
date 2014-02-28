@@ -112,11 +112,15 @@ function ($, _, DateFilter, localeSettings) {
                 value.value.start = this._formatDatetime(
                     value.value.start, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat
                 );
+
+                value.value.start = value.value.start.replace(/^\s+|\s+$/g, '');
             }
             if (value.value && value.value.end) {
                 value.value.end = this._formatDatetime(
                     value.value.end, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat
                 );
+
+                value.value.end = value.value.end.replace(/^\s+|\s+$/g, '');
             }
             return value;
         },
