@@ -49,9 +49,11 @@ function(_, Backbone, DialogWidget, Helper) {
                 'title': this.model.get('name').length ? 'Edit step' : 'Add new step',
                 'el': this.$el,
                 'stateEnabled': false,
+                'incrementalPosition': false,
                 'dialogOptions': {
                     'close': _.bind(this.remove, this),
-                    'width': 600
+                    'width': 600,
+                    'modal': true
                 }
             });
             this.widget.render();

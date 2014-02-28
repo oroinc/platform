@@ -55,9 +55,24 @@
 {% endblock stats %}
 
 {% block content_data %}
+    <script type="text/template" id="transition-form-template">
+
+    </script>
+
     <script type="text/template" id="step-form-template">
         {% set stepNameConstraints = {
-            'NotBlank': null
+            "NotBlank": null
+        } %}
+
+        {% set orderConstraints = {
+            "NotBlank": null,
+            "Range": {
+                "minMessage": "This value should be {{ limit }} or more."|trans,
+                "maxMessage": "This value should be {{ limit }} or less."|trans,
+                "invalidMessage": "This value should be a valid number."|trans,
+                "min": 0,
+                "max": null
+            }
         } %}
 
         <form action="#">
@@ -73,7 +88,7 @@
                     <div class="control-group">
                         <label class="control-label">{{ "Order"|trans }}</label>
                         <div class="controls">
-                            <input type="text" name="order" value="<%= order %>">
+                            <input type="text" name="order" value="<%= order %>" data-validation="{{ orderConstraints|json_encode }}">
                         </div>
                     </div>
 
@@ -112,7 +127,7 @@
             <% if (_is_start) { %>
                 <%= label %>
             <% } else { %>
-                <a href="#" class="edit-step" data-step-name="<%= name %>"><%= label %></a>
+                <a href="#" class="edit-step"><%= label %></a>
             <% } %>
             <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
         </td>
@@ -121,10 +136,10 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (!_is_start) { %>
-                    <a href="#" class="edit-step" title="Edit step" data-step-name="<%= name %>"><i class="icon-edit"/></a>
-                    <a href="#" class="delete-step" title="Delete step" data-step-name="<%= name %>"><i class="icon-remove"/></a>
+                    <a href="#" class="edit-step" title="Edit step"><i class="icon-edit"/></a>
+                    <a href="#" class="delete-step" title="Delete step"><i class="icon-remove"/></a>
                 <% } %>
-                <a href="#" class="add-step-transition" title="Add transition" data-step-name="<%= name %>"><i class="icon-plus-sign"/></a>
+                <a href="#" class="add-step-transition" title="Add transition"><i class="icon-plus-sign"/></a>
             </div>
         </td>
     </script>

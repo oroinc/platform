@@ -16,6 +16,8 @@ function(_, Backbone, TransitionsShortRowView) {
             workflow: null
         },
 
+        rowViews: [],
+
         initialize: function() {
             this.listenTo(this.getCollection(), 'add', this.addItem);
             this.listenTo(this.getCollection(), 'reset', this.addAllItems);
@@ -26,6 +28,7 @@ function(_, Backbone, TransitionsShortRowView) {
                 model: item,
                 workflow: this.options.workflow
             });
+            this.rowViews.push(rowView);
             this.$el.append(rowView.render().$el);
         },
 
@@ -35,6 +38,17 @@ function(_, Backbone, TransitionsShortRowView) {
 
         getCollection: function() {
             return this.options.collection;
+        },
+
+        remove: function() {
+            this.resetView();
+            Backbone.View.prototype.remove.call(this);
+        },
+
+        resetView: function() {
+            _.each(this.rowViews, function (rowView) {
+                rowView.remove();
+            });
         },
 
         render: function() {

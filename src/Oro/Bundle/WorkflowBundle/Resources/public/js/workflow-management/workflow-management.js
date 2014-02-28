@@ -68,8 +68,9 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection, StepEditVi
         },
 
         addStep: function(step) {
-            this.model.get('steps').add(step);
-            this.renderSteps();
+            if (!this.model.get('steps').get(step.cid)) {
+                this.model.get('steps').add(step);
+            }
         },
 
         onStepRemove: function(step) {
@@ -82,6 +83,7 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection, StepEditVi
 
         render: function() {
             this.renderSteps();
+            return this;
         }
     });
 });

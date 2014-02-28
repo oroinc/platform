@@ -24,6 +24,9 @@ function(_, Backbone, TransitionsShortListView) {
             template: null
         },
 
+        template: null,
+        transitionsListView: null,
+
         initialize: function() {
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
@@ -45,13 +48,20 @@ function(_, Backbone, TransitionsShortListView) {
             this.model.trigger('requestAddTransition', this.model);
         },
 
+        remove: function() {
+            if (this.transitionsListView) {
+                this.transitionsListView.remove();
+            }
+            Backbone.View.prototype.remove.call(this);
+        },
+
         render: function() {
-            var transitionsList = new TransitionsShortListView({
+            this.transitionsListView = new TransitionsShortListView({
                 'collection': this.model.getAllowedTransitions(this.options.workflow),
                 'workflow': this.options.workflow
             });
             var rowHtml = $(this.template(this.model.toJSON()));
-            var transitionsListEl = transitionsList.render().$el;
+            var transitionsListEl = this.transitionsListView.render().$el;
             rowHtml.filter('.step-transitions').append(transitionsListEl);
             this.$el.append(rowHtml);
 
