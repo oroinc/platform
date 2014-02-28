@@ -82,7 +82,7 @@ define(function (require) {
     };
 
     layout.onPageRendered = function (cb) {
-        if (document['page-rendered']) {
+        if (document.pageReady) {
             setTimeout(cb, 0);
         } else {
             pageRenderedCbPool.push(cb);
@@ -90,13 +90,13 @@ define(function (require) {
     };
 
     layout.pageRendering = function () {
-        document['page-rendered'] = false;
+        document.pageReady = false;
 
         pageRenderedCbPool = [];
     };
 
     layout.pageRendered = function () {
-        document['page-rendered'] = true;
+        document.pageReady = true;
 
         _.each(pageRenderedCbPool, function (cb) {
             try {

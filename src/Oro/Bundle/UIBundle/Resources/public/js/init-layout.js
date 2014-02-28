@@ -1,6 +1,18 @@
 /*jshint browser: true*/
 /*jslint browser: true, nomen: true, vars: true*/
 /*global require*/
+
+require(['oro/mediator'], function (mediator) {
+    'use strict';
+    mediator.once('tab:changed', function () {
+        setTimeout(function () {
+            // emulates 'document ready state' for selenium tests
+            document['page-rendered'] = true;
+            mediator.trigger('page-rendered');
+        }, 50);
+    });
+});
+
 require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
     'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
     ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
