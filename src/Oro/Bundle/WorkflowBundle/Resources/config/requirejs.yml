@@ -12,7 +12,7 @@ config:
         'oro/workflow-management/step/collection':            'bundles/oroworkflow/js/workflow-management/step/collection.js'
         'oro/workflow-management/step/view/list':             'bundles/oroworkflow/js/workflow-management/step/view/list.js'
         'oro/workflow-management/step/view/row':              'bundles/oroworkflow/js/workflow-management/step/view/row.js'
-        'oro/workflow-management/step/view/edit':              'bundles/oroworkflow/js/workflow-management/step/view/edit.js'
+        'oro/workflow-management/step/view/edit':             'bundles/oroworkflow/js/workflow-management/step/view/edit.js'
 
         'oro/workflow-management/transition/model':           'bundles/oroworkflow/js/workflow-management/transition/model.js'
         'oro/workflow-management/transition/collection':      'bundles/oroworkflow/js/workflow-management/transition/collection.js'
@@ -20,4 +20,4 @@ config:
         'oro/workflow-management/transition/view/row':        'bundles/oroworkflow/js/workflow-management/transition/view/row.js'
         'oro/workflow-management/transition/view/list-short': 'bundles/oroworkflow/js/workflow-management/transition/view/list-short.js'
         'oro/workflow-management/transition/view/row-short':  'bundles/oroworkflow/js/workflow-management/transition/view/row-short.js'
-        'oro/workflow-management/transition/view/edit':        'bundles/oroworkflow/js/workflow-management/transition/view/edit.js'
+        'oro/workflow-management/transition/view/edit':       'bundles/oroworkflow/js/workflow-management/transition/view/edit.js'

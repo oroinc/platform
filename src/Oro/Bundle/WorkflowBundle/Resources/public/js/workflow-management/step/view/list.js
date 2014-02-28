@@ -11,12 +11,6 @@ function(_, Backbone, StepRowView) {
      * @extends Backbone.View
      */
     return Backbone.View.extend({
-        events: {
-            'click .edit-step': 'editStep',
-            'click .delete-step': 'removeStep',
-            'click .add-step-transition': 'addStepTransition'
-        },
-
         options: {
             listElBodyEl: 'tbody',
             template: null,
@@ -32,27 +26,6 @@ function(_, Backbone, StepRowView) {
             this.listenTo(this.getCollection(), 'change', this.render);
             this.listenTo(this.getCollection(), 'add', this.addItem);
             this.listenTo(this.getCollection(), 'reset', this.addAllItems);
-        },
-
-        editStep: function(e) {
-            e.preventDefault();
-            var stepName = $(e.target).closest('.edit-step').data('step-name');
-
-            this.trigger('stepEdit', stepName);
-        },
-
-        removeStep: function(e) {
-            e.preventDefault();
-            var stepName = $(e.target).closest('.edit-step').data('step-name');
-
-            this.trigger('stepRemove', stepName);
-        },
-
-        addStepTransition: function(e) {
-            e.preventDefault();
-            var stepName = $(e.target).closest('.edit-step').data('step-name');
-
-            this.trigger('stepAddTransition', stepName);
         },
 
         addItem: function(item) {

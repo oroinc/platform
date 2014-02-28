@@ -12,8 +12,11 @@ function(_, Backbone, TransitionsShortListView) {
      */
     return Backbone.View.extend({
         tagName: 'tr',
+
         events: {
-            'click .delete-step': 'remove'
+            'click .edit-step': 'triggerEditStep',
+            'click .delete-step': 'triggerRemoveStep',
+            'click .add-step-transition': 'triggerAddStepTransition'
         },
 
         options: {
@@ -25,6 +28,21 @@ function(_, Backbone, TransitionsShortListView) {
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
             this.listenTo(this.model, 'destroy', this.remove);
+        },
+
+        triggerEditStep: function(e) {
+            e.preventDefault();
+            this.model.trigger('requestEdit', this.model);
+        },
+
+        triggerRemoveStep: function(e) {
+            e.preventDefault();
+            this.model.destroy();
+        },
+
+        triggerAddStepTransition: function(e) {
+            e.preventDefault();
+            this.model.trigger('requestAddTransition', this.model);
         },
 
         render: function() {

@@ -30,7 +30,7 @@ function(_, Backbone, TransitionsShortRowView) {
         },
 
         addAllItems: function(items) {
-            _.each(items, _.bind(this.addItem, this));
+            _.each(items, this.addItem, this);
         },
 
         getCollection: function() {

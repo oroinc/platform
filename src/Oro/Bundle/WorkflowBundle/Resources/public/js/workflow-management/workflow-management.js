@@ -28,16 +28,22 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection, StepEditVi
                 workflow: this.model
             });
 
-            this.listenTo(this.stepListView, 'stepEdit', this.editStep);
+            this.listenTo(this.model.get('steps'), 'requestEdit', this.openManageStepForm);
+            this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
         },
 
         _getStartStep: function() {
-            return new StepModel({
+            var startStepModel = new StepModel({
                 'label': '(Starting point)',
                 'order': -1,
-                '_is_start': true,
-                'allowed_transitions': new TransitionCollection(this.model.getStartTransitions())
+                '_is_start': true
             });
+
+            startStepModel
+                .getAllowedTransitions(this.model)
+                .reset(this.model.getStartTransitions());
+
+            return startStepModel;
         },
 
         renderSteps: function() {
@@ -47,12 +53,6 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection, StepEditVi
         addNewStep: function() {
             this.openManageStepForm(
                 new StepModel()
-            );
-        },
-
-        editStep: function(stepName) {
-            this.openManageStepForm(
-                this.model.getStepByName(stepName)
             );
         },
 
@@ -68,15 +68,16 @@ function(_, Backbone, StepsListView, StepModel, TransitionCollection, StepEditVi
         },
 
         addStep: function(step) {
-            if (!this.model.getStepByName(step.get('name'))) {
-                this.model.get('steps').add(step);
-            }
+            this.model.get('steps').add(step);
             this.renderSteps();
         },
 
-        _getFormElement: function(form, name) {
-            var elId = this.$el.attr('id') + '_' + name;
-            return this.$('#' + elId);
+        onStepRemove: function(step) {
+            var stepTransitions = step.getAllowedTransitions(this.model);
+            //Cloned because of iterator elements removing in loop
+            _.each(_.clone(stepTransitions.models), function(transition) {
+                transition.destroy();
+            });
         },
 
         render: function() {
