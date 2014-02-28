@@ -8,14 +8,14 @@ Database structure migrations
 
 Each bundle can have migration files that allow to update database schema.
 
-Migration files should be located in Migrations\Schema\version_number folder. Version numbers must be an PHP-standardized version number string with some limitations. This string can not use "." and "+" chars as version parts separator. More info about HP-standardized version number string can be found [here][1].
+Migration files should be located in Migrations\Schema\version_number folder. Version numbers must be an PHP-standardized version number string with some limitations. This string should not contain "." and "+" chars as version parts separator. More info about PHP-standardized version number string can be found in [PHP manual][1].
 
-Migration files must implement Oro\Bundle\MigrationBundle\Migration\Migration interface.
+Each migration class must implement Oro\Bundle\MigrationBundle\Migration\Migration interface.
 
-In migration class must be implemented up function. This function receive current database structure in schema variable and additional queries bag in queries parameter.
+A migration class must implements `up` function. This function receive current database structure in `schema` variable and `queries` parameter witch can be used to add additional queries.
 
 With schema parameter, you can create or update database structure without fear of compatibility between database engines. 
-If developer must add additional queries to the database between or after allying changed schema, it can be used queries parameter. Is support adding the SQL queries that should be executed before UP migrations defined in class with **addPreSql** function or after UP migrations defined in class with **addSql** function.
+If developer want to add additional queries to the database before or after applying schema modification, he can used `queries` parameter. This parameter allow to add additional queries witch will be executed before (**addPreSql** function) or after (**addSql** or **addPostSql**  function). 
 
 Example of migration file:
 
@@ -117,7 +117,7 @@ This command support two types of migration files: main data fixtures and demo d
 
 Data fixtures for this command should be put in Migrations/Data/ORM or in Migrations/Data/Demo/ORM directory.
 
-Fixtures order can be changed with standart Doctrine ordering or dependency functionality. More information about fixture ordering can be found [here][2].
+Fixtures order can be changed with standart Doctrine ordering or dependency functionality. More information about fixture ordering can be found in [doctrine data fixtures manual][2].
 
 
   [1]: http://php.net/manual/en/function.version-compare.php
