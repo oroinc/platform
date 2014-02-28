@@ -8,7 +8,6 @@ class Token
     const TYPE_INTEGER     = 'TYPE_INTEGER';
     const TYPE_VARIABLE    = 'TYPE_VARIABLE';
     const TYPE_PUNCTUATION = 'TYPE_PUNCTUATION';
-    const TYPE_END         = 'TYPE_END';
     const TYPE_TIME        = 'TYPE_TIME';
     const TYPE_DATE        = 'TYPE_DATE';
 

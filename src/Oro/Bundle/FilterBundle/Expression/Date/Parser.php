@@ -2,52 +2,49 @@
 
 namespace Oro\Bundle\FilterBundle\Expression\Date;
 
-use Carbon\Carbon;
+use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 
 class Parser
 {
     /**
-     * @param Token[] $tokens
+     * @param array $tokens
      *
-     * @return \Carbon\Carbon
+     * @throws \LogicException
+     * @return mixed
      */
     public function parse($tokens)
     {
+        $this->validate($tokens);
         $RPNTokens = $this->convertExprToRPN($tokens);
 
         $stack = [];
         foreach ($RPNTokens as $token) {
-            if ($token instanceof Token && $token->getType() === Token::TYPE_OPERATOR) {
-                switch ($token->getValue()) {
-                    case '+':
-                        $result = $this->getValue(array_shift($stack)) + $this->getValue(array_shift($stack));
-                        break;
-                    case '-':
-                        $result = $this->getValue(array_shift($stack)) - $this->getValue(array_shift($stack));
-                        break;
+            if ($token instanceof Token && $token->is(Token::TYPE_OPERATOR)) {
+                $a = array_shift($stack);
+                $b = array_shift($stack);
 
-                }
+                $method = $token->getValue() === '-' ? 'subtract' : 'add';
+                $result = $a->{$method}($b);
                 array_push($stack, $result);
             } else {
-                $stack[] = $token;
+                $stack[] = new ExpressionResult($token);
             }
         }
 
         if (count($stack) > 1) {
-            throw new \LogicException('Invalid operator count');
+            // TODO add processing parts merge
+            // e.g. {{ THIS DAY }} 05:00 PM
+            throw new \LogicException('Invalid count');
         }
-    }
+        /** @var ExpressionResult $result */
+        $result = array_pop($stack);
 
-    protected function getValue($data)
-    {
-        if ($data instanceof Token) {
-            return $data->getValue();
-        } else {
-            return $data;
-        }
+        return $result === null ? $result : $result->getValue();
     }
 
     /**
+     * Convert token stream to reverse polish notation
+     *
      * @param Token[] $tokens
      *
      * @return Token[]
@@ -58,9 +55,9 @@ class Parser
         $result = $stack = [];
 
         foreach ($tokens as $token) {
-            if ($token->getValue() === '(') {
+            if ($token->is(Token::TYPE_PUNCTUATION, '(')) {
                 $stack[] = $token;
-            } elseif ($token->getValue() === ')') {
+            } elseif ($token->is(Token::TYPE_PUNCTUATION, ')')) {
                 $stackItem = array_pop($stack);
                 while ($stackItem !== null && $stackItem->getValue() !== '(') {
                     $result [] = $stackItem;
@@ -70,10 +67,10 @@ class Parser
                     throw new \LogicException('The open parenthesis is missing.');
                 }
             } else {
-                if ($token->getType() === Token::TYPE_OPERATOR) {
+                if ($token->is(Token::TYPE_OPERATOR)) {
                     $stackItem = array_pop($stack);
                     while ($stackItem !== null) {
-                        if ($stackItem->getValue() === '(') {
+                        if ($stackItem->is(Token::TYPE_PUNCTUATION, '(')) {
                             $stack[] = $stackItem;
                             break;
                         } else {
@@ -88,7 +85,7 @@ class Parser
 
         $stackItem = array_pop($stack);
         while (null !== $stackItem) {
-            if ($stackItem->getValue() === '(') {
+            if ($stackItem->is(Token::TYPE_PUNCTUATION, '(')) {
                 throw new \LogicException('The close parenthesis is missing.');
             }
             $result [] = $stackItem;
@@ -96,5 +93,26 @@ class Parser
         }
 
         return $result;
+    }
+
+    /**
+     * Validates token stream
+     *
+     * @param array $tokens
+     *
+     * @throws SyntaxException
+     */
+    protected function validate(array $tokens)
+    {
+        $variables = array_filter(
+            $tokens,
+            function (Token $token) {
+                return $token->is(Token::TYPE_VARIABLE);
+            }
+        );
+
+        if (count($variables) > 1) {
+            throw new SyntaxException('Only one variable allowed in expression');
+        }
     }
 }

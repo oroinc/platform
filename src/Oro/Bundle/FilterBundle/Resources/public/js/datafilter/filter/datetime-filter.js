@@ -1,7 +1,8 @@
 /*global define*/
-define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-ui-timepicker',
-    'jquery-ui-datevariables'], function ($, _, DateFilter, localeSettings) {
+define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-ui-timepicker', 'jquery-ui-datevariables'],
+function ($, _, DateFilter, localeSettings) {
     'use strict';
+
     /**
      * Datetime filter: filter type as option + interval begin and end dates
      *
@@ -49,6 +50,7 @@ define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-
         _initializeDateWidget: function(widgetSelector) {
             this.$(widgetSelector).datevariables(this.dateWidgetOptions);
             var widget = this.$(widgetSelector).datevariables('widget');
+
             widget.addClass(this.dateWidgetOptions.className);
             $(this.dateWidgetSelector).on('click', function(e) {
                 e.stopImmediatePropagation();
