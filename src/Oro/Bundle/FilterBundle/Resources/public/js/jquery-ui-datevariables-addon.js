@@ -88,7 +88,7 @@
         },
 
         _getDatevariablesByDatepart: function(datePart) {
-            var dateVars = this.inst.settings.dateVarsGetter(datePart);
+            var dateVars = this.inst.settings.dateVars;
             return dateVars[datePart] ? dateVars[datePart] : dateVars['value'];
         },
 
@@ -154,15 +154,6 @@
                 dp_inst.currentMonth=dp_inst.selectedMonth;
                 dp_inst.currentDay=dp_inst.selectedDay;
             }
-
-            /*
-             * remove following lines to force every changes in date picker to change the input value
-             * Bug descriptions: when an input field has a default value, and click on the field to pop up the date picker.
-             * If the user manually empty the value in the input field, the date picker will never change selected value.
-             */
-            //if (dp_inst.lastVal !== undefined && (dp_inst.lastVal.length > 0 && this.$input.val().length === 0)) {
-            //	return;
-            //}
 
             if (this._defaults.timeOnly === true) {
                 formattedDateTime = this.formattedTime;
