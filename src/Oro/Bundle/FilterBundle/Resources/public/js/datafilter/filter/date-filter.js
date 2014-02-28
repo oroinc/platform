@@ -152,7 +152,12 @@ define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale
         },
 
         changeFilterType: function (type) {
-            $.datevariables.datePart = type;
+            if (this.dateWidgets.start) {
+                this.dateWidgets.start.data('datepicker').settings.part = type;
+            }
+            if (this.dateWidgets.end) {
+                this.dateWidgets.end.data('datepicker').settings.part = type;
+            }
 
             type = parseInt(type, 10);
             this.$el.find('.filter-separator').show().end().find('input').show();
