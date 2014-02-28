@@ -126,7 +126,7 @@
 {% endmacro %}
 
 {#
-    Create dropdown
+    Create dropdown button
     Parameters - array:
         [
             'label' - button label
@@ -135,7 +135,7 @@
 
         ]
 #}
-{% macro dropdown(parameters) %}
+{% macro dropdownButton(parameters) %}
     <div class="btn-group">
         <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             {{ parameters.label|trans }}

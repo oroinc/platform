@@ -65,19 +65,20 @@ class PlaceholderExtension extends \Twig_Extension
         if (isset($this->placeholders[$name]['items'])) {
 
             /**
-             * Delegate which sort items by order field (dy descending)
+             * Compare function to order blocks using ascending sorting
+             *
              * @param array $firstBlock
              * @param array $secondBlock
              * @return int
              */
-            $compareResolverDelegate = function ($firstBlock, $secondBlock) {
-                $firstBlockOrder = isset($firstBlock['order']) ? (int)$firstBlock['order'] : 1;
-                $secondBlockOrder = isset($secondBlock['order']) ? (int)$secondBlock['order'] : 1;
-                return $secondBlockOrder - $firstBlockOrder;
+            $compareFunction = function ($firstBlock, $secondBlock) {
+                $firstBlockOrder = isset($firstBlock['order']) ? (int)$firstBlock['order'] : 0;
+                $secondBlockOrder = isset($secondBlock['order']) ? (int)$secondBlock['order'] : 0;
+                return $firstBlockOrder - $secondBlockOrder;
             };
 
             $items = $this->placeholders[$name]['items'];
-            usort($items, $compareResolverDelegate);
+            usort($items, $compareFunction);
 
             foreach ($items as $block) {
                 if (isset($block['template'])) {
