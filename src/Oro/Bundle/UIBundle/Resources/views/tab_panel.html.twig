@@ -12,6 +12,7 @@
             <li{% if isFirstLoop %} class="active"{% endif %}>
                 {% set widgetOptions = {
                     'type': 'block',
+                    'event': 'shown.bs.tab',
                     'multiple': false,
                     'options': {
                         'container': '#' ~ tab.alias,
