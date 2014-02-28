@@ -1,9 +1,10 @@
 /*global define*/
-/*jshint browser: true*/
+/*jshint browser: true, devel: true*/
 define(function (require) {
     'use strict';
 
     var $ = require('jquery');
+    var _ = require('underscore');
 
     var __ = require('oro/translator');
     var scrollspy = require('oro/scrollspy');
@@ -11,6 +12,8 @@ define(function (require) {
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
     var _widgetControlInitializer = require('oro/widget-control-initializer');
+
+    var pageRenderedCbPool = [];
 
     var layout = {};
 
@@ -59,6 +62,10 @@ define(function (require) {
             });
 
         _widgetControlInitializer.init(container);
+
+        layout.onPageRendered(function () {
+            scrollspy.top();
+        });
     };
 
     layout.hideProgressBar = function () {
@@ -75,6 +82,36 @@ define(function (require) {
             elements.uniform();
             elements.trigger('uniformInit');
         }
+    };
+
+    layout.onPageRendered = function (cb) {
+        if (document.pageReady) {
+            setTimeout(cb, 0);
+        } else {
+            pageRenderedCbPool.push(cb);
+        }
+    };
+
+    layout.pageRendering = function () {
+        document.pageReady = false;
+
+        pageRenderedCbPool = [];
+    };
+
+    layout.pageRendered = function () {
+        document.pageReady = true;
+
+        _.each(pageRenderedCbPool, function (cb) {
+            try {
+                cb();
+            } catch (ex) {
+                if (console && (typeof console.log === 'function')) {
+                    console.log(ex);
+                }
+            }
+        });
+
+        pageRenderedCbPool = [];
     };
 
     return layout;

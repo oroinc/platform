@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Symfony\Component\HttpKernel\Log\NullLogger;
 
-use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
@@ -20,7 +20,7 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->stepExecutionMock = $this->getMockBuilder('Oro\\Bundle\\BatchBundle\\Entity\\StepExecution')
+        $this->stepExecutionMock = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Entity\\StepExecution')
             ->setMethods(['getExecutionContext'])
             ->disableOriginalConstructor()->getMock();
         $this->transportSettings = $this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport');

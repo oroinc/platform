@@ -1,14 +1,7 @@
 config:
     paths:
-        'oro/query-designer': 'bundles/oroquerydesigner/js/query-designer.js'
-        'oro/query-designer/util': 'bundles/oroquerydesigner/js/query-designer/util.js'
-        'oro/query-designer/function-manager': 'bundles/oroquerydesigner/js/query-designer/function-manager.js'
-        'oro/query-designer/abstract-view': 'bundles/oroquerydesigner/js/query-designer/abstract-view.js'
-        'oro/query-designer/column-selector-view': 'bundles/oroquerydesigner/js/query-designer/column-selector-view.js'
-        'oro/query-designer/column/collection': 'bundles/oroquerydesigner/js/query-designer/column/collection.js'
-        'oro/query-designer/column/model': 'bundles/oroquerydesigner/js/query-designer/column/model.js'
-        'oro/query-designer/column/view': 'bundles/oroquerydesigner/js/query-designer/column/view.js'
-        'oro/query-designer/grouping/view': 'bundles/oroquerydesigner/js/query-designer/grouping/view.js'
-
         'oroquerydesigner/js/condition-builder': 'bundles/oroquerydesigner/js/condition-builder.js'
         'oroquerydesigner/js/field-condition': 'bundles/oroquerydesigner/js/field-condition.js'
+        'oroquerydesigner/js/function-choice': 'bundles/oroquerydesigner/js/function-choice.js'
+        'oroquerydesigner/js/items-manager/grouping-model': 'bundles/oroquerydesigner/js/items-manager/grouping-model.js'
+        'oroquerydesigner/js/items-manager/column-model': 'bundles/oroquerydesigner/js/items-manager/column-model.js'

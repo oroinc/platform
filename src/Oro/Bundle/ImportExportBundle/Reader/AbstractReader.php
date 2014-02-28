@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
