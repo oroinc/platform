@@ -88,7 +88,7 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
         $this->IncludeFile('WrongTableNameMigration.php');
         $migrations = [new WrongTableNameMigration()];
         $this->setExpectedException(
-            'Doctrine\ORM\Mapping\MappingException',
+            'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
                 'Max table name length is %s. Please correct "%s" table in "%s" migration',
                 MigrationQueryBuilder::MAX_TABLE_NAME_LENGTH,
@@ -106,7 +106,7 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
         $this->includeFile('WrongColumnNameMigration.php');
         $migrations = [new WrongColumnNameMigration()];
         $this->setExpectedException(
-            'Doctrine\ORM\Mapping\MappingException',
+            'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
                 'Max column name length is %s. Please correct "%s:%s" column in "%s" migration',
                 MigrationQueryBuilder::MAX_TABLE_NAME_LENGTH,
