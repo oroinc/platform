@@ -42,15 +42,6 @@ class OroIntegrationBundle implements Migration
         $table = $schema->createTable('oro_integration_transport');
         $table->addColumn('id', 'smallint', ['autoincrement' => true]);
         $table->addColumn('type', 'string', ['length' => 30]);
-        $table->addColumn('wsdl_url', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('api_user', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('api_key', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('sync_start_date', 'date', ['notnull' => false]);
-        $table->addColumn('sync_range', 'string', ['notnull' => false, 'length' => 50]);
-        $table->addColumn('website_id', 'integer', ['notnull' => false]);
-        $table->addColumn('websites', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
-        $table->addColumn('is_extension_installed', 'boolean', ['notnull' => false]);
-        $table->addColumn('is_wsi_mode', 'boolean', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_integration_transport **/
 
