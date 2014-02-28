@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\Guess\TypeGuess;
+
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
@@ -31,17 +33,32 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
      */
     protected $workflowRegistry;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $formRegistry;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $attributeGuesser;
+
+
     protected function setUp()
     {
         parent::setUp();
 
+        $this->formRegistry = $this->createFormRegistryMock();
         $this->workflowRegistry = $this->createWorkflowRegistryMock();
+        $this->attributeGuesser = $this->createAttributeGuesserMock();
         $this->defaultValuesListener = $this->createDefaultValuesListenerMock();
         $this->initActionListener = $this->createInitActionsListenerMock();
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
 
         $this->type = $this->createWorkflowAttributesType(
+            $this->formRegistry,
             $this->workflowRegistry,
+            $this->attributeGuesser,
             $this->defaultValuesListener,
             $this->initActionListener,
             $this->requiredAttributesListener
@@ -56,6 +73,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $formData,
         array $formOptions,
         array $childrenOptions,
+        array $guessedData = array(),
         $sourceWorkflowData = null
     ) {
         // Check default values listener is subscribed or not subscribed
@@ -95,6 +113,29 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ->with($this->isInstanceOf('Symfony\Component\Form\FormEvent'));
         } else {
             $this->requiredAttributesListener->expects($this->never())->method($this->anything());
+        }
+
+        // Set guessed data for attributes
+        $formTypeGuesser = $this->getMockForAbstractClass('Symfony\Component\Form\FormTypeGuesserInterface');
+        $this->formRegistry->expects($this->any())
+            ->method('getTypeGuesser')
+            ->will($this->returnValue($formTypeGuesser));
+
+        foreach ($guessedData as $number => $guess) {
+            $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+            $metadata->expects($this->any())
+                ->method('getName')
+                ->will($this->returnValue($guess['class']));
+            $this->attributeGuesser->expects($this->at($number))
+                ->method('guessMetadataAndField')
+                ->with($guess['entity'], $guess['property_path'])
+                ->will($this->returnValue(array('metadata' => $metadata, 'field' => $guess['field'])));
+
+            $typeGuess = new TypeGuess($guess['form_type'], $guess['form_options'], TypeGuess::VERY_HIGH_CONFIDENCE);
+            $formTypeGuesser->expects($this->at($number))
+                ->method('guessType')
+                ->with($guess['class'], $guess['field'])
+                ->will($this->returnValue($typeGuess));
         }
 
         $form = $this->factory->create($this->type, $sourceWorkflowData, $formOptions);
@@ -198,6 +239,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),
                 ),
+                'guessedData' => array(),
                 'sourceWorkflowData' => $this->createWorkflowData(
                     array(
                         'first' => 'first_string',
@@ -227,6 +269,42 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     'first'  => array('label' => 'First', 'required' => true, 'disabled' => true),
                     'second' => array('label' => 'Second', 'required' => false, 'disabled' => true),
                 )
+            ),
+            'guessed_fields' => array(
+                'submitData' => array('first' => 'first_string'),
+                'formData' => $this->createWorkflowData(array('first' => 'first_string')),
+                'formOptions' => array(
+                    'workflow' => $workflow = $this->createWorkflow(
+                        'test_workflow_with_attributes',
+                        array('first' => $this->createAttribute('first', null, null, 'entity.association.first')),
+                        array(),
+                        'RelatedEntity'
+                    ),
+                    'workflow_item' => $this->createWorkflowItem($workflow),
+                    'attribute_fields' => array(
+                        'first'  => array()
+                    ),
+                ),
+                'childrenOptions' => array(
+                    'first'  => array(
+                        'label' => 'Guessed Label',
+                        'max_length' => 50,
+                        'required' => false
+                    ),
+                ),
+                'guessedData' => array(
+                    array(
+                        'entity' => 'RelatedEntity',
+                        'property_path' => 'entity.association.first',
+                        'class' => 'AssociationEntity',
+                        'field' => 'first',
+                        'form_type' => 'text',
+                        'form_options' => array(
+                            'label' => 'Guessed Label',
+                            'max_length' => 50,
+                        )
+                    )
+                ),
             )
         );
     }
@@ -285,6 +363,23 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                     ),
                 )
             ),
+            'form_type_cant_guessed' => array(
+                'expectedException' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
+                'expectedMessage' =>
+                    'Parameter "form_type" must be defined for attribute "test" in workflow "test_workflow".',
+                'options' => array(
+                    'workflow' => $this->createWorkflow(
+                        'test_workflow',
+                        array(
+                            'test' => $this->createAttribute('test', null, null, 'entity.field')
+                        )
+                    ),
+                    'workflow_item' => $this->createWorkflowItem($workflow),
+                    'attribute_fields' => array(
+                        'test'  => array()
+                    ),
+                )
+            ),
         );
     }
 
@@ -300,5 +395,10 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->with($expectedWorkflow->getName())->will($this->returnValue($expectedWorkflow));
 
         $this->factory->create($this->type, null, $options);
+    }
+
+    protected function setFormTypeGuesser(array $guessedData)
+    {
+
     }
 }

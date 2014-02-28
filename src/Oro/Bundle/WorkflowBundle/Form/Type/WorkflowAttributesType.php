@@ -7,12 +7,16 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\Form\FormRegistry;
+use Symfony\Component\Form\FormTypeGuesserInterface;
+
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
@@ -21,14 +25,19 @@ class WorkflowAttributesType extends AbstractType
     const NAME = 'oro_workflow_attributes';
 
     /**
+     * @var FormRegistry
+     */
+    protected $formRegistry;
+
+    /**
      * @var WorkflowRegistry
      */
     protected $workflowRegistry;
 
     /**
-     * @var WorkflowData
+     * @var AttributeGuesser
      */
-    protected $workflowData;
+    protected $attributeGuesser;
 
     /**
      * @var DefaultValuesListener
@@ -46,18 +55,29 @@ class WorkflowAttributesType extends AbstractType
     protected $requiredAttributesListener;
 
     /**
+     * @var FormTypeGuesserInterface
+     */
+    protected $formTypeGuesser;
+
+    /**
+     * @param FormRegistry $formRegistry
      * @param WorkflowRegistry $workflowRegistry
+     * @param AttributeGuesser $attributeGuesser,
      * @param DefaultValuesListener $defaultValuesListener
      * @param InitActionsListener $initActionsListener
      * @param RequiredAttributesListener $requiredAttributesListener
      */
     public function __construct(
+        FormRegistry $formRegistry,
         WorkflowRegistry $workflowRegistry,
+        AttributeGuesser $attributeGuesser,
         DefaultValuesListener $defaultValuesListener,
         InitActionsListener $initActionsListener,
         RequiredAttributesListener $requiredAttributesListener
     ) {
+        $this->formRegistry = $formRegistry;
         $this->workflowRegistry = $workflowRegistry;
+        $this->attributeGuesser = $attributeGuesser;
         $this->defaultValuesListener = $defaultValuesListener;
         $this->initActionsListener = $initActionsListener;
         $this->requiredAttributesListener = $requiredAttributesListener;
@@ -161,6 +181,14 @@ class WorkflowAttributesType extends AbstractType
         /** @var Workflow $workflow */
         $workflow = $options['workflow'];
 
+        // updates form options
+        if (!isset($attributeOptions['options'])) {
+            $attributeOptions['options'] = array();
+        }
+
+        // try to guess form type and form options
+        $attributeOptions = $this->guessAttributeOptions($workflow, $attribute, $attributeOptions);
+
         // ensure has form_type
         if (empty($attributeOptions['form_type'])) {
             throw new InvalidConfigurationException(
@@ -170,11 +198,6 @@ class WorkflowAttributesType extends AbstractType
                     $workflow->getName()
                 )
             );
-        }
-
-        // updates form options
-        if (!isset($attributeOptions['options'])) {
-            $attributeOptions['options'] = array();
         }
 
         // updates form options label
@@ -245,6 +268,56 @@ class WorkflowAttributesType extends AbstractType
                 },
             )
         );
+    }
+
+    /**
+     * @param Workflow $workflow
+     * @param Attribute $attribute
+     * @param array $attributeOptions
+     * @return array
+     */
+    protected function guessAttributeOptions(Workflow $workflow, Attribute $attribute, array $attributeOptions)
+    {
+        if (!empty($attributeOptions['form_type'])) {
+            return $attributeOptions;
+        }
+
+        $propertyPath = $attribute->getPropertyPath();
+        if (!$propertyPath) {
+            return $attributeOptions;
+        }
+
+        $relatedEntity = $workflow->getDefinition()->getRelatedEntity();
+        $attributeParameters = $this->attributeGuesser->guessMetadataAndField($relatedEntity, $propertyPath);
+        if (!$attributeParameters) {
+            return $attributeOptions;
+        }
+
+        /** @var ClassMetadata $metadata */
+        $metadata = $attributeParameters['metadata'];
+        $class = $metadata->getName();
+        $field = $attributeParameters['field'];
+
+        $typeGuess = $this->getFormTypeGuesser()->guessType($class, $field);
+        $attributeOptions['form_type'] = $typeGuess->getType();
+        $attributeOptions['options'] = array_merge_recursive($attributeOptions['options'], $typeGuess->getOptions());
+        if (!array_key_exists('required', $attributeOptions['options'])) {
+            $attributeOptions['options']['required'] = false;
+        }
+
+        return $attributeOptions;
+    }
+
+    /**
+     * @return FormTypeGuesserInterface
+     */
+    protected function getFormTypeGuesser()
+    {
+        if (!$this->formTypeGuesser) {
+            $this->formTypeGuesser = $this->formRegistry->getTypeGuesser();
+        }
+
+        return $this->formTypeGuesser;
     }
 
     /**
