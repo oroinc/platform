@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroCalendarBundle implements Migration
 {
