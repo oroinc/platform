@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendOptionBuilder
 {
@@ -39,20 +40,75 @@ class ExtendOptionBuilder
     {
         $entityClassName = $this->getEntityClassName($tableName);
 
-        var_dump($entityClassName);
-
         if (!isset($this->result[$entityClassName])) {
             $this->result[$entityClassName] = [];
         }
         if (!isset($this->result[$entityClassName]['fields'])) {
             $this->result[$entityClassName]['fields'] = [];
         }
+
+        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])
+            && isset($options['extend'])
+            && isset($options['extend']['target'])
+        ) {
+
+            if ((
+                    $columnType == 'manyToOne'
+                    && (
+                        empty($options['extend']['target']['table_name'])
+                        || empty($options['extend']['target']['column'])
+                    )
+                )
+                || (
+                    in_array($columnType, ['oneToMany', 'manyToMany'])
+                    && (
+                        empty($options['extend']['target']['table_name'])
+                        || empty($options['extend']['target']['title_columns'])
+                        || empty($options['extend']['target']['grid_columns'])
+                        || empty($options['extend']['target']['detailed_columns'])
+                    )
+                )
+            ) {
+                throw new \RuntimeException(
+                    sprintf('Configuration error for table "%s" column "%s"', $tableName, $columnName)
+                );
+            }
+
+            foreach ($options['extend']['target'] as $optionName => $optionValue) {
+                switch ($optionName) {
+                    case 'table_name':
+                        $options['extend']['target_entity'] =
+                            $this->entityClassResolver->getEntityClassByTableName($optionValue);
+                        break;
+                    case 'column':
+                        $options['extend']['target_field'] = $optionValue;
+                        break;
+                    case 'title_columns':
+                        $options['extend']['target_title'] = $optionValue;
+                        break;
+                    case 'grid_columns':
+                        $options['extend']['target_grid'] = $optionValue;
+                        break;
+                    case 'detailed_columns':
+                        $options['extend']['target_detailed'] = $optionValue;
+                        break;
+                }
+            }
+
+            $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
+                $entityClassName,
+                $columnName,
+                $columnType,
+                $options['extend']['target_entity']
+            );
+
+            unset($options['extend']['target']);
+        }
+
         $this->result[$entityClassName]['fields'][$columnName] = [
             'type'    => $columnType,
             'configs' => $options
         ];
-
-        var_dump($this->result);
     }
 
     /**
