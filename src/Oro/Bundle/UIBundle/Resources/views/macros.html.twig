@@ -89,22 +89,21 @@
     Create the link
     Parameters - array:
         [
-            'path' - button url
+            'path'  - button url
             'class' - default class
-            'aClass' - additional button class
+            'aCss'  - additional button class
             'title' - button title
-            'iClass' - css class for 'i' tag (icon)
+            'iCss'  - css class for 'i' tag (icon)
             'label' - button label
         ]
 #}
 {% macro link(parameters) %}
     <a href="{{ parameters.path }}"
-       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aClass is defined? parameters.aClass : '' }}"
+       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
        title="{{ parameters.title|trans }}">
-        {% if parameters.iClass is defined %}
-            <i class="{{ parameters.iClass }} hide-text" >{{ parameters.label|trans }}</i>
-        {% endif %}
-        {{ parameters.label|trans }}
+        {% if parameters.iCss is defined %}
+            <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        {% endif %}{{ parameters.label|trans }}
     </a>
 {% endmacro %}
 
@@ -112,10 +111,10 @@
     Create the button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title
-            'iClass' - css class for 'i' tag (icon)
+            'iCss'  - css class for 'i' tag (icon)
             'label' - button label
         ]
 #}
@@ -158,10 +157,10 @@
     Create the dropdown button item
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title
-            'iClass' - css class for 'i' tag (icon)
+            'iCss'  - css class for 'i' tag (icon)
             'label' - button label
         ]
 #}
@@ -183,21 +182,21 @@
     Create 'Edit' button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title | 'Edit' by default
             'label' - button label | 'Edit' by default
             'entity_label' - if specified will be added for title and label
         ]
 #}
 {% macro editButton(parameters) %}
-    {% set iClass = ['icon-edit'] %}
-    {% set aClass = ['edit-button', 'main-group'] %}
-    {% if parameters.iClass is defined %}
-        {% set iClass = parameters.iClass|split(' ')|merge(iClass) %}
+    {% set iCss = ['icon-edit'] %}
+    {% set aCss = ['edit-button', 'main-group'] %}
+    {% if parameters.iCss is defined %}
+        {% set iCss = parameters.iCss|split(' ')|merge(iCss) %}
     {% endif %}
-    {% if parameters.aClass is defined %}
-        {% set aClass = parameters.aClass|split(' ')|merge(aClass) %}
+    {% if parameters.aCss is defined %}
+        {% set aCss = parameters.aCss|split(' ')|merge(aCss) %}
     {% endif %}
     {% set title = parameters.title is defined
         ? parameters.title
@@ -208,8 +207,8 @@
         : 'Edit'|trans
     %}
     {% set parameters = parameters|merge({
-        'iClass': iClass|join(' '),
-        'aClass': aClass|join(' '),
+        'iCss': iCss|join(' '),
+        'aCss': aCss|join(' '),
         'title': title,
         'label': label
     }) %}
@@ -220,8 +219,8 @@
     Create 'add' button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title | 'Create' by default
             'label' - button label | 'Create' by default
             'entity_label' - if specified will be added for title and label
@@ -229,7 +228,7 @@
 #}
 {% macro addButton(parameters) %}
     <a href="{{ parameters.path }}"
-        class="btn main-group btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
+        class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
         title="{{ parameters.title is defined ? parameters.title : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
     >
         {{ parameters.label is defined ? parameters.label : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}
