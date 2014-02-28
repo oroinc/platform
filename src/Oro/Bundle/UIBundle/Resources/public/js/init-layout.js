@@ -168,14 +168,21 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
             $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         });
+
+        layout.pageRendered();
+    });
+
+    mediator.bind('hash_navigation_request:before', function () {
+        layout.pageRendering();
     });
 
     /**
      * Init page layout js and hide progress bar after hash navigation request is completed
      */
     mediator.bind("hash_navigation_request:complete", function () {
-        layout.hideProgressBar();
         layout.init();
+        layout.hideProgressBar();
+        layout.pageRendered();
     });
 
     /* ============================================================
@@ -258,7 +265,7 @@ require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'o
                 .appendTo($(document.body));
         }
 
-        mediator.once("page-rendered", function () {
+        layout.onPageRendered(function () {
             var debugBar = $('.sf-toolbar');
             if (debugBar.length) {
                 waitForDebugBar();

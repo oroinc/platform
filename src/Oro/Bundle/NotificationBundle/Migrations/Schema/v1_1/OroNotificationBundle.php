@@ -13,10 +13,10 @@ class OroNotificationBundle implements Migration
     public function up(Schema $schema)
     {
         return [
-            "ALTER TABLE oro_notification_emailnotification RENAME TO oro_notification_emailnotif;",
-            "ALTER TABLE oro_notification_recipient_list RENAME TO oro_notification_recipient_lst;",
-            "ALTER TABLE oro_notification_recipient_user RENAME TO oro_notification_recipient_usr;",
-            "ALTER TABLE oro_notification_recipient_group RENAME TO oro_notification_recipient_grp;",
+            "ALTER TABLE oro_notification_emailnotification RENAME TO oro_notification_email_notif;",
+            "ALTER TABLE oro_notification_recipient_list RENAME TO oro_notification_recip_list;",
+            "ALTER TABLE oro_notification_recipient_user RENAME TO oro_notification_recip_user;",
+            "ALTER TABLE oro_notification_recipient_group RENAME TO oro_notification_recip_group;",
         ];
     }
 }

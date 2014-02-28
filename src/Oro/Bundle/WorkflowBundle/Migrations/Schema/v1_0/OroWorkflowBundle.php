@@ -9,7 +9,6 @@ class OroWorkflowBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
@@ -148,7 +147,7 @@ class OroWorkflowBundle implements Migration
      * @param Schema $schema
      * @param string $tableName
      */
-    public static function oroWorkflowEntityAclIdentityTable(Schema $schema, $tableName = '')
+    public static function oroWorkflowEntityAclIdentityTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_workflow_entity_acl_identity **/
         $table = $schema->createTable($tableName ? : 'oro_workflow_entity_acl_identity');
@@ -288,7 +287,7 @@ class OroWorkflowBundle implements Migration
      * @param Schema $schema
      * @param string $tableName
      */
-    public static function oroWorkflowEntityAclIdentityForeignKeys(Schema $schema, $tableName = '')
+    public static function oroWorkflowEntityAclIdentityForeignKeys(Schema $schema, $tableName = null)
     {
         /** Generate foreign keys for table oro_workflow_entity_acl_identity **/
         $table = $schema->getTable($tableName ? : 'oro_workflow_entity_acl_identity');

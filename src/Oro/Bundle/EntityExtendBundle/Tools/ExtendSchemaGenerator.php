@@ -5,20 +5,16 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ExtendSchemaGenerator
 {
     /** @var  ConfigManager */
     protected $configManager;
 
-    /** @var  ExtendManager */
-    protected $extendManager;
-
-    public function __construct(ConfigManager $configManager, ExtendManager $extendManager)
+    public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
-        $this->extendManager = $extendManager;
     }
 
     /**
@@ -27,11 +23,8 @@ class ExtendSchemaGenerator
     public function parseConfigs($configs = [])
     {
         if ($configs) {
-            foreach ($configs as $className => $entityOptions) {
-                $className = class_exists($className)
-                    ? $className
-                    : ExtendConfigDumper::ENTITY . $className;
-                $this->parseEntity($className, $entityOptions);
+            foreach ($configs as $className => $options) {
+                $this->parseEntity($className, $options);
             }
 
             $this->configManager->flush();
@@ -60,93 +53,50 @@ class ExtendSchemaGenerator
     }
 
     /**
-     * @param string $className     Entity's class name
-     * @param array  $entityOptions Entity's options
+     * @param string $className Entity's class name
+     * @param array  $options   Entity's options
      * @throws \InvalidArgumentException
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function parseEntity($className, $entityOptions)
+    protected function parseEntity($className, $options)
     {
-        $configProvider = $this->extendManager->getConfigProvider();
-
         if (class_exists($className)) {
             $this->checkExtend($className);
         }
 
         if (!$this->configManager->hasConfig($className)) {
-            $this->createEntityModel($className, $entityOptions);
-            $this->setDefaultConfig($entityOptions, $className);
-
-            $entityConfig = $configProvider->getConfig($className);
-
-            $entityConfig->set(
-                'owner',
-                isset($entityOptions['owner']) ? $entityOptions['owner'] : ExtendManager::OWNER_SYSTEM
+            $this->createEntityModel(
+                $className,
+                isset($options['mode']) ? $options['mode'] : ConfigModelManager::MODE_DEFAULT,
+                isset($options['configs']) ? $options['configs'] : []
             );
-
-            if (isset($entityOptions['is_extend'])) {
-                $entityConfig->set('is_extend', $entityOptions['is_extend']);
-            } else {
-                $entityConfig->set('is_extend', false);
-            }
         }
 
-        if (isset($entityOptions['fields'])) {
-            foreach ($entityOptions['fields'] as $fieldName => $fieldConfig) {
-                if ($this->configManager->hasConfig($className, $fieldName)) {
-                    throw new \InvalidArgumentException(
-                        sprintf('Field "%s" for Entity "%s" already added', $fieldName, $className)
-                    );
-                }
-
-                $mode = ConfigModelManager::MODE_DEFAULT;
-                if (isset($fieldConfig['mode'])) {
-                    $mode = $fieldConfig['mode'];
-                }
-
-                $owner = ExtendManager::OWNER_SYSTEM;
-                if (isset($fieldConfig['owner'])) {
-                    $owner = $fieldConfig['owner'];
-                }
-
-                $isExtend = false;
-                if (isset($fieldConfig['is_extend'])) {
-                    $isExtend = $fieldConfig['is_extend'];
-                }
-
-                $this->extendManager->createField(
+        if (isset($options['fields'])) {
+            foreach ($options['fields'] as $fieldName => $fieldOptions) {
+                $this->createFieldModel(
                     $className,
                     $fieldName,
-                    $fieldConfig,
-                    $owner,
-                    $mode
+                    $fieldOptions['type'],
+                    isset($fieldOptions['mode']) ? $fieldOptions['mode'] : ConfigModelManager::MODE_DEFAULT,
+                    $fieldOptions
                 );
-
-                $this->setDefaultConfig($entityOptions, $className, $fieldName);
-
-                $config = $configProvider->getConfig($className, $fieldName);
-                $config->set('state', ExtendManager::STATE_NEW);
-                $config->set('is_extend', $isExtend);
-
-                $this->configManager->persist($config);
             }
         }
     }
 
     /**
-     * @param $entityName
-     * @param $entityConfig
-     * @return void
+     * @param string $className
+     * @param string $mode
+     * @param array  $configOptions
      */
-    protected function createEntityModel($entityName, $entityConfig)
+    protected function createEntityModel($className, $mode, array $configOptions)
     {
-        $mode = isset($entityConfig['mode']) ? $entityConfig['mode'] : ConfigModelManager::MODE_DEFAULT;
+        $this->configManager->createConfigEntityModel($className, $mode);
 
-        $this->configManager->createConfigEntityModel($entityName, $mode);
-
-        if (class_exists($entityName)) {
-            $doctrineMetadata = $this->configManager->getEntityManager()->getClassMetadata($entityName);
+        if (class_exists($className)) {
+            $doctrineMetadata = $this->configManager->getEntityManager()->getClassMetadata($className);
             foreach ($doctrineMetadata->getFieldNames() as $fieldName) {
                 $type = $doctrineMetadata->getTypeOfField($fieldName);
                 $this->configManager->createConfigFieldModel($doctrineMetadata->getName(), $fieldName, $type);
@@ -157,26 +107,45 @@ class ExtendSchemaGenerator
                 $this->configManager->createConfigFieldModel($doctrineMetadata->getName(), $fieldName, $type);
             }
         }
+
+        $this->updateConfigs($configOptions, $className);
+    }
+
+    protected function createFieldModel($className, $fieldName, $fieldType, $mode, array $configOptions)
+    {
+        if ($this->configManager->hasConfig($className, $fieldName)) {
+            throw new \InvalidArgumentException(
+                sprintf('Field "%s" for Entity "%s" already added', $fieldName, $className)
+            );
+        }
+
+        $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, $mode);
+
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
+        $extendConfig->set('state', ExtendScope::STATE_NEW);
+        $extendConfig->set('extend', true);
+        if (isset($fieldConfig['options'])) {
+            foreach ($fieldConfig['options'] as $key => $value) {
+                $extendConfig->set($key, $value);
+            }
+        }
+        $this->configManager->persist($extendConfig);
+
+        if (isset($configOptions['configs'])) {
+            $this->updateConfigs($configOptions['configs'], $className, $fieldName);
+        }
     }
 
     /**
-     * @param array  $options
-     * @param string $entityName
-     * @param string $fieldName
+     * @param array       $options
+     * @param string      $className
+     * @param string|null $fieldName
      */
-    protected function setDefaultConfig($options, $entityName, $fieldName = null)
+    protected function updateConfigs(array $options, $className, $fieldName = null)
     {
-        if ($fieldName) {
-            $config = isset($options['fields'][$fieldName]['configs'])
-                ? $options['fields'][$fieldName]['configs']
-                : array();
-        } else {
-            $config = isset($options['configs']) ? $options['configs'] : array();
-        }
-
-        foreach ($config as $scope => $values) {
-            $config = $this->configManager->getProvider($scope)->getConfig($entityName, $fieldName);
-
+        foreach ($options as $scope => $values) {
+            $config = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
             foreach ($values as $key => $value) {
                 $config->set($key, $value);
             }

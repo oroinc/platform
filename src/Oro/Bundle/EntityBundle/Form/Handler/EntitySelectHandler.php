@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\EntityBundle\Form\Type\EntitySelectType;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
@@ -91,10 +91,10 @@ class EntitySelectHandler implements SearchHandlerInterface
 
         $this->entityName = str_replace('_', '\\', $targetEntity);
 
-        $fieldConfig = $this->entityManager->getExtendManager()->getConfigProvider()
+        $fieldConfig = $this->entityManager->getExtendConfigProvider()
             ->getConfig($this->entityName, $targetField);
 
-        if ($fieldConfig->is('owner', ExtendManager::OWNER_CUSTOM)) {
+        if ($fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
             $this->isCustomField = true;
         }
 

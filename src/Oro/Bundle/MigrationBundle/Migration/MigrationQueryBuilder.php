@@ -5,7 +5,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\Mapping\MappingException;
+use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
 class MigrationQueryBuilder
 {
@@ -35,11 +35,13 @@ class MigrationQueryBuilder
     }
 
     /**
+     * Gets a list of SQL queries can be used to apply database changes
+     *
      * @param Migration[] $migrations
-     * @throws \Doctrine\ORM\Mapping\MappingException
      * @return array
      *   'migration' => class name of a migration
      *   'queries'   => a list of sql queries (a query can be a string or instance of MigrationQuery)
+     * @throws InvalidNameException if invalid table or column name is detected
      */
     public function getQueries(array $migrations)
     {
@@ -48,14 +50,13 @@ class MigrationQueryBuilder
         $platform   = $this->connection->getDatabasePlatform();
         $fromSchema = $this->getSchema();
         foreach ($migrations as $migration) {
-            $toSchema   = $this->cloneSchema($fromSchema);
+            $toSchema   = clone $fromSchema;
             $queries    = $migration->up($toSchema);
             $comparator = new Comparator();
             $schemaDiff = $comparator->compare($fromSchema, $toSchema);
 
             $this->checkTableNameLengths($schemaDiff->newTables, $migration);
 
-            /** @var \Doctrine\DBAL\Schema\TableDiff $changedTables */
             $changedTables = $schemaDiff->changedTables;
             foreach ($changedTables as $tableName => $diff) {
                 $this->checkColumnsNameLength(
@@ -80,12 +81,9 @@ class MigrationQueryBuilder
         return $result;
     }
 
-    protected function cloneSchema(Schema $schema)
-    {
-        return clone $schema;
-    }
-
     /**
+     * Gets a database schema
+     *
      * @return Schema
      */
     protected function getSchema()
@@ -96,13 +94,13 @@ class MigrationQueryBuilder
     /**
      * @param \Doctrine\DBAL\Schema\Table[] $tables
      * @param Migration $migration
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws InvalidNameException
      */
     protected function checkTableNameLengths($tables, Migration $migration)
     {
         foreach ($tables as $table) {
             if (strlen($table->getName()) > self::MAX_TABLE_NAME_LENGTH) {
-                throw new MappingException(
+                throw new InvalidNameException(
                     sprintf(
                         'Max table name length is %s. Please correct "%s" table in "%s" migration',
                         self::MAX_TABLE_NAME_LENGTH,
@@ -120,13 +118,13 @@ class MigrationQueryBuilder
      * @param string $tableName
      * @param \Doctrine\DBAL\Schema\Column[] $columns
      * @param Migration $migration
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws InvalidNameException
      */
     protected function checkColumnsNameLength($tableName, $columns, Migration $migration)
     {
         foreach ($columns as $column) {
             if (strlen($column->getName()) > self::MAX_TABLE_NAME_LENGTH) {
-                throw new MappingException(
+                throw new InvalidNameException(
                     sprintf(
                         'Max column name length is %s. Please correct "%s:%s" column in "%s" migration',
                         self::MAX_TABLE_NAME_LENGTH,

@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -75,8 +75,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                         $ownerFieldName,
                         [
                             'extend'        => true,
-                            'state'         => ExtendManager::STATE_NEW,
-                            'owner'         => ExtendManager::OWNER_CUSTOM,
+                            'state'         => ExtendScope::STATE_NEW,
+                            'owner'         => ExtendScope::OWNER_CUSTOM,
                             'target_entity' => $ownerTargetEntity,
                             'target_field'  => 'id',
                             'relation_key'  =>

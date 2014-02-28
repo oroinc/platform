@@ -18,7 +18,7 @@ use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -85,7 +85,7 @@ class EntitiesController extends Controller
         $fields = $extendProvider->filter(
             function (ConfigInterface $config) use ($relationConfig) {
                 return
-                    !$config->is('state', ExtendManager::STATE_NEW)
+                    !$config->is('state', ExtendScope::STATE_NEW)
                     && !$config->is('is_deleted')
                     && in_array($config->getId()->getFieldName(), $relationConfig->get('target_detailed'));
             },

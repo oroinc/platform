@@ -9,12 +9,9 @@ class OroInstallerBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        // @codingStandardsIgnoreStart
-
         /** Generate table oro_installer_bundle_version **/
         $table = $schema->createTable('oro_installer_bundle_version');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -23,8 +20,6 @@ class OroInstallerBundle implements Migration
         $table->addColumn('demo_data_version', 'string', ['notnull' => false, 'length' => 15]);
         $table->setPrimaryKey(['id']);
         /** End of generate table oro_installer_bundle_version **/
-
-        // @codingStandardsIgnoreEnd
 
         return [];
     }

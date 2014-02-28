@@ -85,8 +85,6 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                 }
             }
         }
-
-        $output->writeln('Done.');
     }
 
     /**

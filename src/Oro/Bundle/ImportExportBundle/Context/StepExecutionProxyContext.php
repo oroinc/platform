@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Context;
 
-use Oro\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
 class StepExecutionProxyContext implements ContextInterface
 {

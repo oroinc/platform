@@ -13,7 +13,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Extend\ExtendManager;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
@@ -171,9 +171,9 @@ class ExtendExtension extends AbstractExtension
             $fieldIds = $entityProvider->getIds($entityName);
             foreach ($fieldIds as $fieldId) {
                 $extendConfig = $extendProvider->getConfigById($fieldId);
-                if ($extendConfig->is('owner', ExtendManager::OWNER_CUSTOM)
+                if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
                     && $datagridProvider->getConfigById($fieldId)->is('is_visible')
-                    && !$extendConfig->is('state', ExtendManager::STATE_NEW)
+                    && !$extendConfig->is('state', ExtendScope::STATE_NEW)
                     && !$extendConfig->is('is_deleted')
                 ) {
                     $fields[] = $fieldId;

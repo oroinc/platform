@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
+use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 
 class ExtendSchema extends Schema
@@ -15,8 +16,8 @@ class ExtendSchema extends Schema
 
     /**
      * @param ExtendOptionManager $extendOptionManager
-     * @param array               $tables
-     * @param array               $sequences
+     * @param Table[]             $tables
+     * @param Sequence[]          $sequences
      * @param SchemaConfig        $schemaConfig
      */
     public function __construct(
@@ -26,13 +27,7 @@ class ExtendSchema extends Schema
         SchemaConfig $schemaConfig = null
     ) {
         $this->extendOptionManager = $extendOptionManager;
-
-        $extendTables = [];
-        foreach ($tables as $table) {
-            $extendTables[] = new ExtendTable($this, $this->extendOptionManager, $table);
-        }
-
-        parent::__construct($extendTables, $sequences, $schemaConfig);
+        parent::__construct($tables, $sequences, $schemaConfig);
     }
 
     /**
@@ -48,15 +43,34 @@ class ExtendSchema extends Schema
      */
     public function createTable($tableName)
     {
-        $baseTable = new Table($tableName);
-        $table = new ExtendTable($this, $this->extendOptionManager, $baseTable);
+        parent::createTable($tableName);
 
-        $this->_addTable($table);
+        return $this->getTable($tableName);
+    }
 
-        foreach ($this->_schemaConfig->getDefaultTableOptions() as $name => $value) {
-            $table->addOption($name, $value);
+    /**
+     * {@inheritdoc}
+     */
+    // @codingStandardsIgnoreStart
+    protected function _addTable(Table $table)
+    {
+        if (!($table instanceof ExtendTable)) {
+            $table = new ExtendTable($this->extendOptionManager, $table);
         }
+        $table->setSchema($this);
+        parent::_addTable($table);
+    }
+    // @codingStandardsIgnoreEnd
 
-        return $table;
+    /**
+     * {@inheritdoc}
+     */
+    public function __clone()
+    {
+        parent::__clone();
+        /** @var ExtendTable $table */
+        foreach ($this->_tables as $table) {
+            $table->setSchema($this);
+        }
     }
 }

@@ -9,11 +9,9 @@ class OroEntityConfigBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function up(Schema $schema)
     {
-        // @codingStandardsIgnoreStart
         self::oroEntityConfigTable($schema);
         self::oroEntityConfigFieldTable($schema);
         self::oroEntityConfigLogTable($schema);
@@ -28,7 +26,6 @@ class OroEntityConfigBundle implements Migration
         self::oroEntityConfigValueForeignKeys($schema);
         self::oroEntityConfigFieldForeignKeys($schema);
         self::oroEntityConfigLogForeignKeys($schema);
-        // @codingStandardsIgnoreEnd
 
         return [];
     }
@@ -135,7 +132,7 @@ class OroEntityConfigBundle implements Migration
      * @param Schema $schema
      * @param string $tableName
      */
-    public static function oroEntityConfigOptionsetRelationTable(Schema $schema, $tableName = '')
+    public static function oroEntityConfigOptionsetRelationTable(Schema $schema, $tableName = null)
     {
         /** Generate table oro_entity_config_optionset_relation **/
         $table = $schema->createTable($tableName ? : 'oro_entity_config_optionset_relation');
@@ -213,7 +210,7 @@ class OroEntityConfigBundle implements Migration
      * @param Schema $schema
      * @param string $tableName
      */
-    public static function oroEntityConfigOptionsetRelationForeignKeys(Schema $schema, $tableName = '')
+    public static function oroEntityConfigOptionsetRelationForeignKeys(Schema $schema, $tableName = null)
     {
         /** Generate foreign keys for table oro_entity_config_optionset_relation **/
         $table = $schema->getTable($tableName ? : 'oro_entity_config_optionset_relation');
