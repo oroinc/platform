@@ -37,7 +37,7 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/
                                 var allowMultiple     = controlElement.data('widget-multiple');
                                 var reloadEvent       = controlElement.data('widget-reload-event')
                                     || 'widget_success:' + widgetOptions.alias;
-                                var reloadGridName    = controlElement.data('widget-gridname');
+                                var reloadGridName    = controlElement.data('widget-reload-grid-name');
                                 var reloadWidgetAlias = controlElement.data('widget-reload-widget-alias');
 
                                 if (!widgetOptions.url && controlElement.data('url')) {

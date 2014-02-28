@@ -323,7 +323,7 @@
         style="display: none"
         {% endif -%}
         {% if parameters.widget is defined and parameters.widget|length %}
-            {{ _self.renderWidgetElementAttributes(parameters.widget) }}
+            {{ _self.renderWidgetDataAttributes(parameters.widget) }}
         {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
@@ -332,7 +332,7 @@
     </a>
 {% endmacro %}
 
-{% macro renderWidgetElementAttributes(options) %}
+{% macro renderWidgetDataAttributes(options) %}
     {{ _self.renderAttributes(options, 'widget') }}
 {% endmacro %}
 
@@ -645,88 +645,3 @@
         <a href="tel:{{ phone|raw }}" title="{{ title|escape }}">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
-
-{#
-    Render tab panel
-    Tabs - array:
-        [
-            name           - tab name
-            options        - route options
-        ]
-#}
-{% macro dynamicTabPanel(name, options) %}
-    {% set menu = oro_menu_get(name, {}, options) %}
-    {% set tabs = {} %}
-    {% for child in menu.children %}
-        {% set tabs = tabs|merge([{
-            'alias': child.name,
-            'url': path(child.extras.routes.0, options),
-            'label': child.label,
-            'widgetType': child.extras.widgetType
-        }]) %}
-    {% endfor %}
-    {{ _self.tabPanel(tabs, options) }}
-{% endmacro %}
-
-{#
-    Render tab panel
-    Tabs - array:
-        [
-            alias      - widget alias
-            url        - wiget url
-            label      - tab label
-            widgetType - wiget type
-        ]
-#}
-{% macro tabPanel(tabs, options) %}
-    {% set containerAlias = 'tab' %}
-    {% for tab in tabs %}
-        {% set containerAlias = containerAlias ~ '-' ~ tab.alias %}
-    {% endfor %}
-
-    <div class="oro-tabs">
-        <ul class="nav nav-tabs">
-            {% for tab in tabs %}
-                {% set isFirstLoop = loop.index == 1 %}
-                <li{% if isFirstLoop %} class="active"{% endif %}>
-                    {% set widgetOptions = {
-                        'type': 'block',
-                        'multiple': false,
-                        'options': {
-                            'container': '#' ~ tab.alias,
-                            'loadingElement': '#' ~ containerAlias,
-                            'alias': tab.alias,
-                        }
-                    } %}
-
-                    {% set dataAttributes = {
-                        'target': '#' ~ tab.alias,
-                        'toggle': 'tab',
-                        'url': tab.url
-                    } %}
-
-                    {% if isFirstLoop %}
-                        {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
-                    {% endif %}
-
-                    {% set options = tab|merge({
-                        'widget': widgetOptions,
-                        'dataAttributes': dataAttributes,
-                        'label': tab.label
-                    }) %}
-
-                    {{ _self.clientLink(options) }}
-                </li>
-            {% endfor %}
-        </ul>
-
-        <div class="tab-content" id="{{ containerAlias }}">
-            {% for tab in tabs %}
-                {% set isFirstLoop = loop.index == 1 %}
-                <div class="tab-pane{% if isFirstLoop %} active{% endif %}" id="{{ tab.alias }}">
-                    {% if isFirstLoop %}{{ oro_widget_render(tab) }}{% endif %}
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-{% endmacro %}
