@@ -20,4 +20,4 @@ config:
         'oro/workflow-management/transition/view/row':        'bundles/oroworkflow/js/workflow-management/transition/view/row.js'
         'oro/workflow-management/transition/view/list-short': 'bundles/oroworkflow/js/workflow-management/transition/view/list-short.js'
         'oro/workflow-management/transition/view/row-short':  'bundles/oroworkflow/js/workflow-management/transition/view/row-short.js'
-        'oro/workflow-management/transition/view/add':        'bundles/oroworkflow/js/workflow-management/transition/view/add.js'
+        'oro/workflow-management/transition/view/edit':        'bundles/oroworkflow/js/workflow-management/transition/view/edit.js'

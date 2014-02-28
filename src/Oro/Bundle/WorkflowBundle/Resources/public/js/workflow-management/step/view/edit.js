@@ -27,11 +27,12 @@ function(_, Backbone, DialogWidget, Helper) {
 
         onStepAdd: function() {
             var formData = Helper.getFormData(this.widget.form);
+            var order = parseInt(formData.order);
 
             if (!this.model.get('name')) {
                 this.model.set('name', Helper.getNameByString(formData.label, 'step'));
             }
-            this.model.set('order', parseInt(formData.order));
+            this.model.set('order', order > 0 ? order : 0);
             this.model.set('is_final', formData.hasOwnProperty('is_final'));
             this.model.set('label', formData.label);
 
@@ -55,6 +56,7 @@ function(_, Backbone, DialogWidget, Helper) {
             });
             this.widget.render();
 
+            // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
                 'submitHandler': _.bind(this.onStepAdd, this)
