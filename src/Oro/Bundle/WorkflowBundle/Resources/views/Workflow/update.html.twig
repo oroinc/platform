@@ -55,10 +55,99 @@
 {% endblock stats %}
 
 {% block content_data %}
+    {% set requiredConstraint = {
+        "NotBlank": null
+    } %}
+    <script type="text/template" id="transition-form-template">
+        <form action="#">
+            <div class="row-fluid">
+                <div class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label required">{{ "Transition name"|trans }} <em>*</em></label>
+                        <div class="controls">
+                            <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label required">{{ "From step"|trans }}  <em>*</em></label>
+                        <div class="controls">
+                            <select name="step_from" data-validation="{{ requiredConstraint|json_encode }}"
+                                <% if (name) { %>disabled="disabled"<% } %>
+                            >
+                                <% _.each(allowedStepsFrom, function (step) { %>
+                                <option
+                                    value="<%= step.get('name') %>"
+                                    <% if (step.get('name') == stepFrom) { %>selected="selected"<% } %>
+                                ><%= step.get('label') %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label required">{{ "To step"|trans }}  <em>*</em></label>
+                        <div class="controls">
+                            <select name="step_to" data-validation="{{ requiredConstraint|json_encode }}">
+                                <option value=""></value>
+                                <% _.each(allowedStepsTo, function (step) { %>
+                                <option
+                                    value="<%= step.get('name') %>"
+                                    <% if (step.get('name') == step_to) { %>selected="selected"<% } %>
+                                ><%= step.get('label') %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label required">{{ "Display form as"|trans }}  <em>*</em></label>
+                        <div class="controls">
+                            <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
+                                <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
+                                <option value="page" <% if (display_type == 'page') { %>selected="selected"<% } %>>{{ "Separate page"|trans }}</value>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">{{ "Warning message"|trans }}</label>
+                        <div class="controls">
+                            <input type="text" name="message" value="<%= message %>">
+                        </div>
+                    </div>
+                </div>
+
+                <h5>{{ "Preconditions"|trans }}</h5>
+                <textarea disabled="disabled" style="width: 90%; height: 30px;"></textarea>
+
+                <h5>{{ "Attributes"|trans }}</h5>
+                <div class="transition-attributes-container"></div>
+
+                <h5>{{ "Validations"|trans }}</h5>
+                <textarea disabled="disabled" style="width: 90%; height: 30px;"></textarea>
+
+                <h5>{{ "Post actions"|trans }}</h5>
+                <textarea disabled="disabled" style="width: 90%; height: 30px;"></textarea>
+            </div>
+
+            <div class="widget-actions">
+                <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
+                <button type="submit" class="btn btn-success">{{ "Ok"|trans }}</button>
+            </div>
+        </form>
+    </script>
+
     <script type="text/template" id="step-form-template">
-        {% set stepNameConstraints = {
-            'NotBlank': null
-        } %}
+        {% set orderConstraints = requiredConstraint|merge({
+            "Range": {
+                "minMessage": "This value should be {{ limit }} or more."|trans,
+                "maxMessage": "This value should be {{ limit }} or less."|trans,
+                "invalidMessage": "This value should be a valid number."|trans,
+                "min": 0,
+                "max": null
+            }
+        }) %}
 
         <form action="#">
             <div class="row-fluid">
@@ -66,14 +155,14 @@
                     <div class="control-group">
                         <label class="control-label required">{{ "Name"|trans }} <em>*</em></label>
                         <div class="controls">
-                            <input type="text" name="label" value="<%= label %>" data-validation="{{ stepNameConstraints|json_encode }}">
+                            <input type="text" name="label" value="<%= label %>" data-validation="{{ requiredConstraint|json_encode }}">
                         </div>
                     </div>
 
                     <div class="control-group">
                         <label class="control-label">{{ "Order"|trans }}</label>
                         <div class="controls">
-                            <input type="text" name="order" value="<%= order %>">
+                            <input type="text" name="order" value="<%= order %>" data-validation="{{ orderConstraints|json_encode }}">
                         </div>
                     </div>
 
@@ -112,7 +201,7 @@
             <% if (_is_start) { %>
                 <%= label %>
             <% } else { %>
-                <a href="#" class="edit-step" data-step-name="<%= name %>"><%= label %></a>
+                <a href="#" class="edit-step"><%= label %></a>
             <% } %>
             <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
         </td>
@@ -121,16 +210,16 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (!_is_start) { %>
-                    <a href="#" class="edit-step" title="Edit step" data-step-name="<%= name %>"><i class="icon-edit"/></a>
-                    <a href="#" class="delete-step" title="Delete step" data-step-name="<%= name %>"><i class="icon-remove"/></a>
+                    <a href="#" class="edit-step" title="Edit step"><i class="icon-edit"/></a>
+                    <a href="#" class="delete-step" title="Delete step"><i class="icon-remove"/></a>
                 <% } %>
-                <a href="#" class="add-step-transition" title="Add transition" data-step-name="<%= name %>"><i class="icon-plus-sign"/></a>
+                <a href="#" class="add-step-transition" title="Add transition"><i class="icon-plus-sign"/></a>
             </div>
         </td>
     </script>
 
     <script type="text/template" id="transition-row-short-template">
-        <a href="#"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
+        <a href="#" class="edit-transition"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
     </script>
 
     {% set dataBlocks = [{

@@ -18,10 +18,7 @@ function(Backbone) {
             form_options: null,
             message: null,
             is_unavailable_hidden: true,
-            transition_definition: null,
-            pre_conditions: null,
-            conditions: null,
-            post_actions: null
+            transition_definition: null
         }
     });
 });

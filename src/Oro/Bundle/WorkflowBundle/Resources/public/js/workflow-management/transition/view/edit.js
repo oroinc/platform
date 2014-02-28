@@ -16,7 +16,9 @@ function(_, Backbone, DialogWidget, Helper) {
         },
 
         options: {
-            template: null
+            template: null,
+            workflow: null,
+            step_from: ''
         },
 
         initialize: function() {
@@ -29,26 +31,35 @@ function(_, Backbone, DialogWidget, Helper) {
             var formData = Helper.getFormData(this.widget.form);
 
             if (!this.model.get('name')) {
-                this.model.set('name', Helper.getNameByString(formData.label, 'step'));
+                this.model.set('name', Helper.getNameByString(formData.label, 'transition_'));
             }
             this.model.set('label', formData.label);
+            this.model.set('step_to', formData.step_to);
+            this.model.set('display_type', formData.display_type);
+            this.model.set('message', formData.message);
 
-            this.trigger('transitionAdd', this.model);
+            this.trigger('transitionAdd', this.model, formData.step_from);
             this.widget.remove();
         },
 
         render: function() {
-            this.$el.append(
-                this.template(this.model.toJSON())
-            );
+            var data = this.model.toJSON();
+            var steps = this.options.workflow.get('steps').models;
+            data.stepFrom = this.options.step_from ? this.options.step_from.get('name') : '';
+            data.allowedStepsFrom = steps;
+            data.allowedStepsTo = steps.slice(1);
+
+            this.$el.append(this.template(data));
 
             this.widget = new DialogWidget({
                 'title': this.model.get('name').length ? 'Edit transition' : 'Add new transition',
                 'el': this.$el,
                 'stateEnabled': false,
+                'incrementalPosition': false,
                 'dialogOptions': {
                     'close': _.bind(this.remove, this),
-                    'width': 600
+                    'width': 600,
+                    'modal': true
                 }
             });
             this.widget.render();
