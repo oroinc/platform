@@ -59,10 +59,6 @@ define(function (require) {
             });
 
         _widgetControlInitializer.init(container);
-
-        setTimeout(function () {
-            scrollspy.top();
-        }, 500);
     };
 
     layout.hideProgressBar = function () {
