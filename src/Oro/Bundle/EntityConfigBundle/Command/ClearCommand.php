@@ -19,6 +19,5 @@ class ClearCommand extends BaseCommand
     {
         $output->writeln($this->getDescription());
         $this->getConfigManager()->clearCacheAll();
-        $output->writeln('Done');
     }
 }
