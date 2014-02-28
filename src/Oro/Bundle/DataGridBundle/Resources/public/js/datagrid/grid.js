@@ -499,6 +499,12 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                  */
                 this.trigger("rendered");
 
+                /**
+                 * Backbone event. Fired when data for grid has been successfully rendered.
+                 * @event grid_render:complete
+                 */
+                mediator.trigger('grid_render:complete', this.$el);
+
                 return this;
             },
 

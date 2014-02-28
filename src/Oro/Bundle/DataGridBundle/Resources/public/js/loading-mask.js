@@ -26,8 +26,8 @@ function($, _, Backbone) {
 
         /** @property */
         template:_.template(
-            '<div id="loading-wrapper" class="loading-wrapper"></div>' +
-            '<div id="loading-frame" class="loading-frame">' +
+            '<div class="loading-wrapper"></div>' +
+            '<div class="loading-frame">' +
                 '<div class="box well">' +
                     '<div class="loading-content">' +
                         '<%= loadingHint %>' +

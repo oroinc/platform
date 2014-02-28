@@ -2,6 +2,8 @@
 {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
+{% set entity = entity is defined ? entity : null %}
+
 {% block page_container %}
     {% block content %}
         <form id="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
