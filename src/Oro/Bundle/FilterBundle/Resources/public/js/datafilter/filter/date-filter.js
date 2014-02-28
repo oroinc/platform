@@ -1,5 +1,5 @@
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter', 'orolocale/js/locale-settings',
+define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale-settings',
     'jquery-ui-datevariables'], function ($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
 
@@ -110,27 +110,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          */
         initialize: function () {
             _.extend(this.dateWidgetOptions, this.externalWidgetOptions);
-
-            this.dateWidgetOptions.dateVarsGetter = function(part){
-                var result = {};
-                if (part == 'value') {
-                    for (var i in this.dateVars) {
-                        if (i > 7) {
-                            break;
-                        }
-                        result[i] = this.dateVars[i];
-                    }
-                } else {
-                    for (var i in this.dateVars) {
-                        if (i < 7) {
-                            continue;
-                        }
-                        result[i] = this.dateVars[i];
-                    }
-                }
-
-                return result;
-            };
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
