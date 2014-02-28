@@ -4,13 +4,14 @@ namespace Oro\Bundle\NotificationBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroNotificationBundle implements Migration
 {
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         self::oroNotificationEmailSpoolTable($schema);
         self::oroNotificationEmailNotificationTable($schema);
@@ -22,8 +23,6 @@ class OroNotificationBundle implements Migration
         self::oroNotificationEmailNotificationForeignKeys($schema);
         self::oroNotificationRecipientGroupForeignKeys($schema);
         self::oroNotificationRecipientUserForeignKeys($schema);
-
-        return [];
     }
 
     /**

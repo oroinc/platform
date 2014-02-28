@@ -4,13 +4,14 @@ namespace Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroEntityConfigBundle implements Migration
 {
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         self::oroEntityConfigTable($schema);
         self::oroEntityConfigFieldTable($schema);
@@ -26,8 +27,6 @@ class OroEntityConfigBundle implements Migration
         self::oroEntityConfigValueForeignKeys($schema);
         self::oroEntityConfigFieldForeignKeys($schema);
         self::oroEntityConfigLogForeignKeys($schema);
-
-        return [];
     }
 
     /**

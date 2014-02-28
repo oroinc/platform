@@ -4,6 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\NotificationBundle\Migrations\Schema\v1_0\OroNotificationBundle;
 
 class OroNotificationBundleInstaller implements Installation
@@ -19,7 +20,7 @@ class OroNotificationBundleInstaller implements Installation
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         OroNotificationBundle::oroNotificationEmailSpoolTable($schema);
         OroNotificationBundle::oroNotificationEmailNotificationTable($schema, 'oro_notification_email_notif');
@@ -43,7 +44,5 @@ class OroNotificationBundleInstaller implements Installation
             'oro_notification_recip_user',
             'oro_notification_recip_list'
         );
-
-        return [];
     }
 }

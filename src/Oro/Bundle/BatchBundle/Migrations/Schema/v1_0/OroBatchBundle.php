@@ -10,7 +10,7 @@ class OroBatchBundle implements Migration
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         self::oroBatchJobExecutionTable($schema);
         self::oroBatchJobInstanceTable($schema);
@@ -21,8 +21,6 @@ class OroBatchBundle implements Migration
         self::oroBatchJobExecutionForeignKeys($schema);
         self::oroBatchMappingFieldForeignKeys($schema);
         self::oroBatchStepExecutionForeignKeys($schema);
-
-        return [];
     }
 
     /**

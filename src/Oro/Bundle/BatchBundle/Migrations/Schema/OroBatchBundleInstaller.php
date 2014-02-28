@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\BatchBundle\Migrations\Schema\v1_0\OroBatchBundle;
 
 class OroBatchBundleInstaller implements Installation
@@ -19,7 +20,7 @@ class OroBatchBundleInstaller implements Installation
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         OroBatchBundle::oroBatchJobExecutionTable($schema, 'akeneo_batch_job_execution');
         OroBatchBundle::oroBatchJobInstanceTable($schema, 'akeneo_batch_job_instance');
@@ -42,7 +43,5 @@ class OroBatchBundleInstaller implements Installation
             'akeneo_batch_step_execution',
             'akeneo_batch_job_execution'
         );
-
-        return [];
     }
 }
