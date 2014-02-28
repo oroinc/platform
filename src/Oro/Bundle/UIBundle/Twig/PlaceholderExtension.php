@@ -3,7 +3,6 @@
 namespace Oro\Bundle\UIBundle\Twig;
 
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
-use Symfony\Component\HttpKernel\Controller\ControllerReference;
 
 class PlaceholderExtension extends \Twig_Extension
 {
@@ -64,7 +63,23 @@ class PlaceholderExtension extends \Twig_Extension
     {
         $renderedBlocks = [];
         if (isset($this->placeholders[$name]['items'])) {
-            foreach ($this->placeholders[$name]['items'] as $block) {
+
+            /**
+             * Delegate which sort items by order field (dy descending)
+             * @param array $firstBlock
+             * @param array $secondBlock
+             * @return int
+             */
+            $compareResolverDelegate = function ($firstBlock, $secondBlock) {
+                $firstBlockOrder = isset($firstBlock['order']) ? (int)$firstBlock['order'] : 1;
+                $secondBlockOrder = isset($secondBlock['order']) ? (int)$secondBlock['order'] : 1;
+                return $secondBlockOrder - $firstBlockOrder;
+            };
+
+            $items = $this->placeholders[$name]['items'];
+            usort($items, $compareResolverDelegate);
+
+            foreach ($items as $block) {
                 if (isset($block['template'])) {
                     $renderedBlocks[] = $this->environment->render($block['template'], $variables);
                 } elseif (isset($block['action'])) {
