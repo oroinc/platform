@@ -16,17 +16,17 @@ class ExtendTable extends Table
      */
     protected $extendOptionManager;
 
-    /** @var  ExtendSchema */
+    /**
+     * @var ExtendSchema
+     */
     protected $schema;
 
     /**
-     * @param ExtendSchema        $schema
      * @param ExtendOptionManager $extendOptionManager
      * @param Table               $baseTable
      */
-    public function __construct(ExtendSchema $schema, ExtendOptionManager $extendOptionManager, Table $baseTable)
+    public function __construct(ExtendOptionManager $extendOptionManager, Table $baseTable)
     {
-        $this->schema              = $schema;
         $this->extendOptionManager = $extendOptionManager;
 
         parent::__construct(
@@ -37,6 +37,16 @@ class ExtendTable extends Table
             false,
             $baseTable->getOptions()
         );
+    }
+
+    /**
+     * Sets a schema this table belongs
+     *
+     * @param ExtendSchema $schema
+     */
+    public function setSchema(ExtendSchema $schema)
+    {
+        $this->schema = $schema;
     }
 
     /**
@@ -210,10 +220,5 @@ class ExtendTable extends Table
         }
 
         return parent::addColumn($columnName, $typeName, $options);
-    }
-
-    public function setSchema(ExtendSchema $schema)
-    {
-        $this->schema = $schema;
     }
 }
