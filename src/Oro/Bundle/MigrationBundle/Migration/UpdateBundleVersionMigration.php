@@ -22,22 +22,20 @@ class UpdateBundleVersionMigration implements Migration
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
-        $versionsSql = [];
         if (!empty($this->bundleVersions)) {
             $date = new \DateTime();
             foreach ($this->bundleVersions as $bundleName => $bundleVersion) {
-                $versionsSql[] = sprintf(
+                $sql = sprintf(
                     "INSERT INTO %s (bundle, version, loaded_at) VALUES ('%s', '%s', '%s')",
                     CreateMigrationTableMigration::MIGRATION_TABLE,
                     $bundleName,
                     $bundleVersion,
                     $date->format('Y-m-d H:i:s')
                 );
+                $queries->addSql($sql);
             }
         }
-
-        return $versionsSql;
     }
 }

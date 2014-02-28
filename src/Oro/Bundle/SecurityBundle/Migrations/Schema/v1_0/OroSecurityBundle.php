@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroSecurityBundle implements Migration, ContainerAwareInterface
 {
@@ -26,10 +27,9 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         //create symfony acl tables
         $this->container->get('security.acl.dbal.schema')->addToSchema($schema);
-        return [];
     }
 }

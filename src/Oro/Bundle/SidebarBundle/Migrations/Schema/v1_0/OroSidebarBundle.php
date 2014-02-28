@@ -4,14 +4,14 @@ namespace Oro\Bundle\SidebarBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroSidebarBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -52,7 +52,5 @@ class OroSidebarBundle implements Migration
         /** End of generate foreign keys for table oro_sidebar_widget **/
 
         // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }

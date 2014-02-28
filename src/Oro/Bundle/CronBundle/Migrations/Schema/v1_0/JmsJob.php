@@ -11,7 +11,7 @@ class JmsJob implements Migration
      * @inheritdoc
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -86,7 +86,5 @@ class JmsJob implements Migration
         /** End of generate foreign keys for table jms_jobs **/
 
         // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }

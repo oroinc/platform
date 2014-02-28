@@ -4,13 +4,14 @@ namespace Oro\Bundle\AddressBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroAddressBundle implements Migration
 {
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         self::oroAddressTable($schema);
         self::oroAddressTypeTable($schema);
@@ -21,8 +22,6 @@ class OroAddressBundle implements Migration
         self::oroDictionaryRegionTranslationTable($schema);
 
         self::addForeignKeys($schema);
-
-        return [];
     }
 
     /**

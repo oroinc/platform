@@ -4,17 +4,15 @@ namespace Oro\Bundle\TranslationBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroTranslationBundle implements Migration
 {
     /**
      * @inheritdoc
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
-        // @codingStandardsIgnoreStart
-
         /** Generate table oro_translation **/
         $table = $schema->createTable('oro_translation');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -26,9 +24,5 @@ class OroTranslationBundle implements Migration
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'domain', 'key', 'scope'], 'MESSAGE_IDX', []);
         /** End of generate table oro_translation **/
-
-        // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }

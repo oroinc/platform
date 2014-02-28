@@ -4,6 +4,7 @@ namespace Oro\Bundle\AddressBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\AddressBundle\Migrations\Schema\v1_0\OroAddressBundle;
 
 class OroAddressBundleInstaller implements Installation
@@ -19,7 +20,7 @@ class OroAddressBundleInstaller implements Installation
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         OroAddressBundle::oroAddressTable($schema);
         OroAddressBundle::oroAddressTypeTable($schema);
@@ -30,7 +31,5 @@ class OroAddressBundleInstaller implements Installation
         OroAddressBundle::oroDictionaryRegionTranslationTable($schema, 'oro_dictionary_region_trans');
 
         OroAddressBundle::addForeignKeys($schema);
-
-        return [];
     }
 }

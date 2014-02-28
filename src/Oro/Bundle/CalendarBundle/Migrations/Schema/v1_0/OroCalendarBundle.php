@@ -11,7 +11,7 @@ class OroCalendarBundle implements Migration
      * @inheritdoc
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart
 
@@ -71,7 +71,5 @@ class OroCalendarBundle implements Migration
         /** End of generate foreign keys for table oro_calendar_event **/
 
         // @codingStandardsIgnoreEnd
-
-        return [];
     }
 }

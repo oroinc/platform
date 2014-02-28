@@ -3,8 +3,10 @@
 namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 
 class MigrationQueryBuilder
@@ -49,9 +51,12 @@ class MigrationQueryBuilder
 
         $platform   = $this->connection->getDatabasePlatform();
         $fromSchema = $this->getSchema();
+        $queryBag   = new QueryBag();
         foreach ($migrations as $migration) {
-            $toSchema   = clone $fromSchema;
-            $queries    = $migration->up($toSchema);
+            $toSchema = clone $fromSchema;
+
+            $migration->up($toSchema, $queryBag);
+
             $comparator = new Comparator();
             $schemaDiff = $comparator->compare($fromSchema, $toSchema);
 
@@ -67,15 +72,18 @@ class MigrationQueryBuilder
             }
 
             $queries = array_merge(
+                $queryBag->getPreSqls(),
                 $schemaDiff->toSql($platform),
-                $queries
+                $queryBag->getPostSqls()
             );
 
-            $result[]   = [
+            $result[] = [
                 'migration' => get_class($migration),
                 'queries'   => $queries
             ];
+
             $fromSchema = $toSchema;
+            $queryBag->clear();
         }
 
         return $result;
@@ -92,7 +100,7 @@ class MigrationQueryBuilder
     }
 
     /**
-     * @param \Doctrine\DBAL\Schema\Table[] $tables
+     * @param Table[]   $tables
      * @param Migration $migration
      * @throws InvalidNameException
      */
@@ -115,8 +123,8 @@ class MigrationQueryBuilder
     }
 
     /**
-     * @param string $tableName
-     * @param \Doctrine\DBAL\Schema\Column[] $columns
+     * @param string    $tableName
+     * @param Column[]  $columns
      * @param Migration $migration
      * @throws InvalidNameException
      */

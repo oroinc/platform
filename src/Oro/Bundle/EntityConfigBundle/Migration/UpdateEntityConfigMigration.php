@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
 
 class UpdateEntityConfigMigration implements Migration
@@ -21,8 +22,8 @@ class UpdateEntityConfigMigration implements Migration
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
-        return [new UpdateEntityConfigMigrationQuery($this->configDumper)];
+        $queries->addSql(new UpdateEntityConfigMigrationQuery($this->configDumper));
     }
 }
