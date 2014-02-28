@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendSchema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
 
@@ -30,16 +31,16 @@ class UpdateExtendConfigMigration implements Migration
     /**
      * @inheritdoc
      */
-    public function up(Schema $schema)
+    public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema instanceof ExtendSchema) {
-            return [
+            $queries->addSql(
                 new UpdateExtendConfigMigrationQuery(
                     $schema->getExtendOptions(),
                     $this->schemaGenerator,
                     $this->configDumper
                 )
-            ];
+            );
         }
 
         return [];
