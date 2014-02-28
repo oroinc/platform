@@ -1,0 +1,52 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+{% set containerAlias = 'tab' %}
+{% for tab in tabs %}
+    {% set containerAlias = containerAlias ~ '-' ~ tab.alias %}
+{% endfor %}
+
+<div class="oro-tabs">
+    <ul class="nav nav-tabs">
+        {% for tab in tabs %}
+            {% set isFirstLoop = loop.index == 1 %}
+            <li{% if isFirstLoop %} class="active"{% endif %}>
+                {% set widgetOptions = {
+                    'type': 'block',
+                    'multiple': false,
+                    'options': {
+                        'container': '#' ~ tab.alias,
+                        'loadingElement': '#' ~ containerAlias,
+                        'alias': tab.alias,
+                    }
+                } %}
+
+                {% set dataAttributes = {
+                    'target': '#' ~ tab.alias,
+                    'toggle': 'tab',
+                    'url': tab.url
+                } %}
+
+                {% if isFirstLoop %}
+                    {% set widgetOptions = widgetOptions|merge({'initialized': true}) %}
+                {% endif %}
+
+                {% set options = tab|merge({
+                    'widget': widgetOptions,
+                    'dataAttributes': dataAttributes,
+                    'label': tab.label
+                }) %}
+
+                {{ UI.clientLink(options) }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="tab-content" id="{{ containerAlias }}">
+        {% for tab in tabs %}
+            {% set isFirstLoop = loop.index == 1 %}
+            <div class="tab-pane{% if isFirstLoop %} active{% endif %}" id="{{ tab.alias }}">
+                {% if isFirstLoop %}{{ oro_widget_render(tab) }}{% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
