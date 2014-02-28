@@ -95,7 +95,6 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
                 'extra_long_table_name_bigger_than_30_chars',
                 'TestPackage\src\WrongTableNameMigration'
             )
-
         );
         $this->builder->getQueries($migrations);
 
@@ -114,7 +113,6 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
                 'extra_long_column_bigger_30_chars',
                 'TestPackage\src\WrongColumnNameMigration'
             )
-
         );
         $this->builder->getQueries($migrations);
 
