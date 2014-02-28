@@ -9,7 +9,7 @@ function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
     var initialized = false,
         methods = {
             initBuilder: function () {
-                this.metadata = _.extend({state: {filters: []}, filters: {}}, this.$el.data('metadata'));
+                this.metadata = _.extend({filters: {}}, this.$el.data('metadata'));
                 this.modules = {};
                 methods.collectModules.call(this);
                 tools.loadModules(this.modules, _.bind(methods.build, this));
@@ -32,6 +32,7 @@ function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
                 var filtersList = new FiltersManager(options);
                 this.$el.prepend(filtersList.render().$el);
                 mediator.trigger('datagrid_filters:rendered', this.collection);
+                this.metadata.state.filters = this.metadata.state.filters || [];
                 if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
                     filtersList.$el.hide();
                 }

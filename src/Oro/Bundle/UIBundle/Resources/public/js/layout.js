@@ -63,9 +63,10 @@ define(function (require) {
 
         _widgetControlInitializer.init(container);
 
-        layout.onPageRendered(function () {
-            scrollspy.top();
-        });
+//        @todo: BAP-3374
+//        layout.onPageRendered(function () {
+//            scrollspy.top();
+//        });
     };
 
     layout.hideProgressBar = function () {
