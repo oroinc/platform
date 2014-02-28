@@ -4,10 +4,13 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Carbon\Carbon;
 
+use Symfony\Component\Form\FormFactoryInterface;
+
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {
@@ -15,6 +18,21 @@ abstract class AbstractDateFilter extends AbstractFilter
      * DateTime object as string format
      */
     const DATETIME_FORMAT = 'Y-m-d';
+
+    /**
+     * @var LocaleSettings
+     */
+    protected $localeSettings;
+
+    public function __construct(
+        FormFactoryInterface $factory,
+        FilterUtility $util,
+        LocaleSettings $localeSettings = null
+    ) {
+        parent::__construct($factory, $util);
+
+        $this->localeSettings = $localeSettings;
+    }
 
     /**
      * {@inheritdoc}
@@ -217,17 +235,26 @@ abstract class AbstractDateFilter extends AbstractFilter
         $endDateParameterName,
         $fieldName
     ) {
+        // check if date part applied and start date greater than end
+        if ($dateStartValue > $dateEndValue && strpos($fieldName, '(') !== false) {
+            $conditionType = FilterUtility::CONDITION_OR;
+        } else {
+            $conditionType = FilterUtility::CONDITION_AND;
+        }
+
         if ($dateStartValue) {
             $this->applyFilterToClause(
                 $ds,
-                $ds->expr()->gte($fieldName, $startDateParameterName, true)
+                $ds->expr()->gte($fieldName, $startDateParameterName, true),
+                $conditionType
             );
         }
 
         if ($dateEndValue) {
             $this->applyFilterToClause(
                 $ds,
-                $ds->expr()->lte($fieldName, $endDateParameterName, true)
+                $ds->expr()->lte($fieldName, $endDateParameterName, true),
+                $conditionType
             );
         }
     }
