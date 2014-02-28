@@ -6,8 +6,11 @@ use Oro\Bundle\UIBundle\Twig\PlaceholderExtension;
 class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const PLACEHOLDER_NAME = 'placeholder_name';
+    const ORDERED_PLACEHOLDER_NAME = 'ordered_placeholder_name';
     const INVALID_PLACEHOLDER_NAME = 'invalid_placeholder_name';
     const TEMPLATE_NAME = 'FooBarBundle:Test:test.html.twig';
+    const TEMPLATE_NAME_ORDER_100 = 'FooBarBundle:Test:testOrder100.html.twig';
+    const TEMPLATE_NAME_ORDER_200 = 'FooBarBundle:Test:testOrder200.html.twig';
     const ACTION_NAME = 'FooBarBundle:Test:test';
     const DELIMITER = ',';
 
@@ -31,6 +34,13 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
                 array('action' => self::ACTION_NAME),
             )
         ),
+        self::ORDERED_PLACEHOLDER_NAME => array(
+            'items' => array(
+                array('template' => self::TEMPLATE_NAME_ORDER_200, 'order' => 200),
+                array('template' => self::TEMPLATE_NAME),
+                array('template' => self::TEMPLATE_NAME_ORDER_100, 'order' => 100),
+            )
+        ),
         self::INVALID_PLACEHOLDER_NAME => array(
             'items' => array(
                 array('foo' => 'bar', 'baz' => 'bar'),
@@ -45,17 +55,11 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
-    }
-
-    protected function init($placeHolders = null)
-    {
-        $this->extension = new PlaceholderExtension($this->twig, ($placeHolders ? $placeHolders :$this->placehoders));
+        $this->extension = new PlaceholderExtension($this->twig, $this->placehoders);
     }
 
     public function testRenderPlaceholder()
     {
-        $this->init();
         $variables = array('variables' => 'test');
         $expectedTemplateRender = '<p>template</p>';
         $expectedActionRender = '<p>action</p>';
@@ -98,59 +102,30 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testRenderPlaceholderWithCorrectOrder()
     {
-        $placeholders = $this->placehoders;
-        $placeholders[self::PLACEHOLDER_NAME]['items'][0]['order'] = 200;
-        $placeholders[self::PLACEHOLDER_NAME]['items'][1]['order'] = 100;
-        $lastTemplate = 'test template 3';
-        //test default value
-        $placeholders[self::PLACEHOLDER_NAME]['items'][] = array('template' => $lastTemplate);
-
-        $this->init($placeholders);
         $variables = array('variables' => 'test');
         $expectedTemplateRender = '<p>template</p>';
-        $expectedActionRender = '<p>action</p>';
-        $lastTemplateExpected = "<p>{$lastTemplate}</p>";
-        $delimiter = self::DELIMITER;
-        $expectedResult = "{$expectedTemplateRender}{$delimiter}$expectedActionRender{$delimiter}$lastTemplateExpected";
+        $expectedTemplate100Render = '<p>template100</p>';
+        $expectedTemplate200Render = '<p>template200</p>';
+        $expectedResult = $expectedTemplateRender . self::DELIMITER
+            . $expectedTemplate100Render . self::DELIMITER
+            . $expectedTemplate200Render;
 
         $this->twig
-            ->expects($this->at(0))
+            ->expects($this->exactly(3))
             ->method('render')
-            ->with(self::TEMPLATE_NAME, $variables)
-            ->will($this->returnValue($expectedTemplateRender));
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array(self::TEMPLATE_NAME_ORDER_200, $variables, $expectedTemplate200Render),
+                        array(self::TEMPLATE_NAME_ORDER_100, $variables, $expectedTemplate100Render),
+                        array(self::TEMPLATE_NAME, $variables, $expectedTemplateRender)
+                    )
+                )
+            );
 
-        $this->twig
-            ->expects($this->at(2))
-            ->method('render')
-            ->with($lastTemplate, $variables)
-            ->will($this->returnValue($lastTemplateExpected));
+        $this->twig->expects($this->never())->method('getExtension');
 
-
-        $httpKernelExtension = $this->getMockBuilder('Symfony\\Bridge\\Twig\\Extension\\HttpKernelExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->twig
-            ->expects($this->at(1))
-            ->method('getExtension')
-            ->with(PlaceholderExtension::HTTP_KERNEL_EXTENSION_NAME)
-            ->will($this->returnValue($httpKernelExtension));
-
-        $controllerReference = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerReference')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $httpKernelExtension->expects($this->once())
-            ->method('controller')
-            ->with(self::ACTION_NAME, $variables)
-            ->will($this->returnValue($controllerReference));
-
-        $httpKernelExtension->expects($this->once())
-            ->method('renderFragment')
-            ->with($controllerReference)
-            ->will($this->returnValue($expectedActionRender));
-
-        $result = $this->extension->renderPlaceholder(self::PLACEHOLDER_NAME, $variables, self::DELIMITER);
+        $result = $this->extension->renderPlaceholder(self::ORDERED_PLACEHOLDER_NAME, $variables, self::DELIMITER);
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -163,19 +138,16 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
     //@codingStandardsIgnoreEnd
     public function testRenderPlaceholderFails()
     {
-        $this->init();
         $this->extension->renderPlaceholder(self::INVALID_PLACEHOLDER_NAME, array(), self::DELIMITER);
     }
 
     public function testGetFunctions()
     {
-        $this->init();
         $this->assertArrayHasKey('placeholder', $this->extension->getFunctions());
     }
 
     public function testGetName()
     {
-        $this->init();
         $this->assertEquals(PlaceholderExtension::EXTENSION_NAME, $this->extension->getName());
     }
 }
