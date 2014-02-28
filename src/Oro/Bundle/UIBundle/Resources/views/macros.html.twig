@@ -140,7 +140,7 @@
             {{ parameters.label|trans }}
             <span class="caret"></span>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu {{ parameters.classes is defined? parameters.classes|join(" ") : "" }}">
             {% if parameters.elements is defined and parameters.elements is not empty %}
                 {% for item in parameters.elements %}
                     {{ _self.dropdownItem(parameters) }}
