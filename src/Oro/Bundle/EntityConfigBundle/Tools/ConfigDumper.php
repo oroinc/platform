@@ -34,6 +34,13 @@ class ConfigDumper
 
                     foreach ($doctrineMetadata->getFieldNames() as $fieldName) {
                         $fieldType = $doctrineMetadata->getTypeOfField($fieldName);
+
+                        /**
+                         * TODO:
+                         * fix duplicates
+                         * wrong $fieldName coming !!!
+                         * for example: field_extend_ownership instead of extend_ownership
+                         */
                         if ($this->configManager->hasConfig($className, $fieldName)) {
                             $this->configManager->updateConfigFieldModel($className, $fieldName, $force);
                         } else {

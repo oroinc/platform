@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -81,16 +82,40 @@ class ExtendOptionBuilder
                             $this->entityClassResolver->getEntityClassByTableName($optionValue);
                         break;
                     case 'column':
-                        $options['extend']['target_field'] = $optionValue;
+                        $options['extend']['target_field'] = $this->entityClassResolver->getFieldNameByColumnName(
+                            $options['extend']['target']['table_name'],
+                            $optionValue
+                        );
                         break;
                     case 'title_columns':
-                        $options['extend']['target_title'] = $optionValue;
+                        $values = [];
+                        foreach ($optionValue as $value) {
+                            $values[] = $this->entityClassResolver->getFieldNameByColumnName(
+                                $options['extend']['target']['table_name'],
+                                $value
+                            );
+                        }
+                        $options['extend']['target_title'] = $values;
                         break;
                     case 'grid_columns':
-                        $options['extend']['target_grid'] = $optionValue;
+                        $values = [];
+                        foreach ($optionValue as $value) {
+                            $values[] = $this->entityClassResolver->getFieldNameByColumnName(
+                                $options['extend']['target']['table_name'],
+                                $value
+                            );
+                        }
+                        $options['extend']['target_grid'] = $values;
                         break;
                     case 'detailed_columns':
-                        $options['extend']['target_detailed'] = $optionValue;
+                        $values = [];
+                        foreach ($optionValue as $value) {
+                            $values[] = $this->entityClassResolver->getFieldNameByColumnName(
+                                $options['extend']['target']['table_name'],
+                                $value
+                            );
+                        }
+                        $options['extend']['target_detailed'] = $values;
                         break;
                 }
             }

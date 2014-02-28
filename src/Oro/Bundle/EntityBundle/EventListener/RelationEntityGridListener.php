@@ -75,11 +75,8 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $fieldName = $this->getRequestParam('field_name');
         $entityId = $this->getRequestParam('id');
 
-        /** @var ConfigProvider $entityConfigProvider */
-        //$entityConfigProvider = $this->configManager->getProvider('entity');
+        /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->configManager->getProvider('extend');
-
-        //$entityConfig = $entityConfigProvider->getConfig($extendEntityName);
         $fieldConfig  = $extendConfigProvider->getConfig($extendEntityName, $fieldName);
 
         $this->entityClass = $fieldConfig->get('target_entity');
@@ -167,9 +164,12 @@ class RelationEntityGridListener extends CustomEntityGridListener
         if (null === $this->hasAssignedExpression) {
             $entityAlias = 'ce';
 
-            $compOperator = $this->relationConfig->getId()->getFieldType() == 'oneToMany'
-                ? '='
-                : 'MEMBER OF';
+            $fieldType = $this->configManager->getConfigFieldModel(
+                $this->relationConfig->getId()->getClassName(),
+                $this->relationConfig->getId()->getFieldName()
+            )->getType();
+
+            $compOperator = $fieldType == 'oneToMany' ? '=' : 'MEMBER OF';
 
             if ($this->getRelation()->getId()) {
                 $this->hasAssignedExpression =
