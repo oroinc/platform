@@ -3,6 +3,8 @@ define(['underscore', 'backbone'],
 function(_, Backbone) {
     'use strict';
 
+    var $ = Backbone.$;
+
     /**
      * @export  oro/workflow-management/transition/view/row-short
      * @class   oro.WorkflowManagement.TransitionsShortRowView
@@ -10,6 +12,10 @@ function(_, Backbone) {
      */
     return Backbone.View.extend({
         tagName: 'li',
+
+        events: {
+            'click .edit-transition': 'triggerEditTransition'
+        },
 
         options: {
             workflow: null,
@@ -19,7 +25,14 @@ function(_, Backbone) {
         initialize: function() {
             var template = this.options.template || $('#transition-row-short-template').html();
             this.template = _.template(template);
+
+            this.listenTo(this.options.model, 'change', this.render);
             this.listenTo(this.options.model, 'destroy', this.remove);
+        },
+
+        triggerEditTransition: function (e) {
+            e.preventDefault();
+            this.model.trigger('requestEdit', this.model);
         },
 
         render: function() {

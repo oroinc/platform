@@ -28,7 +28,7 @@ function(_, Backbone, StepRowView) {
             this.$el.html(this.$listEl);
 
             this.listenTo(this.getCollection(), 'change', this.render);
-            this.listenTo(this.getCollection(), 'add', this.addItem);
+            this.listenTo(this.getCollection(), 'add', this.render);
             this.listenTo(this.getCollection(), 'reset', this.addAllItems);
         },
 

@@ -30,7 +30,7 @@ function(_, Backbone, DialogWidget, Helper) {
             var order = parseInt(formData.order);
 
             if (!this.model.get('name')) {
-                this.model.set('name', Helper.getNameByString(formData.label, 'step'));
+                this.model.set('name', Helper.getNameByString(formData.label, 'step_'));
             }
             this.model.set('order', order > 0 ? order : 0);
             this.model.set('is_final', formData.hasOwnProperty('is_final'));
