@@ -5,16 +5,33 @@ use Oro\Bundle\UIBundle\Twig\Node\PlaceholderNode;
 
 class PlaceholderNodeTest extends \PHPUnit_Framework_TestCase
 {
-    protected $compiler;
-
-    protected $blocks;
-    protected $variables;
-    protected $wrapClassName;
-    protected $line;
-    protected $tag;
+    /**
+     * @var int
+     */
+    protected $lineno = 100;
 
     /**
-     * @var \Oro\Bundle\UIBundle\Twig\Node\PlaceholderNode
+     * @var string
+     */
+    protected $tag = 'placeholder';
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $compiler;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $nameNode;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $variablesNode;
+
+    /**
+     * @var PlaceholderNode
      */
     protected $node;
 
@@ -24,72 +41,61 @@ class PlaceholderNodeTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->blocks = array(
-            'items' => array(
-                'some_action' => array(
-                    array(
-                        'action' => 'some_action'
-                    ),
-                ),
-                'some_template' =>array(
-                    array(
-                        'template' => 'some_template'
-                    )
-                )
-            )
-
-        );
-
-        $this->line = array(12);
-        $this->variables = new \Twig_Node_Expression_Constant(array(), $this->line);
-        $this->wrapClassName = 'test_class';
-
-        $this->tag = 'test_tag';
+        $this->nameNode = $this->createNode();
+        $this->variablesNode = $this->createNode();
 
         $this->node = new PlaceholderNode(
-            $this->blocks,
-            $this->variables,
-            $this->wrapClassName,
-            $this->line,
+            $this->nameNode,
+            $this->variablesNode,
+            $this->lineno,
             $this->tag
         );
     }
 
     public function testCompile()
     {
-        $this->compiler->expects($this->any())
-            ->method('write')
-            ->will($this->returnValue($this->compiler));
-
-        $this->compiler->expects($this->any())
-            ->method('subcompile')
-            ->will($this->returnValue($this->compiler));
-
-        $this->compiler->expects($this->any())
-            ->method('outdent')
-            ->will($this->returnValue($this->compiler));
-
-        $this->compiler->expects($this->any())
-            ->method('indent')
-            ->will($this->returnValue($this->compiler));
-
-        $this->compiler->expects($this->any())
+        $this->compiler->expects($this->at(0))
             ->method('addDebugInfo')
-            ->will($this->returnValue($this->compiler));
+            ->with($this->isInstanceOf('Twig_Node_Print'))
+            ->will($this->returnSelf());
 
-        $this->compiler->expects($this->any())
+        $this->compiler->expects($this->at(1))
+            ->method('write')
+            ->with('echo ')
+            ->will($this->returnSelf());
+
+        $this->compiler->expects($this->at(2))
+            ->method('subcompile')
+            ->with(
+                $this->callback(
+                    function ($functionExpressionNode) {
+                        /** @var \Twig_Node_Expression_Function $functionExpressionNode */
+                        $this->assertInstanceOf('Twig_Node_Expression_Function', $functionExpressionNode);
+                        $this->assertEquals('placeholder', $functionExpressionNode->getAttribute('name'));
+                        $this->assertEquals($this->lineno, $functionExpressionNode->getLine());
+
+                        /** @var \Twig_Node $argumentsNode */
+                        $argumentsNode = $functionExpressionNode->getNode('arguments');
+                        $this->assertEquals($this->nameNode, $argumentsNode->getNode('name'));
+                        $this->assertEquals($this->variablesNode, $argumentsNode->getNode('variables'));
+                        return true;
+                    }
+                )
+            )
+            ->will($this->returnSelf());
+
+        $this->compiler->expects($this->at(3))
             ->method('raw')
-            ->will($this->returnValue($this->compiler));
+            ->with(";\n")
+            ->will($this->returnSelf());
 
         $this->node->compile($this->compiler);
+    }
 
-        $nodeWoVariables = new PlaceholderNode(
-            array('items' => array('some_action' => array('action' => 'some_action'))),
-            null,
-            $this->wrapClassName,
-            $this->line,
-            $this->tag
-        );
-        $nodeWoVariables->compile($this->compiler);
+    protected function createNode()
+    {
+        return $this->getMockBuilder('Twig_Node')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }
