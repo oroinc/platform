@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 
 /**
  * @ORM\Table(
- *      name="oro_workflow_entity_acl_identity",
+ *      name="oro_workflow_entity_acl_ident",
  *      indexes={
  *          @ORM\Index(
  *              name="oro_workflow_entity_acl_identity_idx",

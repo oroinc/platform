@@ -24,7 +24,7 @@ class SchemaStep extends AbstractStep
                     array('--force' => true, '--full-database' => true)
                 );
             case 'schema-create':
-                return $this->handleAjaxAction('doctrine:schema:create');
+                return $this->handleAjaxAction('oro:migration:load');
             case 'init-config':
                 return $this->handleAjaxAction('oro:entity-config:init');
             case 'init-extend':
@@ -35,7 +35,7 @@ class SchemaStep extends AbstractStep
                 return $this->handleAjaxAction('doctrine:schema:update', array('--force' => true));
             case 'fixtures':
                 return $this->handleAjaxAction(
-                    'oro:installer:fixtures:load',
+                    'oro:migration:data:load',
                     array('--no-interaction' => true)
                 );
             case 'workflows':

@@ -59,6 +59,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
         remove: function() {
             this.trigger('widgetRemove', this.$el);
             mediator.trigger('widget_remove', this.getWid());
+            mediator.trigger('widget_remove:' + this.getAlias());
             Backbone.View.prototype.remove.call(this);
         },
 

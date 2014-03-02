@@ -11,6 +11,7 @@ define(function (require) {
     var _bootstrapTooltip = require('bootstrap-tooltip');
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
+    var _widgetControlInitializer = require('oro/widget-control-initializer');
 
     var pageRenderedCbPool = [];
 
@@ -60,9 +61,12 @@ define(function (require) {
                 }, 500);
             });
 
-        layout.onPageRendered(function () {
-            scrollspy.top();
-        });
+        _widgetControlInitializer.init(container);
+
+//        @todo: BAP-3374
+//        layout.onPageRendered(function () {
+//            scrollspy.top();
+//        });
     };
 
     layout.hideProgressBar = function () {

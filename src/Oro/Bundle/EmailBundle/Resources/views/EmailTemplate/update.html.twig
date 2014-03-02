@@ -23,8 +23,8 @@
             'path' :  path('oro_email_emailtemplate_preview', {'id': form.vars.value.id }),
             'title' : 'Preview',
             'label' : 'Preview',
-            aClass: 'btn-success dialog-form-renderer no-hash',
-            iClass: 'icon-share'
+            'aCss': 'btn-success dialog-form-renderer no-hash',
+            'iCss': 'icon-share'
         }) }}
 
         {{ _emailMacros.renderPreviewDialog(form.vars.id, form.vars.value.subject) }}
@@ -35,8 +35,8 @@
             'path':  path('oro_email_emailtemplate_clone', {'id': form.vars.value.id}),
             'title': 'Clone',
             'label': 'Clone',
-            'aClass': 'btn-success',
-            'iClass': 'icon-share'
+            'aCss': 'btn-success',
+            'iCss': 'icon-share'
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}

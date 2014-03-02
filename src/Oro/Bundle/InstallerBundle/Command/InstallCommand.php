@@ -146,7 +146,8 @@ class InstallCommand extends ContainerAwareCommand
                     '--process-timeout' => 360
                 )
             )
-            ->runCommand('doctrine:schema:create')
+            //->runCommand('doctrine:schema:create')
+            ->runCommand('oro:migration:load')
             ->runCommand('oro:entity-config:init')
             ->runCommand('oro:entity-extend:init')
             ->runCommand(
@@ -162,7 +163,7 @@ class InstallCommand extends ContainerAwareCommand
                 array('--process-isolation' => true)
             )
             ->runCommand(
-                'oro:installer:fixtures:load',
+                'oro:migration:data:load',
                 array('--process-isolation' => true, '--no-interaction' => true)
             );
 
@@ -263,7 +264,7 @@ class InstallCommand extends ContainerAwareCommand
         // load demo fixtures
         if ($demo) {
             $commandExecutor->runCommand(
-                'oro:installer:fixtures:load',
+                'oro:migration:data:load',
                 array('--process-isolation' => true, '--process-timeout' => 300, '--fixtures-type' => 'demo')
             );
         }
