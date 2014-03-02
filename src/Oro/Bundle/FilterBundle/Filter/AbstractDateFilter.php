@@ -27,7 +27,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         FormFactoryInterface $factory,
         FilterUtility $util,
         Compiler $compiler,
-        LocaleSettings $localeSettings = null
+        LocaleSettings $localeSettings
     ) {
         parent::__construct($factory, $util);
 
@@ -409,7 +409,7 @@ abstract class AbstractDateFilter extends AbstractFilter
     public function processParams($data)
     {
         $start = $this->expressionCompiler->compile($data['value']['start']);
-        $end   = $this->expressionCompiler->compile($data['value']['start']);
+        $end   = $this->expressionCompiler->compile($data['value']['end']);
 
         if ($start instanceof Carbon) {
             $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));

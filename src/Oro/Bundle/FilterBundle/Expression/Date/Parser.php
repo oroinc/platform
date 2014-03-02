@@ -31,13 +31,13 @@ class Parser
             }
         }
 
-        if (count($stack) > 1) {
-            // TODO add processing parts merge
-            // e.g. {{ THIS DAY }} 05:00 PM
-            throw new \LogicException('Invalid count');
-        }
         /** @var ExpressionResult $result */
         $result = array_pop($stack);
+        if (count($stack) > 0) {
+            foreach ($stack as $stackedResult) {
+                $result->merge($stackedResult);
+            }
+        }
 
         return $result === null ? $result : $result->getValue();
     }

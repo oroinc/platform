@@ -97,6 +97,14 @@ class ExpressionResult
     }
 
     /**
+     * @return int
+     */
+    public function getSourceType()
+    {
+        return $this->sourceType;
+    }
+
+    /**
      * @param ExpressionResult $value
      *
      * @throws SyntaxException
@@ -106,8 +114,8 @@ class ExpressionResult
     {
         if (!$this->isModifier()) {
             /** @var Carbon $dateValue */
-            $dateValue = $this->value;
-            switch ($this->variableType) {
+            $dateValue = $this->getValue();
+            switch ($this->getVariableType()) {
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
@@ -204,5 +212,32 @@ class ExpressionResult
         }
 
         return $this;
+    }
+
+    /**
+     * Merges two results by rules
+     *
+     * @param ExpressionResult $expression
+     *
+     * @throws SyntaxException
+     */
+    public function merge(ExpressionResult $expression)
+    {
+        if ($expression->isModifier() || $this->isModifier()) {
+            throw new SyntaxException('Operator missed');
+        }
+
+        if (self::TYPE_DATE === $this->getSourceType()) {
+            /** @var Carbon $dateValue */
+            $dateValue = $this->getValue();
+            $dateValue->second($expression->getValue()->second);
+            $dateValue->minute($expression->getValue()->minute);
+            $dateValue->hour($expression->getValue()->hour);
+        } elseif (self::TYPE_TIME === $this->getSourceType()) {
+            $expression->merge($this);
+            $this->value = $expression->getValue();
+        } else {
+            throw new SyntaxException('Merge are not allowed');
+        }
     }
 }
