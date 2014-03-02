@@ -14,24 +14,25 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {
-    /**
-     * DateTime object as string format
-     */
+    /** DateTime object as string format */
     const DATETIME_FORMAT = 'Y-m-d';
 
-    /**
-     * @var LocaleSettings
-     */
+    /** @var LocaleSettings */
     protected $localeSettings;
+
+    /** @var Compiler */
+    protected $expressionCompiler;
 
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
+        Compiler $compiler,
         LocaleSettings $localeSettings = null
     ) {
         parent::__construct($factory, $util);
 
-        $this->localeSettings = $localeSettings;
+        $this->expressionCompiler = $compiler;
+        $this->localeSettings     = $localeSettings;
     }
 
     /**
@@ -110,10 +111,10 @@ abstract class AbstractDateFilter extends AbstractFilter
         if (!in_array(
             $data['type'],
             array(
-                DateRangeFilterType::TYPE_BETWEEN,
-                DateRangeFilterType::TYPE_NOT_BETWEEN,
-                DateRangeFilterType::TYPE_MORE_THAN,
-                DateRangeFilterType::TYPE_LESS_THAN
+                 DateRangeFilterType::TYPE_BETWEEN,
+                 DateRangeFilterType::TYPE_NOT_BETWEEN,
+                 DateRangeFilterType::TYPE_MORE_THAN,
+                 DateRangeFilterType::TYPE_LESS_THAN
             )
         )
         ) {
@@ -407,10 +408,8 @@ abstract class AbstractDateFilter extends AbstractFilter
      */
     public function processParams($data)
     {
-        $compiler = new Compiler();
-
-        $start = $compiler->compile($data['value']['start']);
-        $end   = $compiler->compile($data['value']['start']);
+        $start = $this->expressionCompiler->compile($data['value']['start']);
+        $end   = $this->expressionCompiler->compile($data['value']['start']);
 
         if ($start instanceof Carbon) {
             $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));

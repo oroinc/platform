@@ -28,38 +28,28 @@ class ExpressionResult
             $this->value      = $value;
             $this->sourceType = self::TYPE_INT;
         } elseif ($value instanceof Token && $value->is(Token::TYPE_VARIABLE)) {
+            $dateValue = Carbon::now(new \DateTimeZone('UTC'));
+
             switch ($value->getValue()) {
-                case DateModifierInterface::VAR_NOW:
-                    $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
-                    break;
-                case DateModifierInterface::VAR_TODAY:
-                case DateModifierInterface::VAR_THIS_DAY:
-                    $dateValue = Carbon::parse('today', new \DateTimeZone('UTC'));
-                    break;
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_THIS_WEEK:
-                    $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
-                    $dateValue->startOfWeek();
+                    //do not use start of the week due to it always use monday as 1 day
+                    $dateValue->modify('this week');
+                    $dateValue->startOfDay();
                     break;
                 case DateModifierInterface::VAR_SOM:
                 case DateModifierInterface::VAR_THIS_MONTH:
-                    $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                     $dateValue->firstOfMonth();
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_SOQ:
                 case DateModifierInterface::VAR_THIS_QUARTER:
                 case DateModifierInterface::VAR_FDQ:
-                    $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                     $dateValue->firstOfQuarter();
                     break;
                 case DateModifierInterface::VAR_SOY:
                 case DateModifierInterface::VAR_THIS_YEAR:
-                    $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
                     $dateValue->firstOfYear();
-                    break;
-                default:
-                    $dateValue = Carbon::now(new \DateTimeZone('UTC'));
                     break;
             }
 
@@ -90,11 +80,17 @@ class ExpressionResult
         return $this->sourceType === self::TYPE_INT;
     }
 
+    /**
+     * @return int
+     */
     public function getVariableType()
     {
         return $this->variableType;
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue()
     {
         return $this->value;
@@ -137,7 +133,7 @@ class ExpressionResult
         } elseif (!$value->isModifier()) {
             $value->add($this);
 
-            return $value;
+            $this->value = $value->getValue();
         } else {
             $this->value += $value->getValue();
         }
@@ -187,7 +183,7 @@ class ExpressionResult
                     $this->value -= $value->getValue()->day;
                     break;
                 case DateModifierInterface::VAR_THIS_WEEK:
-                    $this->value -= $value->getValue()->week;
+                    $this->value -= $value->getValue()->format('W');
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_THIS_MONTH:

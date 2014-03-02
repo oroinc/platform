@@ -7,8 +7,14 @@ class Compiler
     /** @var Lexer */
     private $lexer;
 
-    /** @var  Parser */
+    /** @var Parser */
     private $parser;
+
+    public function __construct(Lexer $lexer, Parser $parser)
+    {
+        $this->lexer  = $lexer;
+        $this->parser = $parser;
+    }
 
     /**
      * @param string $string
@@ -17,30 +23,6 @@ class Compiler
      */
     public function compile($string)
     {
-        return $this->getParser()->parse($this->getLexer()->tokenize($string));
-    }
-
-    /**
-     * @return Lexer
-     */
-    protected function getLexer()
-    {
-        if (null === $this->lexer) {
-            $this->lexer = new Lexer();
-        }
-
-        return $this->lexer;
-    }
-
-    /**
-     * @return Parser
-     */
-    private function getParser()
-    {
-        if (null === $this->parser) {
-            $this->parser = new Parser();
-        }
-
-        return $this->parser;
+        return $this->parser->parse($this->lexer->tokenize($string));
     }
 }

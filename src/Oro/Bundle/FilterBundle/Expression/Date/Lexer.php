@@ -6,8 +6,8 @@ use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 
 class Lexer
 {
-    const REGEXP_TIME     = '#(\d\d:\d\d)#';
-    const REGEXP_DATETIME = '#((\d{4}\-\d\d\-\d\d)?[tT\s]+(\d\d:\d\d)?)#';
+    const REGEXP_TIME     = '#(\d\d:\d\d(:\d\d)?)#';
+    const REGEXP_DATETIME = '#((\d{4}\-\d{2}\-\d{2})[tT\s]*(\d\d:\d\d(:\d\d)?)?)#';
     const REGEXP_VARIABLE = '#{{(\d+)}}#';
     const REGEXP_OPERATOR = '#\+|\-#';
     const REGEXP_INTEGER  = '#[0-9]+#';
@@ -57,13 +57,8 @@ class Lexer
                 ++$cursor;
             } elseif (false !== strpos(')', $current)) {
                 // closing bracket
-                if (empty($brackets)) {
+                if (null === array_pop($brackets)) {
                     throw new SyntaxException(sprintf('Unexpected "%s"', $current));
-                }
-
-                $expect = array_pop($brackets);
-                if ($current != strtr($expect, '(', ')')) {
-                    throw new SyntaxException(sprintf('Unclosed "%s"', $expect));
                 }
 
                 $tokens[] = new Token(Token::TYPE_PUNCTUATION, $current);
