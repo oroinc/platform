@@ -72,6 +72,27 @@ class EntityClassResolver
     }
 
     /**
+     * Gets an entity field name by entity table name and column name
+     *
+     * @param string $tableName
+     * @param string $columnName
+     * @return string|null
+     */
+    public function getFieldNameByColumnName($tableName, $columnName)
+    {
+        $className = $this->getEntityClassByTableName($tableName);
+
+        if (null !== $className) {
+            /** @var ClassMetadata $classMetadata */
+            $classMetadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
+
+            return $classMetadata->getFieldName($columnName);
+        }
+
+        return null;
+    }
+
+    /**
      * Checks whether the given namespace is registered in the Doctrine
      *
      * @param string $namespace

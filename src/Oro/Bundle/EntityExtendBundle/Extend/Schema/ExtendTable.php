@@ -109,20 +109,19 @@ class ExtendTable extends Table
                     $targetTable->getPrimaryKey()->getColumns(),
                     ['onDelete' => 'SET NULL']
                 );
+
                 $targetTable->addColumn($targetColumnName, 'integer', ['notnull' => false]);
                 $targetTable->addIndex([$targetColumnName], 'IDX_' . $targetColumnName);
                 $targetTable->addForeignKeyConstraint(
                     $this,
                     [$targetColumnName],
-                    [$selfColumnName],
+                    $this->getPrimaryKey()->getColumns(),
                     ['onDelete' => 'SET NULL']
                 );
 
                 break;
-
             case 'manyToOne':
-                $selfColumnName = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
-
+                $selfColumnName = ExtendConfigDumper::FIELD_PREFIX . $columnName . '_id';
                 $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
                 if (!$this->schema->hasTable($targetTableName)) {
                     throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
@@ -139,7 +138,6 @@ class ExtendTable extends Table
                 );
 
                 break;
-
             case 'manyToMany':
                 $selfColumnName     = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
                 $selfTableName      = $this->getName();
@@ -220,5 +218,20 @@ class ExtendTable extends Table
         }
 
         return parent::addColumn($columnName, $typeName, $options);
+    }
+
+    protected function addRelationOneToMany()
+    {
+
+    }
+
+    protected function addRelationManyToMany()
+    {
+
+    }
+
+    protected function addRelationManyToOne()
+    {
+
     }
 }

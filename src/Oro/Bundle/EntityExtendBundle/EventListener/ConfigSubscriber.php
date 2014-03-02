@@ -156,10 +156,13 @@ class ConfigSubscriber implements EventSubscriberInterface
     protected function createRelation(Config $fieldConfig)
     {
         $selfConfig = $this->extendConfigProvider->getConfig($fieldConfig->getId()->getClassName());
-        $relations  = $selfConfig->get('relation');
-        foreach ($relations as $relation) {
-            if ($relation['field_id'] == $fieldConfig->getId()) {
-                return;
+
+        if ($selfConfig->has('relation')) {
+            $relations  = $selfConfig->get('relation');
+            foreach ($relations as $relation) {
+                if ($relation['field_id'] == $fieldConfig->getId()) {
+                    return;
+                }
             }
         }
 
@@ -246,7 +249,6 @@ class ConfigSubscriber implements EventSubscriberInterface
         $fieldConfig->set('relation_key', $relationKey);
 
         $this->extendConfigProvider->persist($targetConfig);
-        //$this->extendConfigProvider->persist($fieldConfig);
     }
 
     protected function createTargetRelation(Config $fieldConfig, $relationKey)
