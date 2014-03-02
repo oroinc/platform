@@ -14,7 +14,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
  */
 class ControllersTest extends WebTestCase
 {
-    const ENTITY_NAME = 'Oro\Bundle\UserBundle\Entity\User';
+    const ENTITY_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
     protected $eventUpdate;
     protected $eventCreate;
@@ -68,18 +68,9 @@ class ControllersTest extends WebTestCase
 
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
-        $form['emailnotification[entityName]'] = 'Oro\Bundle\UserBundle\Entity\User';
+        $form['emailnotification[entityName]'] = self::ENTITY_NAME;
         $form['emailnotification[event]'] = $this->eventUpdate->getId();
-        $doc = new \DOMDocument("1.0");
-        $doc->loadHTML(
-            '<select required="required" name="emailnotification[template]" id="emailnotification_template" ' .
-            'tabindex="-1" class="select2-offscreen"> ' .
-            '<option value="" selected="selected"></option> ' .
-            '<option value="' . $this->templateUpdate->getId() . '">' .
-            'EmailBundle:' . $this->templateUpdate->getName() .
-            '</option> </select>'
-        );
-
+        $doc = $this->createSelectTemplate();
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
         $form->set($field);
         $form['emailnotification[template]'] = $this->templateUpdate->getId();
@@ -122,18 +113,9 @@ class ControllersTest extends WebTestCase
 
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
-        $form['emailnotification[entityName]'] = 'Oro\Bundle\UserBundle\Entity\User';
+        $form['emailnotification[entityName]'] = self::ENTITY_NAME;
         $form['emailnotification[event]'] = $this->eventCreate->getId();
-        $doc = new \DOMDocument("1.0");
-        $doc->loadHTML(
-            '<select required="required" name="emailnotification[template]" id="emailnotification_template" ' .
-            'tabindex="-1" class="select2-offscreen"> ' .
-            '<option value="" selected="selected"></option> ' .
-            '<option value="' . $this->templateUpdate->getId() . '">' .
-            'EmailBundle:' . $this->templateUpdate->getName() .
-            '</option> </select>'
-        );
-
+        $doc = $this->createSelectTemplate();
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
         $form->set($field);
         $form['emailnotification[template]'] = $this->templateUpdate->getId();
@@ -174,5 +156,19 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         ToolsAPI::assertJsonResponse($result, 204);
+    }
+
+    protected function createSelectTemplate()
+    {
+        $doc = new \DOMDocument("1.0");
+        $doc->loadHTML(
+            '<select required="required" name="emailnotification[template]" id="emailnotification_template" ' .
+            'tabindex="-1" class="select2-offscreen"> ' .
+            '<option value="" selected="selected"></option> ' .
+            '<option value="' . $this->templateUpdate->getId() . '">' .
+            'EmailBundle:' . $this->templateUpdate->getName() .
+            '</option> </select>'
+        );
+        return $doc;
     }
 }

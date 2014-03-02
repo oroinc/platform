@@ -160,6 +160,7 @@ class UserController extends Controller
         }
 
         return array(
+            'entity'        => $entity,
             'form'          => $this->get('oro_user.form.user')->createView(),
             'businessUnits' => $this->getBusinessUnitManager()->getBusinessUnitsTree($entity),
             'editRoute'     => $updateRoute,

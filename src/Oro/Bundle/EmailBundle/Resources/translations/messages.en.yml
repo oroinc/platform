@@ -24,6 +24,7 @@ oro:
         entity_label:        Email
         entity_plural_label: Emails
         entity_description:  Email message
+        send_email:          Send email
         id.label:            Id
         created.label:       Created at
         subject.label:       Subject
