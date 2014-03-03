@@ -85,7 +85,6 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/
             layout.init(element);
         });
 
-
         mediator.on('grid_render:complete', function(element) {
             layout.init(element);
         });
