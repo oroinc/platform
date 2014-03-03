@@ -24,12 +24,10 @@ function(_, Backbone, TransitionsShortListView) {
             template: null
         },
 
-        template: null,
-        transitionsListView: null,
-
         initialize: function() {
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
+            this.transitionsListView = null;
             this.listenTo(this.model, 'destroy', this.remove);
         },
 

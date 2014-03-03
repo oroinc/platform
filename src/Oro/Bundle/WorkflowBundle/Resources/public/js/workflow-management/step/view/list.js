@@ -17,11 +17,10 @@ function(_, Backbone, StepRowView) {
             workflow: null
         },
 
-        rowViews: [],
-
         initialize: function() {
             var template = this.options.template || $('#step-list-template').html();
             this.template = _.template(template);
+            this.rowViews = [];
 
             this.$listEl = $(this.template());
             this.$listElBody = this.$listEl.find(this.options.listElBodyEl);

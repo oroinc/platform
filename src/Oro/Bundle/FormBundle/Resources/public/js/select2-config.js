@@ -116,10 +116,14 @@ function($, _) {
         },
 
         initSelection: function(element, callback) {
+            var data = element.data('selected-data')
+                ? element.data('selected-data')
+                : [{'id': element.val(), 'text': element.val()}];
+
             if (this.config.multiple === true) {
-                callback(element.data('selected-data'));
+                callback(data);
             } else {
-                callback(element.data('selected-data').pop());
+                callback(data.pop());
             }
         },
 

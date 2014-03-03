@@ -14,7 +14,8 @@ function(_, Backbone) {
         tagName: 'li',
 
         events: {
-            'click .edit-transition': 'triggerEditTransition'
+            'click .edit-transition': 'triggerEditTransition',
+            'click .delete-transition': 'deleteTransition'
         },
 
         options: {
@@ -28,6 +29,11 @@ function(_, Backbone) {
 
             this.listenTo(this.options.model, 'change', this.render);
             this.listenTo(this.options.model, 'destroy', this.remove);
+        },
+
+        deleteTransition: function(e) {
+            e.preventDefault();
+            this.model.destroy();
         },
 
         triggerEditTransition: function (e) {

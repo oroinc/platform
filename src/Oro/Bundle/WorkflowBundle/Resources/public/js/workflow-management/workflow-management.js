@@ -16,6 +16,8 @@ function(_, Backbone,
 ) {
     'use strict';
 
+    var $ = Backbone.$;
+
     /**
      * @export  oro/workflow-management
      * @class   oro.WorkflowManagement
@@ -23,12 +25,13 @@ function(_, Backbone,
      */
     return Backbone.View.extend({
         events: {
-            'click .add-step-btn': 'addNewStep'
+            'click .add-step-btn': 'addNewStep',
+            'click .add-transition-btn': 'addNewTransition'
         },
 
         options: {
             stepsEl: null,
-            metadataFormEl: null,
+            saveBtnEl: null,
             model: null
         },
 
@@ -40,11 +43,20 @@ function(_, Backbone,
                 workflow: this.model
             });
 
-            this.listenTo(this.model.get('steps'), 'requestAddTransition', this.addNewTransition);
+            this.listenTo(this.model.get('steps'), 'requestAddTransition', this.addNewStepTransition);
             this.listenTo(this.model.get('steps'), 'requestEdit', this.openManageStepForm);
             this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
 
             this.listenTo(this.model.get('transitions'), 'requestEdit', this.openManageTransitionForm);
+
+            this.$saveBtn = $(this.options.saveBtnEl);
+            this.$saveBtn.on('click', _.bind(this.saveConfiguration, this));
+            this.model.url = this.$saveBtn.data('url');
+        },
+
+        saveConfiguration: function(e) {
+            e.preventDefault();
+            this.model.save();
         },
 
         _getStartStep: function() {
@@ -70,7 +82,11 @@ function(_, Backbone,
             this.openManageStepForm(new StepModel());
         },
 
-        addNewTransition: function(step) {
+        addNewTransition: function() {
+            this.addNewStepTransition(null);
+        },
+
+        addNewStepTransition: function(step) {
             this.openManageTransitionForm(new TransitionModel(), step);
         },
 
@@ -89,12 +105,14 @@ function(_, Backbone,
 
         addTransition: function(transition, stepFrom) {
             if (!this.model.get('transitions').get(transition.cid)) {
+                var stepFrom = this.model.getStepByName(stepFrom);
+                transition.set('is_start', stepFrom.get('_is_start'));
+
                 this.model
                     .get('transitions')
                     .add(transition);
 
-                this.model
-                    .getStepByName(stepFrom)
+                stepFrom
                     .getAllowedTransitions(this.model)
                     .add(transition);
             }

@@ -31,17 +31,18 @@
     {{ UI.cancelButton(path('oro_workflow_definition_index')) }}
 
     <div class="btn-group">
-        <button type="button" class="btn btn-success" id="save-btn">{{ 'Save'|trans }}</button>
+        <button type="button" class="btn btn-success" id="save-btn"
+            data-url="{{ path('oro_workflow_definition_index') }}">{{ 'Save'|trans }}</button>
     </div>
 {% endblock %}
 
 {% block pageHeader %}
     {% if entity.name %}
         {% set breadcrumbs = {
-        'entity':      entity,
-        'indexPath':   path('oro_workflow_definition_index'),
-        'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
-        'entityTitle': entity.label
+            'entity':      entity,
+            'indexPath':   path('oro_workflow_definition_index'),
+            'indexLabel': 'oro.workflow.workflowdefinition.entity_plural_label'|trans,
+            'entityTitle': entity.label
         } %}
         {{ parent() }}
     {% else %}
@@ -116,19 +117,41 @@
                             <input type="text" name="message" value="<%= message %>">
                         </div>
                     </div>
+
+                    {{ form_row(form.transition_prototype_icon)|replace({
+                            "<script": '<% print("<sc" + "ript"); %>',
+                            "</script": '<% print("</sc" + "ript"); %>',
+                            "<%": '<% print("<" + "%"); %>',
+                            "%>": '<% print("%" + ">"); %>',
+                        })|raw
+                    }}
+                    <% print('<sc' + 'ript>'); %>
+                    require(['jquery'], function($) {
+                        $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
+                    });
+                    <% print('</sc' + 'ript>'); %>
+
+                    <div class="control-group">
+                        <label class="control-label required">{{ "Button style"|trans }} </label>
+                        <div class="controls">
+                            <select name="button_color">
+                                <% _.each(allowedButtonStyles, function (style) { %>
+                                <option value="<%= style.name %>"
+                                <% if (buttonStyle == style.name) { %>selected="selected"<% } %>
+                                ><%= style.label %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <h5>{{ "Preconditions"|trans }}</h5>
-                <textarea disabled="disabled" style="width: 90%; height: 30px;"></textarea>
+                <div class="transition-example-container">
+                    <h5>Example</h5>
+                    <div class="transition-btn-example"></div>
+                </div>
 
                 <h5>{{ "Attributes"|trans }}</h5>
                 <div class="transition-attributes-container"></div>
-
-                <h5>{{ "Validations"|trans }}</h5>
-                <textarea disabled="disabled" style="width: 90%; height: 30px;"></textarea>
-
-                <h5>{{ "Post actions"|trans }}</h5>
-                <textarea disabled="disabled" style="width: 90%; height: 30px;"></textarea>
             </div>
 
             <div class="widget-actions">
@@ -201,7 +224,7 @@
             <% if (_is_start) { %>
                 <%= label %>
             <% } else { %>
-                <a href="#" class="edit-step"><%= label %></a>
+                <a href="#" class="edit-step" title="Edit step"><%= label %></a>
             <% } %>
             <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
         </td>
@@ -219,7 +242,7 @@
     </script>
 
     <script type="text/template" id="transition-row-short-template">
-        <a href="#" class="edit-transition"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
+        <a href="#" class="delete-transition" title="Remove transition"><i class="icon-trash"></i></a> <a href="#" class="edit-transition" title="Edit transition"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
     </script>
 
     {% set dataBlocks = [{
@@ -240,6 +263,7 @@
         <div class="workflow-definition-steps-list-container"></div>
         <div class="workflow-definition-buttons">
             <div class="pull-right">
+                <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
                 <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
             </div>
         </div>
@@ -272,13 +296,15 @@
                     {% endfor %}
                 {% endif %}
 
-                var workflowModel = new WorkflowModel({
-                    steps: steps,
-                    transitions: transitions
-                });
+                var configuration = {{ entity.configuration|json_encode|raw }};
+                configuration.name = {{ entity.name|json_encode|raw }};
+                configuration.steps = steps;
+                configuration.transitions = transitions;
+                var workflowModel = new WorkflowModel(configuration);
                 var workflowManagement = new WorkflowManagement({
                     el: '#{{ form.vars.id }}',
                     stepsEl: '.workflow-definition-steps-list-container',
+                    saveBtnEl: '#save-btn',
                     model: workflowModel
                 });
 

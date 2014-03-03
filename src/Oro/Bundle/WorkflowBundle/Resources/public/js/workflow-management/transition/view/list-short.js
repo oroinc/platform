@@ -16,9 +16,9 @@ function(_, Backbone, TransitionsShortRowView) {
             workflow: null
         },
 
-        rowViews: [],
-
         initialize: function() {
+            this.rowViews = [];
+
             this.listenTo(this.getCollection(), 'add', this.addItem);
             this.listenTo(this.getCollection(), 'reset', this.addAllItems);
         },

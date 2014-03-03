@@ -27,7 +27,12 @@ define(function() {
             var result = {};
             for (var i = 0; i < data.length; i++) {
                 var field = data[i];
-                result[field.name] = field.value;
+                var name = field.name;
+                var fieldNameParts = name.match(/\[(\w+)\]$/);
+                if (fieldNameParts) {
+                    name = fieldNameParts[1];
+                }
+                result[name] = field.value;
             }
             return result;
         }

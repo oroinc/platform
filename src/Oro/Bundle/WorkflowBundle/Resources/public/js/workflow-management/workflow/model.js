@@ -12,7 +12,7 @@ function(_, Backbone, StepCollection, TransitionCollection) {
         defaults: {
             name: '',
             label: '',
-            related_entity: '',
+            entity: '',
             start_step: null,
             steps_display_ordered: false,
             steps: null,

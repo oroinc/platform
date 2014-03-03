@@ -34,6 +34,14 @@ class WorkflowDefinitionType extends AbstractType
                 array(
                     'label' => 'Display all steps in order',
                 )
+            )
+            ->add(
+                'transition_prototype_icon',
+                'oro_icon_select',
+                array(
+                    'label' => 'Button icon',
+                    'mapped' => false
+                )
             );
     }
 
