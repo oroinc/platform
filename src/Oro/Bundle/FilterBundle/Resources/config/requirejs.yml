@@ -6,9 +6,6 @@ config:
         'jquery.multiselect.filter':
             deps:
                 - 'jquery.multiselect'
-        'jquery-ui-datevariables':
-            deps:
-                - 'jquery-ui'
     paths:
         'jquery.multiselect': 'bundles/orofilter/lib/multiselect/jquery.multiselect.js'
         'jquery.multiselect.filter': 'bundles/orofilter/lib/multiselect/jquery.multiselect.filter.js'

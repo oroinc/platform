@@ -200,10 +200,16 @@
 }
 
 .ui-datevariables-div dl {
-    margin: 0px;
+    margin: 0;
 }
+
 a.ui_dvariable {
     color: #006acc !important;
     font-weight: bold;
     cursor: pointer;
+}
+
+.ui-datevariables-div dl i {
+    color: #6b92d0;
+    font-size: 13px;
 }
