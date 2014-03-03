@@ -7,6 +7,13 @@ use Carbon\Carbon;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
+/**
+ * Class ExpressionResult
+ *
+ * @package Oro\Bundle\FilterBundle\Expression\Date
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExpressionResult
 {
     const TYPE_INT  = 1;
