@@ -46,13 +46,13 @@ abstract class AbstractDateFilter extends AbstractFilter
         }
 
         if (empty($data['date_start'])) {
-            $dateStartValue = '';
+            $dateStartValue = null;
         } else {
             $dateStartValue = Carbon::parse($data['date_start'], new \DateTimeZone('UTC'));
         }
 
         if (empty($data['date_end'])) {
-            $dateEndValue = '';
+            $dateEndValue = null;
         } else {
             $dateEndValue = Carbon::parse($data['date_end'], new \DateTimeZone('UTC'));
         }
