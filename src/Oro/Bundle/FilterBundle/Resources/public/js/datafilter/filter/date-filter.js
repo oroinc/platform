@@ -435,6 +435,16 @@ define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale
             }
 
             return selectedChoiceLabel;
+        },
+
+        /**
+         *
+         * @return {Object}
+         */
+        getValue: function() {
+            var value = ChoiceFilter.prototype.getValue.apply(this.value);
+
+            return this._formatRawValue({value: value});
         }
     });
 });
