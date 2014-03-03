@@ -174,8 +174,8 @@ define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale
          * @inheritDoc
          */
         render: function () {
-            var value = _.extend({}, this.emptyValue, this.value);
-            var part  = _.extend({}, this.emptyPart, {value: this.value.part, type: this.value.part});
+            var value = _.extend({}, this.emptyValue, this.value.value);
+            var part  = {value: value.part, type: value.part};
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
             var selectedPartLabel   = this._getSelectedChoiceLabel('dateParts', part);
