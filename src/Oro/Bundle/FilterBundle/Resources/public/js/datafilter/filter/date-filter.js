@@ -174,7 +174,7 @@ define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale
          * @inheritDoc
          */
         render: function () {
-            var value = _.extend({}, this.emptyValue, this.value.value);
+            var value = _.extend({}, this.emptyValue, this.value);
             var part  = {value: value.part, type: value.part};
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
@@ -434,16 +434,6 @@ define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale
             }
 
             return selectedChoiceLabel;
-        },
-
-        /**
-         *
-         * @return {Object}
-         */
-        getValue: function() {
-            var value = ChoiceFilter.prototype.getValue.apply(this.value);
-
-            return this._formatRawValue({value: value});
         }
     });
 });
