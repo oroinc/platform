@@ -574,6 +574,12 @@ define(['jquery', 'underscore', 'backgrid', 'oro/translator', 'oro/mediator', 'o
                      * @event grid_load:complete
                      */
                     mediator.trigger("grid_load:complete", this.collection);
+
+                    /**
+                     * Backbone event. Fired when data for grid has been successfully rendered.
+                     * @event grid_load:grid:complete
+                     */
+                    mediator.trigger("grid_load:grid:complete", this.$el);
                 }
             },
 
