@@ -6,6 +6,7 @@ define(function (require) {
     var $ = require('jquery');
 
     var app = require('oro/app');
+    var mediator = require('oro/mediator');
 
     var scrollspy = {};
 
@@ -17,12 +18,12 @@ define(function (require) {
 
         $('.scrollspy .responsive-section:nth-of-type(1) .scrollspy-title').css('display', 'none');
 
-        container.find('[data-spy="scroll"]').each(function () {
-            var $spy = $(this);
-            $spy.scrollspy($spy.data());
-            $(this).scrollspy('refresh');
-            $('.scrollspy-nav ul.nav li').removeClass('active');
-            $('.scrollspy-nav ul.nav li:first').addClass('active');
+        mediator.on('hash_navigation_request:refresh', function(){
+            scrollspy._init(container);
+        });
+
+        mediator.on('page-rendered', function(){
+            scrollspy._init(container);
         });
     };
 
@@ -116,6 +117,15 @@ define(function (require) {
             });
         });
     };
+
+    scrollspy._init = function(container) {
+        container.find('[data-spy="scroll"]').each(function () {
+            $(this).scrollspy($(this).data());
+            $(this).scrollspy('refresh');
+            $('.scrollspy-nav ul.nav li').removeClass('active');
+            $('.scrollspy-nav ul.nav li:first').addClass('active');
+        });
+    }
 
     return scrollspy;
 });

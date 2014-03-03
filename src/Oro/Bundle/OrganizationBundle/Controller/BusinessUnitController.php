@@ -106,6 +106,7 @@ class BusinessUnitController extends Controller
         }
 
         return array(
+            'entity' => $entity,
             'form' => $this->get('oro_organization.form.business_unit')->createView(),
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete an owner and related entities or reassign related entities to another owner before

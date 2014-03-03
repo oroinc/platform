@@ -1,0 +1,106 @@
+<?php
+
+namespace ;
+
+use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
+class AllMigration implements Migration
+{
+    /**
+     * @inheritdoc
+     */
+    public function up(Schema $schema, QueryBag $queries)
+    {
+    {% for table in schema.tables %}
+    /** Generate table {{ table.name }} **/
+        $table = $schema->createTable('{{ table.name }}');
+    {% for column in table.columns %}
+    $table->addColumn('{{ column.name }}', '{{ column.type.name }}', {{ _self.dumpColumnOptions(column) }});
+    {% endfor -%}
+    {% for index in table.indexes -%}
+    {% if index.isPrimary %}
+    $table->setPrimaryKey({{ _self.dumpArray(index.columns) }});
+    {% elseif index.isUnique -%}
+    $table->addUniqueIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}');
+    {% else -%}
+    $table->addIndex({{ _self.dumpArray(index.columns) }}, '{{ index.name }}', {{ _self.dumpArray(index.flags) }});
+    {% endif %}
+    {% endfor -%}
+    /** End of generate table {{ table.name }} **/
+
+    {% endfor %}
+
+    {% for table in schema.tables -%}
+    {% if table.ForeignKeys is not empty %}
+    /** Generate foreign keys for table {{ table.name }} **/
+        $table = $schema->getTable('{{ table.name }}');
+    {% for foreignKey in table.ForeignKeys %}
+    $table->addForeignKeyConstraint($schema->getTable('{{ foreignKey.foreignTableName }}'), {{ _self.dumpArray(foreignKey.localColumns) }}, {{ _self.dumpArray(foreignKey.foreignColumns) }}, {{ _self.dumpOptionsArray(foreignKey.options) }});
+    {% endfor %}
+    /** End of generate foreign keys for table {{ table.name }} **/
+
+    {% endif -%}
+    {% endfor %}
+    }
+}
+
+{% macro dumpColumnOptions(column) %}
+{% spaceless %}
+{% set options = getColumnOptions(column) %}
+{% set items = [] %}
+{% if options.default is defined %}{% set items = items|merge(["'default' => " ~ _self.dumpString(options.default)]) %}{% endif -%}
+{% if options.notnull is defined %}{% set items = items|merge(["'notnull' => " ~ _self.dumpBoolean(options.notnull)]) %}{% endif -%}
+{% if options.length is defined %}{% set items = items|merge(["'length' => " ~ _self.dumpInteger(options.length)]) %}{% endif -%}
+{% if options.precision is defined %}{% set items = items|merge(["'precision' => " ~ _self.dumpInteger(options.precision)]) %}{% endif -%}
+{% if options.scale is defined %}{% set items = items|merge(["'scale' => " ~ _self.dumpInteger(options.scale)]) %}{% endif -%}
+{% if options.fixed is defined %}{% set items = items|merge(["'fixed' => " ~ _self.dumpBoolean(options.fixed)]) %}{% endif -%}
+{% if options.unsigned is defined %}{% set items = items|merge(["'unsigned' => " ~ _self.dumpBoolean(options.unsigned)]) %}{% endif -%}
+{% if options.autoincrement is defined %}{% set items = items|merge(["'autoincrement' => " ~ _self.dumpBoolean(options.autoincrement)]) %}{% endif -%}
+{% if options.comment is defined %}{% set items = items|merge(["'comment' => " ~ _self.dumpString(options.comment)]) %}{% endif -%}
+[{% for item in items %}{% if not loop.first %}, {% endif %}{{ item|raw }}{% endfor %}]
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpOptionsArray(arrayValues) %}
+{% spaceless %}
+[{% for valueName, value in arrayValues %}{% if value is null %}'{{ valueName }}' => null, {% elseif value is same as(true) %}'{{ valueName }}' => true, {% elseif value is same as(false) %}'{{ valueName }}' => false, {% else  %}'{{ valueName }}' => '{{value  }}', {% endif %}{% endfor %}]
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpArray(arrayValues) %}
+{% spaceless %}
+[{% for value in arrayValues %}{% if not loop.first %}, {% endif %}'{{ value }}'{% endfor %}]
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpBoolean(value) %}
+{% spaceless %}
+    {% if value %}
+        true
+    {% else %}
+        false
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpString(value) %}
+{% spaceless %}
+    {% if value is not null %}
+        '{{ value }}'
+    {% else %}
+        null
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}
+
+{% macro dumpInteger(value) %}
+{% spaceless %}
+    {% if value is not null %}
+        {{ value }}
+    {% else %}
+        null
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}

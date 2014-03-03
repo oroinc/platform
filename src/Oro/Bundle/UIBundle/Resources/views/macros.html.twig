@@ -86,27 +86,86 @@
 {% endmacro %}
 
 {#
+    Create the link
+    Parameters - array:
+        [
+            'path'  - button url
+            'class' - default class
+            'aCss'  - additional button class
+            'title' - button title
+            'iCss'  - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro link(parameters) %}
+    <a href="{{ parameters.path }}"
+       class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
+       title="{{ parameters.title|trans }}">
+        {% if parameters.iCss is defined %}
+            <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        {% endif %}{{ parameters.label|trans }}
+    </a>
+{% endmacro %}
+
+{#
     Create the button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title
-            'iClass' - css class for 'i' tag (icon)
+            'iCss'  - css class for 'i' tag (icon)
             'label' - button label
         ]
 #}
 {% macro button(parameters) %}
     <div class="pull-left btn-group icons-holder">
-        <a href="{{ parameters.path }}"
-           class="btn back icons-holder-text {{ parameters.aClass is defined? parameters.aClass : '' }}"
-           title="{{ parameters.title|trans }}">
-            {% if parameters.iClass is defined %}
-                <i class="{{ parameters.iClass }} hide-text" >{{ parameters.label|trans }}</i>
-            {% endif %}
-            {{ parameters.label|trans }}
-        </a>
+        {{ _self.link(parameters|merge({'class': 'btn back icons-holder-text'})) }}
     </div>
+{% endmacro %}
+
+{#
+    Create dropdown button
+    Parameters - array:
+        [
+            'label' - button label
+            'elements' - dropdown elements
+            'html' - html from placeholder
+            'aCss'  - additional drop down class
+        ]
+#}
+{% macro dropdownButton(parameters) %}
+    <div class="btn-group">
+        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            {{ parameters.label|trans }}
+            <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
+            {% if parameters.elements is defined and parameters.elements is not empty %}
+                {% for item in parameters.elements %}
+                    {{ _self.dropdownItem(parameters) }}
+                {% endfor %}
+            {% endif %}
+            {% if parameters.html is defined and parameters.html is not empty %}
+                {{ parameters.html }}
+            {% endif %}
+        </ul>
+    </div>
+{% endmacro %}
+
+{#
+    Create the dropdown button item
+    Parameters - array:
+        [
+            'path'  - button url
+            'aCss'  - additional button class
+            'title' - button title
+            'iCss'  - css class for 'i' tag (icon)
+            'label' - button label
+        ]
+#}
+{% macro dropdownItem(parameters) %}
+    <li>{{ _self.link(parameters) }}</li>
 {% endmacro %}
 
 {#
@@ -123,21 +182,21 @@
     Create 'Edit' button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title | 'Edit' by default
             'label' - button label | 'Edit' by default
             'entity_label' - if specified will be added for title and label
         ]
 #}
 {% macro editButton(parameters) %}
-    {% set iClass = ['icon-edit'] %}
-    {% set aClass = ['edit-button', 'main-group'] %}
-    {% if parameters.iClass is defined %}
-        {% set iClass = parameters.iClass|split(' ')|merge(iClass) %}
+    {% set iCss = ['icon-edit'] %}
+    {% set aCss = ['edit-button', 'main-group'] %}
+    {% if parameters.iCss is defined %}
+        {% set iCss = parameters.iCss|split(' ')|merge(iCss) %}
     {% endif %}
-    {% if parameters.aClass is defined %}
-        {% set aClass = parameters.aClass|split(' ')|merge(aClass) %}
+    {% if parameters.aCss is defined %}
+        {% set aCss = parameters.aCss|split(' ')|merge(aCss) %}
     {% endif %}
     {% set title = parameters.title is defined
         ? parameters.title
@@ -148,8 +207,8 @@
         : 'Edit'|trans
     %}
     {% set parameters = parameters|merge({
-        'iClass': iClass|join(' '),
-        'aClass': aClass|join(' '),
+        'iCss': iCss|join(' '),
+        'aCss': aCss|join(' '),
         'title': title,
         'label': label
     }) %}
@@ -160,8 +219,8 @@
     Create 'add' button
     Parameters - array:
         [
-            'path' - button url
-            'aClass' - additional button class
+            'path'  - button url
+            'aCss'  - additional button class
             'title' - button title | 'Create' by default
             'label' - button label | 'Create' by default
             'entity_label' - if specified will be added for title and label
@@ -169,7 +228,7 @@
 #}
 {% macro addButton(parameters) %}
     <a href="{{ parameters.path }}"
-        class="btn main-group btn-primary pull-right {{ parameters.aClass is defined? parameters.aClass : '' }}"
+        class="btn main-group btn-primary pull-right {{ parameters.aCss is defined? parameters.aCss : '' }}"
         title="{{ parameters.title is defined ? parameters.title : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}"
     >
         {{ parameters.label is defined ? parameters.label : 'Create'|trans ~ (parameters.entity_label is defined ? ' ' ~ parameters.entity_label|lower : '') }}
@@ -221,10 +280,75 @@
     </div>
 {% endmacro %}
 
+
 {#
     A button with javascript handler
     Parameters - array:
         [
+            'class' - default class
+            'aCss' - additional css class for 'a' tag
+            'iCss' - additional css class for 'i' tag
+            'dataId' - data-id parameter
+            'dataUrl' - data-url parameter
+            'dataRedirect' - url to redirect after an operation finished
+            'successMessage' - a message which will be shown after an operation finished
+            'title' - button title
+            'label' - button label
+            'visible' - determined whether the button is visible or not. Defaults to true,
+            'dataAttributes' - additional data attributes
+        ]
+#}
+{% macro clientLink(parameters) %}
+    <a href="javascript: void(0);" class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
+        {% if (parameters.id is defined) %}
+        id="{{ parameters.id }}"
+        {% endif %}
+        {% if (parameters.dataId is defined) %}
+        data-id="{{ parameters.dataId }}"
+        {% endif %}
+        {% if (parameters.dataUrl is defined) %}
+        data-url="{{ parameters.dataUrl }}"
+        {% endif %}
+        {% if (parameters.successMessage is defined) %}
+        data-success-message="{{ parameters.successMessage|trans }}"
+        {% endif %}
+        {% if parameters.dataRedirect is defined %}
+        data-redirect="{{ parameters.dataRedirect  }}"
+        {% endif %}
+        {% if (parameters.title is defined) %}
+        title="{{ parameters.title|trans }}"
+        {% endif -%}
+        {% if (parameters.visible is defined and not parameters.visible) %}
+        style="display: none"
+        {% endif -%}
+        {% if parameters.widget is defined and parameters.widget|length %}
+            {{ _self.renderWidgetDataAttributes(parameters.widget) }}
+        {% endif %}
+        {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
+            {{ _self.renderAttributes(parameters.dataAttributes) }}
+        {% endif %}
+        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
+    </a>
+{% endmacro %}
+
+{% macro renderWidgetDataAttributes(options) %}
+    {{ _self.renderAttributes(options, 'widget') }}
+{% endmacro %}
+
+{% macro renderAttributes(options, prefix) %}
+    {% for name, value in options %}
+        {% if (value is iterable) %}
+            {% set value = value|json_encode(constant('JSON_FORCE_OBJECT')) %}
+        {% endif %}
+        data-{% if prefix is not empty %}{{ prefix }}-{% endif %}{{ name }}="{{ value }}"
+    {% endfor %}
+{% endmacro %}
+
+{#
+    A button with javascript handler
+    Parameters - array:
+        [
+            'class' - default class
             'aCss' - additional css class for 'a' tag
             'iCss' - additional css class for 'i' tag
             'dataId' - data-id parameter
@@ -238,31 +362,28 @@
 #}
 {% macro clientButton(parameters) %}
     <div class="pull-left btn-group icons-holder">
-        <a href="javascript: void(0);" class="btn icons-holder-text {{ parameters.aCss is defined ? parameters.aCss : '' }}"
-            {% if (parameters.id is defined) %}
-            id="{{ parameters.id }}"
-            {% endif %}
-            {% if (parameters.dataId is defined) %}
-            data-id="{{ parameters.dataId }}"
-            {% endif %}
-            {% if (parameters.dataUrl is defined) %}
-            data-url="{{ parameters.dataUrl }}"
-            {% endif %}
-            {% if (parameters.successMessage is defined) %}
-            data-success-message="{{ parameters.successMessage|trans }}"
-            {% endif %}
-            {% if parameters.dataRedirect is defined %}
-            data-redirect="{{ parameters.dataRedirect  }}"
-            {% endif %}
-            {% if (parameters.title is defined) %}
-            title="{{ parameters.title|trans }}"
-            {% endif -%}
-            {% if (parameters.visible is defined and not parameters.visible) %}
-            style="display: none"
-            {% endif -%}
-        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
-        </a>
+        {{ _self.clientLink(parameters|merge({'class': 'btn icons-holder-text'})) }}
     </div>
+{% endmacro %}
+
+{#
+    A button with javascript handler
+    Parameters - array:
+        [
+            'class' - default class
+            'aCss' - additional css class for 'a' tag
+            'iCss' - additional css class for 'i' tag
+            'dataId' - data-id parameter
+            'dataUrl' - data-url parameter
+            'dataRedirect' - url to redirect after an operation finished
+            'successMessage' - a message which will be shown after an operation finished
+            'title' - button title
+            'label' - button label
+            'visible' - determined whether the button is visible or not. Defaults to true
+        ]
+#}
+{% macro dropdownClientItem(parameters) %}
+    <li>{{ _self.clientLink(parameters) }}</li>
 {% endmacro %}
 
 {#

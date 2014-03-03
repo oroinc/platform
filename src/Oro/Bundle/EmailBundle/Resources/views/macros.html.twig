@@ -225,11 +225,3 @@
     {%- endif %}
 {%- endmacro %}
 
-{% macro renderJs() %}
-    <script type="text/javascript">
-        !function() {
-            /* global:require */
-            require(['oro/init-email']);
-        }();
-    </script>
-{% endmacro %}

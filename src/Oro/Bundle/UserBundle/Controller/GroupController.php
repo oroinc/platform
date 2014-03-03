@@ -94,6 +94,7 @@ class GroupController extends Controller
         }
 
         return array(
+            'entity'   => $entity,
             'form'     => $this->get('oro_user.form.group')->createView(),
         );
     }

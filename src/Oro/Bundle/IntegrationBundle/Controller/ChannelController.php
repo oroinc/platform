@@ -111,6 +111,7 @@ class ChannelController extends Controller
         $form = $this->getForm();
 
         return [
+            'entity' => $channel,
             'form' => $form->createView()
         ];
     }
