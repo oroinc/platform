@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
@@ -114,16 +113,12 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     protected function createWorkflowAttributesType(
-        FormRegistry $formRegistry = null,
         WorkflowRegistry $workflowRegistry = null,
         AttributeGuesser $attributeGuesser = null,
         DefaultValuesListener $defaultValuesListener = null,
         InitActionsListener $initActionListener = null,
         RequiredAttributesListener $requiredAttributesListener = null
     ) {
-        if (!$formRegistry) {
-            $formRegistry = $this->createFormRegistryMock();
-        }
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createWorkflowRegistryMock();
         }
@@ -141,7 +136,6 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         }
 
         return new WorkflowAttributesType(
-            $formRegistry,
             $workflowRegistry,
             $attributeGuesser,
             $defaultValuesListener,
@@ -169,7 +163,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     {
         return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeGuesser')
             ->disableOriginalConstructor()
-            ->setMethods(array('guessMetadataAndField'))
+            ->setMethods(array('guessClassAttributeForm'))
             ->getMock();
     }
 

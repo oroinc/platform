@@ -24,7 +24,6 @@ services:
     oro_workflow.form.type.attributes:
         class: %oro_workflow.form.type.attributes.class%
         arguments:
-            - @form.registry
             - @oro_workflow.registry
             - @oro_workflow.attribute_guesser
             - @oro_workflow.form.event_listener.default_values

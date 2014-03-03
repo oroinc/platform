@@ -25,11 +25,6 @@ class WorkflowAttributesType extends AbstractType
     const NAME = 'oro_workflow_attributes';
 
     /**
-     * @var FormRegistry
-     */
-    protected $formRegistry;
-
-    /**
      * @var WorkflowRegistry
      */
     protected $workflowRegistry;
@@ -55,12 +50,6 @@ class WorkflowAttributesType extends AbstractType
     protected $requiredAttributesListener;
 
     /**
-     * @var FormTypeGuesserInterface
-     */
-    protected $formTypeGuesser;
-
-    /**
-     * @param FormRegistry $formRegistry
      * @param WorkflowRegistry $workflowRegistry
      * @param AttributeGuesser $attributeGuesser,
      * @param DefaultValuesListener $defaultValuesListener
@@ -68,14 +57,12 @@ class WorkflowAttributesType extends AbstractType
      * @param RequiredAttributesListener $requiredAttributesListener
      */
     public function __construct(
-        FormRegistry $formRegistry,
         WorkflowRegistry $workflowRegistry,
         AttributeGuesser $attributeGuesser,
         DefaultValuesListener $defaultValuesListener,
         InitActionsListener $initActionsListener,
         RequiredAttributesListener $requiredAttributesListener
     ) {
-        $this->formRegistry = $formRegistry;
         $this->workflowRegistry = $workflowRegistry;
         $this->attributeGuesser = $attributeGuesser;
         $this->defaultValuesListener = $defaultValuesListener;
@@ -145,6 +132,9 @@ class WorkflowAttributesType extends AbstractType
                     )
                 );
             }
+            if (null === $attributeOptions) {
+                $attributeOptions = array();
+            }
             $this->addAttributeField($builder, $attribute, $attributeOptions, $options);
         }
     }
@@ -181,7 +171,7 @@ class WorkflowAttributesType extends AbstractType
         /** @var Workflow $workflow */
         $workflow = $options['workflow'];
 
-        // updates form options
+        // set default form options
         if (!isset($attributeOptions['options'])) {
             $attributeOptions['options'] = array();
         }
@@ -189,7 +179,7 @@ class WorkflowAttributesType extends AbstractType
         // try to guess form type and form options
         $attributeOptions = $this->guessAttributeOptions($workflow, $attribute, $attributeOptions);
 
-        // ensure has form_type
+        // ensure that attribute has form_type
         if (empty($attributeOptions['form_type'])) {
             throw new InvalidConfigurationException(
                 sprintf(
@@ -200,13 +190,17 @@ class WorkflowAttributesType extends AbstractType
             );
         }
 
-        // updates form options label
-        if (!isset($attributeOptions['options']['label'])) {
-            $attributeOptions['options']['label'] = isset($attributeOptions['label'])
-                ? $attributeOptions['label']
-                : $attribute->getLabel();
+        // update form label
+        $attributeOptions['options']['label'] = isset($attributeOptions['label'])
+            ? $attributeOptions['label']
+            : $attribute->getLabel();
+
+        // update required option
+        if (!array_key_exists('required', $attributeOptions['options'])) {
+            $attributeOptions['options']['required'] = false;
         }
 
+        // set disabled option
         if ($options['disable_attribute_fields']) {
             $attributeOptions['options']['disabled'] = true;
         }
@@ -282,42 +276,16 @@ class WorkflowAttributesType extends AbstractType
             return $attributeOptions;
         }
 
-        $propertyPath = $attribute->getPropertyPath();
-        if (!$propertyPath) {
-            return $attributeOptions;
-        }
-
         $relatedEntity = $workflow->getDefinition()->getRelatedEntity();
-        $attributeParameters = $this->attributeGuesser->guessMetadataAndField($relatedEntity, $propertyPath);
-        if (!$attributeParameters) {
+        $typeGuess = $this->attributeGuesser->guessClassAttributeForm($relatedEntity, $attribute);
+        if (!$typeGuess) {
             return $attributeOptions;
         }
 
-        /** @var ClassMetadata $metadata */
-        $metadata = $attributeParameters['metadata'];
-        $class = $metadata->getName();
-        $field = $attributeParameters['field'];
-
-        $typeGuess = $this->getFormTypeGuesser()->guessType($class, $field);
         $attributeOptions['form_type'] = $typeGuess->getType();
         $attributeOptions['options'] = array_merge_recursive($attributeOptions['options'], $typeGuess->getOptions());
-        if (!array_key_exists('required', $attributeOptions['options'])) {
-            $attributeOptions['options']['required'] = false;
-        }
 
         return $attributeOptions;
-    }
-
-    /**
-     * @return FormTypeGuesserInterface
-     */
-    protected function getFormTypeGuesser()
-    {
-        if (!$this->formTypeGuesser) {
-            $this->formTypeGuesser = $this->formRegistry->getTypeGuesser();
-        }
-
-        return $this->formTypeGuesser;
     }
 
     /**

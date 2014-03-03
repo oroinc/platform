@@ -117,10 +117,6 @@ class WidgetController extends Controller
             $transitionForm->submit($this->getRequest());
 
             if ($transitionForm->isValid()) {
-                /** @var WorkflowAwareSerializer $serializer */
-                $serializer = $this->get('oro_workflow.serializer.data.serializer');
-                $serializer->setWorkflowName($workflow->getName());
-
                 // Create new WorkflowData instance with all data required to start.
                 // Original WorkflowData can not be used, as some attributes may be set by reference
                 // So, serialized data will not contain all required data.
@@ -144,6 +140,9 @@ class WidgetController extends Controller
                     }
                 }
 
+                /** @var WorkflowAwareSerializer $serializer */
+                $serializer = $this->get('oro_workflow.serializer.data.serializer');
+                $serializer->setWorkflowName($workflow->getName());
                 $data = $serializer->serialize(new WorkflowData($existingAttributes + $formAttributes), 'json');
                 $saved = true;
             }

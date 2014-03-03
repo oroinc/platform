@@ -36,11 +36,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $formRegistry;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $attributeGuesser;
 
 
@@ -48,7 +43,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     {
         parent::setUp();
 
-        $this->formRegistry = $this->createFormRegistryMock();
         $this->workflowRegistry = $this->createWorkflowRegistryMock();
         $this->attributeGuesser = $this->createAttributeGuesserMock();
         $this->defaultValuesListener = $this->createDefaultValuesListenerMock();
@@ -56,7 +50,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
 
         $this->type = $this->createWorkflowAttributesType(
-            $this->formRegistry,
             $this->workflowRegistry,
             $this->attributeGuesser,
             $this->defaultValuesListener,
@@ -116,25 +109,11 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         }
 
         // Set guessed data for attributes
-        $formTypeGuesser = $this->getMockForAbstractClass('Symfony\Component\Form\FormTypeGuesserInterface');
-        $this->formRegistry->expects($this->any())
-            ->method('getTypeGuesser')
-            ->will($this->returnValue($formTypeGuesser));
-
         foreach ($guessedData as $number => $guess) {
-            $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
-            $metadata->expects($this->any())
-                ->method('getName')
-                ->will($this->returnValue($guess['class']));
-            $this->attributeGuesser->expects($this->at($number))
-                ->method('guessMetadataAndField')
-                ->with($guess['entity'], $guess['property_path'])
-                ->will($this->returnValue(array('metadata' => $metadata, 'field' => $guess['field'])));
-
             $typeGuess = new TypeGuess($guess['form_type'], $guess['form_options'], TypeGuess::VERY_HIGH_CONFIDENCE);
-            $formTypeGuesser->expects($this->at($number))
-                ->method('guessType')
-                ->with($guess['class'], $guess['field'])
+            $this->attributeGuesser->expects($this->at($number))
+                ->method('guessClassAttributeForm')
+                ->with($guess['entity'], $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\Attribute'))
                 ->will($this->returnValue($typeGuess));
         }
 
@@ -208,7 +187,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 ),
                 'childrenOptions' => array(
                     'first'  => array('label' => 'First Custom', 'required' => true),
-                    'second' => array('label' => 'Second Custom', 'required' => false),
+                    'second' => array('label' => 'Second', 'required' => false),
                 )
             ),
             'partial_fields' => array(
@@ -276,18 +255,18 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 'formOptions' => array(
                     'workflow' => $workflow = $this->createWorkflow(
                         'test_workflow_with_attributes',
-                        array('first' => $this->createAttribute('first', null, null, 'entity.association.first')),
+                        array('first' => $this->createAttribute('first', null, 'Attribute Label', 'entity.first')),
                         array(),
                         'RelatedEntity'
                     ),
                     'workflow_item' => $this->createWorkflowItem($workflow),
                     'attribute_fields' => array(
-                        'first'  => array()
+                        'first' => null
                     ),
                 ),
                 'childrenOptions' => array(
                     'first'  => array(
-                        'label' => 'Guessed Label',
+                        'label' => 'Attribute Label',
                         'max_length' => 50,
                         'required' => false
                     ),
@@ -295,9 +274,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 'guessedData' => array(
                     array(
                         'entity' => 'RelatedEntity',
-                        'property_path' => 'entity.association.first',
-                        'class' => 'AssociationEntity',
-                        'field' => 'first',
                         'form_type' => 'text',
                         'form_options' => array(
                             'label' => 'Guessed Label',
