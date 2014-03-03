@@ -196,14 +196,27 @@
     width: 200px;
     border: 1px #aaaaaa solid;
     background-color: white;
-    padding: 0 2px 0 2px;
+    padding: 5px;
 }
 
-.ui-datevariables-div dl {
-    margin: 0px;
+.ui-datevariables-div ul {
+    margin: 0;
+    padding: 0;
 }
+
+.ui-datevariables-div ul li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 a.ui_dvariable {
     color: #006acc !important;
     font-weight: bold;
     cursor: pointer;
+}
+
+.ui-datevariables-div i {
+    color: #6b92d0;
+    font-size: 13px;
 }

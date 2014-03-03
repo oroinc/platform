@@ -1,7 +1,8 @@
 /*global define*/
-define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-ui-timepicker',
-    'jquery-ui-datevariables'], function ($, _, DateFilter, localeSettings) {
+define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-ui-timepicker', 'jquery-ui-datevariables'],
+function ($, _, DateFilter, localeSettings) {
     'use strict';
+
     /**
      * Datetime filter: filter type as option + interval begin and end dates
      *
@@ -49,6 +50,7 @@ define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-
         _initializeDateWidget: function(widgetSelector) {
             this.$(widgetSelector).datevariables(this.dateWidgetOptions);
             var widget = this.$(widgetSelector).datevariables('widget');
+
             widget.addClass(this.dateWidgetOptions.className);
             $(this.dateWidgetSelector).on('click', function(e) {
                 e.stopImmediatePropagation();
@@ -110,11 +112,15 @@ define(['jquery', 'underscore', './date-filter', 'oro/locale-settings', 'jquery-
                 value.value.start = this._formatDatetime(
                     value.value.start, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat
                 );
+
+                value.value.start = value.value.start.replace(/^\s+|\s+$/g, '');
             }
             if (value.value && value.value.end) {
                 value.value.end = this._formatDatetime(
                     value.value.end, dateFromFormat, dateToFormat, timeFromFormat, timeToToFormat
                 );
+
+                value.value.end = value.value.end.replace(/^\s+|\s+$/g, '');
             }
             return value;
         },

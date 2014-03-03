@@ -344,8 +344,7 @@ define(['jquery', 'underscore', 'oro/translator', './choice-filter', 'oro/locale
             return value;
         },
 
-        _replaceDateVars: function(value, mode)
-        {
+        _replaceDateVars: function(value, mode) {
             // replace date variables with constant values
             var dateVars = this.dateWidgetOptions.dateVars;
 

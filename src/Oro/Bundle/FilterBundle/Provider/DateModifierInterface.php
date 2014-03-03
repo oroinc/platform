@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Provider;
 
-
 interface DateModifierInterface
 {
     const LABEL_VAR_PREFIX  = 'oro.filter.form.label_date_var.';

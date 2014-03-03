@@ -9,3 +9,13 @@
 "from": "from"
 "to": "to"
 "and": "and"
+oro:
+    filter:
+        date:
+            variable:
+                title: Available variables
+                tooltip_title: Date expressions
+                tooltip: >
+                    You can also use them to create expressions.<br/>
+                    For example:<br/>
+                    "today - 2" will be evaluated as the day before yesterday.

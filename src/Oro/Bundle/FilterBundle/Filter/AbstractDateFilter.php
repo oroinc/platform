@@ -6,6 +6,7 @@ use Carbon\Carbon;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
@@ -13,24 +14,25 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 abstract class AbstractDateFilter extends AbstractFilter
 {
-    /**
-     * DateTime object as string format
-     */
+    /** DateTime object as string format */
     const DATETIME_FORMAT = 'Y-m-d';
 
-    /**
-     * @var LocaleSettings
-     */
+    /** @var LocaleSettings */
     protected $localeSettings;
+
+    /** @var Compiler */
+    protected $expressionCompiler;
 
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        LocaleSettings $localeSettings = null
+        Compiler $compiler,
+        LocaleSettings $localeSettings
     ) {
         parent::__construct($factory, $util);
 
-        $this->localeSettings = $localeSettings;
+        $this->expressionCompiler = $compiler;
+        $this->localeSettings     = $localeSettings;
     }
 
     /**
@@ -46,9 +48,8 @@ abstract class AbstractDateFilter extends AbstractFilter
         $dateStartValue = Carbon::parse($data['date_start'], new \DateTimeZone('UTC'));
         $dateEndValue   = Carbon::parse($data['date_end'], new \DateTimeZone('UTC'));
 
-        $datePart  = $data['part'];
         $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-        $fieldName = $this->applyDatePart($datePart, $fieldName, $dateStartValue, $dateEndValue);
+        $fieldName = $this->applyDatePart($data['part'], $fieldName, $dateStartValue, $dateEndValue);
 
         $startDateParameterName = $ds->generateParameterName($this->getName());
         $endDateParameterName   = $ds->generateParameterName($this->getName());
@@ -110,10 +111,10 @@ abstract class AbstractDateFilter extends AbstractFilter
         if (!in_array(
             $data['type'],
             array(
-                DateRangeFilterType::TYPE_BETWEEN,
-                DateRangeFilterType::TYPE_NOT_BETWEEN,
-                DateRangeFilterType::TYPE_MORE_THAN,
-                DateRangeFilterType::TYPE_LESS_THAN
+                 DateRangeFilterType::TYPE_BETWEEN,
+                 DateRangeFilterType::TYPE_NOT_BETWEEN,
+                 DateRangeFilterType::TYPE_MORE_THAN,
+                 DateRangeFilterType::TYPE_LESS_THAN
             )
         )
         ) {
@@ -163,8 +164,8 @@ abstract class AbstractDateFilter extends AbstractFilter
     }
 
     /**
-     * @param string                   $part
-     * @param string                   $field
+     * @param string           $part
+     * @param string           $field
      *
      * @param Carbon|\DateTime $dateStart
      * @param Carbon|\DateTime $dateEnd
@@ -175,37 +176,37 @@ abstract class AbstractDateFilter extends AbstractFilter
     {
         switch ($part) {
             case DateModifierInterface::PART_MONTH:
-                $field = sprintf('MONTH(%s)', $field);
+                $field     = sprintf('MONTH(%s)', $field);
                 $dateStart = $dateStart->month;
                 $dateEnd   = $dateEnd->month;
                 break;
             case DateModifierInterface::PART_DOW:
-                $field = sprintf('DAYOFWEEK(%s)', $field);
+                $field     = sprintf('DAYOFWEEK(%s)', $field);
                 $dateStart = $dateStart->dayOfWeek;
                 $dateEnd   = $dateEnd->dayOfWeek;
                 break;
             case DateModifierInterface::PART_WEEK:
-                $field = sprintf('WEEK(%s)', $field);
+                $field     = sprintf('WEEK(%s)', $field);
                 $dateStart = $dateStart->weekOfYear;
                 $dateEnd   = $dateEnd->weekOfYear;
                 break;
             case DateModifierInterface::PART_DAY:
-                $field = sprintf('DAY(%s)', $field);
+                $field     = sprintf('DAY(%s)', $field);
                 $dateStart = $dateStart->day;
                 $dateEnd   = $dateEnd->day;
                 break;
             case DateModifierInterface::PART_QUARTER:
-                $field = sprintf('QUARTER(%s)', $field);
+                $field     = sprintf('QUARTER(%s)', $field);
                 $dateStart = $dateStart->quarter;
                 $dateEnd   = $dateEnd->quarter;
                 break;
             case DateModifierInterface::PART_DOY:
-                $field = sprintf('DAYOFYEAR(%s)', $field);
+                $field     = sprintf('DAYOFYEAR(%s)', $field);
                 $dateStart = $dateStart->dayOfYear;
                 $dateEnd   = $dateEnd->dayOfYear;
                 break;
             case DateModifierInterface::PART_YEAR:
-                $field = sprintf('YEAR(%s)', $field);
+                $field     = sprintf('YEAR(%s)', $field);
                 $dateStart = $dateStart->year;
                 $dateEnd   = $dateEnd->year;
                 break;
@@ -407,67 +408,19 @@ abstract class AbstractDateFilter extends AbstractFilter
      */
     public function processParams($data)
     {
-        $data['value']['start'] = $this->replaceDateVariables($data['value']['start']);
-        $data['value']['end']   = $this->replaceDateVariables($data['value']['end']);
+        $start = $this->expressionCompiler->compile($data['value']['start']);
+        $end   = $this->expressionCompiler->compile($data['value']['end']);
+
+        if ($start instanceof Carbon) {
+            $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
+        }
+        if ($end instanceof Carbon) {
+            $end->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
+        }
+
+        $data['value']['start'] = (string)$start;
+        $data['value']['end']   = (string)$end;
 
         return $data;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return string replaced actual datetime value
-     */
-    protected function replaceDateVariables($value)
-    {
-        if (empty($value)) {
-            $value = '';
-        }
-
-        if (preg_match_all('#{{(\d+)}}#', $value, $matches)) {
-            $varsCodes = $matches[1];
-
-            $timezone = $this->localeSettings->getTimeZone();
-            foreach ($varsCodes as $code) {
-                switch ($code) {
-                    case DateModifierInterface::VAR_NOW:
-                        $dateValue = Carbon::parse('now', $timezone);
-                        break;
-                    case DateModifierInterface::VAR_TODAY:
-                    case DateModifierInterface::VAR_THIS_DAY:
-                        $dateValue = Carbon::parse('today', $timezone);
-                        break;
-                    case DateModifierInterface::VAR_SOW:
-                    case DateModifierInterface::VAR_THIS_WEEK:
-                        $dateValue = Carbon::parse('now', $timezone);
-                        $dateValue->startOfWeek();
-                        break;
-                    case DateModifierInterface::VAR_SOM:
-                    case DateModifierInterface::VAR_THIS_MONTH:
-                    case DateModifierInterface::VAR_FMQ:
-                        $dateValue = Carbon::parse('now', $timezone);
-                        $dateValue->firstOfMonth();
-                        break;
-                    case DateModifierInterface::VAR_SOQ:
-                    case DateModifierInterface::VAR_THIS_QUARTER:
-                    case DateModifierInterface::VAR_FDQ:
-                        $dateValue = Carbon::parse('now', $timezone);
-                        $dateValue->firstOfQuarter();
-                        break;
-                    case DateModifierInterface::VAR_SOY:
-                    case DateModifierInterface::VAR_THIS_YEAR:
-                        $dateValue = Carbon::parse('now', $timezone);
-                        $dateValue->firstOfYear();
-                        break;
-                    default:
-                        $dateValue = Carbon::now($timezone);
-                        break;
-                }
-            }
-
-            $value = (string)$dateValue;
-        }
-
-        return $value;
     }
 }
