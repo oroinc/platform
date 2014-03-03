@@ -187,5 +187,6 @@ abstract class AbstractFilter implements FilterInterface
     public function processParams($data)
     {
         // nothing to do here, can be overridden in child classes
+        return $data;
     }
 }

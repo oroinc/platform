@@ -55,14 +55,14 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('\DateTime', $result);
 
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('today'))->format('d');
+        $expectedResult = date('d');
         $this->assertSame((int)$expectedResult, (int)$result->day);
 
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('today +3 days'))->format('d');
+        $expectedResult = date('d', strtotime('today +3 days'));
         $expression->add(new ExpressionResult(3));
         $this->assertSame((int)$expectedResult, (int)$result->day);
 
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('today -5 days'))->format('d');
+        $expectedResult = date('d', strtotime('today -5 days'));
         $expression->subtract(new ExpressionResult(8));
         $this->assertSame((int)$expectedResult, (int)$result->day);
     }
@@ -185,7 +185,7 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_DAY));
         $expression->add($expressionModify);
 
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('today +2 days'))->format('d');
+        $expectedResult = date('d', strtotime('today +2 days'));
         $result         = $expression->getValue();
         $this->assertSame((int)$expectedResult, (int)$result->day);
     }
@@ -196,7 +196,7 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_DAY));
         $expression->subtract($expressionModify);
 
-        $day    = \DateTime::createFromFormat('U', strtotime('today'))->format('d');
+        $day    = date('d');
         $result = $expression->getValue();
         $this->assertSame(33 - (int)$day, (int)$result);
 
@@ -204,16 +204,16 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expression       = new ExpressionResult(5000);
         $expression->subtract($expressionModify);
 
-        $week   = (new \DateTime())->format('Y');
+        $year   = date('Y');
         $result = $expression->getValue();
-        $this->assertSame(5000 - (int)$week, (int)$result);
+        $this->assertSame(5000 - (int)$year, (int)$result);
 
         $expressionModify
                     = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_MONTH));
         $expression = new ExpressionResult(12);
         $expression->subtract($expressionModify);
 
-        $month  = (new \DateTime())->format('m');
+        $month  = date('m');
         $result = $expression->getValue();
         $this->assertSame(12 - (int)$month, (int)$result);
 
@@ -230,7 +230,7 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expressionModify = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_THIS_WEEK));
         $expression       = new ExpressionResult(200);
         $expression->subtract($expressionModify);
-        $expectedResult = \DateTime::createFromFormat('U', strtotime('this week'))->format('W');
+        $expectedResult = date('W');
         $result         = $expression->getValue();
         $this->assertSame(200 - (int)$expectedResult, (int)$result);
     }

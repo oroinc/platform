@@ -105,15 +105,16 @@
             // Prevent displaying twice
             if ($dp.find("div.ui-datevariables-div").length === 0 && o.showDatevariables) {
                 var html = '<div class="ui-datevariables-div'+ (o.isRTL? ' ui-datevariables-rtl' : '') +'"><dl>' +
-                        '<dt class="ui_dvars_time_label">Available variables</dt>';
+                        '<dt class="ui_dvars_time_label">Available variables <i class="icon-info-sign"' +
+                'style="color: #6b92d0;font-size: 13px;" data-content="123" data-toggle="tooltip"></i></dt>';
 
                 for (var varCode in dateVars) {
                     html += '<dd class="ui_dvars_content">' +
                         '<a class="ui_dvariable" href="#" data-code="' + varCode + '">' + dateVars[varCode] + '</a></dd>';
                 }
                 html += '</dl></div>';
-
                 var $tp = $(html);
+
                 if (o.varsOnly === true) {
                     $tp.prepend('<div class="ui-widget-header ui-helper-clearfix ui-corner-all">' + '<div class="ui-datepicker-title">' + o.timeOnlyTitle + '</div>' + '</div>');
                     $dp.find('.ui-datepicker-header, .ui-datepicker-calendar').hide();
@@ -126,6 +127,8 @@
                 } else {
                     $dp.append($tp);
                 }
+
+                $dp.find('[data-toggle="tooltip"]').tooltip();
 
                 $(".ui-datevariables-div a.ui_dvariable").click(function(e) {
                     var variable = this.text;

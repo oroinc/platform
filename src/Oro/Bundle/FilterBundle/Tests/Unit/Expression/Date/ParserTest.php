@@ -49,14 +49,14 @@ class ParserTest extends \PHPUnit_Framework_TestCase
                     new Token(Token::TYPE_DATE, '2001-01-01'),
                     new Token(Token::TYPE_TIME, '23:00:00'),
                 ],
-                Carbon::parse('2001-01-01 23:00:00')
+                Carbon::parse('2001-01-01 23:00:00', 'UTC')
             ],
             'should merge date and time reverse mode' => [
                 [
                     new Token(Token::TYPE_TIME, '23:00:00'),
                     new Token(Token::TYPE_DATE, '2001-01-01'),
                 ],
-                Carbon::parse('2001-01-01 23:00:00')
+                Carbon::parse('2001-01-01 23:00:00', 'UTC')
             ],
             'should process parentheses'                     => [
                 [
