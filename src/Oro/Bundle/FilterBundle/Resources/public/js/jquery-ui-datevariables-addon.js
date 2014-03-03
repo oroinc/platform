@@ -103,20 +103,20 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
                     currentDatePart = this.inst.settings.part,
                     dateVars = this._getDatevariablesByDatepart(currentDatePart),
                     tooltipTemplate = _.template('<i class="icon-info-sign" data-content="<%- content %>"' +
-                        ' data-placement="top" data-toggle="popover"></i>');
+                        ' data-placement="top" data-toggle="popover" data-original-title="<%- title %>"></i>');
 
                 // Prevent displaying twice
                 if ($dp.find("div.ui-datevariables-div").length === 0 && o.showDatevariables) {
-                    var tooltipHTML = tooltipTemplate({content: __('oro.filter.date.variable.tooltip')});
+                    var tooltipHTML = tooltipTemplate({content: __('oro.filter.date.variable.tooltip'), title:__('oro.filter.date.variable.tooltip_title')});
 
-                    var html = '<div class="ui-datevariables-div' + (o.isRTL ? ' ui-datevariables-rtl' : '') + '"><dl>' +
-                        '<dt class="ui_dvars_time_label">Available variables ' + tooltipHTML + '</dt>';
+                    var html = '<div class="ui-datevariables-div' + (o.isRTL ? ' ui-datevariables-rtl' : '') + '">'
+                         + '<b>' + __('oro.filter.date.variable.title') + '</b>' + tooltipHTML + '<ul>';
 
                     for (var varCode in dateVars) {
-                        html += '<dd class="ui_dvars_content">' +
-                            '<a class="ui_dvariable" href="#" data-code="' + varCode + '">' + dateVars[varCode] + '</a></dd>';
+                        html += '<li>' +
+                            '<a class="ui_dvariable" href="#" data-code="' + varCode + '">' + dateVars[varCode] + '</a></li>';
                     }
-                    html += '</dl></div>';
+                    html += '</ul></div>';
                     var $tp = $(html);
 
                     if (o.varsOnly === true) {

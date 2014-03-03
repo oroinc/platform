@@ -13,7 +13,8 @@ oro:
     filter:
         date:
             variable:
+                title: Available variables
+                tooltip_title: Date expressions
                 tooltip: >
-                    <b>Date expressions</b><br/>
-                    You can also use them to create expressions.
-                    For example: "today - 2" will be evaluated as the day before yesterday.
+                    You can also use them to create expressions.<br/>
+                    For example: <span>"today - 2"<span> will be evaluated as the day before yesterday.
