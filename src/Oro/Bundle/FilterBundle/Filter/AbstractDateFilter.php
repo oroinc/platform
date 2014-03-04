@@ -177,7 +177,7 @@ abstract class AbstractDateFilter extends AbstractFilter
      *
      * @return mixed
      */
-    protected function applyDatePart($part, $field, Carbon &$dateStart, Carbon &$dateEnd)
+    protected function applyDatePart($part, $field, Carbon &$dateStart = null, Carbon &$dateEnd = null)
     {
         switch ($part) {
             case DateModifierInterface::PART_MONTH:
