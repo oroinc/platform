@@ -247,7 +247,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId)
     {
-        // TODO: getting field type from model here is a temporary solution.
+        // TODO: getting a field type from a model here is a temporary solution.
         // We need to use $fieldConfigId->getFieldType()
         $fieldType = $this->configManager->getConfigFieldModel(
             $fieldConfigId->getClassName(),

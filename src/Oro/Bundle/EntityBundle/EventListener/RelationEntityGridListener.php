@@ -164,6 +164,8 @@ class RelationEntityGridListener extends CustomEntityGridListener
         if (null === $this->hasAssignedExpression) {
             $entityAlias = 'ce';
 
+            // TODO: getting a field type from a model here is a temporary solution.
+            // We need to use $this->relationConfig->getId()->getFieldType()
             $fieldType = $this->configManager->getConfigFieldModel(
                 $this->relationConfig->getId()->getClassName(),
                 $this->relationConfig->getId()->getFieldName()
