@@ -12,6 +12,7 @@ define(function (require) {
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
     var _widgetControlInitializer = require('oro/widget-control-initializer');
+    var mediator = require('oro/mediator');
 
     var pageRenderedCbPool = [];
 
@@ -114,6 +115,10 @@ define(function (require) {
 
         pageRenderedCbPool = [];
     };
+
+    mediator.on('layout.init', function(element) {
+        layout.init(element);
+    });
 
     return layout;
 });
