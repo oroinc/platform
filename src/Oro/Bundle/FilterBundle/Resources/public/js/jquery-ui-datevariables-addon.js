@@ -38,21 +38,20 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
              * Create a new Datevariables instance
              */
             _newInst: function ($input, o) {
-                var tp_inst = new Datevariables(),
-                    fns = {},
-                    overrides, i;
+                var dvInst = new Datevariables(),
+                    fns = {};
 
-                tp_inst._defaults = $.extend({}, this._defaults, o, overrides, {
+                dvInst._defaults = $.extend({}, this._defaults, o, {
                     evnts: fns,
-                    datevariables: tp_inst // add datevariables as a property of datepicker: $.datepicker._get(dp_inst, 'datevariables');
+                    datevariables: dvInst // add datevariables as a property of datepicker: $.datepicker._get(dp_inst, 'datevariables');
                 });
 
-                tp_inst.$input = $input;
-                tp_inst.$input.bind('focus', function () {
-                    tp_inst._onFocus();
+                dvInst.$input = $input;
+                dvInst.$input.bind('focus', function () {
+                    dvInst._onFocus();
                 });
 
-                return tp_inst;
+                return dvInst;
             },
 
             _addDatevariables: function () {
@@ -74,7 +73,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
             _injectDateVariables: function () {
                 var $dp = this.inst.dpDiv,
                     o = this.inst.settings,
-                    tp_inst = this,
+                    dvInst = this,
                     currentDatePart = this.inst.settings.part,
                     dateVars = this._getDatevariablesByDatepart(currentDatePart),
                     tooltipTemplate = _.template('<i class="icon-info-sign" data-content="<%- content %>"' +
@@ -82,17 +81,20 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
 
                 // Prevent displaying twice
                 if ($dp.find("div.ui-datevariables-div").length === 0 && o.showDatevariables) {
-                    var tooltipHTML = tooltipTemplate({content: __('oro.filter.date.variable.tooltip'), title:__('oro.filter.date.variable.tooltip_title')});
+                    var htmlTemplate = _.template('<div class="ui-datevariables-div <%- attributes %>">' +
+                        '<b><%- title %></b><%= tooltipHTML %><ul>' +
+                        '<% _.each(dateVars, function(dateVariable, varCode) { %>' +
+                        '<li><a class="ui_dvariable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
+                        '<% }); %>' +
+                        '</ul></div>'
+                    );
 
-                    var html = '<div class="ui-datevariables-div' + (o.isRTL ? ' ui-datevariables-rtl' : '') + '">'
-                         + '<b>' + __('oro.filter.date.variable.title') + '</b>' + tooltipHTML + '<ul>';
-
-                    for (var varCode in dateVars) {
-                        html += '<li>' +
-                            '<a class="ui_dvariable" href="#" data-code="' + varCode + '">' + dateVars[varCode] + '</a></li>';
-                    }
-                    html += '</ul></div>';
-                    var $tp = $(html);
+                    var $tp = $(htmlTemplate({
+                        attributes:  o.isRTL ? ' ui-datevariables-rtl' : '',
+                        title:       __('oro.filter.date.variable.title'),
+                        tooltipHTML: tooltipTemplate({content: __('oro.filter.date.variable.tooltip'), title:__('oro.filter.date.variable.tooltip_title')}),
+                        dateVars:    dateVars
+                    }));
 
                     if (o.varsOnly === true) {
                         $tp.prepend('<div class="ui-widget-header ui-helper-clearfix ui-corner-all">' + '<div class="ui-datepicker-title">' + o.timeOnlyTitle + '</div>' + '</div>');
@@ -110,8 +112,8 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
 
                     $(".ui-datevariables-div a.ui_dvariable").click(function (e) {
                         var variable = this.text;
-                        tp_inst.$input.val(variable);
-                        tp_inst.$input.trigger("change");
+                        dvInst.$input.val(variable);
+                        dvInst.$input.trigger("change");
                         e.preventDefault();
                     });
                 }
@@ -121,9 +123,9 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
                 if (!this.$input.val() && this._defaults.defaultValue) {
                     this.$input.val(this._defaults.defaultValue);
                     var inst = $.datepicker._getInst(this.$input.get(0)),
-                        tp_inst = $.datepicker._get(inst, 'datevariables');
-                    if (tp_inst) {
-                        if (tp_inst._defaults.timeOnly && (inst.input.val() != inst.lastVal)) {
+                        dvInst = $.datepicker._get(inst, 'datevariables');
+                    if (dvInst) {
+                        if (dvInst._defaults.timeOnly && (inst.input.val() != inst.lastVal)) {
                             try {
                                 $.datepicker._updateDatepicker(inst);
                             } catch (err) {
@@ -141,7 +143,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
              */
             datevariables: function (o) {
                 o = o || {};
-                var tmp_args = Array.prototype.slice.call(arguments);
+                var tmpArgs = Array.prototype.slice.call(arguments);
 
                 if (typeof o == 'object') {
                     return this.each(function () {
@@ -151,14 +153,13 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
                 }
 
                 return $(this).each(function () {
-                    $.fn.datetimepicker.apply($(this), tmp_args);
+                    $.fn.datetimepicker.apply($(this), tmpArgs);
                 });
             }
         });
 
         $.datepicker._prev_updateDatepicker = $.datepicker._updateDatepicker;
         $.datepicker._updateDatepicker = function (inst) {
-
             // don't popup the datepicker if there is another instance already opened
             var input = inst.input[0];
             if ($.datepicker._curInst && $.datepicker._curInst != inst && $.datepicker._datepickerShowing && $.datepicker._lastInput != input) {
@@ -166,13 +167,11 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
             }
 
             if (typeof(inst.stay_open) !== 'boolean' || inst.stay_open === false) {
-
                 this._prev_updateDatepicker(inst);
-
                 // Reload the control when changing something in the input text field.
-                var tp_inst = this._get(inst, 'datevariables');
-                if (tp_inst) {
-                    tp_inst._addDatevariables(inst);
+                var dvInst = this._get(inst, 'datevariables');
+                if (dvInst) {
+                    dvInst._addDatevariables(inst);
                 }
             }
         };
@@ -188,8 +187,9 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
          * @return void
          */
         $.datevariables.log = function (err) {
-            if (window.console)
+            if (window.console) {
                 console.log(err);
+            }
         };
 
         $.datepicker.parseDate = function (format, value, settings) {
@@ -197,10 +197,10 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
             try {
                 date = this._base_parseDate(format, value, settings);
             } catch (err) {
-                date = value;
             }
             return date;
         };
 
         $.datevariables.version = "1.0";
-    });
+    }
+);
