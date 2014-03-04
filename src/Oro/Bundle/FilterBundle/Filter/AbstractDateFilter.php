@@ -45,15 +45,11 @@ abstract class AbstractDateFilter extends AbstractFilter
             return false;
         }
 
-        if (empty($data['date_start'])) {
-            $dateStartValue = null;
-        } else {
+        if (!empty($data['date_start'])) {
             $dateStartValue = Carbon::parse($data['date_start'], new \DateTimeZone('UTC'));
         }
 
-        if (empty($data['date_end'])) {
-            $dateEndValue = null;
-        } else {
+        if (!empty($data['date_end'])) {
             $dateEndValue = Carbon::parse($data['date_end'], new \DateTimeZone('UTC'));
         }
 
@@ -120,10 +116,10 @@ abstract class AbstractDateFilter extends AbstractFilter
         if (!in_array(
             $data['type'],
             array(
-                 DateRangeFilterType::TYPE_BETWEEN,
-                 DateRangeFilterType::TYPE_NOT_BETWEEN,
-                 DateRangeFilterType::TYPE_MORE_THAN,
-                 DateRangeFilterType::TYPE_LESS_THAN
+                DateRangeFilterType::TYPE_BETWEEN,
+                DateRangeFilterType::TYPE_NOT_BETWEEN,
+                DateRangeFilterType::TYPE_MORE_THAN,
+                DateRangeFilterType::TYPE_LESS_THAN
             )
         )
         ) {
