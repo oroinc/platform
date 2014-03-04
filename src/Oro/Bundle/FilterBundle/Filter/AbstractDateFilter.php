@@ -407,25 +407,4 @@ abstract class AbstractDateFilter extends AbstractFilter
 
         return $metadata;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function processParams($data)
-    {
-        $start = $this->expressionCompiler->compile($data['value']['start']);
-        $end   = $this->expressionCompiler->compile($data['value']['end']);
-
-        if ($start instanceof Carbon) {
-            $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
-        }
-        if ($end instanceof Carbon) {
-            $end->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
-        }
-
-        $data['value']['start'] = (string)$start;
-        $data['value']['end']   = (string)$end;
-
-        return $data;
-    }
 }

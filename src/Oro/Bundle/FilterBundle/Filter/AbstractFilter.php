@@ -180,13 +180,4 @@ abstract class AbstractFilter implements FilterInterface
 
         return array_combine($keys, array_values($params));
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function processParams($data)
-    {
-        // nothing to do here, can be overridden in child classes
-        return $data;
-    }
 }
