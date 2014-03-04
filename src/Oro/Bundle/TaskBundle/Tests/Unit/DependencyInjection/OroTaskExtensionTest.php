@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TaskBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\TaskBundle\DependencyInjection\OroTaskExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Oro\Bundle\TaskBundle\DependencyInjection\OroTaskExtension;
 
 class OroTaskExtensionTest extends \PHPUnit_Framework_TestCase
 {
