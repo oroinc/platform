@@ -4,10 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
-use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
-use Oro\Bundle\FilterBundle\Expression\Date\Parser;
-use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -28,6 +24,8 @@ use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
@@ -218,9 +216,11 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     ->disableOriginalConstructor()->getMock();
                 $localeSetting->expects($this->any())->method('getTimeZone')->will($this->returnValue('UTC'));
 
-                $compiler = new Compiler(new Lexer(), new Parser());
-
-                $filter = new DateTimeRangeFilter($this->formFactory, new FilterUtility(), $compiler, $localeSetting);
+                $filter = new DateTimeRangeFilter(
+                    $this->formFactory,
+                    new FilterUtility(),
+                    new DateFilterUtility($localeSetting)
+                );
                 break;
             default:
                 throw new \Exception(sprintf('Not implementer in this test filter: "%s".', $name));
