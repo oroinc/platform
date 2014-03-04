@@ -28,4 +28,4 @@ config:
         'oroform/js/multiple-entity/view': 'bundles/oroform/js/multiple-entity/view.js'
         'oroform/js/multiple-entity/model': 'bundles/oroform/js/multiple-entity/model.js'
         'oroform/js/multiple-entity/collection': 'bundles/oroform/js/multiple-entity/collection.js'
-        'oro/create-select-type-handler': 'bundles/oroform/js/create-select-type-handler.js'
+        'oroform/js/create-select-type-handler': 'bundles/oroform/js/create-select-type-handler.js'

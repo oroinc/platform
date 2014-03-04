@@ -4,8 +4,8 @@ function ($, widgetManager, routing) {
     'use strict';
 
     /**
-     * @export  oro/create-select-type-handler
-     * @class   oro.createSelectTypeHandler
+     * @export  oroform/js/create-select-type-handler
+     * @class   oroform.createSelectTypeHandler
      */
     return function (
         btnContainer,
