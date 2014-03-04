@@ -1,4 +1,5 @@
 /*global define*/
+/*jslint nomen: true*/
 /*jshint browser: true, devel: true*/
 define(function (require) {
     'use strict';
@@ -6,16 +7,15 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
 
-    var __ = require('oro/translator');
-    var scrollspy = require('oro/scrollspy');
-    var _bootstrapTooltip = require('bootstrap-tooltip');
-    var _jqueryUI = require('jquery-ui');
-    var _jqueryUITimepicker = require('jquery-ui-timepicker');
-    var _widgetControlInitializer = require('oro/widget-control-initializer');
+    var scrollspy = require('oroui/js/scrollspy');
+    var widgetControlInitializer = require('oroui/js/widget-control-initializer');
+    var mediator = require('oroui/js/mediator');
 
     var pageRenderedCbPool = [];
-
     var layout = {};
+
+    require('jquery-ui');
+    require('jquery-ui-timepicker');
 
     layout.init = function (container) {
         container = $(container || document.body);
@@ -61,12 +61,7 @@ define(function (require) {
                 }, 500);
             });
 
-        _widgetControlInitializer.init(container);
-
-//        @todo: BAP-3374
-//        layout.onPageRendered(function () {
-//            scrollspy.top();
-//        });
+        widgetControlInitializer.init(container);
     };
 
     layout.hideProgressBar = function () {
@@ -114,6 +109,18 @@ define(function (require) {
 
         pageRenderedCbPool = [];
     };
+
+    mediator.on('layout.init', function(element) {
+        layout.init(element);
+    });
+
+    mediator.on('grid_load:complete', function(collection, element) {
+        widgetControlInitializer.init(element);
+    });
+
+    mediator.on('grid_render:complete', function(element) {
+        widgetControlInitializer.init(element);
+    });
 
     return layout;
 });

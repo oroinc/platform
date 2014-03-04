@@ -4,7 +4,7 @@ define(function () {
     'use strict';
 
     /**
-     * @export  oro/sidebar/constants
+     * @export  orosidebar/js/constants
      */
     var constants = {};
 
