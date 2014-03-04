@@ -62,11 +62,6 @@ define(function (require) {
             });
 
         widgetControlInitializer.init(container);
-
-//        @todo: BAP-3374
-//        layout.onPageRendered(function () {
-//            scrollspy.top();
-//        });
     };
 
     layout.hideProgressBar = function () {
@@ -117,6 +112,14 @@ define(function (require) {
 
     mediator.on('layout.init', function(element) {
         layout.init(element);
+    });
+
+    mediator.on('grid_load:complete', function(collection, element) {
+        widgetControlInitializer.init(element);
+    });
+
+    mediator.on('grid_render:complete', function(element) {
+        widgetControlInitializer.init(element);
     });
 
     return layout;

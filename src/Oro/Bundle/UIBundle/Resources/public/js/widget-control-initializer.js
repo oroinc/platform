@@ -15,10 +15,6 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oroui/js/widget-manager', 
                         self.initWidgetControlElement(controlElement);
                     }
                 );
-
-                mediator.on('grid_render:complete', function(element) {
-                    self.init(element);
-                });
             },
             initWidgetControlElement: function (controlElement) {
                 controlElement = $(controlElement);
