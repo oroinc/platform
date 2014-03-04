@@ -1,6 +1,6 @@
 services:
     oro_filter.form.event_subscriber.date:
-        class: Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubsriber
+        class: Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber
         arguments:
             - @oro_filter.expression.date.compiler
             - @oro_locale.settings

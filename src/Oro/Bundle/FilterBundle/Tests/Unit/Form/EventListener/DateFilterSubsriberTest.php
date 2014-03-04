@@ -5,11 +5,11 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\EventListener;
 use Carbon\Carbon;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubsriber;
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 
-class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
+class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var DateFilterSubsriber */
+    /** @var DateFilterSubscriber */
     protected $subscriber;
 
     protected $compiler;
@@ -24,12 +24,12 @@ class DateFilterSubsriberTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->subscriber = new DateFilterSubsriber($this->compiler, $this->localeSettings);
+        $this->subscriber = new DateFilterSubscriber($this->compiler, $this->localeSettings);
     }
 
     public function testSubscribedEvents()
     {
-        $events = DateFilterSubsriber::getSubscribedEvents();
+        $events = DateFilterSubscriber::getSubscribedEvents();
         $this->assertCount(1, $events);
 
         $eventNames = array_keys($events);

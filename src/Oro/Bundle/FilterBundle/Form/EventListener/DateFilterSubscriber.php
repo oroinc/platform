@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormEvents;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 
-class DateFilterSubsriber implements EventSubscriberInterface
+class DateFilterSubscriber implements EventSubscriberInterface
 {
     /** @var Compiler */
     protected $expressionCompiler;
