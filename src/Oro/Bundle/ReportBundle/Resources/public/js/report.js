@@ -7,8 +7,8 @@ define(function (require) {
         _ = require('underscore'),
         Backbone = require('backbone'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
-        ColumnModel = require('oroquerydesigner/js/items-manager/column-model');
-    var DeleteConfirmation = require('oro/delete-confirmation');
+        ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
+        DeleteConfirmation = require('oroui/js/delete-confirmation');
     require('oroentity/js/field-choice');
     require('oroui/js/items-manager/editor');
     require('oroui/js/items-manager/table');

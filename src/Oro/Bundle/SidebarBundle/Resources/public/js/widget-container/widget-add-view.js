@@ -7,16 +7,16 @@ define(function (require) {
     var $ = require('jquery');
     var _ = require('underscore');
 
-    var widgetAddTemplate = require('text!oro/sidebar/widget-container/widget-add-template');
-    var WidgetContainerModel = require('oro/sidebar/widget-container/model');
+    var widgetAddTemplate = require('text!./templates/widget-add-template.html');
+    var WidgetContainerModel = require('./model');
 
-    var Modal = require('oro/modal');
+    var Modal = require('oroui/js/modal');
     var DialogWidget = require('oro/dialog-widget');
-    var constants = require('oro/sidebar/constants');
+    var constants = require('../constants');
 
     /**
-     * @export  oro/sidebar/widget-controller/widget-add-view
-     * @class oro.sidebar.widget-controller.WidgetAddView
+     * @export  orosidebar/js/widget-container/widget-add-view
+     * @class   orosidebar.widgetContainer.WidgetAddView
      * @extends oro.Modal
      */
     var WidgetAddView = Modal.extend({

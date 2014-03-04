@@ -1,13 +1,13 @@
-/* global define */
-define(['underscore', 'backgrid'],
-function(_, Backgrid) {
+/*global define*/
+define(['underscore', 'backgrid'
+    ], function (_, Backgrid) {
     'use strict';
 
     /**
      * Cell formatter with fixed fromRaw method
      *
-     * @export  oro/datagrid/cell-formatter
-     * @class   oro.datagrid.CellFormatter
+     * @export  orodatagrid/js/datagrid/formatter/cell-formatter
+     * @class   orodatagrid.datagrid.formatter.CellFormatter
      * @extends Backgrid.CellFormatter
      */
     var CellFormatter = function () {};
@@ -19,7 +19,7 @@ function(_, Backgrid) {
          * @inheritDoc
          */
         fromRaw: function (rawData) {
-            if (rawData == null) {
+            if (rawData === null) {
                 return '';
             }
             return Backgrid.CellFormatter.prototype.fromRaw.apply(this, arguments);
