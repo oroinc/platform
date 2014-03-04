@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Common\Util\Inflector;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ConfigDumper
 {
@@ -36,11 +40,26 @@ class ConfigDumper
                         $fieldType = $doctrineMetadata->getTypeOfField($fieldName);
 
                         /**
-                         * TODO:
-                         * fix duplicates
-                         * wrong $fieldName coming !!!
-                         * for example: field_extend_ownership instead of extend_ownership
+                         * possible field duplicates fix
                          */
+                        if (strpos($fieldName, ExtendConfigDumper::FIELD_PREFIX) === 0) {
+                            $realClassName = $doctrineMetadata->getName();
+                            $realClass = ClassUtils::getClass(new $realClassName);
+                            if (! method_exists($realClass, Inflector::camelize('get_' . $fieldName))
+                                && ! method_exists($realClass, Inflector::camelize('set_' . $fieldName))
+                            ) {
+                                $fieldName = str_replace(ExtendConfigDumper::FIELD_PREFIX, '', $fieldName);
+                            }
+                        }
+
+                        /**
+                         * relation's default fields
+                         */
+                        if (strpos($fieldName, ExtendConfigDumper::DEFAULT_PREFIX) === 0) {
+
+                        }
+
+
                         if ($this->configManager->hasConfig($className, $fieldName)) {
                             $this->configManager->updateConfigFieldModel($className, $fieldName, $force);
                         } else {
