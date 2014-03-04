@@ -11,6 +11,8 @@ define(function (require) {
     var _bootstrapTooltip = require('bootstrap-tooltip');
     var _jqueryUI = require('jquery-ui');
     var _jqueryUITimepicker = require('jquery-ui-timepicker');
+    var _widgetControlInitializer = require('oro/widget-control-initializer');
+    var mediator = require('oro/mediator');
 
     var pageRenderedCbPool = [];
 
@@ -60,9 +62,7 @@ define(function (require) {
                 }, 500);
             });
 
-        layout.onPageRendered(function () {
-            scrollspy.top();
-        });
+        _widgetControlInitializer.init(container);
     };
 
     layout.hideProgressBar = function () {
@@ -110,6 +110,18 @@ define(function (require) {
 
         pageRenderedCbPool = [];
     };
+
+    mediator.on('layout.init', function(element) {
+        layout.init(element);
+    });
+
+    mediator.on('grid_load:complete', function(collection, element) {
+        _widgetControlInitializer.init(element);
+    });
+
+    mediator.on('grid_render:complete', function(element) {
+        _widgetControlInitializer.init(element);
+    });
 
     return layout;
 });

@@ -83,6 +83,7 @@ class EmailNotificationController extends Controller
         }
 
         return array(
+            'entity' => $entity,
             'form' => $this->get('oro_notification.form.email_notification')->createView(),
         );
     }

@@ -1,7 +1,7 @@
 /* jshint devel:true*/
 /* global define, require */
-define(['underscore', 'backbone', 'oro/mediator', 'oro/loading-mask', 'oro/layout', 'jquery.form'],
-function(_, Backbone, mediator, LoadingMask, layout) {
+define(['underscore', 'backbone', 'oro/mediator', 'oro/loading-mask'],
+function(_, Backbone, mediator, LoadingMask) {
     'use strict';
 
     var $ = Backbone.$;
@@ -59,6 +59,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
         remove: function() {
             this.trigger('widgetRemove', this.$el);
             mediator.trigger('widget_remove', this.getWid());
+            mediator.trigger('widget_remove:' + this.getAlias());
             Backbone.View.prototype.remove.call(this);
         },
 
@@ -558,7 +559,7 @@ function(_, Backbone, mediator, LoadingMask, layout) {
                 this.actionsEl = null;
                 this.actions = {};
                 this.setElement($(content).filter('.widget-content:first'));
-                layout.init(this.$el);
+                mediator.trigger('layout.init', this.$el);
                 this._show();
                 mediator.trigger('hash_navigation_request:complete');
             } catch (error) {
