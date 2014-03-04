@@ -7,6 +7,7 @@ parameters:
     oro_filter.choice_filter.class:               Oro\Bundle\FilterBundle\Filter\ChoiceFilter
     oro_filter.entity_filter.class:               Oro\Bundle\FilterBundle\Filter\EntityFilter
     oro_filter.boolean_filter.class:              Oro\Bundle\FilterBundle\Filter\BooleanFilter
+    oro_filter.date_filter_utility.class:         Oro\Bundle\FilterBundle\Filter\DateFilterUtility
     oro_filter.date_range_filter.class:           Oro\Bundle\FilterBundle\Filter\DateRangeFilter
     oro_filter.datetime_range_filter.class:       Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
 
@@ -70,13 +71,17 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: boolean }
 
+    oro_filter.date_filter_utility:
+        class: %oro_filter.date_filter_utility.class%
+        arguments:
+            - @oro_locale.settings
+
     oro_filter.date_range_filter:
         class: %oro_filter.date_range_filter.class%
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
-            - @oro_filter.expression.date.compiler
-            - @oro_locale.settings
+            - @oro_filter.date_filter_utility
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: date }
 
@@ -85,8 +90,7 @@ services:
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
-            - @oro_filter.expression.date.compiler
-            - @oro_locale.settings
+            - @oro_filter.date_filter_utility
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: datetime }
 

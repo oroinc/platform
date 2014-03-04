@@ -22,7 +22,7 @@ class DateFilterSubsriber implements EventSubscriberInterface
     public function __construct(Compiler $compiler, LocaleSettings $localeSettings)
     {
         $this->expressionCompiler = $compiler;
-        $this->localeSettings = $localeSettings;
+        $this->localeSettings     = $localeSettings;
     }
 
     /**
@@ -45,10 +45,10 @@ class DateFilterSubsriber implements EventSubscriberInterface
         $start = $this->expressionCompiler->compile($data['start']);
         $end   = $this->expressionCompiler->compile($data['end']);
 
-        if ($start instanceof Carbon) {
+        if ($start instanceof \DateTime) {
             $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
-        if ($end instanceof Carbon) {
+        if ($end instanceof \DateTime) {
             $end->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
 
