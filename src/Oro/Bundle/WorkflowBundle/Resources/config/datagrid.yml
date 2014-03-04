@@ -17,15 +17,12 @@ datagrid:
                     - { table: %oro_workflow.workflow_definition.entity.class%, alias: w }
         columns:
             label:
-                label: oro.workflow.workflow_definition.label
+                label: oro.workflow.workflowdefinition.name.label
             system:
-                label: oro.workflow.workflow_definition.system
-                frontend_type: select
-                choices:
-                   - No
-                   - Yes
+                label: oro.workflow.workflowdefinition.system.label
+                frontend_type: boolean
             createdAt:
-                label: oro.workflow.workflow_definition.createdAt
+                label: oro.workflow.workflowdefinition.created_at.label
                 frontend_type: datetime
         properties:
             name: ~
@@ -36,7 +33,7 @@ datagrid:
                 params:     [ name ]
             delete_link:
                 type:       url
-                route:      oro_api_workflow_definitiondelete
+                route:      oro_api_workflow_definition_delete
                 params:     [ workflowDefinition ]
         sorters:
             columns:

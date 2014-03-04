@@ -41,7 +41,11 @@ class WorkflowController extends FOSRestController
      * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
-     * @Rest\Get("/start/{workflowName}/{transitionName}", defaults={"_format"="json"})
+     * @Rest\Get(
+     *      "/api/rest/{version}/workflow/start/{workflowName}/{transitionName}",
+     *      requirements={"version"="latest|v1"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
      * @ApiDoc(description="Start workflow for entity from transition", resource=true)
      * @AclAncestor("oro_workflow")
      *
@@ -133,9 +137,9 @@ class WorkflowController extends FOSRestController
      * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
      *
      * @Rest\Get(
-     *      "/{workflowItemId}/transit/{transitionName}",
-     *      requirements={"workflowItemId"="\d+"},
-     *      defaults={"_format"="json"}
+     *      "/api/rest/{version}/workflow/transit/{workflowItemId}/{transitionName}",
+     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
+     *      defaults={"version"="latest", "_format"="json"}
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Perform transition for workflow item", resource=true)
@@ -173,7 +177,11 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
      *
-     * @Rest\Get("/{workflowItemId}", requirements={"workflowItemId"="\d+"}, defaults={"_format"="json"})
+     * @Rest\Get(
+     *      "/api/rest/{version}/workflow/{workflowItemId}",
+     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Get workflow item", resource=true)
      * @AclAncestor("oro_workflow")
@@ -199,7 +207,11 @@ class WorkflowController extends FOSRestController
      * Returns
      * - HTTP_NO_CONTENT (204)
      *
-     * @Rest\Delete("/{workflowItemId}", requirements={"workflowItemId"="\d+"}, defaults={"_format"="json"})
+     * @Rest\Delete(
+     *      "/api/rest/{version}/workflow/{workflowItemId}",
+     *      requirements={"version"="latest|v1", "workflowItemId"="\d+"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
      * @ApiDoc(description="Delete workflow item", resource=true)
      * @AclAncestor("oro_workflow")

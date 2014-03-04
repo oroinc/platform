@@ -15,11 +15,14 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
+/**
+ * @Route("/workflow")
+ */
 class WorkflowController extends Controller
 {
     /**
      * @Route(
-     *      "/{workflowName}/start/{transitionName}",
+     *      "/start/{workflowName}/{transitionName}",
      *      name="oro_workflow_start_transition_form"
      * )
      * @Template("OroWorkflowBundle:Workflow:transitionForm.html.twig")
@@ -56,7 +59,7 @@ class WorkflowController extends Controller
 
     /**
      * @Route(
-     *      "/transit/{transitionName}/{workflowItemId}",
+     *      "/transit/{workflowItemId}/{transitionName}",
      *      name="oro_workflow_transition_form"
      * )
      * @ParamConverter("workflowItem", options={"id"="workflowItemId"})
@@ -88,71 +91,6 @@ class WorkflowController extends Controller
                 'oro_workflow_widget_transition_form',
                 $routeParams
             )
-        );
-    }
-
-    /**
-     * @Route(
-     *      "/{_format}",
-     *      name="oro_workflow_definition_index",
-     *      requirements={"_format"="html|json"},
-     *      defaults={"_format" = "html"}
-     * )
-     * @Template
-     * * @Acl(
-     *      id="oro_workflow_definition_view",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="VIEW"
-     * )
-     * @return array
-     */
-    public function indexAction()
-    {
-        return array();
-    }
-
-    /**
-     * @Route(
-     *      "/create",
-     *      name="oro_workflow_definition_create"
-     * )
-     * @Template("OroWorkflowBundle:Workflow:update.html.twig")
-     * @Acl(
-     *      id="oro_workflow_definition_create",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="CREATE"
-     * )
-     * @return array
-     */
-    public function createAction()
-    {
-        return $this->updateAction(new WorkflowDefinition());
-    }
-
-    /**
-     * @Route(
-     *      "/update/{name}",
-     *      name="oro_workflow_definition_update"
-     * )
-     * @Template("OroWorkflowBundle:Workflow:update.html.twig")
-     * @Acl(
-     *      id="oro_workflow_definition_update",
-     *      type="entity",
-     *      class="OroWorkflowBundle:WorkflowDefinition",
-     *      permission="EDIT"
-     * )
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array
-     */
-    public function updateAction(WorkflowDefinition $workflowDefinition)
-    {
-        $form = $this->get('oro_workflow.form.workflow_definition');
-        $form->setData($workflowDefinition);
-        return array(
-            'form' => $form->createView(),
-            'entity' => $workflowDefinition
         );
     }
 }

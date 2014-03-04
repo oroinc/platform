@@ -18,21 +18,26 @@ class WorkflowDefinitionType extends AbstractType
                 'label',
                 'text',
                 array(
-                    'label' => 'Label'
+                    'label' => 'oro.workflow.workflowdefinition.name.label',
+                    'required' => true,
+                    'constraints' => array(array('NotBlank' => null)),
                 )
             )
             ->add(
                 'related_entity',
                 'oro_entity_choice',
                 array(
-                    'label' => 'Related Entity',
+                    'label' => 'oro.workflow.workflowdefinition.related_entity.label',
+                    'required' => true,
+                    'constraints' => array(array('NotBlank' => null)),
                 )
             )
             ->add(
                 'steps_display_ordered',
                 'checkbox',
                 array(
-                    'label' => 'Display all steps in order',
+                    'label' => 'oro.workflow.workflowdefinition.steps_display_ordered.label',
+                    'required' => false,
                 )
             )
             ->add(

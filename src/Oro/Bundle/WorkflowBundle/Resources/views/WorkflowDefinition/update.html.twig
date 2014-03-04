@@ -19,7 +19,7 @@
 {% block navButtons %}
     {% if entity.name and resource_granted('DELETE', entity) %}
         {{ UI.deleteButton({
-            'dataUrl': path('oro_api_workflow_definitiondelete', {'workflowDefinition': entity.name}),
+            'dataUrl': path('oro_api_workflow_definition_delete', {'workflowDefinition': entity.name}),
             'dataRedirect': path('oro_workflow_definition_index'),
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-workflow',
@@ -30,9 +30,14 @@
     {% endif %}
     {{ UI.cancelButton(path('oro_workflow_definition_index')) }}
 
+    {# API REST route for POST used both for create and update #}
+    {% if entity.name %}
+        {% set apiPath = path('oro_workflow_api_rest_workflowdefinition_post', {workflowDefinition: entity.name}) %}
+    {% else %}
+        {% set apiPath = path('oro_workflow_api_rest_workflowdefinition_post') %}
+    {% endif %}
     <div class="btn-group">
-        <button type="button" class="btn btn-success" id="save-btn"
-            data-url="{{ path('oro_workflow_definition_index') }}">{{ 'Save'|trans }}</button>
+        <button type="button" class="btn btn-success" id="save-btn" data-url="{{ apiPath }}">{{ 'Save'|trans }}</button>
     </div>
 {% endblock %}
 
@@ -51,8 +56,8 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    <li>{{ 'oro.workflow.workflow_definition.createdAt'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.workflow.workflow_definition.updatedAt'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.workflowdefinition.created_at.label'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.workflow.workflowdefinition.updated_at.label'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
 {% block content_data %}

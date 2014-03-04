@@ -23,8 +23,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *  routeView="oro_workflow_definition_update",
  *  defaultValues={
  *      "entity"={
- *          "label"="Workflow Definition",
- *          "plural_label"="Workflow Definitions",
+ *          "label"="Workflow",
+ *          "plural_label"="Workflows",
  *          "icon"="icon-exchange"
  *      },
  *      "security"={
