@@ -80,18 +80,22 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData' => array(),
-                'formData' => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                'viewData' => array(
-                    'value'          => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                    'widget_options' => array('firstDay' => 1),
-                ),
-                'customOptions' => array(
-                    'widget_options' => array('firstDay' => 1)
-                )
-            ),
-        );
+        return [
+            'empty' => [
+                'bindData'      => [],
+                'formData'      => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                'viewData'      => [
+                    'value'          => [
+                        'type'  => null,
+                        'value' => array('start' => '', 'end' => ''),
+                        'part'  => null
+                    ],
+                    'widget_options' => ['firstDay' => 1],
+                ],
+                'customOptions' => [
+                    'widget_options' => ['firstDay' => 1]
+                ]
+            ],
+        ];
     }
 }

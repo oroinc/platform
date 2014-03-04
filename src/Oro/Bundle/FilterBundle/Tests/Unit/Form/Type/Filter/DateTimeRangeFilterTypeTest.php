@@ -20,7 +20,6 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped('Fix it');
         $translator = $this->createMockTranslator();
 
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
@@ -33,7 +32,7 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
 
         $types = array(
             new FilterType($translator),
-            new DateRangeType($localeSettings),
+            new DateRangeType(),
             new DateTimeRangeType($localeSettings),
             new DateRangeFilterType($translator, new DateModifierProvider())
         );
@@ -62,23 +61,18 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
      */
     public function setDefaultOptionsDataProvider()
     {
-        return array(
-            array(
-                'defaultOptions' => array(
+        return [
+            [
+                'defaultOptions' => [
                     'field_type' => DateTimeRangeType::NAME,
-                    'date_parts' => array(
-                        DateModifierProvider::PART_VALUE   => 'oro.filter.form.label_date_part.value',
-                        DateModifierProvider::PART_DOW     => 'oro.filter.form.label_date_part.dayofweek',
-                        DateModifierProvider::PART_WEEK    => 'oro.filter.form.label_date_part.week',
-                        DateModifierProvider::PART_DAY     => 'oro.filter.form.label_date_part.day',
-                        DateModifierProvider::PART_MONTH   => 'oro.filter.form.label_date_part.month',
-                        DateModifierProvider::PART_QUARTER => 'oro.filter.form.label_date_part.quarter',
-                        DateModifierProvider::PART_DOY     => 'oro.filter.form.label_date_part.dayofyear',
-                        DateModifierProvider::PART_YEAR    => 'oro.filter.form.label_date_part.year',
-                    ),
-                )
-            )
-        );
+                    'widget_options' => [
+                        'showDatevariables' => true,
+                        'showTime'          => true,
+                        'showTimepicker'    => true,
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
@@ -86,18 +80,18 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
      */
     public function bindDataProvider()
     {
-        return array(
-            'empty' => array(
-                'bindData'      => array(),
-                'formData'      => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                'viewData'      => array(
-                    'value'          => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                    'widget_options' => array('firstDay' => 1)
-                ),
-                'customOptions' => array(
-                    'widget_options' => array('firstDay' => 1)
-                )
-            ),
-        );
+        return [
+            'empty' => [
+                'bindData'      => [],
+                'formData'      => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                'viewData'      => [
+                    'value'          => ['type' => null, 'value' => array('start' => '', 'end' => ''), 'part' => null],
+                    'widget_options' => ['firstDay' => 1],
+                ],
+                'customOptions' => [
+                    'widget_options' => ['firstDay' => 1],
+                ]
+            ],
+        ];
     }
 }
