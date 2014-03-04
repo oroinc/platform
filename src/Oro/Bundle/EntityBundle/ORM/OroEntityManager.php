@@ -68,15 +68,6 @@ class OroEntityManager extends EntityManager
     }
 
     /**
-     * @param string $className
-     * @return bool
-     */
-    public function isExtendEntity($className)
-    {
-        return $this->extendConfigProvider->getConfig($className)->is('is_extend');
-    }
-
-    /**
      * @param FilterCollection $collection
      */
     public function setFilterCollection(FilterCollection $collection)
