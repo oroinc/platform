@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
 abstract class AbstractDateFilterType extends AbstractType
@@ -21,7 +22,7 @@ abstract class AbstractDateFilterType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var DateModifierInterface */
+    /** @var DateModifierProvider */
     protected $dateModifiers;
 
     /** @var null|array */

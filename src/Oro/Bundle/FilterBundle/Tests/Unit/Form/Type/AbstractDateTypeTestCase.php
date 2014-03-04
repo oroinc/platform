@@ -13,11 +13,8 @@ abstract class AbstractDateTypeTestCase extends AbstractTypeTestCase
     {
         $resolver = $this->createMockOptionsResolver();
 
-        $dateParts = array_pop($defaultOptions);
-
         $resolver->expects($this->at(0))
             ->method('setDefaults')
-            ->with(['date_parts' => $dateParts])
             ->will($this->returnSelf());
 
         $resolver->expects($this->at(1))

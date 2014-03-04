@@ -1,6 +1,14 @@
 services:
+    oro_filter.form.event_subscriber.date:
+        class: Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubsriber
+        arguments:
+            - @oro_filter.expression.date.compiler
+            - @oro_locale.settings
+
     oro_filter.form.type.date_range:
         class: Oro\Bundle\FilterBundle\Form\Type\DateRangeType
+        arguments:
+            - @oro_filter.form.event_subscriber.date
         tags:
             - { name: form.type, alias: oro_type_date_range }
 

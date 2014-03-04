@@ -8,9 +8,19 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubsriber;
+
 class DateRangeType extends AbstractType
 {
     const NAME = 'oro_type_date_range';
+
+    /** @var DateFilterSubsriber */
+    protected $subsriber;
+
+    public function __construct(DateFilterSubsriber $subsriber = null)
+    {
+        $this->subsriber = $subsriber;
+    }
 
     /**
      * {@inheritDoc}
@@ -56,6 +66,10 @@ class DateRangeType extends AbstractType
                 $options['end_field_options']
             )
         );
+
+        if (!empty($this->subsriber)) {
+            $builder->addEventSubscriber($this->subsriber);
+        }
     }
 
     /**
