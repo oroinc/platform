@@ -63,16 +63,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
                 this.extraActionsPanel.setActions(options.extraActions);
             }
 
+            this.massActionsPanel = new this.massActionsPanel();
+            if (options.massActions) {
+                this.massActionsPanel.setActions(options.massActions);
+            }
+
             if (!options.enable) {
                 this.disable();
             }
             if (options.hide) {
                 this.hide();
-            }
-
-            this.massActionsPanel = new this.massActionsPanel();
-            if (options.massActions) {
-                this.massActionsPanel.setActions(options.massActions);
             }
 
             this.template = _.template($(options.template || this.template).html());
