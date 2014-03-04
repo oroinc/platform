@@ -101,7 +101,6 @@ class OrmDatasourceExtension implements ExtensionVisitorInterface
 
                 $form   = $filter->getForm();
                 if (!$form->isSubmitted()) {
-                    $item['filterData'] = $filter->processParams($item['filterData']);
                     $form->submit($item['filterData']);
                 }
                 if ($form->isValid()) {

@@ -6,17 +6,13 @@ use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
 
 class DateRangeTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var DateRangeType
-     */
-    private $type;
+    /** @var DateRangeType */
+    protected $type;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $defaultLocale = 'en';
 
-    protected function setUp()
+    public function setUp()
     {
         parent::setUp();
 

@@ -18,20 +18,10 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped('Fix it');
-
-        $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getTimezone'))
-            ->getMock();
-        $localeSettings->expects($this->any())
-            ->method('getTimezone')
-            ->will($this->returnValue(date_default_timezone_get()));
-
         $translator = $this->createMockTranslator();
 
         $types = array(
-            new DateRangeType($localeSettings),
+            new DateRangeType(),
             new FilterType($translator)
         );
 
@@ -69,23 +59,17 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
                         DateRangeFilterType::TYPE_MORE_THAN => 'oro.filter.form.label_date_type_more_than',
                         DateRangeFilterType::TYPE_LESS_THAN => 'oro.filter.form.label_date_type_less_than',
                     ),
-                    'widget_options' => array(),
+                    'widget_options' => array(
+                        'showDatevariables' => true,
+                        'showTime'          => false,
+                        'showTimepicker'    => false,
+                    ),
                     'type_values' => array(
                         'between'    => DateRangeFilterType::TYPE_BETWEEN,
                         'notBetween' => DateRangeFilterType::TYPE_NOT_BETWEEN,
                         'moreThan'   => DateRangeFilterType::TYPE_MORE_THAN,
                         'lessThan'   => DateRangeFilterType::TYPE_LESS_THAN
-                    ),
-                    'date_parts' => array(
-                        DateModifierProvider::PART_VALUE   => 'oro.filter.form.label_date_part.value',
-                        DateModifierProvider::PART_DOW     => 'oro.filter.form.label_date_part.dayofweek',
-                        DateModifierProvider::PART_WEEK    => 'oro.filter.form.label_date_part.week',
-                        DateModifierProvider::PART_DAY     => 'oro.filter.form.label_date_part.day',
-                        DateModifierProvider::PART_MONTH   => 'oro.filter.form.label_date_part.month',
-                        DateModifierProvider::PART_QUARTER => 'oro.filter.form.label_date_part.quarter',
-                        DateModifierProvider::PART_DOY     => 'oro.filter.form.label_date_part.dayofyear',
-                        DateModifierProvider::PART_YEAR    => 'oro.filter.form.label_date_part.year',
-                    ),
+                    )
                 )
             )
         );
@@ -102,7 +86,7 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
                 'formData' => array('type' => null, 'value' => array('start' => '', 'end' => '')),
                 'viewData' => array(
                     'value'          => array('type' => null, 'value' => array('start' => '', 'end' => '')),
-                    'widget_options' => array('firstDay' => 1)
+                    'widget_options' => array('firstDay' => 1),
                 ),
                 'customOptions' => array(
                     'widget_options' => array('firstDay' => 1)
