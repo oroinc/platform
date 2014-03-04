@@ -123,5 +123,13 @@ define(function (require) {
         layout.init(element);
     });
 
+    mediator.on('grid_load:complete', function(collection, element) {
+        _widgetControlInitializer.init(element);
+    });
+
+    mediator.on('grid_render:complete', function(element) {
+        _widgetControlInitializer.init(element);
+    });
+
     return layout;
 });
