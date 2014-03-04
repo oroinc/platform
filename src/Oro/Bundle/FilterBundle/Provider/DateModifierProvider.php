@@ -4,6 +4,7 @@ namespace Oro\Bundle\FilterBundle\Provider;
 
 class DateModifierProvider implements DateModifierInterface
 {
+    /** @var array */
     protected $varMap = [
         self::PART_VALUE => [
             self::VAR_NOW   => 'now',
@@ -39,6 +40,9 @@ class DateModifierProvider implements DateModifierInterface
     ];
 
     /**
+     * Return date variables available for each date part
+     * as associative array
+     *
      * @return array
      */
     public function getDateVariables()
@@ -58,6 +62,9 @@ class DateModifierProvider implements DateModifierInterface
     }
 
     /**
+     * Return date part associative array where key is the code and
+     * value is translatable string
+     *
      * @return array
      */
     public function getDateParts()

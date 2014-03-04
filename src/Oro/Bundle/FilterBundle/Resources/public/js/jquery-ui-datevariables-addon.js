@@ -42,26 +42,6 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
                     fns = {},
                     overrides, i;
 
-                overrides = {
-                    beforeShow: function (input, dp_inst) {
-                        if ($.isFunction(tp_inst._defaults.evnts.beforeShow)) {
-                            return tp_inst._defaults.evnts.beforeShow.call($input[0], input, dp_inst, tp_inst);
-                        }
-                    },
-                    onClose: function (dateText, dp_inst) {
-                        if (tp_inst.timeDefined === true && $input.val() !== '') {
-                            tp_inst._updateDateTime(dp_inst);
-                        }
-                        if ($.isFunction(tp_inst._defaults.evnts.onClose)) {
-                            tp_inst._defaults.evnts.onClose.call($input[0], dateText, dp_inst, tp_inst);
-                        }
-                    }
-                };
-                for (i in overrides) {
-                    if (overrides.hasOwnProperty(i)) {
-                        fns[i] = o[i] || null;
-                    }
-                }
                 tp_inst._defaults = $.extend({}, this._defaults, o, overrides, {
                     evnts: fns,
                     datevariables: tp_inst // add datevariables as a property of datepicker: $.datepicker._get(dp_inst, 'datevariables');
@@ -75,12 +55,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
                 return tp_inst;
             },
 
-            /*
-             * add our vars to the calendar
-             */
-            _addDatevariables: function (dp_inst) {
-                var currDT = this.$altInput ? this.$input.val() + ' ' + this.$altInput.val() : this.$input.val();
-
+            _addDatevariables: function () {
                 if (!this.inst) {
                     this.inst = $.datepicker._getInst(this.$input[0]);
                 }
@@ -140,57 +115,6 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
                         e.preventDefault();
                     });
                 }
-            },
-
-            /*
-             * update our input with the new date time..
-             */
-            _updateDateTime: function (dp_inst) {
-                dp_inst = this.inst || dp_inst;
-                var dt = $.datepicker._daylightSavingAdjust(new Date(dp_inst.selectedYear, dp_inst.selectedMonth, dp_inst.selectedDay)),
-                    dateFmt = $.datepicker._get(dp_inst, 'dateFormat'),
-                    formatCfg = $.datepicker._getFormatConfig(dp_inst),
-                    timeAvailable = dt !== null && this.timeDefined;
-                this.formattedDate = $.datepicker.formatDate(dateFmt, (dt === null ? new Date() : dt), formatCfg);
-                var formattedDateTime = this.formattedDate;
-
-                // if a slider was changed but datepicker doesn't have a value yet, set it
-                if (dp_inst.lastVal == "") {
-                    dp_inst.currentYear = dp_inst.selectedYear;
-                    dp_inst.currentMonth = dp_inst.selectedMonth;
-                    dp_inst.currentDay = dp_inst.selectedDay;
-                }
-
-                if (this._defaults.timeOnly === true) {
-                    formattedDateTime = this.formattedTime;
-                } else if (this._defaults.timeOnly !== true && (this._defaults.alwaysSetTime || timeAvailable)) {
-                    formattedDateTime += this._defaults.separator + this.formattedTime + this._defaults.timeSuffix;
-                }
-
-                this.formattedDateTime = formattedDateTime;
-
-                if (!this._defaults.showDatevariables) {
-                    this.$input.val(this.formattedDate);
-                } else if (this.$altInput && this._defaults.altFieldTimeOnly === true) {
-                    this.$altInput.val(this.formattedTime);
-                    this.$input.val(this.formattedDate);
-                } else if (this.$altInput) {
-                    this.$input.val(formattedDateTime);
-                    var altFormattedDateTime = '',
-                        altSeparator = this._defaults.altSeparator ? this._defaults.altSeparator : this._defaults.separator,
-                        altTimeSuffix = this._defaults.altTimeSuffix ? this._defaults.altTimeSuffix : this._defaults.timeSuffix;
-
-                    if (this._defaults.altFormat) altFormattedDateTime = $.datepicker.formatDate(this._defaults.altFormat, (dt === null ? new Date() : dt), formatCfg);
-                    else altFormattedDateTime = this.formattedDate;
-                    if (altFormattedDateTime) altFormattedDateTime += altSeparator;
-                    if (this._defaults.altTimeFormat) altFormattedDateTime += $.datepicker.formatTime(this._defaults.altTimeFormat, this, this._defaults) + altTimeSuffix;
-                    else altFormattedDateTime += this.formattedTime + altTimeSuffix;
-                    this.$altInput.val(altFormattedDateTime);
-                } else {
-                    this.$input.val(formattedDateTime);
-                }
-
-                this.$input.trigger("change");
             },
 
             _onFocus: function () {
@@ -273,7 +197,7 @@ define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
             try {
                 date = this._base_parseDate(format, value, settings);
             } catch (err) {
-                $.timepicker.log("Error parsing the date string: " + err + "\ndate string = " + value + "\ndate format = " + format);
+                date = value;
             }
             return date;
         };
