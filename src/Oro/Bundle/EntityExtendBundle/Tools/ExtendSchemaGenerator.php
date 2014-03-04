@@ -32,24 +32,21 @@ class ExtendSchemaGenerator
     }
 
     /**
-     * @param $className
-     * @throws \InvalidArgumentException
+     * @param string        $className
+     * @return bool
      */
-    protected function checkExtend($className)
+    protected function isExtendEntity($className)
     {
-        $error = false;
-        if (!$this->configManager->hasConfig($className)) {
-            $error = true;
-        } else {
-            $config = $this->configManager->getProvider('extend')->getConfig($className);
-            if (!$config->is('is_extend')) {
-                $error = true;
-            }
+        $result = false;
+
+        if ($this->configManager->hasConfig($className)) {
+            $result = $this->configManager
+                ->getProvider('extend')
+                ->getConfig($className)
+                ->is('is_extend');
         }
 
-        if ($error) {
-            throw new \InvalidArgumentException(sprintf('Class "%s" is not extended.', $className));
-        }
+        return $result;
     }
 
     /**
@@ -61,8 +58,8 @@ class ExtendSchemaGenerator
      */
     protected function parseEntity($className, $options)
     {
-        if (class_exists($className)) {
-            $this->checkExtend($className);
+        if (class_exists($className) && !$this->isExtendEntity($className)) {
+            throw new \InvalidArgumentException(sprintf('Class "%s" is not extended.', $className));
         }
 
         if (!$this->configManager->hasConfig($className)) {
