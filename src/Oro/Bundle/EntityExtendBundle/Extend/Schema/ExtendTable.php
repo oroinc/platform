@@ -83,109 +83,13 @@ class ExtendTable extends Table
     {
         switch ($typeName) {
             case 'oneToMany':
-                $selfColumnName     = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
-                $selfTableName      = $this->getName();
-                $selfClassName      =
-                    $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
-                $selfClassNameParts = explode('\\', $selfClassName);
-
-                $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
-                if (!$this->schema->hasTable($targetTableName)) {
-                    throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
-                }
-                $targetTable      = $this->schema->getTable($targetTableName);
-                $targetColumnName =
-                    ExtendConfigDumper::FIELD_PREFIX .
-                    strtolower(array_pop($selfClassNameParts)) .
-                    '_' .
-                    $columnName .
-                    '_id';
-
-                parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
-                parent::addUniqueIndex([$selfColumnName], 'UNIQUE_' . $selfColumnName);
-                parent::addForeignKeyConstraint(
-                    $targetTable,
-                    [$selfColumnName],
-                    $targetTable->getPrimaryKey()->getColumns(),
-                    ['onDelete' => 'SET NULL']
-                );
-
-                $targetTable->addColumn($targetColumnName, 'integer', ['notnull' => false]);
-                $targetTable->addIndex([$targetColumnName], 'IDX_' . $targetColumnName);
-                $targetTable->addForeignKeyConstraint(
-                    $this,
-                    [$targetColumnName],
-                    $this->getPrimaryKey()->getColumns(),
-                    ['onDelete' => 'SET NULL']
-                );
-
+                $this->addRelationOneToMany($columnName, $options);
                 break;
             case 'manyToOne':
-                $selfColumnName = ExtendConfigDumper::FIELD_PREFIX . $columnName . '_id';
-                $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
-                if (!$this->schema->hasTable($targetTableName)) {
-                    throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
-                }
-                $targetTable = $this->schema->getTable($targetTableName);
-
-                parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
-                parent::addIndex([$selfColumnName], 'IDX_' . $selfColumnName);
-                parent::addForeignKeyConstraint(
-                    $targetTable,
-                    [$selfColumnName],
-                    $targetTable->getPrimaryKey()->getColumns(),
-                    ['onDelete' => 'SET NULL']
-                );
-
+                $this->addRelationManyToOne($columnName, $options);
                 break;
             case 'manyToMany':
-                $selfColumnName     = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
-                $selfTableName      = $this->getName();
-                $selfClassName      =
-                    $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
-                $selfClassNameParts = explode('\\', $selfClassName);
-                $selfName           = strtolower(array_pop($selfClassNameParts));
-
-                $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
-                if (!$this->schema->hasTable($targetTableName)) {
-                    throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
-                }
-                $targetTable          = $this->schema->getTable($targetTableName);
-                $targetClassName      =
-                    $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($targetTableName);
-                $targetClassNameParts = explode('\\', $targetClassName);
-                $targetName           = strtolower(array_pop($targetClassNameParts));
-
-                parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
-                parent::addUniqueIndex([$selfColumnName], 'UNIQ_' . $selfColumnName);
-                parent::addForeignKeyConstraint(
-                    $targetTable,
-                    [$selfColumnName],
-                    $targetTable->getPrimaryKey()->getColumns(),
-                    ['onDelete' => 'SET NULL']
-                );
-                parent::addIndex([$selfColumnName], 'IDX_' . $selfColumnName, ['KEY']);
-
-                $relationsTableName = 'oro_' . $selfName . '_' . $targetName . '_' . $columnName;
-                $relationsTable     = $this->schema->createTable($relationsTableName);
-                $relationsTable->addColumn($selfName . '_id', 'integer');
-                $relationsTable->addIndex([$selfName . '_id'], 'IDX_' . $selfName . '_id');
-                $relationsTable->addForeignKeyConstraint(
-                    $this,
-                    [$selfName . '_id'],
-                    $this->getPrimaryKey()->getColumns(),
-                    ['onDelete' => 'CASCADE']
-                );
-                $relationsTable->addColumn($targetName . '_id', 'integer');
-                $relationsTable->addIndex([$targetName . '_id'], 'IDX_' . $targetName . '_id');
-                $relationsTable->addForeignKeyConstraint(
-                    $targetTable,
-                    [$targetName . '_id'],
-                    $targetTable->getPrimaryKey()->getColumns(),
-                    ['onDelete' => 'CASCADE']
-                );
-                $relationsTable->setPrimaryKey([$selfName . '_id', $targetName . '_id']);
-
+                $this->addRelationManyToMany($columnName, $options);
                 break;
         }
 
@@ -220,18 +124,126 @@ class ExtendTable extends Table
         return parent::addColumn($columnName, $typeName, $options);
     }
 
-    protected function addRelationOneToMany()
+    /**
+     * @param $columnName
+     * @param $options
+     * @throws \RuntimeException
+     */
+    protected function addRelationOneToMany($columnName, $options)
     {
+        $selfColumnName     = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
+        $selfTableName      = $this->getName();
+        $selfClassName      =
+            $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
+        $selfClassNameParts = explode('\\', $selfClassName);
 
+        $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
+        if (!$this->schema->hasTable($targetTableName)) {
+            throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
+        }
+        $targetTable      = $this->schema->getTable($targetTableName);
+        $targetColumnName =
+            ExtendConfigDumper::FIELD_PREFIX .
+            strtolower(array_pop($selfClassNameParts)) .
+            '_' .
+            $columnName .
+            '_id';
+
+        parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
+        parent::addUniqueIndex([$selfColumnName], 'UNIQUE_' . $selfColumnName);
+        parent::addForeignKeyConstraint(
+            $targetTable,
+            [$selfColumnName],
+            $targetTable->getPrimaryKey()->getColumns(),
+            ['onDelete' => 'SET NULL']
+        );
+
+        $targetTable->addColumn($targetColumnName, 'integer', ['notnull' => false]);
+        $targetTable->addIndex([$targetColumnName], 'IDX_' . $targetColumnName);
+        $targetTable->addForeignKeyConstraint(
+            $this,
+            [$targetColumnName],
+            $this->getPrimaryKey()->getColumns(),
+            ['onDelete' => 'SET NULL']
+        );
     }
 
-    protected function addRelationManyToMany()
+    /**
+     * @param $columnName
+     * @param $options
+     * @throws \RuntimeException
+     */
+    protected function addRelationManyToMany($columnName, $options)
     {
+        $selfColumnName     = ExtendConfigDumper::DEFAULT_PREFIX . $columnName . '_id';
+        $selfTableName      = $this->getName();
+        $selfClassName      =
+            $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($selfTableName);
+        $selfClassNameParts = explode('\\', $selfClassName);
+        $selfName           = strtolower(array_pop($selfClassNameParts));
 
+        $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
+        if (!$this->schema->hasTable($targetTableName)) {
+            throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
+        }
+        $targetTable          = $this->schema->getTable($targetTableName);
+        $targetClassName      =
+            $this->extendOptionManager->getEntityClassResolver()->getEntityClassByTableName($targetTableName);
+        $targetClassNameParts = explode('\\', $targetClassName);
+        $targetName           = strtolower(array_pop($targetClassNameParts));
+
+        parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
+        parent::addUniqueIndex([$selfColumnName], 'UNIQ_' . $selfColumnName);
+        parent::addForeignKeyConstraint(
+            $targetTable,
+            [$selfColumnName],
+            $targetTable->getPrimaryKey()->getColumns(),
+            ['onDelete' => 'SET NULL']
+        );
+
+        $relationsTableName = 'oro_' . $selfName . '_' . $targetName . '_' . $columnName;
+
+        $relationsTable = $this->schema->createTable($relationsTableName);
+        $relationsTable->addColumn($selfName . '_id', 'integer');
+        $relationsTable->addIndex([$selfName . '_id'], 'IDX_' . $selfName . '_id');
+        $relationsTable->addForeignKeyConstraint(
+            $this,
+            [$selfName . '_id'],
+            $this->getPrimaryKey()->getColumns(),
+            ['onDelete' => 'CASCADE']
+        );
+        $relationsTable->addColumn($targetName . '_id', 'integer');
+        $relationsTable->addIndex([$targetName . '_id'], 'IDX_' . $targetName . '_id');
+        $relationsTable->addForeignKeyConstraint(
+            $targetTable,
+            [$targetName . '_id'],
+            $targetTable->getPrimaryKey()->getColumns(),
+            ['onDelete' => 'CASCADE']
+        );
+        $relationsTable->setPrimaryKey([$selfName . '_id', $targetName . '_id']);
     }
 
-    protected function addRelationManyToOne()
+    /**
+     * @param $columnName
+     * @param $options
+     * @throws \RuntimeException
+     */
+    protected function addRelationManyToOne($columnName, $options)
     {
+        $selfColumnName = ExtendConfigDumper::FIELD_PREFIX . $columnName . '_id';
+        $targetTableName = $options[self::ORO_OPTIONS_NAME]['extend']['target']['table_name'];
+        if (!$this->schema->hasTable($targetTableName)) {
+            throw new \RuntimeException(sprintf('Table "%s" do NOT exists.', $targetTableName));
+        }
+        $targetTable = $this->schema->getTable($targetTableName);
 
+        parent::addColumn($selfColumnName, 'integer', ['notnull' => false]);
+        parent::addIndex([$selfColumnName], 'IDX_' . $selfColumnName);
+        parent::addForeignKeyConstraint(
+            $targetTable,
+            [$selfColumnName],
+            $targetTable->getPrimaryKey()->getColumns(),
+            ['onDelete' => 'SET NULL']
+        );
     }
 }

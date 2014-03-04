@@ -37,7 +37,7 @@ class ExtendHelper
         $targetClassArray = explode('\\', $targetEntity);
         $targetClassName  = array_pop($targetClassArray);
 
-        return strtolower('oro_extend_' . $selfClassName . '_' . $targetClassName . '_' . $selfFieldId->getFieldName());
+        return strtolower('oro_' . $selfClassName . '_' . $targetClassName . '_' . $selfFieldId->getFieldName());
     }
 
     /**
