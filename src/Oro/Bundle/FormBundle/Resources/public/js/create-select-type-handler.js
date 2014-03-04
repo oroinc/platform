@@ -1,5 +1,5 @@
 /* global define */
-define(['jquery', 'oro/widget-manager', 'routing', 'oro/navigation'],
+define(['jquery', 'oroui/js/widget-manager', 'routing', 'oronavigation/js/navigation'],
 function ($, widgetManager, routing) {
     'use strict';
 

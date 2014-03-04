@@ -1,5 +1,5 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/abstract-widget'
+define(['underscore', 'backbone', 'oroui/js/widget/abstract'
     ], function (_, Backbone, AbstractWidget) {
     'use strict';
 

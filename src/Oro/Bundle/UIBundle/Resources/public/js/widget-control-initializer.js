@@ -1,14 +1,14 @@
-/* global define */
-define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/mediator'],
-    function($, _, DialogWidget, WidgetManager, mediator) {
+/*global define*/
+define(['jquery', 'underscore', 'oro/dialog-widget', 'oroui/js/widget-manager', 'oroui/js/mediator'],
+    function ($, _, DialogWidget, WidgetManager, mediator) {
         'use strict';
 
         /**
-         * @export oro/widget-control-initializer
-         * @class oro.WidgetControlInitializer
+         * @export oroui/js/widget-control-initializer
+         * @class oroui.widgetControlInitializer
          */
         return {
-            init: function(container) {
+            init: function (container) {
                 var self = this;
                 container.find('[data-widget-type]').each(
                     function (index, controlElement) {
