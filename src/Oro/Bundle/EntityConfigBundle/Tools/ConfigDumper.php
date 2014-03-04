@@ -61,6 +61,7 @@ class ConfigDumper
         }
 
         $this->configManager->clearConfigurableCache();
+        $this->configManager->clearCacheAll();
 
         $this->configManager->flush();
     }

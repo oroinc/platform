@@ -325,6 +325,7 @@ class ConfigManager
         if ($this->cache) {
             $this->cache->removeConfigFromCache($configId);
         }
+        unset($this->localCache[$this->buildConfigKey($configId)]);
     }
 
     /**
@@ -335,6 +336,7 @@ class ConfigManager
         if ($this->cache) {
             $this->cache->removeAll();
         }
+        $this->localCache = [];
     }
 
     /**
