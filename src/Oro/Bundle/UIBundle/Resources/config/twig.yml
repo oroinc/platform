@@ -1,0 +1,69 @@
+parameters:
+    oro_ui.twig.ceil.class:              Oro\Bundle\UIBundle\Twig\CeilExtension
+    oro_ui.twig.extension.class:         Oro\Bundle\UIBundle\Twig\UiExtension
+    oro_ui.twig.mobile.class:            Oro\Bundle\UIBundle\Twig\MobileExtension
+    oro_ui.twig.widget.class:            Oro\Bundle\UIBundle\Twig\WidgetExtension
+    oro_ui.twig.date.class:              Oro\Bundle\UIBundle\Twig\DateExtension
+    oro_ui.twig.skype_button.class:      Oro\Bundle\UIBundle\Twig\SkypeButtonExtension
+    oro_ui.twig.form.class:              Oro\Bundle\UIBundle\Twig\FormExtension
+    oro_ui.twig.placeholder.class:       Oro\Bundle\UIBundle\Twig\PlaceholderExtension
+    oro_ui.twig.tab.class:               Oro\Bundle\UIBundle\Twig\TabExtension
+
+services:
+    oro_ui.twig.ceil_extension:
+        class: %oro_ui.twig.ceil.class%
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.ui_extension:
+        class: %oro_ui.twig.extension.class%
+        arguments: [%oro_ui.placeholders%, %oro_ui.wrap_class%]
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.mobile_extension:
+        class: %oro_ui.twig.mobile.class%
+        arguments:
+            - @service_container
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.form_extension:
+        class: %oro_ui.twig.form.class%
+        arguments:
+            - @event_dispatcher
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.widget_extension:
+        class: %oro_ui.twig.widget.class%
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.date_extension:
+        class: %oro_ui.twig.date.class%
+        arguments:
+            - @translator
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.skype_button_extension:
+        class: %oro_ui.twig.skype_button.class%
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.tab_extension:
+        class: %oro_ui.twig.tab.class%
+        arguments:
+            - @oro_menu.twig.extension
+            - @router
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.placeholder_extension:
+        class: %oro_ui.twig.placeholder.class%
+        arguments:
+            - @twig
+            - @oro_ui.placeholder.provider
+        tags:
+            - { name: twig.extension }
