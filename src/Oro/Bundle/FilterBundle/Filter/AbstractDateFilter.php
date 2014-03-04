@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Carbon\Carbon;
-
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
@@ -45,20 +44,11 @@ abstract class AbstractDateFilter extends AbstractFilter
             return false;
         }
 
-        if (!empty($data['date_start'])) {
-            $dateStartValue = Carbon::parse($data['date_start'], new \DateTimeZone('UTC'));
-        }
-
-        if (!empty($data['date_end'])) {
-            $dateEndValue = Carbon::parse($data['date_end'], new \DateTimeZone('UTC'));
-        }
-
-        $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-        $fieldName = $this->applyDatePart($data['part'], $fieldName, $dateStartValue, $dateEndValue);
+        $dateStartValue = $data['date_start'];
+        $dateEndValue   = $data['date_end'];
 
         $startDateParameterName = $ds->generateParameterName($this->getName());
         $endDateParameterName   = $ds->generateParameterName($this->getName());
-
 
         $this->applyDependingOnType(
             $data['type'],
@@ -67,7 +57,7 @@ abstract class AbstractDateFilter extends AbstractFilter
             $dateEndValue,
             $startDateParameterName,
             $endDateParameterName,
-            $fieldName
+            $data['field']
         );
 
         if ($dateStartValue) {
@@ -91,53 +81,26 @@ abstract class AbstractDateFilter extends AbstractFilter
             return false;
         }
 
-        if (isset($data['value']['start'])) {
-            /** @var \DateTime $startDate */
-            $startDate = $data['value']['start'];
-            $startDate->setTimezone(new \DateTimeZone('UTC'));
-            $data['value']['start'] = $startDate->format(static::DATETIME_FORMAT);
-        } else {
-            $data['value']['start'] = null;
-        }
+        $data['value'] = array_merge(['start' => null, 'end' => null], $data['value']);
+        $data['type']  = isset($data['type']) ? $data['type'] : DateRangeFilterType::TYPE_BETWEEN;
 
-        if (isset($data['value']['end'])) {
-            /** @var \DateTime $endDate */
-            $endDate = $data['value']['end'];
-            $endDate->setTimezone(new \DateTimeZone('UTC'));
-            $data['value']['end'] = $endDate->format(static::DATETIME_FORMAT);
-        } else {
-            $data['value']['end'] = null;
-        }
-
-        if (!isset($data['type'])) {
-            $data['type'] = null;
-        }
-
-        if (!in_array(
-            $data['type'],
-            array(
-                DateRangeFilterType::TYPE_BETWEEN,
-                DateRangeFilterType::TYPE_NOT_BETWEEN,
-                DateRangeFilterType::TYPE_MORE_THAN,
-                DateRangeFilterType::TYPE_LESS_THAN
-            )
-        )
-        ) {
-            $data['type'] = DateRangeFilterType::TYPE_BETWEEN;
-        }
-
+        // values will not be used, so just unset them
         if ($data['type'] == DateRangeFilterType::TYPE_MORE_THAN) {
             $data['value']['end'] = null;
         } elseif ($data['type'] == DateRangeFilterType::TYPE_LESS_THAN) {
             $data['value']['start'] = null;
         }
 
-        return array(
+        $data = [
             'date_start' => $data['value']['start'],
             'date_end'   => $data['value']['end'],
             'type'       => $data['type'],
-            'part'       => $data['part'],
-        );
+            'part'       => isset($data['part']) ? $data['part'] : DateModifierInterface::PART_VALUE,
+            'field'      => $this->get(FilterUtility::DATA_NAME_KEY)
+        ];
+        $data = $this->applyDatePart($data);
+
+        return $data;
     }
 
     /**
@@ -168,59 +131,83 @@ abstract class AbstractDateFilter extends AbstractFilter
         return true;
     }
 
-    /**
-     * @param string           $part
-     * @param string           $field
-     *
-     * @param Carbon|\DateTime $dateStart
-     * @param Carbon|\DateTime $dateEnd
-     *
-     * @return mixed
-     */
-    protected function applyDatePart($part, $field, Carbon &$dateStart = null, Carbon &$dateEnd = null)
+    protected function applyDatePart($data)
     {
-        switch ($part) {
+        $dateStart = $data['date_start'];
+        $dateEnd   = $data['date_end'];
+        $field     = $data['field'];
+        switch ($data['part']) {
             case DateModifierInterface::PART_MONTH:
-                $field     = sprintf('MONTH(%s)', $field);
-                $dateStart = $dateStart->month;
-                $dateEnd   = $dateEnd->month;
+                $field     = sprintf('MONTH(%s)', $data['field']);
+                $dateStart = $this->getDatePartValue($dateStart, 'm');
+                $dateEnd   = $this->getDatePartValue($dateEnd, 'm');
                 break;
             case DateModifierInterface::PART_DOW:
                 $field     = sprintf('DAYOFWEEK(%s)', $field);
-                $dateStart = $dateStart->dayOfWeek;
-                $dateEnd   = $dateEnd->dayOfWeek;
+                $dateStart = $this->getDatePartValue($dateStart, 'N');
+                $dateEnd   = $this->getDatePartValue($dateEnd, 'N');
                 break;
             case DateModifierInterface::PART_WEEK:
                 $field     = sprintf('WEEK(%s)', $field);
-                $dateStart = $dateStart->weekOfYear;
-                $dateEnd   = $dateEnd->weekOfYear;
+                $dateStart = $this->getDatePartValue($dateStart, 'W');
+                $dateEnd   = $this->getDatePartValue($dateEnd, 'W');
                 break;
             case DateModifierInterface::PART_DAY:
                 $field     = sprintf('DAY(%s)', $field);
-                $dateStart = $dateStart->day;
-                $dateEnd   = $dateEnd->day;
+                $dateStart = $this->getDatePartValue($dateStart, 'd');
+                $dateEnd   = $this->getDatePartValue($dateEnd, 'd');
                 break;
             case DateModifierInterface::PART_QUARTER:
                 $field     = sprintf('QUARTER(%s)', $field);
-                $dateStart = $dateStart->quarter;
-                $dateEnd   = $dateEnd->quarter;
+                $dateStart = $this->getDatePartValue($dateStart, 'm');
+                $dateEnd   = $this->getDatePartValue($dateEnd, 'm');
+                $dateStart = $dateStart ? ceil($dateStart / 3) : $dateStart;
+                $dateEnd   = $dateEnd ? ceil($dateEnd / 3) : $dateEnd;
                 break;
             case DateModifierInterface::PART_DOY:
                 $field     = sprintf('DAYOFYEAR(%s)', $field);
-                $dateStart = $dateStart->dayOfYear;
-                $dateEnd   = $dateEnd->dayOfYear;
+                $dateStart = $this->getDatePartValue($dateStart, 'z');
+                $dateEnd   = $this->getDatePartValue($dateEnd, 'z');
                 break;
             case DateModifierInterface::PART_YEAR:
                 $field     = sprintf('YEAR(%s)', $field);
-                $dateStart = $dateStart->year;
-                $dateEnd   = $dateEnd->year;
+                $dateStart = $this->getDatePartValue($dateStart, 'Y');
+                $dateEnd   = $this->getDatePartValue($dateEnd, 'Y');
                 break;
             case DateModifierInterface::PART_VALUE:
             default:
                 break;
         }
 
-        return $field;
+        return array_merge(
+            $data,
+            [
+                'date_start' => $dateStart,
+                'date_end'   => $dateEnd,
+                'field'      => $field
+            ]
+        );
+    }
+
+    /**
+     * @param mixed  $value
+     * @param string $part
+     *
+     * @return integer|null
+     * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+     */
+    private function getDatePartValue($value, $part)
+    {
+        switch (true) {
+            case is_integer($value) || is_null($value):
+                return $value;
+                break;
+            case ($value instanceof \DateTime):
+                return $value->format($part);
+                break;
+            default:
+                throw new UnexpectedTypeException($value, 'integer or \DateTime');
+        }
     }
 
     /**
@@ -416,10 +403,10 @@ abstract class AbstractDateFilter extends AbstractFilter
         $start = $this->expressionCompiler->compile($data['value']['start']);
         $end   = $this->expressionCompiler->compile($data['value']['end']);
 
-        if ($start instanceof Carbon) {
+        if ($start instanceof \DateTime) {
             $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
-        if ($end instanceof Carbon) {
+        if ($end instanceof \DateTime) {
             $end->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
 
