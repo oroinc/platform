@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -11,6 +11,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -58,20 +59,25 @@ class WorkflowDefinitionController extends FOSRestController
      */
     public function putAction(WorkflowDefinition $workflowDefinition)
     {
-        /*
-        $entity = $this->getManager()->find($id);
-        if (!$entity) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        try {
+            /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
+            $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
+            $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration());
+            $workflowDefinition->import($builtDefinition);
+
+            $entityManager = $this->getEntityManager();
+            $entityManager->persist($workflowDefinition);
+            $entityManager->flush($workflowDefinition);
+        } catch (\Exception $exception) {
+            return $this->handleView(
+                $this->view(
+                    array('error' => $exception->getMessage()),
+                    Codes::HTTP_BAD_REQUEST
+                )
+            );
         }
 
-        if ($this->processForm($entity)) {
-            $view = $this->view(null, Codes::HTTP_NO_CONTENT);
-        } else {
-            $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
-        }
-        */
-
-        return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+        return $this->handleView($this->view(null, Codes::HTTP_OK));
     }
 
     /**
@@ -122,9 +128,9 @@ class WorkflowDefinitionController extends FOSRestController
         if ($workflowDefinition->isSystem()) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         } else {
-            $em = $this->getEntityManager();
-            $em->remove($workflowDefinition);
-            $em->flush();
+            $entityManager = $this->getEntityManager();
+            $entityManager->remove($workflowDefinition);
+            $entityManager->flush();
             return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
         }
     }

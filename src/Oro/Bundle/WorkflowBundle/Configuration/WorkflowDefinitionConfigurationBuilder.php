@@ -31,44 +31,54 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     {
         $workflowDefinitions = array();
         foreach ($configurationData as $workflowName => $workflowConfiguration) {
-            $this->assertConfigurationOptions($workflowConfiguration, array('label', 'entity'));
-
-            $enabled = $this->getConfigurationOption($workflowConfiguration, 'enabled', true);
-            $system = $this->getConfigurationOption($workflowConfiguration, 'system', false);
-            $startStepName = $this->getConfigurationOption($workflowConfiguration, 'start_step', null);
-            $entityAttributeName = $this->getConfigurationOption(
-                $workflowConfiguration,
-                'entity_attribute',
-                WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE
-            );
-            $stepsDisplayOrdered = $this->getConfigurationOption(
-                $workflowConfiguration,
-                'steps_display_ordered',
-                false
-            );
-
-            $workflowDefinition = new WorkflowDefinition();
-            $workflowDefinition
-                ->setName($workflowName)
-                ->setLabel($workflowConfiguration['label'])
-                ->setRelatedEntity($workflowConfiguration['entity'])
-                ->setStepsDisplayOrdered($stepsDisplayOrdered)
-                ->setEnabled($enabled)
-                ->setSystem($system)
-                ->setEntityAttributeName($entityAttributeName)
-                ->setConfiguration($workflowConfiguration);
-
-            $workflow = $this->workflowAssembler->assemble($workflowDefinition);
-
-            $this->setSteps($workflowDefinition, $workflow);
-            $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
-
-            $this->setEntityAcls($workflowDefinition, $workflow);
-
-            $workflowDefinitions[] = $workflowDefinition;
+            $workflowDefinitions[] = $this->buildOneFromConfiguration($workflowName, $workflowConfiguration);
         }
 
         return $workflowDefinitions;
+    }
+
+    /**
+     * @param string $name
+     * @param array $configuration
+     * @return WorkflowDefinition
+     */
+    public function buildOneFromConfiguration($name, array $configuration)
+    {
+        $this->assertConfigurationOptions($configuration, array('label', 'entity'));
+
+        $enabled = $this->getConfigurationOption($configuration, 'enabled', true);
+        $system = $this->getConfigurationOption($configuration, 'system', false);
+        $startStepName = $this->getConfigurationOption($configuration, 'start_step', null);
+        $entityAttributeName = $this->getConfigurationOption(
+            $configuration,
+            'entity_attribute',
+            WorkflowConfiguration::DEFAULT_ENTITY_ATTRIBUTE
+        );
+        $stepsDisplayOrdered = $this->getConfigurationOption(
+            $configuration,
+            'steps_display_ordered',
+            false
+        );
+
+        $workflowDefinition = new WorkflowDefinition();
+        $workflowDefinition
+            ->setName($name)
+            ->setLabel($configuration['label'])
+            ->setRelatedEntity($configuration['entity'])
+            ->setStepsDisplayOrdered($stepsDisplayOrdered)
+            ->setEnabled($enabled)
+            ->setSystem($system)
+            ->setEntityAttributeName($entityAttributeName)
+            ->setConfiguration($configuration);
+
+        $workflow = $this->workflowAssembler->assemble($workflowDefinition);
+
+        $this->setSteps($workflowDefinition, $workflow);
+        $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
+
+        $this->setEntityAcls($workflowDefinition, $workflow);
+
+        return $workflowDefinition;
     }
 
     /**

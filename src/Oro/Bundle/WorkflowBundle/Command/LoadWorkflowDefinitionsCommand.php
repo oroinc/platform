@@ -70,8 +70,10 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
             /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
             $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
             foreach ($workflowDefinitions as $workflowDefinition) {
-                $workflowDefinition->setSystem(true);
                 $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $workflowDefinition->getName()));
+
+                // all loaded workflows set as system by default
+                $workflowDefinition->setSystem(true);
 
                 /** @var WorkflowDefinition $existingWorkflowDefinition */
                 $existingWorkflowDefinition = $workflowDefinitionRepository->find($workflowDefinition->getName());

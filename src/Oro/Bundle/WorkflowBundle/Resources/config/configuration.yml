@@ -2,9 +2,12 @@ parameters:
     oro_workflow.configuration.config.workflow_sole.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration
     oro_workflow.configuration.config.workflow_list.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration
 
+    oro_workflow.configuration.handler.workflow.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler
+
     oro_workflow.configuration.provider.workflow_config.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider
 
     oro_workflow.configuration.builder.workflow_definition.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder
+    oro_workflow.configuration.builder.workflow_definition.handle.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder
 
 services:
     oro_workflow.configuration.config.workflow_sole:
@@ -14,6 +17,9 @@ services:
         class: %oro_workflow.configuration.config.workflow_list.class%
         arguments:
             - @oro_workflow.configuration.config.workflow_sole
+
+    oro_workflow.configuration.handler.workflow:
+        class: %oro_workflow.configuration.handler.workflow.class%
 
     oro_workflow.configuration.provider.workflow_config:
         class: %oro_workflow.configuration.provider.workflow_config.class%
@@ -25,3 +31,10 @@ services:
         class: %oro_workflow.configuration.builder.workflow_definition.class%
         arguments:
             - @oro_workflow.workflow_assembler
+
+    oro_workflow.configuration.builder.workflow_definition.handle:
+        class: %oro_workflow.configuration.builder.workflow_definition.handle.class%
+        arguments:
+            - @oro_workflow.configuration.handler.workflow
+            - @oro_workflow.configuration.config.workflow_sole
+            - @oro_workflow.configuration.builder.workflow_definition
