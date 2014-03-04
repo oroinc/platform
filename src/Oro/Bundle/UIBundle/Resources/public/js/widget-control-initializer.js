@@ -3,7 +3,11 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/
     function($, _, DialogWidget, WidgetManager, mediator) {
         'use strict';
 
-        var layout = {
+        /**
+         * @export oro/widget-control-initializer
+         * @class oro.WidgetControlInitializer
+         */
+        return {
             init: function(container) {
                 var self = this;
                 container.find('[data-widget-type]').each(
@@ -80,19 +84,5 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oro/widget-manager', 'oro/
                 );
             }
         };
-
-        mediator.on('grid_load:grid:complete', function(element) {
-            layout.init(element);
-        });
-
-        mediator.on('grid_render:complete', function(element) {
-            layout.init(element);
-        });
-
-        /**
-         * @export oro/widget-control-initializer
-         * @class oro.WidgetControlInitializer
-         */
-        return layout;
     }
 );
