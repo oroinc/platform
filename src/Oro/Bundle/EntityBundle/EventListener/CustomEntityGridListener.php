@@ -204,14 +204,14 @@ class CustomEntityGridListener extends AbstractConfigGridListener
      */
     public function getDynamicFieldItem($alias, ConfigInterface $extendConfig)
     {
-        /** @var FieldConfigId $fieldConfig */
-        $fieldConfig = $extendConfig->getId();
+        /** @var FieldConfigId $fieldConfigId */
+        $fieldConfigId = $extendConfig->getId();
 
         /** @var ConfigProvider $datagridProvider */
         $datagridConfigProvider = $this->configManager->getProvider('datagrid');
         $datagridConfig         = $datagridConfigProvider->getConfig(
             $this->entityClass,
-            $fieldConfig->getFieldName()
+            $fieldConfigId->getFieldName()
         );
 
         $select = '';
@@ -221,17 +221,17 @@ class CustomEntityGridListener extends AbstractConfigGridListener
             $entityConfigProvider = $this->configManager->getProvider('entity');
             $entityConfig         = $entityConfigProvider->getConfig(
                 $this->entityClass,
-                $fieldConfig->getFieldName()
+                $fieldConfigId->getFieldName()
             );
 
-            $label = $entityConfig->get('label') ?: $fieldConfig->getFieldName();
+            $label = $entityConfig->get('label') ?: $fieldConfigId->getFieldName();
             $code  = $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldConfig->getFieldName()
-                : $fieldConfig->getFieldName();
+                ? ExtendConfigDumper::FIELD_PREFIX . $fieldConfigId->getFieldName()
+                : $fieldConfigId->getFieldName();
 
             $this->queryFields[] = $code;
 
-            $field = $this->createFieldArrayDefinition($code, $label, $fieldConfig);
+            $field = $this->createFieldArrayDefinition($code, $label, $fieldConfigId);
             $select = $alias . '.' . $code;
         }
 
@@ -241,15 +241,17 @@ class CustomEntityGridListener extends AbstractConfigGridListener
     /**
      * @param string $code
      * @param $label
-     * @param FieldConfigId $fieldConfig
+     * @param FieldConfigId $fieldConfigId
      *
      * @return array
      */
-    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfig)
+    protected function createFieldArrayDefinition($code, $label, FieldConfigId $fieldConfigId)
     {
+        // TODO: getting field type from model here is a temporary solution.
+        // We need to use $fieldConfigId->getFieldType()
         $fieldType = $this->configManager->getConfigFieldModel(
-            $fieldConfig->getClassName(),
-            $fieldConfig->getFieldName()
+            $fieldConfigId->getClassName(),
+            $fieldConfigId->getFieldName()
         )->getType();
 
         return [
