@@ -2,7 +2,7 @@
 /*jslint browser: true, nomen: true, vars: true*/
 /*global require*/
 
-require(['oro/mediator'], function (mediator) {
+require(['oroui/js/mediator'], function (mediator) {
     'use strict';
     mediator.once('tab:changed', function () {
         setTimeout(function () {
@@ -13,8 +13,10 @@ require(['oro/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'oro/translator', 'oro/app', 'oro/mediator', 'oro/layout', 'oro/navigation',
-    'oro/delete-confirmation', 'oro/messenger', 'oro/scrollspy', 'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
+        'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
+        'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
+        'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
     ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
     'use strict';
 

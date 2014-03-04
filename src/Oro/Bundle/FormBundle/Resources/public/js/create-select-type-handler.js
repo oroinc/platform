@@ -1,11 +1,11 @@
 /* global define */
-define(['jquery', 'oro/widget-manager', 'routing', 'oro/navigation'],
+define(['jquery', 'oroui/js/widget-manager', 'routing', 'oronavigation/js/navigation'],
 function ($, widgetManager, routing) {
     'use strict';
 
     /**
-     * @export  oro/create-select-type-handler
-     * @class   oro.createSelectTypeHandler
+     * @export  oroform/js/create-select-type-handler
+     * @class   oroform.createSelectTypeHandler
      */
     return function (
         btnContainer,

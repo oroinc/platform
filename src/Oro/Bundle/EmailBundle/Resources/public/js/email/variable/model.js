@@ -1,11 +1,11 @@
-/* global define */
-define(['backbone', 'routing'],
-function(Backbone, routing) {
+/*global define*/
+define(['backbone', 'routing'
+    ], function (Backbone, routing) {
     'use strict';
 
     /**
-     * @export  oro/email/variable/model
-     * @class   oro.email.variable.Model
+     * @export  oroemail/js/email/variable/model
+     * @class   oroemail.email.variable.Model
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
@@ -18,7 +18,7 @@ function(Backbone, routing) {
         route: 'oro_api_get_emailtemplate_available_variables',
         url: null,
 
-        initialize: function() {
+        initialize: function () {
             this.updateUrl();
             this.bind('change:entityName', this.updateUrl, this);
         },
@@ -26,7 +26,7 @@ function(Backbone, routing) {
         /**
          * onChange entityName attribute
          */
-        updateUrl: function() {
+        updateUrl: function () {
             this.url = routing.generate(this.route, {entityName: this.get('entityName')});
         }
     });
