@@ -19,12 +19,21 @@ class PostUpMigrationListener
      */
     protected $configDumper;
 
+    /**
+     * @param ExtendSchemaGenerator $schemaGenerator
+     * @param ExtendConfigDumper    $configDumper
+     */
     public function __construct(ExtendSchemaGenerator $schemaGenerator, ExtendConfigDumper $configDumper)
     {
         $this->schemaGenerator = $schemaGenerator;
         $this->configDumper    = $configDumper;
     }
 
+    /**
+     * POST UP event handler
+     *
+     * @param PostMigrationEvent $event
+     */
     public function onPostUp(PostMigrationEvent $event)
     {
         $event->addMigration(

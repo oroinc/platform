@@ -13,13 +13,23 @@ class PostUpMigrationListener
      */
     protected $configDumper;
 
+    /**
+     * @param ConfigDumper $configDumper
+     */
     public function __construct(ConfigDumper $configDumper)
     {
         $this->configDumper = $configDumper;
     }
 
+    /**
+     * POST UP event handler
+     *
+     * @param PostMigrationEvent $event
+     */
     public function onPostUp(PostMigrationEvent $event)
     {
-        $event->addMigration(new UpdateEntityConfigMigration($this->configDumper));
+        $event->addMigration(
+            new UpdateEntityConfigMigration($this->configDumper)
+        );
     }
 }
