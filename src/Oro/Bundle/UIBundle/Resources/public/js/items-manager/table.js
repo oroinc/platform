@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'oro/translator', 'jquery-ui'], function ($, _, __) {
+define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
     'use strict';
 
     /**
