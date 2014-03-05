@@ -2,8 +2,27 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration\Handler;
 
-class WorkflowHandler implements ConfigurationHandlerInterface
+use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+
+class WorkflowHandler extends AbstractHandler
 {
+    /**
+     * @var array
+     */
+    protected $workflowKeys = array(
+        'name',
+        'label',
+        'entity',
+        'is_system',
+        'start_step',
+        'entity_attribute',
+        'steps_display_ordered',
+        WorkflowConfiguration::NODE_STEPS,
+        WorkflowConfiguration::NODE_ATTRIBUTES,
+        WorkflowConfiguration::NODE_TRANSITIONS,
+        WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+    );
+
     /**
      * @var ConfigurationHandlerInterface[]
      */
@@ -22,7 +41,7 @@ class WorkflowHandler implements ConfigurationHandlerInterface
      */
     public function handle(array $configuration)
     {
-        $configuration = $this->handleWorkflowFields($configuration);
+        $configuration = $this->handleWorkflowConfiguration($configuration);
 
         foreach ($this->handlers as $handler) {
             $configuration = $handler->handle($configuration);
@@ -32,23 +51,23 @@ class WorkflowHandler implements ConfigurationHandlerInterface
     }
 
     /**
-     * @param array $configuration
+     * @param array $workflow
      * @return array
      */
-    protected function handleWorkflowFields(array $configuration)
+    protected function handleWorkflowConfiguration(array $workflow)
     {
-        if (empty($configuration['name'])) {
-            $configuration['name'] = uniqid('workflow_', true);
+        if (empty($workflow['name'])) {
+            $workflow['name'] = uniqid('workflow_', true);
         }
 
-        if (empty($configuration['label'])) {
-            $configuration['label'] = $configuration['name'];
+        if (empty($workflow['label'])) {
+            $workflow['label'] = $workflow['name'];
         }
 
-        if (!empty($configuration['entity']) && !class_exists($configuration['entity'])) {
-            unset($configuration['entity']);
+        if (!empty($workflow['entity']) && !class_exists($workflow['entity'])) {
+            unset($workflow['entity']);
         }
 
-        return $configuration;
+        return $this->filterKeys($workflow, $this->workflowKeys);
     }
 }

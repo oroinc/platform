@@ -47,7 +47,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $this->assertConfigurationOptions($configuration, array('label', 'entity'));
 
         $enabled = $this->getConfigurationOption($configuration, 'enabled', true);
-        $system = $this->getConfigurationOption($configuration, 'system', false);
+        $system = $this->getConfigurationOption($configuration, 'is_system', false);
         $startStepName = $this->getConfigurationOption($configuration, 'start_step', null);
         $entityAttributeName = $this->getConfigurationOption(
             $configuration,

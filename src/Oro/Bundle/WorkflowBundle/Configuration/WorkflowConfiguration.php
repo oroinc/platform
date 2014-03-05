@@ -64,7 +64,7 @@ class WorkflowConfiguration implements ConfigurationInterface
             ->booleanNode('enabled')
                 ->defaultTrue()
             ->end()
-            ->booleanNode('system')
+            ->booleanNode('is_system')
                 ->defaultFalse()
             ->end()
             ->scalarNode('start_step')
@@ -92,10 +92,14 @@ class WorkflowConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root(self::NODE_STEPS);
         $rootNode
+            ->useAttributeAsKey('name')
             ->isRequired()
             ->requiresAtLeastOneElement()
             ->prototype('array')
                 ->children()
+                    ->scalarNode('name')
+                        ->cannotBeEmpty()
+                    ->end()
                     ->scalarNode('label')
                         ->isRequired()
                         ->cannotBeEmpty()
@@ -136,8 +140,12 @@ class WorkflowConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root(self::NODE_ATTRIBUTES);
         $rootNode
+            ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()
+                    ->scalarNode('name')
+                        ->cannotBeEmpty()
+                    ->end()
                     ->scalarNode('label')
                         ->defaultNull()
                     ->end()
@@ -187,10 +195,14 @@ class WorkflowConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root(self::NODE_TRANSITIONS);
         $rootNode
+            ->useAttributeAsKey('name')
             ->isRequired()
             ->requiresAtLeastOneElement()
             ->prototype('array')
                 ->children()
+                    ->scalarNode('name')
+                        ->cannotBeEmpty()
+                    ->end()
                     ->scalarNode('label')
                         ->isRequired()
                         ->cannotBeEmpty()
@@ -261,8 +273,12 @@ class WorkflowConfiguration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root(self::NODE_TRANSITION_DEFINITIONS);
         $rootNode
+            ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()
+                    ->scalarNode('name')
+                        ->cannotBeEmpty()
+                    ->end()
                     ->arrayNode('pre_conditions')
                         ->prototype('variable')
                         ->end()

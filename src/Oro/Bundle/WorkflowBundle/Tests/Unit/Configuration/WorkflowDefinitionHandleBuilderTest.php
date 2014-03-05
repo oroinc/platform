@@ -11,7 +11,7 @@ class WorkflowDefinitionHandleBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $rawConfiguration = array('name' => 'test_workflow');
         $handledConfiguration = array('name' => 'test_workflow', 'label' => 'Test Workflow');
-        $processedConfiguration = array('name' => 'test_workflow', 'label' => 'Test Workflow', 'system' => false);
+        $processedConfiguration = array('name' => 'test_workflow', 'label' => 'Test Workflow', 'is_system' => false);
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName($processedConfiguration['name']);

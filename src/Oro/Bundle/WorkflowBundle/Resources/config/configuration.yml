@@ -2,6 +2,7 @@ parameters:
     oro_workflow.configuration.config.workflow_sole.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration
     oro_workflow.configuration.config.workflow_list.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration
 
+    oro_workflow.configuration.handler.step.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\StepHandler
     oro_workflow.configuration.handler.workflow.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler
 
     oro_workflow.configuration.provider.workflow_config.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider
@@ -18,8 +19,13 @@ services:
         arguments:
             - @oro_workflow.configuration.config.workflow_sole
 
+    oro_workflow.configuration.handler.step:
+        class: %oro_workflow.configuration.handler.step.class%
+
     oro_workflow.configuration.handler.workflow:
         class: %oro_workflow.configuration.handler.workflow.class%
+        calls:
+            - [addHandler, [@oro_workflow.configuration.handler.step]]
 
     oro_workflow.configuration.provider.workflow_config:
         class: %oro_workflow.configuration.provider.workflow_config.class%

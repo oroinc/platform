@@ -44,6 +44,10 @@ class WorkflowDefinitionController extends FOSRestController
     /**
      * Update workflow definition
      *
+     * Returns
+     * - HTTP_OK (200)
+     * - HTTP_BAD_REQUEST (400)
+     *
      * @param WorkflowDefinition $workflowDefinition
      *
      * @Rest\Put(
@@ -77,7 +81,7 @@ class WorkflowDefinitionController extends FOSRestController
             );
         }
 
-        return $this->handleView($this->view(null, Codes::HTTP_OK));
+        return $this->handleView($this->view($workflowDefinition->getName(), Codes::HTTP_OK));
     }
 
     /**
@@ -107,6 +111,7 @@ class WorkflowDefinitionController extends FOSRestController
      *
      * Returns
      * - HTTP_NO_CONTENT (204)
+     * - HTTP_FORBIDDEN (403)
      *
      * @Rest\Delete(
      *      "/api/rest/{version}/workflowdefinition/{workflowDefinition}",
