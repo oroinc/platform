@@ -60,11 +60,12 @@ class WorkflowAssembler extends AbstractAssembler
 
     /**
      * @param WorkflowDefinition $definition
+     * @param bool $needValidation
      * @throws UnknownStepException
      * @throws AssemblerException
      * @return Workflow
      */
-    public function assemble(WorkflowDefinition $definition)
+    public function assemble(WorkflowDefinition $definition, $needValidation = true)
     {
         $configuration = $this->parseConfiguration($definition);
         $this->assertOptions(
@@ -94,7 +95,9 @@ class WorkflowAssembler extends AbstractAssembler
         $workflow->getTransitionManager()
             ->setTransitions($transitions);
 
-        $this->validateWorkflow($workflow);
+        if ($needValidation) {
+            $this->validateWorkflow($workflow);
+        }
 
         return $workflow;
     }
