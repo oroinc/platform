@@ -112,6 +112,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
 
                     $(".ui-datevariables-div a.ui_dvariable").click(function (e) {
                         var variable = this.text;
+                        dvInst.inst.settings.timepicker.timeDefined = false;
                         dvInst.$input.val(variable);
                         dvInst.$input.trigger("change");
                         e.preventDefault();
@@ -167,6 +168,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
             }
 
             if (typeof(inst.stay_open) !== 'boolean' || inst.stay_open === false) {
+                inst.settings.timepicker.timezone = inst.settings.defaultTimezone;
                 this._prev_updateDatepicker(inst);
                 // Reload the control when changing something in the input text field.
                 var dvInst = this._get(inst, 'datevariables');
