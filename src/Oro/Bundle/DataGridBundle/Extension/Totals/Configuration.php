@@ -14,6 +14,9 @@ class Configuration implements ConfigurationInterface
     const TOTALS_QUERY_KEY     = 'query';
     const TOTALS_FORMATTER     = 'formatter';
 
+    const TOTALS_PER_PAGE_ROW  = 'per_page';
+    const TOTALS_EXTEND         = 'extend_config';
+
     /**
      * {@inheritDoc}
      */
@@ -21,23 +24,29 @@ class Configuration implements ConfigurationInterface
     {
         $builder = new TreeBuilder();
         $builder->root('totals')
-            ->children()
-                ->arrayNode('rows')
-                    ->prototype('array')
-                    ->children()
-                        ->arrayNode('columns')
-                            ->prototype('array')
-                                ->children()
-                                    ->scalarNode(self::TOTALS_LABEL_KEY)
-                                        ->defaultFalse()
-                                        ->end()
-                                    ->scalarNode(self::TOTALS_QUERY_KEY)
-                                        ->defaultFalse()
-                                        ->end()
-                                    ->scalarNode(self::TOTALS_FORMATTER)
-                                        ->defaultFalse()
-                                        ->end()
-                                ->end()
+            ->useAttributeAsKey('rows')
+            ->prototype('array')
+                ->children()
+                    ->scalarNode(self::TOTALS_PER_PAGE_ROW)
+                        ->cannotBeEmpty()
+                        ->defaultFalse()
+                    ->end()
+                    ->scalarNode(self::TOTALS_EXTEND)
+                        ->cannotBeEmpty()
+                        ->defaultNull()
+                    ->end()
+                    ->arrayNode('columns')
+                        ->prototype('array')
+                            ->children()
+                                ->scalarNode(self::TOTALS_LABEL_KEY)
+                                    ->defaultFalse()
+                                    ->end()
+                                ->scalarNode(self::TOTALS_QUERY_KEY)
+                                    ->defaultFalse()
+                                    ->end()
+                                ->scalarNode(self::TOTALS_FORMATTER)
+                                    ->defaultFalse()
+                                    ->end()
                             ->end()
                         ->end()
                     ->end()

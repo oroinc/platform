@@ -19,10 +19,12 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
         },
 
         makeCell: function (column, options) {
+
             var FooterCell = column.get("footerCell") || options.footerCell || Backgrid.FooterCell;
             return new FooterCell({
                 column: column,
-                collection: this.collection
+                collection: this.collection,
+                rowName: this.options.rowName
             });
         }
     });
