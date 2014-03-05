@@ -1,6 +1,9 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget', 'oro/workflow-management/helper', 'oro/layout'],
-function(_, Backbone, DialogWidget, Helper, layout) {
+define(['underscore', 'backbone', 'oro/dialog-widget', 'oro/workflow-management/helper',
+    'oro/workflow-management/attribute/form-option-view/edit',
+    'oro/workflow-management/attribute/form-option-view/list',
+    'oro/layout'],
+function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, layout) {
     'use strict';
 
     var $ = Backbone.$;
@@ -95,7 +98,7 @@ function(_, Backbone, DialogWidget, Helper, layout) {
             this.model.set('display_type', formData.display_type);
             this.model.set('message', formData.message);
 
-            var frontendOptions = this.model.get('frontend_options')
+            var frontendOptions = this.model.get('frontend_options');
             frontendOptions = _.extend({}, frontendOptions, {
                 'icon': formData.transition_prototype_icon,
                 'class': formData.button_color
@@ -115,6 +118,31 @@ function(_, Backbone, DialogWidget, Helper, layout) {
             return result;
         },
 
+        renderAddAttributeForm: function(el) {
+            this.attributesFormView = new AttributeFormOptionEditView({
+                'el': el.find('.transition-attributes-form-container'),
+                'workflow': this.options.workflow,
+                'entity_select_el': this.options.entity_select_el
+            });
+
+            this.attributesFormView.on('formOptionAdd', _.bind(function(data) {
+                this.attributesList.addItem(data);
+            }, this));
+
+            this.attributesFormView.render();
+        },
+
+        renderAttributesList: function(el) {
+            this.attributesList = new AttributeFormOptionListView({
+                el: el.find('.transition-attributes-list-container')
+            });
+        },
+
+        removeHandler: function() {
+            this.attributesFormView.remove();
+            this.remove();
+        },
+
         render: function() {
             var data = this.model.toJSON();
             var steps = this.options.workflow.get('steps').models;
@@ -126,7 +154,10 @@ function(_, Backbone, DialogWidget, Helper, layout) {
             data.allowedStepsTo = steps.slice(1);
 
             var form = $(this.template(data));
-            layout.init(form);
+
+            this.renderAddAttributeForm(form);
+            this.renderAttributesList(form);
+
             this.$el.append(form);
 
             this.widget = new DialogWidget({
@@ -135,10 +166,13 @@ function(_, Backbone, DialogWidget, Helper, layout) {
                 'stateEnabled': false,
                 'incrementalPosition': false,
                 'dialogOptions': {
-                    'close': _.bind(this.remove, this),
+                    'close': _.bind(this.removeHandler, this),
                     'width': 600,
                     'modal': true
                 }
+            });
+            this.widget.on('renderComplete', function(el) {
+                layout.init(el);
             });
             this.widget.render();
 

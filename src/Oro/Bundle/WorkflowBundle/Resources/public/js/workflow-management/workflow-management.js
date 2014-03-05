@@ -5,7 +5,8 @@ define([
     'oro/workflow-management/step/model',
     'oro/workflow-management/transition/model',
     'oro/workflow-management/step/view/edit',
-    'oro/workflow-management/transition/view/edit'
+    'oro/workflow-management/transition/view/edit',
+    'oroentity/js/fields-loader'
 ],
 function(_, Backbone,
      StepsListView,
@@ -42,6 +43,8 @@ function(_, Backbone,
                 collection: this.model.get('steps'),
                 workflow: this.model
             });
+            this.$entitySelectEl = this.$('[name$="[related_entity]"]');
+            this.initEntityFieldsLoader();
 
             this.listenTo(this.model.get('steps'), 'requestAddTransition', this.addNewStepTransition);
             this.listenTo(this.model.get('steps'), 'requestEdit', this.openManageStepForm);
@@ -52,6 +55,13 @@ function(_, Backbone,
             this.$saveBtn = $(this.options.saveBtnEl);
             this.$saveBtn.on('click', _.bind(this.saveConfiguration, this));
             this.model.url = this.$saveBtn.data('url');
+        },
+
+        initEntityFieldsLoader: function() {
+            this.$entitySelectEl.fieldsLoader({
+                router: 'oro_api_get_entity_fields',
+                routingParams: {"with-relations": 1,"with-entity-details": 1, "deep-level": 2}
+            });
         },
 
         saveConfiguration: function(e) {
@@ -94,7 +104,8 @@ function(_, Backbone,
             var transitionEditView = new TransitionEditForm({
                 'model': transition,
                 'workflow': this.model,
-                'step_from': step_from
+                'step_from': step_from,
+                'entity_select_el': this.$entitySelectEl
             });
             transitionEditView.on(
                 'transitionAdd',

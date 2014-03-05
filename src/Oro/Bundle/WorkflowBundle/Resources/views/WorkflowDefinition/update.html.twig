@@ -107,7 +107,50 @@
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label required">{{ "Display form as"|trans }}  <em>*</em></label>
+                        <label class="control-label">{{ "Warning message"|trans }}</label>
+                        <div class="controls">
+                            <input type="text" name="message" value="<%= message %>">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h5>{{ 'Button'|trans }}</h5>
+                    <div class="form-horizontal">
+                        {{ UI.getApplicableForUnderscore(form_row(form.transition_prototype_icon))|raw }}
+
+                        <% print('<sc' + 'ript>'); %>
+                            require(['jquery'], function($) {
+                            $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
+                            });
+                        <% print('</sc' + 'ript>'); %>
+
+                        <div class="control-group">
+                            <label class="control-label required">{{ "Button style"|trans }} </label>
+                            <div class="controls">
+                                <select name="button_color">
+                                    <% _.each(allowedButtonStyles, function (style) { %>
+                                    <option value="<%= style.name %>"
+                                    <% if (buttonStyle == style.name) { %>selected="selected"<% } %>
+                                    ><%= style.label %></option>
+                                    <% }); %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="control-group transition-example-container">
+                            <div class="controls">
+                                <div class="transition-btn-example"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <h5>{{ "Attributes"|trans }}</h5>
+                <div class="form-horizontal">
+                    <div class="control-group">
+                        <label class="control-label required">{{ "View form"|trans }}  <em>*</em></label>
                         <div class="controls">
                             <select name="display_type" data-validation="{{ requiredConstraint|json_encode }}">
                                 <option value="dialog" <% if (display_type == 'dialog') { %>selected="selected"<% } %>>{{ "Popup window"|trans }}</value>
@@ -115,48 +158,9 @@
                             </select>
                         </div>
                     </div>
-
-                    <div class="control-group">
-                        <label class="control-label">{{ "Warning message"|trans }}</label>
-                        <div class="controls">
-                            <input type="text" name="message" value="<%= message %>">
-                        </div>
-                    </div>
-
-                    {{ form_row(form.transition_prototype_icon)|replace({
-                            "<script": '<% print("<sc" + "ript"); %>',
-                            "</script": '<% print("</sc" + "ript"); %>',
-                            "<%": '<% print("<" + "%"); %>',
-                            "%>": '<% print("%" + ">"); %>',
-                        })|raw
-                    }}
-                    <% print('<sc' + 'ript>'); %>
-                    require(['jquery'], function($) {
-                        $('#{{ form.transition_prototype_icon.vars.id }}').select2('val', '<%= buttonIcon %>');
-                    });
-                    <% print('</sc' + 'ript>'); %>
-
-                    <div class="control-group">
-                        <label class="control-label required">{{ "Button style"|trans }} </label>
-                        <div class="controls">
-                            <select name="button_color">
-                                <% _.each(allowedButtonStyles, function (style) { %>
-                                <option value="<%= style.name %>"
-                                <% if (buttonStyle == style.name) { %>selected="selected"<% } %>
-                                ><%= style.label %></option>
-                                <% }); %>
-                            </select>
-                        </div>
-                    </div>
                 </div>
-
-                <div class="transition-example-container">
-                    <h5>Example</h5>
-                    <div class="transition-btn-example"></div>
-                </div>
-
-                <h5>{{ "Attributes"|trans }}</h5>
-                <div class="transition-attributes-container"></div>
+                <div class="transition-attributes-form-container"></div>
+                <div class="transition-attributes-list-container"></div>
             </div>
 
             <div class="widget-actions">
@@ -250,6 +254,62 @@
         <a href="#" class="delete-transition" title="Remove transition"><i class="icon-trash"></i></a> <a href="#" class="edit-transition" title="Edit transition"><%= label %></a> <i class="icon-long-arrow-right"/> <span><%= stepToLabel %></span>
     </script>
 
+    <script type="text/template" id="attribute-form-option-edit-template">
+        <div class="form-horizontal">
+            <div class="control-group">
+                <label class="control-label required">{{ "Entity field"|trans }} <em>*</em></label>
+                <div class="controls">
+                    <input type="hidden" name="form_option_property_path"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">{{ "Label"|trans }}</label>
+                <div class="controls">
+                    <input type="text" name="form_option_label" value="<%= label %>"/>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">{{ "Required"|trans }}</label>
+                <div class="controls">
+                    <input type="checkbox" name="form_option_required" <% if (isRequired) { %>checked="checked"<% } %>/>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-primary form-option-add-btn"><i class="icon-plus"></i> {{ 'Add'|trans }}</button>
+        </div>
+    </script>
+
+    <script type="text/template" id="attribute-form-option-list-template">
+        <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <thead>
+            <th>{{ "Entity field"|trans }}</th>
+            <th>{{ "Label"|trans }}</th>
+            <th>{{ "Required"|trans }}</th>
+            <th>{{ "Actions"|trans }}</th>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </script>
+
+    <script type="text/template" id="attribute-form-option-row-template">
+        <td>
+            <%= property_path %>
+        </td>
+        <td>
+            <%= label %>
+        </td>
+        <td>
+            <% if (required) { %><span class="label label-important">{{ "Required"|trans }}</span><% } %>
+        </td>
+        <td class="step-actions">
+            <div class="pull-right">
+                <a href="#" class="delete-form-option" title="Delete row"><i class="icon-remove"/></a>
+            </div>
+        </td>
+    </script>
+
     {% set dataBlocks = [{
         'title': 'General'|trans,
         'class': 'active',
@@ -276,16 +336,25 @@
         <script type="text/javascript">
             require([
                 'oro/workflow-management',
-                'oro/workflow-management/workflow/model'
+                'oro/workflow-management/workflow/model',
+                'oro/workflow-management/step/model',
+                'oro/workflow-management/transition/model',
+                'oro/workflow-management/attribute/model',
+                'oro/workflow-management/step/collection',
+                'oro/workflow-management/transition/collection',
+                'oro/workflow-management/attribute/collection'
             ],
-            function(WorkflowManagement, WorkflowModel) {
-                var StepModel = require('oro/workflow-management/step/model'),
-                    TransitionModel = require('oro/workflow-management/transition/model'),
-                    StepCollection = require('oro/workflow-management/step/collection'),
-                    TransitionCollection = require('oro/workflow-management/transition/collection');
-
+            function(WorkflowManagement, WorkflowModel,
+                StepModel,
+                TransitionModel,
+                AttributeModel,
+                StepCollection,
+                TransitionCollection,
+                AttributeCollection
+            ) {
                 var steps = new StepCollection(),
-                    transitions = new TransitionCollection();
+                    transitions = new TransitionCollection(),
+                    attributes = new AttributeCollection();
 
                 {% if entity.configuration.steps is defined %}
                     {% for stepName, stepConfig in entity.configuration.steps %}
@@ -301,10 +370,18 @@
                     {% endfor %}
                 {% endif %}
 
+                {% if entity.configuration.attributes is defined %}
+                    {% for attributeName, attributeConfig in entity.configuration.attributes %}
+                        {% set attributeConfig = attributeConfig|merge({name: attributeName}) %}
+                        attributes.add(new AttributeModel({{ attributeConfig|json_encode|raw }}));
+                    {% endfor %}
+                {% endif %}
+
                 var configuration = {{ entity.configuration|json_encode|raw }};
                 configuration.name = {{ entity.name|json_encode|raw }};
                 configuration.steps = steps;
                 configuration.transitions = transitions;
+                configuration.attributes = attributes;
                 var workflowModel = new WorkflowModel(configuration);
                 var workflowManagement = new WorkflowManagement({
                     el: '#{{ form.vars.id }}',

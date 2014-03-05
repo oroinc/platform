@@ -52,7 +52,12 @@ define(['jquery', 'underscore', 'oro/entity-field-select-util', 'oro/entity-fiel
         _init: function () {
             $.extend(this.entityFieldUtil, this.options.util);
             this._processSelect2Options();
-            this._updateData(this.options.entity, this.options.fields);
+            if (this.options.fields && !this.options.fields.length && this.options.fieldsLoaderSelector) {
+                var $fieldsLoader = $(this.options.fieldsLoaderSelector);
+                $fieldsLoader.fieldsLoader('loadFields');
+            } else {
+                this._updateData(this.options.entity, this.options.fields);
+            }
         },
 
         _setOption: function (key, value) {
