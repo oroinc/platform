@@ -1,6 +1,6 @@
-/*jslint evil: true, white: false, undef: false, nomen: false */
-/* global define */
-define(['jquery', 'underscore', 'oro/translator', 'oro/layout', 'jquery-ui'],
+/*jslint evil: true, white: false, undef: false, nomen: true*/
+/*global define*/
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout', 'jquery-ui'],
     function ($, _, __, layout) {
         /*
          * Lets not redefine datevariables, Prevent "Uncaught RangeError: Maximum call stack size exceeded"
