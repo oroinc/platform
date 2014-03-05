@@ -94,6 +94,24 @@
 
     <div class="layout-content scrollable-container">
         {% block content_data %}
+            {% if data is defined and data.dataBlocks is defined %}
+                {%- set additionalInformation -%}
+                    {% placeholder view_additional_content_data with {entity: entity} %}
+                {%- endset -%}
+                {% if additionalInformation is not empty %}
+                    {% set dataBlocks = data.dataBlocks %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'Additional Information'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'empty',
+                                'data': [additionalInformation]
+                            }
+                        ]
+                    }]) %}
+                    {% set data = data|merge({'dataBlocks': dataBlocks}) %}
+                {% endif %}
+            {% endif %}
             {{ UI.scrollData(id, data) }}
         {% endblock content_data %}
     </div>
