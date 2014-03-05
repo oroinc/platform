@@ -36,6 +36,7 @@ class StepHandler extends AbstractHandler
             } else {
                 $handledStep = $this->handleStepConfiguration($configuration, $rawStep);
                 $handledSteps[] = $handledStep;
+
                 if (!empty($configuration['start_step']) && $configuration['start_step'] == $handledStep['name']) {
                     $startStepExists = true;
                 }
@@ -69,9 +70,7 @@ class StepHandler extends AbstractHandler
 
         // set is_start flag for transitions
         foreach ($transitions as $key => $transition) {
-            if (array_key_exists('name', $transition) && in_array($transition['name'], $startTransitions)
-                || in_array($key, $startTransitions)
-            ) {
+            if (!empty($transition['name']) && in_array($transition['name'], $startTransitions)) {
                 $transitions[$key]['is_start'] = true;
             } else {
                 $transitions[$key]['is_start'] = false;
@@ -117,19 +116,6 @@ class StepHandler extends AbstractHandler
      */
     protected function hasTransition(array $configuration, $transitionName)
     {
-        $transitions = array();
-        if (!empty($configuration[WorkflowConfiguration::NODE_TRANSITIONS])) {
-            $transitions = $configuration[WorkflowConfiguration::NODE_TRANSITIONS];
-        }
-
-        foreach ($transitions as $key => $transition) {
-            if (array_key_exists('name', $transition) && $transition['name'] == $transitionName
-                || $key === $transitionName
-            ) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasEntityInGroup($configuration, WorkflowConfiguration::NODE_TRANSITIONS, $transitionName);
     }
 }

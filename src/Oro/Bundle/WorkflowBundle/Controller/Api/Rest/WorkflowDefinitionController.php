@@ -10,6 +10,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -68,6 +69,10 @@ class WorkflowDefinitionController extends FOSRestController
             $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
             $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration());
             $workflowDefinition->import($builtDefinition);
+
+            /** @var WorkflowAssembler $workflowAssembler */
+            $workflowAssembler = $this->get('oro_workflow.workflow_assembler');
+            $workflowAssembler->assemble($workflowDefinition);
 
             $entityManager = $this->getEntityManager();
             $entityManager->persist($workflowDefinition);
