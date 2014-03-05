@@ -16,26 +16,51 @@ class ExtendOptionManager
      */
     protected $options = [];
 
+    /**
+     * @param EntityClassResolver $entityClassResolver
+     */
     public function __construct(EntityClassResolver $entityClassResolver)
     {
         $this->entityClassResolver = $entityClassResolver;
     }
 
+    /**
+     * @return EntityClassResolver
+     */
     public function getEntityClassResolver()
     {
         return $this->entityClassResolver;
     }
 
-    public function addTableOptions($tableName, $options)
+    /**
+     * Sets table options
+     *
+     * @param string $tableName
+     * @param array $options
+     */
+    public function setTableOptions($tableName, array $options)
     {
         $this->setOptions($tableName, $options);
     }
 
-    public function addColumnOptions($tableName, $columnName, $columnType, $options)
+    /**
+     * Sets column options
+     *
+     * @param string $tableName
+     * @param string $columnName
+     * @param string $columnType
+     * @param array $options
+     */
+    public function setColumnOptions($tableName, $columnName, $columnType, array $options)
     {
         $this->setOptions(sprintf('%s!%s!%s', $tableName, $columnName, $columnType), $options);
     }
 
+    /**
+     * Gets all options
+     *
+     * @return array
+     */
     public function getExtendOptions()
     {
         $builder = new ExtendOptionBuilder($this->entityClassResolver);
@@ -61,26 +86,33 @@ class ExtendOptionManager
         return $builder->get();
     }
 
-    protected function setOptions($objectKey, $options)
+    /**
+     * @param string $objectKey
+     * @param array  $options
+     * @throws \InvalidArgumentException
+     */
+    protected function setOptions($objectKey, array $options)
     {
-        if (!empty($options)) {
-            if (!is_array($options)) {
-                throw new \InvalidArgumentException('Options must be an array.');
+        if (!isset($this->options[$objectKey])) {
+            $this->options[$objectKey] = [];
+        }
+        foreach ($options as $scope => $values) {
+            if (!is_string($scope) || empty($scope)) {
+                throw new \InvalidArgumentException(
+                    sprintf('A scope name must be non empty string. Key: %s.', $objectKey)
+                );
             }
-            if (!isset($this->options[$objectKey])) {
-                $this->options[$objectKey] = [];
-            }
-            foreach ($options as $scope => $values) {
-                if (!is_string($scope) || empty($scope)) {
-                    throw new \InvalidArgumentException('A scope name must be non empty string.');
+            if (isset($this->options[$objectKey][$scope])) {
+                if (!is_array($values)) {
+                    throw new \InvalidArgumentException(
+                        sprintf('A value of "%s" scope must be an array. Key: %s.', $scope, $objectKey)
+                    );
                 }
-                if (isset($this->options[$objectKey][$scope])) {
-                    foreach ($values as $key => $val) {
-                        $this->options[$objectKey][$scope][$key] = $val;
-                    }
-                } else {
-                    $this->options[$objectKey][$scope] = $values;
+                foreach ($values as $key => $val) {
+                    $this->options[$objectKey][$scope][$key] = $val;
                 }
+            } else {
+                $this->options[$objectKey][$scope] = $values;
             }
         }
     }

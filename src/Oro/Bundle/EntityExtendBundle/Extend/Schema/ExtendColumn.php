@@ -64,7 +64,7 @@ class ExtendColumn extends Column
             if (strpos($columnName, ExtendConfigDumper::FIELD_PREFIX) === 0) {
                 $columnName = substr($columnName, strlen(ExtendConfigDumper::FIELD_PREFIX));
             }
-            $this->extendOptionManager->addColumnOptions(
+            $this->extendOptionManager->setColumnOptions(
                 $this->tableName,
                 $columnName,
                 $this->getType()->getName(),

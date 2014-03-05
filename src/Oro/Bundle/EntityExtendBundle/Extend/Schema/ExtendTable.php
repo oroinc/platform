@@ -8,8 +8,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendTable extends Table
 {
-    const AUTO_GENERATED_ID_COLUMN_NAME = 'id';
-
     /**
      * @var ExtendOptionManager
      */
@@ -39,20 +37,7 @@ class ExtendTable extends Table
     public function addOption($name, $value)
     {
         if ($name === ExtendColumn::ORO_OPTIONS_NAME) {
-            if (isset($value['extend']['entity_name'])) {
-                // add a table name to options
-                $value['extend']['table'] = $this->getName();
-            }
-            $this->extendOptionManager->addTableOptions(
-                $this->getName(),
-                $value
-            );
-
-            if (isset($value['extend']['entity_name'])) {
-                // add a primary key for new custom entity
-                $this->addColumn(self::AUTO_GENERATED_ID_COLUMN_NAME, 'integer', ['autoincrement' => true]);
-                $this->setPrimaryKey([self::AUTO_GENERATED_ID_COLUMN_NAME]);
-            }
+            $this->extendOptionManager->setTableOptions($this->getName(), $value);
 
             return $this;
         }
