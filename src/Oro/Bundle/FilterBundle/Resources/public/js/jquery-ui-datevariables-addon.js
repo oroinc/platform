@@ -1,5 +1,5 @@
-/*jslint evil: true, white: false, undef: false, nomen: false */
-/* global define */
+/*jslint evil: true, white: false, undef: false, nomen: true*/
+/*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout', 'jquery-ui'],
     function ($, _, __, layout) {
         /*
