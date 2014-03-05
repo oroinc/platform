@@ -47,14 +47,4 @@ interface FilterInterface
      * @return bool true if a filter successfully applied; otherwise, false.
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data);
-
-    /**
-     * Process filter params, replace or adjust them
-     * used by date filters for date variables processing
-     *
-     * @param $data
-     *
-     * @return mixed
-     */
-    public function processParams($data);
 }
