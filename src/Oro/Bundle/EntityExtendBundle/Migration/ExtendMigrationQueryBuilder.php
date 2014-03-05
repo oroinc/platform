@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendOptionManager;
 use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendSchema;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
 
 class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
@@ -14,11 +15,24 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
     protected $extendOptionManager;
 
     /**
+     * @var ExtendMigrationHelper
+     */
+    protected $extendMigrationHelper;
+
+    /**
      * @param ExtendOptionManager $extendOptionManager
      */
     public function setExtendOptionManager(ExtendOptionManager $extendOptionManager)
     {
-        $this->extendOptionManager = $extendOptionManager;
+        $this->extendOptionManager   = $extendOptionManager;
+    }
+
+    /**
+     * @param ExtendMigrationHelper $extendMigrationHelper
+     */
+    public function setExtendMigrationHelper(ExtendMigrationHelper $extendMigrationHelper)
+    {
+        $this->extendMigrationHelper = $extendMigrationHelper;
     }
 
     /**
@@ -40,5 +54,17 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
             $sequences,
             $sm->createSchemaConfig()
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setMigrationHelpers(Migration $migration)
+    {
+        parent::setMigrationHelpers($migration);
+
+        if ($migration instanceof ExtendMigrationHelperAwareInterface) {
+            $migration->setExtendSchemaHelper($this->extendMigrationHelper);
+        }
     }
 }

@@ -27,6 +27,7 @@ class ExtendSchema extends Schema
         SchemaConfig $schemaConfig = null
     ) {
         $this->extendOptionManager = $extendOptionManager;
+
         parent::__construct($tables, $sequences, $schemaConfig);
     }
 
@@ -57,20 +58,7 @@ class ExtendSchema extends Schema
         if (!($table instanceof ExtendTable)) {
             $table = new ExtendTable($this->extendOptionManager, $table);
         }
-        $table->setSchema($this);
         parent::_addTable($table);
     }
     // @codingStandardsIgnoreEnd
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __clone()
-    {
-        parent::__clone();
-        /** @var ExtendTable $table */
-        foreach ($this->_tables as $table) {
-            $table->setSchema($this);
-        }
-    }
 }
