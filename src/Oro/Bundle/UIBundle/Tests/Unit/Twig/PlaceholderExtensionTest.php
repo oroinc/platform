@@ -27,6 +27,11 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
     protected $placeholderProvider;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $kernelExtension;
+
+    /**
      * @var array
      */
     protected $placeholders = array(
@@ -49,11 +54,21 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->placeholderProvider = $this->getMockBuilder('Oro\\Bundle\\UIBundle\\Placeholder\\PlaceholderProvider')
+        $this->placeholderProvider = $this
+            ->getMockBuilder('Oro\\Bundle\\UIBundle\\Placeholder\\PlaceholderProvider')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new PlaceholderExtension($this->twig, $this->placeholderProvider);
+        $this->kernelExtension = $this
+            ->getMockBuilder('Symfony\\Bridge\\Twig\\Extension\\HttpKernelExtension')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->extension = new PlaceholderExtension(
+            $this->twig,
+            $this->placeholderProvider,
+            $this->kernelExtension
+        );
     }
 
     public function testRenderPlaceholder()
@@ -74,26 +89,17 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEMPLATE_NAME, $variables)
             ->will($this->returnValue($expectedTemplateRender));
 
-        $httpKernelExtension = $this->getMockBuilder('Symfony\\Bridge\\Twig\\Extension\\HttpKernelExtension')
+        $controllerReference = $this
+            ->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerReference')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->twig
-            ->expects($this->at(1))
-            ->method('getExtension')
-            ->with(PlaceholderExtension::HTTP_KERNEL_EXTENSION_NAME)
-            ->will($this->returnValue($httpKernelExtension));
-
-        $controllerReference = $this->getMockBuilder('Symfony\\Component\\HttpKernel\\Controller\\ControllerReference')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $httpKernelExtension->expects($this->once())
+        $this->kernelExtension->expects($this->once())
             ->method('controller')
             ->with(self::ACTION_NAME, $variables)
             ->will($this->returnValue($controllerReference));
 
-        $httpKernelExtension->expects($this->once())
+        $this->kernelExtension->expects($this->once())
             ->method('renderFragment')
             ->with($controllerReference)
             ->will($this->returnValue($expectedActionRender));

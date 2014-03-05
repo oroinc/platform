@@ -8,8 +8,6 @@ use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
 
 class PlaceholderExtension extends \Twig_Extension
 {
-    const HTTP_KERNEL_EXTENSION_NAME = 'http_kernel';
-
     const EXTENSION_NAME = 'oro_placeholder';
 
     /**
@@ -23,15 +21,23 @@ class PlaceholderExtension extends \Twig_Extension
     protected $placeholder;
 
     /**
+     * @var HttpKernelExtension
+     */
+    protected $kernelExtension;
+
+    /**
      * @param \Twig_Environment $environment
      * @param PlaceholderProvider $placeholder
+     * @param HttpKernelExtension $kernelExtension
      */
     public function __construct(
         \Twig_Environment $environment,
-        PlaceholderProvider $placeholder
+        PlaceholderProvider $placeholder,
+        HttpKernelExtension $kernelExtension
     ) {
         $this->environment = $environment;
         $this->placeholder = $placeholder;
+        $this->kernelExtension = $kernelExtension;
     }
 
     /**
@@ -72,9 +78,8 @@ class PlaceholderExtension extends \Twig_Extension
                 $renderedBlocks[] = $this->environment->render($block['template'], $variables);
             } elseif (isset($block['action'])) {
                 /** @var HttpKernelExtension $kernelExtension */
-                $kernelExtension = $this->environment->getExtension(self::HTTP_KERNEL_EXTENSION_NAME);
-                $renderedBlocks[] = $kernelExtension->renderFragment(
-                    $kernelExtension->controller($block['action'], $variables)
+                $renderedBlocks[] = $this->kernelExtension->renderFragment(
+                    $this->kernelExtension->controller($block['action'], $variables)
                 );
             } else {
                 throw new \RuntimeException(
