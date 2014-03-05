@@ -174,7 +174,7 @@ function ($, _, __, ChoiceFilter, localeSettings) {
          * @inheritDoc
          */
         render: function () {
-            var value = _.extend({}, this.emptyValue, this.value);
+            var value = _.extend({}, this.emptyValue, this.getValue());
             var part  = {value: value.part, type: value.part};
 
             var selectedChoiceLabel = this._getSelectedChoiceLabel('choices', value);
