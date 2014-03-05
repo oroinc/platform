@@ -124,6 +124,13 @@ class ExtendMigrationHelper
             $selfTable->getPrimaryKey()->getColumns(),
             ['onDelete' => 'SET NULL']
         );
+
+        $this->extendOptionManager->setColumnOptions(
+            $selfTableName,
+            $columnName,
+            'oneToMany',
+            $options
+        );
     }
 
     /**
@@ -179,6 +186,13 @@ class ExtendMigrationHelper
             ['onDelete' => 'CASCADE']
         );
         $relationsTable->setPrimaryKey([$selfRelationName, $targetRelationName]);
+
+        $this->extendOptionManager->setColumnOptions(
+            $selfTableName,
+            $columnName,
+            'manyToMany',
+            $options
+        );
     }
 
     /**
@@ -196,6 +210,7 @@ class ExtendMigrationHelper
         array $options
     ) {
         $selfColumnName  = sprintf('%s%s_id', ExtendConfigDumper::FIELD_PREFIX, $columnName);
+        $selfTableName   = $table instanceof Table ? $table->getName() : $table;
         $selfTable       = $table instanceof Table ? $table : $schema->getTable($table);
         $targetTableName = $options['extend']['target']['table_name'];
         $targetTable     = $schema->getTable($targetTableName);
@@ -207,6 +222,13 @@ class ExtendMigrationHelper
             [$selfColumnName],
             $targetTable->getPrimaryKey()->getColumns(),
             ['onDelete' => 'SET NULL']
+        );
+
+        $this->extendOptionManager->setColumnOptions(
+            $selfTableName,
+            $columnName,
+            'manyToOne',
+            $options
         );
     }
 
