@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ExtendOptionManager
 {
@@ -60,13 +59,6 @@ class ExtendOptionManager
         }
 
         return $builder->get();
-    }
-
-    public function isCustomEntity($tableName)
-    {
-        return isset($this->options[$tableName])
-            && isset($this->options[$tableName]['extend']['owner'])
-            && $this->options[$tableName]['extend']['owner'] === ExtendScope::OWNER_CUSTOM;
     }
 
     protected function setOptions($objectKey, $options)

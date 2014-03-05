@@ -55,6 +55,7 @@ class MigrationQueryBuilder
         foreach ($migrations as $migration) {
             $toSchema = clone $fromSchema;
 
+            $this->setMigrationHelpers($migration);
             $migration->up($toSchema, $queryBag);
 
             $comparator = new Comparator();
@@ -97,6 +98,15 @@ class MigrationQueryBuilder
     protected function getSchema()
     {
         return $this->connection->getSchemaManager()->createSchema();
+    }
+
+    /**
+     * Sets helpers to the given migration
+     *
+     * @param Migration $migration
+     */
+    protected function setMigrationHelpers(Migration $migration)
+    {
     }
 
     /**

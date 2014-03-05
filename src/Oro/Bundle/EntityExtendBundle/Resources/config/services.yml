@@ -8,6 +8,7 @@ parameters:
     oro_entity_extend.listener.entity_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
     oro_entity_extend.twig.view_extension.class:            Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
     oro_entity_extend.migration.post_up.listener.class:     Oro\Bundle\EntityExtendBundle\EventListener\PostUpMigrationListener
+    oro_entity_extend.migration_helper.extend.class:        Oro\Bundle\EntityExtendBundle\Migration\ExtendMigrationHelper
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -60,3 +61,8 @@ services:
             - @oro_entity_extend.tools.dumper
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -100 }
+
+    oro_entity_extend.migration_helper.extend:
+        class: %oro_entity_extend.migration_helper.extend.class%
+        arguments:
+            - @oro_entity_extend.extend.option_manager
