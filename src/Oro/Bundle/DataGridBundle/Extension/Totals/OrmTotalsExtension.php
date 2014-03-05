@@ -69,24 +69,26 @@ class OrmTotalsExtension extends AbstractExtension
             ['totals' => $totalRows]
         );
 
-        foreach ($totalRows as $rowName => $rowConfig) {
-            if (isset($rowConfig[Configuration::TOTALS_EXTEND]) && $rowConfig[Configuration::TOTALS_EXTEND]) {
-                if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND]])) {
-                    throw new \Exception(sprintf(
-                        'Total row %s definition in %s datagrid config does not exists',
-                        $rowConfig[Configuration::TOTALS_EXTEND],
-                        $config->getName()
-                    ));
+        if (!empty($totalRows)) {
+            foreach ($totalRows as $rowName => $rowConfig) {
+                if (isset($rowConfig[Configuration::TOTALS_EXTEND]) && $rowConfig[Configuration::TOTALS_EXTEND]) {
+                    if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND]])) {
+                        throw new \Exception(sprintf(
+                            'Total row %s definition in %s datagrid config does not exists',
+                            $rowConfig[Configuration::TOTALS_EXTEND],
+                            $config->getName()
+                        ));
+                    }
+                    $totalRows[$rowName] = array_replace_recursive(
+                        $totalRows[$rowConfig[Configuration::TOTALS_EXTEND]],
+                        $totalRows[$rowName]
+                    );
+                    unset($totalRows[$rowName][Configuration::TOTALS_EXTEND]);
                 }
-                $totalRows[$rowName] = array_replace_recursive(
-                    $totalRows[$rowConfig[Configuration::TOTALS_EXTEND]],
-                    $totalRows[$rowName]
-                );
-                unset($totalRows[$rowName][Configuration::TOTALS_EXTEND]);
             }
-        }
 
-        $config->offsetSetByPath(Configuration::TOTALS_PATH, $totalRows);
+            $config->offsetSetByPath(Configuration::TOTALS_PATH, $totalRows);
+        }
     }
 
     /**
