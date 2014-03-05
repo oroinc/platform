@@ -438,6 +438,46 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $workflowAssembler->assemble($workflowDefinition);
     }
 
+    public function testAssembleWithoutValidation()
+    {
+        $configuration = array(
+            WorkflowConfiguration::NODE_ATTRIBUTES => array('attributes_configuration'),
+            WorkflowConfiguration::NODE_STEPS => array('test_step' => $this->stepConfiguration),
+            WorkflowConfiguration::NODE_TRANSITIONS => $this->transitionConfiguration,
+            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS => $this->transitionDefinition
+        );
+
+        // source data
+        $workflow = $this->createWorkflow();
+        $workflowDefinition = $this->createWorkflowDefinition($configuration);
+        $attributes = new ArrayCollection(array('test' => $this->getAttributeMock('test')));
+        $steps = new ArrayCollection(array('test_start_step' => $this->getStepMock('test_start_step')));
+        $transitions = new ArrayCollection(
+            array('test_transition' => $this->getTransitionMock(false, 'test_transition'))
+        );
+
+        // mocks
+        $container = $this->createContainerMock($workflow);
+        $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
+        $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
+        $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
+        $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
+
+        // test
+        $workflowAssembler = new WorkflowAssembler(
+            $container,
+            $configurationTree,
+            $attributeAssembler,
+            $stepAssembler,
+            $transitionAssembler
+        );
+        $workflow = $workflowAssembler->assemble($workflowDefinition, false);
+
+        $this->assertEquals($attributes->toArray(), $workflow->getAttributeManager()->getAttributes()->toArray());
+        $this->assertEquals($steps->toArray(), $workflow->getStepManager()->getSteps()->toArray());
+        $this->assertEquals($transitions->toArray(), $workflow->getTransitionManager()->getTransitions()->toArray());
+    }
+
     /**
      * @param array $configuration
      */
