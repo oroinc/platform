@@ -26,7 +26,7 @@ define(function (require) {
         container.find('[data-toggle="tooltip"]').tooltip();
 
         this.initPopover($('form label'));
-        _widgetControlInitializer.init(container);
+        widgetControlInitializer.init(container);
 
 //        @todo: BAP-3374
 //        layout.onPageRendered(function () {
