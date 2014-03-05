@@ -36,7 +36,7 @@ class UpdateExtendConfigMigration implements Migration
         if ($schema instanceof ExtendSchema) {
             $queries->addSql(
                 new UpdateExtendConfigMigrationQuery(
-                    $schema->getExtendOptions(),
+                    $schema->getExtendOptionsProvider(),
                     $this->schemaGenerator,
                     $this->configDumper
                 )

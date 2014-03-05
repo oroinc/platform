@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Schema\Column;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendColumn extends Column
@@ -11,9 +11,9 @@ class ExtendColumn extends Column
     const ORO_OPTIONS_NAME = 'oro_options';
 
     /**
-     * @var ExtendOptionManager
+     * @var ExtendOptionsManager
      */
-    protected $extendOptionManager;
+    protected $extendOptionsManager;
 
     /**
      * @var string
@@ -21,14 +21,14 @@ class ExtendColumn extends Column
     protected $tableName;
 
     /**
-     * @param ExtendOptionManager $extendOptionManager
-     * @param string              $tableName
-     * @param Column              $baseColumn
+     * @param ExtendOptionsManager $extendOptionsManager
+     * @param string               $tableName
+     * @param Column               $baseColumn
      */
-    public function __construct(ExtendOptionManager $extendOptionManager, $tableName, Column $baseColumn)
+    public function __construct(ExtendOptionsManager $extendOptionsManager, $tableName, Column $baseColumn)
     {
-        $this->extendOptionManager = $extendOptionManager;
-        $this->tableName           = $tableName;
+        $this->extendOptionsManager = $extendOptionsManager;
+        $this->tableName            = $tableName;
 
         $optionNames = [
             'Length',
@@ -65,7 +65,7 @@ class ExtendColumn extends Column
             if (strpos($columnName, ExtendConfigDumper::FIELD_PREFIX) === 0) {
                 $columnName = substr($columnName, strlen(ExtendConfigDumper::FIELD_PREFIX));
             }
-            $this->extendOptionManager->setColumnOptions(
+            $this->extendOptionsManager->setColumnOptions(
                 $this->tableName,
                 $columnName,
                 $this->getType()->getName(),

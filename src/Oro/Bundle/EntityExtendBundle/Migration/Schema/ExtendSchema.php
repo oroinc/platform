@@ -6,38 +6,39 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsProviderInterface;
 
 class ExtendSchema extends Schema
 {
     /**
-     * @var ExtendOptionManager
+     * @var ExtendOptionsManager
      */
-    protected $extendOptionManager;
+    protected $extendOptionsManager;
 
     /**
-     * @param ExtendOptionManager $extendOptionManager
-     * @param Table[]             $tables
-     * @param Sequence[]          $sequences
-     * @param SchemaConfig        $schemaConfig
+     * @param ExtendOptionsManager $extendOptionsManager
+     * @param Table[]              $tables
+     * @param Sequence[]           $sequences
+     * @param SchemaConfig         $schemaConfig
      */
     public function __construct(
-        ExtendOptionManager $extendOptionManager,
+        ExtendOptionsManager $extendOptionsManager,
         array $tables = [],
         array $sequences = [],
         SchemaConfig $schemaConfig = null
     ) {
-        $this->extendOptionManager = $extendOptionManager;
+        $this->extendOptionsManager = $extendOptionsManager;
 
         parent::__construct($tables, $sequences, $schemaConfig);
     }
 
     /**
-     * @return array
+     * @return ExtendOptionsProviderInterface
      */
-    public function getExtendOptions()
+    public function getExtendOptionsProvider()
     {
-        return $this->extendOptionManager->getExtendOptions();
+        return $this->extendOptionsManager->getExtendOptionsProvider();
     }
 
     /**
@@ -57,7 +58,7 @@ class ExtendSchema extends Schema
     protected function _addTable(Table $table)
     {
         if (!($table instanceof ExtendTable)) {
-            $table = new ExtendTable($this->extendOptionManager, $table);
+            $table = new ExtendTable($this->extendOptionsManager, $table);
         }
         parent::_addTable($table);
     }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 
@@ -13,8 +13,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityClassResolver;
 
-    /** @var ExtendOptionManager */
-    protected $extendOptionManager;
+    /** @var ExtendOptionsManager */
+    protected $extendOptionsManager;
 
     protected function setUp()
     {
@@ -41,13 +41,13 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->extendOptionManager = new ExtendOptionManager($this->entityClassResolver);
+        $this->extendOptionsManager = new ExtendOptionsManager($this->entityClassResolver);
     }
 
     public function testCreateExtendTable()
     {
-        $schema    = new ExtendSchema($this->extendOptionManager);
-        $extension = new ExtendExtension($this->extendOptionManager);
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
 
         $extension->createExtendTable(
             $schema,
@@ -91,8 +91,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOptionSet()
     {
-        $schema    = new ExtendSchema($this->extendOptionManager);
-        $extension = new ExtendExtension($this->extendOptionManager);
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -130,8 +130,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOneToManyRelation()
     {
-        $schema    = new ExtendSchema($this->extendOptionManager);
-        $extension = new ExtendExtension($this->extendOptionManager);
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -203,8 +203,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddManyToManyRelation()
     {
-        $schema    = new ExtendSchema($this->extendOptionManager);
-        $extension = new ExtendExtension($this->extendOptionManager);
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -282,8 +282,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddManyToOneRelation()
     {
-        $schema    = new ExtendSchema($this->extendOptionManager);
-        $extension = new ExtendExtension($this->extendOptionManager);
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -356,7 +356,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
-        $extendOptions = $schema->getExtendOptions();
+        $extendOptions = $schema->getExtendOptionsProvider()->getOptions();
         $this->assertEquals($expectedOptions, $extendOptions);
     }
 }

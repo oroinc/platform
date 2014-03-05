@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
-class ExtendOptionManager
+class ExtendOptionsManager
 {
     /**
      * @var EntityClassResolver
@@ -59,11 +59,11 @@ class ExtendOptionManager
     /**
      * Gets all options
      *
-     * @return array
+     * @return ExtendOptionsProviderInterface
      */
-    public function getExtendOptions()
+    public function getExtendOptionsProvider()
     {
-        $builder = new ExtendOptionBuilder($this->entityClassResolver);
+        $builder = new ExtendOptionsBuilder($this->entityClassResolver);
 
         $objectKeys = array_keys($this->options);
 
@@ -83,7 +83,7 @@ class ExtendOptionManager
             }
         }
 
-        return $builder->get();
+        return $builder;
     }
 
     /**

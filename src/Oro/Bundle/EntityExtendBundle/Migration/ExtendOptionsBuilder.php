@@ -2,28 +2,48 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ExtendOptionBuilder
+class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
 {
     /**
      * @var EntityClassResolver
      */
     protected $entityClassResolver;
 
+    /**
+     * @var array
+     */
     protected $tableToEntityMap = [];
 
+    /**
+     * @var array
+     */
     protected $result = [];
 
+    /**
+     * @param EntityClassResolver $entityClassResolver
+     */
     public function __construct(EntityClassResolver $entityClassResolver)
     {
         $this->entityClassResolver = $entityClassResolver;
     }
 
-    public function addTableOptions($tableName, $options)
+    /**
+     * {@inheritdoc}
+     */
+    public function getOptions()
+    {
+        return $this->result;
+    }
+
+    /**
+     * @param string $tableName
+     * @param array  $options
+     */
+    public function addTableOptions($tableName, array $options)
     {
         $entityName = null;
         if (isset($options['extend']['entity_name'])) {
@@ -37,6 +57,12 @@ class ExtendOptionBuilder
         $this->result[$entityClassName]['configs'] = $options;
     }
 
+    /**
+     * @param string $tableName
+     * @param string $columnName
+     * @param string $columnType
+     * @param array  $options
+     */
     public function addColumnOptions($tableName, $columnName, $columnType, $options)
     {
         $entityClassName = $this->getEntityClassName($tableName);
@@ -90,16 +116,6 @@ class ExtendOptionBuilder
     }
 
     /**
-     * Returns extend options
-     *
-     * @return array
-     */
-    public function get()
-    {
-        return $this->result;
-    }
-
-    /**
      * Gets an entity class name by its table name
      *
      * @param string $tableName
@@ -127,6 +143,13 @@ class ExtendOptionBuilder
         return $this->tableToEntityMap[$tableName];
     }
 
+    /**
+     * Gets a field name by a column name
+     *
+     * @param string $tableName
+     * @param string $columnName
+     * @return string
+     */
     protected function getFieldName($tableName, $columnName)
     {
         $fieldName = $this->entityClassResolver->getFieldNameByColumnName($tableName, $columnName);

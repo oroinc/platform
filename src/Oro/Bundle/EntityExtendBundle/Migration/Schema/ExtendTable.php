@@ -4,23 +4,23 @@ namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendTable extends Table
 {
     /**
-     * @var ExtendOptionManager
+     * @var ExtendOptionsManager
      */
-    protected $extendOptionManager;
+    protected $extendOptionsManager;
 
     /**
-     * @param ExtendOptionManager $extendOptionManager
-     * @param Table               $baseTable
+     * @param ExtendOptionsManager $extendOptionsManager
+     * @param Table                $baseTable
      */
-    public function __construct(ExtendOptionManager $extendOptionManager, Table $baseTable)
+    public function __construct(ExtendOptionsManager $extendOptionsManager, Table $baseTable)
     {
-        $this->extendOptionManager = $extendOptionManager;
+        $this->extendOptionsManager = $extendOptionsManager;
 
         parent::__construct(
             $baseTable->getName(),
@@ -38,7 +38,7 @@ class ExtendTable extends Table
     public function addOption($name, $value)
     {
         if ($name === ExtendColumn::ORO_OPTIONS_NAME) {
-            $this->extendOptionManager->setTableOptions($this->getName(), $value);
+            $this->extendOptionsManager->setTableOptions($this->getName(), $value);
 
             return $this;
         }
@@ -79,7 +79,7 @@ class ExtendTable extends Table
     protected function _addColumn(Column $column)
     {
         if (!($column instanceof ExtendColumn)) {
-            $column = new ExtendColumn($this->extendOptionManager, $this->getName(), $column);
+            $column = new ExtendColumn($this->extendOptionsManager, $this->getName(), $column);
         }
         parent::_addColumn($column);
     }

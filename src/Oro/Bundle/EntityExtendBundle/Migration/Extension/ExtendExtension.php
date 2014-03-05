@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -16,16 +16,16 @@ class ExtendExtension
     const AUTO_GENERATED_ID_COLUMN_NAME = 'id';
 
     /**
-     * @var ExtendOptionManager
+     * @var ExtendOptionsManager
      */
-    protected $extendOptionManager;
+    protected $extendOptionsManager;
 
     /**
-     * @param ExtendOptionManager $extendOptionManager
+     * @param ExtendOptionsManager $extendOptionsManager
      */
-    public function __construct(ExtendOptionManager $extendOptionManager)
+    public function __construct(ExtendOptionsManager $extendOptionsManager)
     {
-        $this->extendOptionManager = $extendOptionManager;
+        $this->extendOptionsManager = $extendOptionsManager;
     }
 
     /**
@@ -74,7 +74,7 @@ class ExtendExtension
         $columnName,
         array $options = []
     ) {
-        $this->extendOptionManager->setColumnOptions(
+        $this->extendOptionsManager->setColumnOptions(
             $this->getTableName($table),
             $columnName,
             'optionSet',
@@ -154,7 +154,7 @@ class ExtendExtension
             ],
         ];
 
-        $this->extendOptionManager->setColumnOptions(
+        $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $columnName,
             'oneToMany',
@@ -242,7 +242,7 @@ class ExtendExtension
             ],
         ];
 
-        $this->extendOptionManager->setColumnOptions(
+        $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $columnName,
             'manyToMany',
@@ -295,7 +295,7 @@ class ExtendExtension
             'column'     => $targetColumnName,
         ];
 
-        $this->extendOptionManager->setColumnOptions(
+        $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $columnName,
             'manyToOne',
@@ -331,7 +331,7 @@ class ExtendExtension
      */
     protected function getEntityClassByTableName($tableName)
     {
-        return $this->extendOptionManager
+        return $this->extendOptionsManager
             ->getEntityClassResolver()
             ->getEntityClassByTableName($tableName);
     }

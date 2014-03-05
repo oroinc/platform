@@ -9,9 +9,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
     /**
-     * @var array
+     * @var ExtendOptionsProviderInterface
      */
-    protected $options;
+    protected $optionsProvider;
 
     /**
      * @var ExtendSchemaGenerator
@@ -23,9 +23,12 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
      */
     protected $configDumper;
 
-    public function __construct($options, ExtendSchemaGenerator $schemaGenerator, ExtendConfigDumper $configDumper)
-    {
-        $this->options         = $options;
+    public function __construct(
+        ExtendOptionsProviderInterface $optionsProvider,
+        ExtendSchemaGenerator $schemaGenerator,
+        ExtendConfigDumper $configDumper
+    ) {
+        $this->optionsProvider = $optionsProvider;
         $this->schemaGenerator = $schemaGenerator;
         $this->configDumper    = $configDumper;
     }
@@ -36,7 +39,8 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     public function getDescription()
     {
         $result = [];
-        foreach ($this->options as $entityClassName => $entityOptions) {
+        $options = $this->optionsProvider->getOptions();
+        foreach ($options as $entityClassName => $entityOptions) {
             if (isset($entityOptions['configs'])) {
                 $result[] = sprintf(
                     'CREATE EXTEND ENTITY %s',
@@ -62,7 +66,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
      */
     public function execute()
     {
-        $this->schemaGenerator->parseConfigs($this->options);
+        $this->schemaGenerator->parseConfigs($this->optionsProvider->getOptions());
         $this->configDumper->updateConfig();
         $this->configDumper->dump();
     }

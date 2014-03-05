@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 
 class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
@@ -15,8 +15,8 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityClassResolver;
 
-    /** @var ExtendOptionManager */
-    protected $extendOptionManager;
+    /** @var ExtendOptionsManager */
+    protected $extendOptionsManager;
 
     protected function setUp()
     {
@@ -32,13 +32,13 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->extendOptionManager = new ExtendOptionManager($this->entityClassResolver);
+        $this->extendOptionsManager = new ExtendOptionsManager($this->entityClassResolver);
     }
 
     public function testEmptySchema()
     {
         $schema = new ExtendSchema(
-            $this->extendOptionManager
+            $this->extendOptionsManager
         );
 
         $this->assertSchemaTypes($schema);
@@ -56,7 +56,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
         );
 
         $schema = new ExtendSchema(
-            $this->extendOptionManager,
+            $this->extendOptionsManager,
             [$table1]
         );
 
@@ -72,7 +72,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 
     public function testSchema()
     {
-        $schema = new ExtendSchema($this->extendOptionManager);
+        $schema = new ExtendSchema($this->extendOptionsManager);
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('column1', 'string', ['length' => 100]);
@@ -182,7 +182,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 
     protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
-        $extendOptions = $schema->getExtendOptions();
+        $extendOptions = $schema->getExtendOptionsProvider()->getOptions();
         $this->assertEquals($expectedOptions, $extendOptions);
     }
 }

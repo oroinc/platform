@@ -11,9 +11,9 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
 class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
 {
     /**
-     * @var ExtendOptionManager
+     * @var ExtendOptionsManager
      */
-    protected $extendOptionManager;
+    protected $extendOptionsManager;
 
     /**
      * @var ExtendExtension
@@ -21,11 +21,11 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
     protected $extendExtension;
 
     /**
-     * @param ExtendOptionManager $extendOptionManager
+     * @param ExtendOptionsManager $extendOptionsManager
      */
-    public function setExtendOptionManager(ExtendOptionManager $extendOptionManager)
+    public function setExtendOptionsManager(ExtendOptionsManager $extendOptionsManager)
     {
-        $this->extendOptionManager   = $extendOptionManager;
+        $this->extendOptionsManager = $extendOptionsManager;
     }
 
     /**
@@ -50,7 +50,7 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
         $tables = $sm->listTables();
 
         return new ExtendSchema(
-            $this->extendOptionManager,
+            $this->extendOptionsManager,
             $tables,
             $sequences,
             $sm->createSchemaConfig()
