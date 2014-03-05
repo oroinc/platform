@@ -29,15 +29,19 @@ class ExpressionResult
     /** @var mixed */
     private $value;
 
-    public function __construct($value)
+    public function __construct($value, $timezone = null)
     {
+        $timezone = $timezone ? : 'UTC';
         if (is_numeric($value)) {
             $this->value      = $value;
             $this->sourceType = self::TYPE_INT;
         } elseif ($value instanceof Token && $value->is(Token::TYPE_VARIABLE)) {
-            $dateValue = Carbon::now(new \DateTimeZone('UTC'));
+            $dateValue = Carbon::now(new \DateTimeZone($timezone));
 
             switch ($value->getValue()) {
+                case DateModifierInterface::VAR_TODAY:
+                    $dateValue->startOfDay();
+                    break;
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_THIS_WEEK:
                     //do not use start of the week due to it always use monday as 1 day
@@ -65,14 +69,14 @@ class ExpressionResult
             $this->variableType = $value->getValue();
             $this->sourceType   = self::TYPE_DATE;
         } elseif ($value instanceof Token && $value->is(Token::TYPE_TIME)) {
-            $dateValue = Carbon::parse('now', new \DateTimeZone('UTC'));
+            $dateValue = Carbon::parse('now', new \DateTimeZone($timezone));
             call_user_func_array([$dateValue, 'setTime'], explode(':', $value->getValue()));
 
             $this->value      = $dateValue;
             $this->sourceType = self::TYPE_TIME;
         } elseif ($value instanceof Token && $value->is(Token::TYPE_DATE)) {
             $this->sourceType = self::TYPE_DATE;
-            $this->value      = Carbon::parse($value->getValue(), new \DateTimeZone('UTC'));
+            $this->value      = Carbon::parse($value->getValue(), new \DateTimeZone($timezone));
         } elseif ($value instanceof Token && $value->is(Token::TYPE_INTEGER)) {
             $this->sourceType = self::TYPE_INT;
             $this->value      = $value->getValue();

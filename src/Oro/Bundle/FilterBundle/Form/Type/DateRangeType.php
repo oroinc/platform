@@ -15,11 +15,11 @@ class DateRangeType extends AbstractType
     const NAME = 'oro_type_date_range';
 
     /** @var DateFilterSubscriber */
-    protected $subsriber;
+    protected $subscriber;
 
-    public function __construct(DateFilterSubscriber $subsriber = null)
+    public function __construct(DateFilterSubscriber $subscriber)
     {
-        $this->subsriber = $subsriber;
+        $this->subscriber = $subscriber;
     }
 
     /**
@@ -40,11 +40,11 @@ class DateRangeType extends AbstractType
             $options['field_type'],
             array_merge(
                 array(
-                    'required' => false,
-                    'widget' => 'single_text',
-                    'format' => 'yyyy-MM-dd',
+                    'required'       => false,
+                    'widget'         => 'single_text',
+                    'format'         => 'yyyy-MM-dd',
                     'model_timezone' => 'UTC',
-                    'view_timezone' => 'UTC',
+                    'view_timezone'  => 'UTC',
                 ),
                 $options['field_options'],
                 $options['start_field_options']
@@ -56,20 +56,18 @@ class DateRangeType extends AbstractType
             $options['field_type'],
             array_merge(
                 array(
-                    'required' => false,
-                    'widget' => 'single_text',
-                    'format' => 'yyyy-MM-dd',
+                    'required'       => false,
+                    'widget'         => 'single_text',
+                    'format'         => 'yyyy-MM-dd',
                     'model_timezone' => 'UTC',
-                    'view_timezone' => 'UTC',
+                    'view_timezone'  => 'UTC',
                 ),
                 $options['field_options'],
                 $options['end_field_options']
             )
         );
 
-        if (!empty($this->subsriber)) {
-            $builder->addEventSubscriber($this->subsriber);
-        }
+        $builder->addEventSubscriber($this->subscriber);
     }
 
     /**

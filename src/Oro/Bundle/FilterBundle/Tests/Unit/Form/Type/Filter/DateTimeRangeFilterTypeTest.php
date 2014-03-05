@@ -30,9 +30,10 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
             ->method('getTimezone')
             ->will($this->returnValue(date_default_timezone_get()));
 
+        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
         $types = array(
             new FilterType($translator),
-            new DateRangeType(),
+            new DateRangeType($subscriber),
             new DateTimeRangeType($localeSettings),
             new DateRangeFilterType($translator, new DateModifierProvider())
         );

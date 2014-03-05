@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\FilterBundle\Form\EventListener;
 
-use Carbon\Carbon;
-
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 
 class DateFilterSubscriber implements EventSubscriberInterface
@@ -16,13 +13,9 @@ class DateFilterSubscriber implements EventSubscriberInterface
     /** @var Compiler */
     protected $expressionCompiler;
 
-    /** @var LocaleSettings */
-    protected $localeSettings;
-
-    public function __construct(Compiler $compiler, LocaleSettings $localeSettings)
+    public function __construct(Compiler $compiler)
     {
         $this->expressionCompiler = $compiler;
-        $this->localeSettings     = $localeSettings;
     }
 
     /**
@@ -44,13 +37,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
         $start = $this->expressionCompiler->compile($data['start']);
         $end   = $this->expressionCompiler->compile($data['end']);
-
-        if ($start instanceof \DateTime) {
-            $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
-        }
-        if ($end instanceof \DateTime) {
-            $end->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
-        }
 
         $data['start'] = (string)$start;
         $data['end']   = (string)$end;

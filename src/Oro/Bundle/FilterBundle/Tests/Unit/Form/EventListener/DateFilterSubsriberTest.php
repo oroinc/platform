@@ -12,19 +12,15 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var DateFilterSubscriber */
     protected $subscriber;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $compiler;
-
-    protected $localeSettings;
 
     public function setUp()
     {
-        $this->compiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
+        $this->compiler   = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->subscriber = new DateFilterSubscriber($this->compiler, $this->localeSettings);
+        $this->subscriber = new DateFilterSubscriber($this->compiler);
     }
 
     public function testSubscribedEvents()
@@ -40,7 +36,7 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $data = [
             'start' => '{{4}}',
-            'end' => '{{6}}',
+            'end'   => '{{6}}',
         ];
 
         $start = $end = Carbon::now();
@@ -63,10 +59,6 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('compile')
             ->with($data['end'])
             ->will($this->returnValue($end));
-
-        $this->localeSettings->expects($this->exactly(2))
-            ->method('getTimeZone')
-            ->will($this->returnValue('Europe/Kiev'));
 
         $this->subscriber->processParams($event);
     }
