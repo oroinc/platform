@@ -65,5 +65,6 @@ services:
         arguments:
             - @twig
             - @oro_ui.placeholder.provider
+            - @twig.extension.httpkernel
         tags:
             - { name: twig.extension }

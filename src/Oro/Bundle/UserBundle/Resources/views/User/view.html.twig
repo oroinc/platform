@@ -114,6 +114,18 @@
         }]) %}
     {% endif %}
 
+    {% set tasksInfo %}
+        {{ placeholder('orocrm_user_tasks', {'user': entity}) }}
+    {% endset %}
+    {% if tasksInfo|trim is not empty %}
+        {% set dataBlocks = dataBlocks|merge([
+            {
+                'title': 'orocrm.task.user_tasks_section'|trans,
+                'subblocks': [{'data': [tasksInfo]}]
+            }
+        ]) %}
+    {% endif %}
+
     {% set id = 'userView' %}
     {% set data = { 'dataBlocks': dataBlocks } %}
     {{ parent() }}
