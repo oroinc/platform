@@ -1,6 +1,6 @@
-/* global define */
-define(['jquery', 'underscore', 'backgrid'],
-function($, _, Backgrid) {
+/*global define*/
+define(['jquery', 'underscore', 'backgrid'
+    ], function ($, _, Backgrid) {
     'use strict';
 
     /**
@@ -9,8 +9,8 @@ function($, _, Backgrid) {
      * Triggers events:
      *  - "clicked" when row is clicked
      *
-     * @export  oro/datagrid/row
-     * @class   oro.datagrid.Row
+     * @export  orodatagrid/js/datagrid/row
+     * @class   orodatagrid.datagrid.Row
      * @extends Backgrid.Row
      */
     return Backgrid.Row.extend({
@@ -32,7 +32,7 @@ function($, _, Backgrid) {
          *
          * @param {Event} e
          */
-        onClick: function(e) {
+        onClick: function (e) {
             var targetElement = e.target;
             var targetParentElement = $(e.target).parent().get(0);
 
@@ -40,7 +40,7 @@ function($, _, Backgrid) {
                 return;
             }
 
-            this.clickData.counter++;
+            this.clickData.counter += 1;
             if (this.clickData.counter == 1 && !this._hasSelectedText()) {
                 _.delay(_.bind(function() {
                     if (!this._hasSelectedText() && this.clickData.counter == 1) {
@@ -59,7 +59,7 @@ function($, _, Backgrid) {
          * @returns {string}
          * @return {boolean}
          */
-        _hasSelectedText: function() {
+        _hasSelectedText: function () {
             var text = "";
             if (_.isFunction(window.getSelection)) {
                 text = window.getSelection().toString();
@@ -87,7 +87,7 @@ function($, _, Backgrid) {
          * @param {Backgrid.Cell} cell
          * @private
          */
-        _listenToCellEvents: function(cell) {
+        _listenToCellEvents: function (cell) {
             if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
                 this.on('clicked', _.bind(cell.onRowClicked, cell));
             }

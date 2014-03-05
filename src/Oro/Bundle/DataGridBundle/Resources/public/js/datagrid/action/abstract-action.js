@@ -1,7 +1,8 @@
- /* global define */
-define(['jquery', 'underscore', 'backbone', 'routing', 'oro/navigation', 'oro/translator', 'oro/mediator',
-    'oro/messenger', 'oro/error', 'oro/modal', 'oro/datagrid/action-launcher'],
-function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigation',
+        'orotranslation/js/translator', 'oroui/js/mediator',
+        'oroui/js/messenger', 'oroui/js/error', 'oroui/js/modal', '../action-launcher'
+    ], function ($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Modal, ActionLauncher) {
     'use strict';
 
     /**
@@ -11,7 +12,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
      *  - "preExecute" before action is executed
      *  - "postExecute" after action is executed
      *
-     * @export  oro/datagrid/abstract-action
+     * @export  orodatagrid/js/datagrid/action/abstract-action
      * @class   oro.datagrid.AbstractAction
      * @extends Backbone.View
      */
@@ -71,7 +72,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          * @param {Object} options
          * @param {Object} [options.launcherOptions] Options for new instance of launcher object
          */
-        initialize: function(options) {
+        initialize: function (options) {
             if (!options.datagrid) {
                 throw new TypeError("'datagrid' is required");
             }
@@ -90,7 +91,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          * @param {Object} options Launcher options
          * @return {oro.datagrid.ActionLauncher}
          */
-        createLauncher: function(options) {
+        createLauncher: function (options) {
             options = options || {};
             if (_.isUndefined(options.icon) && !_.isUndefined(this.icon)) {
                 options.icon = this.icon;
@@ -102,7 +103,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /**
          * Run action
          */
-        run: function() {
+        run: function () {
             var options = {
                 doExecute: true
             };
@@ -116,11 +117,11 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
         /**
          * Execute action
          */
-        execute: function() {
+        execute: function () {
             this._confirmationExecutor(_.bind(this.executeConfiguredAction, this));
         },
 
-        executeConfiguredAction: function() {
+        executeConfiguredAction: function () {
             switch (this.frontend_handle) {
                 case 'ajax':
                     this._handleAjax();
@@ -133,7 +134,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
         },
 
-        _confirmationExecutor: function(callback) {
+        _confirmationExecutor: function (callback) {
             if (this.confirmation) {
                 this.getConfirmDialog(callback).open();
             } else {
@@ -141,7 +142,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
         },
 
-        _handleWidget: function() {
+        _handleWidget: function () {
             if (this.dispatched) {
                 return;
             }
@@ -154,7 +155,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             });
         },
 
-        _handleRedirect: function() {
+        _handleRedirect: function () {
             if (this.dispatched) {
                 return;
             }
@@ -170,7 +171,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             }
         },
 
-        _handleAjax: function() {
+        _handleAjax: function () {
             if (this.dispatched) {
                 return;
             }
@@ -191,14 +192,14 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             });
         },
 
-        _onAjaxError: function(jqXHR, textStatus, errorThrown) {
+        _onAjaxError: function (jqXHR, textStatus, errorThrown) {
             error.dispatch(null, jqXHR);
             if (this.reloadData) {
                 this.datagrid.hideLoading();
             }
         },
 
-        _onAjaxSuccess: function(data, textStatus, jqXHR) {
+        _onAjaxSuccess: function (data, textStatus, jqXHR) {
             if (this.reloadData) {
                 this.datagrid.hideLoading();
                 this.datagrid.collection.fetch();
@@ -206,7 +207,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
             this._showAjaxSuccessMessage(data);
         },
 
-        _showAjaxSuccessMessage: function(data) {
+        _showAjaxSuccessMessage: function (data) {
             var defaultMessage = data.successful ? this.messages.success : this.messages.error,
                 message = data.message || defaultMessage;
             if (message) {
@@ -220,7 +221,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          * @return {String}
          * @private
          */
-        getLink: function(parameters) {
+        getLink: function (parameters) {
             if (_.isUndefined(parameters)) {
                 parameters = {};
             }
@@ -238,7 +239,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          *
          * @returns {String}
          */
-        getLinkWithParameters: function() {
+        getLinkWithParameters: function () {
             return this.getLink(this.getActionParameters());
         },
 
@@ -247,7 +248,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          *
          * @returns {Object}
          */
-        getActionParameters: function() {
+        getActionParameters: function () {
             return {};
         },
 
@@ -256,7 +257,7 @@ function($, _, Backbone, routing, Navigation, __, mediator, messenger, error, Mo
          *
          * @return {oro.Modal}
          */
-        getConfirmDialog: function(callback) {
+        getConfirmDialog: function (callback) {
             if (!this.confirmModal) {
                 this.confirmModal = (new this.confirmModalConstructor({
                     title: this.messages.confirm_title,

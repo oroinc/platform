@@ -2,7 +2,7 @@
 
 <div class="widget-content">
     <script type="text/javascript">
-        require(['oro/mediator', 'oro/widget-manager'],
+        require(['oroui/js/mediator', 'oroui/js/widget-manager'],
         function(mediator, widgetManager) {
             var gridName = {{ gridName|json_encode|raw }};
             mediator.bind('datagrid_create_before', function(options) {
