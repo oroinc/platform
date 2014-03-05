@@ -68,7 +68,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
                 this.massActionsPanel.setActions(options.massActions);
             }
 
-            if (!options.enable) {
+            if (_.has(options, 'enable') && !options.enable) {
                 this.disable();
             }
             if (options.hide) {
