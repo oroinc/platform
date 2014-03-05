@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
+namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendTable extends Table

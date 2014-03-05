@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
+namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionManager;
 
 class ExtendSchema extends Schema
 {

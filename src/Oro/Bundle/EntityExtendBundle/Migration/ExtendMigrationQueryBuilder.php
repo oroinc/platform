@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendOptionManager;
-use Oro\Bundle\EntityExtendBundle\Extend\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
 
@@ -15,9 +16,9 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
     protected $extendOptionManager;
 
     /**
-     * @var ExtendMigrationHelper
+     * @var ExtendExtension
      */
-    protected $extendMigrationHelper;
+    protected $extendExtension;
 
     /**
      * @param ExtendOptionManager $extendOptionManager
@@ -28,11 +29,11 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
     }
 
     /**
-     * @param ExtendMigrationHelper $extendMigrationHelper
+     * @param ExtendExtension $extendExtension
      */
-    public function setExtendMigrationHelper(ExtendMigrationHelper $extendMigrationHelper)
+    public function setExtendExtension(ExtendExtension $extendExtension)
     {
-        $this->extendMigrationHelper = $extendMigrationHelper;
+        $this->extendExtension = $extendExtension;
     }
 
     /**
@@ -59,12 +60,12 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
     /**
      * {@inheritdoc}
      */
-    protected function setMigrationHelpers(Migration $migration)
+    protected function setExtensions(Migration $migration)
     {
-        parent::setMigrationHelpers($migration);
+        parent::setExtensions($migration);
 
-        if ($migration instanceof ExtendMigrationHelperAwareInterface) {
-            $migration->setExtendSchemaHelper($this->extendMigrationHelper);
+        if ($migration instanceof ExtendExtensionAwareInterface) {
+            $migration->setExtendExtension($this->extendExtension);
         }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Extend\Schema;
+namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -48,74 +48,27 @@ class ExtendOptionBuilder
             $this->result[$entityClassName]['fields'] = [];
         }
 
-        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])
-            && isset($options['extend'])
-            && isset($options['extend']['target'])
-        ) {
-
-            if ((
-                    $columnType == 'manyToOne'
-                    && (
-                        empty($options['extend']['target']['table_name'])
-                        || empty($options['extend']['target']['column'])
-                    )
-                )
-                || (
-                    in_array($columnType, ['oneToMany', 'manyToMany'])
-                    && (
-                        empty($options['extend']['target']['table_name'])
-                        || empty($options['extend']['target']['title_columns'])
-                        || empty($options['extend']['target']['grid_columns'])
-                        || empty($options['extend']['target']['detailed_columns'])
-                    )
-                )
-            ) {
-                throw new \RuntimeException(
-                    sprintf('Configuration error for table "%s" column "%s"', $tableName, $columnName)
-                );
+        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
+            if (!isset($options['extend'])) {
+                $options['extend'] = [];
             }
-
-            foreach ($options['extend']['target'] as $optionName => $optionValue) {
+            foreach ($options['_target'] as $optionName => $optionValue) {
                 switch ($optionName) {
                     case 'table_name':
-                        $options['extend']['target_entity'] =
-                            $this->entityClassResolver->getEntityClassByTableName($optionValue);
+                        $options['extend']['target_entity'] = $this->getEntityClassName($optionValue);
                         break;
                     case 'column':
-                        $options['extend']['target_field'] = $this->entityClassResolver->getFieldNameByColumnName(
-                            $options['extend']['target']['table_name'],
-                            $optionValue
-                        );
+                        $options['extend']['target_field'] =
+                            $this->getFieldName($options['_target']['table_name'], $optionValue);
                         break;
-                    case 'title_columns':
-                        $values = [];
-                        foreach ($optionValue as $value) {
-                            $values[] = $this->entityClassResolver->getFieldNameByColumnName(
-                                $options['extend']['target']['table_name'],
-                                $value
-                            );
+                    case 'columns':
+                        foreach ($optionValue as $group => $columns) {
+                            $values = [];
+                            foreach ($columns as $column) {
+                                $values[] = $this->getFieldName($options['_target']['table_name'], $column);
+                            }
+                            $options['extend']['target_' . $group] = $values;
                         }
-                        $options['extend']['target_title'] = $values;
-                        break;
-                    case 'grid_columns':
-                        $values = [];
-                        foreach ($optionValue as $value) {
-                            $values[] = $this->entityClassResolver->getFieldNameByColumnName(
-                                $options['extend']['target']['table_name'],
-                                $value
-                            );
-                        }
-                        $options['extend']['target_grid'] = $values;
-                        break;
-                    case 'detailed_columns':
-                        $values = [];
-                        foreach ($optionValue as $value) {
-                            $values[] = $this->entityClassResolver->getFieldNameByColumnName(
-                                $options['extend']['target']['table_name'],
-                                $value
-                            );
-                        }
-                        $options['extend']['target_detailed'] = $values;
                         break;
                 }
             }
@@ -127,7 +80,7 @@ class ExtendOptionBuilder
                 $options['extend']['target_entity']
             );
 
-            unset($options['extend']['target']);
+            unset($options['_target']);
         }
 
         $this->result[$entityClassName]['fields'][$columnName] = [
@@ -172,5 +125,15 @@ class ExtendOptionBuilder
         }
 
         return $this->tableToEntityMap[$tableName];
+    }
+
+    protected function getFieldName($tableName, $columnName)
+    {
+        $fieldName = $this->entityClassResolver->getFieldNameByColumnName($tableName, $columnName);
+        if (empty($fieldName)) {
+            $fieldName = $columnName;
+        }
+
+        return $fieldName;
     }
 }
