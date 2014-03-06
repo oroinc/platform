@@ -57,7 +57,6 @@ function(_, Backbone, Helper) {
                 var propertyData = part.split('+');
                 path.push(propertyData[0]);
             });
-            console.log(path);
             return path.join('.');
         },
 

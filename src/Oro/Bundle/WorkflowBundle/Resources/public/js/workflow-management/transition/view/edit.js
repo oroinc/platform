@@ -178,7 +178,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
             this.$el.append(form);
 
             this.widget = new DialogWidget({
-                'title': this.model.get('name').length ? 'Edit transition' : 'Add new transition',
+                'title': this.model.get('name') ? 'Edit transition' : 'Add new transition',
                 'el': this.$el,
                 'stateEnabled': false,
                 'incrementalPosition': false,

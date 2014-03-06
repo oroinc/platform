@@ -125,11 +125,9 @@ function(_, Backbone,
             transitionEditView.render();
         },
 
-        addTransition: function(transition, stepFrom) {
-            console.log(transition);
-
+        addTransition: function(transition, stepFromName) {
             if (!this.model.get('transitions').get(transition.cid)) {
-                var stepFrom = this.model.getStepByName(stepFrom);
+                var stepFrom = this.model.getStepByName(stepFromName);
                 transition.set('is_start', stepFrom.get('_is_start'));
 
                 this.model

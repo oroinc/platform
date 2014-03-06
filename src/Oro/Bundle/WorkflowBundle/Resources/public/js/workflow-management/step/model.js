@@ -10,15 +10,20 @@ function(_, Backbone, TransitionCollection) {
      */
     return Backbone.Model.extend({
         defaults: {
-            name: '',
-            label: '',
+            name: null,
+            label: null,
             is_final: false,
             order: 0,
-            allowed_transitions: [],
+            allowed_transitions: null,
             _is_start: false
         },
 
-        allowedTransitions: null,
+        initialize: function() {
+            this.allowedTransitions = null;
+            if (this.get('allowed_transitions') === null) {
+                this.set('allowed_transitions', []);
+            }
+        },
 
         getAllowedTransitions: function(workflowModel) {
             // Initialize allowedTransitions as Backbone.Collection instance.

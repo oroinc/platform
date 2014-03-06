@@ -46,7 +46,7 @@ function(_, Backbone, DialogWidget, Helper, layout) {
             );
 
             this.widget = new DialogWidget({
-                'title': this.model.get('name').length ? 'Edit step' : 'Add new step',
+                'title': this.model.get('name') ? 'Edit step' : 'Add new step',
                 'el': this.$el,
                 'stateEnabled': false,
                 'incrementalPosition': false,

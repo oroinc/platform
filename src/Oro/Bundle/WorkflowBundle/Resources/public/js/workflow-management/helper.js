@@ -11,8 +11,8 @@ define(function() {
             str = (prefix || '') + str;         //Add prefix to string
             str = str
                 .toLowerCase()                   //Convert to lowercase
+                .replace(/[^A-Za-z\s_-]+/g, '') //Remove all non latin symbols
                 .replace(/\s+|\-+/g, '_')        //Replace spaces and - with underscore
-                .replace(/[\u0250-\ue007]/g, '') //Remove all non latin symbols
                 .replace(/__+/g, '_');           //Remove duplicated underscores;
 
             return str + '_' + this.getRandomId();

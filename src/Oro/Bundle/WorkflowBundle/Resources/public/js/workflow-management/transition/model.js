@@ -10,15 +10,21 @@ function(Backbone) {
      */
     return Backbone.Model.extend({
         defaults: {
-            name: '',
-            label: '',
+            name: null,
+            label: null,
             display_type: 'dialog',
             step_to: null,
             is_start: false,
-            form_options: {},
+            form_options: null,
             message: null,
             is_unavailable_hidden: true,
             transition_definition: null
+        },
+
+        initialize: function() {
+            if (this.get('form_options') === null) {
+                this.set('form_options', {});
+            }
         }
     });
 });

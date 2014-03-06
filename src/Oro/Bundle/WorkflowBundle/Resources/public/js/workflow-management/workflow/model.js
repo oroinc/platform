@@ -50,7 +50,7 @@ function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection,
             var attribute = _.first(this.get('attributes').where({'property_path': propertyPath}));
             if (!attribute) {
                 attribute = new AttributeModel({
-                    'name': propertyPath.replace('.', '_'),
+                    'name': propertyPath.replace(/\./g, '_'),
                     'property_path': propertyPath
                 });
                 this.get('attributes').add(attribute);
