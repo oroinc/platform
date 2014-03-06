@@ -1,7 +1,7 @@
 /*jslint nomen: true*/
 /*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter',
-        'orolocale/js/locale-settings', 'jquery-ui-datevariables'
+        'orolocale/js/locale-settings', '../datevariables-widget'
     ], function ($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
 
@@ -173,10 +173,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
         changeFilterType: function (type) {
             if (this.dateWidgets.start && this.dateWidgets.start.data('datepicker')) {
-                this.dateWidgets.start.data('datepicker').settings.part = type;
+                this.dateWidgets.start_vars.dateVariables('setPart', type);
             }
             if (this.dateWidgets.end && this.dateWidgets.end.data('datepicker')) {
-                this.dateWidgets.end.data('datepicker').settings.part = type;
+                this.dateWidgets.end_vars.dateVariables('setPart', type);
             }
 
             type = parseInt(type, 10);
@@ -269,7 +269,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             });
 
             this.dateWidgets[name] = this._initializeDateWidget('#calendar' + tabSuffix, widgetOptions);
-            this.dateWidgets[name].datepicker('setDate', $input.val());
+            //this.dateWidgets[name].datepicker('setDate', $input.val());
+
+            widgetOptions = _.extend({
+                $input: $input
+            }, this.dateWidgetOptions);
+            this.dateWidgets[name + '_vars'] = this._initializeDateVariablesWidget('#variables' + tabSuffix, widgetOptions);
         },
 
         /**
@@ -280,12 +285,30 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @protected
          */
         _initializeDateWidget: function (widgetSelector, options) {
-            this.$(widgetSelector).datevariables(options);
-            var widget = this.$(widgetSelector).datevariables('widget');
+            this.$(widgetSelector).datepicker(options);
+            var widget = this.$(widgetSelector).datepicker('widget');
+
             widget.addClass(options.className);
             $(this.dateWidgetSelector).on('click', function (e) {
                 e.stopImmediatePropagation();
             });
+
+            return widget;
+        },
+
+        /**
+         * Initialize date variables widget
+         *
+         * @param {String} widgetSelector
+         * @return {*}
+         * @protected
+         */
+        _initializeDateVariablesWidget: function (widgetSelector, options) {
+            this.$(widgetSelector).dateVariables(options);
+
+            var widget = this.$(widgetSelector).dateVariables('widget');
+            widget.addClass(options.className);
+
             return widget;
         },
 

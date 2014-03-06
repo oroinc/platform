@@ -49,7 +49,7 @@ function ($, _, DateFilter, localeSettings) {
          * @inheritDoc
          */
         _initializeDateWidget: function(widgetSelector, options) {
-            this.$(widgetSelector).datevariables(options);
+            this.$(widgetSelector).datetimepicker(options);
             var widget = this.$(widgetSelector).datevariables('widget');
 
             widget.addClass(options.className);
