@@ -34,8 +34,6 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oroui/js/widget-manager', 
                             function (event) {
                                 var widgetOptions     = $.extend(true, {}, controlElement.data('widget-options'));
                                 var allowMultiple     = controlElement.data('widget-multiple');
-                                var reloadEvent       = controlElement.data('widget-reload-event')
-                                    || 'widget_success:' + widgetOptions.alias;
                                 var reloadGridName    = controlElement.data('widget-reload-grid-name');
                                 var reloadWidgetAlias = controlElement.data('widget-reload-widget-alias');
 
@@ -55,19 +53,17 @@ define(['jquery', 'underscore', 'oro/dialog-widget', 'oroui/js/widget-manager', 
                                 // Create and open widget
                                 var widget = new Widget(widgetOptions);
 
-                                if (reloadWidgetAlias) {
-                                    mediator.on(reloadEvent, function () {
-                                        WidgetManager.getWidgetInstanceByAlias(reloadWidgetAlias, function (widget) {
-                                            widget.loadContent();
-                                        });
-                                    });
-                                }
+                                var reloadEvent       = controlElement.data('widget-reload-event')
+                                    || 'widget_success:' + (widget.getAlias() || widget.getWid());
 
-                                if (reloadGridName) {
-                                    mediator.on(reloadEvent, function () {
-                                        mediator.trigger('datagrid:doRefresh:' + reloadGridName);
+                                mediator.on(reloadEvent, function () {
+                                    WidgetManager.getWidgetInstanceByAlias(reloadWidgetAlias, function (widget) {
+                                        widget.loadContent();
                                     });
-                                }
+                                    if (reloadGridName) {
+                                        mediator.trigger('datagrid:doRefresh:' + reloadGridName);
+                                    }
+                                });
 
                                 if (!allowMultiple) {
                                     widget.on('widgetRemove', function () {

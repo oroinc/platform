@@ -16,6 +16,7 @@
                 widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                     messenger.notificationFlashMessage('success', __('The email was sent'));
                     mediator.trigger('widget_success:' + widget.getAlias());
+                    mediator.trigger('widget_success:' + widget.getWid());
                     widget.remove(true);
                 });
             });

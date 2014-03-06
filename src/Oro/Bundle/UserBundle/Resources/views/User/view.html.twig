@@ -98,34 +98,6 @@
         ]) %}
     {% endif %}
 
-    {%- set additionalInformation -%}
-        {% placeholder oro_user_view_additional_data %}
-    {%- endset -%}
-
-    {% if additionalInformation is not empty %}
-        {% set dataBlocks = dataBlocks|merge([{
-            'title': 'Additional Information'|trans,
-            'subblocks': [
-                {
-                    'spanClass': 'empty',
-                    'data': [additionalInformation]
-                }
-            ]
-        }]) %}
-    {% endif %}
-
-    {% set tasksInfo %}
-        {{ placeholder('orocrm_user_tasks', {'user': entity}) }}
-    {% endset %}
-    {% if tasksInfo|trim is not empty %}
-        {% set dataBlocks = dataBlocks|merge([
-            {
-                'title': 'orocrm.task.user_tasks_section'|trans,
-                'subblocks': [{'data': [tasksInfo]}]
-            }
-        ]) %}
-    {% endif %}
-
     {% set id = 'userView' %}
     {% set data = { 'dataBlocks': dataBlocks } %}
     {{ parent() }}
