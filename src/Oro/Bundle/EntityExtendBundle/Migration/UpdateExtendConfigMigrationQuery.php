@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
 
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
@@ -14,22 +13,27 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     protected $optionsProvider;
 
     /**
-     * @var ExtendSchemaGenerator
+     * @var ExtendConfigProcessor
      */
-    protected $schemaGenerator;
+    protected $configProcessor;
 
     /**
      * @var ExtendConfigDumper
      */
     protected $configDumper;
 
+    /**
+     * @param ExtendOptionsProviderInterface $optionsProvider
+     * @param ExtendConfigProcessor          $configProcessor
+     * @param ExtendConfigDumper             $configDumper
+     */
     public function __construct(
         ExtendOptionsProviderInterface $optionsProvider,
-        ExtendSchemaGenerator $schemaGenerator,
+        ExtendConfigProcessor $configProcessor,
         ExtendConfigDumper $configDumper
     ) {
         $this->optionsProvider = $optionsProvider;
-        $this->schemaGenerator = $schemaGenerator;
+        $this->configProcessor = $configProcessor;
         $this->configDumper    = $configDumper;
     }
 
@@ -66,7 +70,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
      */
     public function execute()
     {
-        $this->schemaGenerator->parseConfigs($this->optionsProvider->getOptions());
+        $this->configProcessor->processConfigs($this->optionsProvider->getOptions());
         $this->configDumper->updateConfig();
         $this->configDumper->dump();
     }

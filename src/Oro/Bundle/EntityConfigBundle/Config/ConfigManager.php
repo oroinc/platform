@@ -700,6 +700,18 @@ class ConfigManager
     }
 
     /**
+     * Changes a type of a field
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
+     */
+    public function changeFieldType($className, $fieldName, $fieldType)
+    {
+        $this->modelManager->changeFieldType($className, $fieldName, $fieldType);
+    }
+
+    /**
      * Gets config id for the given model
      *
      * @param EntityConfigModel|FieldConfigModel $model

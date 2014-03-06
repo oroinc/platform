@@ -102,12 +102,13 @@ class ExtendOptionsManager
                     sprintf('A scope name must be non empty string. Key: %s.', $objectKey)
                 );
             }
+            // a scope which name starts with '_' is a temporary and it should be removed in ExtendOptionsBuilder
+            if (strpos($scope, '_') !== 0 && !is_array($values)) {
+                throw new \InvalidArgumentException(
+                    sprintf('A value of "%s" scope must be an array. Key: %s.', $scope, $objectKey)
+                );
+            }
             if (isset($this->options[$objectKey][$scope])) {
-                if (!is_array($values)) {
-                    throw new \InvalidArgumentException(
-                        sprintf('A value of "%s" scope must be an array. Key: %s.', $scope, $objectKey)
-                    );
-                }
                 foreach ($values as $key => $val) {
                     $this->options[$objectKey][$scope][$key] = $val;
                 }

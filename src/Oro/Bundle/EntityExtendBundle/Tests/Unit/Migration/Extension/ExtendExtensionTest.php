@@ -4,9 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,23 +46,101 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extendOptionsManager = new ExtendOptionsManager($this->entityClassResolver);
     }
 
-    public function testCreateExtendTable()
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid entity name: "Acme\AcmeBundle\Entity\Entity1".
+     */
+    public function testCreateCustomEntityTableWithInvalidEntityName1()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
         $extension = new ExtendExtension($this->extendOptionsManager);
 
-        $extension->createExtendTable(
+        $extension->createCustomEntityTable(
             $schema,
             'table1',
             'Acme\AcmeBundle\Entity\Entity1'
         );
-        $extension->createExtendTable(
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid entity name: "Extend\Entity\Entity1".
+     */
+    public function testCreateCustomEntityTableWithInvalidEntityName2()
+    {
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
+
+        $extension->createCustomEntityTable(
+            $schema,
+            'table1',
+            ExtendConfigDumper::ENTITY . 'Entity1'
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "extend.owner" option for a custom entity must be "Custom".
+     */
+    public function testCreateCustomEntityTableWithInvalidOwner()
+    {
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
+
+        $extension->createCustomEntityTable(
+            $schema,
+            'table1',
+            'Entity1',
+            [
+                'extend' => ['owner' => ExtendScope::OWNER_SYSTEM],
+            ]
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "extend.is_extend" option for a custom entity must be TRUE.
+     */
+    public function testCreateCustomEntityTableWithInvalidIsExtend()
+    {
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
+
+        $extension->createCustomEntityTable(
+            $schema,
+            'table1',
+            'Entity1',
+            [
+                'extend' => ['is_extend' => false],
+            ]
+        );
+    }
+
+    public function testCreateCustomEntityTable()
+    {
+        $schema    = new ExtendSchema($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager);
+
+        $extension->createCustomEntityTable(
+            $schema,
+            'table1',
+            'Entity1'
+        );
+        $extension->createCustomEntityTable(
             $schema,
             'table2',
-            'Acme\AcmeBundle\Entity\Entity2',
+            'Entity2',
             [
                 'entity' => ['icon' => 'icon2'],
-                'extend' => ['owner' => 'Custom'],
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+            ]
+        );
+        $extension->createCustomEntityTable(
+            $schema,
+            'table3',
+            'Entity3',
+            [
+                'extend' => ['is_extend' => true],
             ]
         );
 
@@ -69,20 +149,26 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'CREATE TABLE table1 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
                 'CREATE TABLE table2 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
+                'CREATE TABLE table3 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
             ]
         );
         $this->assertExtendOptions(
             $schema,
             [
-                'Acme\AcmeBundle\Entity\Entity1' => [
+                ExtendConfigDumper::ENTITY . 'Entity1' => [
                     'configs' => [
-                        'extend' => ['table' => 'table1']
+                        'extend' => ['table' => 'table1', 'owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true]
                     ],
                 ],
-                'Acme\AcmeBundle\Entity\Entity2' => [
+                ExtendConfigDumper::ENTITY . 'Entity2' => [
                     'configs' => [
-                        'extend' => ['table' => 'table2', 'owner' => 'Custom'],
+                        'extend' => ['table' => 'table2', 'owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true],
                         'entity' => ['icon' => 'icon2'],
+                    ],
+                ],
+                ExtendConfigDumper::ENTITY . 'Entity3' => [
+                    'configs' => [
+                        'extend' => ['table' => 'table3', 'owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true]
                     ],
                 ],
             ]

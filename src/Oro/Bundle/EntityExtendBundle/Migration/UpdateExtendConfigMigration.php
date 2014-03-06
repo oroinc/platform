@@ -8,23 +8,26 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
 
 class UpdateExtendConfigMigration implements Migration
 {
     /**
-     * @var ExtendSchemaGenerator
+     * @var ExtendConfigProcessor
      */
-    protected $schemaGenerator;
+    protected $configProcessor;
 
     /**
      * @var ExtendConfigDumper
      */
     protected $configDumper;
 
-    public function __construct(ExtendSchemaGenerator $schemaGenerator, ExtendConfigDumper $configDumper)
+    /**
+     * @param ExtendConfigProcessor $configProcessor
+     * @param ExtendConfigDumper    $configDumper
+     */
+    public function __construct(ExtendConfigProcessor $configProcessor, ExtendConfigDumper $configDumper)
     {
-        $this->schemaGenerator = $schemaGenerator;
+        $this->configProcessor = $configProcessor;
         $this->configDumper    = $configDumper;
     }
 
@@ -37,7 +40,7 @@ class UpdateExtendConfigMigration implements Migration
             $queries->addSql(
                 new UpdateExtendConfigMigrationQuery(
                     $schema->getExtendOptionsProvider(),
-                    $this->schemaGenerator,
+                    $this->configProcessor,
                     $this->configDumper
                 )
             );

@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -29,15 +30,18 @@ class ExtendExtension
     }
 
     /**
-     * Creates a new "extend" table.
+     * Creates a table for a custom entity.
+     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
+     * created automatically in Symfony cache
      *
      * @param Schema $schema
      * @param string $tableName
      * @param string $entityName
      * @param array  $options
      * @return Table
+     * @throws \InvalidArgumentException
      */
-    public function createExtendTable(
+    public function createCustomEntityTable(
         Schema $schema,
         $tableName,
         $entityName,
@@ -49,8 +53,29 @@ class ExtendExtension
         if (!isset($options['extend'])) {
             $options['extend'] = [];
         }
-        $options['extend']['table']       = $tableName;
-        $options['extend']['entity_name'] = $entityName;
+        if (empty($entityName) || !preg_match('/^[A-Z][a-zA-Z\d]+$/', $entityName)) {
+            throw new \InvalidArgumentException(sprintf('Invalid entity name: "%s".', $entityName));
+        }
+        $options['_entity_name']    = ExtendConfigDumper::ENTITY . $entityName;
+        $options['extend']['table'] = $tableName;
+        if (isset($options['extend']['owner'])) {
+            if ($options['extend']['owner'] !== ExtendScope::OWNER_CUSTOM) {
+                throw new \InvalidArgumentException(
+                    sprintf('The "extend.owner" option for a custom entity must be "%s".', ExtendScope::OWNER_CUSTOM)
+                );
+            }
+        } else {
+            $options['extend']['owner'] = ExtendScope::OWNER_CUSTOM;
+        }
+        if (isset($options['extend']['is_extend'])) {
+            if ($options['extend']['is_extend'] !== true) {
+                throw new \InvalidArgumentException(
+                    'The "extend.is_extend" option for a custom entity must be TRUE.'
+                );
+            }
+        } else {
+            $options['extend']['is_extend'] = true;
+        }
         $table->addOption(ExtendColumn::ORO_OPTIONS_NAME, $options);
 
         // add a primary key
