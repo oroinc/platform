@@ -1,8 +1,10 @@
 /* global define */
 define(['underscore', 'backbone',
     'oroworkflow/js/workflow-management/step/collection',
-    'oroworkflow/js/workflow-management/transition/collection'],
-function(_, Backbone, StepCollection, TransitionCollection) {
+    'oroworkflow/js/workflow-management/transition/collection',
+    'oroworkflow/js/workflow-management/attribute/collection',
+    'oroworkflow/js/workflow-management/attribute/model'],
+function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection, AttributeModel) {
     'use strict';
 
     /**
@@ -29,6 +31,30 @@ function(_, Backbone, StepCollection, TransitionCollection) {
             if (this.get('transitions') === null) {
                 this.set('transitions', new TransitionCollection());
             }
+            if (this.get('attributes') === null) {
+                this.set('attributes', new AttributeCollection());
+            }
+        },
+
+        getSystemEntities: function() {
+            return this.systemEntities;
+        },
+
+        setSystemEntities: function(entities) {
+            this.systemEntities = entities;
+        },
+
+        getOrAddAttributeByPropertyPath: function(propertyPath) {
+            var attribute = _.first(this.get('attributes').where({'property_path': propertyPath}));
+            if (!attribute) {
+                attribute = new AttributeModel({
+                    'name': propertyPath.replace('.', '_'),
+                    'property_path': propertyPath
+                });
+                this.get('attributes').add(attribute);
+            }
+
+            return attribute;
         },
 
         getStepByName: function(name) {

@@ -126,11 +126,23 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
                 'entity_select_el': this.options.entity_select_el
             });
 
-            this.attributesFormView.on('formOptionAdd', _.bind(function(data) {
-                this.attributesList.addItem(data);
-            }, this));
-
+            this.attributesFormView.on('formOptionAdd', this.addFormOption, this);
             this.attributesFormView.render();
+        },
+
+        addFormOption: function(data) {
+            var attribute = this.options.workflow.getOrAddAttributeByPropertyPath(data.property_path);
+            var formOptions = this.model.get('form_options');
+            var formOptionsData = (data.required || data.label) ? {} : null;
+            if (data.required) {
+                formOptionsData.required = true;
+            }
+            if (data.label) {
+                formOptionsData.label = data.label;
+            }
+            formOptions[attribute.get('name')] = formOptionsData;
+
+            this.attributesList.addItem(data);
         },
 
         renderAttributesList: function(el) {
@@ -141,6 +153,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
 
         removeHandler: function() {
             this.attributesFormView.remove();
+            this.attributesList.remove();
             this.remove();
         },
 
@@ -172,9 +185,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
                     'modal': true
                 }
             });
-            this.widget.on('renderComplete', function(el) {
-                layout.init(el);
-            });
+            this.widget.on('renderComplete', layout.init, layout);
             this.widget.render();
 
             // Disable widget submit handler and set our own instead

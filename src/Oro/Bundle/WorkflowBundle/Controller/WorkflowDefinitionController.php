@@ -72,7 +72,8 @@ class WorkflowDefinitionController extends Controller
 
         return array(
             'form' => $form->createView(),
-            'entity' => $workflowDefinition
+            'entity' => $workflowDefinition,
+            'system_entities' => $this->get('oro_entity.entity_provider')->getEntities()
         );
     }
 }

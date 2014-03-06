@@ -33,7 +33,8 @@ function(_, Backbone,
         options: {
             stepsEl: null,
             saveBtnEl: null,
-            model: null
+            model: null,
+            entities: []
         },
 
         initialize: function() {
@@ -105,16 +106,16 @@ function(_, Backbone,
                 'model': transition,
                 'workflow': this.model,
                 'step_from': step_from,
-                'entity_select_el': this.$entitySelectEl
+                'entity_select_el': this.$entitySelectEl,
+                'entities': this.options.entities
             });
-            transitionEditView.on(
-                'transitionAdd',
-                _.bind(this.addTransition, this)
-            );
+            transitionEditView.on('transitionAdd', this.addTransition, this);
             transitionEditView.render();
         },
 
         addTransition: function(transition, stepFrom) {
+            console.log(transition);
+
             if (!this.model.get('transitions').get(transition.cid)) {
                 var stepFrom = this.model.getStepByName(stepFrom);
                 transition.set('is_start', stepFrom.get('_is_start'));
@@ -133,10 +134,7 @@ function(_, Backbone,
             var stepEditView = new StepEditView({
                 'model': step
             });
-            stepEditView.on(
-                'stepAdd',
-                _.bind(this.addStep, this)
-            );
+            stepEditView.on('stepAdd', this.addStep, this);
             stepEditView.render();
         },
 

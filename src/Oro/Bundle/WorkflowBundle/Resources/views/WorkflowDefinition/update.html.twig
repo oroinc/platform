@@ -1,5 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 {% set title = entity.name
@@ -61,12 +62,14 @@
 {% endblock stats %}
 
 {% block content_data %}
+    {{ QD.query_designer_column_chain_template('entity-column-chain-template') }}
+
     {% set requiredConstraint = {
         "NotBlank": null
     } %}
     <script type="text/template" id="transition-form-template">
-        <form action="#">
-            <div class="row-fluid">
+        <div class="row-fluid">
+            <form action="#">
                 <div class="form-horizontal">
                     <div class="control-group">
                         <label class="control-label required">{{ "Transition name"|trans }} <em>*</em></label>
@@ -144,7 +147,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <h5>{{ "Attributes"|trans }}</h5>
@@ -159,15 +161,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="transition-attributes-form-container"></div>
-                <div class="transition-attributes-list-container"></div>
-            </div>
 
-            <div class="widget-actions">
-                <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
-                <button type="submit" class="btn btn-success">{{ "Ok"|trans }}</button>
-            </div>
-        </form>
+                <div class="widget-actions">
+                    <button type="reset" class="btn">{{ "Cancel"|trans }}</button>
+                    <button type="submit" class="btn btn-success">{{ "Ok"|trans }}</button>
+                </div>
+            </form>
+
+            <div class="transition-attributes-form-container"></div>
+            <div class="transition-attributes-list-container"></div>
+        </div>
     </script>
 
     <script type="text/template" id="step-form-template">
@@ -255,30 +258,32 @@
     </script>
 
     <script type="text/template" id="attribute-form-option-edit-template">
-        <div class="form-horizontal">
-            <div class="control-group">
-                <label class="control-label required">{{ "Entity field"|trans }} <em>*</em></label>
-                <div class="controls">
-                    <input type="hidden" name="form_option_property_path"/>
+        <form action="#">
+            <div class="form-horizontal">
+                <div class="control-group">
+                    <label class="control-label required">{{ "Entity field"|trans }} <em>*</em></label>
+                    <div class="controls">
+                        <input type="hidden" name="property_path" data-validation="{{ requiredConstraint|json_encode }}"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label">{{ "Label"|trans }}</label>
-                <div class="controls">
-                    <input type="text" name="form_option_label" value="<%= label %>"/>
+                <div class="control-group">
+                    <label class="control-label">{{ "Label"|trans }}</label>
+                    <div class="controls">
+                        <input type="text" name="label" value="<%= label %>"/>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label">{{ "Required"|trans }}</label>
-                <div class="controls">
-                    <input type="checkbox" name="form_option_required" <% if (isRequired) { %>checked="checked"<% } %>/>
+                <div class="control-group">
+                    <label class="control-label">{{ "Required"|trans }}</label>
+                    <div class="controls">
+                        <input type="checkbox" name="required" <% if (required) { %>checked="checked"<% } %>/>
+                    </div>
                 </div>
-            </div>
 
-            <button type="button" class="btn btn-primary form-option-add-btn"><i class="icon-plus"></i> {{ 'Add'|trans }}</button>
-        </div>
+                <button type="submit" class="btn btn-primary"><i class="icon-plus"></i> {{ 'Add'|trans }}</button>
+            </div>
+        </form>
     </script>
 
     <script type="text/template" id="attribute-form-option-list-template">
@@ -295,7 +300,7 @@
 
     <script type="text/template" id="attribute-form-option-row-template">
         <td>
-            <%= property_path %>
+            <%= property_path_text || property_path %>
         </td>
         <td>
             <%= label %>
@@ -382,7 +387,10 @@
                 configuration.steps = steps;
                 configuration.transitions = transitions;
                 configuration.attributes = attributes;
+
                 var workflowModel = new WorkflowModel(configuration);
+                workflowModel.setSystemEntities({{ system_entities|json_encode|raw }});
+
                 var workflowManagement = new WorkflowManagement({
                     el: '#{{ form.vars.id }}',
                     stepsEl: '.workflow-definition-steps-list-container',
