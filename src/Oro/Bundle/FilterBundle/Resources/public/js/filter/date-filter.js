@@ -269,6 +269,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             });
 
             this.dateWidgets[name] = this._initializeDateWidget('#calendar' + tabSuffix, widgetOptions);
+            this.dateWidgets[name].datepicker('setDate', $input.val());
         },
 
         /**

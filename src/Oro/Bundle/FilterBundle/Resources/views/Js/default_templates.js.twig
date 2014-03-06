@@ -80,7 +80,7 @@
 <script type="text/template" id="date-filter-dropdown-template">
     <div class="dropdown-menu">
         <% if (!tabs.length) { %>
-        <div data-tabname="calendar"></div>
+        <div id="calendar<%= suffix %>"></div>
         <% } else { %>
         <ul class="nav nav-tabs">
             <% _.each(tabs, function (tab, i) { %>
@@ -89,7 +89,7 @@
         </ul>
         <div class="tab-content">
             <% _.each(tabs, function (tab, i) { %>
-            <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>" data-tabname="<%= tab.name %>"></div>
+            <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
             <% }); %>
         </div>
         <% } %>
