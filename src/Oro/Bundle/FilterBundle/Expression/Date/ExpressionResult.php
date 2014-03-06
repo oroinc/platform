@@ -234,10 +234,6 @@ class ExpressionResult
      */
     public function merge(ExpressionResult $expression)
     {
-        if ($expression->isModifier() || $this->isModifier()) {
-            throw new SyntaxException('Operator missed');
-        }
-
         if (self::TYPE_DATE === $this->getSourceType()) {
             /** @var Carbon $dateValue */
             $dateValue = $this->getValue();
