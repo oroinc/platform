@@ -6,6 +6,7 @@ define([
     'oroworkflow/js/workflow-management/transition/model',
     'oroworkflow/js/workflow-management/step/view/edit',
     'oroworkflow/js/workflow-management/transition/view/edit',
+    'oroworkflow/js/workflow-management/helper',
     'oroentity/js/fields-loader'
 ],
 function(_, Backbone,
@@ -13,7 +14,8 @@ function(_, Backbone,
      StepModel,
      TransitionModel,
      StepEditView,
-     TransitionEditForm
+     TransitionEditForm,
+     Helper
 ) {
     'use strict';
 
@@ -67,6 +69,16 @@ function(_, Backbone,
 
         saveConfiguration: function(e) {
             e.preventDefault();
+            var formData = Helper.getFormData(this.$el);
+            formData.steps_display_ordered = formData.hasOwnProperty('steps_display_ordered');
+
+            if (!this.model.get('name')) {
+                this.model.set('name', Helper.getNameByString(formData.label, 'workflow_'));
+            }
+            this.model.set('label', formData.label);
+            this.model.set('steps_display_ordered', formData.steps_display_ordered);
+            this.model.set('entity', formData.related_entity);
+
             this.model.save();
         },
 
