@@ -1,6 +1,6 @@
 /*global define*/
 
-define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings', 'jquery-ui-timepicker', 'jquery-ui-datevariables'],
+define(['jquery', 'underscore', './date-filter', 'orolocale/js/locale-settings', 'jquery-ui-timepicker'],
 function ($, _, DateFilter, localeSettings) {
     'use strict';
 
@@ -50,7 +50,7 @@ function ($, _, DateFilter, localeSettings) {
          */
         _initializeDateWidget: function(widgetSelector, options) {
             this.$(widgetSelector).datetimepicker(options);
-            var widget = this.$(widgetSelector).datevariables('widget');
+            var widget = this.$(widgetSelector).datetimepicker('widget');
 
             widget.addClass(options.className);
             $(this.dateWidgetSelector).on('click', function(e) {
