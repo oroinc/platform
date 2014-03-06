@@ -256,7 +256,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         },
 
         _appendDropdown: function (template, actualSelector, name) {
-            var $el = this.$el,
+            var $calendar, $el = this.$el,
                 $input = this.$(actualSelector),
                 $dropdown = $input.wrap('<div class="dropdown">').parent(),
                 tabSuffix = '-' + this.cid + '-' + name,
@@ -269,13 +269,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 suffix: tabSuffix
             }));
 
-            $input.on('focus', function () {
+            $input.on('focus, click', function () {
                 $el.find('.dropdown.open').removeClass('open');
                 $dropdown.addClass('open');
             });
 
-            this.dateWidgets[name] = this._initializeDateWidget('#calendar' + tabSuffix, widgetOptions);
-            //this.dateWidgets[name].datepicker('setDate', $input.val());
+            $calendar = this.dateWidgets[name] = this._initializeDateWidget('#calendar' + tabSuffix, widgetOptions);
+            $calendar.addClass(widgetOptions.className)
+                .click(function (e) {
+                    e.stopImmediatePropagation();
+                });
+            //$calendar.datepicker('setDate', $input.val());
 
             widgetOptions = _.extend({
                 $input: $input
@@ -287,25 +291,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * Initialize date widget
          *
          * @param {String} widgetSelector
+         * @param {Object} options
          * @return {*}
          * @protected
          */
         _initializeDateWidget: function (widgetSelector, options) {
-            this.$(widgetSelector).datepicker(options);
-            var widget = this.$(widgetSelector).datepicker('widget');
-
-            widget.addClass(options.className);
-            $(this.dateWidgetSelector).on('click', function (e) {
-                e.stopImmediatePropagation();
-            });
-
-            return widget;
+            return this.$(widgetSelector).datepicker(options);
         },
 
         /**
          * Initialize date variables widget
          *
          * @param {String} widgetSelector
+         * @param {Object} options
          * @return {*}
          * @protected
          */

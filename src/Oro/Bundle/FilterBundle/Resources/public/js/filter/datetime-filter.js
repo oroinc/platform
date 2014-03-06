@@ -48,15 +48,8 @@ function ($, _, DateFilter, localeSettings) {
         /**
          * @inheritDoc
          */
-        _initializeDateWidget: function(widgetSelector, options) {
-            this.$(widgetSelector).datetimepicker(options);
-            var widget = this.$(widgetSelector).datevariables('widget');
-
-            widget.addClass(options.className);
-            $(this.dateWidgetSelector).on('click', function(e) {
-                e.stopImmediatePropagation();
-            });
-            return widget;
+        _initializeDateWidget: function (widgetSelector, options) {
+            return this.$(widgetSelector).datetimepicker(options);
         },
 
         /**
