@@ -140,7 +140,10 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
             if (data.label) {
                 formOptionsData.label = data.label;
             }
-            formOptions[attribute.get('name')] = formOptionsData;
+            if (!formOptions.hasOwnProperty('attribute_fields')) {
+                formOptions.attribute_fields = {};
+            }
+            formOptions.attribute_fields[attribute.get('name')] = formOptionsData;
 
             this.attributesList.addItem(data);
         },

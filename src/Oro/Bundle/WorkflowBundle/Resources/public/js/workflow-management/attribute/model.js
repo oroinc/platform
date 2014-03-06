@@ -10,8 +10,8 @@ function(Backbone) {
      */
     return Backbone.Model.extend({
         defaults: {
-            name: '',
-            label: '',
+            name: null,
+            label: null,
             type: null,
             property_path: null,
             options: {}

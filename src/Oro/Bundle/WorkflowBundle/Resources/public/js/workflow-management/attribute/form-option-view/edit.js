@@ -51,13 +51,13 @@ function(_, Backbone, Helper) {
         },
 
         getPropertyPath: function(propertyPath) {
-            var path = [];
+            var path = [this.options.workflow.get('entity_attribute')];
             var parts = propertyPath.split('::');
             _.each(parts, function(part) {
                 var propertyData = part.split('+');
                 path.push(propertyData[0]);
             });
-
+            console.log(path);
             return path.join('.');
         },
 
