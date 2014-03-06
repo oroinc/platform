@@ -1,6 +1,6 @@
 /* global define */
 define([
-    'underscore', 'backbone',
+    'underscore', 'backbone', 'oroui/js/messenger', 'orotranslation/js/translator',
     'oroworkflow/js/workflow-management/step/view/list',
     'oroworkflow/js/workflow-management/step/model',
     'oroworkflow/js/workflow-management/transition/model',
@@ -9,7 +9,7 @@ define([
     'oroworkflow/js/workflow-management/helper',
     'oroentity/js/fields-loader'
 ],
-function(_, Backbone,
+function(_, Backbone, messanger, __,
      StepsListView,
      StepModel,
      TransitionModel,
@@ -79,13 +79,20 @@ function(_, Backbone,
             this.model.set('steps_display_ordered', formData.steps_display_ordered);
             this.model.set('entity', formData.related_entity);
 
-            this.model.save();
+            this.model.save(null, {
+                'success': function() {
+                    messanger.notificationFlashMessage('success', __('Workflow saved.'));
+                },
+                'error': function() {
+                    messanger.notificationFlashMessage('error', __('Could not save workflow.'));
+                }
+            });
         },
 
         _getStartStep: function() {
             var startStepModel = new StepModel({
                 'name': 'step:starting_point',
-                'label': '(Starting point)',
+                'label': __('(Starting point)'),
                 'order': -1,
                 '_is_start': true
             });
