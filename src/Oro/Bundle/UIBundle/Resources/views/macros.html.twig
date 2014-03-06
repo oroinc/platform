@@ -644,3 +644,12 @@
         <a href="tel:{{ phone|raw }}" title="{{ title|escape }}">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
+
+{% macro getApplicableForUnderscore(str) %}
+    {{ str|replace({
+        "<script": '<% print("<sc" + "ript"); %>',
+        "</script": '<% print("</sc" + "ript"); %>',
+        "<%": '<% print("<" + "%"); %>',
+        "%>": '<% print("%" + ">"); %>',
+    })|raw }}
+{% endmacro %}

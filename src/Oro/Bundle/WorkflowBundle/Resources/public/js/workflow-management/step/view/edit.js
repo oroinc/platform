@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget', 'oro/workflow-management/helper'],
-function(_, Backbone, DialogWidget, Helper) {
+define(['underscore', 'backbone', 'oro/dialog-widget', 'oro/workflow-management/helper', 'oro/layout'],
+function(_, Backbone, DialogWidget, Helper, layout) {
     'use strict';
 
     var $ = Backbone.$;
@@ -55,6 +55,9 @@ function(_, Backbone, DialogWidget, Helper) {
                     'width': 600,
                     'modal': true
                 }
+            });
+            this.widget.on('renderComplete', function(el) {
+                layout.init(el);
             });
             this.widget.render();
 
