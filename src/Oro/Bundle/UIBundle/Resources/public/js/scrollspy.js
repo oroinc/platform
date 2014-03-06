@@ -5,8 +5,8 @@ define(function (require) {
 
     var $ = require('jquery');
 
-    var app = require('oro/app');
-    var mediator = require('oro/mediator');
+    var app = require('oroui/js/app');
+    var mediator = require('oroui/js/mediator');
 
     var scrollspy = {};
 

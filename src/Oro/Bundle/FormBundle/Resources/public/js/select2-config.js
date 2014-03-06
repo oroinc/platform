@@ -1,11 +1,11 @@
-/* global define */
-define(['jquery', 'underscore'],
-function($, _) {
+/*global define*/
+define(['jquery', 'underscore'
+    ], function ($, _) {
     'use strict';
 
     /**
-     * @export  oro/select2-config
-     * @class   oro.Select2Config
+     * @export  oroform/js/select2-config
+     * @class   oroform.Select2Config
      */
     var Select2Config = function (config, url, perPage, excluded) {
         this.config = config;

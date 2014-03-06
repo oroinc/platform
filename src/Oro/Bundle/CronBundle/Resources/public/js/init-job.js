@@ -1,10 +1,20 @@
-/* jshint browser:true, devel:true */
-/* global require */
-require(['jquery', 'oro/translator'],
-function($, __) {
+/*jshint browser:true, devel:true*/
+/*global require, alert*/
+require(['jquery', 'orotranslation/js/translator'], function ($, __) {
     'use strict';
-    $(function() {
-        $(document).on('click', '#run-daemon, #stop-daemon', function (e) {
+
+    function switchButtons(run) {
+        if (run) {
+            $('#run-daemon').show();
+            $('#stop-daemon').hide();
+        } else {
+            $('#run-daemon').hide();
+            $('#stop-daemon').show();
+        }
+    }
+
+    $(function () {
+        $(document).on('click', '#run-daemon, #stop-daemon', function () {
             var el = $(this),
                 img = $('#status-daemon').closest('div').find('img');
 
@@ -30,7 +40,7 @@ function($, __) {
             return false;
         });
 
-        $(document).on('click', '.stack-trace a', function (e) {
+        $(document).on('click', '.stack-trace a', function () {
             var el = $(this),
                 traceCon = el.closest('.stack-trace').find('.traces'),
                 traceConVis = traceCon.is(':visible');
@@ -73,15 +83,5 @@ function($, __) {
                 img.hide();
             });
         }, 30000);
-
-        function switchButtons(run) {
-            if (run) {
-                $('#run-daemon').show();
-                $('#stop-daemon').hide();
-            } else {
-                $('#run-daemon').hide();
-                $('#stop-daemon').show();
-            }
-        }
     });
 });

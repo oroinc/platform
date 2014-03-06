@@ -71,7 +71,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setEntityAttributeName($entityAttributeName)
             ->setConfiguration($configuration);
 
-        $workflow = $this->workflowAssembler->assemble($workflowDefinition);
+        $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
 
         $this->setSteps($workflowDefinition, $workflow);
         $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));

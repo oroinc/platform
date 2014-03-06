@@ -1,6 +1,6 @@
-/* global define */
-define(['jquery', 'underscore', 'backgrid', 'oro/datagrid/select-row-cell'],
-function ($, _, Backgrid, SelectRowCell) {
+/*global define*/
+define(['jquery', 'underscore', 'backgrid', '../cell/select-row-cell'
+    ], function ($, _, Backgrid, SelectRowCell) {
     "use strict";
 
     /**
@@ -11,9 +11,9 @@ function ($, _, Backgrid, SelectRowCell) {
      *      fills in 'obj' with proper data for
      *      `backgrid:isSelected` and `backgrid:getSelected`
      *
-     * @export  oro/datagrid/select-all-header-cell
-     * @class   oro.datagrid.SelectAllHeaderCell
-     * @extends oro.datagrid.SelectRowCell
+     * @export  orodatagrid/js/datagrid/header-cell/select-all-header-cell
+     * @class   orodatagrid.datagrid.headerCell.SelectAllHeaderCell
+     * @extends orodatagrid.datagrid.cell.SelectRowCell
      */
     return SelectRowCell.extend({
         /** @property */
@@ -78,7 +78,7 @@ function ($, _, Backgrid, SelectRowCell) {
          *
          * @returns {{selectedModels: *, inset: boolean}}
          */
-        getSelectionState: function() {
+        getSelectionState: function () {
             return {
                 selectedModels: this.selectedModels,
                 inset: this.inset

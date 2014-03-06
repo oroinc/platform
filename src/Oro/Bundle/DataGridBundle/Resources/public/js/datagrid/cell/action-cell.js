@@ -1,13 +1,13 @@
-/* global define */
-define(['jquery', 'underscore', 'backgrid'],
-function($, _, Backgrid) {
+/*global define*/
+define(['jquery', 'underscore', 'backgrid'
+    ], function ($, _, Backgrid) {
     'use strict';
 
     /**
      * Cell for grid, contains actions
      *
-     * @export  oro/datagrid/action-cell
-     * @class   oro.datagrid.ActionCell
+     * @export  orodatagrid/js/datagrid/cell/action-cell
+     * @class   orodatagrid.datagrid.cell.ActionCell
      * @extends Backgrid.Cell
      */
     return Backgrid.Cell.extend({
@@ -22,7 +22,7 @@ function($, _, Backgrid) {
         launchers: undefined,
 
         /** @property */
-        template:_.template(
+        template: _.template(
             '<div class="more-bar-holder">' +
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
