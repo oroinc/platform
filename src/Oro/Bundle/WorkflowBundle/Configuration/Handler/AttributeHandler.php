@@ -45,7 +45,7 @@ class AttributeHandler extends AbstractHandler
     protected function handleAttributeConfiguration(array $attribute)
     {
         if (empty($attribute['name'])) {
-            $attribute['name'] = uniqid('attribute_', true);
+            $attribute['name'] = uniqid('attribute_');
         }
 
         return $this->filterKeys($attribute, $this->attributeKeys);

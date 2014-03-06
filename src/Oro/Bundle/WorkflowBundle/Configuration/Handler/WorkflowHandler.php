@@ -57,7 +57,7 @@ class WorkflowHandler extends AbstractHandler
     protected function handleWorkflowConfiguration(array $workflow)
     {
         if (empty($workflow['name'])) {
-            $workflow['name'] = uniqid('workflow_', true);
+            $workflow['name'] = uniqid('workflow_');
         }
 
         if (empty($workflow['label'])) {

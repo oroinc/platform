@@ -64,7 +64,7 @@ class WorkflowStepTest extends \PHPUnit_Framework_TestCase
         $this->step->setFinal(true);
 
         $newStep = new WorkflowStep();
-        $newStep->import($this->step);
+        $this->assertEquals($newStep, $newStep->import($this->step));
 
         $this->assertEquals('test', $newStep->getName());
         $this->assertEquals('test', $newStep->getLabel());

@@ -176,7 +176,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'label' => 'Test Workflow',
                     'enabled' => true,
                     'entity'     => 'My\Entity',
-                    'configuration' => $minimumConfiguration,
+                    'configuration' => $this->filterConfiguration($minimumConfiguration),
                 ),
             ),
             'maximum configuration' => array(
@@ -189,7 +189,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                     'enabled' => false,
                     'start_step' => 'test_step',
                     'entity' => 'My\Entity',
-                    'configuration' => $maximumConfiguration,
+                    'configuration' => $this->filterConfiguration($maximumConfiguration),
                 ),
                 'expected_acls' => array(
                     array(
@@ -205,6 +205,22 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 ),
             ),
         );
+    }
+
+    /**
+     * @param array $configuration
+     * @return array
+     */
+    protected function filterConfiguration(array $configuration)
+    {
+        $configurationKeys = array(
+            WorkflowConfiguration::NODE_STEPS,
+            WorkflowConfiguration::NODE_ATTRIBUTES,
+            WorkflowConfiguration::NODE_TRANSITIONS,
+            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+        );
+
+        return array_intersect_key($configuration, array_flip($configurationKeys));
     }
 
     /**

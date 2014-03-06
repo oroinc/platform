@@ -8,6 +8,7 @@ datagrid:
             acl_resource: oro_workflow_definition_view
             query:
                 select:
+                    - w.name as id
                     - w.name
                     - w.name as workflowDefinition
                     - w.label
@@ -25,11 +26,16 @@ datagrid:
                 label: oro.workflow.workflowdefinition.created_at.label
                 frontend_type: datetime
         properties:
+            id: ~
             name: ~
             workflowDefinition: ~
             update_link:
                 type:       url
                 route:      oro_workflow_definition_update
+                params:     [ name ]
+            clone_link:
+                type:       url
+                route:      oro_workflow_definition_clone
                 params:     [ name ]
             delete_link:
                 type:       url
@@ -49,16 +55,23 @@ datagrid:
             update:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_update
-                label:         oro.workflow.workflow_definition.datagrid.update
+                label:         oro.workflow.workflowdefinition.datagrid.update
                 icon:          edit
                 rowAction:     true
                 link:          update_link
+            clone:
+                type:          navigate
+                acl_resource:  oro_workflow_definition_create
+                label:         oro.workflow.workflowdefinition.datagrid.clone
+                icon:          share
+                link:          clone_link
             delete:
                 type:          delete
                 acl_resource:  oro_workflow_definition_delete
-                label:         oro.workflow.workflow_definition.datagrid.delete
+                label:         oro.workflow.workflowdefinition.datagrid.delete
                 icon:          trash
                 link:          delete_link
+        action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getWorkflowDefinitionPermissions"]
         filters:
             columns:
                 label:

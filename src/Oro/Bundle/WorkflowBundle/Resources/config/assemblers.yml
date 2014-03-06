@@ -49,7 +49,6 @@ services:
         class: %oro_workflow.workflow_assembler.class%
         arguments:
             - @service_container
-            - @oro_workflow.configuration.config.workflow_sole
             - @oro_workflow.attribute_assembler
             - @oro_workflow.step_assembler
             - @oro_workflow.transition_assembler

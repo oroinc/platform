@@ -11,13 +11,7 @@ abstract class AbstractHandler implements ConfigurationHandlerInterface
      */
     protected function filterKeys(array $configuration, array $keys)
     {
-        foreach ($configuration as $key => $value) {
-            if (!in_array($key, $keys)) {
-                unset($configuration[$key]);
-            }
-        }
-
-        return $configuration;
+        return array_intersect_key($configuration, array_flip($keys));
     }
 
     /**

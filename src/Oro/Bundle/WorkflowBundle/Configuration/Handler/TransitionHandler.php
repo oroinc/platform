@@ -64,7 +64,7 @@ class TransitionHandler extends AbstractHandler
     protected function handleTransitionConfiguration(array $configuration, array $transition)
     {
         if (empty($transition['name'])) {
-            $transition['name'] = uniqid('transition_', true);
+            $transition['name'] = uniqid('transition_');
         }
 
         if (empty($transition['label'])) {
@@ -72,7 +72,7 @@ class TransitionHandler extends AbstractHandler
         }
 
         if (empty($transition['transition_definition'])) {
-            $transition['transition_definition'] = uniqid('transition_definition_', true);
+            $transition['transition_definition'] = uniqid('transition_definition_');
         }
 
         if (!empty($transition['form_options'])) {

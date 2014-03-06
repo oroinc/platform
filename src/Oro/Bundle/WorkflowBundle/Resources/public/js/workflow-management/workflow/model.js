@@ -21,7 +21,8 @@ function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection,
             steps_display_ordered: false,
             steps: null,
             transitions: null,
-            transition_definitions: null
+            transition_definitions: null,
+            attributes: null
         },
 
         initialize: function() {

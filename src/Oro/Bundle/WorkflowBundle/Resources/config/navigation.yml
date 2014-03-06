@@ -18,5 +18,6 @@ oro_titles:
     oro_workflow_definition_index: ~
     oro_workflow_definition_create: Create Workflow
     oro_workflow_definition_update: %%workflow_definition.label%% - Edit
+    oro_workflow_definition_clone: %%workflow_definition.label%% - Clone
     oro_workflow_start_transition_form: %%workflow_title%%
     oro_workflow_transition_form: %%workflow_title%%

@@ -384,6 +384,10 @@
 
                 var configuration = {{ entity.configuration|json_encode|raw }};
                 configuration.name = {{ entity.name|json_encode|raw }};
+                configuration.label = {{ entity.label|json_encode|raw }};
+                configuration.entity = {{ entity.relatedEntity|json_encode|raw }};
+                configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
+                configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
                 configuration.steps = steps;
                 configuration.transitions = transitions;
                 configuration.attributes = attributes;

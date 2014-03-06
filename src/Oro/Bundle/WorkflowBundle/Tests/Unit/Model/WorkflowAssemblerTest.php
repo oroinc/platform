@@ -93,24 +93,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @return WorkflowConfiguration
-     */
-    protected function createConfigurationTreeMock(WorkflowDefinition $workflowDefinition)
-    {
-        $configurationTree = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration')
-            ->disableOriginalConstructor()
-            ->setMethods(array('processConfiguration'))
-            ->getMock();
-        $configurationTree->expects($this->once())
-            ->method('processConfiguration')
-            ->with($workflowDefinition->getConfiguration())
-            ->will($this->returnValue($workflowDefinition->getConfiguration()));
-
-        return $configurationTree;
-    }
-
-    /**
      * @param WorkflowDefinition $definition
      * @param array $configuration
      * @param Collection $attributes
@@ -271,7 +253,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
         // mocks
         $container = $this->createContainerMock($workflow);
-        $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
         $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock(
@@ -286,7 +267,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         // test
         $workflowAssembler = new WorkflowAssembler(
             $container,
-            $configurationTree,
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler
@@ -422,7 +402,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
         // mocks
         $container = $this->createContainerMock($workflow);
-        $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
         $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
@@ -430,7 +409,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         // test
         $workflowAssembler = new WorkflowAssembler(
             $container,
-            $configurationTree,
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler
@@ -458,7 +436,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
         // mocks
         $container = $this->createContainerMock($workflow);
-        $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
         $attributeAssembler = $this->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps);
         $transitionAssembler = $this->createTransitionAssemblerMock($configuration, $steps, $transitions);
@@ -466,7 +443,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         // test
         $workflowAssembler = new WorkflowAssembler(
             $container,
-            $configurationTree,
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler
@@ -490,7 +466,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $transitions = new ArrayCollection();
 
         $container = $this->createContainerMock($workflow, false);
-        $configurationTree = $this->createConfigurationTreeMock($workflowDefinition);
         $attributeAssembler = $this
             ->createAttributeAssemblerMock($workflowDefinition, $configuration, $attributes, false);
         $stepAssembler = $this->createStepAssemblerMock($configuration, $attributes, $steps, false);
@@ -498,7 +473,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $workflowAssembler = new WorkflowAssembler(
             $container,
-            $configurationTree,
             $attributeAssembler,
             $stepAssembler,
             $transitionAssembler

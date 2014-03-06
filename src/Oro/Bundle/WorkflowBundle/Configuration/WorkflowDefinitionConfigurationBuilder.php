@@ -69,7 +69,7 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
             ->setEnabled($enabled)
             ->setSystem($system)
             ->setEntityAttributeName($entityAttributeName)
-            ->setConfiguration($configuration);
+            ->setConfiguration($this->filterConfiguration($configuration));
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
 
@@ -102,6 +102,10 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $workflowDefinition->setSteps($workflowSteps);
     }
 
+    /**
+     * @param WorkflowDefinition $workflowDefinition
+     * @param Workflow $workflow
+     */
     protected function setEntityAcls(WorkflowDefinition $workflowDefinition, Workflow $workflow)
     {
         $entityAcls = array();
@@ -126,5 +130,21 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         }
 
         $workflowDefinition->setEntityAcls($entityAcls);
+    }
+
+    /**
+     * @param array $configuration
+     * @return array
+     */
+    protected function filterConfiguration(array $configuration)
+    {
+        $configurationKeys = array(
+            WorkflowConfiguration::NODE_STEPS,
+            WorkflowConfiguration::NODE_ATTRIBUTES,
+            WorkflowConfiguration::NODE_TRANSITIONS,
+            WorkflowConfiguration::NODE_TRANSITION_DEFINITIONS,
+        );
+
+        return array_intersect_key($configuration, array_flip($configurationKeys));
     }
 }

@@ -90,7 +90,7 @@ class StepHandler extends AbstractHandler
     protected function handleStepConfiguration(array $configuration, array $step)
     {
         if (empty($step['name'])) {
-            $step['name'] = uniqid('step_', true);
+            $step['name'] = uniqid('step_');
         }
 
         if (empty($step['label'])) {

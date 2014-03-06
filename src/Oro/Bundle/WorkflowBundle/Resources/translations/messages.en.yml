@@ -33,6 +33,12 @@ oro:
             start_step.label:             Start step
             steps.label:                  Steps
             steps_display_ordered.label:  Display steps ordered
+            clone_label_prefix:           'Copy of '
+
+            datagrid:
+                update: Update
+                clone:  Clone
+                delete: Delete
         action:
             general: "Workflow manipulations"
         enabled: enabled

@@ -1,12 +1,12 @@
 parameters:
+    oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
     oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
     oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.manager.class: Oro\Bundle\WorkflowBundle\Model\WorkflowManager
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
-
-    oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+    oro_workflow.datagrid.action_permission_provider.class: Oro\Bundle\WorkflowBundle\Datagrid\ActionPermissionProvider
 
 services:
     oro_workflow.context_accessor:
@@ -61,3 +61,6 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
+
+    oro_workflow.datagrid.action_permission_provider:
+        class: %oro_workflow.datagrid.action_permission_provider.class%

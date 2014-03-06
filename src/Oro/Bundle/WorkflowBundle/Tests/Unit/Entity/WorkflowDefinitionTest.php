@@ -103,7 +103,7 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
             ->setStartStep($expectedData['start_step'])
             ->setConfiguration($expectedData['configuration']);
 
-        $this->workflowDefinition->import($newDefinition);
+        $this->assertEquals($this->workflowDefinition, $this->workflowDefinition->import($newDefinition));
         $this->assertEquals($expectedData, $this->getDefinitionAsArray($this->workflowDefinition));
     }
 
