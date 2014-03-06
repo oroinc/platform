@@ -144,7 +144,7 @@ class DateFilterUtility
     private function getTimeZoneOffset()
     {
         if (null === $this->offset) {
-            $time = new \DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
+            $time         = new \DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
             $this->offset = $time->format('P');
         }
 
