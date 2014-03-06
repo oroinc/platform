@@ -132,18 +132,24 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
 
         addFormOption: function(data) {
             var attribute = this.options.workflow.getOrAddAttributeByPropertyPath(data.property_path);
+            var attributeName = attribute.get('name');
             var formOptions = this.model.get('form_options');
-            var formOptionsData = (data.required || data.label) ? {} : null;
+
+            var formOptionsData = formOptions.attribute_fields.hasOwnProperty(attributeName)
+                ? formOptions.attribute_fields[attributeName]
+                : null;
+            if (!formOptionsData && (data.required || data.label)) {
+                formOptionsData = {};
+            }
+
             if (data.required) {
-                formOptionsData.required = true;
+                formOptionsData = _.extend({}, {options: {required: true}});
             }
             if (data.label) {
                 formOptionsData.label = data.label;
             }
-            if (!formOptions.hasOwnProperty('attribute_fields')) {
-                formOptions.attribute_fields = {};
-            }
-            formOptions.attribute_fields[attribute.get('name')] = formOptionsData;
+
+            formOptions.attribute_fields[attributeName] = formOptionsData;
 
             this.attributesList.addItem(data);
         },

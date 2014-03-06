@@ -23,7 +23,7 @@ function(Backbone) {
 
         initialize: function() {
             if (this.get('form_options') === null) {
-                this.set('form_options', {});
+                this.set('form_options', {'attribute_fields': {}});
             }
         }
     });
