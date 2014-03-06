@@ -16,6 +16,9 @@ class DateFilterSubscriber implements EventSubscriberInterface
     /** @var Compiler */
     protected $expressionCompiler;
 
+    /** @var array */
+    protected $processed = [];
+
     /**
      * @param Compiler $compiler
      */
@@ -44,6 +47,13 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
         $data = $event->getData();
         $form = $event->getForm();
+
+        $oid = spl_object_hash($form);
+        if (!empty($this->processed[$oid])) {
+            // ensure that data is not processed
+            // in case when DateTimeFilter already process and parent subscription is not necessary
+            return;
+        }
 
         $children = array_keys($form->get('value')->all());
 
@@ -77,12 +87,24 @@ class DateFilterSubscriber implements EventSubscriberInterface
                 $this->replaceValueFields($form->get('value'), range(1, 31));
                 break;
             case DateModifierInterface::PART_QUARTER:
-                $this->mapValues($children, $data, $this->getDatePartAccessorClosure('m'));
                 $this->mapValues(
                     $children,
                     $data,
                     function ($data) {
-                        return $data ? ceil($data / 3) : $data;
+                        $quarter = null;
+                        switch (true) {
+                            case is_numeric($data):
+                                $quarter = (int)$data;
+                                break;
+                            case ($data instanceof \DateTime):
+                                $month   = (int)$data->format('m');
+                                $quarter = ceil($month / 3);
+                                break;
+                            default:
+                                throw new UnexpectedTypeException($data, 'integer or \DateTime');
+                        }
+
+                        return $quarter;
                     }
                 );
                 $this->replaceValueFields($form->get('value'), range(1, 4));
@@ -101,6 +123,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
                     $children,
                     $data,
                     function ($data) use ($compiler) {
+                        // html5 format for intl
                         return $data instanceof \DateTime ? $data->format('Y-m-d H:i') : $data;
                     }
                 );
@@ -108,6 +131,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
         }
 
         $event->setData($data);
+        $this->processed[$oid] = true;
     }
 
     /**
@@ -157,9 +181,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
                     break;
                 case ($value instanceof \DateTime):
                     return (int)$value->format($part);
-                    break;
-                case (is_null($value)):
-                    return $value;
                     break;
                 default:
                     throw new UnexpectedTypeException($value, 'integer or \DateTime');

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
@@ -44,11 +43,5 @@ class DateTimeRangeFilterType extends AbstractDateFilterType
                 ]
             )
         );
-    }
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        parent::buildForm($builder, $options);
-        $builder->addEventSubscriber($this->subscriber);
     }
 }
