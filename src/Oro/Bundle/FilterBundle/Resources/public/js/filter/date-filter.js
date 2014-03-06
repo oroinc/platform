@@ -172,15 +172,21 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         },
 
         changeFilterType: function (type) {
-            if (this.dateWidgets.start && this.dateWidgets.start.data('datepicker')) {
+            // filter filter range types
+            if (this.dateWidgets.start_vars && type.length > 1) {
                 this.dateWidgets.start_vars.dateVariables('setPart', type);
             }
-            if (this.dateWidgets.end && this.dateWidgets.end.data('datepicker')) {
+            if (this.dateWidgets.end_vars && type.length > 1) {
                 this.dateWidgets.end_vars.dateVariables('setPart', type);
             }
 
             type = parseInt(type, 10);
-            this.$el.find('.filter-separator').show().end().find('input').show();
+
+            // check it's valid integer
+            if (type === parseInt(type)) {
+                this.$el.find('.filter-separator').show().end().find('input').show();
+            }
+
             if (this.typeValues.moreThan === type) {
                 this.$el.find('.filter-separator').hide();
                 this.$el.find(this.criteriaValueSelectors.value.end).val('').hide();

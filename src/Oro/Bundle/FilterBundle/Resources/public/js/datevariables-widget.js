@@ -10,7 +10,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
     $.widget('orofilter.dateVariables', {
         options: {
             $input: null,
-            isRTL: false,
             value: null,
             part:  'value',
             dateParts: null,
@@ -55,7 +54,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
                 htmlTemplate    = _.template(o.htmlTemplate);
 
             var $dv = $(htmlTemplate({
-                attributes:  o.isRTL ? ' ui-datevariables-rtl' : '',
+                attributes:  '',
                 title:       __('oro.filter.date.variable.title'),
                 tooltipHTML: tooltipTemplate({
                     content: __('oro.filter.date.variable.tooltip'),
