@@ -1,11 +1,11 @@
 /* global define */
 define([
     'underscore', 'backbone',
-    'oro/workflow-management/step/view/list',
-    'oro/workflow-management/step/model',
-    'oro/workflow-management/transition/model',
-    'oro/workflow-management/step/view/edit',
-    'oro/workflow-management/transition/view/edit',
+    'oroworkflow/js/workflow-management/step/view/list',
+    'oroworkflow/js/workflow-management/step/model',
+    'oroworkflow/js/workflow-management/transition/model',
+    'oroworkflow/js/workflow-management/step/view/edit',
+    'oroworkflow/js/workflow-management/transition/view/edit',
     'oroentity/js/fields-loader'
 ],
 function(_, Backbone,
@@ -20,7 +20,7 @@ function(_, Backbone,
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management
+     * @export  oroworkflow/js/workflow-management
      * @class   oro.WorkflowManagement
      * @extends Backbone.View
      */

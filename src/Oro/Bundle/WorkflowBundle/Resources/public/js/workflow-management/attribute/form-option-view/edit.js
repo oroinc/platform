@@ -6,7 +6,7 @@ function(_, Backbone) {
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/attribute/form-option-view/edit
+     * @export  oroworkflow/js/workflow-management/attribute/form-option-view/edit
      * @class   oro.WorkflowManagement.AttributeFormOptionEditView
      * @extends Backbone.View
      */

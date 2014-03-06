@@ -1,12 +1,12 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget', 'oro/workflow-management/helper', 'oro/layout'],
+define(['underscore', 'backbone', 'oro/dialog-widget', 'oroworkflow/js/workflow-management/helper', 'oroui/js/layout'],
 function(_, Backbone, DialogWidget, Helper, layout) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/step/view/edit
+     * @export  oroworkflow/js/workflow-management/step/view/edit
      * @class   oro.WorkflowManagement.StepEditView
      * @extends Backbone.View
      */

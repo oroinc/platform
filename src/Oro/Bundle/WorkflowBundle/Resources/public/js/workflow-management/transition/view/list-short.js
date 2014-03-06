@@ -1,5 +1,5 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/workflow-management/transition/view/row-short'],
+define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/transition/view/row-short'],
 function(_, Backbone, TransitionsShortRowView) {
     'use strict';
 

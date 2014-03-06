@@ -1,12 +1,12 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/workflow-management/step/view/row'],
+define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/step/view/row'],
 function(_, Backbone, StepRowView) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/step/view/list
+     * @export  oroworkflow/js/workflow-management/step/view/list
      * @class   oro.WorkflowManagement.StepsListView
      * @extends Backbone.View
      */

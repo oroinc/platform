@@ -1,15 +1,16 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget', 'oro/workflow-management/helper',
-    'oro/workflow-management/attribute/form-option-view/edit',
-    'oro/workflow-management/attribute/form-option-view/list',
-    'oro/layout'],
+define(['underscore', 'backbone', 'oro/dialog-widget',
+    'oroworkflow/js/workflow-management/helper',
+    'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
+    'oroworkflow/js/workflow-management/attribute/form-option-view/list',
+    'oroui/js/layout'],
 function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, layout) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/transition/view/edit
+     * @export  oroworkflow/js/workflow-management/transition/view/edit
      * @class   oro.WorkflowManagement.TransitionEditView
      * @extends Backbone.View
      */

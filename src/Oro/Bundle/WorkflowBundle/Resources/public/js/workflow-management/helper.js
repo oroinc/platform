@@ -3,7 +3,7 @@ define(function() {
     'use strict';
 
     /**
-     * @export  oro/workflow-management/helper
+     * @export  oroworkflow/js/workflow-management/helper
      * @class   oro.WorkflowManagement.Helper
      */
     return {

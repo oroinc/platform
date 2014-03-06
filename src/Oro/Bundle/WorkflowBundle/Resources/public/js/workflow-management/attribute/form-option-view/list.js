@@ -1,12 +1,12 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/workflow-management/attribute/form-option-view/row'],
+define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/attribute/form-option-view/row'],
 function(_, Backbone, AttributeFormOptionRowView) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/attribute/form-option-view/list
+     * @export  oroworkflow/js/workflow-management/attribute/form-option-view/list
      * @class   oro.WorkflowManagement.AttributeFormOptionListView
      * @extends Backbone.View
      */

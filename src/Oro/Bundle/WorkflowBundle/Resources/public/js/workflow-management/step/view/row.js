@@ -1,12 +1,12 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/workflow-management/transition/view/list-short'],
+define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/transition/view/list-short'],
 function(_, Backbone, TransitionsShortListView) {
     'use strict';
 
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/step/view/row
+     * @export  oroworkflow/js/workflow-management/step/view/row
      * @class   oro.WorkflowManagement.StepRowView
      * @extends Backbone.View
      */

@@ -1,10 +1,10 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/workflow-management/transition/collection'],
+define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/transition/collection'],
 function(_, Backbone, TransitionCollection) {
     'use strict';
 
     /**
-     * @export  oro/workflow-management/step/model
+     * @export  oroworkflow/js/workflow-management/step/model
      * @class   oro.workflowManagement.StepModel
      * @extends Backbone.Model
      */

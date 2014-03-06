@@ -1,10 +1,10 @@
 /* global define */
-define(['backbone', 'oro/workflow-management/attribute/model'],
+define(['backbone', 'oroworkflow/js/workflow-management/attribute/model'],
 function(Backbone, AttributeModel) {
     'use strict';
 
     /**
-     * @export  oro/workflow-management/attribute/collection
+     * @export  oroworkflow/js/workflow-management/attribute/collection
      * @class   oro.workflowManagement.AttributeCollection
      * @extends Backbone.Collection
      */

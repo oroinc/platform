@@ -4,7 +4,7 @@ function(Backbone) {
     'use strict';
 
     /**
-     * @export  oro/workflow-management/attribute/model
+     * @export  oroworkflow/js/workflow-management/attribute/model
      * @class   oro.workflowManagement.AttributeModel
      * @extends Backbone.Model
      */

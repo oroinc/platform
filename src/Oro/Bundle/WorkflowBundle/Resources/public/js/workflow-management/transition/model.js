@@ -4,7 +4,7 @@ function(Backbone) {
     'use strict';
 
     /**
-     * @export  oro/workflow-management/transition/model
+     * @export  oroworkflow/js/workflow-management/transition/model
      * @class   oro.workflowManagement.TransitionModel
      * @extends Backbone.Model
      */
