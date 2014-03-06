@@ -20,3 +20,7 @@ In order to define dependency on platform in your project just add this to compo
         "oro/platform": "1.0.*"
     }
 ```
+
+## Documentation
+
+The documentation for the Oro Plataform can be found [here](https://github.com/orocrm/documentation).
