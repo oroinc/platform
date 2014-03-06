@@ -47,6 +47,8 @@ services:
         arguments:
             - @translator
             - @oro_filter.provider.datemodifierprovider
+            - @oro_filter.expression.date.compiler
+            - @oro_filter.form.event_subscriber.date
         tags:
             - { name: form.type, alias: oro_type_date_range_filter }
 
@@ -55,6 +57,8 @@ services:
         arguments:
             - @translator
             - @oro_filter.provider.datemodifierprovider
+            - @oro_filter.expression.date.compiler
+            - @oro_filter.form.event_subscriber.date
         tags:
             - { name: form.type, alias: oro_type_datetime_range_filter }
 

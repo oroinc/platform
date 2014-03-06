@@ -43,6 +43,17 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
         $localeSettings = new LocaleSettings($configManager, $calendarFactory);
 
+        $subscriber = $this->getMockBuilder('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber')
+            ->disableOriginalConstructor()
+            ->setMethods(['getSubscribedEvents'])
+            ->getMock();
+        $subscriberСlass = get_class($subscriber);
+
+        // Static stub method
+        $subscriberСlass::staticExpects($this->any())
+            ->method('getSubscribedEvents')
+            ->will($this->returnValue([]));
+
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(
                 array(
@@ -50,9 +61,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                          array(
                               'oro_type_text_filter'           => new TextFilterType($translator),
                               'oro_type_datetime_range_filter' =>
-                                  new DateTimeRangeFilterType($translator, new DateModifierProvider()),
+                                  new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
                               'oro_type_date_range_filter'     =>
-                                  new DateRangeFilterType($translator, new DateModifierProvider()),
+                                  new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber),
                               'oro_type_datetime_range'        => new DateTimeRangeType($localeSettings),
                               'oro_type_date_range'            => new DateRangeType(),
                               'oro_type_filter'                => new FilterType($translator),

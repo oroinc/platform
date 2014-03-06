@@ -16,8 +16,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
     {
         parent::setUp();
 
-        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
-        $this->type = new DateRangeType($subscriber);
+        $this->type = new DateRangeType();
     }
 
     /**

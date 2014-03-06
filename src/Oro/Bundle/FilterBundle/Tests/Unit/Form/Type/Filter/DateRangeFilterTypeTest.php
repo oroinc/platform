@@ -23,14 +23,14 @@ class DateRangeFilterTypeTest extends AbstractDateTypeTestCase
         $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
 
         $types = array(
-            new DateRangeType($subscriber),
+            new DateRangeType(),
             new FilterType($translator)
         );
 
         $this->formExtensions[] = new CustomFormExtension($types);
 
         parent::setUp();
-        $this->type = new DateRangeFilterType($translator, new DateModifierProvider());
+        $this->type = new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber);
     }
 
     /**

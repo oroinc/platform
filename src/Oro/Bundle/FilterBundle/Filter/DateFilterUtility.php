@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
@@ -77,16 +75,6 @@ class DateFilterUtility
             return false;
         }
 
-        // check start date
-        if (isset($data['value']['start']) && !$data['value']['start'] instanceof \DateTime) {
-            return false;
-        }
-
-        // check end date
-        if (isset($data['value']['end']) && !$data['value']['end'] instanceof \DateTime) {
-            return false;
-        }
-
         return true;
     }
 
@@ -99,81 +87,35 @@ class DateFilterUtility
      */
     protected function applyDatePart($data)
     {
-        $dateStart = $data['date_start'];
-        $dateEnd   = $data['date_end'];
-        $field     = $data['field'];
+        $field = $data['field'];
         switch ($data['part']) {
             case DateModifierInterface::PART_MONTH:
-                $field     = $this->getEnforcedTimezoneFunction('MONTH', $field);
-                $dateStart = $this->getDatePartValue($dateStart, 'm');
-                $dateEnd   = $this->getDatePartValue($dateEnd, 'm');
+                $field = $this->getEnforcedTimezoneFunction('MONTH', $field);
                 break;
             case DateModifierInterface::PART_DOW:
-                $field     = $this->getEnforcedTimezoneFunction('DAYOFWEEK', $field);
-                $dateStart = $this->getDatePartValue($dateStart, 'N');
-                $dateEnd   = $this->getDatePartValue($dateEnd, 'N');
+                $field = $this->getEnforcedTimezoneFunction('DAYOFWEEK', $field);
                 break;
             case DateModifierInterface::PART_WEEK:
-                $field     = $this->getEnforcedTimezoneFunction('WEEK', $field);
-                $dateStart = $this->getDatePartValue($dateStart, 'W');
-                $dateEnd   = $this->getDatePartValue($dateEnd, 'W');
+                $field = $this->getEnforcedTimezoneFunction('WEEK', $field);
                 break;
             case DateModifierInterface::PART_DAY:
-                $field     = $this->getEnforcedTimezoneFunction('DAY', $field);
-                $dateStart = $this->getDatePartValue($dateStart, 'd');
-                $dateEnd   = $this->getDatePartValue($dateEnd, 'd');
+                $field = $this->getEnforcedTimezoneFunction('DAY', $field);
                 break;
             case DateModifierInterface::PART_QUARTER:
-                $field     = $this->getEnforcedTimezoneFunction('QUARTER', $field);
-                $dateStart = $this->getDatePartValue($dateStart, 'm');
-                $dateEnd   = $this->getDatePartValue($dateEnd, 'm');
-                $dateStart = $dateStart ? ceil($dateStart / 3) : $dateStart;
-                $dateEnd   = $dateEnd ? ceil($dateEnd / 3) : $dateEnd;
+                $field = $this->getEnforcedTimezoneFunction('QUARTER', $field);
                 break;
             case DateModifierInterface::PART_DOY:
-                $field     = $this->getEnforcedTimezoneFunction('DAYOFYEAR', $field);
-                $dateStart = $this->getDatePartValue($dateStart, 'z');
-                $dateEnd   = $this->getDatePartValue($dateEnd, 'z');
+                $field = $this->getEnforcedTimezoneFunction('DAYOFYEAR', $field);
                 break;
             case DateModifierInterface::PART_YEAR:
-                $field     = $this->getEnforcedTimezoneFunction('YEAR', $field);
-                $dateStart = $this->getDatePartValue($dateStart, 'Y');
-                $dateEnd   = $this->getDatePartValue($dateEnd, 'Y');
+                $field = $this->getEnforcedTimezoneFunction('YEAR', $field);
                 break;
             case DateModifierInterface::PART_VALUE:
             default:
                 break;
         }
 
-        return array_merge(
-            $data,
-            [
-                'date_start' => $dateStart,
-                'date_end'   => $dateEnd,
-                'field'      => $field
-            ]
-        );
-    }
-
-    /**
-     * @param mixed  $value
-     * @param string $part
-     *
-     * @return integer|null
-     * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
-     */
-    private function getDatePartValue($value, $part)
-    {
-        switch (true) {
-            case is_integer($value) || is_null($value):
-                return $value;
-                break;
-            case ($value instanceof \DateTime):
-                return $value->format($part);
-                break;
-            default:
-                throw new UnexpectedTypeException($value, 'integer or \DateTime');
-        }
+        return array_merge($data, ['field' => $field]);
     }
 
     /**

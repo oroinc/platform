@@ -33,8 +33,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
             ->method('getTimezone')
             ->will($this->returnValue($this->defaultTimezone));
 
-        $subscriber = $this->getMockSubscriber('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber');
-        $this->formExtensions[] = new CustomFormExtension([new DateRangeType($subscriber)]);
+        $this->formExtensions[] = new CustomFormExtension([new DateRangeType()]);
 
         parent::setUp();
 
