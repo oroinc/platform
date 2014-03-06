@@ -1,7 +1,7 @@
 /*global define, require*/
 /*jslint nomen: true*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout', 'jquery-ui'],
-    function ($, _, __) {
+    function ($, _, __, layout) {
     'use strict';
 
     /**
@@ -66,6 +66,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
 
             var widget = this.widget();
             widget.empty().append($dv);
+
+            layout.initPopover(widget);
 
             widget.find('.ui-datevariables-div a.ui_dvariable').click(
                 _.bind(this.onSelectVar, this)
