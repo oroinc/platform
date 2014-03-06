@@ -9,7 +9,6 @@ config:
     paths:
         'jquery.multiselect': 'bundles/orofilter/lib/multiselect/jquery.multiselect.js'
         'jquery.multiselect.filter': 'bundles/orofilter/lib/multiselect/jquery.multiselect.filter.js'
-        'jquery-ui-datevariables': 'bundles/orofilter/js/jquery-ui-datevariables-addon.js'
         'orofilter/js/filter/abstract-filter': 'bundles/orofilter/js/filter/abstract-filter.js'
         'orofilter/js/filter/none-filter': 'bundles/orofilter/js/filter/none-filter.js'
         'orofilter/js/filter/choice-filter': 'bundles/orofilter/js/filter/choice-filter.js'
