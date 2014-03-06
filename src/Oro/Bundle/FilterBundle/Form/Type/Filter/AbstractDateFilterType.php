@@ -153,6 +153,5 @@ abstract class AbstractDateFilterType extends AbstractType
         }
 
         $builder->add('part', 'choice', ['choices' => $options['date_parts']]);
-        $builder->addEventSubscriber($this->subscriber);
     }
 }

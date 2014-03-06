@@ -101,7 +101,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
                     $children,
                     $data,
                     function ($data) use ($compiler) {
-                        return (string)$data;
+                        return $data instanceof \DateTime ? $data->format('Y-m-d H:i') : $data;
                     }
                 );
                 break;

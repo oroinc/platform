@@ -50,10 +50,10 @@ abstract class AbstractDateFilter extends AbstractFilter
             $data['field']
         );
 
-        if ($dateStartValue) {
+        if (null !== $dateStartValue) {
             $ds->setParameter($startDateParameterName, $dateStartValue);
         }
-        if ($dateEndValue) {
+        if (null !== $dateEndValue) {
             $ds->setParameter($endDateParameterName, $dateEndValue);
         }
 
@@ -85,7 +85,7 @@ abstract class AbstractDateFilter extends AbstractFilter
             $conditionType = FilterUtility::CONDITION_AND;
         }
 
-        if ($dateStartValue) {
+        if (null !== $dateStartValue) {
             $this->applyFilterToClause(
                 $ds,
                 $ds->expr()->gte($fieldName, $startDateParameterName, true),
@@ -93,7 +93,7 @@ abstract class AbstractDateFilter extends AbstractFilter
             );
         }
 
-        if ($dateEndValue) {
+        if (null !== $dateEndValue) {
             $this->applyFilterToClause(
                 $ds,
                 $ds->expr()->lte($fieldName, $endDateParameterName, true),
@@ -118,7 +118,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         $fieldName,
         $isLess
     ) {
-        if ($dateValue) {
+        if (null !== $dateValue) {
             $expr = $isLess
                 ? $ds->expr()->lt($fieldName, $dateParameterName, true)
                 : $ds->expr()->gt($fieldName, $dateParameterName, true);
@@ -144,10 +144,10 @@ abstract class AbstractDateFilter extends AbstractFilter
         $endDateParameterName,
         $fieldName
     ) {
-        if ($dateStartValue || $dateEndValue) {
+        if (null !== $dateStartValue || null !== $dateEndValue) {
             $expr = null;
-            if ($dateStartValue) {
-                if ($dateEndValue) {
+            if (null !== $dateStartValue) {
+                if (null !== $dateEndValue) {
                     $expr = $ds->expr()->orX(
                         $ds->expr()->lt($fieldName, $startDateParameterName, true),
                         $ds->expr()->gt($fieldName, $endDateParameterName, true)
