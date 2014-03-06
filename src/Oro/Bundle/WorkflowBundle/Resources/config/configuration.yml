@@ -3,6 +3,7 @@ parameters:
     oro_workflow.configuration.config.workflow_list.class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration
 
     oro_workflow.configuration.handler.step.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\StepHandler
+    oro_workflow.configuration.handler.attribute.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\AttributeHandler
     oro_workflow.configuration.handler.transition.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\TransitionHandler
     oro_workflow.configuration.handler.workflow.class: Oro\Bundle\WorkflowBundle\Configuration\Handler\WorkflowHandler
 
@@ -23,6 +24,9 @@ services:
     oro_workflow.configuration.handler.step:
         class: %oro_workflow.configuration.handler.step.class%
 
+    oro_workflow.configuration.handler.attribute:
+        class: %oro_workflow.configuration.handler.attribute.class%
+
     oro_workflow.configuration.handler.transition:
         class: %oro_workflow.configuration.handler.transition.class%
 
@@ -30,6 +34,7 @@ services:
         class: %oro_workflow.configuration.handler.workflow.class%
         calls:
             - [addHandler, [@oro_workflow.configuration.handler.step]]
+            - [addHandler, [@oro_workflow.configuration.handler.attribute]]
             - [addHandler, [@oro_workflow.configuration.handler.transition]]
 
     oro_workflow.configuration.provider.workflow_config:

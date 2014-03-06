@@ -129,14 +129,14 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var \DateTime $created
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="created_at", type="datetime")
      */
     protected $createdAt;
 
     /**
      * @var \DateTime $updated
      *
-     * @ORM\Column(type="datetime")
+     * @ORM\Column(name="updated_at", type="datetime")
      */
     protected $updatedAt;
 
