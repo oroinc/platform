@@ -102,7 +102,7 @@ class ExtendExtension
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
-        array $options
+        array $options = []
     ) {
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
@@ -182,7 +182,7 @@ class ExtendExtension
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
-        array $options
+        array $options = []
     ) {
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
@@ -267,7 +267,7 @@ class ExtendExtension
         $columnName,
         $targetTable,
         $targetColumnName,
-        array $options
+        array $options = []
     ) {
         $selfTableName  = $this->getTableName($table);
         $selfTable      = $this->getTable($table, $schema);
@@ -302,7 +302,6 @@ class ExtendExtension
             $options
         );
     }
-
 
     /**
      * @param Table|string $table A Table object or table name
