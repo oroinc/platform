@@ -1,0 +1,116 @@
+@import "../mixins";
+// PER PAGE
+.ui-widget,
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+  font-family:@baseFontFamily !important;
+}
+.ui-datepicker .ui-datepicker-calendar .ui-state-default {
+  background:none ;
+  font-size: 13px;
+  border: 1px solid transparent;
+  color: #727272;
+}
+.ui-datepicker .ui-widget-header {
+  margin:-.2em -.2em 0 -.2em !important;
+  background:#eee !important;
+  border:none !important;
+  border-bottom:1px solid #ddd !important;
+  border-radius:0 !important;
+  -webkit-border-radius:0 !important;
+  -moz-border-radius:0 !important;
+}
+.ui-datepicker .ui-datepicker-calendar .ui-state-hover,
+.ui-datepicker .ui-datepicker-calendar .ui-state-active,
+.ui-datepicker.ui-widget-content .ui-state-hover,
+.ui-datepicker.ui-widget-content .ui-state-active{
+  border-color: #ececec;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  color: #434343;
+}
+.ui-datepicker.ui-widget-content .ui-state-active,
+.ui-datepicker .ui-datepicker-calendar .ui-state-active{
+  #gradient > .vertical(#ffffff, #fbfbfb);
+}
+.ui-datepicker .ui-widget-header{
+  background: none !important;
+}
+.ui-datepicker .ui-widget-header{
+
+}
+.ui-datepicker {
+  .ui-datepicker-header{
+    .ui-datepicker-prev a{
+      .ui-icon-circle-triangle-w{
+        background-position: -95px 0;
+      }
+    }
+    .ui-datepicker-next a{
+      .ui-icon-circle-triangle-e{
+
+      }
+    }
+  }
+}
+.ui-datepicker {
+  .ui-widget-header{
+    padding: 0 0 10px;
+    .ui-icon-circle-triangle-w{
+      background-position: -95px 0;
+      margin-left: -10px;
+    }
+    .ui-icon-circle-triangle-e{
+      background-position: -32px 0;
+    }
+    .ui-datepicker-next,
+    .ui-datepicker-prev{
+      top: 4px;
+    }
+    .ui-datepicker-next-hover{
+      top: 4px;
+      right: 2px;
+    }
+    .ui-datepicker-prev-hover{
+      top: 4px;
+      left: 2px;
+    }
+  }
+}
+
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-close,
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current{
+  .border-radius(4px);
+  .box-shadow(inset 0 1px 0 0 #9cbcf1);
+  #gradient > .vertical(#80a8e7, #5281cc);
+  border: 1px solid;
+  border-color: #5e7eb0 #546d92 #485670 #546d92;
+  text-shadow: 0px 1px 0px #386e9f;
+  color: #fff;
+  font-weight: bold;
+  height: 26px;
+  &:hover {
+    #gradient > .vertical(#739cdc, #5281cc);
+    .box-shadow(inset 0 1px 0 0 #7fa6e5);
+    color: #fff;
+  }
+  &:active,
+  &:focus {
+    #gradient > .vertical(#739cdc, #3061af);
+    .box-shadow(inset 0 1px 4px 0 #3962a3);
+    color: #fff;
+  }
+  &[disabled] {
+    &,
+    &:hover,
+    &:active,
+    &:focus{
+      background-color: #0044cc;
+      color: #fff;
+      background-image: none;
+      .box-shadow(none);
+    }
+  }
+}
