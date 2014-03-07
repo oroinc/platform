@@ -144,7 +144,13 @@ class ExtendConfigDumper
         foreach ($fieldConfigs as $fieldConfig) {
             if ($fieldConfig->is('extend')) {
                 $fieldName = self::FIELD_PREFIX . $fieldConfig->getId()->getFieldName();
-                $fieldType = $fieldConfig->getId()->getFieldType();
+
+                // TODO: getting a field type from a model here is a temporary solution.
+                // We need to use $fieldType = $fieldConfig->getId()->getFieldType();
+                $fieldType =$extendProvider->getConfigManager()->getConfigFieldModel(
+                    $fieldConfig->getId()->getClassName(),
+                    $fieldConfig->getId()->getFieldName()
+                )->getType();
 
                 if (in_array($fieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
                     $relationProperties[$fieldName] = $fieldConfig->getId()->getFieldName();
