@@ -40,7 +40,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select[name=date]',
+            type: 'select[name!=date_part]',
             part: 'select[name=date_part]',
             value: {
                 start: 'input[name="start"]',
