@@ -30,7 +30,9 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getTimezone')
             ->will($this->returnValue('Europe/Moscow'));
 
-        $this->compiler   = new Compiler(new Lexer(), new Parser($localeSettings));
+        $translatorMock = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $providerMock   = $this->getMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
+        $this->compiler   = new Compiler(new Lexer($translatorMock, $providerMock), new Parser($localeSettings));
         $this->subscriber = new DateFilterSubscriber($this->compiler);
     }
 

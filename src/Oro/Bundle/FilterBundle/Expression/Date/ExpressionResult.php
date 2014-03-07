@@ -4,6 +4,7 @@ namespace Oro\Bundle\FilterBundle\Expression\Date;
 
 use Carbon\Carbon;
 
+use Oro\Bundle\FilterBundle\Expression\Exception\ExpressionDenied;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 
@@ -22,6 +23,8 @@ class ExpressionResult
 
     /** @var int */
     private $variableType = null;
+
+    private $variableLabel = null;
 
     /** @var int */
     private $sourceType;
@@ -66,8 +69,9 @@ class ExpressionResult
 
             $this->value = $dateValue;
 
-            $this->variableType = $value->getValue();
-            $this->sourceType   = self::TYPE_DATE;
+            $this->variableType  = $value->getValue();
+            $this->variableLabel = (string)$value;
+            $this->sourceType    = self::TYPE_DATE;
         } elseif ($value instanceof Token && $value->is(Token::TYPE_TIME)) {
             $dateValue = Carbon::parse('now', new \DateTimeZone($timezone));
             call_user_func_array([$dateValue, 'setTime'], explode(':', $value->getValue()));
@@ -105,6 +109,14 @@ class ExpressionResult
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getVariableLabel()
+    {
+        return $this->variableLabel;
     }
 
     /**
@@ -146,7 +158,7 @@ class ExpressionResult
                     $dateValue->addYears($value->getValue());
                     break;
                 default:
-                    throw new SyntaxException('Expressions with this variable is not allowed');
+                    throw new ExpressionDenied($this->getVariableLabel());
                     break;
             }
         } elseif (!$value->isModifier()) {
@@ -191,7 +203,7 @@ class ExpressionResult
                     $dateValue->subYears($value->getValue());
                     break;
                 default:
-                    throw new SyntaxException('Expressions with this variable is not allowed');
+                    throw new ExpressionDenied($this->getVariableLabel());
                     break;
             }
         } elseif (!$value->isModifier()) {
@@ -215,7 +227,7 @@ class ExpressionResult
                     $this->value -= $value->getValue()->year;
                     break;
                 default:
-                    throw new SyntaxException('Expressions with this variable is not allowed');
+                    throw new ExpressionDenied($value->getVariableLabel());
                     break;
             }
         } else {
@@ -244,7 +256,7 @@ class ExpressionResult
             $expression->merge($this);
             $this->value = $expression->getValue();
         } else {
-            throw new SyntaxException('Merge are not allowed');
+            throw new ExpressionDenied($expression->getVariableLabel());
         }
     }
 }

@@ -12,7 +12,9 @@ class LexerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->lexer = new Lexer();
+        $translatorMock = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $providerMock   = $this->getMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
+        $this->lexer    = new Lexer($translatorMock, $providerMock);
     }
 
     public function tearDown()
@@ -99,7 +101,7 @@ class LexerTest extends \PHPUnit_Framework_TestCase
                 [],
                 'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'
             ],
-            'should check errors'                                  => [
+            'should check errors'                                         => [
                 '1+3)',
                 [],
                 'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'

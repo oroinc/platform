@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Expression\Date;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
 
 class Lexer
@@ -11,6 +14,18 @@ class Lexer
     const REGEXP_VARIABLE = '#{{(\d+)}}#';
     const REGEXP_OPERATOR = '#\+|\-#';
     const REGEXP_INTEGER  = '#[0-9]+#';
+
+    /** @var TranslatorInterface */
+    private $translator;
+
+    /** @var DateModifierProvider */
+    private $provider;
+
+    public function __construct(TranslatorInterface $translator, DateModifierProvider $provider)
+    {
+        $this->translator = $translator;
+        $this->provider   = $provider;
+    }
 
     /**
      * @param string $string
@@ -43,7 +58,11 @@ class Lexer
                 $cursor += strlen($match[0]);
             } elseif (preg_match(self::REGEXP_VARIABLE . 'A', $string, $match, null, $cursor)) {
                 // variables
-                $tokens[] = new Token(Token::TYPE_VARIABLE, $match[1]);
+                $tokens[] = new Token(
+                    Token::TYPE_VARIABLE,
+                    $match[1],
+                    $this->translator->trans($this->provider->getVariableKey($match[1]))
+                );
                 $cursor += strlen($match[0]);
             } elseif (preg_match(self::REGEXP_INTEGER . 'A', $string, $match, null, $cursor)) {
                 // integers

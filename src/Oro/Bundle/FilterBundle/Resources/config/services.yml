@@ -24,6 +24,9 @@ services:
 
     oro_filter.expression.date.lexer:
         class: %oro_filter.expression.date.lexer.class%
+        arguments:
+            - @translator
+            - @oro_filter.provider.datemodifierprovider
 
     oro_filter.expression.date.compiler:
         class: %oro_filter.expression.date.compiler.class%
