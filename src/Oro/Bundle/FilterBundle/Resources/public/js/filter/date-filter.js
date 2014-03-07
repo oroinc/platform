@@ -178,9 +178,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         changeFilterType: function (type) {
             // filter filter range types
             if (this.dateWidgets.start_vars && type.length > 1) {
+                this.$el.find(this.criteriaValueSelectors.value.start).val('');
                 this.dateWidgets.start_vars.dateVariables('setPart', type);
             }
             if (this.dateWidgets.end_vars && type.length > 1) {
+                this.$el.find(this.criteriaValueSelectors.value.end).val('');
                 this.dateWidgets.end_vars.dateVariables('setPart', type);
             }
 
@@ -262,7 +264,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         _appendDropdown: function (template, actualSelector, name) {
             var $calendar, $el = this.$el,
                 $input = this.$(actualSelector),
-                $dropdown = $input.wrap('<div class="dropdown">').parent(),
+                $dropdown = $input.wrap('<div class="dropdown datefilter">').parent(),
                 tabSuffix = '-' + this.cid + '-' + name,
                 widgetOptions = _.extend({onSelect: function (date) {
                     $input.val(date);
@@ -283,7 +285,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 .click(function (e) {
                     e.stopImmediatePropagation();
                 });
-            //$calendar.datepicker('setDate', $input.val());
+
+            $calendar.data('datepicker').inline = false;
+            $calendar.datepicker('refresh');
+            $calendar.find('.ui-datepicker-close').click(function() {
+                $dropdown.find('.dropdown-menu-calendar').hide();
+            });
 
             widgetOptions = _.extend({
                 $input: $input
