@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
@@ -41,7 +40,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
     /**
      * {@internaldoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output)
     {
         $reminders = $this->getReminderRepository()->findNotSentReminders();
 
