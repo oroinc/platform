@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\ReminderBundle\Model\ReminderState;
 
 /**
  * Reminder
@@ -83,9 +84,9 @@ class Reminder
     protected $reminderInterval;
 
     /**
-     * @var array $types
+     * @var ReminderState $state
      *
-     * @ORM\Column(name="types", type="array", nullable=false)
+     * @ORM\Column(name="state", type="object", nullable=false)
      * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
@@ -93,7 +94,7 @@ class Reminder
      *  }
      * )
      */
-    protected $types;
+    protected $state;
 
     /**
      * @var integer $relatedEntityId
@@ -155,6 +156,11 @@ class Reminder
     public function __toString()
     {
         return $this->subject;
+    }
+
+    public function __construct()
+    {
+        $this->state = new ReminderState();
     }
 
     /**
@@ -253,26 +259,26 @@ class Reminder
     }
 
     /**
-     * Set types
+     * Set state
      *
-     * @param array $types
+     * @param ReminderState $state
      * @return Reminder
      */
-    public function setTypes(array $types)
+    public function setState(ReminderState $state)
     {
-        $this->types = $types;
+        $this->state = $state;
 
         return $this;
     }
 
     /**
-     * Get types
+     * Get state
      *
-     * @return array 
+     * @return ReminderState
      */
-    public function getTypes()
+    public function getState()
     {
-        return $this->types;
+        return $this->state;
     }
 
     /**
