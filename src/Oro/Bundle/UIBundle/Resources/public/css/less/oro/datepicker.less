@@ -14,6 +14,15 @@
   color: #727272;
   min-width: 30px;
 }
+.dropdown-menu-calendar .ui-datepicker .ui-datepicker-calendar a.ui-state-default{
+  background:none ;
+  font-size: 13px;
+  color: #727272;
+  #gradient > .vertical(#ffffff, #fbfbfb);
+  &:hover{
+    #gradient > .vertical(#ffffff, #fbfbfb);
+  }
+}
 .ui-datepicker .ui-widget-header {
   margin:-.2em -.2em 0 -.2em !important;
   background:#eee !important;
@@ -46,18 +55,21 @@
 .ui-datepicker .ui-widget-header{
   background: none !important;
 }
-.ui-datepicker .ui-widget-header{
-
-}
-.ui-datepicker {
+.dropdown-menu-calendar .ui-datepicker {
+  .ui-datepicker-calendar{
+    thead{
+      th{
+        span{
+          text-transform: uppercase;
+          color: #006CC6;
+          font-size: 14px;
+          text-align: center;
+        }
+    }
+  }
   .ui-datepicker-header{
     padding: 8px 0 0;
-    th{
-      span{
-        text-transform: uppercase;
-        color: #6782af;
-      }
-    }
+  }
     .ui-datepicker-prev a{
       .ui-icon-circle-triangle-w{
         background-position: -95px 0;
@@ -94,6 +106,7 @@
       display: block;
       #gradient > .vertical(#fcfcfc, #f9f9f9);
       padding: 8px 0 5px;
+      margin: 0;
       text-align: center;
       color: #bebebe;
       &:hover{
@@ -109,12 +122,18 @@
         content: "\f073";
         font-size: 20px;
         margin-right: 6px;
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+        top: -2px;
       }
       &.variables:before{
         font-family: 'FontAwesome';
         content: "\f0ca";
         font-size: 20px;
         margin-right: 6px;
+        display: inline-block;
+        vertical-align: middle;
       }
     }
     &.active{
@@ -139,10 +158,12 @@
   ul{
     color: #006cc6;
     margin-left: 15px;
-    a{
-      color: #006cc6;
+    li a{
+      color: #006cc6 !important;
       &:hover{
-        background: none;
+        background: none !important;
+        color: #006cc6 !important;
+        text-decoration: underline;
       }
     }
   }
@@ -172,15 +193,17 @@
     }
     .ui-datepicker-next,
     .ui-datepicker-prev{
-      top: 4px;
+      top: 9px;
     }
     .ui-datepicker-next-hover{
-      top: 4px;
+      top: 9px;
       right: 2px;
+      background-color: #f9f9f9;
     }
     .ui-datepicker-prev-hover{
-      top: 4px;
+      top: 9px;
       left: 2px;
+      background-color: #f9f9f9;
     }
   }
 }
