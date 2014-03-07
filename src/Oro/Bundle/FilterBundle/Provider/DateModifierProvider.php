@@ -5,41 +5,60 @@ namespace Oro\Bundle\FilterBundle\Provider;
 class DateModifierProvider implements DateModifierInterface
 {
     /** @var array */
-    protected $varMap = [
-        self::PART_VALUE => [
-            self::VAR_NOW   => 'now',
-            self::VAR_TODAY => 'today',
-            self::VAR_SOW   => 'sow',
-            self::VAR_SOM   => 'som',
-            self::VAR_SOQ   => 'soq',
-            self::VAR_SOY   => 'soy',
-        ],
-        self::PART_DOW => [
+    protected $variableLabelsMap
+        = [
+            self::VAR_NOW          => 'now',
+            self::VAR_TODAY        => 'today',
+            self::VAR_SOW          => 'sow',
+            self::VAR_SOM          => 'som',
+            self::VAR_SOQ          => 'soq',
+            self::VAR_SOY          => 'soy',
             self::VAR_THIS_DAY     => 'this_day',
-            self::VAR_FDQ          => 'this_fdq',
-        ],
-        self::PART_WEEK => [
             self::VAR_THIS_WEEK    => 'this_week',
-        ],
-        self::PART_DAY => [
-            self::VAR_THIS_DAY     => 'this_day',
-            self::VAR_FDQ          => 'this_fdq',
-        ],
-        self::PART_MONTH => [
             self::VAR_THIS_MONTH   => 'this_month',
             self::VAR_FMQ          => 'this_fmq',
-        ],
-        self::PART_QUARTER => [
             self::VAR_THIS_QUARTER => 'this_quarter',
-        ],
-        self::PART_DOY => [
-            self::VAR_THIS_DAY     => 'this_day',
             self::VAR_FDQ          => 'this_fdq',
-        ],
-        self::PART_YEAR => [
             self::VAR_THIS_YEAR    => 'this_year',
-        ],
-    ];
+        ];
+
+    /** @var array */
+    protected $varMap
+        = [
+            self::PART_VALUE   => [
+                self::VAR_NOW,
+                self::VAR_TODAY,
+                self::VAR_SOW,
+                self::VAR_SOM,
+                self::VAR_SOQ,
+                self::VAR_SOY,
+            ],
+            self::PART_DOW     => [
+                self::VAR_THIS_DAY,
+                self::VAR_FDQ,
+            ],
+            self::PART_WEEK    => [
+                self::VAR_THIS_WEEK
+            ],
+            self::PART_DAY     => [
+                self::VAR_THIS_DAY,
+                self::VAR_FDQ
+            ],
+            self::PART_MONTH   => [
+                self::VAR_THIS_MONTH,
+                self::VAR_FMQ
+            ],
+            self::PART_QUARTER => [
+                self::VAR_THIS_QUARTER
+            ],
+            self::PART_DOY     => [
+                self::VAR_THIS_DAY,
+                self::VAR_FDQ
+            ],
+            self::PART_YEAR    => [
+                self::VAR_THIS_YEAR
+            ],
+        ];
 
     /**
      * Return date variables available for each date part
@@ -50,17 +69,33 @@ class DateModifierProvider implements DateModifierInterface
     public function getDateVariables()
     {
         $result = [];
+        $self   = $this;
 
         foreach ($this->varMap as $part => $vars) {
-            $result[$part] = array_map(
-                function ($item) {
-                    return self::LABEL_VAR_PREFIX . $item;
-                },
-                $vars
+            $result[$part] = array_combine(
+                array_values($vars),
+                array_map(
+                    function ($item) use ($self) {
+                        return $self->getVariableKey($item);
+                    },
+                    $vars
+                )
             );
         }
 
         return $result;
+    }
+
+    /**
+     * Get variable
+     *
+     * @param string $variable
+     *
+     * @return string
+     */
+    public function getVariableKey($variable)
+    {
+        return self::LABEL_VAR_PREFIX . $this->variableLabelsMap[$variable];
     }
 
     /**
