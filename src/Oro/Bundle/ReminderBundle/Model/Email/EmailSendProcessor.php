@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\Email;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
@@ -14,6 +16,11 @@ class EmailSendProcessor implements SendProcessorInterface
      * @var EmailNotificationProcessor
      */
     protected $emailNotificationProcessor;
+
+    /**
+     * @var ObjectManager
+     */
+    protected $em;
 
     /**
      * @param EmailNotificationProcessor $emailNotificationProcessor
@@ -30,7 +37,16 @@ class EmailSendProcessor implements SendProcessorInterface
      */
     public function process(Reminder $reminder)
     {
-        // TODO: Implement process() method.
+        $entity = $this->em
+            ->getRepository($reminder->getRelatedEntityClassName())
+            ->find($reminder->getRelatedEntityId());
+
+        $notification = new EmailNotification();
+
+        $this->emailNotificationProcessor->process(
+            $entity,
+            [$notification]
+        );
     }
 
     /**
