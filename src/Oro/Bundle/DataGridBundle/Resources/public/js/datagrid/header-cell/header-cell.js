@@ -1,19 +1,19 @@
-/* global define */
-define(['jquery', 'underscore', 'backbone', 'backgrid', 'oro/pageable-collection'],
-function ($, _, Backbone, Backgrid, PageableCollection) {
+/*global define*/
+define(['jquery', 'underscore', 'backbone', 'backgrid', '../../pageable-collection'
+    ], function ($, _, Backbone, Backgrid, PageableCollection) {
     "use strict";
 
     /**
      * Datagrid header cell
      *
-     * @export  oro/datagrid/header-cell
-     * @class   oro.datagrid.HeaderCell
+     * @export  orodatagrid/js/datagrid/header-cell/header-cell
+     * @class   orodatagrid.datagrid.headerCell.HeaderCell
      * @extends Backgrid.HeaderCell
      */
     return Backgrid.HeaderCell.extend({
 
         /** @property */
-        template:_.template(
+        template: _.template(
             '<% if (sortable) { %>' +
                 '<a href="#">' +
                     '<%= label %> ' +
@@ -32,7 +32,7 @@ function ($, _, Backbone, Backgrid, PageableCollection) {
          *
          * Add listening "reset" event of collection to able catch situation when header cell should update it's sort state.
          */
-        initialize: function() {
+        initialize: function () {
             this.allowNoSorting = this.collection.multipleSorting;
             Backgrid.HeaderCell.prototype.initialize.apply(this, arguments);
             this._initCellDirection(this.collection);
@@ -52,19 +52,20 @@ function ($, _, Backbone, Backgrid, PageableCollection) {
          * @param collection
          * @private
          */
-        _initCellDirection: function(collection) {
-            if (collection == this.collection) {
-                var state = collection.state;
-                var direction = null;
-                var columnName = this.column.get('name');
+        _initCellDirection: function (collection) {
+            var state, direction, columnName;
+            if (collection === this.collection) {
+                state = collection.state;
+                direction = null;
+                columnName = this.column.get('name');
                 if (this.column.get('sortable') && _.has(state.sorters, columnName)) {
-                    if (1 == state.sorters[columnName]) {
+                    if (1 === state.sorters[columnName]) {
                         direction = 'descending';
-                    } else if (-1 == state.sorters[columnName]) {
+                    } else if (-1 === state.sorters[columnName]) {
                         direction = 'ascending';
                     }
                 }
-                if (direction != this.direction()) {
+                if (direction !== this.direction()) {
                     this.direction(direction);
                 }
             }

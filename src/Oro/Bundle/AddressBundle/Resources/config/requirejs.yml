@@ -1,10 +1,10 @@
 config:
     paths:
-        'oro/address-book': 'bundles/oroaddress/js/address-book.js'
-        'oro/address/collection': 'bundles/oroaddress/js/address/collection.js'
-        'oro/address/model': 'bundles/oroaddress/js/address/model.js'
-        'oro/address/view': 'bundles/oroaddress/js/address/view.js'
-        'oro/mapservice/googlemaps': 'bundles/oroaddress/js/mapservice/googlemaps.js'
-        'oro/region/collection': 'bundles/oroaddress/js/region/collection.js'
-        'oro/region/model': 'bundles/oroaddress/js/region/model.js'
-        'oro/region/view': 'bundles/oroaddress/js/region/view.js'
+        'oroaddress/js/address-book': 'bundles/oroaddress/js/address-book.js'
+        'oroaddress/js/address/collection': 'bundles/oroaddress/js/address/collection.js'
+        'oroaddress/js/address/model': 'bundles/oroaddress/js/address/model.js'
+        'oroaddress/js/address/view': 'bundles/oroaddress/js/address/view.js'
+        'oroaddress/js/mapservice/googlemaps': 'bundles/oroaddress/js/mapservice/googlemaps.js'
+        'oroaddress/js/region/collection': 'bundles/oroaddress/js/region/collection.js'
+        'oroaddress/js/region/model': 'bundles/oroaddress/js/region/model.js'
+        'oroaddress/js/region/view': 'bundles/oroaddress/js/region/view.js'

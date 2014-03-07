@@ -93,7 +93,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
             ->getMock();
         $workflowAssembler->expects($this->once())
             ->method('assemble')
-            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'))
+            ->with($this->isInstanceOf('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition'), false)
             ->will($this->returnValue($workflow));
 
         $builder = new WorkflowDefinitionConfigurationBuilder($workflowAssembler);
