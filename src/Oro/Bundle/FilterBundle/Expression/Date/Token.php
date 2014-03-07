@@ -17,14 +17,19 @@ class Token
     /** @var mixed */
     private $value;
 
+    /** @var string */
+    private $stringRepresentation;
+
     /**
-     * @param $type
-     * @param $value
+     * @param string $type
+     * @param mixed  $value
+     * @param null   $stringRepresentation
      */
-    public function __construct($type, $value)
+    public function __construct($type, $value, $stringRepresentation = null)
     {
-        $this->type  = $type;
-        $this->value = $value;
+        $this->type                 = $type;
+        $this->value                = $value;
+        $this->stringRepresentation = $stringRepresentation;
     }
 
     /**
@@ -54,5 +59,13 @@ class Token
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function __toString()
+    {
+        return (string)$this->stringRepresentation;
     }
 }

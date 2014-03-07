@@ -25,7 +25,7 @@ function ($, _, DateFilter, localeSettings) {
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select[name=datetime]',
+            type: 'select[name!=datetime_part]',
             part: 'select[name=datetime_part]',
             value: {
                 start: 'input[name="start"]',
