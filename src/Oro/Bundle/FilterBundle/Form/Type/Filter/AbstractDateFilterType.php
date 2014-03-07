@@ -11,6 +11,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 
 abstract class AbstractDateFilterType extends AbstractType
 {
@@ -31,14 +32,22 @@ abstract class AbstractDateFilterType extends AbstractType
     /** @var null|array */
     protected $datePartsChoices = null;
 
+    /** @var DateFilterSubscriber */
+    protected $subscriber;
+
     /**
-     * @param TranslatorInterface    $translator
-     * @param DateModifierInterface  $dateModifiers
+     * @param TranslatorInterface   $translator
+     * @param DateModifierInterface $dateModifiers
+     * @param DateFilterSubscriber  $subscriber
      */
-    public function __construct(TranslatorInterface $translator, DateModifierInterface $dateModifiers)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        TranslatorInterface $translator,
+        DateModifierInterface $dateModifiers,
+        DateFilterSubscriber $subscriber
+    ) {
+        $this->translator    = $translator;
         $this->dateModifiers = $dateModifiers;
+        $this->subscriber    = $subscriber;
     }
 
     /**
@@ -54,6 +63,9 @@ abstract class AbstractDateFilterType extends AbstractType
         ];
     }
 
+    /**
+     * @return array
+     */
     public function getOperatorChoices()
     {
         return [
@@ -71,8 +83,8 @@ abstract class AbstractDateFilterType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'date_parts' => $this->getDateParts(),
-                'date_vars' => $this->getDateVariables(),
+            'date_parts' => $this->getDateParts(),
+            'date_vars'  => $this->getDateVariables(),
             ]
         );
     }
@@ -83,7 +95,7 @@ abstract class AbstractDateFilterType extends AbstractType
     protected function getDateParts()
     {
         if (is_null($this->datePartsChoices)) {
-            $t = $this->translator;
+            $t                      = $this->translator;
             $this->datePartsChoices = array_map(
                 function ($item) use ($t) {
                     return $t->trans($item);
@@ -101,7 +113,7 @@ abstract class AbstractDateFilterType extends AbstractType
     protected function getDateVariables()
     {
         if (is_null($this->dateVarsChoices)) {
-            $t = $this->translator;
+            $t      = $this->translator;
             $result = $this->dateModifiers->getDateVariables();
 
             foreach ($result as $part => $vars) {
@@ -131,6 +143,9 @@ abstract class AbstractDateFilterType extends AbstractType
         $view->vars['date_vars']      = $options['date_vars'];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!isset($options['date_parts'])) {
@@ -138,5 +153,6 @@ abstract class AbstractDateFilterType extends AbstractType
         }
 
         $builder->add('part', 'choice', ['choices' => $options['date_parts']]);
+        $builder->addEventSubscriber($this->subscriber);
     }
 }

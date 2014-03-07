@@ -65,6 +65,16 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         $expectedResult = date('d', strtotime('today -5 days'));
         $expression->subtract(new ExpressionResult(8));
         $this->assertSame((int)$expectedResult, (int)$result->day);
+
+        $expression = new ExpressionResult(new Token(Token::TYPE_VARIABLE, DateModifierInterface::VAR_TODAY));
+        $result     = $expression->getValue();
+
+        $this->assertInstanceOf('\DateTime', $result);
+
+        $expectedResult = date('d');
+        $this->assertSame((int)$expectedResult, (int)$result->day);
+        $this->assertEquals(0, (int)$result->hour);
+        $this->assertEquals(0, (int)$result->minute);
     }
 
     public function testThisWeekModify()

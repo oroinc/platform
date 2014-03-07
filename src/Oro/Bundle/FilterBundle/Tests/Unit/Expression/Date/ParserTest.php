@@ -13,7 +13,12 @@ class ParserTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->parser = new Parser();
+        $localeSettingsMock = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
+            ->disableOriginalConstructor()->getMock();
+        $localeSettingsMock->expects($this->any())->method('getTimeZone')
+            ->will($this->returnValue('UTC'));
+
+        $this->parser = new Parser($localeSettingsMock);
     }
 
     public function tearDown()

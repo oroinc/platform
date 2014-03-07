@@ -3,9 +3,21 @@
 namespace Oro\Bundle\FilterBundle\Expression\Date;
 
 use Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class Parser
 {
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
+    /**
+     * @param LocaleSettings $localeSettings
+     */
+    public function __construct(LocaleSettings $localeSettings)
+    {
+        $this->localeSettings = $localeSettings;
+    }
+
     /**
      * @param array $tokens
      *
@@ -27,7 +39,7 @@ class Parser
                 $result = $a->{$method}($b);
                 array_push($stack, $result);
             } else {
-                $stack[] = new ExpressionResult($token);
+                $stack[] = new ExpressionResult($token, $this->localeSettings->getTimeZone());
             }
         }
 

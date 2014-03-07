@@ -18,6 +18,8 @@ services:
         class: %oro_filter.provider.datevarsprovider.class%
 
     oro_filter.expression.date.parser:
+        arguments:
+            - @oro_locale.settings
         class: %oro_filter.expression.date.parser.class%
 
     oro_filter.expression.date.lexer:

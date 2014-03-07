@@ -4,10 +4,6 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\Extension;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
-use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
-use Oro\Bundle\FilterBundle\Expression\Date\Parser;
-use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -28,6 +24,8 @@ use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\FilterBundle\Filter\DateFilterUtility;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 
 class OrmDatasourceExtensionTest extends OrmTestCase
 {
@@ -45,6 +43,17 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $translator->expects($this->any())->method('trans')->will($this->returnArgument(0));
         $localeSettings = new LocaleSettings($configManager, $calendarFactory);
 
+        $subscriber = $this->getMockBuilder('Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber')
+            ->disableOriginalConstructor()
+            ->setMethods(['getSubscribedEvents'])
+            ->getMock();
+        $subscriberСlass = get_class($subscriber);
+
+        // Static stub method
+        $subscriberСlass::staticExpects($this->any())
+            ->method('getSubscribedEvents')
+            ->will($this->returnValue([]));
+
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(
                 array(
@@ -52,9 +61,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                          array(
                               'oro_type_text_filter'           => new TextFilterType($translator),
                               'oro_type_datetime_range_filter' =>
-                                  new DateTimeRangeFilterType($translator, new DateModifierProvider()),
+                                  new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
                               'oro_type_date_range_filter'     =>
-                                  new DateRangeFilterType($translator, new DateModifierProvider()),
+                                  new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber),
                               'oro_type_datetime_range'        => new DateTimeRangeType($localeSettings),
                               'oro_type_date_range'            => new DateRangeType(),
                               'oro_type_filter'                => new FilterType($translator),
@@ -218,9 +227,11 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     ->disableOriginalConstructor()->getMock();
                 $localeSetting->expects($this->any())->method('getTimeZone')->will($this->returnValue('UTC'));
 
-                $compiler = new Compiler(new Lexer(), new Parser());
-
-                $filter = new DateTimeRangeFilter($this->formFactory, new FilterUtility(), $compiler, $localeSetting);
+                $filter = new DateTimeRangeFilter(
+                    $this->formFactory,
+                    new FilterUtility(),
+                    new DateFilterUtility($localeSetting)
+                );
                 break;
             default:
                 throw new \Exception(sprintf('Not implementer in this test filter: "%s".', $name));
