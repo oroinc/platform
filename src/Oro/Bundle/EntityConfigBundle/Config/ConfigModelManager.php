@@ -321,6 +321,14 @@ class ConfigModelManager
     }
 
     /**
+     * Removes all cached data
+     */
+    public function clearCache()
+    {
+        $this->localCache->clear();
+    }
+
+    /**
      * @param string $className
      * @return EntityConfigModel|null
      */

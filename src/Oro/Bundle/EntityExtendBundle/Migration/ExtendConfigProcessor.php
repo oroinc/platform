@@ -2,17 +2,26 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Psr\Log\LoggerInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendConfigProcessor
 {
     /**
      * @var ConfigManager
      */
     protected $configManager;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * @param ConfigManager $configManager
@@ -23,16 +32,63 @@ class ExtendConfigProcessor
     }
 
     /**
+     * @param array                $configs
+     * @param LoggerInterface|null $logger
+     * @param bool                 $dryRun
+     * @throws \Exception
+     */
+    public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
+    {
+        $this->logger = $logger;
+        try {
+            if (!empty($configs)) {
+                $this->filterConfigs($configs);
+                if (!empty($configs)) {
+                    foreach ($configs as $className => $entityConfigs) {
+                        $this->processEntityConfigs($className, $entityConfigs);
+                    }
+
+                    if ($dryRun) {
+                        $this->configManager->clear();
+                    } else {
+                        $this->configManager->flush();
+                    }
+                }
+            }
+        } catch (\Exception $ex) {
+            $this->logger = null;
+            throw $ex;
+        }
+    }
+
+    /**
+     * Removes configs for non configurable entities if requested a change of field type only
+     *
      * @param array $configs
      */
-    public function processConfigs(array $configs)
+    protected function filterConfigs(array &$configs)
     {
-        if (!empty($configs)) {
-            foreach ($configs as $className => $entityConfigs) {
-                $this->processEntityConfigs($className, $entityConfigs);
+        foreach ($configs as $className => $entityConfigs) {
+            if (!$this->isCustomEntity($className)) {
+                if (!$this->configManager->hasConfig($className)) {
+                    $fieldsCanBeRemoved = false;
+                    if (isset($entityConfigs['fields'])) {
+                        $fieldsCanBeRemoved = true;
+                        foreach ($entityConfigs['fields'] as $fieldConfigs) {
+                            if (!(isset($fieldConfigs['type']) && count($fieldConfigs) === 1)) {
+                                $fieldsCanBeRemoved = false;
+                                break;
+                            }
+                        }
+                        if ($fieldsCanBeRemoved) {
+                            unset($configs[$className]['fields']);
+                        }
+                    }
+                    if ($fieldsCanBeRemoved && empty($configs[$className])) {
+                        unset($configs[$className]);
+                    }
+                }
             }
-
-            $this->configManager->flush();
         }
     }
 
@@ -43,10 +99,9 @@ class ExtendConfigProcessor
     protected function processEntityConfigs($className, array $configs)
     {
         if ($this->configManager->hasConfig($className)) {
-            $this->updateEntityModel(
-                $className,
-                isset($configs['configs']) ? $configs['configs'] : []
-            );
+            if (isset($configs['configs'])) {
+                $this->updateEntityModel($className, $configs['configs']);
+            }
         } else {
             $this->createEntityModel(
                 $className,
@@ -72,12 +127,12 @@ class ExtendConfigProcessor
     protected function processFieldConfigs($className, $fieldName, array $configs, $isExtendEntity)
     {
         if ($this->configManager->hasConfig($className, $fieldName)) {
-            $this->updateFieldModel(
-                $className,
-                $fieldName,
-                isset($configs['configs']) ? $configs['configs'] : [],
-                isset($configs['type']) ? $configs['type'] : null
-            );
+            if (isset($configs['configs'])) {
+                $this->updateFieldModel($className, $fieldName, $configs['configs']);
+            }
+            if (isset($configs['type'])) {
+                $this->changeFieldType($className, $fieldName, $configs['type']);
+            }
         } else {
             $this->createFieldModel(
                 $className,
@@ -102,6 +157,13 @@ class ExtendConfigProcessor
             throw new \LogicException(sprintf('Class "%s" is not configurable.', $className));
         }
 
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf('Create entity "%s".', $className),
+                ['configs' => $configs]
+            );
+        }
+
         $this->configManager->createConfigEntityModel($className, $mode);
 
         $this->updateConfigs($configs, $className);
@@ -118,6 +180,13 @@ class ExtendConfigProcessor
      */
     protected function updateEntityModel($className, array $configs)
     {
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf('Update entity "%s".', $className),
+                ['configs' => $configs]
+            );
+        }
+
         $haveChanges = $this->updateConfigs($configs, $className);
 
         if ($haveChanges) {
@@ -147,6 +216,19 @@ class ExtendConfigProcessor
             );
         }
 
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf(
+                    'Create field "%s". Type: %s. Mode: %s. Entity: %s.',
+                    $fieldName,
+                    $fieldType,
+                    $mode,
+                    $className
+                ),
+                ['configs' => $configs]
+            );
+        }
+
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, $mode);
 
         $this->updateConfigs($configs, $className, $fieldName);
@@ -161,11 +243,16 @@ class ExtendConfigProcessor
      * @param string $className
      * @param string $fieldName
      * @param array  $configs
-     * @param string $fieldType
-     * @throws \InvalidArgumentException
      */
-    protected function updateFieldModel($className, $fieldName, array $configs, $fieldType = null)
+    protected function updateFieldModel($className, $fieldName, array $configs)
     {
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf('Update field "%s". Entity: %s.', $fieldName, $className),
+                ['configs' => $configs]
+            );
+        }
+
         $haveChanges = $this->updateConfigs($configs, $className, $fieldName);
 
         if ($haveChanges) {
@@ -176,8 +263,21 @@ class ExtendConfigProcessor
             }
             $this->configManager->persist($extendConfig);
         }
+    }
 
-        if ($fieldType) {
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
+     */
+    protected function changeFieldType($className, $fieldName, $fieldType)
+    {
+        if ($this->configManager->getConfigFieldModel($className, $fieldName)->getType() !== $fieldType) {
+            if ($this->logger) {
+                $this->logger->notice(
+                    sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
+                );
+            }
             $this->configManager->changeFieldType($className, $fieldName, $fieldType);
         }
     }

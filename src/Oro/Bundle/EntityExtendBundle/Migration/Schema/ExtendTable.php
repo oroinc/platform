@@ -69,6 +69,7 @@ class ExtendTable extends Table
 
         $column = $this->getColumn($columnName);
         if (null !== $oroOptions) {
+            $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
             $column->setOptions([ExtendColumn::ORO_OPTIONS_NAME => $oroOptions]);
         }
 

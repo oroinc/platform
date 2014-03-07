@@ -111,10 +111,10 @@ class ExtendExtension
     ) {
         $this->ensureExtendFieldSet($options);
 
+        $options[ExtendOptionsManager::TYPE_OPTION] = 'optionSet';
         $this->extendOptionsManager->setColumnOptions(
             $this->getTableName($table),
             $optionSetName,
-            'optionSet',
             $options
         );
     }
@@ -202,7 +202,7 @@ class ExtendExtension
             )
         );
 
-        $options['_target'] = [
+        $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name' => $targetTableName,
             'columns'    => [
                 'title'    => $targetTitleColumnNames,
@@ -211,10 +211,10 @@ class ExtendExtension
             ],
         ];
 
+        $options[ExtendOptionsManager::TYPE_OPTION] = 'oneToMany';
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
-            'oneToMany',
             $options
         );
     }
@@ -325,7 +325,7 @@ class ExtendExtension
         );
         $relationsTable->setPrimaryKey([$selfRelationName, $targetRelationName]);
 
-        $options['_target'] = [
+        $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name' => $targetTableName,
             'columns'    => [
                 'title'    => $targetTitleColumnNames,
@@ -334,10 +334,10 @@ class ExtendExtension
             ],
         ];
 
+        $options[ExtendOptionsManager::TYPE_OPTION] = 'manyToMany';
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
-            'manyToMany',
             $options
         );
     }
@@ -393,15 +393,15 @@ class ExtendExtension
             )
         );
 
-        $options['_target'] = [
+        $options[ExtendOptionsManager::TARGET_OPTION] = [
             'table_name' => $targetTableName,
             'column'     => $targetColumnName,
         ];
 
+        $options[ExtendOptionsManager::TYPE_OPTION] = 'manyToOne';
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
-            'manyToOne',
             $options
         );
     }

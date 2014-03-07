@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
@@ -46,7 +47,65 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             self::CLASS_NAME => []
         ];
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects($this->any())
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::CLASS_NAME, null, false],
+                    ]
+                )
+            );
+
+        $this->generator->processConfigs($configs);
+    }
+
+    public function testModificationOfNonConfigurableEntityWithOnlyFieldsTypeSpecified()
+    {
+        $configs = [
+            self::CLASS_NAME => [
+                'fields' => [
+                    'field1' => [
+                        'type' => 'integer'
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configManager->expects($this->any())
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::CLASS_NAME, null, false],
+                    ]
+                )
+            );
+
+        $this->configManager->expects($this->never())
+            ->method('flush');
+
+        $this->generator->processConfigs($configs);
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Class "Test\ExtendConfigProcessorTestBundle\Entity\SomeClass" is not configurable.
+     */
+    public function testModificationOfNonConfigurableEntityWithFieldsTypeSpecifiedAndHasEntityConfigs()
+    {
+        $configs = [
+            self::CLASS_NAME => [
+                'configs' => [],
+                'fields' => [
+                    'field1' => [
+                        'type' => 'integer'
+                    ]
+                ]
+            ]
+        ];
+
+        $this->configManager->expects($this->any())
             ->method('hasConfig')
             ->will(
                 $this->returnValueMap(
@@ -385,6 +444,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $extendConfigEntity->set('is_extend', true);
         $extendConfigField   = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
+        $configFieldModel    = new FieldConfigModel($testFieldName, 'string');
 
         // config providers configuration
         $extendConfigProvider   = $this->getConfigProviderMock();
@@ -432,6 +492,10 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->configManager->expects($this->never())
             ->method('createConfigFieldModel');
+        $this->configManager->expects($this->once())
+            ->method('getConfigFieldModel')
+            ->with(self::CLASS_NAME, $testFieldName)
+            ->will($this->returnValue($configFieldModel));
         $this->configManager->expects($this->once())
             ->method('changeFieldType')
             ->with(self::CLASS_NAME, $testFieldName, 'integer');

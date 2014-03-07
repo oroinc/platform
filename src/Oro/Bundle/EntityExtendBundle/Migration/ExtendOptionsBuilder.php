@@ -50,47 +50,67 @@ class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
             unset($options['_entity_name']);
         }
         $entityClassName = $this->getEntityClassName($tableName, $entityName);
+
+        $tableMode = isset($options[ExtendOptionsManager::MODE_OPTION])
+            ? $options[ExtendOptionsManager::MODE_OPTION]
+            : null;
+        unset($options[ExtendOptionsManager::MODE_OPTION]);
+
         if (!isset($this->result[$entityClassName])) {
             $this->result[$entityClassName] = [];
         }
-        $this->result[$entityClassName]['configs'] = $options;
+        if (!empty($options)) {
+            $this->result[$entityClassName]['configs'] = $options;
+        }
+        if ($tableMode) {
+            $this->result[$entityClassName]['mode'] = $tableMode;
+        }
     }
 
     /**
      * @param string $tableName
      * @param string $columnName
-     * @param string $columnType
      * @param array  $options
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function addColumnOptions($tableName, $columnName, $columnType, $options)
+    public function addColumnOptions($tableName, $columnName, $options)
     {
         $entityClassName = $this->getEntityClassName($tableName);
 
-        if (!isset($this->result[$entityClassName])) {
-            $this->result[$entityClassName] = [];
-        }
-        if (!isset($this->result[$entityClassName]['fields'])) {
-            $this->result[$entityClassName]['fields'] = [];
-        }
+        $columnType = isset($options[ExtendOptionsManager::TYPE_OPTION])
+            ? $options[ExtendOptionsManager::TYPE_OPTION]
+            : null;
+        unset($options[ExtendOptionsManager::TYPE_OPTION]);
+        $columnMode = isset($options[ExtendOptionsManager::MODE_OPTION])
+            ? $options[ExtendOptionsManager::MODE_OPTION]
+            : null;
+        unset($options[ExtendOptionsManager::MODE_OPTION]);
 
         if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }
-            foreach ($options['_target'] as $optionName => $optionValue) {
+            foreach ($options[ExtendOptionsManager::TARGET_OPTION] as $optionName => $optionValue) {
                 switch ($optionName) {
                     case 'table_name':
                         $options['extend']['target_entity'] = $this->getEntityClassName($optionValue);
                         break;
                     case 'column':
-                        $options['extend']['target_field'] =
-                            $this->getFieldName($options['_target']['table_name'], $optionValue);
+                        $options['extend']['target_field'] = $this->getFieldName(
+                            $options[ExtendOptionsManager::TARGET_OPTION]['table_name'],
+                            $optionValue
+                        );
                         break;
                     case 'columns':
                         foreach ($optionValue as $group => $columns) {
                             $values = [];
                             foreach ($columns as $column) {
-                                $values[] = $this->getFieldName($options['_target']['table_name'], $column);
+                                $values[] = $this->getFieldName(
+                                    $options[ExtendOptionsManager::TARGET_OPTION]['table_name'],
+                                    $column
+                                );
                             }
                             $options['extend']['target_' . $group] = $values;
                         }
@@ -105,13 +125,25 @@ class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
                 $options['extend']['target_entity']
             );
 
-            unset($options['_target']);
+            unset($options[ExtendOptionsManager::TARGET_OPTION]);
         }
 
-        $this->result[$entityClassName]['fields'][$columnName] = [
-            'type'    => $columnType,
-            'configs' => $options
-        ];
+        if (!isset($this->result[$entityClassName])) {
+            $this->result[$entityClassName] = [];
+        }
+        if (!isset($this->result[$entityClassName]['fields'])) {
+            $this->result[$entityClassName]['fields'] = [];
+        }
+        $this->result[$entityClassName]['fields'][$columnName] = [];
+        if (!empty($options)) {
+            $this->result[$entityClassName]['fields'][$columnName]['configs'] = $options;
+        }
+        if ($columnType) {
+            $this->result[$entityClassName]['fields'][$columnName]['type'] = $columnType;
+        }
+        if ($columnMode) {
+            $this->result[$entityClassName]['fields'][$columnName]['mode'] = $columnMode;
+        }
     }
 
     /**

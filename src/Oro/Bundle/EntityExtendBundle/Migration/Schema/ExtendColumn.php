@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Schema\Column;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -49,7 +50,9 @@ class ExtendColumn extends Column
                 $options[$name] = $val;
             }
         }
-        parent::__construct($baseColumn->getName(), $baseColumn->getType(), $options);
+        $this->_setName($baseColumn->getName());
+        $this->_type = $baseColumn->getType();
+        $this->setOptions($options);
         $this->setColumnDefinition($baseColumn->getColumnDefinition());
         $this->setPlatformOptions($baseColumn->getPlatformOptions());
         $this->setCustomSchemaOptions($baseColumn->getCustomSchemaOptions());
@@ -68,7 +71,6 @@ class ExtendColumn extends Column
             $this->extendOptionsManager->setColumnOptions(
                 $this->tableName,
                 $columnName,
-                $this->getType()->getName(),
                 $options[ExtendColumn::ORO_OPTIONS_NAME]
             );
             unset($options[ExtendColumn::ORO_OPTIONS_NAME]);
@@ -77,5 +79,23 @@ class ExtendColumn extends Column
         if (!empty($options)) {
             parent::setOptions($options);
         }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setType(Type $type)
+    {
+        $this->setOptions(
+            [
+                ExtendColumn::ORO_OPTIONS_NAME => [
+                    ExtendOptionsManager::TYPE_OPTION => $type->getName()
+                ]
+            ]
+        );
+
+        return parent::setType($type);
     }
 }
