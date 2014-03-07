@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Abstract segment mapped super class implementing node and tree
  *
- *
  * @ORM\MappedSuperclass
  * @Gedmo\Tree(type="nested")
  */
