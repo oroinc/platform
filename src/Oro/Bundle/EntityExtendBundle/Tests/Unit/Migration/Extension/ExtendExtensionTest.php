@@ -202,7 +202,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     'fields' => [
                         'option_set1' => [
                             'type'    => 'optionSet',
-                            'configs' => []
+                            'configs' => [
+                                'extend' => ['extend' => true]
+                            ]
                         ]
                     ],
                 ],
@@ -240,7 +242,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         'option_set1' => [
                             'type'    => 'optionSet',
                             'configs' => [
-                                'extend' => ['is_extend' => true]
+                                'extend' => ['extend' => true, 'is_extend' => true]
                             ]
                         ]
                     ],
@@ -418,6 +420,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'type'    => 'oneToMany',
                             'configs' => [
                                 'extend' => [
+                                    'extend'          => true,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
@@ -490,6 +493,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'type'    => 'oneToMany',
                             'configs' => [
                                 'extend' => [
+                                    'extend'          => true,
                                     'is_extend'       => true,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_title'    => ['name'],
@@ -682,6 +686,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'type'    => 'manyToMany',
                             'configs' => [
                                 'extend' => [
+                                    'extend'          => true,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_title'    => ['name'],
                                     'target_detailed' => ['name'],
@@ -760,6 +765,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'type'    => 'manyToMany',
                             'configs' => [
                                 'extend' => [
+                                    'extend'          => true,
                                     'is_extend'       => true,
                                     'target_entity'   => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_title'    => ['name'],
@@ -874,6 +880,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'type'    => 'manyToOne',
                             'configs' => [
                                 'extend' => [
+                                    'extend'        => true,
                                     'target_entity' => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_field'  => 'name',
                                     'relation_key'  =>
@@ -934,6 +941,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'type'    => 'manyToOne',
                             'configs' => [
                                 'extend' => [
+                                    'extend'        => true,
                                     'is_extend'     => true,
                                     'target_entity' => 'Acme\AcmeBundle\Entity\Entity2',
                                     'target_field'  => 'name',

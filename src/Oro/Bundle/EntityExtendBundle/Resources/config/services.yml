@@ -72,3 +72,4 @@ services:
         class: %oro_entity_extend.migration.extension.extend.class%
         arguments:
             - @oro_entity_extend.migration.options_manager
+            - @oro_entity_extend.db_id_name_generator

@@ -109,6 +109,8 @@ class ExtendExtension
         $optionSetName,
         array $options = []
     ) {
+        $this->ensureExtendFieldSet($options);
+
         $this->extendOptionsManager->setColumnOptions(
             $this->getTableName($table),
             $optionSetName,
@@ -139,6 +141,8 @@ class ExtendExtension
         array $targetGridColumnNames,
         array $options = []
     ) {
+        $this->ensureExtendFieldSet($options);
+
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
@@ -239,6 +243,8 @@ class ExtendExtension
         array $targetGridColumnNames,
         array $options = []
     ) {
+        $this->ensureExtendFieldSet($options);
+
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
@@ -355,6 +361,8 @@ class ExtendExtension
         $targetColumnName,
         array $options = []
     ) {
+        $this->ensureExtendFieldSet($options);
+
         $selfTableName  = $this->getTableName($table);
         $selfTable      = $this->getTable($table, $schema);
         $selfColumnName = sprintf('%s%s_id', ExtendConfigDumper::FIELD_PREFIX, $associationName);
@@ -496,5 +504,18 @@ class ExtendExtension
         $parts = explode('\\', $className);
 
         return array_pop($parts);
+    }
+
+    /**
+     * @param array $options
+     */
+    protected function ensureExtendFieldSet(array &$options)
+    {
+        if (!isset($options['extend'])) {
+            $options['extend'] = [];
+        }
+        if (!isset($options['extend']['extend'])) {
+            $options['extend']['extend'] = true;
+        }
     }
 }

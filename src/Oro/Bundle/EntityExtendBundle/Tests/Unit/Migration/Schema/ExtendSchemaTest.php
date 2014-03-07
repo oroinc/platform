@@ -141,7 +141,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                         'extend_column1'       => [
                             'type'    => 'string',
                             'configs' => [
-                                'extend'   => ['is_extend' => true, 'owner' => 'Custom'],
+                                'extend'   => ['extend' => true, 'is_extend' => true, 'owner' => 'Custom'],
                                 'datagrid' => ['is_visible' => false]
                             ]
                         ]

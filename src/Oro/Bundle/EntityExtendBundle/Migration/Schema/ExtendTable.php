@@ -58,6 +58,9 @@ class ExtendTable extends Table
         }
 
         if (null !== $oroOptions && isset($oroOptions['extend'])) {
+            if (!isset($oroOptions['extend']['extend'])) {
+                $oroOptions['extend']['extend'] = true;
+            }
             $columnName         = ExtendConfigDumper::FIELD_PREFIX . $columnName;
             $options['notnull'] = false;
         }
