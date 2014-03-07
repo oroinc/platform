@@ -7,6 +7,7 @@ define([
     'oroworkflow/js/workflow-management/step/view/edit',
     'oroworkflow/js/workflow-management/transition/view/edit',
     'oroworkflow/js/workflow-management/helper',
+    'oronavigation/js/navigation',
     'oroentity/js/fields-loader'
 ],
 function(_, Backbone, messanger, __,
@@ -15,7 +16,8 @@ function(_, Backbone, messanger, __,
      TransitionModel,
      StepEditView,
      TransitionEditForm,
-     Helper
+     Helper,
+     Navigation
 ) {
     'use strict';
 
@@ -107,6 +109,8 @@ function(_, Backbone, messanger, __,
 
         saveConfiguration: function(e) {
             e.preventDefault();
+            var navigation = Navigation.isEnabled() ? Navigation.getInstance() : null;
+
             var formData = Helper.getFormData(this.$el);
             formData.steps_display_ordered = formData.hasOwnProperty('steps_display_ordered');
 
@@ -117,11 +121,20 @@ function(_, Backbone, messanger, __,
             this.model.set('steps_display_ordered', formData.steps_display_ordered);
             this.model.set('entity', formData.related_entity);
 
+            if (navigation) {
+                navigation.showLoading();
+            }
             this.model.save(null, {
                 'success': function() {
+                    if (navigation) {
+                        navigation.hideLoading();
+                    }
                     messanger.notificationFlashMessage('success', __('Workflow saved.'));
                 },
                 'error': function() {
+                    if (navigation) {
+                        navigation.hideLoading();
+                    }
                     messanger.notificationFlashMessage('error', __('Could not save workflow.'));
                 }
             });
