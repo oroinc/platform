@@ -48,3 +48,50 @@
     margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }
+.controls{
+  .selector{
+    width: 100% !important;
+    span{
+      width: 100% !important;
+    }
+    select{
+      width: 100% !important;
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+    }
+  }
+
+  input[type="text"],
+  input[type="search"],
+  input[type="email"]{
+    width: 100% !important;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    height: 30px;
+  }
+  textarea{
+    width: 100% !important;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+  }
+}
+.form-horizontal{
+  .controls{
+    .control-label{
+      padding-top: 0;
+    }  
+  }
+  .select2-container{
+    width: 100%;
+    max-width: 100%;
+  }
+}
+.oro-multiselect-holder{
+  input[type="email"],
+  input[type="text"]{
+    width: 225px !important;
+  }
+}
