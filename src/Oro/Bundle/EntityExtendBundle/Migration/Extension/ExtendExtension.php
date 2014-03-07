@@ -100,18 +100,18 @@ class ExtendExtension
      *
      * @param Schema       $schema
      * @param Table|string $table A Table object or table name
-     * @param string       $columnName
+     * @param string       $optionSetName
      * @param array        $options
      */
     public function addOptionSet(
         Schema $schema,
         $table,
-        $columnName,
+        $optionSetName,
         array $options = []
     ) {
         $this->extendOptionsManager->setColumnOptions(
             $this->getTableName($table),
-            $columnName,
+            $optionSetName,
             'optionSet',
             $options
         );
@@ -122,7 +122,7 @@ class ExtendExtension
      *
      * @param Schema       $schema
      * @param Table|string $table                     A Table object or table name
-     * @param string       $columnName
+     * @param string       $associationName           A relation name
      * @param Table|string $targetTable               A Table object or table name
      * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
@@ -132,7 +132,7 @@ class ExtendExtension
     public function addOneToManyRelation(
         Schema $schema,
         $table,
-        $columnName,
+        $associationName,
         $targetTable,
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
@@ -142,7 +142,7 @@ class ExtendExtension
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = sprintf('%s%s_id', ExtendConfigDumper::DEFAULT_PREFIX, $columnName);
+        $selfColumnName           = sprintf('%s%s_id', ExtendConfigDumper::DEFAULT_PREFIX, $associationName);
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
 
@@ -154,7 +154,7 @@ class ExtendExtension
             '%s%s_%s_id',
             ExtendConfigDumper::FIELD_PREFIX,
             strtolower($this->getShortClassName($selfClassName)),
-            $columnName
+            $associationName
         );
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
@@ -209,7 +209,7 @@ class ExtendExtension
 
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
-            $columnName,
+            $associationName,
             'oneToMany',
             $options
         );
@@ -220,7 +220,7 @@ class ExtendExtension
      *
      * @param Schema       $schema
      * @param Table|string $table                     A Table object or table name
-     * @param string       $columnName
+     * @param string       $associationName           A relation name
      * @param Table|string $targetTable               A Table object or table name
      * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
@@ -232,7 +232,7 @@ class ExtendExtension
     public function addManyToManyRelation(
         Schema $schema,
         $table,
-        $columnName,
+        $associationName,
         $targetTable,
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
@@ -242,7 +242,7 @@ class ExtendExtension
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = sprintf('%s%s_id', ExtendConfigDumper::DEFAULT_PREFIX, $columnName);
+        $selfColumnName           = sprintf('%s%s_id', ExtendConfigDumper::DEFAULT_PREFIX, $associationName);
         $selfRelationName         = sprintf('%s_id', strtolower($this->getShortClassName($selfClassName)));
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
@@ -279,7 +279,7 @@ class ExtendExtension
 
         $relationsTableName = $this->dbIdentifierNameGenerator->generateManyToManyJoinTableName(
             $selfClassName,
-            $columnName,
+            $associationName,
             $targetClassName
         );
         $relationsTable     = $schema->createTable($relationsTableName);
@@ -330,7 +330,7 @@ class ExtendExtension
 
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
-            $columnName,
+            $associationName,
             'manyToMany',
             $options
         );
@@ -341,7 +341,7 @@ class ExtendExtension
      *
      * @param Schema       $schema
      * @param Table|string $table            A Table object or table name
-     * @param string       $columnName
+     * @param string       $associationName  A relation name
      * @param Table|string $targetTable      A Table object or table name
      * @param string       $targetColumnName A column name is used to show related entity
      * @param array        $options
@@ -350,14 +350,14 @@ class ExtendExtension
     public function addManyToOneRelation(
         Schema $schema,
         $table,
-        $columnName,
+        $associationName,
         $targetTable,
         $targetColumnName,
         array $options = []
     ) {
         $selfTableName  = $this->getTableName($table);
         $selfTable      = $this->getTable($table, $schema);
-        $selfColumnName = sprintf('%s%s_id', ExtendConfigDumper::FIELD_PREFIX, $columnName);
+        $selfColumnName = sprintf('%s%s_id', ExtendConfigDumper::FIELD_PREFIX, $associationName);
 
         $targetTableName = $this->getTableName($targetTable);
         if (!($targetTable instanceof Table)) {
@@ -392,7 +392,7 @@ class ExtendExtension
 
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
-            $columnName,
+            $associationName,
             'manyToOne',
             $options
         );
