@@ -7,70 +7,152 @@ use Oro\Bundle\ReminderBundle\Model\ReminderState;
 class ReminderStateTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @dataProvider typesProvider
+     * @dataProvider typesDataProvider
      */
     public function testCreate($types)
     {
-        new ReminderState($types);
+        $this->createReminderState($types);
     }
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider isAllSentDataProvider
+     */
+    public function testIsAllSent(array $types, $expected)
+    {
+        $reminderState = $this->createReminderState($types);
+        $this->assertEquals($expected, $reminderState->isAllSent());
+    }
+
+    public function isAllSentDataProvider()
+    {
+        return array(
+            'all_sent_true' => array(
+                'types' => array('foo' => ReminderState::SEND_TYPE_SENT, 'bar' => ReminderState::SEND_TYPE_SENT),
+                'expected' => true,
+            ),
+            'all_sent_false' => array(
+                'types' => array('foo' => ReminderState::SEND_TYPE_SENT, 'bar' => ReminderState::SEND_TYPE_NOT_SENT),
+                'expected' => false,
+            ),
+            'all_sent_true_empty' => array(
+                'types' => array(),
+                'expected' => true,
+            ),
+        );
+    }
+
+    /**
+     * @dataProvider getSendTypeNamesDataProvider
+     */
+    public function testGetSendTypeNames(array $types, array $expected)
+    {
+        $reminderState = $this->createReminderState($types);
+        $this->assertEquals($expected, $reminderState->getSendTypeNames());
+    }
+
+    public function getSendTypeNamesDataProvider()
+    {
+        return array(
+            'default' => array(
+                'types' => array('foo' => ReminderState::SEND_TYPE_SENT, 'bar' => ReminderState::SEND_TYPE_SENT),
+                'expected' => array('foo', 'bar'),
+            ),
+            'empty' => array(
+                'types' => array(),
+                'expected' => array(),
+            )
+        );
+    }
+
+    /**
+     * @dataProvider typesDataProvider
+     */
+    public function testHasSendTypeState($types, $offset, $value, $offsetExists)
+    {
+        $state = $this->createReminderState($types);
+
+        $this->$offsetExists($state->hasSendTypeState($offset));
+    }
+
+    /**
+     * @dataProvider typesDataProvider
+     */
+    public function testGetSendTypeState($types, $name, $value)
+    {
+        $state = $this->createReminderState($types);
+
+        $this->assertEquals($value, $state->getSendTypeState($name));
+    }
+
+    /**
+     * @dataProvider typesDataProvider
+     */
+    public function testSetSendTypeState($types, $name, $value)
+    {
+        $state = $this->createReminderState($types);
+
+        $state->setSendTypeState($name, $value);
+
+        $this->assertEquals($value, $state->getSendTypeState($name));
+    }
+
+    /**
+     * @dataProvider typesDataProvider
      */
     public function testToArray($types)
     {
-        $state = new ReminderState($types);
+        $state = $this->createReminderState($types);
 
         $this->assertEquals($types, $state->toArray());
     }
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider typesDataProvider
      */
     public function testSerialize($types)
     {
-        $state = new ReminderState($types);
+        $state = $this->createReminderState($types);
 
         $this->assertEquals(serialize($types), $state->serialize());
     }
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider typesDataProvider
      */
     public function testUnserialize($types)
     {
-        $state = new ReminderState($types);
+        $state = $this->createReminderState($types);
         $state->unserialize($state->serialize());
 
         $this->assertEquals($types, $state->toArray());
     }
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider typesDataProvider
      */
     public function testOffsetExists($types, $offset, $value, $offsetExists)
     {
-        $state = new ReminderState($types);
+        $state = $this->createReminderState($types);
 
         $this->$offsetExists($state->offsetExists($offset));
     }
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider typesDataProvider
      */
     public function testOffsetGet($types, $offset, $value)
     {
-        $state = new ReminderState($types);
+        $state = $this->createReminderState($types);
 
         $this->assertEquals($value, $state->offsetGet($offset));
     }
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider typesDataProvider
      */
     public function testOffsetSet($types, $offset, $value)
     {
-        $state = new ReminderState($types);
+        $state = $this->createReminderState($types);
 
         $state->offsetSet($offset, $value . $value);
 
@@ -78,18 +160,18 @@ class ReminderStateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider typesProvider
+     * @dataProvider typesDataProvider
      */
     public function testOffsetUnset($types, $offset)
     {
-        $state = new ReminderState($types);
+        $state = $this->createReminderState($types);
 
         $state->offsetUnset($offset);
 
         $this->assertFalse($state->offsetExists($offset));
     }
 
-    public function typesProvider()
+    public function typesDataProvider()
     {
         return [
             'empty' => [
@@ -99,11 +181,20 @@ class ReminderStateTest extends \PHPUnit_Framework_TestCase
                 'offsetExists' => 'assertFalse',
             ],
             'not_empty' => [
-                'types' => ['type1' => true, 'type2' => false],
+                'types' => ['type1' => ReminderState::SEND_TYPE_SENT, 'type2' => ReminderState::SEND_TYPE_NOT_SENT],
                 'offset' => 'type1',
-                'value' => true,
+                'value' => ReminderState::SEND_TYPE_SENT,
                 'offsetExists' => 'assertTrue',
             ],
         ];
+    }
+
+    /**
+     * @param array $types
+     * @return ReminderState
+     */
+    protected function createReminderState(array $types)
+    {
+        return new ReminderState($types);
     }
 }

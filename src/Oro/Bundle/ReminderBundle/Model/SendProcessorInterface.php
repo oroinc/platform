@@ -17,13 +17,6 @@ interface SendProcessorInterface
     public function process(Reminder $reminder);
 
     /**
-     * Checks if reminder sending should be processed
-     *
-     * @param Reminder $reminder
-     */
-    public function supports(Reminder $reminder);
-
-    /**
      * Gets unique name of processor
      *
      * @param string

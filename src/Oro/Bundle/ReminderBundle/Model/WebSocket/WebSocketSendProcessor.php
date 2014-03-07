@@ -20,16 +20,6 @@ class WebSocketSendProcessor implements SendProcessorInterface
     }
 
     /**
-     * If reminder should be sent using WebSocket
-     *
-     * @param Reminder $reminder
-     */
-    public function supports(Reminder $reminder)
-    {
-        // TODO: Implement supports() method.
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getName()

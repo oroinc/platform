@@ -2,8 +2,13 @@
 
 namespace Oro\Bundle\ReminderBundle\Model;
 
+use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
+
 class ReminderState implements \ArrayAccess, \Serializable
 {
+    const SEND_TYPE_SENT = 'sent';
+    const SEND_TYPE_NOT_SENT = 'not_sent';
+
     /**
      * @var array
      */
@@ -18,6 +23,65 @@ class ReminderState implements \ArrayAccess, \Serializable
     }
 
     /**
+     * Get all send types names
+     *
+     * @return bool
+     */
+    public function isAllSent()
+    {
+        foreach ($this->types as $state) {
+            if ($state !== self::SEND_TYPE_SENT) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get all send types names
+     *
+     * @return array
+     */
+    public function getSendTypeNames()
+    {
+        return array_keys($this->types);
+    }
+
+    /**
+     * Is reminder has send type state
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function hasSendTypeState($name)
+    {
+        return $this->offsetExists($name);
+    }
+
+    /**
+     * Get reminder send type state
+     *
+     * @param string $name
+     * @return string
+     * @throws InvalidArgumentException
+     */
+    public function getSendTypeState($name)
+    {
+        return $this->offsetGet($name);
+    }
+
+    /**
+     * Set reminder send type state
+     *
+     * @param string $name
+     * @param string $state
+     */
+    public function setSendTypeState($name, $state)
+    {
+        $this->offsetSet($name, $state);
+    }
+
+    /**
      * @return array
      */
     public function toArray()
@@ -26,7 +90,7 @@ class ReminderState implements \ArrayAccess, \Serializable
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function serialize()
     {
@@ -34,7 +98,7 @@ class ReminderState implements \ArrayAccess, \Serializable
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function unserialize($serialized)
     {
@@ -42,7 +106,7 @@ class ReminderState implements \ArrayAccess, \Serializable
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function offsetExists($offset)
     {
@@ -50,7 +114,7 @@ class ReminderState implements \ArrayAccess, \Serializable
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function offsetGet($offset)
     {
@@ -62,7 +126,7 @@ class ReminderState implements \ArrayAccess, \Serializable
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function offsetSet($offset, $value)
     {
@@ -70,7 +134,7 @@ class ReminderState implements \ArrayAccess, \Serializable
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function offsetUnset($offset)
     {

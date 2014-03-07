@@ -34,16 +34,6 @@ class EmailSendProcessor implements SendProcessorInterface
     }
 
     /**
-     * If reminder email should be sent
-     *
-     * @param Reminder $reminder
-     */
-    public function supports(Reminder $reminder)
-    {
-        // TODO: Implement supports() method.
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getName()
