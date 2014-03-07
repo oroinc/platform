@@ -4,6 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+
 /**
  * @ORM\Table(
  *      name="oro_workflow_step",
@@ -12,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
  *      }
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowStepRepository")
+ * @Config()
  */
 class WorkflowStep
 {

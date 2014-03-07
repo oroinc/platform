@@ -6,12 +6,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use JMS\Serializer\Annotation as Serializer;
+
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
-
-use JMS\Serializer\Annotation as Serializer;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Workflow item
@@ -26,6 +27,7 @@ use JMS\Serializer\Annotation as Serializer;
  *      }
  *  )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
+ * @Config()
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
  */
@@ -63,7 +65,7 @@ class WorkflowItem
      * @var WorkflowStep
      *
      * @ORM\ManyToOne(targetEntity="WorkflowStep")
-     * @ORM\JoinColumn(name="current_step_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="current_step_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $currentStep;
 
@@ -156,9 +158,6 @@ class WorkflowItem
      */
     protected $serializeFormat;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         $this->transitionRecords = new ArrayCollection();

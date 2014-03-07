@@ -5,7 +5,7 @@ parameters:
     oro_entity_extend.tools.dumper.class:                   Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
     oro_entity_extend.listener.config_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.listener.entity_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
-    oro_entity_extend.twig.view_extension.class:            Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
+    oro_entity_extend.extend.entity_processor.class:        Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -46,3 +46,10 @@ services:
         class:                                              %oro_entity_extend.listener.entity_subscriber.class%
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    oro_entity_extend.extend.entity_processor:
+        class:                                              %oro_entity_extend.extend.entity_processor.class%
+        arguments:
+            - @kernel
+            - @oro_platform.maintenance
+            - @oro_entity_config.config_manager

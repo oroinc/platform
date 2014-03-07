@@ -368,6 +368,12 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($obj->hasForm()); // by default transition has form
 
         $obj->setFormOptions(array('key' => 'value'));
+        $this->assertFalse($obj->hasForm());
+
+        $obj->setFormOptions(array('attribute_fields' => array()));
+        $this->assertFalse($obj->hasForm());
+
+        $obj->setFormOptions(array('attribute_fields' => array('key' => 'value')));
         $this->assertTrue($obj->hasForm());
     }
 }

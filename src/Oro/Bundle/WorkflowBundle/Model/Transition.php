@@ -343,7 +343,7 @@ class Transition
      */
     public function hasForm()
     {
-        return !empty($this->formOptions);
+        return !empty($this->formOptions) && !empty($this->formOptions['attribute_fields']);
     }
 
     /**

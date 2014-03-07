@@ -63,7 +63,7 @@ datagrid:
                 type:          navigate
                 acl_resource:  oro_workflow_definition_create
                 label:         oro.workflow.workflowdefinition.datagrid.clone
-                icon:          share
+                icon:          copy
                 link:          clone_link
             delete:
                 type:          delete

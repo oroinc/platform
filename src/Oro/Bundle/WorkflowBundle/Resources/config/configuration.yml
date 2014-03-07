@@ -47,6 +47,7 @@ services:
         class: %oro_workflow.configuration.builder.workflow_definition.class%
         arguments:
             - @oro_workflow.workflow_assembler
+            - @oro_workflow.field_generator
 
     oro_workflow.configuration.builder.workflow_definition.handle:
         class: %oro_workflow.configuration.builder.workflow_definition.handle.class%

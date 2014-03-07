@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Generator\FieldGenerator;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
@@ -16,11 +17,18 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
     protected $workflowAssembler;
 
     /**
-     * @param WorkflowAssembler $workflowAssembler
+     * @var FieldGenerator
      */
-    public function __construct(WorkflowAssembler $workflowAssembler)
+    protected $fieldGenerator;
+
+    /**
+     * @param WorkflowAssembler $workflowAssembler
+     * @param FieldGenerator $fieldGenerator
+     */
+    public function __construct(WorkflowAssembler $workflowAssembler, FieldGenerator $fieldGenerator)
     {
         $this->workflowAssembler = $workflowAssembler;
+        $this->fieldGenerator = $fieldGenerator;
     }
 
     /**
@@ -77,6 +85,8 @@ class WorkflowDefinitionConfigurationBuilder extends AbstractConfigurationBuilde
         $workflowDefinition->setStartStep($workflowDefinition->getStepByName($startStepName));
 
         $this->setEntityAcls($workflowDefinition, $workflow);
+
+        $this->fieldGenerator->generateWorkflowFields($workflowDefinition->getRelatedEntity());
 
         return $workflowDefinition;
     }

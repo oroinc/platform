@@ -14,9 +14,31 @@
 oro:
     workflow:
         workflowitem:
-            entity_label:        Workflow Item
-            entity_plural_label: Workflow Items
-            entity_description:  Represent workflow item
+            entity_label:             Workflow Item
+            entity_plural_label:      Workflow Items
+            entity_description:       Represents workflow item
+            id.label:                 ID
+            acl_identities.label:     ACL identities
+            current_step.label:       Current step
+            definition.label:         Workflow definition
+            entity_id.label:          Entity identifier
+            serialized_data.label:    Serialized data
+            transition_records.label: Transition records
+            workflow_name.label:      Workflow name
+            created.label:            Created
+            updated.label:            Updated
+
+        workflowstep:
+            entity_label:         Workflow Step
+            entity_plural_label:  Workflow Steps
+            entity_description:   Represents workflow step
+            id.label:             ID
+            definition.label:     Workflow definition
+            final.label:          Is final
+            label.label:          Label
+            name.label:           Name
+            step_order.label:     Step order
+
         workflowdefinition:
             entity_label:                 Workflow
             entity_plural_label:          Workflows
