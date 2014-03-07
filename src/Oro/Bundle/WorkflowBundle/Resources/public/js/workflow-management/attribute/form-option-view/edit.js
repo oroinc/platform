@@ -35,13 +35,12 @@ function(_, Backbone, Helper) {
             this.entity_field_template = this.options.entity_field_template || $('#entity-column-chain-template').html();
         },
 
+        getFieldSelector: function() {
+            return this.entityFieldSelectEl;
+        },
+
         onAdd: function() {
             var formData = Helper.getFormData(this.form);
-
-            var util = this.entityFieltSelectEl.data('oroentity-fieldChoice').entityFieldUtil;
-            var pathData = util.splitFieldId(formData.property_path);
-            var tpl = _.template(this.entity_field_template);
-            formData.property_path_text = tpl(pathData);
 
             formData.property_path = this.getPropertyPath(formData.property_path);
             formData.required = formData.hasOwnProperty('required');
@@ -61,15 +60,15 @@ function(_, Backbone, Helper) {
         },
 
         resetForm: function() {
-            this.entityFieltSelectEl.select2('val', '');
+            this.entityFieldSelectEl.select2('val', '');
             this.form.get(0).reset();
         },
 
         initFieldChoice: function(container) {
             var workflow = this.options.workflow;
 
-            this.entityFieltSelectEl = container.find('[name="property_path"]');
-            this.entityFieltSelectEl.fieldChoice({
+            this.entityFieldSelectEl = container.find('[name="property_path"]');
+            this.entityFieldSelectEl.fieldChoice({
                 fieldsLoaderSelector: this.options.entity_select_el,
                 select2: {
                     placeholder: "Choose field...",

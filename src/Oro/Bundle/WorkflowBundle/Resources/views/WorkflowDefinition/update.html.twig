@@ -270,7 +270,7 @@
                 <div class="control-group">
                     <label class="control-label">{{ "Label"|trans }}</label>
                     <div class="controls">
-                        <input type="text" name="label" value="<%= label %>"/>
+                        <input type="text" name="label" value="<%= label %>" placeholder="{{ 'Leave empty for system value'|trans }}"/>
                     </div>
                 </div>
 
@@ -300,13 +300,17 @@
 
     <script type="text/template" id="attribute-form-option-row-template">
         <td>
-            <%= property_path_text || property_path %>
+            <%= entityField %>
         </td>
         <td>
-            <%= label %>
+            <% if (!label) { %>
+                <span class="label">{{ 'system'|trans }}</span>
+            <% } else { %>
+                <%= label %>
+            <% } %>
         </td>
         <td>
-            <% if (required) { %><span class="label label-important">{{ "Required"|trans }}</span><% } %>
+            <% if (required) { %><span class="label label-important">{{ "yes"|trans }}</span><% } %>
         </td>
         <td class="step-actions">
             <div class="pull-right">

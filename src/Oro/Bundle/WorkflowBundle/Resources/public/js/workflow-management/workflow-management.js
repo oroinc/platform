@@ -65,6 +65,44 @@ function(_, Backbone, messanger, __,
                 router: 'oro_api_get_entity_fields',
                 routingParams: {"with-relations": 1,"with-entity-details": 1, "deep-level": 2}
             });
+
+            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
+                this.createPathMapping($(e.target).data('fields'));
+            }, this));
+        },
+
+        createPathMapping: function(fields) {
+            var rootAttributeName = this.model.get('entity_attribute');
+            var mapping = {};
+
+            var addMapping = _.bind(function(field, parent) {
+                var propertyPath = parent + '.' + field.name;
+                var fieldIdParts = [];
+
+                if (mapping.hasOwnProperty(parent)) {
+                    fieldIdParts.push(mapping[parent]);
+                }
+
+                var fieldIdName = field.name;
+                if (field.hasOwnProperty('related_entity_name')) {
+                    fieldIdName += '+' + field.related_entity_name;
+                }
+                fieldIdParts.push(fieldIdName);
+
+                mapping[propertyPath] = fieldIdParts.join('::');
+
+                if (field.hasOwnProperty('related_entity_fields')) {
+                    _.each(field.related_entity_fields, function(relatedField) {
+                        addMapping(relatedField, propertyPath);
+                    });
+                }
+            });
+
+            _.each(fields, function(field) {
+                addMapping(field, rootAttributeName);
+            });
+
+            this.model.setPropertyPathToFieldIdMapping(mapping);
         },
 
         saveConfiguration: function(e) {

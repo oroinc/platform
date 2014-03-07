@@ -26,6 +26,9 @@ function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection,
             attributes: null
         },
 
+        propertyPathToFieldIdMapping: {},
+        pathMappingInitialized: false,
+
         initialize: function() {
             if (this.get('steps') === null) {
                 this.set('steps', new StepCollection());
@@ -36,6 +39,18 @@ function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection,
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
+        },
+
+        setPropertyPathToFieldIdMapping: function(mapping) {
+            this.propertyPathToFieldIdMapping = mapping;
+            this.pathMappingInitialized = true;
+            this.trigger('pathMappingInit', mapping);
+        },
+
+        getFieldIdByPropertyPath: function(propertyPath) {
+            return this.pathMappingInitialized && this.propertyPathToFieldIdMapping.hasOwnProperty(propertyPath)
+                ? this.propertyPathToFieldIdMapping[propertyPath]
+                : '';
         },
 
         getSystemEntities: function() {

@@ -14,7 +14,10 @@ function(_, Backbone, AttributeFormOptionRowView) {
         options: {
             listElBodyEl: 'tbody',
             template: null,
-            collection: []
+            fields_selector_el: null,
+            workflow: null,
+            collection: [],
+            entity_field_template: null
         },
 
         initialize: function() {
@@ -25,6 +28,16 @@ function(_, Backbone, AttributeFormOptionRowView) {
             this.$listEl = $(this.template());
             this.$listElBody = this.$listEl.find(this.options.listElBodyEl);
             this.$el.html(this.$listEl);
+
+            this.fieldUtil = this.options.fields_selector_el.data('oroentity-fieldChoice').entityFieldUtil;
+            this.entityFieldTemplate = _.template(
+                this.options.entity_field_template || $('#entity-column-chain-template').html()
+            );
+
+            this.listenTo(this.options.workflow, 'pathMappingInit', this.render);
+            if (this.options.workflow.pathMappingInitialized) {
+                this.render();
+            }
         },
 
         addAllItems: function(items) {
@@ -32,8 +45,12 @@ function(_, Backbone, AttributeFormOptionRowView) {
         },
 
         addItem: function(data) {
-            if (!data.hasOwnProperty('property_path_text')) {
-                data.property_path_text = null;
+            var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
+            if (fieldId) {
+                var pathData = this.fieldUtil.splitFieldId(fieldId);
+                data.entityField = this.entityFieldTemplate(pathData);
+            } else {
+                data.entityField = data.property_path || data.attribute_name;
             }
 
             var rowView = new AttributeFormOptionRowView({

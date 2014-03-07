@@ -29,6 +29,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
             template: null,
             workflow: null,
             step_from: null,
+            entity_select_el: null,
             button_example_template: '<button type="button" class="btn <%= button_color %>">' +
                 '<% if (transition_prototype_icon) { %><i class="<%= transition_prototype_icon %>"/> <% } %>' +
                 '<%= label %></button>',
@@ -159,10 +160,11 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
         renderAttributesList: function(el) {
             this.attributesList = new AttributeFormOptionListView({
                 el: el.find('.transition-attributes-list-container'),
-                collection: this.getFormOptions()
+                collection: this.getFormOptions(),
+                fields_selector_el: this.attributesFormView.getFieldSelector(),
+                workflow: this.options.workflow
             });
             this.attributesList.on('removeFormOption', this.removeFormOption, this);
-            this.attributesList.render();
         },
 
         removeFormOption: function(data) {
