@@ -4,7 +4,6 @@ namespace Oro\Bundle\ReminderBundle\Model;
 
 use Oro\Bundle\ReminderBundle\Exception\SendTypeNotSupportedException;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Oro\Bundle\ReminderBundle\Model\ReminderState;
 
 /**
  * Sends reminders using delegate send processors.
@@ -28,6 +27,8 @@ class ReminderSender implements ReminderSenderInterface
     }
 
     /**
+     * Handle reminder sending
+     *
      * @param Reminder $reminder
      */
     public function send(Reminder $reminder)
@@ -52,6 +53,8 @@ class ReminderSender implements ReminderSenderInterface
     }
 
     /**
+     * Get processor by send type
+     *
      * @param string $sendType
      * @return SendProcessorInterface
      * @throws SendTypeNotSupportedException If processor is not supported
