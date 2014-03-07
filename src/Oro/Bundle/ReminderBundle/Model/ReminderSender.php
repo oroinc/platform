@@ -4,7 +4,10 @@ namespace Oro\Bundle\ReminderBundle\Model;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
-class ReminderSender
+/**
+ * Sends reminders using delegate send processors.
+ */
+class ReminderSender implements ReminderSenderInterface
 {
     /**
      * @var SendProcessorInterface[]

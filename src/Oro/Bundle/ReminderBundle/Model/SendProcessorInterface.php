@@ -22,4 +22,11 @@ interface SendProcessorInterface
      * @param Reminder $reminder
      */
     public function supports(Reminder $reminder);
+
+    /**
+     * Gets unique name of processor
+     *
+     * @param string
+     */
+    public function getName();
 }

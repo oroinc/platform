@@ -7,6 +7,8 @@ use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 
 class WebSocketSendProcessor implements SendProcessorInterface
 {
+    const NAME = 'web_socket';
+
     /**
      * Send reminder using WebSocket
      *
@@ -25,5 +27,13 @@ class WebSocketSendProcessor implements SendProcessorInterface
     public function supports(Reminder $reminder)
     {
         // TODO: Implement supports() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return self::NAME;
     }
 }

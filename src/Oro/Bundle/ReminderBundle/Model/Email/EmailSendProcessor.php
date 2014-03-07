@@ -8,6 +8,8 @@ use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 
 class EmailSendProcessor implements SendProcessorInterface
 {
+    const NAME = 'email';
+
     /**
      * @var EmailNotificationProcessor
      */
@@ -39,5 +41,13 @@ class EmailSendProcessor implements SendProcessorInterface
     public function supports(Reminder $reminder)
     {
         // TODO: Implement supports() method.
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return self::NAME;
     }
 }
