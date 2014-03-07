@@ -6,13 +6,17 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class ExtendOptionsManager
 {
+    const TYPE_OPTION   = '_type';
+    const MODE_OPTION   = '_mode';
+    const TARGET_OPTION = '_target';
+
     /**
      * @var EntityClassResolver
      */
     protected $entityClassResolver;
 
     /**
-     * @var array key = [table name] or [table name!column name!column type]
+     * @var array key = [table name] or [table name!column name]
      */
     protected $options = [];
 
@@ -36,7 +40,7 @@ class ExtendOptionsManager
      * Sets table options
      *
      * @param string $tableName
-     * @param array $options
+     * @param array  $options
      */
     public function setTableOptions($tableName, array $options)
     {
@@ -44,16 +48,50 @@ class ExtendOptionsManager
     }
 
     /**
+     * Sets table mode
+     *
+     * @param string $tableName
+     * @param string $mode
+     */
+    public function setTableMode($tableName, $mode)
+    {
+        $this->setOptions($tableName, [self::MODE_OPTION => $mode]);
+    }
+
+    /**
      * Sets column options
      *
      * @param string $tableName
      * @param string $columnName
-     * @param string $columnType
-     * @param array $options
+     * @param array  $options
      */
-    public function setColumnOptions($tableName, $columnName, $columnType, array $options)
+    public function setColumnOptions($tableName, $columnName, array $options)
     {
-        $this->setOptions(sprintf('%s!%s!%s', $tableName, $columnName, $columnType), $options);
+        $this->setOptions(sprintf('%s!%s', $tableName, $columnName), $options);
+    }
+
+    /**
+     * Sets column mode
+     *
+     * @param string $tableName
+     * @param string $columnName
+     * @param string $mode
+     */
+    public function setColumnMode($tableName, $columnName, $mode)
+    {
+        $this->setOptions(sprintf('%s!%s', $tableName, $columnName), [self::MODE_OPTION => $mode]);
+    }
+
+    /**
+     * Sets column type
+     *
+     * @param string $tableName
+     * @param string $columnName
+     * @param string $columnType
+     */
+    public function setColumnType($tableName, $columnName, $columnType)
+    {
+        $this->setOptions(sprintf('%s!%s', $tableName, $columnName), [self::TYPE_OPTION => $columnType]);
     }
 
     /**
@@ -79,7 +117,7 @@ class ExtendOptionsManager
         foreach ($objectKeys as $objectKey) {
             if (strpos($objectKey, '!')) {
                 $keyParts = explode('!', $objectKey);
-                $builder->addColumnOptions($keyParts[0], $keyParts[1], $keyParts[2], $this->options[$objectKey]);
+                $builder->addColumnOptions($keyParts[0], $keyParts[1], $this->options[$objectKey]);
             }
         }
 

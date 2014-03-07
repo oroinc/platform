@@ -41,22 +41,36 @@ class UpdateExtendConfigMigrationArrayLogger extends AbstractLogger
      * @param array  $configs
      * @param string $indent
      */
-    protected function logConfigs($configs, $indent = '')
+    protected function logConfigs($configs, $indent = '  ')
     {
         if (!empty($configs)) {
             foreach ($configs as $key => $val) {
                 if (is_array($val)) {
-                    $this->messages[] = sprintf('"%s"', $key);
-                    $this->logConfigs($val, $indent . '    ');
+                    $this->messages[] = sprintf('%s"%s"', $indent, $key);
+                    $this->logConfigs($val, $indent . '  ');
                 } else {
-                    $this->messages[] = sprintf(
-                        '%s"%s" = %s',
-                        $indent,
-                        $key,
-                        is_string($val) ? sprintf('"%s"', $val) : (string)$val
-                    );
+                    $this->messages[] = sprintf('%s"%s" = %s', $indent, $key, $this->convertToStr($val));
                 }
             }
         }
+    }
+
+    /**
+     * @param mixed $val
+     * @return string
+     */
+    protected function convertToStr($val)
+    {
+        if (null === $val) {
+            return 'null';
+        }
+        if (is_string($val)) {
+            return sprintf('"%s"', $val);
+        }
+        if (is_bool($val)) {
+            return $val ? 'true' : 'false';
+        }
+
+        return (string)$val;
     }
 }

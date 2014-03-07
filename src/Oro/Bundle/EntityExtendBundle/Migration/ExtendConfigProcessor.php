@@ -8,6 +8,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExtendConfigProcessor
 {
     /**
@@ -39,19 +42,53 @@ class ExtendConfigProcessor
         $this->logger = $logger;
         try {
             if (!empty($configs)) {
-                foreach ($configs as $className => $entityConfigs) {
-                    $this->processEntityConfigs($className, $entityConfigs);
-                }
+                $this->filterConfigs($configs);
+                if (!empty($configs)) {
+                    foreach ($configs as $className => $entityConfigs) {
+                        $this->processEntityConfigs($className, $entityConfigs);
+                    }
 
-                if ($dryRun) {
-                    $this->configManager->clear();
-                } else {
-                    $this->configManager->flush();
+                    if ($dryRun) {
+                        $this->configManager->clear();
+                    } else {
+                        $this->configManager->flush();
+                    }
                 }
             }
         } catch (\Exception $ex) {
             $this->logger = null;
             throw $ex;
+        }
+    }
+
+    /**
+     * Removes configs for non configurable entities if requested a change of field type only
+     *
+     * @param array $configs
+     */
+    protected function filterConfigs(array &$configs)
+    {
+        foreach ($configs as $className => $entityConfigs) {
+            if (!$this->isCustomEntity($className)) {
+                if (!$this->configManager->hasConfig($className)) {
+                    $fieldsCanBeRemoved = false;
+                    if (isset($entityConfigs['fields'])) {
+                        $fieldsCanBeRemoved = true;
+                        foreach ($entityConfigs['fields'] as $fieldConfigs) {
+                            if (!(isset($fieldConfigs['type']) && count($fieldConfigs) === 1)) {
+                                $fieldsCanBeRemoved = false;
+                                break;
+                            }
+                        }
+                        if ($fieldsCanBeRemoved) {
+                            unset($configs[$className]['fields']);
+                        }
+                    }
+                    if ($fieldsCanBeRemoved && empty($configs[$className])) {
+                        unset($configs[$className]);
+                    }
+                }
+            }
         }
     }
 
@@ -62,10 +99,9 @@ class ExtendConfigProcessor
     protected function processEntityConfigs($className, array $configs)
     {
         if ($this->configManager->hasConfig($className)) {
-            $this->updateEntityModel(
-                $className,
-                isset($configs['configs']) ? $configs['configs'] : []
-            );
+            if (isset($configs['configs'])) {
+                $this->updateEntityModel($className, $configs['configs']);
+            }
         } else {
             $this->createEntityModel(
                 $className,
@@ -91,12 +127,12 @@ class ExtendConfigProcessor
     protected function processFieldConfigs($className, $fieldName, array $configs, $isExtendEntity)
     {
         if ($this->configManager->hasConfig($className, $fieldName)) {
-            $this->updateFieldModel(
-                $className,
-                $fieldName,
-                isset($configs['configs']) ? $configs['configs'] : [],
-                isset($configs['type']) ? $configs['type'] : null
-            );
+            if (isset($configs['configs'])) {
+                $this->updateFieldModel($className, $fieldName, $configs['configs']);
+            }
+            if (isset($configs['type'])) {
+                $this->changeFieldType($className, $fieldName, $configs['type']);
+            }
         } else {
             $this->createFieldModel(
                 $className,
@@ -183,11 +219,11 @@ class ExtendConfigProcessor
         if ($this->logger) {
             $this->logger->notice(
                 sprintf(
-                    'Create field "%s::%s". Type: %s. Mode: %s.',
-                    $className,
+                    'Create field "%s". Type: %s. Mode: %s. Entity: %s.',
                     $fieldName,
                     $fieldType,
-                    $mode
+                    $mode,
+                    $className
                 ),
                 ['configs' => $configs]
             );
@@ -207,18 +243,12 @@ class ExtendConfigProcessor
      * @param string $className
      * @param string $fieldName
      * @param array  $configs
-     * @param string $fieldType
-     * @throws \InvalidArgumentException
      */
-    protected function updateFieldModel($className, $fieldName, array $configs, $fieldType = null)
+    protected function updateFieldModel($className, $fieldName, array $configs)
     {
         if ($this->logger) {
             $this->logger->notice(
-                sprintf(
-                    'Update field "%s::%s". %s',
-                    $className,
-                    $fieldName
-                ),
+                sprintf('Update field "%s". Entity: %s.', $fieldName, $className),
                 ['configs' => $configs]
             );
         }
@@ -233,16 +263,19 @@ class ExtendConfigProcessor
             }
             $this->configManager->persist($extendConfig);
         }
+    }
 
-        if ($fieldType) {
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
+     */
+    protected function changeFieldType($className, $fieldName, $fieldType)
+    {
+        if ($this->configManager->getConfigFieldModel($className, $fieldName)->getType() !== $fieldType) {
             if ($this->logger) {
                 $this->logger->notice(
-                    sprintf(
-                        'Update field type "%s::%s". Type: %s',
-                        $className,
-                        $fieldName,
-                        $fieldType
-                    )
+                    sprintf('Update a type of field "%s" to "%s". Entity: %s.', $fieldName, $fieldType, $className)
                 );
             }
             $this->configManager->changeFieldType($className, $fieldName, $fieldType);
