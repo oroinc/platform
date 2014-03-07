@@ -1,2 +1,23 @@
-parameters: ~
-services: ~
+parameters:
+    oro_reminder.entity.class:               Oro\Bundle\ReminderBundle\Entity\Reminder
+    oro_reminder.sender.class:               Oro\Bundle\ReminderBundle\Model\ReminderSender
+    oro_reminder.send_processor.email.class:      Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
+    oro_reminder.send_processor.web_socket.class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
+
+services:
+    oro_reminder.sender:
+        class: %oro_reminder.sender.class%
+        arguments:
+            - []
+
+    oro_reminder.send_processor.email:
+        class: %oro_reminder.send_processor.email.class%
+        arguments:
+            - @oro_notification.email_processor
+        tags:
+            - { name: oro_reminder.send_processor }
+
+    oro_reminder.send_processor.web_socket:
+        class: %oro_reminder.send_processor.web_socket.class%
+        tags:
+            - { name: oro_reminder.send_processor }

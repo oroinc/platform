@@ -182,7 +182,7 @@ class Reminder
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -205,7 +205,7 @@ class Reminder
     /**
      * Get subject
      *
-     * @return string 
+     * @return string
      */
     public function getSubject()
     {
@@ -228,7 +228,7 @@ class Reminder
     /**
      * Get dueDate
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getDueDate()
     {
@@ -251,7 +251,7 @@ class Reminder
     /**
      * Get reminderInterval
      *
-     * @return integer 
+     * @return integer
      */
     public function getReminderInterval()
     {
@@ -297,7 +297,7 @@ class Reminder
     /**
      * Get relatedEntityId
      *
-     * @return integer 
+     * @return integer
      */
     public function getRelatedEntityId()
     {
@@ -320,7 +320,7 @@ class Reminder
     /**
      * Get relatedEntityClassName
      *
-     * @return string 
+     * @return string
      */
     public function getRelatedEntityClassName()
     {
@@ -343,7 +343,7 @@ class Reminder
     /**
      * Get createdAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -366,7 +366,7 @@ class Reminder
     /**
      * Get updatedAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {
@@ -389,7 +389,7 @@ class Reminder
     /**
      * Get sentAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getSentAt()
     {
@@ -412,7 +412,7 @@ class Reminder
     /**
      * Get isSent
      *
-     * @return boolean 
+     * @return boolean
      */
     public function isSent()
     {
