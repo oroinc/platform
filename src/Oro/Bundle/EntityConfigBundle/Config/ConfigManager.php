@@ -376,6 +376,14 @@ class ConfigManager
         return $config;
     }
 
+    public function clear()
+    {
+        $this->modelManager->clearCache();
+        $this->cache->removeAllConfigurable();
+        $this->cache->removeAll();
+        $this->getEntityManager()->clear();
+    }
+
     public function flush()
     {
         $models = [];

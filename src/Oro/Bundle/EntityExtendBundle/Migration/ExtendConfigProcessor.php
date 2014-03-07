@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Psr\Log\LoggerInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -15,6 +16,11 @@ class ExtendConfigProcessor
     protected $configManager;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @param ConfigManager $configManager
      */
     public function __construct(ConfigManager $configManager)
@@ -23,16 +29,29 @@ class ExtendConfigProcessor
     }
 
     /**
-     * @param array $configs
+     * @param array                $configs
+     * @param LoggerInterface|null $logger
+     * @param bool                 $dryRun
+     * @throws \Exception
      */
-    public function processConfigs(array $configs)
+    public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
     {
-        if (!empty($configs)) {
-            foreach ($configs as $className => $entityConfigs) {
-                $this->processEntityConfigs($className, $entityConfigs);
-            }
+        $this->logger = $logger;
+        try {
+            if (!empty($configs)) {
+                foreach ($configs as $className => $entityConfigs) {
+                    $this->processEntityConfigs($className, $entityConfigs);
+                }
 
-            $this->configManager->flush();
+                if ($dryRun) {
+                    $this->configManager->clear();
+                } else {
+                    $this->configManager->flush();
+                }
+            }
+        } catch (\Exception $ex) {
+            $this->logger = null;
+            throw $ex;
         }
     }
 
@@ -102,6 +121,13 @@ class ExtendConfigProcessor
             throw new \LogicException(sprintf('Class "%s" is not configurable.', $className));
         }
 
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf('Create entity "%s".', $className),
+                ['configs' => $configs]
+            );
+        }
+
         $this->configManager->createConfigEntityModel($className, $mode);
 
         $this->updateConfigs($configs, $className);
@@ -118,6 +144,13 @@ class ExtendConfigProcessor
      */
     protected function updateEntityModel($className, array $configs)
     {
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf('Update entity "%s".', $className),
+                ['configs' => $configs]
+            );
+        }
+
         $haveChanges = $this->updateConfigs($configs, $className);
 
         if ($haveChanges) {
@@ -147,6 +180,19 @@ class ExtendConfigProcessor
             );
         }
 
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf(
+                    'Create field "%s::%s". Type: %s. Mode: %s.',
+                    $className,
+                    $fieldName,
+                    $fieldType,
+                    $mode
+                ),
+                ['configs' => $configs]
+            );
+        }
+
         $this->configManager->createConfigFieldModel($className, $fieldName, $fieldType, $mode);
 
         $this->updateConfigs($configs, $className, $fieldName);
@@ -166,6 +212,17 @@ class ExtendConfigProcessor
      */
     protected function updateFieldModel($className, $fieldName, array $configs, $fieldType = null)
     {
+        if ($this->logger) {
+            $this->logger->notice(
+                sprintf(
+                    'Update field "%s::%s". %s',
+                    $className,
+                    $fieldName
+                ),
+                ['configs' => $configs]
+            );
+        }
+
         $haveChanges = $this->updateConfigs($configs, $className, $fieldName);
 
         if ($haveChanges) {
@@ -178,6 +235,16 @@ class ExtendConfigProcessor
         }
 
         if ($fieldType) {
+            if ($this->logger) {
+                $this->logger->notice(
+                    sprintf(
+                        'Update field type "%s::%s". Type: %s',
+                        $className,
+                        $fieldName,
+                        $fieldType
+                    )
+                );
+            }
             $this->configManager->changeFieldType($className, $fieldName, $fieldType);
         }
     }

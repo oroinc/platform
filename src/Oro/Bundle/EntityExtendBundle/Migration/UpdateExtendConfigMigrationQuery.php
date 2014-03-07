@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
@@ -42,27 +43,14 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
      */
     public function getDescription()
     {
-        $result = [];
-        $options = $this->optionsProvider->getOptions();
-        foreach ($options as $entityClassName => $entityOptions) {
-            if (isset($entityOptions['configs'])) {
-                $result[] = sprintf(
-                    'CREATE EXTEND ENTITY %s',
-                    $entityClassName
-                );
-            }
-            if (isset($entityOptions['fields'])) {
-                foreach ($entityOptions['fields'] as $fieldName => $fieldOptions) {
-                    $result[] = sprintf(
-                        'CREATE EXTEND FIELD %s FOR %s',
-                        $fieldName,
-                        $entityClassName
-                    );
-                }
-            }
-        }
+        $logger = new UpdateExtendConfigMigrationArrayLogger();
+        $this->configProcessor->processConfigs(
+            $this->optionsProvider->getOptions(),
+            $logger,
+            true
+        );
 
-        return $result;
+        return $logger->getMessages();
     }
 
     /**
