@@ -285,7 +285,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 .click(function (e) {
                     e.stopImmediatePropagation();
                 });
-            //$calendar.datepicker('setDate', $input.val());
+
+            $calendar.data('datepicker').inline = false;
+            $calendar.datepicker('refresh');
+            $calendar.find('.ui-datepicker-close').click(function() {
+                $dropdown.find('.dropdown-menu-calendar').hide();
+            });
 
             widgetOptions = _.extend({
                 $input: $input
