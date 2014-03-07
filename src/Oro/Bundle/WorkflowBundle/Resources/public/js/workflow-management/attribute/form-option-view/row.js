@@ -14,7 +14,8 @@ function(_, Backbone) {
         tagName: 'tr',
 
         events: {
-            'click .delete-form-option': 'triggerRemove'
+            'click .delete-form-option': 'triggerRemove',
+            'click .edit-form-option': 'triggerEdit'
         },
 
         options: {
@@ -30,6 +31,12 @@ function(_, Backbone) {
         initialize: function() {
             var template = this.options.template || $('#attribute-form-option-row-template').html();
             this.template = _.template(template);
+            this.options.data.view_id = this.cid;
+        },
+
+        triggerEdit: function(e) {
+            e.preventDefault();
+            this.trigger('editFormOption', this.options.data);
         },
 
         triggerRemove: function(e) {
@@ -40,7 +47,7 @@ function(_, Backbone) {
 
         render: function() {
             var rowHtml = $(this.template(this.options.data));
-            this.$el.append(rowHtml);
+            this.$el.html(rowHtml);
 
             return this;
         }

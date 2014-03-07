@@ -23,7 +23,9 @@ function(_, Backbone, AttributeFormOptionRowView) {
         initialize: function() {
             var template = this.options.template || $('#attribute-form-option-list-template').html();
             this.template = _.template(template);
-            this.rowViews = [];
+            this.rowViews = {};
+            this.rowViewsByAttribute = {};
+            this.$listElBody = null;
 
             this.fieldUtil = this.options.fields_selector_el.data('oroentity-fieldChoice').entityFieldUtil;
             this.entityFieldTemplate = _.template(
@@ -40,6 +42,14 @@ function(_, Backbone, AttributeFormOptionRowView) {
             _.each(items, this.addItem, this);
         },
 
+        initList: function () {
+            if (!this.$listElBody) {
+                var listEl = $(this.template());
+                this.$listElBody = listEl.find(this.options.listElBodyEl);
+                this.$el.html(listEl);
+            }
+        },
+
         addItem: function(data) {
             var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
             if (fieldId) {
@@ -49,15 +59,43 @@ function(_, Backbone, AttributeFormOptionRowView) {
                 data.entityField = data.property_path || data.attribute_name;
             }
 
-            var rowView = new AttributeFormOptionRowView({
-                data: data,
-                workflow: this.options.workflow
-            });
-            rowView.on('removeFormOption', function(data) {
-                this.trigger('removeFormOption', data);
-            }, this);
-            this.rowViews.push(rowView);
-            this.$listElBody.append(rowView.render().$el);
+            var viewId = data.view_id
+                || (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name)
+                    ? this.rowViewsByAttribute[data.attribute_name]
+                    : null);
+            if (!viewId) {
+                var rowView = new AttributeFormOptionRowView({
+                    data: data,
+                    workflow: this.options.workflow
+                });
+
+                rowView.on('editFormOption', function(data) {
+                    this.trigger('editFormOption', data);
+                }, this);
+
+                rowView.on('removeFormOption', function(data) {
+                    var collection = this.getCollection();
+                    var i = collection.length - 1;
+                    while (i >= 0) {
+                        if (collection[i].attribute_name == data.attribute_name) {
+                            collection.splice(i, 1);
+                        }
+                        i--;
+                    }
+                    if (!this.getCollection().length) {
+                        this.render();
+                    }
+                    this.trigger('removeFormOption', data);
+                }, this);
+
+                this.rowViews[rowView.cid] = rowView;
+                this.rowViewsByAttribute[data.attribute_name] = rowView.cid;
+                this.initList();
+                this.$listElBody.append(rowView.render().$el);
+            } else {
+                this.rowViews[viewId].options.data = data;
+                this.rowViews[viewId].render();
+            }
         },
 
         getCollection: function() {
@@ -73,18 +111,17 @@ function(_, Backbone, AttributeFormOptionRowView) {
             _.each(this.rowViews, function (rowView) {
                 rowView.remove();
             });
-            this.rowViews = [];
+            this.rowViews = {};
         },
 
         render: function() {
             this.resetView();
             if (this.getCollection().length) {
-                this.$listEl = $(this.template());
-                this.$listElBody = this.$listEl.find(this.options.listElBodyEl);
-                this.$el.html(this.$listEl);
+                this.initList();
                 this.addAllItems(this.getCollection());
             } else {
                 this.$el.empty();
+                this.$listElBody = null;
             }
 
             return this;

@@ -68,7 +68,7 @@
         "NotBlank": null
     } %}
     <script type="text/template" id="transition-form-template">
-        <div class="row-fluid">
+        <div class="row-fluid" style="height: 600px;overflow: auto;">
             <form action="#">
                 <div class="form-horizontal">
                     <div class="control-group">
@@ -300,21 +300,27 @@
 
     <script type="text/template" id="attribute-form-option-row-template">
         <td>
+            <% if (!is_entity_attribute) { %>
+                <span class="badge">{{ 'system'|trans }}</span>
+            <% } %>
             <%= entityField %>
         </td>
         <td>
             <% if (!label) { %>
-                <span class="label">{{ 'system'|trans }}</span>
+                <span class="badge">{{ 'system'|trans }}</span>
             <% } else { %>
                 <%= label %>
             <% } %>
         </td>
         <td>
-            <% if (required) { %><span class="label label-important">{{ "yes"|trans }}</span><% } %>
+            <% if (required) { %><span class="badge badge-important">{{ "yes"|trans }}</span><% } %>
         </td>
         <td class="step-actions">
             <div class="pull-right">
-                <a href="#" class="delete-form-option" title="Delete row"><i class="icon-remove"/></a>
+                <% if (is_entity_attribute) { %>
+                <a href="#" class="edit-form-option" title="{{ 'Edit field'|trans }}"><i class="icon-edit"/></a>
+                <% } %>
+                <a href="#" class="delete-form-option" title="{{ 'Delete field'|trans }}"><i class="icon-remove"/></a>
             </div>
         </td>
     </script>

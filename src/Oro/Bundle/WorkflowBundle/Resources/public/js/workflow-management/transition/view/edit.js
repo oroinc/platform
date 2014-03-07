@@ -153,6 +153,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
             formOptions.attribute_fields[attributeName] = formOptionsData;
 
             data.attribute_name = attributeName;
+            data.is_entity_attribute = true;
 
             this.attributesList.addItem(data);
         },
@@ -164,7 +165,13 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
                 fields_selector_el: this.attributesFormView.getFieldSelector(),
                 workflow: this.options.workflow
             });
-            this.attributesList.on('removeFormOption', this.removeFormOption, this);
+
+            this.listenTo(this.attributesList, 'removeFormOption', this.removeFormOption);
+            this.listenTo(this.attributesList, 'editFormOption', this.editFormOption);
+        },
+
+        editFormOption: function(data) {
+            this.attributesFormView.editRow(data);
         },
 
         removeFormOption: function(data) {
@@ -186,6 +193,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
                 }
 
                 result.push({
+                    'is_entity_attribute': attribute.get('property_path'),
                     'attribute_name': attributeName,
                     'property_path': propertyPath,
                     'required': isRequired,
@@ -226,7 +234,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
                 'incrementalPosition': false,
                 'dialogOptions': {
                     'close': _.bind(this.removeHandler, this),
-                    'width': 600,
+                    'width': 800,
                     'modal': true
                 }
             });

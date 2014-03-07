@@ -33,6 +33,8 @@ function(_, Backbone, Helper) {
             this.template = _.template(template);
 
             this.entity_field_template = this.options.entity_field_template || $('#entity-column-chain-template').html();
+
+            this.editViewId = null;
         },
 
         getFieldSelector: function() {
@@ -44,6 +46,7 @@ function(_, Backbone, Helper) {
 
             formData.property_path = this.getPropertyPath(formData.property_path);
             formData.required = formData.hasOwnProperty('required');
+            formData.view_id = this.editViewId;
 
             this.resetForm();
             this.trigger('formOptionAdd', formData);
@@ -60,8 +63,10 @@ function(_, Backbone, Helper) {
         },
 
         resetForm: function() {
+            this.editViewId = null;
             this.entityFieldSelectEl.select2('val', '');
             this.form.get(0).reset();
+            this.submitBtn.html('<i class="icon-plus"></i> Add');
         },
 
         initFieldChoice: function(container) {
@@ -82,13 +87,30 @@ function(_, Backbone, Helper) {
             });
         },
 
-        render: function(data) {
-            data = data || this.options.data;
-            this.form = $(this.template(data)).filter('form');
+        editRow: function(data) {
+            this.editViewId = data.view_id;
+            this.fieldSelectorEl.select2(
+                'val',
+                this.options.workflow.getFieldIdByPropertyPath(data.property_path)
+            );
+            this.labelEl.val(data.label);
+            this.requiredEl.get(0).checked = data.required;
+            this.submitBtn.html('<i class="icon-edit"></i> Edit');
+        },
+
+        render: function() {
+            this.form = $(this.template(this.options.data)).filter('form');
             this.form.validate({
                 'submitHandler': _.bind(this.onAdd, this)
             });
+            this.form.on('submit', function(e) {e.preventDefault();});
             this.initFieldChoice(this.form);
+
+            this.submitBtn = this.form.find('[type=submit]');
+            this.fieldSelectorEl = this.form.find('[name=property_path]');
+            this.labelEl = this.form.find('[name=label]');
+            this.requiredEl = this.form.find('[name=required]');
+
             this.$el.append(this.form);
 
             return this;
