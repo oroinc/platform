@@ -7,9 +7,11 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\DatabaseIdentifierNameGenerator;
 
 class ExtendExtension
 {
@@ -21,23 +23,35 @@ class ExtendExtension
     protected $extendOptionsManager;
 
     /**
-     * @param ExtendOptionsManager $extendOptionsManager
+     * @var DatabaseIdentifierNameGenerator
      */
-    public function __construct(ExtendOptionsManager $extendOptionsManager)
-    {
-        $this->extendOptionsManager = $extendOptionsManager;
+    protected $dbIdentifierNameGenerator;
+
+    /**
+     * @param ExtendOptionsManager            $extendOptionsManager
+     * @param DatabaseIdentifierNameGenerator $dbIdentifierNameGenerator
+     */
+    public function __construct(
+        ExtendOptionsManager $extendOptionsManager,
+        DatabaseIdentifierNameGenerator $dbIdentifierNameGenerator
+    ) {
+        $this->extendOptionsManager      = $extendOptionsManager;
+        $this->dbIdentifierNameGenerator = $dbIdentifierNameGenerator;
     }
 
     /**
-     * Creates a new "extend" table.
+     * Creates a table for a custom entity.
+     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
+     * created automatically in Symfony cache
      *
      * @param Schema $schema
      * @param string $tableName
      * @param string $entityName
      * @param array  $options
      * @return Table
+     * @throws \InvalidArgumentException
      */
-    public function createExtendTable(
+    public function createCustomEntityTable(
         Schema $schema,
         $tableName,
         $entityName,
@@ -49,8 +63,29 @@ class ExtendExtension
         if (!isset($options['extend'])) {
             $options['extend'] = [];
         }
-        $options['extend']['table']       = $tableName;
-        $options['extend']['entity_name'] = $entityName;
+        if (empty($entityName) || !preg_match('/^[A-Z][a-zA-Z\d]+$/', $entityName)) {
+            throw new \InvalidArgumentException(sprintf('Invalid entity name: "%s".', $entityName));
+        }
+        $options['_entity_name']    = ExtendConfigDumper::ENTITY . $entityName;
+        $options['extend']['table'] = $tableName;
+        if (isset($options['extend']['owner'])) {
+            if ($options['extend']['owner'] !== ExtendScope::OWNER_CUSTOM) {
+                throw new \InvalidArgumentException(
+                    sprintf('The "extend.owner" option for a custom entity must be "%s".', ExtendScope::OWNER_CUSTOM)
+                );
+            }
+        } else {
+            $options['extend']['owner'] = ExtendScope::OWNER_CUSTOM;
+        }
+        if (isset($options['extend']['is_extend'])) {
+            if ($options['extend']['is_extend'] !== true) {
+                throw new \InvalidArgumentException(
+                    'The "extend.is_extend" option for a custom entity must be TRUE.'
+                );
+            }
+        } else {
+            $options['extend']['is_extend'] = true;
+        }
         $table->addOption(ExtendColumn::ORO_OPTIONS_NAME, $options);
 
         // add a primary key
@@ -128,21 +163,39 @@ class ExtendExtension
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex([$selfColumnName], 'UIDX_' . $selfColumnName);
+        $selfTable->addUniqueIndex(
+            [$selfColumnName],
+            $this->dbIdentifierNameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
+        );
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL'],
+            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+                $selfTableName,
+                [$selfColumnName],
+                $targetTableName,
+                [$targetPrimaryKeyColumnName]
+            )
         );
 
         $this->addRelationColumn($targetTable, $targetColumnName, $selfPrimaryKeyColumn, ['notnull' => false]);
-        $targetTable->addIndex([$targetColumnName], 'IDX_' . $targetColumnName);
+        $targetTable->addIndex(
+            [$targetColumnName],
+            $this->dbIdentifierNameGenerator->generateIndexName($targetTableName, [$targetColumnName])
+        );
         $targetTable->addForeignKeyConstraint(
             $selfTable,
             [$targetColumnName],
             [$selfPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL'],
+            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+                $targetTableName,
+                [$targetColumnName],
+                $selfTableName,
+                [$selfPrimaryKeyColumnName]
+            )
         );
 
         $options['_target'] = [
@@ -173,6 +226,8 @@ class ExtendExtension
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
      * @param array        $options
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function addManyToManyRelation(
         Schema $schema,
@@ -205,31 +260,62 @@ class ExtendExtension
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex([$selfColumnName], 'UIDX_' . $selfColumnName);
+        $selfTable->addUniqueIndex(
+            [$selfColumnName],
+            $this->dbIdentifierNameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
+        );
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL'],
+            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+                $selfTableName,
+                [$selfColumnName],
+                $targetTableName,
+                [$targetPrimaryKeyColumnName]
+            )
         );
 
-        $relationsTableName = $this->buildManyToManyRelationTableName($selfClassName, $targetClassName, $columnName);
+        $relationsTableName = $this->dbIdentifierNameGenerator->generateManyToManyJoinTableName(
+            $selfClassName,
+            $columnName,
+            $targetClassName
+        );
         $relationsTable     = $schema->createTable($relationsTableName);
         $this->addRelationColumn($relationsTable, $selfRelationName, $selfPrimaryKeyColumn);
-        $relationsTable->addIndex([$selfRelationName], 'IDX_' . $selfRelationName);
+        $relationsTable->addIndex(
+            [$selfRelationName],
+            $this->dbIdentifierNameGenerator->generateIndexName($relationsTableName, [$selfRelationName])
+        );
         $relationsTable->addForeignKeyConstraint(
             $selfTable,
             [$selfRelationName],
             [$selfPrimaryKeyColumnName],
-            ['onDelete' => 'CASCADE']
+            ['onDelete' => 'CASCADE'],
+            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+                $relationsTableName,
+                [$selfRelationName],
+                $selfTableName,
+                [$selfPrimaryKeyColumnName]
+            )
         );
         $this->addRelationColumn($relationsTable, $targetRelationName, $targetPrimaryKeyColumn);
-        $relationsTable->addIndex([$targetRelationName], 'IDX_' . $targetRelationName);
+        $relationsTable->addIndex(
+            [$targetRelationName],
+            $this->dbIdentifierNameGenerator->generateIndexName($relationsTableName, [$targetRelationName])
+        );
         $relationsTable->addForeignKeyConstraint(
             $targetTable,
             [$targetRelationName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'CASCADE']
+            ['onDelete' => 'CASCADE'],
+            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+                $relationsTableName,
+                [$targetRelationName],
+                $targetTableName,
+                [$targetPrimaryKeyColumnName]
+            )
         );
         $relationsTable->setPrimaryKey([$selfRelationName, $targetRelationName]);
 
@@ -282,12 +368,21 @@ class ExtendExtension
         $this->checkColumnsExist($targetTable, [$targetColumnName]);
 
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addIndex([$selfColumnName], 'IDX_' . $selfColumnName);
+        $selfTable->addIndex(
+            [$selfColumnName],
+            $this->dbIdentifierNameGenerator->generateIndexName($selfTableName, [$selfColumnName])
+        );
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
+            ['onDelete' => 'SET NULL'],
+            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+                $selfTableName,
+                [$selfColumnName],
+                $targetTableName,
+                [$targetPrimaryKeyColumnName]
+            )
         );
 
         $options['_target'] = [
@@ -390,24 +485,6 @@ class ExtendExtension
         }
 
         $table->addColumn($columnName, $columnTypeName, $options);
-    }
-
-    /**
-     * Builds a table name for many-to-many relation
-     *
-     * @param string $selfClassName
-     * @param string $targetClassName
-     * @param string $columnName
-     * @return string
-     */
-    protected function buildManyToManyRelationTableName($selfClassName, $targetClassName, $columnName)
-    {
-        return sprintf(
-            'oro_%s_%s_%s',
-            strtolower($this->getShortClassName($selfClassName)),
-            strtolower($this->getShortClassName($targetClassName)),
-            $columnName
-        );
     }
 
     /**

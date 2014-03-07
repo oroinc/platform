@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
@@ -46,9 +45,9 @@ class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
     public function addTableOptions($tableName, array $options)
     {
         $entityName = null;
-        if (isset($options['extend']['entity_name'])) {
-            $entityName = $options['extend']['entity_name'];
-            unset($options['extend']['entity_name']);
+        if (isset($options['_entity_name'])) {
+            $entityName = $options['_entity_name'];
+            unset($options['_entity_name']);
         }
         $entityClassName = $this->getEntityClassName($tableName, $entityName);
         if (!isset($this->result[$entityClassName])) {
@@ -119,23 +118,18 @@ class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
      * Gets an entity class name by its table name
      *
      * @param string $tableName
-     * @param string $customEntityName The name of custom entity
+     * @param string $customEntityName The name of a custom entity
      * @return string|null
      * @throws \RuntimeException
      */
     protected function getEntityClassName($tableName, $customEntityName = null)
     {
         if (!isset($this->tableToEntityMap[$tableName])) {
-            $entityClassName = $this->entityClassResolver->getEntityClassByTableName($tableName);
+            $entityClassName = !empty($customEntityName)
+                ? $customEntityName
+                : $this->entityClassResolver->getEntityClassByTableName($tableName);
             if (empty($entityClassName)) {
-                if (empty($customEntityName)) {
-                    throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
-                }
-                if (!preg_match('/^[A-Z][a-zA-Z\d]+$/', $customEntityName)) {
-                    throw new \RuntimeException(sprintf('Invalid entity name: "%s".', $customEntityName));
-                }
-
-                $entityClassName = ExtendConfigDumper::ENTITY . $customEntityName;
+                throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
             }
             $this->tableToEntityMap[$tableName] = $entityClassName;
         }

@@ -217,6 +217,35 @@ class ConfigModelManager
     }
 
     /**
+     * Changes a type of a field
+     * Important: this method do not save changes in a database. To do this you need to call entityManager->flush
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @param string $fieldType
+     * @throws \InvalidArgumentException if $className, $fieldName or $fieldType is empty
+     */
+    public function changeFieldType($className, $fieldName, $fieldType)
+    {
+        if (empty($className)) {
+            throw new \InvalidArgumentException('$className must not be empty');
+        }
+        if (empty($fieldName)) {
+            throw new \InvalidArgumentException('$fieldName must not be empty');
+        }
+        if (empty($fieldType)) {
+            throw new \InvalidArgumentException('$fieldType must not be empty');
+        }
+
+        $fieldModel = $this->findFieldModel($className, $fieldName);
+        if ($fieldModel && $fieldModel->getType() !== $fieldType) {
+            $fieldModel->setType($fieldType);
+            $this->getEntityManager()->persist($fieldModel);
+            $this->localCache->set($this->buildFieldLocalCacheKey($className, $fieldName), $fieldModel);
+        }
+    }
+
+    /**
      * @param ConfigIdInterface $configId
      * @return AbstractConfigModel
      */

@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\EventListener;
 
+use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaGenerator;
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class PostUpMigrationListener
 {
     /**
-     * @var ExtendSchemaGenerator
+     * @var ExtendConfigProcessor
      */
-    protected $schemaGenerator;
+    protected $configProcessor;
 
     /**
      * @var ExtendConfigDumper
@@ -20,12 +20,12 @@ class PostUpMigrationListener
     protected $configDumper;
 
     /**
-     * @param ExtendSchemaGenerator $schemaGenerator
+     * @param ExtendConfigProcessor $configProcessor
      * @param ExtendConfigDumper    $configDumper
      */
-    public function __construct(ExtendSchemaGenerator $schemaGenerator, ExtendConfigDumper $configDumper)
+    public function __construct(ExtendConfigProcessor $configProcessor, ExtendConfigDumper $configDumper)
     {
-        $this->schemaGenerator = $schemaGenerator;
+        $this->configProcessor = $configProcessor;
         $this->configDumper    = $configDumper;
     }
 
@@ -38,7 +38,7 @@ class PostUpMigrationListener
     {
         $event->addMigration(
             new UpdateExtendConfigMigration(
-                $this->schemaGenerator,
+                $this->configProcessor,
                 $this->configDumper
             )
         );
