@@ -41,6 +41,7 @@ class RolesTest extends Selenium2TestCase
     public function testRolesGrid()
     {
         $login = $this->login();
+        /** @var Roles $login */
         $login->openRoles('Oro\Bundle\UserBundle')
             ->assertTitle('Roles - Users Management - System');
     }
@@ -48,6 +49,7 @@ class RolesTest extends Selenium2TestCase
     public function testRolesGridDefaultContent()
     {
         $login = $this->login();
+        /** @var Roles $login */
         $roles = $login->openRoles('Oro\Bundle\UserBundle');
         //get grid content
         $records = $roles->getRows();
@@ -85,7 +87,7 @@ class RolesTest extends Selenium2TestCase
         $randomPrefix = ToolsAPI::randomGen(5);
 
         $login = $this->login();
-        /** @var Roles $roles */
+        /** @var Roles $login */
         $roles = $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel($this->newRole['LABEL'] . $randomPrefix)
@@ -109,7 +111,7 @@ class RolesTest extends Selenium2TestCase
     public function testRoleDelete($randomPrefix)
     {
         $login = $this->login();
-        /** @var Roles $roles */
+        /** @var Roles $login */
         $roles = $login->openRoles('Oro\Bundle\UserBundle');
         $roles->deleteEntity(array('name' => $this->newRole['LABEL'] . $randomPrefix));
         $this->assertFalse($roles->entityExists(array('name' => $this->newRole['LABEL'] . $randomPrefix)));
