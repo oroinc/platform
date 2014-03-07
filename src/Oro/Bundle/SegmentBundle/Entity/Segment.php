@@ -14,7 +14,7 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  * Segment
  *
  * @ORM\Table(name="oro_segment")
- * @ORM\Entity(repositoryClass="Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository")
+ * @ORM\Entity()
  * @Config(
  *      routeName="oro_segment_index",
  *      defaultValues={
@@ -128,7 +128,7 @@ class Segment extends AbstractQueryDesigner
      * Set name
      *
      * @param string $name
-     * @return Report
+     * @return Segment
      */
     public function setName($name)
     {
