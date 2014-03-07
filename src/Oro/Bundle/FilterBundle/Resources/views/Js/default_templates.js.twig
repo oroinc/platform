@@ -62,9 +62,7 @@
 
 <script type="text/template" id="date-filter-template">
     <div>
-        <% _.each(parts, function (part) { %>
-            <%= part %>
-        <% }); %>
+        <%= parts.join('') %>
         <div>
             <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
             <span class="filter-separator">-</span>

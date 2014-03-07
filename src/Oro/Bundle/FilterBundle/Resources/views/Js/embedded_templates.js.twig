@@ -40,9 +40,7 @@
 
 <script type="text/template" id="date-filter-template-embedded">
     <span> field </span>
-    <% _.each(parts, function (part) { %>
-        <%= part %>
-    <% }); %>:
+    <%= parts.join('') %>:
     <div />
     <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="from">
     <span class="filter-separator">-</span>

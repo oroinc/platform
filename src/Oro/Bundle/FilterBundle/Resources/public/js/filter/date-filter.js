@@ -103,11 +103,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         tabs: [
             {
                 name: 'calendar',
-                label: 'Calendar'
+                label: 'oro.filter.date.tab.calendar'
             },
             {
                 name: 'variables',
-                label: 'Variables'
+                label: 'oro.filter.date.tab.variables'
             }
         ],
 
@@ -160,6 +160,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                     value: firstPart
                 };
             }
+
+            _.each(this.tabs, function(tab) {
+                tab.label = __(tab.label);
+            });
 
             ChoiceFilter.prototype.initialize.apply(this, arguments);
         },
