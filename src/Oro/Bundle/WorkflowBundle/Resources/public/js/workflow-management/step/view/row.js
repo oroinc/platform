@@ -16,6 +16,7 @@ function(_, Backbone, TransitionsShortListView) {
         events: {
             'click .edit-step': 'triggerEditStep',
             'click .delete-step': 'triggerRemoveStep',
+            'click .clone-step': 'triggerCloneStep',
             'click .add-step-transition': 'triggerAddStepTransition'
         },
 
@@ -39,6 +40,11 @@ function(_, Backbone, TransitionsShortListView) {
         triggerRemoveStep: function(e) {
             e.preventDefault();
             this.model.destroy();
+        },
+
+        triggerCloneStep: function(e) {
+            e.preventDefault();
+            this.model.trigger('requestClone', this.model);
         },
 
         triggerAddStepTransition: function(e) {
