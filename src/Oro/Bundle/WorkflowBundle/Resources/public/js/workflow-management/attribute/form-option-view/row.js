@@ -34,7 +34,7 @@ function(_, Backbone) {
 
         triggerRemove: function(e) {
             e.preventDefault();
-            this.trigger('removeFormOption', this.model);
+            this.trigger('removeFormOption', this.options.data);
             this.remove();
         },
 

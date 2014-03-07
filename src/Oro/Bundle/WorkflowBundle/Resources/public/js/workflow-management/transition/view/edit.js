@@ -151,13 +151,47 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
 
             formOptions.attribute_fields[attributeName] = formOptionsData;
 
+            data.attribute_name = attributeName;
+
             this.attributesList.addItem(data);
         },
 
         renderAttributesList: function(el) {
             this.attributesList = new AttributeFormOptionListView({
-                el: el.find('.transition-attributes-list-container')
+                el: el.find('.transition-attributes-list-container'),
+                collection: this.getFormOptions()
             });
+            this.attributesList.on('removeFormOption', this.removeFormOption, this);
+            this.attributesList.render();
+        },
+
+        removeFormOption: function(data) {
+            delete this.model.get('form_options').attribute_fields[data.attribute_name];
+        },
+
+        getFormOptions: function() {
+            var result = [];
+            _.each(this.model.get('form_options').attribute_fields, function(formOption, attributeName) {
+                formOption = formOption || {};
+                var attribute = this.options.workflow.getAttributeByName(attributeName);
+                var propertyPath = attribute.get('property_path') || attributeName;
+                var options = formOption.hasOwnProperty('options') ? formOption.options : {};
+                var isRequired = options.hasOwnProperty('required') ? options.required : false;
+
+                var label = formOption.hasOwnProperty('label') ? formOption.label : null;
+                if (!label && options.hasOwnProperty('label')) {
+                    label = options.label;
+                }
+
+                result.push({
+                    'attribute_name': attributeName,
+                    'property_path': propertyPath,
+                    'required': isRequired,
+                    'label': label
+                });
+            }, this);
+
+            return result;
         },
 
         removeHandler: function() {

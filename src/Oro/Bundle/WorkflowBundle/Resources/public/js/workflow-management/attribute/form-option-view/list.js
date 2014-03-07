@@ -32,10 +32,17 @@ function(_, Backbone, AttributeFormOptionRowView) {
         },
 
         addItem: function(data) {
+            if (!data.hasOwnProperty('property_path_text')) {
+                data.property_path_text = null;
+            }
+
             var rowView = new AttributeFormOptionRowView({
                 data: data,
                 workflow: this.options.workflow
             });
+            rowView.on('removeFormOption', function(data) {
+                this.trigger('removeFormOption', data);
+            }, this);
             this.rowViews.push(rowView);
             this.$listElBody.append(rowView.render().$el);
         },

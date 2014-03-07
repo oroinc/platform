@@ -59,6 +59,14 @@ function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection,
             return attribute;
         },
 
+        getAttributeByPropertyPath: function(propertyPath) {
+            return _.first(this.get('attributes').where({'property_path': propertyPath}));
+        },
+
+        getAttributeByName: function(name) {
+            return this._getByName('attributes', name);
+        },
+
         getStepByName: function(name) {
             return this._getByName('steps', name);
         },
