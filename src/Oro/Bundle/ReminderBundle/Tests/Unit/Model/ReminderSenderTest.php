@@ -99,6 +99,33 @@ class ReminderSenderTest extends \PHPUnit_Framework_TestCase
         $this->sender->send($reminder);
     }
 
+    /**
+     * @expectedException \Oro\Bundle\ReminderBundle\Exception\SendTypeNotSupportedException
+     * @expectedExceptionMessage
+     */
+    public function testNonExistingProvider()
+    {
+        $reminder = $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
+        $reminderState = $this->getMock('Oro\\Bundle\\ReminderBundle\\Model\\ReminderState');
+
+        $reminderState->expects($this->once())
+            ->method('isAllSent')
+            ->will($this->returnValue(false));
+
+        $reminderState->expects($this->once())
+            ->method('getSendTypeNames')
+            ->will($this->returnValue(array('not_exists')));
+
+        $reminder->expects($this->once())
+            ->method('getState')
+            ->will($this->returnValue($reminderState));
+
+        $this->processors[self::FOO_TYPE]->expects($this->never())->method($this->anything());
+        $this->processors[self::BAR_TYPE]->expects($this->never())->method($this->anything());
+
+        $this->sender->send($reminder);
+    }
+
     protected function getMockProcessor($name)
     {
         $result = $this->getMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
