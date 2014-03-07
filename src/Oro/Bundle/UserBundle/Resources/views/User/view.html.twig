@@ -79,25 +79,6 @@
         }
     ] %}
 
-    {% if resource_granted('oro_email_view') %}
-        {% set userEmailsWidget %}
-            {{ oro_widget_render({
-                'widgetType': 'block',
-                'url': path('oro_user_widget_emails', {id: entity.id}),
-                'alias': 'user_emails',
-                'cssClass': 'inner-grid'
-            }) }}
-        {% endset %}
-        {% set dataBlocks = dataBlocks|merge([
-            {
-                'title': 'oro.user.emails.label'|trans,
-                'subblocks': [
-                    {'data' : [userEmailsWidget]}
-                ]
-            }
-        ]) %}
-    {% endif %}
-
     {% set id = 'userView' %}
     {% set data = { 'dataBlocks': dataBlocks } %}
     {{ parent() }}
