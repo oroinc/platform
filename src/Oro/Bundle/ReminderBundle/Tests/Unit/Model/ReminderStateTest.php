@@ -107,24 +107,39 @@ class ReminderStateTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider typesDataProvider
+     * @dataProvider serializeDataProvider
      */
-    public function testSerialize($types)
+    public function testSerialize(array $types, $serialized)
     {
         $state = $this->createReminderState($types);
 
-        $this->assertEquals(serialize($types), $state->serialize());
+        $this->assertEquals($serialized, $state->serialize());
     }
 
     /**
-     * @dataProvider typesDataProvider
+     * @dataProvider serializeDataProvider
      */
-    public function testUnserialize($types)
+    public function testUnserialize(array $types, $serialized)
     {
-        $state = $this->createReminderState($types);
-        $state->unserialize($state->serialize());
+        $expectedState = $this->createReminderState($types);
+        $actualState = $this->createReminderState();
+        $actualState->unserialize($serialized);
 
-        $this->assertEquals($types, $state->toArray());
+        $this->assertEquals($expectedState, $actualState);
+    }
+
+    public function serializeDataProvider()
+    {
+        return array(
+            'default' => array(
+                'types' => array('foo' => 'bar', 'bar' => 'baz'),
+                'serialized' => 'foo=bar&bar=baz',
+            ),
+            'empty' => array(
+                'types' => array(),
+                'serialized' => '',
+            )
+        );
     }
 
     /**
@@ -193,7 +208,7 @@ class ReminderStateTest extends \PHPUnit_Framework_TestCase
      * @param array $types
      * @return ReminderState
      */
-    protected function createReminderState(array $types)
+    protected function createReminderState(array $types = array())
     {
         return new ReminderState($types);
     }

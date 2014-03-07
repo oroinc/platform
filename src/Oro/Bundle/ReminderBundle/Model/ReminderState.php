@@ -94,7 +94,7 @@ class ReminderState implements \ArrayAccess, \Serializable
      */
     public function serialize()
     {
-        return serialize($this->types);
+        return http_build_query($this->types);
     }
 
     /**
@@ -102,7 +102,7 @@ class ReminderState implements \ArrayAccess, \Serializable
      */
     public function unserialize($serialized)
     {
-        $this->types = unserialize($serialized);
+        parse_str($serialized, $this->types);
     }
 
     /**

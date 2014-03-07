@@ -29,12 +29,12 @@ class OroReminderBundle implements Migration
         $table->addColumn('subject', 'string', ['length' => 255]);
         $table->addColumn('due_date', 'datetime', []);
         $table->addColumn('reminder_interval', 'integer', []);
-        $table->addColumn('state', 'object', ['comment' => '(DC2Type:object)']);
+        $table->addColumn('state', 'text', []);
         $table->addColumn('related_entity_id', 'integer', []);
         $table->addColumn('related_entity_classname', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
-        $table->addColumn('sent_at', 'datetime', []);
+        $table->addColumn('sent_at', 'datetime', ['notnull' => false]);
         $table->addColumn('is_sent', 'boolean', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['is_sent'], 'reminder_is_sent_idx', []);
