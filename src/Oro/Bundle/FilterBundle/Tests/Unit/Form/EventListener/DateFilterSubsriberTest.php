@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\EventListener;
 
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 
