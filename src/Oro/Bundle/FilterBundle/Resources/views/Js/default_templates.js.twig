@@ -78,13 +78,13 @@
     </div>
 </script>
 <script type="text/template" id="date-filter-dropdown-template">
-    <div class="dropdown-menu">
+    <div class="dropdown-menu dropdown-menu-calendar">
         <% if (!tabs.length) { %>
         <div id="calendar<%= suffix %>"></div>
         <% } else { %>
-        <ul class="nav nav-tabs">
+        <ul class="nav nav-tabs nav-tabs-oro">
             <% _.each(tabs, function (tab, i) { %>
-            <li<% if (i === 0) { %> class="active"<% } %>><a href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
+            <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
             <% }); %>
         </ul>
         <div class="tab-content">
