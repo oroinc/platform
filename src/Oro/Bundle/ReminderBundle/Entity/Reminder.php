@@ -12,7 +12,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderState;
 /**
  * Reminder
  *
- * @ORM\Table(name="oro_reminder")
+ * @ORM\Table(name="oro_reminder", indexes={
+ *     @ORM\Index(name="reminder_is_sent_idx", columns={"is_sent"})
+ * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository")
  * @Oro\Loggable
  * @ORM\HasLifecycleCallbacks()
@@ -148,7 +150,7 @@ class Reminder
      *
      * @ORM\Column(name="is_sent", type="boolean")
      */
-    protected $isSent = true;
+    protected $isSent = false;
 
     /**
      * @return string

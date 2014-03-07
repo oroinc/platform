@@ -37,6 +37,7 @@ class OroReminderBundle implements Migration
         $table->addColumn('sent_at', 'datetime', []);
         $table->addColumn('is_sent', 'boolean', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['is_sent'], 'reminder_is_sent_idx', []);
         /** End of generate table oro_reminder **/
     }
 }
