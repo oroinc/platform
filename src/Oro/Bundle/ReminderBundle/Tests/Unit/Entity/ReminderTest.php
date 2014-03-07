@@ -3,12 +3,16 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Model\ReminderState;
 
 class ReminderTest extends \PHPUnit_Framework_TestCase
 {
     public function testCreate()
     {
-        new Reminder();
+        $entity = new Reminder();
+
+        $this->assertEquals($entity->getState(), new ReminderState());
+        $this->assertEmpty($entity->getId());
     }
 
     public function testPrePersist()
@@ -41,13 +45,13 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSettersAndGetters($value, $property, $getter = null, $setter = null)
     {
-        $reminder = new Reminder();
+        $entity = new Reminder();
 
         $getter = $getter ?: 'get' . ucfirst($property);
         $setter = $setter ?: 'set' . ucfirst($property);
 
-        $this->assertEquals($reminder, $reminder->$setter($value));
-        $this->assertEquals($value, $reminder->$getter());
+        $this->assertEquals($entity, $entity->$setter($value));
+        $this->assertEquals($value, $entity->$getter());
     }
 
     public function settersAndGettersDataProvider()
@@ -65,9 +69,9 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'value' => 5,
                 'property' => 'reminderInterval',
             ],
-            'types' => [
-                'value' => ['type1', 'type2'],
-                'property' => 'types',
+            'state' => [
+                'value' => new ReminderState(['type1', 'type2']),
+                'property' => 'state',
             ],
             'relatedEntityId' => [
                 'value' => 1,
