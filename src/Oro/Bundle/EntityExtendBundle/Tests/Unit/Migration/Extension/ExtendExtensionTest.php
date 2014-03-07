@@ -8,6 +8,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Tools\DatabaseIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
@@ -53,7 +54,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateCustomEntityTableWithInvalidEntityName1()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $extension->createCustomEntityTable(
             $schema,
@@ -69,7 +70,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateCustomEntityTableWithInvalidEntityName2()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $extension->createCustomEntityTable(
             $schema,
@@ -85,7 +86,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateCustomEntityTableWithInvalidOwner()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $extension->createCustomEntityTable(
             $schema,
@@ -104,7 +105,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateCustomEntityTableWithInvalidIsExtend()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $extension->createCustomEntityTable(
             $schema,
@@ -119,7 +120,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testCreateCustomEntityTable()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $extension->createCustomEntityTable(
             $schema,
@@ -178,7 +179,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOptionSetWithNoOptions()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -212,7 +213,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOptionSet()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -255,7 +256,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOneToManyRelationWithNoPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -283,7 +284,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOneToManyRelationWithCombinedPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -313,7 +314,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOneToManyRelationWithNoTargetPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -341,7 +342,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOneToManyRelationWithCombinedTargetPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -367,7 +368,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOneToManyRelationWithNoOptions()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -394,17 +395,17 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_default_relation_column1_id (default_relation_column1_id), '
+                . 'UNIQUE INDEX uidx_63a7b4021c95229d (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
                 . 'field_entity1_relation_column1_id INT DEFAULT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
-                . 'INDEX IDX_field_entity1_relation_column1_id (field_entity1_relation_column1_id), '
+                . 'INDEX idx_7462fc4859c7327 (field_entity1_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
+                'ALTER TABLE table1 ADD CONSTRAINT fk_63a7b402bf3967501c95229d859 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73277462FC4 '
+                'ALTER TABLE table2 ADD CONSTRAINT fk_7462fc4bf396750859c73271c95 '
                 . 'FOREIGN KEY (field_entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
             ]
         );
@@ -436,7 +437,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddOneToManyRelation()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -466,17 +467,17 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_default_relation_column1_id (default_relation_column1_id), '
+                . 'UNIQUE INDEX uidx_63a7b4021c95229d (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
                 . 'field_entity1_relation_column1_id INT DEFAULT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
-                . 'INDEX IDX_field_entity1_relation_column1_id (field_entity1_relation_column1_id), '
+                . 'INDEX idx_7462fc4859c7327 (field_entity1_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
+                'ALTER TABLE table1 ADD CONSTRAINT fk_63a7b402bf3967501c95229d859 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73277462FC4 '
+                'ALTER TABLE table2 ADD CONSTRAINT fk_7462fc4bf396750859c73271c95 '
                 . 'FOREIGN KEY (field_entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
             ]
         );
@@ -513,7 +514,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToManyRelationWithNoPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -541,7 +542,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToManyRelationWithCombinedPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -571,7 +572,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToManyRelationWithNoTargetPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -599,7 +600,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToManyRelationWithCombinedTargetPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -625,7 +626,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToManyRelationWithNoOptions()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -652,23 +653,23 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_default_relation_column1_id (default_relation_column1_id), '
+                . 'UNIQUE INDEX uidx_63a7b4021c95229d (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
                 . 'PRIMARY KEY(id))',
-                'CREATE TABLE oro_entity1_entity2_relation_column1 ('
+                'CREATE TABLE acme_2d67f27af061705960f46bf ('
                 . 'entity1_id INT NOT NULL, '
                 . 'entity2_id SMALLINT NOT NULL, '
-                . 'INDEX IDX_entity1_id (entity1_id), '
-                . 'INDEX IDX_entity2_id (entity2_id), '
+                . 'INDEX idx_c33725a7855f9652 (entity1_id), '
+                . 'INDEX idx_d1828a49855f9652 (entity2_id), '
                 . 'PRIMARY KEY(entity1_id, entity2_id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
+                'ALTER TABLE table1 ADD CONSTRAINT fk_63a7b402bf3967501c95229d859 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE oro_entity1_entity2_relation_column1 ADD CONSTRAINT FK_672603D1C33725A7 '
+                'ALTER TABLE acme_2d67f27af061705960f46bf ADD CONSTRAINT fk_c33725a7bf396750855f96521c9 '
                 . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
-                'ALTER TABLE oro_entity1_entity2_relation_column1 ADD CONSTRAINT FK_672603D1D1828A49 '
+                'ALTER TABLE acme_2d67f27af061705960f46bf ADD CONSTRAINT fk_d1828a49bf396750855f9652859 '
                 . 'FOREIGN KEY (entity2_id) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
@@ -700,7 +701,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToManyRelation()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -730,23 +731,23 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_default_relation_column1_id (default_relation_column1_id), '
+                . 'UNIQUE INDEX uidx_63a7b4021c95229d (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
                 . 'PRIMARY KEY(id))',
-                'CREATE TABLE oro_entity1_entity2_relation_column1 ('
+                'CREATE TABLE acme_2d67f27af061705960f46bf ('
                 . 'entity1_id INT NOT NULL, '
                 . 'entity2_id SMALLINT NOT NULL, '
-                . 'INDEX IDX_entity1_id (entity1_id), '
-                . 'INDEX IDX_entity2_id (entity2_id), '
+                . 'INDEX idx_c33725a7855f9652 (entity1_id), '
+                . 'INDEX idx_d1828a49855f9652 (entity2_id), '
                 . 'PRIMARY KEY(entity1_id, entity2_id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
+                'ALTER TABLE table1 ADD CONSTRAINT fk_63a7b402bf3967501c95229d859 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE oro_entity1_entity2_relation_column1 ADD CONSTRAINT FK_672603D1C33725A7 '
+                'ALTER TABLE acme_2d67f27af061705960f46bf ADD CONSTRAINT fk_c33725a7bf396750855f96521c9 '
                 . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
-                'ALTER TABLE oro_entity1_entity2_relation_column1 ADD CONSTRAINT FK_672603D1D1828A49 '
+                'ALTER TABLE acme_2d67f27af061705960f46bf ADD CONSTRAINT fk_d1828a49bf396750855f9652859 '
                 . 'FOREIGN KEY (entity2_id) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
@@ -783,7 +784,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToOneRelationWithNoTargetPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -809,7 +810,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToOneRelationWithCombinedTargetPrimaryKey()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -833,7 +834,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToOneRelationWithNoOptions()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -858,9 +859,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'field_relation_column1_id INT DEFAULT NULL, '
-                . 'INDEX IDX_field_relation_column1_id (field_relation_column1_id), PRIMARY KEY(id))',
+                . 'INDEX idx_f10431011c95229d (field_relation_column1_id), PRIMARY KEY(id))',
                 'CREATE TABLE table2 (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229DF1043101 '
+                'ALTER TABLE table1 ADD CONSTRAINT fk_f1043101bf3967501c95229d859 '
                 . 'FOREIGN KEY (field_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
             ]
         );
@@ -890,7 +891,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     public function testAddManyToOneRelation()
     {
         $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager);
+        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -918,9 +919,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'field_relation_column1_id INT DEFAULT NULL, '
-                . 'INDEX IDX_field_relation_column1_id (field_relation_column1_id), PRIMARY KEY(id))',
+                . 'INDEX idx_f10431011c95229d (field_relation_column1_id), PRIMARY KEY(id))',
                 'CREATE TABLE table2 (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229DF1043101 '
+                'ALTER TABLE table1 ADD CONSTRAINT fk_f1043101bf3967501c95229d859 '
                 . 'FOREIGN KEY (field_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
             ]
         );

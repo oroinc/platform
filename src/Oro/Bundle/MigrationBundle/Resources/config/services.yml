@@ -1,10 +1,14 @@
 parameters:
+    oro_migration.db_id_name_generator.class:         Oro\Bundle\MigrationBundle\Tools\DatabaseIdentifierNameGenerator
     oro_migration.data_fixtures.loader.class:         Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
     oro_migration.migrations.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
     oro_migration.migrations.query_builder.class:     Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder
     oro_migration.migration.pre_up.listener.class:    Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
 
 services:
+    oro_migration.db_id_name_generator:
+        class: %oro_migration.db_id_name_generator.class%
+
     oro_migration.data_fixtures.loader:
         class: %oro_migration.data_fixtures.loader.class%
         arguments:

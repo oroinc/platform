@@ -13,10 +13,24 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+use Oro\Bundle\EntityExtendBundle\Tools\DatabaseIdentifierNameGenerator;
 
 class DoctrineSubscriber implements EventSubscriber
 {
+    /**
+     * @var DatabaseIdentifierNameGenerator
+     */
+    protected $dbIdentifierNameGenerator;
+
+    /**
+     * @param DatabaseIdentifierNameGenerator $dbIdentifierNameGenerator
+     */
+    public function __construct(DatabaseIdentifierNameGenerator $dbIdentifierNameGenerator)
+    {
+        $this->dbIdentifierNameGenerator = $dbIdentifierNameGenerator;
+    }
+
     /**
      * @return array
      */
@@ -120,8 +134,9 @@ class DoctrineSubscriber implements EventSubscriber
                                 }
 
                                 $builder->setJoinTable(
-                                    ExtendHelper::generateManyToManyJoinTableName(
-                                        $fieldId,
+                                    $this->dbIdentifierNameGenerator->generateManyToManyJoinTableName(
+                                        $fieldId->getClassName(),
+                                        $fieldId->getFieldName(),
                                         $relation['target_entity']
                                     )
                                 );
