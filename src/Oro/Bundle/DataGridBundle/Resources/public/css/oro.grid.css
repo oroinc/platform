@@ -63,12 +63,3 @@ table.grid tbody tr.row-click-action {
     background:#f9f9f9;
     margin:10px 0;
 }
-
-.loading-mask .loading-frame .box {
-    margin: 20px 0;
-}
-
-.loading-mask .loading-frame .box .loading-content {
-    background: #ffffff url('../img/loader.gif') no-repeat center left;
-    padding-left: 30px;
-}

@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
      *  - "postExecute" after action is executed
      *
      * @export  orodatagrid/js/datagrid/action/abstract-action
-     * @class   oro.datagrid.AbstractAction
+     * @class   orodatagrid.datagrid.action.AbstractAction
      * @extends Backbone.View
      */
     return Backbone.View.extend({
@@ -23,7 +23,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
         /** @property {String} */
         name: null,
 
-        /** @property {oro.datagrid.Grid} */
+        /** @property {orodatagrid.datagrid.Grid} */
         datagrid: null,
 
         /** @property {string} */
@@ -89,7 +89,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
          * Creates launcher
          *
          * @param {Object} options Launcher options
-         * @return {oro.datagrid.ActionLauncher}
+         * @return {orodatagrid.datagrid.ActionLauncher}
          */
         createLauncher: function (options) {
             options = options || {};

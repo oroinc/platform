@@ -9,13 +9,17 @@ placeholders:
                 order: 40
             template_datagrid_toolbar_page_size:
                 order: 50
+            template_datagrid_select_all_header_cell:
+                order: 50
 
 items:
    template_datagrid_toolbar:
-        template: OroDataGridBundle:js:toolbar.html.twig
+       template: OroDataGridBundle:js:toolbar.html.twig
    template_datagrid_toolbar_pagination:
-        template: OroDataGridBundle:js:pagination.html.twig
+       template: OroDataGridBundle:js:pagination.html.twig
    template_datagrid_toolbar_pagination_input:
-        template: OroDataGridBundle:js:pagination-input.html.twig
+       template: OroDataGridBundle:js:pagination-input.html.twig
    template_datagrid_toolbar_page_size:
-        template: OroDataGridBundle:js:page-size.html.twig
+       template: OroDataGridBundle:js:page-size.html.twig
+   template_datagrid_select_all_header_cell:
+       template: OroDataGridBundle:js:select-all-header-cell.html.twig

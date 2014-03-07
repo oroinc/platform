@@ -15,8 +15,8 @@ define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
     /**
      * Cell formatter that format percent representation
      *
-     * @export orodatagrid/js/datagrid/formatter/number-formatter
-     * @class  orodatagrid.datagrid.formatter.NumberFormatter
+     * @export  orodatagrid/js/datagrid/formatter/number-formatter
+     * @class   orodatagrid.datagrid.formatter.NumberFormatter
      * @extends orodatagrid.datagrid.formatter.CellFormatter
      */
     function NumberFormatter(options) {
