@@ -5,6 +5,8 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\MigrationBundle\Tools\DatabaseIdentifierNameGenerator;
+
 use Migration\v1_0\Test1BundleMigration10;
 use Migration\v1_1\Test1BundleMigration11;
 use TestPackage\src\WrongTableNameMigration;
@@ -91,7 +93,7 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
                 'Max table name length is %s. Please correct "%s" table in "%s" migration',
-                MigrationQueryBuilder::MAX_TABLE_NAME_LENGTH,
+                DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
                 'extra_long_table_name_bigger_than_30_chars',
                 'TestPackage\src\WrongTableNameMigration'
             )
@@ -108,7 +110,7 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
                 'Max column name length is %s. Please correct "%s:%s" column in "%s" migration',
-                MigrationQueryBuilder::MAX_TABLE_NAME_LENGTH,
+                DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
                 'wrong_table',
                 'extra_long_column_bigger_30_chars',
                 'TestPackage\src\WrongColumnNameMigration'

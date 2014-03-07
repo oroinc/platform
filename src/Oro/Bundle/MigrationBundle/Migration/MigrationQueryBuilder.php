@@ -8,11 +8,10 @@ use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
+use Oro\Bundle\MigrationBundle\Tools\DatabaseIdentifierNameGenerator;
 
 class MigrationQueryBuilder
 {
-    const MAX_TABLE_NAME_LENGTH = 30;
-
     /**
      * @var Connection
      */
@@ -117,11 +116,11 @@ class MigrationQueryBuilder
     protected function checkTableNameLengths($tables, Migration $migration)
     {
         foreach ($tables as $table) {
-            if (strlen($table->getName()) > self::MAX_TABLE_NAME_LENGTH) {
+            if (strlen($table->getName()) > DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE) {
                 throw new InvalidNameException(
                     sprintf(
                         'Max table name length is %s. Please correct "%s" table in "%s" migration',
-                        self::MAX_TABLE_NAME_LENGTH,
+                        DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
                         $table->getName(),
                         get_class($migration)
                     )
@@ -141,11 +140,11 @@ class MigrationQueryBuilder
     protected function checkColumnsNameLength($tableName, $columns, Migration $migration)
     {
         foreach ($columns as $column) {
-            if (strlen($column->getName()) > self::MAX_TABLE_NAME_LENGTH) {
+            if (strlen($column->getName()) > DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE) {
                 throw new InvalidNameException(
                     sprintf(
                         'Max column name length is %s. Please correct "%s:%s" column in "%s" migration',
-                        self::MAX_TABLE_NAME_LENGTH,
+                        DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
                         $tableName,
                         $column->getName(),
                         get_class($migration)
