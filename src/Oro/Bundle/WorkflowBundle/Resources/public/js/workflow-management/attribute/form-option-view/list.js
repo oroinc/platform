@@ -25,10 +25,6 @@ function(_, Backbone, AttributeFormOptionRowView) {
             this.template = _.template(template);
             this.rowViews = [];
 
-            this.$listEl = $(this.template());
-            this.$listElBody = this.$listEl.find(this.options.listElBodyEl);
-            this.$el.html(this.$listEl);
-
             this.fieldUtil = this.options.fields_selector_el.data('oroentity-fieldChoice').entityFieldUtil;
             this.entityFieldTemplate = _.template(
                 this.options.entity_field_template || $('#entity-column-chain-template').html()
@@ -82,7 +78,14 @@ function(_, Backbone, AttributeFormOptionRowView) {
 
         render: function() {
             this.resetView();
-            this.addAllItems(this.getCollection());
+            if (this.getCollection().length) {
+                this.$listEl = $(this.template());
+                this.$listElBody = this.$listEl.find(this.options.listElBodyEl);
+                this.$el.html(this.$listEl);
+                this.addAllItems(this.getCollection());
+            } else {
+                this.$el.empty();
+            }
 
             return this;
         }
