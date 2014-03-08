@@ -167,39 +167,21 @@ class ExtendExtension
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex(
-            [$selfColumnName],
-            $this->nameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
-        );
+        $selfTable->addUniqueIndex([$selfColumnName]);
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL'],
-            $this->nameGenerator->generateForeignKeyConstraintName(
-                $selfTableName,
-                [$selfColumnName],
-                $targetTableName,
-                [$targetPrimaryKeyColumnName]
-            )
+            ['onDelete' => 'SET NULL']
         );
 
         $this->addRelationColumn($targetTable, $targetColumnName, $selfPrimaryKeyColumn, ['notnull' => false]);
-        $targetTable->addIndex(
-            [$targetColumnName],
-            $this->nameGenerator->generateIndexName($targetTableName, [$targetColumnName])
-        );
+        $targetTable->addIndex([$targetColumnName]);
         $targetTable->addForeignKeyConstraint(
             $selfTable,
             [$targetColumnName],
             [$selfPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL'],
-            $this->nameGenerator->generateForeignKeyConstraintName(
-                $targetTableName,
-                [$targetColumnName],
-                $selfTableName,
-                [$selfPrimaryKeyColumnName]
-            )
+            ['onDelete' => 'SET NULL']
         );
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
@@ -266,21 +248,12 @@ class ExtendExtension
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex(
-            [$selfColumnName],
-            $this->nameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
-        );
+        $selfTable->addUniqueIndex([$selfColumnName]);
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL'],
-            $this->nameGenerator->generateForeignKeyConstraintName(
-                $selfTableName,
-                [$selfColumnName],
-                $targetTableName,
-                [$targetPrimaryKeyColumnName]
-            )
+            ['onDelete' => 'SET NULL']
         );
 
         $relationsTableName = $this->nameGenerator->generateManyToManyJoinTableName(
@@ -290,38 +263,20 @@ class ExtendExtension
         );
         $relationsTable     = $schema->createTable($relationsTableName);
         $this->addRelationColumn($relationsTable, $selfRelationName, $selfPrimaryKeyColumn);
-        $relationsTable->addIndex(
-            [$selfRelationName],
-            $this->nameGenerator->generateIndexName($relationsTableName, [$selfRelationName])
-        );
+        $relationsTable->addIndex([$selfRelationName]);
         $relationsTable->addForeignKeyConstraint(
             $selfTable,
             [$selfRelationName],
             [$selfPrimaryKeyColumnName],
-            ['onDelete' => 'CASCADE'],
-            $this->nameGenerator->generateForeignKeyConstraintName(
-                $relationsTableName,
-                [$selfRelationName],
-                $selfTableName,
-                [$selfPrimaryKeyColumnName]
-            )
+            ['onDelete' => 'CASCADE']
         );
         $this->addRelationColumn($relationsTable, $targetRelationName, $targetPrimaryKeyColumn);
-        $relationsTable->addIndex(
-            [$targetRelationName],
-            $this->nameGenerator->generateIndexName($relationsTableName, [$targetRelationName])
-        );
+        $relationsTable->addIndex([$targetRelationName]);
         $relationsTable->addForeignKeyConstraint(
             $targetTable,
             [$targetRelationName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'CASCADE'],
-            $this->nameGenerator->generateForeignKeyConstraintName(
-                $relationsTableName,
-                [$targetRelationName],
-                $targetTableName,
-                [$targetPrimaryKeyColumnName]
-            )
+            ['onDelete' => 'CASCADE']
         );
         $relationsTable->setPrimaryKey([$selfRelationName, $targetRelationName]);
 
@@ -376,21 +331,12 @@ class ExtendExtension
         $this->checkColumnsExist($targetTable, [$targetColumnName]);
 
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addIndex(
-            [$selfColumnName],
-            $this->nameGenerator->generateIndexName($selfTableName, [$selfColumnName])
-        );
+        $selfTable->addIndex([$selfColumnName]);
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL'],
-            $this->nameGenerator->generateForeignKeyConstraintName(
-                $selfTableName,
-                [$selfColumnName],
-                $targetTableName,
-                [$targetPrimaryKeyColumnName]
-            )
+            ['onDelete' => 'SET NULL']
         );
 
         $options[ExtendOptionsManager::TARGET_OPTION] = [
