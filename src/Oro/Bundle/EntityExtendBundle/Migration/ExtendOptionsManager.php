@@ -97,9 +97,9 @@ class ExtendOptionsManager
     /**
      * Gets all options
      *
-     * @return ExtendOptionsProviderInterface
+     * @return array
      */
-    public function getExtendOptionsProvider()
+    public function getExtendOptions()
     {
         $builder = new ExtendOptionsBuilder($this->entityClassResolver);
 
@@ -121,7 +121,7 @@ class ExtendOptionsManager
             }
         }
 
-        return $builder;
+        return $builder->getOptions();
     }
 
     /**

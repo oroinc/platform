@@ -988,7 +988,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function assertExtendOptions(ExtendSchema $schema, array $expectedOptions)
     {
-        $extendOptions = $schema->getExtendOptionsProvider()->getOptions();
+        $extendOptions = $schema->getExtendOptions();
         $this->assertEquals($expectedOptions, $extendOptions);
     }
 }

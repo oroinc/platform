@@ -4,14 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
     /**
-     * @var ExtendOptionsProviderInterface
+     * @var array
      */
-    protected $optionsProvider;
+    protected $options;
 
     /**
      * @var ExtendConfigProcessor
@@ -24,16 +23,16 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     protected $configDumper;
 
     /**
-     * @param ExtendOptionsProviderInterface $optionsProvider
-     * @param ExtendConfigProcessor          $configProcessor
-     * @param ExtendConfigDumper             $configDumper
+     * @param array                 $options
+     * @param ExtendConfigProcessor $configProcessor
+     * @param ExtendConfigDumper    $configDumper
      */
     public function __construct(
-        ExtendOptionsProviderInterface $optionsProvider,
+        array $options,
         ExtendConfigProcessor $configProcessor,
         ExtendConfigDumper $configDumper
     ) {
-        $this->optionsProvider = $optionsProvider;
+        $this->options         = $options;
         $this->configProcessor = $configProcessor;
         $this->configDumper    = $configDumper;
     }
@@ -45,7 +44,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     {
         $logger = new UpdateExtendConfigMigrationArrayLogger();
         $this->configProcessor->processConfigs(
-            $this->optionsProvider->getOptions(),
+            $this->options,
             $logger,
             true
         );
@@ -58,7 +57,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
      */
     public function execute()
     {
-        $this->configProcessor->processConfigs($this->optionsProvider->getOptions());
+        $this->configProcessor->processConfigs($this->options);
         $this->configDumper->updateConfig();
         $this->configDumper->dump();
     }

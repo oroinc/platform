@@ -6,7 +6,6 @@ use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Schema\SchemaWithNameGenerator;
 
@@ -54,10 +53,10 @@ class ExtendSchema extends SchemaWithNameGenerator
     }
 
     /**
-     * @return ExtendOptionsProviderInterface
+     * @return array
      */
-    public function getExtendOptionsProvider()
+    public function getExtendOptions()
     {
-        return $this->extendOptionsManager->getExtendOptionsProvider();
+        return $this->extendOptionsManager->getExtendOptions();
     }
 }

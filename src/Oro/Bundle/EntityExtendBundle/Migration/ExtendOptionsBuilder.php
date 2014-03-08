@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
+class ExtendOptionsBuilder
 {
     /**
      * @var EntityClassResolver
@@ -31,7 +31,7 @@ class ExtendOptionsBuilder implements ExtendOptionsProviderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function getOptions()
     {
