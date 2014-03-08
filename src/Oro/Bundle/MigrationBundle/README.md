@@ -13,7 +13,7 @@ Migration files should be located in `Migrations\Schema\version_number` folder. 
 Each migration class must extend `Oro\Bundle\MigrationBundle\Migration\Migration` abstract class and must implement `up` method. This method receives a current database structure in `schema` parameter and `queries` parameter witch can be used to add additional queries.
 
 With `schema` parameter, you can create or update database structure without fear of compatibility between database engines. 
-If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter allows to add additional queries witch will be executed before (`addPreQuery` method) or after (`addQuery` `addPostQuery` method).
+If you want to execute additional SQL queries before or after applying a schema modification, you can use `queries` parameter. This parameter allows to add additional queries witch will be executed before (`addPreQuery` method) or after (`addQuery` or `addPostQuery` method).
 
 Example of migration file:
 
