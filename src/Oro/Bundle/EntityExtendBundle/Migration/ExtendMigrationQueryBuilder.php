@@ -6,9 +6,9 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilderWithNameGenerator;
 
-class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
+class ExtendMigrationQueryBuilder extends MigrationQueryBuilderWithNameGenerator
 {
     /**
      * @var ExtendOptionsManager
@@ -39,21 +39,14 @@ class ExtendMigrationQueryBuilder extends MigrationQueryBuilder
     /**
      * {@inheritdoc}
      */
-    protected function getSchema()
+    public function createSchemaObject($tables, $sequences, $schemaConfig)
     {
-        $sm        = $this->connection->getSchemaManager();
-        $platform  = $this->connection->getDatabasePlatform();
-        $sequences = array();
-        if ($platform->supportsSequences()) {
-            $sequences = $sm->listSequences();
-        }
-        $tables = $sm->listTables();
-
         return new ExtendSchema(
             $this->extendOptionsManager,
+            $this->nameGenerator,
             $tables,
             $sequences,
-            $sm->createSchemaConfig()
+            $schemaConfig
         );
     }
 

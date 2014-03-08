@@ -5,7 +5,6 @@ parameters:
     oro_entity_extend.listener.config_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\ConfigSubscriber
     oro_entity_extend.listener.entity_subscriber.class:     Oro\Bundle\EntityExtendBundle\EventListener\DoctrineSubscriber
     oro_entity_extend.twig.view_extension.class:            Oro\Bundle\EntityExtendBundle\Twig\ViewExtension
-    oro_entity_extend.db_id_name_generator.class:           Oro\Bundle\EntityExtendBundle\Tools\DatabaseIdentifierNameGenerator
     oro_entity_extend.migration.config_processor.class:     Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor
     oro_entity_extend.migration.post_up.listener.class:     Oro\Bundle\EntityExtendBundle\EventListener\PostUpMigrationListener
     oro_entity_extend.migration.options_manager.class:      Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager
@@ -43,12 +42,9 @@ services:
     oro_entity_extend.listener.entity_subscriber:
         class: %oro_entity_extend.listener.entity_subscriber.class%
         arguments:
-            - @oro_entity_extend.db_id_name_generator
+            - @oro_migration.db_id_name_generator
         tags:
             - { name: doctrine.event_subscriber, connection: default }
-
-    oro_entity_extend.db_id_name_generator:
-        class: %oro_entity_extend.db_id_name_generator.class%
 
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%
@@ -72,4 +68,4 @@ services:
         class: %oro_entity_extend.migration.extension.extend.class%
         arguments:
             - @oro_entity_extend.migration.options_manager
-            - @oro_entity_extend.db_id_name_generator
+            - @oro_migration.db_id_name_generator

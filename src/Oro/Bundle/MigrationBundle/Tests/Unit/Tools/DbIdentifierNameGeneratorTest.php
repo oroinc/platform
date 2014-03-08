@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\MigrationBundle\Tools\DatabaseIdentifierNameGenerator;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class DatabaseIdentifierNameGeneratorTest extends \PHPUnit_Framework_TestCase
+class DbIdentifierNameGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider generateIndexNameProvider
      */
     public function testGenerateIndexName($tableName, $columnNames, $uniqueIndex, $expectedName)
     {
-        $generator = new DatabaseIdentifierNameGenerator();
+        $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateIndexName($tableName, $columnNames, $uniqueIndex);
         $this->assertEquals($expectedName, $result);
     }
@@ -26,7 +26,7 @@ class DatabaseIdentifierNameGeneratorTest extends \PHPUnit_Framework_TestCase
         $foreignColumnNames,
         $expectedName
     ) {
-        $generator = new DatabaseIdentifierNameGenerator();
+        $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateForeignKeyConstraintName(
             $tableName,
             $columnNames,
@@ -41,7 +41,7 @@ class DatabaseIdentifierNameGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerateIdentifierName($tableNames, $columnNames, $prefix, $expectedName)
     {
-        $generator = new DatabaseIdentifierNameGenerator();
+        $generator = new DbIdentifierNameGenerator();
         $result = $generator->generateIdentifierName($columnNames, $prefix, $tableNames);
         $this->assertEquals($expectedName, $result);
     }

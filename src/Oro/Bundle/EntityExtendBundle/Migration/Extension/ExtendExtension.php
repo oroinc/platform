@@ -11,7 +11,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\DatabaseIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
 
 class ExtendExtension
 {
@@ -23,20 +23,20 @@ class ExtendExtension
     protected $extendOptionsManager;
 
     /**
-     * @var DatabaseIdentifierNameGenerator
+     * @var DbIdentifierNameGenerator
      */
-    protected $dbIdentifierNameGenerator;
+    protected $nameGenerator;
 
     /**
-     * @param ExtendOptionsManager            $extendOptionsManager
-     * @param DatabaseIdentifierNameGenerator $dbIdentifierNameGenerator
+     * @param ExtendOptionsManager      $extendOptionsManager
+     * @param DbIdentifierNameGenerator $nameGenerator
      */
     public function __construct(
         ExtendOptionsManager $extendOptionsManager,
-        DatabaseIdentifierNameGenerator $dbIdentifierNameGenerator
+        DbIdentifierNameGenerator $nameGenerator
     ) {
-        $this->extendOptionsManager      = $extendOptionsManager;
-        $this->dbIdentifierNameGenerator = $dbIdentifierNameGenerator;
+        $this->extendOptionsManager = $extendOptionsManager;
+        $this->nameGenerator        = $nameGenerator;
     }
 
     /**
@@ -169,14 +169,14 @@ class ExtendExtension
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
         $selfTable->addUniqueIndex(
             [$selfColumnName],
-            $this->dbIdentifierNameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
+            $this->nameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
         );
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
             ['onDelete' => 'SET NULL'],
-            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+            $this->nameGenerator->generateForeignKeyConstraintName(
                 $selfTableName,
                 [$selfColumnName],
                 $targetTableName,
@@ -187,14 +187,14 @@ class ExtendExtension
         $this->addRelationColumn($targetTable, $targetColumnName, $selfPrimaryKeyColumn, ['notnull' => false]);
         $targetTable->addIndex(
             [$targetColumnName],
-            $this->dbIdentifierNameGenerator->generateIndexName($targetTableName, [$targetColumnName])
+            $this->nameGenerator->generateIndexName($targetTableName, [$targetColumnName])
         );
         $targetTable->addForeignKeyConstraint(
             $selfTable,
             [$targetColumnName],
             [$selfPrimaryKeyColumnName],
             ['onDelete' => 'SET NULL'],
-            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+            $this->nameGenerator->generateForeignKeyConstraintName(
                 $targetTableName,
                 [$targetColumnName],
                 $selfTableName,
@@ -268,14 +268,14 @@ class ExtendExtension
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
         $selfTable->addUniqueIndex(
             [$selfColumnName],
-            $this->dbIdentifierNameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
+            $this->nameGenerator->generateIndexName($selfTableName, [$selfColumnName], true)
         );
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
             ['onDelete' => 'SET NULL'],
-            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+            $this->nameGenerator->generateForeignKeyConstraintName(
                 $selfTableName,
                 [$selfColumnName],
                 $targetTableName,
@@ -283,7 +283,7 @@ class ExtendExtension
             )
         );
 
-        $relationsTableName = $this->dbIdentifierNameGenerator->generateManyToManyJoinTableName(
+        $relationsTableName = $this->nameGenerator->generateManyToManyJoinTableName(
             $selfClassName,
             $associationName,
             $targetClassName
@@ -292,14 +292,14 @@ class ExtendExtension
         $this->addRelationColumn($relationsTable, $selfRelationName, $selfPrimaryKeyColumn);
         $relationsTable->addIndex(
             [$selfRelationName],
-            $this->dbIdentifierNameGenerator->generateIndexName($relationsTableName, [$selfRelationName])
+            $this->nameGenerator->generateIndexName($relationsTableName, [$selfRelationName])
         );
         $relationsTable->addForeignKeyConstraint(
             $selfTable,
             [$selfRelationName],
             [$selfPrimaryKeyColumnName],
             ['onDelete' => 'CASCADE'],
-            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+            $this->nameGenerator->generateForeignKeyConstraintName(
                 $relationsTableName,
                 [$selfRelationName],
                 $selfTableName,
@@ -309,14 +309,14 @@ class ExtendExtension
         $this->addRelationColumn($relationsTable, $targetRelationName, $targetPrimaryKeyColumn);
         $relationsTable->addIndex(
             [$targetRelationName],
-            $this->dbIdentifierNameGenerator->generateIndexName($relationsTableName, [$targetRelationName])
+            $this->nameGenerator->generateIndexName($relationsTableName, [$targetRelationName])
         );
         $relationsTable->addForeignKeyConstraint(
             $targetTable,
             [$targetRelationName],
             [$targetPrimaryKeyColumnName],
             ['onDelete' => 'CASCADE'],
-            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+            $this->nameGenerator->generateForeignKeyConstraintName(
                 $relationsTableName,
                 [$targetRelationName],
                 $targetTableName,
@@ -378,14 +378,14 @@ class ExtendExtension
         $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
         $selfTable->addIndex(
             [$selfColumnName],
-            $this->dbIdentifierNameGenerator->generateIndexName($selfTableName, [$selfColumnName])
+            $this->nameGenerator->generateIndexName($selfTableName, [$selfColumnName])
         );
         $selfTable->addForeignKeyConstraint(
             $targetTable,
             [$selfColumnName],
             [$targetPrimaryKeyColumnName],
             ['onDelete' => 'SET NULL'],
-            $this->dbIdentifierNameGenerator->generateForeignKeyConstraintName(
+            $this->nameGenerator->generateForeignKeyConstraintName(
                 $selfTableName,
                 [$selfColumnName],
                 $targetTableName,

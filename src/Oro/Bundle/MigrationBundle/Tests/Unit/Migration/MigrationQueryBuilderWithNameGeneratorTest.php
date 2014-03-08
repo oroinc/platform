@@ -5,23 +5,26 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\MigrationBundle\Tools\DatabaseIdentifierNameGenerator;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 use Migration\v1_0\Test1BundleMigration10;
 use Migration\v1_1\Test1BundleMigration11;
 use TestPackage\src\WrongTableNameMigration;
 use TestPackage\src\WrongColumnNameMigration;
 
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilderWithNameGenerator;
 
-class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
+class MigrationQueryBuilderWithNameGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var MigrationQueryBuilder */
+    /** @var MigrationQueryBuilderWithNameGenerator */
     protected $builder;
 
     protected $em;
 
     protected $connection;
+
+    /** @var DbIdentifierNameGenerator */
+    protected $nameGenerator;
 
     public function setUp()
     {
@@ -36,14 +39,16 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->connection));
 
         $platform = new MySqlPlatform();
-        $schema   = new Schema();
         $sm       = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
             ->disableOriginalConstructor()
-            ->setMethods(['createSchema'])
+            ->setMethods(['listTables', 'createSchemaConfig'])
             ->getMockForAbstractClass();
         $sm->expects($this->once())
-            ->method('createSchema')
-            ->will($this->returnValue($schema));
+            ->method('listTables')
+            ->will($this->returnValue([]));
+        $sm->expects($this->once())
+            ->method('createSchemaConfig')
+            ->will($this->returnValue(null));
         $this->connection->expects($this->once())
             ->method('getSchemaManager')
             ->will($this->returnValue($sm));
@@ -51,7 +56,10 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getDatabasePlatform')
             ->will($this->returnValue($platform));
 
-        $this->builder = new MigrationQueryBuilder($this->connection);
+        $this->nameGenerator = new DbIdentifierNameGenerator();
+
+        $this->builder = new MigrationQueryBuilderWithNameGenerator($this->connection);
+        $this->builder->setNameGenerator($this->nameGenerator);
     }
 
     public function testGetMigrationsQueries()
@@ -93,7 +101,7 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
                 'Max table name length is %s. Please correct "%s" table in "%s" migration',
-                DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
+                $this->nameGenerator->getMaxIdentifierSize(),
                 'extra_long_table_name_bigger_than_30_chars',
                 'TestPackage\src\WrongTableNameMigration'
             )
@@ -110,7 +118,7 @@ class MigrationQueryBuilderTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\MigrationBundle\Exception\InvalidNameException',
             sprintf(
                 'Max column name length is %s. Please correct "%s:%s" column in "%s" migration',
-                DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
+                $this->nameGenerator->getMaxIdentifierSize(),
                 'wrong_table',
                 'extra_long_column_bigger_30_chars',
                 'TestPackage\src\WrongColumnNameMigration'

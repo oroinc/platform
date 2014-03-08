@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
 
 class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,6 +18,9 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 
     /** @var ExtendOptionsManager */
     protected $extendOptionsManager;
+
+    /** @var DbIdentifierNameGenerator */
+    protected $nameGenerator;
 
     protected function setUp()
     {
@@ -33,12 +37,14 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                 )
             );
         $this->extendOptionsManager = new ExtendOptionsManager($this->entityClassResolver);
+        $this->nameGenerator        = new DbIdentifierNameGenerator();
     }
 
     public function testEmptySchema()
     {
         $schema = new ExtendSchema(
-            $this->extendOptionsManager
+            $this->extendOptionsManager,
+            $this->nameGenerator
         );
 
         $this->assertSchemaTypes($schema);
@@ -57,6 +63,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 
         $schema = new ExtendSchema(
             $this->extendOptionsManager,
+            $this->nameGenerator,
             [$table1]
         );
 
@@ -72,7 +79,10 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 
     public function testSchema()
     {
-        $schema = new ExtendSchema($this->extendOptionsManager);
+        $schema = new ExtendSchema(
+            $this->extendOptionsManager,
+            $this->nameGenerator
+        );
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('column1', 'string', ['length' => 100]);
@@ -130,12 +140,12 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                     'configs' => [
                         'entity' => ['icon' => 'icon1']
                     ],
-                    'fields' => [
+                    'fields'  => [
                         'configurable_column1' => [
                             'type'    => 'string',
                             'configs' => [
                                 'datagrid' => ['is_visible' => true, 'other' => 'val'],
-                                'form' => ['is_enabled' => false],
+                                'form'     => ['is_enabled' => false],
                             ]
                         ],
                         'extend_column1'       => [

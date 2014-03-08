@@ -8,7 +8,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\EntityExtendBundle\Tools\DatabaseIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
@@ -48,13 +48,29 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @return ExtendSchema
+     */
+    protected function getExtendSchema()
+    {
+        return new ExtendSchema($this->extendOptionsManager, new DbIdentifierNameGenerator());
+    }
+
+    /**
+     * @return ExtendExtension
+     */
+    protected function getExtendExtension()
+    {
+        return new ExtendExtension($this->extendOptionsManager, new DbIdentifierNameGenerator());
+    }
+
+    /**
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Invalid entity name: "Acme\AcmeBundle\Entity\Entity1".
      */
     public function testCreateCustomEntityTableWithInvalidEntityName1()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
@@ -69,8 +85,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateCustomEntityTableWithInvalidEntityName2()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
@@ -85,8 +101,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateCustomEntityTableWithInvalidOwner()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
@@ -104,8 +120,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testCreateCustomEntityTableWithInvalidIsExtend()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
@@ -119,8 +135,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateCustomEntityTable()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
@@ -178,8 +194,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOptionSetWithNoOptions()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -214,8 +230,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOptionSet()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -257,8 +273,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddOneToManyRelationWithNoPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -285,8 +301,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddOneToManyRelationWithCombinedPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -315,8 +331,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddOneToManyRelationWithNoTargetPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -343,8 +359,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddOneToManyRelationWithCombinedTargetPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -369,8 +385,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOneToManyRelationWithNoOptions()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -439,8 +455,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddOneToManyRelation()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -517,8 +533,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddManyToManyRelationWithNoPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -545,8 +561,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddManyToManyRelationWithCombinedPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -575,8 +591,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddManyToManyRelationWithNoTargetPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -603,8 +619,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddManyToManyRelationWithCombinedTargetPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -629,8 +645,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddManyToManyRelationWithNoOptions()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -705,8 +721,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddManyToManyRelation()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -789,8 +805,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddManyToOneRelationWithNoTargetPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -815,8 +831,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddManyToOneRelationWithCombinedTargetPrimaryKey()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -839,8 +855,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddManyToOneRelationWithNoOptions()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');
@@ -897,8 +913,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testAddManyToOneRelation()
     {
-        $schema    = new ExtendSchema($this->extendOptionsManager);
-        $extension = new ExtendExtension($this->extendOptionsManager, new DatabaseIdentifierNameGenerator());
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
 
         $table1 = $schema->createTable('table1');
         $table1->addColumn('id', 'integer');

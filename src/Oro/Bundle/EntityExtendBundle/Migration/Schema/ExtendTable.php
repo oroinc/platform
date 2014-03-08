@@ -2,34 +2,38 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
-use Doctrine\DBAL\Schema\Column;
-use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\MigrationBundle\Migration\Schema\TableWithNameGenerator;
 
-class ExtendTable extends Table
+class ExtendTable extends TableWithNameGenerator
 {
+    const COLUMN_CLASS = 'Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn';
+
     /**
      * @var ExtendOptionsManager
      */
     protected $extendOptionsManager;
 
     /**
-     * @param ExtendOptionsManager $extendOptionsManager
-     * @param Table                $baseTable
+     * @param array $args
      */
-    public function __construct(ExtendOptionsManager $extendOptionsManager, Table $baseTable)
+    public function __construct(array $args)
     {
-        $this->extendOptionsManager = $extendOptionsManager;
+        $this->extendOptionsManager = $args['extendOptionsManager'];
 
-        parent::__construct(
-            $baseTable->getName(),
-            $baseTable->getColumns(),
-            $baseTable->getIndexes(),
-            $baseTable->getForeignKeys(),
-            false,
-            $baseTable->getOptions()
-        );
+        parent::__construct($args);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function createColumnObject(array $args)
+    {
+        $args['tableName']            = $this->getName();
+        $args['extendOptionsManager'] = $this->extendOptionsManager;
+
+        return parent::createColumnObject($args);
     }
 
     /**
@@ -65,9 +69,8 @@ class ExtendTable extends Table
             $options['notnull'] = false;
         }
 
-        parent::addColumn($columnName, $typeName, $options);
+        $column = parent::addColumn($columnName, $typeName, $options);
 
-        $column = $this->getColumn($columnName);
         if (null !== $oroOptions) {
             $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
             $column->setOptions([ExtendColumn::ORO_OPTIONS_NAME => $oroOptions]);
@@ -75,17 +78,4 @@ class ExtendTable extends Table
 
         return $column;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    // @codingStandardsIgnoreStart
-    protected function _addColumn(Column $column)
-    {
-        if (!($column instanceof ExtendColumn)) {
-            $column = new ExtendColumn($this->extendOptionsManager, $this->getName(), $column);
-        }
-        parent::_addColumn($column);
-    }
-    // @codingStandardsIgnoreEnd
 }

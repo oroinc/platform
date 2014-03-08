@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Oro\Bundle\MigrationBundle\Tools\DatabaseIdentifierNameGenerator as BaseGenerator;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator as BaseGenerator;
 
-class DatabaseIdentifierNameGenerator extends BaseGenerator
+class DbIdentifierNameGenerator extends BaseGenerator
 {
     /**
      * Builds a table name for many-to-many relation

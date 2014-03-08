@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Schema\Column;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\MigrationBundle\Migration\Schema\Column;
 
 class ExtendColumn extends Column
 {
@@ -22,40 +22,14 @@ class ExtendColumn extends Column
     protected $tableName;
 
     /**
-     * @param ExtendOptionsManager $extendOptionsManager
-     * @param string               $tableName
-     * @param Column               $baseColumn
+     * @param array $args
      */
-    public function __construct(ExtendOptionsManager $extendOptionsManager, $tableName, Column $baseColumn)
+    public function __construct(array $args)
     {
-        $this->extendOptionsManager = $extendOptionsManager;
-        $this->tableName            = $tableName;
+        $this->extendOptionsManager = $args['extendOptionsManager'];
+        $this->tableName            = $args['tableName'];
 
-        $optionNames = [
-            'Length',
-            'Precision',
-            'Scale',
-            'Unsigned',
-            'Fixed',
-            'Notnull',
-            'Default',
-            'Autoincrement',
-            'Comment'
-        ];
-        $options     = [];
-        foreach ($optionNames as $name) {
-            $method = "get" . $name;
-            $val    = $baseColumn->$method();
-            if ($this->$method() !== $val) {
-                $options[$name] = $val;
-            }
-        }
-        $this->_setName($baseColumn->getName());
-        $this->_type = $baseColumn->getType();
-        $this->setOptions($options);
-        $this->setColumnDefinition($baseColumn->getColumnDefinition());
-        $this->setPlatformOptions($baseColumn->getPlatformOptions());
-        $this->setCustomSchemaOptions($baseColumn->getCustomSchemaOptions());
+        parent::__construct($args);
     }
 
     /**

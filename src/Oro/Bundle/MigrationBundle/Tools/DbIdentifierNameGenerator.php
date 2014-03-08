@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\MigrationBundle\Tools;
 
-class DatabaseIdentifierNameGenerator
+class DbIdentifierNameGenerator
 {
     /**
-     * Max size of an identifier
+     * Gets the max size of an identifier
+     *
+     * @return int
      */
-    const MAX_IDENTIFIER_SIZE = 30;
+    public function getMaxIdentifierSize()
+    {
+        return 30;
+    }
 
     /**
      * Builds an index name
@@ -68,14 +73,14 @@ class DatabaseIdentifierNameGenerator
                         $columnNames
                     )
                 );
-            $result = substr($result, 0, self::MAX_IDENTIFIER_SIZE);
+            $result = substr($result, 0, $this->getMaxIdentifierSize());
         } else {
             if (!is_array($tableNames)) {
                 $tableNames = [$tableNames];
             }
             $columns = implode('_', $columnNames);
             $tables = implode('_', $tableNames);
-            if (strlen($prefix) + strlen($tables) + strlen($columns) + 2 <= self::MAX_IDENTIFIER_SIZE) {
+            if (strlen($prefix) + strlen($tables) + strlen($columns) + 2 <= $this->getMaxIdentifierSize()) {
                 $result = $prefix . '_' . $tables . '_' . $columns;
             } else {
                 $result = $prefix . '_' .
@@ -96,7 +101,7 @@ class DatabaseIdentifierNameGenerator
                             )
                         )
                     );
-                $result = substr($result, 0, self::MAX_IDENTIFIER_SIZE);
+                $result = substr($result, 0, $this->getMaxIdentifierSize());
             }
         }
 

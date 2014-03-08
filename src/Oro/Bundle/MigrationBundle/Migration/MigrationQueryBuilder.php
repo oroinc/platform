@@ -6,9 +6,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaConfig;
+use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
-use Oro\Bundle\MigrationBundle\Tools\DatabaseIdentifierNameGenerator;
 
 class MigrationQueryBuilder
 {
@@ -49,7 +50,12 @@ class MigrationQueryBuilder
         $result = [];
 
         $platform   = $this->connection->getDatabasePlatform();
-        $fromSchema = $this->getSchema();
+        $sm         = $this->connection->getSchemaManager();
+        $fromSchema = $this->createSchemaObject(
+            $sm->listTables(),
+            $platform->supportsSequences() ? $sm->listSequences() : [],
+            $sm->createSchemaConfig()
+        );
         $queryBag   = new QueryBag();
         foreach ($migrations as $migration) {
             $toSchema = clone $fromSchema;
@@ -60,11 +66,10 @@ class MigrationQueryBuilder
             $comparator = new Comparator();
             $schemaDiff = $comparator->compare($fromSchema, $toSchema);
 
-            $this->checkTableNameLengths($schemaDiff->newTables, $migration);
-
+            $this->checkTables($schemaDiff->newTables, $migration);
             $changedTables = $schemaDiff->changedTables;
             foreach ($changedTables as $tableName => $diff) {
-                $this->checkColumnsNameLength(
+                $this->checkColumnNames(
                     $tableName,
                     array_values($diff->addedColumns),
                     $migration
@@ -90,13 +95,16 @@ class MigrationQueryBuilder
     }
 
     /**
-     * Gets a database schema
+     * Creates a database schema object
      *
+     * @param Table[]      $tables
+     * @param Sequence[]   $sequences
+     * @param SchemaConfig $schemaConfig
      * @return Schema
      */
-    protected function getSchema()
+    public function createSchemaObject($tables, $sequences, $schemaConfig)
     {
-        return $this->connection->getSchemaManager()->createSchema();
+        return new Schema($tables, $sequences, $schemaConfig);
     }
 
     /**
@@ -109,48 +117,55 @@ class MigrationQueryBuilder
     }
 
     /**
+     * Validates the given tables
+     *
      * @param Table[]   $tables
      * @param Migration $migration
-     * @throws InvalidNameException
+     * @throws InvalidNameException if invalid table or column name is detected
      */
-    protected function checkTableNameLengths($tables, Migration $migration)
+    protected function checkTables($tables, Migration $migration)
     {
         foreach ($tables as $table) {
-            if (strlen($table->getName()) > DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE) {
-                throw new InvalidNameException(
-                    sprintf(
-                        'Max table name length is %s. Please correct "%s" table in "%s" migration',
-                        DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
-                        $table->getName(),
-                        get_class($migration)
-                    )
-                );
-            }
-
-            $this->checkColumnsNameLength($table->getName(), $table->getColumns(), $migration);
+            $this->checkTableName($table->getName(), $migration);
+            $this->checkColumnNames($table->getName(), $table->getColumns(), $migration);
         }
     }
 
     /**
+     * Validates the given columns
+     *
      * @param string    $tableName
      * @param Column[]  $columns
      * @param Migration $migration
-     * @throws InvalidNameException
+     * @throws InvalidNameException if invalid column name is detected
      */
-    protected function checkColumnsNameLength($tableName, $columns, Migration $migration)
+    protected function checkColumnNames($tableName, $columns, Migration $migration)
     {
         foreach ($columns as $column) {
-            if (strlen($column->getName()) > DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE) {
-                throw new InvalidNameException(
-                    sprintf(
-                        'Max column name length is %s. Please correct "%s:%s" column in "%s" migration',
-                        DatabaseIdentifierNameGenerator::MAX_IDENTIFIER_SIZE,
-                        $tableName,
-                        $column->getName(),
-                        get_class($migration)
-                    )
-                );
-            }
+            $this->checkColumnName($tableName, $column->getName(), $migration);
         }
+    }
+
+    /**
+     * Validates table name
+     *
+     * @param string    $tableName
+     * @param Migration $migration
+     * @throws InvalidNameException if table name is invalid
+     */
+    protected function checkTableName($tableName, Migration $migration)
+    {
+    }
+
+    /**
+     * Validates column name
+     *
+     * @param string    $tableName
+     * @param string    $columnName
+     * @param Migration $migration
+     * @throws InvalidNameException if column name is invalid
+     */
+    protected function checkColumnName($tableName, $columnName, Migration $migration)
+    {
     }
 }
