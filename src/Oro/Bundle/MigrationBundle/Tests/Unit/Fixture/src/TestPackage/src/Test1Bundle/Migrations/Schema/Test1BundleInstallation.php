@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class Test1BundleInstallation implements Installation
+class Test1BundleInstallation extends Installation
 {
     /**
      * @inheritdoc

@@ -7,7 +7,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\AddressBundle\Migrations\Schema\v1_0\OroAddressBundle;
 
-class OroAddressBundleInstaller implements Installation
+class OroAddressBundleInstaller extends Installation
 {
     /**
      * @inheritdoc

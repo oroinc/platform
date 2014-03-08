@@ -7,7 +7,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigDumper;
 
-class UpdateEntityConfigMigration implements Migration
+class UpdateEntityConfigMigration extends Migration
 {
     /**
      * @var ConfigDumper

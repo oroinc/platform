@@ -7,7 +7,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\NotificationBundle\Migrations\Schema\v1_0\OroNotificationBundle;
 
-class OroNotificationBundleInstaller implements Installation
+class OroNotificationBundleInstaller extends Installation
 {
     /**
      * @inheritdoc

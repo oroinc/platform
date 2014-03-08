@@ -28,7 +28,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroTestBundle implements Migration
+class OroTestBundle extends Migration
 {
     /**
      * @inheritdoc
@@ -71,7 +71,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroTestBundleInstaller implements Installation
+class OroTestBundleInstaller extends Installation
 {
     /**
      * @inheritdoc

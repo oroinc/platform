@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroWorkflowBundle implements Migration
+class OroWorkflowBundle extends Migration
 {
     /**
      * @inheritdoc

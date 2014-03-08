@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
-interface Migration
+abstract class Migration
 {
     /**
      * Modifies the given schema to apply necessary changes of a database
@@ -14,5 +14,5 @@ interface Migration
      * @param QueryBag $queries
      * @return void
      */
-    public function up(Schema $schema, QueryBag $queries);
+    abstract public function up(Schema $schema, QueryBag $queries);
 }

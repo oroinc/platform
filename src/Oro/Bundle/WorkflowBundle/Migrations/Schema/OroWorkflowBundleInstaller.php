@@ -7,7 +7,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\WorkflowBundle\Migrations\Schema\v1_0\OroWorkflowBundle;
 
-class OroWorkflowBundleInstaller implements Installation
+class OroWorkflowBundleInstaller extends Installation
 {
     /**
      * @inheritdoc

@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
-class CreateMigrationTableMigration implements Migration
+class CreateMigrationTableMigration extends Migration
 {
     const MIGRATION_TABLE = 'oro_migrations';
 
