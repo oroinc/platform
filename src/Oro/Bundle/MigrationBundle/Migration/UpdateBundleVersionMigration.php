@@ -34,7 +34,7 @@ class UpdateBundleVersionMigration extends Migration
                     $bundleVersion,
                     $date->format('Y-m-d H:i:s')
                 );
-                $queries->addSql($sql);
+                $queries->addQuery($sql);
             }
         }
     }

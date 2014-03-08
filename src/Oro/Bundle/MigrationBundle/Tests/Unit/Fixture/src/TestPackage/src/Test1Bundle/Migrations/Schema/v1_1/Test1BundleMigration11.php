@@ -16,6 +16,6 @@ class Test1BundleMigration11 extends Migration
         $table = $schema->createTable('test1table');
         $table->addColumn('id', 'integer');
 
-        $queries->addSql('ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL');
+        $queries->addQuery('ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL');
     }
 }

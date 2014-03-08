@@ -10,6 +10,8 @@ use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
+use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
+use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
 
 class MigrationQueryBuilder
 {
@@ -19,12 +21,26 @@ class MigrationQueryBuilder
     protected $connection;
 
     /**
+     * @var RenameExtension
+     */
+    protected $renameExtension;
+
+    /**
      * @param Connection $connection
      */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
     }
+
+    /**
+     * @param RenameExtension $renameExtension
+     */
+    public function setRenameExtension(RenameExtension $renameExtension)
+    {
+        $this->renameExtension = $renameExtension;
+    }
+
 
     /**
      * Gets a connection object this migration query builder works with
@@ -77,9 +93,9 @@ class MigrationQueryBuilder
             }
 
             $queries = array_merge(
-                $queryBag->getPreSqls(),
+                $queryBag->getPreQueries(),
                 $schemaDiff->toSql($platform),
-                $queryBag->getPostSqls()
+                $queryBag->getPostQueries()
             );
 
             $result[] = [
@@ -114,6 +130,9 @@ class MigrationQueryBuilder
      */
     protected function setExtensions(Migration $migration)
     {
+        if ($migration instanceof RenameExtensionAwareInterface) {
+            $migration->setRenameExtension($this->renameExtension);
+        }
     }
 
     /**

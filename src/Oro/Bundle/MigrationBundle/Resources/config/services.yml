@@ -4,6 +4,7 @@ parameters:
     oro_migration.migrations.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
     oro_migration.migrations.query_builder.class:     Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilderWithNameGenerator
     oro_migration.migration.pre_up.listener.class:    Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
+    oro_migration.migration.extension.rename.class:   Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
 
 services:
     oro_migration.db_id_name_generator:
@@ -29,8 +30,12 @@ services:
             - @doctrine.dbal.default_connection
         calls:
             - [setNameGenerator, [@oro_migration.db_id_name_generator]]
+            - [setRenameExtension, [@oro_migration.migration.extension.rename]]
 
     oro_migration.migration.pre_up.listener:
         class: %oro_migration.migration.pre_up.listener.class%
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
+
+    oro_migration.migration.extension.rename:
+        class: %oro_migration.migration.extension.rename.class%

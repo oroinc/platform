@@ -12,14 +12,14 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class TestMigration extends Migration implements ExtendExtensionAwareInterface
 {
     /** @var ExtendExtension */
-    protected $extend;
+    protected $extendExtension;
 
     /**
      * @inheritdoc
      */
-    public function setExtendExtension(ExtendExtension $extend)
+    public function setExtendExtension(ExtendExtension $extendExtension)
     {
-        $this->extend = $extend;
+        $this->extendExtension = $extendExtension;
     }
 
     /**
@@ -35,7 +35,7 @@ class TestMigration extends Migration implements ExtendExtensionAwareInterface
             []
         );
 
-        $this->extend->addManyToOneRelation(
+        $this->extendExtension->addManyToOneRelation(
             $schema,
             $table,
             'rel_m2o',

@@ -37,7 +37,7 @@ class UpdateExtendConfigMigration extends Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema instanceof ExtendSchema) {
-            $queries->addSql(
+            $queries->addQuery(
                 new UpdateExtendConfigMigrationQuery(
                     $schema->getExtendOptions(),
                     $this->configProcessor,

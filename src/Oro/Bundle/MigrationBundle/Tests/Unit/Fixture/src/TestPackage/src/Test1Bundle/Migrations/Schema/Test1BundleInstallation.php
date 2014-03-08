@@ -21,6 +21,6 @@ class Test1BundleInstallation extends Installation
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addSql('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
+        $queries->addQuery('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
     }
 }

@@ -24,6 +24,6 @@ class UpdateEntityConfigMigration extends Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addSql(new UpdateEntityConfigMigrationQuery($this->configDumper));
+        $queries->addQuery(new UpdateEntityConfigMigrationQuery($this->configDumper));
     }
 }

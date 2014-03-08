@@ -122,7 +122,7 @@ class OroSearchBundle extends Migration implements ContainerAwareInterface
         $configClasses = $this->container->getParameter('oro_search.engine_orm');
         if (isset($configClasses[$config['driver']])) {
             $className = $configClasses[$config['driver']];
-            $queries->addSql($className::getPlainSql());
+            $queries->addQuery($className::getPlainSql());
         }
     }
 }

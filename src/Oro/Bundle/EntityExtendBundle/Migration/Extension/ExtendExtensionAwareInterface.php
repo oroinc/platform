@@ -10,7 +10,7 @@ interface ExtendExtensionAwareInterface
     /**
      * Sets the ExtendExtension
      *
-     * @param ExtendExtension $extend
+     * @param ExtendExtension $extendExtension
      */
-    public function setExtendExtension(ExtendExtension $extend);
+    public function setExtendExtension(ExtendExtension $extendExtension);
 }
