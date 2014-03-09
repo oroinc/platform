@@ -24,7 +24,7 @@ class DbIdentifierNameGenerator
      */
     public function generateIndexName($tableName, $columnNames, $uniqueIndex = false)
     {
-        return $this->generateIdentifierName($columnNames, $uniqueIndex ? 'UIDX' : 'IDX', [$tableName]);
+        return $this->generateIdentifierName($tableName, $columnNames, $uniqueIndex ? 'UIDX' : 'IDX');
     }
 
     /**
@@ -39,9 +39,9 @@ class DbIdentifierNameGenerator
     public function generateForeignKeyConstraintName($tableName, $columnNames, $foreignTableName, $foreignColumnNames)
     {
         return $this->generateIdentifierName(
+            [$tableName, $foreignTableName],
             array_merge($columnNames, $foreignColumnNames),
-            'FK',
-            [$tableName, $foreignTableName]
+            'FK'
         );
     }
 
@@ -52,59 +52,56 @@ class DbIdentifierNameGenerator
      * however building identifiers automatically for foreign keys, composite keys or such can easily create
      * very long names.
      *
+     * @param string|string[] $tableNames A table name or a list of table names
      * @param string[]        $columnNames
      * @param string          $prefix
-     * @param string|string[] $tableNames  A table name or a list of table names
+     * @param bool|null       $upperCase If TRUE the returned string is in upper case;
+     *                                   If FALSE the returned string is in lower case;
+     *                                   If NULL the encoded name id in upper case, not encoded is in lower case
      * @return string
+     * @throws \InvalidArgumentException
      */
     public function generateIdentifierName(
+        $tableNames,
         $columnNames,
         $prefix = '',
-        $tableNames = null
+        $upperCase = null
     ) {
-        if (empty($tableNames)) {
+        if (empty($tableNames) || (is_array($tableNames) && count($tableNames) === 1 && empty($tableNames[0]))) {
+            throw new \InvalidArgumentException('A table name must not be empty.');
+        }
+        if (!is_array($tableNames)) {
+            $tableNames = [$tableNames];
+        }
+
+        $columns = implode('_', $columnNames);
+        $tables = implode('_', $tableNames);
+        if (strlen($prefix) + strlen($tables) + strlen($columns) + 2 <= $this->getMaxIdentifierSize()) {
+            $result = $prefix . '_' . $tables . '_' . $columns;
+
+            return $upperCase === true ? strtoupper($result) : strtolower($result);
+        } else {
             $result = $prefix . '_' .
                 implode(
                     '',
-                    array_map(
-                        function ($name) {
-                            return dechex(crc32($name));
-                        },
-                        $columnNames
+                    array_merge(
+                        array_map(
+                            function ($name) {
+                                return dechex(crc32($name));
+                            },
+                            $tableNames
+                        ),
+                        array_map(
+                            function ($name) {
+                                return dechex(crc32($name));
+                            },
+                            $columnNames
+                        )
                     )
                 );
             $result = substr($result, 0, $this->getMaxIdentifierSize());
-        } else {
-            if (!is_array($tableNames)) {
-                $tableNames = [$tableNames];
-            }
-            $columns = implode('_', $columnNames);
-            $tables = implode('_', $tableNames);
-            if (strlen($prefix) + strlen($tables) + strlen($columns) + 2 <= $this->getMaxIdentifierSize()) {
-                $result = $prefix . '_' . $tables . '_' . $columns;
-            } else {
-                $result = $prefix . '_' .
-                    implode(
-                        '',
-                        array_merge(
-                            array_map(
-                                function ($name) {
-                                    return dechex(crc32($name));
-                                },
-                                $columnNames
-                            ),
-                            array_map(
-                                function ($name) {
-                                    return dechex(crc32($name));
-                                },
-                                $tableNames
-                            )
-                        )
-                    );
-                $result = substr($result, 0, $this->getMaxIdentifierSize());
-            }
-        }
 
-        return strtolower($result);
+            return $upperCase === false ? strtolower($result) : strtoupper($result);
+        }
     }
 }

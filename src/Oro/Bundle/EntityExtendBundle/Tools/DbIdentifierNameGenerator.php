@@ -59,6 +59,11 @@ class DbIdentifierNameGenerator extends BaseGenerator
         $targetParts           = explode('\\', $targetEntityClassName);
         $targetEntityClassName = array_pop($targetParts);
 
-        return $this->generateIdentifierName([$fieldName], $vendorName, [$entityClassName, $targetEntityClassName]);
+        return $this->generateIdentifierName(
+            [$entityClassName, $targetEntityClassName],
+            [$fieldName],
+            $vendorName,
+            false
+        );
     }
 }
