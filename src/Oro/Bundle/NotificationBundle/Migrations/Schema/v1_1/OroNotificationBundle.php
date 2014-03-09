@@ -28,29 +28,29 @@ class OroNotificationBundle extends Migration implements RenameExtensionAwareInt
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_notification_emailnotification',
-                'oro_notification_email_notif'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_notification_emailnotification',
+            'oro_notification_email_notif'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_notification_recipient_list',
-                'oro_notification_recip_list'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_notification_recipient_list',
+            'oro_notification_recip_list'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_notification_recipient_user',
-                'oro_notification_recip_user'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_notification_recipient_user',
+            'oro_notification_recip_user'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_notification_recipient_group',
-                'oro_notification_recip_group'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_notification_recipient_group',
+            'oro_notification_recip_group'
         );
     }
 }

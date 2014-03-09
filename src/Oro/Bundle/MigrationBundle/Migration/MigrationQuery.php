@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
+use Doctrine\DBAL\Connection;
+
 interface MigrationQuery
 {
     /**
@@ -15,5 +17,5 @@ interface MigrationQuery
     /**
      * Executes a query
      */
-    public function execute();
+    public function execute(Connection $connection);
 }

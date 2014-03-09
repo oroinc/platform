@@ -28,11 +28,11 @@ class OroEntityConfigBundle extends Migration implements RenameExtensionAwareInt
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_entity_config_optionset_relation',
-                'oro_entity_config_optset_rel'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_entity_config_optionset_relation',
+            'oro_entity_config_optset_rel'
         );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -55,7 +56,7 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
     /**
      * {@inheritdoc}
      */
-    public function execute()
+    public function execute(Connection $connection)
     {
         $this->configProcessor->processConfigs($this->options);
         $this->configDumper->updateConfig();

@@ -14,7 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 class ExtendConfigDumper
 {
     const ENTITY         = 'Extend\\Entity\\';
-    const TABLE_PREFIX   = 'oro_extend_';
+    const TABLE_PREFIX   = 'oro_ext_';
     const FIELD_PREFIX   = 'field_';
     const DEFAULT_PREFIX = 'default_';
 
@@ -29,13 +29,23 @@ class ExtendConfigDumper
     protected $em;
 
     /**
-     * @param OroEntityManager $em
-     * @param string           $cacheDir
+     * @var DbIdentifierNameGenerator
      */
-    public function __construct(OroEntityManager $em, $cacheDir)
-    {
-        $this->cacheDir = $cacheDir;
-        $this->em       = $em;
+    protected $nameGenerator;
+
+    /**
+     * @param OroEntityManager          $em
+     * @param DbIdentifierNameGenerator $nameGenerator
+     * @param string                    $cacheDir
+     */
+    public function __construct(
+        OroEntityManager $em,
+        DbIdentifierNameGenerator $nameGenerator,
+        $cacheDir
+    ) {
+        $this->nameGenerator = $nameGenerator;
+        $this->em            = $em;
+        $this->cacheDir      = $cacheDir;
     }
 
     /**
@@ -108,13 +118,12 @@ class ExtendConfigDumper
         $className      = $extendConfig->getId()->getClassName();
         $doctrine       = [];
 
-        if (strpos($className, self::ENTITY) !== false) {
+        if (ExtendHelper::isCustomEntity($className)) {
             $type       = 'Custom';
             $entityName = $className;
             $tableName  = $extendConfig->get('table');
             if (!$tableName) {
-                $tableName = self::TABLE_PREFIX
-                    . strtolower(str_replace('\\', '', str_replace(self::ENTITY, '', $entityName)));
+                $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
             }
             $doctrine[$entityName] = [
                 'type'   => 'entity',
@@ -282,7 +291,7 @@ class ExtendConfigDumper
     protected function getEntityIdentifier($className)
     {
         // Extend entity always have "id" identifier
-        if (strpos($className, self::ENTITY) !== false) {
+        if (ExtendHelper::isCustomEntity($className)) {
             return 'id';
         }
 

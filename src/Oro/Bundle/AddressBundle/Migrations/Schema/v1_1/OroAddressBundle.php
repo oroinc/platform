@@ -28,17 +28,17 @@ class OroAddressBundle extends Migration implements RenameExtensionAwareInterfac
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_dictionary_country_translation',
-                'oro_dictionary_country_trans'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_dictionary_country_translation',
+            'oro_dictionary_country_trans'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_dictionary_region_translation',
-                'oro_dictionary_region_trans'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_dictionary_region_translation',
+            'oro_dictionary_region_trans'
         );
     }
 }

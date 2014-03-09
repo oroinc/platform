@@ -9,6 +9,7 @@ parameters:
     oro_entity_extend.migration.post_up.listener.class:     Oro\Bundle\EntityExtendBundle\EventListener\PostUpMigrationListener
     oro_entity_extend.migration.options_manager.class:      Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager
     oro_entity_extend.migration.extension.extend.class:     Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension
+    oro_entity_extend.migration.extension.rename.class:     Oro\Bundle\EntityExtendBundle\Migration\Extension\RenameExtension
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -30,6 +31,7 @@ services:
         class: %oro_entity_extend.tools.dumper.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_migration.db_id_name_generator
             - %kernel.cache_dir%
 
     oro_entity_extend.listener.config_subscriber:
@@ -69,3 +71,10 @@ services:
         arguments:
             - @oro_entity_extend.migration.options_manager
             - @oro_migration.db_id_name_generator
+        tags:
+            - { name: oro_migration.extension, extension_name: extend }
+
+    oro_entity_extend.migration.extension.rename:
+        class: %oro_entity_extend.migration.extension.rename.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: rename, priority: -10 }

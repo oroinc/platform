@@ -45,7 +45,6 @@ class ExtendExtension
      * created automatically in Symfony cache
      *
      * @param Schema $schema
-     * @param string $tableName
      * @param string $entityName
      * @param array  $options
      * @return Table
@@ -53,20 +52,18 @@ class ExtendExtension
      */
     public function createCustomEntityTable(
         Schema $schema,
-        $tableName,
         $entityName,
         array $options = []
     ) {
+        $className = ExtendConfigDumper::ENTITY . $entityName;
+        $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
         $table = $schema->createTable($tableName);
 
         // set options
         if (!isset($options['extend'])) {
             $options['extend'] = [];
         }
-        if (empty($entityName) || !preg_match('/^[A-Z][a-zA-Z\d]+$/', $entityName)) {
-            throw new \InvalidArgumentException(sprintf('Invalid entity name: "%s".', $entityName));
-        }
-        $options['_entity_name']    = ExtendConfigDumper::ENTITY . $entityName;
+        $options['_entity_class']   = $className;
         $options['extend']['table'] = $tableName;
         if (isset($options['extend']['owner'])) {
             if ($options['extend']['owner'] !== ExtendScope::OWNER_CUSTOM) {

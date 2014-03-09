@@ -55,8 +55,11 @@ class OroTestBundle extends Migration implements RenameExtensionAwareInterface
         $table->addColumn('another_field', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery('old_table_name', 'new_table_name')
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'old_table_name',
+            'new_table_name'
         );
         $queries->addQuery(
             "ALTER TABLE another_table ADD COLUMN test_column INT NOT NULL",

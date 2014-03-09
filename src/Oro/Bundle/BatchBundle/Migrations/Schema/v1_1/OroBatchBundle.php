@@ -28,20 +28,35 @@ class OroBatchBundle extends Migration implements RenameExtensionAwareInterface
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery('oro_batch_job_execution', 'akeneo_batch_job_execution')
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_batch_job_execution',
+            'akeneo_batch_job_execution'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery('oro_batch_job_instance', 'akeneo_batch_job_instance')
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_batch_job_instance',
+            'akeneo_batch_job_instance'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery('oro_batch_mapping_field', 'akeneo_batch_mapping_field')
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_batch_mapping_field',
+            'akeneo_batch_mapping_field'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery('oro_batch_mapping_item', 'akeneo_batch_mapping_item')
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_batch_mapping_item',
+            'akeneo_batch_mapping_item'
         );
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery('oro_batch_step_execution', 'akeneo_batch_step_execution')
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_batch_step_execution',
+            'akeneo_batch_step_execution'
         );
     }
 }

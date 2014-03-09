@@ -44,12 +44,12 @@ class ExtendOptionsBuilder
      */
     public function addTableOptions($tableName, array $options)
     {
-        $entityName = null;
-        if (isset($options['_entity_name'])) {
-            $entityName = $options['_entity_name'];
-            unset($options['_entity_name']);
+        $customEntityClassName = null;
+        if (isset($options['_entity_class'])) {
+            $customEntityClassName = $options['_entity_class'];
+            unset($options['_entity_class']);
         }
-        $entityClassName = $this->getEntityClassName($tableName, $entityName);
+        $entityClassName = $this->getEntityClassName($tableName, $customEntityClassName);
 
         $tableMode = isset($options[ExtendOptionsManager::MODE_OPTION])
             ? $options[ExtendOptionsManager::MODE_OPTION]
@@ -150,15 +150,15 @@ class ExtendOptionsBuilder
      * Gets an entity class name by its table name
      *
      * @param string $tableName
-     * @param string $customEntityName The name of a custom entity
+     * @param string $customEntityClassName The name of a custom entity
      * @return string|null
      * @throws \RuntimeException
      */
-    protected function getEntityClassName($tableName, $customEntityName = null)
+    protected function getEntityClassName($tableName, $customEntityClassName = null)
     {
         if (!isset($this->tableToEntityMap[$tableName])) {
-            $entityClassName = !empty($customEntityName)
-                ? $customEntityName
+            $entityClassName = !empty($customEntityClassName)
+                ? $customEntityClassName
                 : $this->entityClassResolver->getEntityClassByTableName($tableName);
             if (empty($entityClassName)) {
                 throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));

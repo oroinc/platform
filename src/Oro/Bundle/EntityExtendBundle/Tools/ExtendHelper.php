@@ -33,4 +33,17 @@ class ExtendHelper
     {
         return implode('|', [$fieldType, $entityClassName, $targetEntityClassName, $fieldName]);
     }
+
+    /**
+     * Checks if an entity is a custom one
+     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
+     * created automatically in Symfony cache
+     *
+     * @param string $className
+     * @return bool
+     */
+    public static function isCustomEntity($className)
+    {
+        return strpos($className, ExtendConfigDumper::ENTITY) === 0;
+    }
 }

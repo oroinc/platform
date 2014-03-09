@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -62,14 +62,34 @@ class ExtendConfigProcessor
     }
 
     /**
-     * Removes configs for non configurable entities if requested a change of field type only
+     * Removes some configs.
+     *  - removes configs for non custom entities if requested a change of table name only
+     *  - removes configs for non configurable entities if requested a change of field type only
      *
      * @param array $configs
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function filterConfigs(array &$configs)
     {
+        // removes configs for non custom entities if requested a change of table name only
         foreach ($configs as $className => $entityConfigs) {
-            if (!$this->isCustomEntity($className)) {
+            if (!ExtendHelper::isCustomEntity($className)) {
+                if (isset($entityConfigs['configs']['extend']['table'])) {
+                    unset($configs[$className]['configs']['extend']['table']);
+                    if (empty($configs[$className]['configs']['extend'])
+                        && count($configs[$className]['configs']) === 1
+                        && count($configs[$className]) === 1
+                    ) {
+                        unset($configs[$className]);
+                    }
+                }
+            }
+        }
+        // removes configs for non configurable entities if requested a change of field type only
+        foreach ($configs as $className => $entityConfigs) {
+            if (!ExtendHelper::isCustomEntity($className)) {
                 if (!$this->configManager->hasConfig($className)) {
                     $fieldsCanBeRemoved = false;
                     if (isset($entityConfigs['fields'])) {
@@ -153,7 +173,7 @@ class ExtendConfigProcessor
      */
     protected function createEntityModel($className, $mode, array $configs)
     {
-        if (!$this->isCustomEntity($className)) {
+        if (!ExtendHelper::isCustomEntity($className)) {
             throw new \LogicException(sprintf('Class "%s" is not configurable.', $className));
         }
 
@@ -177,9 +197,16 @@ class ExtendConfigProcessor
     /**
      * @param string $className
      * @param array  $configs
+     * @throws \LogicException
      */
     protected function updateEntityModel($className, array $configs)
     {
+        if (!ExtendHelper::isCustomEntity($className)) {
+            if (isset($configs['extend']['table'])) {
+                throw new \LogicException(sprintf('A table name cannot be set for "%s" entity.', $className));
+            }
+        }
+
         if ($this->logger) {
             $this->logger->notice(
                 sprintf('Update entity "%s".', $className),
@@ -306,18 +333,5 @@ class ExtendConfigProcessor
         }
 
         return $result;
-    }
-
-    /**
-     * Checks if an entity is a custom one
-     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
-     * created automatically in Symfony cache
-     *
-     * @param string $className
-     * @return bool
-     */
-    protected function isCustomEntity($className)
-    {
-        return strpos($className, ExtendConfigDumper::ENTITY) === 0;
     }
 }

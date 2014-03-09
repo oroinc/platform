@@ -28,11 +28,11 @@ class OroWorkflowBundle extends Migration implements RenameExtensionAwareInterfa
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $queries->addQuery(
-            $this->renameExtension->getRenameTableQuery(
-                'oro_workflow_entity_acl_identity',
-                'oro_workflow_entity_acl_ident'
-            )
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'oro_workflow_entity_acl_identity',
+            'oro_workflow_entity_acl_ident'
         );
     }
 }

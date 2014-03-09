@@ -65,33 +65,91 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entity name: "Acme\AcmeBundle\Entity\Entity1".
+     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\Acme\AcmeBundle\Entity\Entity1.
      */
-    public function testCreateCustomEntityTableWithInvalidEntityName1()
+    public function testCreateCustomEntityTableWithInvalidEntityName()
     {
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
-            'table1',
             'Acme\AcmeBundle\Entity\Entity1'
         );
     }
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Invalid entity name: "Extend\Entity\Entity1".
+     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\Extend\Entity\Entity1.
      */
-    public function testCreateCustomEntityTableWithInvalidEntityName2()
+    public function testCreateCustomEntityTableWithFullClassName()
     {
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
         $extension->createCustomEntityTable(
             $schema,
-            'table1',
             ExtendConfigDumper::ENTITY . 'Entity1'
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\1Entity.
+     */
+    public function testCreateCustomEntityTableWithNameStartsWithDigit()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $extension->createCustomEntityTable(
+            $schema,
+            '1Entity'
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\_Entity.
+     */
+    public function testCreateCustomEntityTableWithNameStartsWithUnderscore()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $extension->createCustomEntityTable(
+            $schema,
+            '_Entity'
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Invalid entity name. Class: Extend\Entity\Entity#1.
+     */
+    public function testCreateCustomEntityTableWithInvalidChars()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $extension->createCustomEntityTable(
+            $schema,
+            'Entity#1'
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Entity name length must be less or equal 22 characters.
+     */
+    public function testCreateCustomEntityTableWithTooLongName()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $extension->createCustomEntityTable(
+            $schema,
+            'E1234567891234567890123'
         );
     }
 
@@ -106,7 +164,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->createCustomEntityTable(
             $schema,
-            'table1',
             'Entity1',
             [
                 'extend' => ['owner' => ExtendScope::OWNER_SYSTEM],
@@ -125,7 +182,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->createCustomEntityTable(
             $schema,
-            'table1',
             'Entity1',
             [
                 'extend' => ['is_extend' => false],
@@ -140,12 +196,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->createCustomEntityTable(
             $schema,
-            'table1',
-            'Entity1'
+            'Entity_1'
         );
         $extension->createCustomEntityTable(
             $schema,
-            'table2',
             'Entity2',
             [
                 'entity' => ['icon' => 'icon2'],
@@ -154,7 +208,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $extension->createCustomEntityTable(
             $schema,
-            'table3',
             'Entity3',
             [
                 'extend' => ['is_extend' => true],
@@ -164,28 +217,49 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSchemaSql(
             $schema,
             [
-                'CREATE TABLE table1 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                'CREATE TABLE table2 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                'CREATE TABLE table3 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
+                sprintf(
+                    'CREATE TABLE %sentity_1 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
+                    ExtendConfigDumper::TABLE_PREFIX
+                ),
+                sprintf(
+                    'CREATE TABLE %sentity2 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
+                    ExtendConfigDumper::TABLE_PREFIX
+                ),
+                sprintf(
+                    'CREATE TABLE %sentity3 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
+                    ExtendConfigDumper::TABLE_PREFIX
+                ),
             ]
         );
         $this->assertExtendOptions(
             $schema,
             [
-                ExtendConfigDumper::ENTITY . 'Entity1' => [
+                ExtendConfigDumper::ENTITY . 'Entity_1' => [
                     'configs' => [
-                        'extend' => ['table' => 'table1', 'owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true]
+                        'extend' => [
+                            'table' => sprintf('%sentity_1', ExtendConfigDumper::TABLE_PREFIX),
+                            'owner' => ExtendScope::OWNER_CUSTOM,
+                            'is_extend' => true
+                        ]
                     ],
                 ],
                 ExtendConfigDumper::ENTITY . 'Entity2' => [
                     'configs' => [
-                        'extend' => ['table' => 'table2', 'owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true],
+                        'extend' => [
+                            'table' => sprintf('%sentity2', ExtendConfigDumper::TABLE_PREFIX),
+                            'owner' => ExtendScope::OWNER_CUSTOM,
+                            'is_extend' => true
+                        ],
                         'entity' => ['icon' => 'icon2'],
                     ],
                 ],
                 ExtendConfigDumper::ENTITY . 'Entity3' => [
                     'configs' => [
-                        'extend' => ['table' => 'table3', 'owner' => ExtendScope::OWNER_CUSTOM, 'is_extend' => true]
+                        'extend' => [
+                            'table' => sprintf('%sentity3', ExtendConfigDumper::TABLE_PREFIX),
+                            'owner' => ExtendScope::OWNER_CUSTOM,
+                            'is_extend' => true
+                        ]
                     ],
                 ],
             ]

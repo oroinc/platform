@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilder;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoader;
 
 class LoadMigrationsCommand extends ContainerAwareCommand
 {
@@ -61,8 +61,9 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                     $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
                 }
             } else {
-                $migrationQueryBuilder = $this->getMigrationQueryBuilder($input);
-                $queries               = $migrationQueryBuilder->getQueries($migrations);
+                $migrationQueryLoader = $this->getMigrationQueryLoader($input);
+                $queries               = $migrationQueryLoader->getQueries($migrations);
+                $connection            = $migrationQueryLoader->getConnection();
                 foreach ($queries as $item) {
                     $output->writeln(sprintf('  <comment>> %s</comment>', $item['migration']));
                     foreach ($item['queries'] as $query) {
@@ -76,9 +77,9 @@ class LoadMigrationsCommand extends ContainerAwareCommand
                         }
                         if (!$input->getOption('dry-run')) {
                             if ($query instanceof MigrationQuery) {
-                                $query->execute();
+                                $query->execute($connection);
                             } else {
-                                $migrationQueryBuilder->getConnection()->executeQuery($query);
+                                $connection->executeQuery($query);
                             }
                         }
                     }
@@ -108,10 +109,10 @@ class LoadMigrationsCommand extends ContainerAwareCommand
 
     /**
      * @param InputInterface $input
-     * @return MigrationQueryBuilder
+     * @return MigrationQueryLoader
      */
-    protected function getMigrationQueryBuilder(InputInterface $input)
+    protected function getMigrationQueryLoader(InputInterface $input)
     {
-        return $this->getContainer()->get('oro_migration.migrations.query_builder');
+        return $this->getContainer()->get('oro_migration.migrations.query_loader');
     }
 }

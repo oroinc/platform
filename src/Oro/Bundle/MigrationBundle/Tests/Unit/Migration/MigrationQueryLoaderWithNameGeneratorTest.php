@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
@@ -12,11 +11,11 @@ use Migration\v1_1\Test1BundleMigration11;
 use TestPackage\src\WrongTableNameMigration;
 use TestPackage\src\WrongColumnNameMigration;
 
-use Oro\Bundle\MigrationBundle\Migration\MigrationQueryBuilderWithNameGenerator;
+use Oro\Bundle\MigrationBundle\Migration\MigrationQueryLoaderWithNameGenerator;
 
-class MigrationQueryBuilderWithNameGeneratorTest extends \PHPUnit_Framework_TestCase
+class MigrationQueryLoaderWithNameGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var MigrationQueryBuilderWithNameGenerator */
+    /** @var MigrationQueryLoaderWithNameGenerator */
     protected $builder;
 
     protected $em;
@@ -58,7 +57,7 @@ class MigrationQueryBuilderWithNameGeneratorTest extends \PHPUnit_Framework_Test
 
         $this->nameGenerator = new DbIdentifierNameGenerator();
 
-        $this->builder = new MigrationQueryBuilderWithNameGenerator($this->connection);
+        $this->builder = new MigrationQueryLoaderWithNameGenerator($this->connection);
         $this->builder->setNameGenerator($this->nameGenerator);
     }
 

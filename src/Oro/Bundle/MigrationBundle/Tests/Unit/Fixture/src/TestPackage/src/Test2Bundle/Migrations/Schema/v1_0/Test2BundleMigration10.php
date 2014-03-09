@@ -11,11 +11,15 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class Test2BundleMigration10 extends Migration implements ContainerAwareInterface
 {
+    /** @var ContainerInterface */
     protected $container;
 
     public function up(Schema $schema, QueryBag $queries)
     {
-        return $this->container->get('test_service')->getQueries();
+        $sqls = $this->container->get('test_service')->getQueries();
+        foreach ($sqls as $sql) {
+            $queries->addQuery($sql);
+        }
     }
 
     public function setContainer(ContainerInterface $container = null)
