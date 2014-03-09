@@ -9,7 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-class UpdateExtendConfigMigration extends Migration
+class UpdateExtendConfigMigration implements Migration
 {
     /**
      * @var ExtendConfigProcessor

@@ -18,7 +18,8 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class RenameCustomManyToManyRelationTables extends Migration implements
+class RenameCustomManyToManyRelationTables implements
+    Migration,
     RenameExtensionAwareInterface,
     NameGeneratorAwareInterface,
     ContainerAwareInterface

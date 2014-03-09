@@ -9,7 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
 
-class RenameCustomEntityTables extends Migration implements RenameExtensionAwareInterface
+class RenameCustomEntityTables implements Migration, RenameExtensionAwareInterface
 {
     const OLD_TABLE_PREFIX = 'oro_extend_';
 

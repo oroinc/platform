@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroSearchBundle extends Migration implements ContainerAwareInterface
+class OroSearchBundle implements Migration, ContainerAwareInterface
 {
     /**
      * @var ContainerInterface

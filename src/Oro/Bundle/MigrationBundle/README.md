@@ -28,7 +28,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
 
-class AcmeTestBundle extends Migration implements RenameExtensionAwareInterface
+class AcmeTestBundle implements Migration, RenameExtensionAwareInterface
 {
     /**
      * @var RenameExtension
@@ -87,7 +87,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class AcmeTestBundleInstaller extends Installation
+class AcmeTestBundleInstaller implements Installation
 {
     /**
      * @inheritdoc
@@ -136,7 +136,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
 
-class AcmeTestBundle extends Migration implements RenameExtensionAwareInterface
+class AcmeTestBundle implements Migration, RenameExtensionAwareInterface
 {
     /**
      * @var RenameExtension

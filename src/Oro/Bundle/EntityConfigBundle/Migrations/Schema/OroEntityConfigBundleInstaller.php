@@ -7,7 +7,7 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityConfigBundle\Migrations\Schema\v1_0\OroEntityConfigBundle;
 
-class OroEntityConfigBundleInstaller extends Installation
+class OroEntityConfigBundleInstaller implements Installation
 {
     /**
      * @inheritdoc

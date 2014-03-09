@@ -12,7 +12,8 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\TestExtensionAwareInterface;
 
-class MigrationWithTestExtension extends Migration implements
+class MigrationWithTestExtension implements
+    Migration,
     TestExtensionAwareInterface,
     DatabasePlatformAwareInterface,
     NameGeneratorAwareInterface

@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class Test2BundleMigration10 extends Migration implements ContainerAwareInterface
+class Test2BundleMigration10 implements Migration, ContainerAwareInterface
 {
     /** @var ContainerInterface */
     protected $container;

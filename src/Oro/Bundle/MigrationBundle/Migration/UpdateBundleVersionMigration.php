@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
-class UpdateBundleVersionMigration extends Migration
+class UpdateBundleVersionMigration implements Migration
 {
     /**
      * @var array
