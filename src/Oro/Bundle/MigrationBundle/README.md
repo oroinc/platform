@@ -4,7 +4,7 @@ OroMigrationBundle
 Database structure and data manipulator. 
 
 Database structure migrations
-=============================
+-----------------------------
 
 Each bundle can have migration files that allow to update database schema.
 
@@ -20,7 +20,7 @@ Example of migration file:
 ``` php
 <?php
 
-namespace Oro\Bundle\TestBundle\Migrations\Schema\v1_0;
+namespace Acme\Bundle\TestBundle\Migrations\Schema\v1_0;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -28,7 +28,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
 use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
 
-class OroTestBundle extends Migration implements RenameExtensionAwareInterface
+class AcmeTestBundle extends Migration implements RenameExtensionAwareInterface
 {
     /**
      * @var RenameExtension
@@ -81,13 +81,13 @@ Example of install migration file:
 ``` php
 <?php
 
-namespace Oro\Bundle\TestBundle\Migrations\Schema;
+namespace Acme\Bundle\TestBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroTestBundleInstaller extends Installation
+class AcmeTestBundleInstaller extends Installation
 {
     /**
      * @inheritdoc
@@ -122,8 +122,115 @@ This command supports some additional options:
 
 Also there is **oro:migration:dump** command to help in creation migration files. This command outputs current database structure as a plain sql or as `Doctrine\DBAL\Schema\Schema` queries.
 
+Extensions for database structure migrations
+--------------------------------------------
+Sometime you cannot use standard Doctrime methods for database structure modification. For example `Schema::renameTable` does not work because it drops existing table and then creates a new table. To help you to manage such case and allow to add some useful functionality to any migration a extensions mechanism was designed. The following example shows how `RenameExtension` can be used:
+``` php
+<?php
+
+namespace Acme\Bundle\TestBundle\Migrations\Schema\v1_0;
+
+use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension;
+use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface;
+
+class AcmeTestBundle extends Migration implements RenameExtensionAwareInterface
+{
+    /**
+     * @var RenameExtension
+     */
+    protected $renameExtension;
+
+    /**
+     * @inheritdoc
+     */
+    public function setRenameExtension(RenameExtension $renameExtension)
+    {
+        $this->renameExtension = $renameExtension;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function up(Schema $schema, QueryBag $queries)
+    {
+        $this->renameExtension->renameTable(
+            $schema,
+            $queries,
+            'old_table_name',
+            'new_table_name'
+        );
+    }
+}
+```
+As you can see to use the `RenameExtension` your migration class should implement `RenameExtensionAwareInterface` and `setRenameExtension` method.
+Also there is some additional useful interfaces you can use in your migration class:
+
+ - `ContainerAwareInterface` - provides an access to Symfony dependency container
+ - `DatabasePlatformAwareInterface` - allows to write a database type independent migrations
+ - `NameGeneratorAwareInterface` - provides an access to `DbIdentifierNameGenerator` class which can be used to generate names of indices, foreign key constraints and others.
+
+Create own extensions for database structure migrations
+-------------------------------------------------------
+To create your own extension you need too do the following simple steps:
+
+ - Create an extension class in `YourBundle/Migration/Extension` directory. Using `YourBundle/Migration/Extension` directory is not mandatory, but highly recommended. For example:  
+``` php
+<?php
+
+namespace Acme\Bundle\TestBundle\Migration\Extension;
+
+use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+
+class MyExtension
+{
+    public function doSomething(Schema $schema, QueryBag $queries, /* other parameters, for example */ $tableName)
+    {
+        $table = $schema->getTable($tableName); // highly recommended to make sure that a table exists
+        $query = 'SOME SQL'; /* or $query = new SqlMigrationQuery('SOME SQL'); */
+
+        $queries->addQuery($query);
+    }
+}
+```
+ - Create `*AwareInterface` in the same namespase. It is important that the interface name should be `{ExtensionClass}AwareInterface` and set method should be `set{ExtensionClass}({ExtensionClass} ${extensionName})`. For example:
+``` php
+<?php
+
+namespace Acme\Bundle\TestBundle\Migration\Extension;
+
+/**
+ * MyExtensionAwareInterface should be implemented by migrations that depends on a MyExtension.
+ */
+interface RenameExtensionAwareInterface
+{
+    /**
+     * Sets the MyExtension
+     *
+     * @param MyExtension $myExtension
+     */
+    public function setMyExtension(MyExtension $myExtension);
+}
+```
+ - Register an extension in dependency container. For example
+``` yaml
+parameters:
+    acme_test.migration.extension.my.class: Acme\Bundle\TestBundle\Migration\Extension\MyExtension
+
+services:
+    acme_test.migration.extension.my:
+        class: %acme_test.migration.extension.my.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: test /*, priority: -10 - priority attribute is optional an can be helpful if you need to override existing extension */ }
+```
+
+If you need an access to the database platform or the name generator you extension class should implement `DatabasePlatformAwareInterface` or `NameGeneratorAwareInterface` appropriately.  
+ 
 Data fixtures
-=============
+-------------
 
 Syfony allows to load data using data fixtures. But these fixtures are run each time when `doctrine:fixtures:load` command is executed.
 
