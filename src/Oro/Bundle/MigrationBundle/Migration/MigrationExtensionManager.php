@@ -4,6 +4,8 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class MigrationExtensionManager
 {
@@ -20,7 +22,14 @@ class MigrationExtensionManager
     protected $platform;
 
     /**
-     * {@inheritdoc}
+     * @var DbIdentifierNameGenerator
+     */
+    protected $nameGenerator;
+
+    /**
+     * Sets a database platform
+     *
+     * @param AbstractPlatform $platform
      */
     public function setDatabasePlatform(AbstractPlatform $platform)
     {
@@ -29,6 +38,22 @@ class MigrationExtensionManager
         foreach ($this->extensions as $extension) {
             if ($extension[0] instanceof DatabasePlatformAwareInterface) {
                 $extension[0]->setDatabasePlatform($this->platform);
+            }
+        }
+    }
+
+    /**
+     * Sets a database identifier name generator
+     *
+     * @param DbIdentifierNameGenerator $nameGenerator
+     */
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
+    {
+        $this->nameGenerator = $nameGenerator;
+
+        foreach ($this->extensions as $extension) {
+            if ($extension[0] instanceof NameGeneratorAwareInterface) {
+                $extension[0]->setNameGenerator($this->nameGenerator);
             }
         }
     }
@@ -43,6 +68,9 @@ class MigrationExtensionManager
     {
         if ($this->platform && $extension instanceof DatabasePlatformAwareInterface) {
             $extension->setDatabasePlatform($this->platform);
+        }
+        if ($this->nameGenerator && $extension instanceof NameGeneratorAwareInterface) {
+            $extension->setNameGenerator($this->nameGenerator);
         }
 
         $extensionAwareInterfaceName = $this->getExtensionAwareInterfaceName($extension);
@@ -60,6 +88,12 @@ class MigrationExtensionManager
      */
     public function applyExtensions(Migration $migration)
     {
+        if ($this->platform && $migration instanceof DatabasePlatformAwareInterface) {
+            $migration->setDatabasePlatform($this->platform);
+        }
+        if ($this->nameGenerator && $migration instanceof NameGeneratorAwareInterface) {
+            $migration->setNameGenerator($this->nameGenerator);
+        }
         foreach ($this->extensions as $extension) {
             if (is_a($migration, $extension[1])) {
                 $setMethod = $extension[2];

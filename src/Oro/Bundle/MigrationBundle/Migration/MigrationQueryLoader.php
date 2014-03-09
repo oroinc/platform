@@ -32,6 +32,8 @@ class MigrationQueryLoader
     }
 
     /**
+     * Sets extension manager
+     *
      * @param MigrationExtensionManager $extensionManager
      */
     public function setExtensionManager(MigrationExtensionManager $extensionManager)

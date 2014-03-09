@@ -49,7 +49,10 @@ class ExtendOptionsBuilder
             $customEntityClassName = $options['_entity_class'];
             unset($options['_entity_class']);
         }
-        $entityClassName = $this->getEntityClassName($tableName, $customEntityClassName);
+        $entityClassName = $this->getEntityClassName($tableName, $customEntityClassName, false);
+        if (!$entityClassName) {
+            return;
+        }
 
         $tableMode = isset($options[ExtendOptionsManager::MODE_OPTION])
             ? $options[ExtendOptionsManager::MODE_OPTION]
@@ -77,7 +80,10 @@ class ExtendOptionsBuilder
      */
     public function addColumnOptions($tableName, $columnName, $options)
     {
-        $entityClassName = $this->getEntityClassName($tableName);
+        $entityClassName = $this->getEntityClassName($tableName, null, false);
+        if (!$entityClassName) {
+            return;
+        }
 
         $columnType = isset($options[ExtendOptionsManager::TYPE_OPTION])
             ? $options[ExtendOptionsManager::TYPE_OPTION]
@@ -151,22 +157,28 @@ class ExtendOptionsBuilder
      *
      * @param string $tableName
      * @param string $customEntityClassName The name of a custom entity
+     * @param bool   $throwExceptionIfNotFound
      * @return string|null
-     * @throws \RuntimeException
+     * @throws \RuntimeException if an entity class name was not found and $throwExceptionIfNotFound = TRUE
      */
-    protected function getEntityClassName($tableName, $customEntityClassName = null)
+    protected function getEntityClassName($tableName, $customEntityClassName = null, $throwExceptionIfNotFound = true)
     {
         if (!isset($this->tableToEntityMap[$tableName])) {
             $entityClassName = !empty($customEntityClassName)
                 ? $customEntityClassName
                 : $this->entityClassResolver->getEntityClassByTableName($tableName);
-            if (empty($entityClassName)) {
+            if ($throwExceptionIfNotFound && empty($entityClassName)) {
                 throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
             }
             $this->tableToEntityMap[$tableName] = $entityClassName;
         }
 
-        return $this->tableToEntityMap[$tableName];
+        $result = $this->tableToEntityMap[$tableName];
+        if ($throwExceptionIfNotFound && empty($result)) {
+            throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
+        }
+
+        return $result;
     }
 
     /**

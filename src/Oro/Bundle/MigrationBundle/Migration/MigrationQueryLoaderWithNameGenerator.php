@@ -19,6 +19,20 @@ class MigrationQueryLoaderWithNameGenerator extends MigrationQueryLoader
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;
+        if ($this->extensionManager) {
+            $this->extensionManager->setNameGenerator($this->nameGenerator);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtensionManager(MigrationExtensionManager $extensionManager)
+    {
+        parent::setExtensionManager($extensionManager);
+        if ($this->nameGenerator) {
+            $this->extensionManager->setNameGenerator($this->nameGenerator);
+        }
     }
 
     /**

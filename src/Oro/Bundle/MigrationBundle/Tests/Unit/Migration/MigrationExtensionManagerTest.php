@@ -10,6 +10,7 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\AnotherTe
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\MigrationWithTestExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\NoAwareInterfaceExtension;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\Extension\AnotherNoAwareInterfaceExtension;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,6 +19,7 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $migration = new MigrationWithTestExtension();
         $extension = new TestExtension();
         $platform = new MySqlPlatform();
+        $nameGenerator = new DbIdentifierNameGenerator();
 
         $manager = new MigrationExtensionManager();
         $manager->addExtension('test', $extension);
@@ -25,9 +27,19 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($extension, $migration->getTestExtension());
         $this->assertNull($extension->getDatabasePlatform());
+        $this->assertNull($extension->getNameGenerator());
 
         $manager->setDatabasePlatform($platform);
         $this->assertSame($platform, $extension->getDatabasePlatform());
+
+        $manager->setNameGenerator($nameGenerator);
+        $this->assertSame($nameGenerator, $extension->getNameGenerator());
+
+        $this->assertNull($migration->getDatabasePlatform());
+        $this->assertNull($migration->getNameGenerator());
+        $manager->applyExtensions($migration);
+        $this->assertSame($platform, $migration->getDatabasePlatform());
+        $this->assertSame($nameGenerator, $migration->getNameGenerator());
     }
 
     public function testAnotherValidExtension()
@@ -35,6 +47,7 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $migration = new MigrationWithTestExtension();
         $extension = new AnotherTestExtension();
         $platform = new MySqlPlatform();
+        $nameGenerator = new DbIdentifierNameGenerator();
 
         $manager = new MigrationExtensionManager();
         $manager->addExtension('test', $extension);
@@ -42,39 +55,59 @@ class MigrationExtensionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($extension, $migration->getTestExtension());
         $this->assertNull($extension->getDatabasePlatform());
+        $this->assertNull($extension->getNameGenerator());
 
         $manager->setDatabasePlatform($platform);
         $this->assertSame($platform, $extension->getDatabasePlatform());
+
+        $manager->setNameGenerator($nameGenerator);
+        $this->assertSame($nameGenerator, $extension->getNameGenerator());
+
+        $this->assertNull($migration->getDatabasePlatform());
+        $this->assertNull($migration->getNameGenerator());
+        $manager->applyExtensions($migration);
+        $this->assertSame($platform, $migration->getDatabasePlatform());
+        $this->assertSame($nameGenerator, $migration->getNameGenerator());
     }
 
-    public function testValidExtensionWithDatabasePlatform()
+    public function testValidExtensionWithDependencies()
     {
         $migration = new MigrationWithTestExtension();
         $extension = new TestExtension();
         $platform = new MySqlPlatform();
+        $nameGenerator = new DbIdentifierNameGenerator();
 
         $manager = new MigrationExtensionManager();
         $manager->setDatabasePlatform($platform);
+        $manager->setNameGenerator($nameGenerator);
         $manager->addExtension('test', $extension);
         $manager->applyExtensions($migration);
 
         $this->assertSame($extension, $migration->getTestExtension());
         $this->assertSame($platform, $extension->getDatabasePlatform());
+        $this->assertSame($nameGenerator, $extension->getNameGenerator());
+        $this->assertSame($platform, $migration->getDatabasePlatform());
+        $this->assertSame($nameGenerator, $migration->getNameGenerator());
     }
 
-    public function testAnotherValidExtensionWithDatabasePlatform()
+    public function testAnotherValidExtensionWithDependencies()
     {
         $migration = new MigrationWithTestExtension();
         $extension = new AnotherTestExtension();
         $platform = new MySqlPlatform();
+        $nameGenerator = new DbIdentifierNameGenerator();
 
         $manager = new MigrationExtensionManager();
         $manager->setDatabasePlatform($platform);
+        $manager->setNameGenerator($nameGenerator);
         $manager->addExtension('test', $extension);
         $manager->applyExtensions($migration);
 
         $this->assertSame($extension, $migration->getTestExtension());
         $this->assertSame($platform, $extension->getDatabasePlatform());
+        $this->assertSame($nameGenerator, $extension->getNameGenerator());
+        $this->assertSame($platform, $migration->getDatabasePlatform());
+        $this->assertSame($nameGenerator, $migration->getNameGenerator());
     }
 
     public function testExtensionWithNoAwareInterface()
