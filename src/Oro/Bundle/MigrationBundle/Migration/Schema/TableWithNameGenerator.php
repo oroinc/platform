@@ -65,9 +65,7 @@ class TableWithNameGenerator extends Table
         if (!$constraintName) {
             $constraintName = $this->nameGenerator->generateForeignKeyConstraintName(
                 $this->getName(),
-                $localColumnNames,
-                $foreignTable->getName(),
-                $foreignColumnNames
+                $localColumnNames
             );
         }
 

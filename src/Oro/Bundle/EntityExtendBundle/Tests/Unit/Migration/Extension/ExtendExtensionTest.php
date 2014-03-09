@@ -11,6 +11,9 @@ use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ */
 class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -487,7 +490,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
@@ -495,9 +498,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'name VARCHAR(255) NOT NULL, '
                 . 'INDEX IDX_859C73277462FC4 (field_entity1_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D859C732763A7B402BF3 '
+                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73271C95229D7462FC4BF39 '
+                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73277462FC4 '
                 . 'FOREIGN KEY (field_entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
             ]
         );
@@ -560,7 +563,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
@@ -568,9 +571,9 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'name VARCHAR(255) NOT NULL, '
                 . 'INDEX IDX_859C73277462FC4 (field_entity1_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D859C732763A7B402BF3 '
+                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73271C95229D7462FC4BF39 '
+                'ALTER TABLE table2 ADD CONSTRAINT FK_859C73277462FC4 '
                 . 'FOREIGN KEY (field_entity1_relation_column1_id) REFERENCES table1 (id) ON DELETE SET NULL'
             ]
         );
@@ -747,7 +750,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
@@ -759,11 +762,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'INDEX IDX_F425D647C33725A7 (entity1_id), '
                 . 'INDEX IDX_F425D647D1828A49 (entity2_id), '
                 . 'PRIMARY KEY(entity1_id, entity2_id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D859C732763A7B402BF3 '
+                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D6471C95229DC33725A7BF3 '
+                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D647C33725A7 '
                 . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
-                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D647859C7327D1828A49BF3 '
+                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D647D1828A49 '
                 . 'FOREIGN KEY (entity2_id) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
@@ -826,7 +829,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'id INT NOT NULL, '
                 . 'default_relation_column1_id SMALLINT DEFAULT NULL, '
-                . 'UNIQUE INDEX UIDX_1C95229D63A7B402 (default_relation_column1_id), '
+                . 'UNIQUE INDEX UNIQ_1C95229D63A7B402 (default_relation_column1_id), '
                 . 'PRIMARY KEY(id))',
                 'CREATE TABLE table2 ('
                 . 'id SMALLINT NOT NULL, '
@@ -838,11 +841,11 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'INDEX IDX_F425D647C33725A7 (entity1_id), '
                 . 'INDEX IDX_F425D647D1828A49 (entity2_id), '
                 . 'PRIMARY KEY(entity1_id, entity2_id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D859C732763A7B402BF3 '
+                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D6471C95229DC33725A7BF3 '
+                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D647C33725A7 '
                 . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
-                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D647859C7327D1828A49BF3 '
+                'ALTER TABLE acme_f061705960f46bf2d67f27a ADD CONSTRAINT FK_F425D647D1828A49 '
                 . 'FOREIGN KEY (entity2_id) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
@@ -957,7 +960,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'field_relation_column1_id INT DEFAULT NULL, '
                 . 'INDEX IDX_1C95229DF1043101 (field_relation_column1_id), PRIMARY KEY(id))',
                 'CREATE TABLE table2 (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D859C7327F1043101BF3 '
+                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229DF1043101 '
                 . 'FOREIGN KEY (field_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
             ]
         );
@@ -1018,7 +1021,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'field_relation_column1_id INT DEFAULT NULL, '
                 . 'INDEX IDX_1C95229DF1043101 (field_relation_column1_id), PRIMARY KEY(id))',
                 'CREATE TABLE table2 (id INT NOT NULL, name VARCHAR(255) NOT NULL, PRIMARY KEY(id))',
-                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D859C7327F1043101BF3 '
+                'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229DF1043101 '
                 . 'FOREIGN KEY (field_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL'
             ]
         );

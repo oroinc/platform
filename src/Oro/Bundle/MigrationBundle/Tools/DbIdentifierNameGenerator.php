@@ -24,7 +24,7 @@ class DbIdentifierNameGenerator
      */
     public function generateIndexName($tableName, $columnNames, $uniqueIndex = false)
     {
-        return $this->generateIdentifierName($tableName, $columnNames, $uniqueIndex ? 'UIDX' : 'IDX');
+        return $this->generateIdentifierName($tableName, $columnNames, $uniqueIndex ? 'UNIQ' : 'IDX');
     }
 
     /**
@@ -32,17 +32,11 @@ class DbIdentifierNameGenerator
      *
      * @param string   $tableName
      * @param string[] $columnNames
-     * @param string   $foreignTableName
-     * @param string[] $foreignColumnNames
      * @return string
      */
-    public function generateForeignKeyConstraintName($tableName, $columnNames, $foreignTableName, $foreignColumnNames)
+    public function generateForeignKeyConstraintName($tableName, $columnNames)
     {
-        return $this->generateIdentifierName(
-            [$tableName, $foreignTableName],
-            array_merge($columnNames, $foreignColumnNames),
-            'FK'
-        );
+        return $this->generateIdentifierName($tableName, $columnNames, 'FK');
     }
 
     /**
