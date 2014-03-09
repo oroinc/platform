@@ -51,18 +51,17 @@ class DbIdentifierNameGenerator extends BaseGenerator
     public function generateManyToManyJoinTableName($entityClassName, $fieldName, $targetEntityClassName)
     {
         $selfParts       = explode('\\', $entityClassName);
-        $vendorName      = ExtendHelper::isCustomEntity($entityClassName)
-            ? 'oro'
-            : array_shift($selfParts);
         $entityClassName = array_pop($selfParts);
 
         $targetParts           = explode('\\', $targetEntityClassName);
         $targetEntityClassName = array_pop($targetParts);
 
+        $prefix = substr(ExtendConfigDumper::TABLE_PREFIX, 0, strlen(ExtendConfigDumper::TABLE_PREFIX) - 1);
+
         return $this->generateIdentifierName(
             [$entityClassName, $targetEntityClassName],
             [$fieldName],
-            $vendorName,
+            $prefix,
             false
         );
     }
