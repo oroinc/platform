@@ -26,18 +26,31 @@ class OroReminderBundle implements Migration
         /** Generate table oro_reminder **/
         $table = $schema->createTable('oro_reminder');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('subject', 'string', ['length' => 255]);
-        $table->addColumn('due_date', 'datetime', []);
-        $table->addColumn('reminder_interval', 'integer', []);
-        $table->addColumn('state', 'text', []);
+        $table->addColumn('subject', 'string', ['length' => 32]);
+        $table->addColumn('start_at', 'datetime', []);
+        $table->addColumn('expire_at', 'datetime', []);
+        $table->addColumn('method', 'string', ['length' => 255]);
+        $table->addColumn('interval_number', 'integer', []);
+        $table->addColumn('interval_unit', 'string', ['length' => 1]);
+        $table->addColumn('state', 'string', ['length' => 32]);
         $table->addColumn('related_entity_id', 'integer', []);
         $table->addColumn('related_entity_classname', 'string', ['length' => 255]);
+        $table->addColumn('recipient_id', 'integer', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->addColumn('sent_at', 'datetime', ['notnull' => false]);
-        $table->addColumn('is_sent', 'boolean', []);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['is_sent'], 'reminder_is_sent_idx', []);
+        $table->addIndex(['recipient_id'], 'IDX_2F4F9F57E92F8F78', []);
+        $table->addIndex(['state'], 'reminder_state_idx', []);
         /** End of generate table oro_reminder **/
+
+        /** Generate foreign keys for table oro_reminder **/
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['recipient_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+        );
+        /** End of generate foreign keys for table oro_reminder **/
     }
 }
