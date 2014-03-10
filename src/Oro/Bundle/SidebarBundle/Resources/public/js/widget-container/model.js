@@ -40,8 +40,6 @@ define(['backbone', '../constants'], function (Backbone, constants) {
             } else {
                 model.set('state', constants.WIDGET_MINIMIZED);
             }
-
-            model.trigger('change');
         },
 
         /**
