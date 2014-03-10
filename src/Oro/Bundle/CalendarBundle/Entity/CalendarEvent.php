@@ -12,7 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      indexes={@ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"})})
  * @Config(
  *  defaultValues={
- *      "entity"={"icon"="icon-time"},
+ *      "entity"={
+ *          "icon"="icon-time",
+ *          "reminder_template_name"="calendar_reminder"
+ *      },
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE;EDIT;DELETE",
