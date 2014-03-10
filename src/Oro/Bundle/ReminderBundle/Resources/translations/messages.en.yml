@@ -1,0 +1,8 @@
+oro:
+    reminder:
+        entity_label:        Reminder
+        entity_plural_label: Reminders
+        entity_description:  Represent reminder
+
+        subject.label:       Subject
+        due_date.label:      Due date

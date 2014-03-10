@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
-use Oro\Bundle\ReminderBundle\Model\ReminderState;
 
 class ReminderTest extends \PHPUnit_Framework_TestCase
 {
@@ -11,8 +11,8 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new Reminder();
 
-        $this->assertEquals($entity->getState(), new ReminderState());
         $this->assertEmpty($entity->getId());
+        $this->assertEquals(Reminder::STATE_NOT_SENT, $entity->getState());
     }
 
     public function testPrePersist()
@@ -61,16 +61,28 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'value' => 'value',
                 'property' => 'subject',
             ],
-            'dueDate' => [
+            'startAt' => [
                 'value' => new \DateTime(),
-                'property' => 'dueDate',
+                'property' => 'startAt',
             ],
-            'reminderInterval' => [
+            'expireAt' => [
+                'value' => new \DateTime(),
+                'property' => 'expireAt',
+            ],
+            'method' => [
+                'value' => 'email',
+                'property' => 'method',
+            ],
+            'intervalNumber' => [
                 'value' => 5,
-                'property' => 'reminderInterval',
+                'property' => 'intervalNumber',
+            ],
+            'intervalUnit' => [
+                'value' => ReminderInterval::UNIT_HOUR,
+                'property' => 'intervalUnit',
             ],
             'state' => [
-                'value' => new ReminderState(['type1', 'type2']),
+                'value' => Reminder::STATE_NOT_SENT,
                 'property' => 'state',
             ],
             'relatedEntityId' => [
@@ -81,9 +93,9 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'value' => 'Namespace\\Entity',
                 'property' => 'relatedEntityClassName',
             ],
-            'recipientList' => [
-                'value' => $this->getMock('Oro\\Bundle\\NotificationBundle\\Entity\\RecipientList'),
-                'property' => 'recipientList',
+            'recipient' => [
+                'value' => $this->getMock('Oro\\Bundle\\UserBundle\\Entity\\User'),
+                'property' => 'recipient',
             ],
             'createdAt' => [
                 'value' => new \DateTime(),
@@ -96,12 +108,6 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
             'sentAt' => [
                 'value' => new \DateTime(),
                 'property' => 'sentAt',
-            ],
-            'isSent' => [
-                'value' => true,
-                'property' => 'isSent',
-                'getter' => 'isSent',
-                'setter' => 'setSent',
             ],
         ];
     }

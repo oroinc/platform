@@ -33,21 +33,12 @@ class ReminderSender implements ReminderSenderInterface
      */
     public function send(Reminder $reminder)
     {
+        $processor = $this->getProcessor($reminder->getMethod());
+        $processor->process($reminder);
+
         $state = $reminder->getState();
 
-        if ($state->isAllSent()) {
-            return;
-        }
-
-        foreach ($state->getSendTypeNames() as $sendType) {
-            if (ReminderState::SEND_TYPE_SENT !== $state->getSendTypeState($sendType)) {
-                $processor = $this->getProcessor($sendType);
-                $processor->process($reminder);
-            }
-        }
-
-        if ($state->isAllSent()) {
-            $reminder->setSent(true);
+        if (Reminder::STATE_SENT == $state) {
             $reminder->setSentAt(new \DateTime());
         }
     }
@@ -55,16 +46,16 @@ class ReminderSender implements ReminderSenderInterface
     /**
      * Get processor by send type
      *
-     * @param string $sendType
+     * @param string $method
      * @return SendProcessorInterface
      * @throws SendTypeNotSupportedException If processor is not supported
      */
-    protected function getProcessor($sendType)
+    protected function getProcessor($method)
     {
-        if (!isset($this->processors[$sendType])) {
-            throw new SendTypeNotSupportedException(sprintf('Reminder send type "%s" is not supported.', $sendType));
+        if (!isset($this->processors[$method])) {
+            throw new SendTypeNotSupportedException(sprintf('Reminder method "%s" is not supported.', $method));
         }
 
-        return $this->processors[$sendType];
+        return $this->processors[$method];
     }
 }

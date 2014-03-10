@@ -5,6 +5,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ReminderBundle\Command\SendRemindersCommand;
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
 class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -89,10 +90,10 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->at(0))->method('beginTransaction');
 
         $this->sender->expects($this->at(0))->method('send')->with($reminders[0]);
-        $reminders[0]->expects($this->once())->method('isSent')->will($this->returnValue(true));
+        $reminders[0]->expects($this->once())->method('getState')->will($this->returnValue(Reminder::STATE_SENT));
 
         $this->sender->expects($this->at(1))->method('send')->with($reminders[1]);
-        $reminders[1]->expects($this->once())->method('isSent')->will($this->returnValue(false));
+        $reminders[1]->expects($this->once())->method('getState')->will($this->returnValue(Reminder::STATE_NOT_SENT));
 
         $output->expects($this->at(1))->method('writeln')->with('<info>Reminders sent:</info> 1');
 
