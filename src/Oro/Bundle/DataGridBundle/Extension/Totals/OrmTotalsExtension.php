@@ -95,13 +95,12 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $renderPerPageRows = $result['options']['totalRecords'] !== count($result['data']);
-        $totals            = $config->offsetGetByPath(Configuration::TOTALS_PATH);
+        $moreThanOnePage = $result['options']['totalRecords'] !== count($result['data']);
+        $totals          = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         if (null != $totals && !empty($result['data'])) {
             foreach ($totals as $rowName => &$rowConfig) {
-                if ($rowConfig[Configuration::TOTALS_PER_PAGE_ROW]
-                    && $rowConfig[Configuration::TOTALS_HIDE_ON_FULL_SET]
-                    && !$renderPerPageRows
+                if ($rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]
+                    && !$moreThanOnePage
                 ) {
                     unset($totals[$rowName]);
                     continue;
@@ -115,13 +114,12 @@ class OrmTotalsExtension extends AbstractExtension
                 };
 
                 $this->appendData(
+                    $rowConfig,
                     $this->getData(
                         $result,
                         $totalQueries,
-                        $this->getGroupParts(),
-                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW]
-                    ),
-                    $rowConfig
+                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY]
+                    )
                 );
             }
         } else {
@@ -155,6 +153,8 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
+     * Get Group by part of master query as array
+     *
      * @return array
      */
     protected function getGroupParts()
@@ -175,45 +175,50 @@ class OrmTotalsExtension extends AbstractExtension
 
     }
 
-
     /**
-     * @param array $data
-     * @param array $rowConfig
+     * Append result data and labels to totals columns
+     *
+     * @param array $rowConfig Total row config
+     * @param array $data Db result data for current total row config
      */
-    protected function appendData($data, &$rowConfig)
+    protected function appendData(&$rowConfig, $data)
     {
         if (!empty($data)) {
             foreach ($rowConfig['columns'] as $field => &$total) {
-                if (isset($data[0][$field])) {
-                    $totalValue = $data[0][$field];
-                    if (isset($total[Configuration::TOTALS_FORMATTER])) {
+                if (isset($data[$field])) {
+                    $totalValue = $data[$field];
+                    if (isset($total[Configuration::TOTALS_FORMATTER_KEY])) {
                         $totalValue = $this->applyFrontendFormatting(
                             $totalValue,
-                            $total[Configuration::TOTALS_FORMATTER]
+                            $total[Configuration::TOTALS_FORMATTER_KEY]
                         );
                     }
                     $total['total'] = $totalValue;
                 }
-                if (isset($total['label'])) {
-                    $total['label'] = $this->translator->trans($total['label']);
+                if (isset($total[Configuration::TOTALS_LABEL_KEY])) {
+                    $total[Configuration::TOTALS_LABEL_KEY] = $this->
+                        translator
+                        ->trans($total[Configuration::TOTALS_LABEL_KEY]);
                 }
             };
         }
     }
 
     /**
+     * Delete garbage configs from result totals data set
+     *
      * @param array $totals
      * @return array
      */
     protected function clearTotalsData($totals)
     {
         foreach ($totals as $rowName => $rowData) {
-            if (isset($rowData['per_page'])) {
-                unset($totals[$rowName]['per_page']);
+            if (isset($rowData[Configuration::TOTALS_PER_PAGE_ROW_KEY])) {
+                unset($totals[$rowName][Configuration::TOTALS_PER_PAGE_ROW_KEY]);
             }
             foreach ($rowData['columns'] as $field => $totalData) {
-                if (isset($totalData['query'])) {
-                    unset($totals[$rowName]['columns'][$field]['query']);
+                if (isset($totalData[Configuration::TOTALS_QUERY_KEY])) {
+                    unset($totals[$rowName]['columns'][$field][Configuration::TOTALS_QUERY_KEY]);
                 }
             }
         }
@@ -222,22 +227,21 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * @param $result
-     * @param $totalQueries
-     * @param $groupParts
-     * @param bool $perPage
-     * @return array
+     * Get root entities config data
+     *
+     * @param QueryBuilder $query
+     * @return array with root entities config
      */
-    protected function getData($result, $totalQueries, $groupParts, $perPage = false)
+    protected function getRootIds(QueryBuilder $query)
     {
-        $rootIdentifier = [];
-        $query          = clone $this->masterQB;
+        $groupParts = $this->getGroupParts();
+        $rootIds    = [];
         if (empty($groupParts)) {
             $rootIdentifiers = $query->getEntityManager()
                 ->getClassMetadata($query->getRootEntities()[0])->getIdentifier();
             $rootAlias       = $query->getRootAliases()[0];
             foreach ($rootIdentifiers as $field) {
-                $rootIdentifier[] = [
+                $rootIds[] = [
                     'fieldAlias'  => $field,
                     'alias'       => $field,
                     'entityAlias' => $rootAlias
@@ -247,7 +251,7 @@ class OrmTotalsExtension extends AbstractExtension
             foreach ($groupParts as $groupPart) {
                 if (strpos($groupPart, '.')) {
                     list($rootAlias, $rootIdentifierPart) = explode('.', $groupPart);
-                    $rootIdentifier[] = [
+                    $rootIds[] = [
                         'fieldAlias'  => $rootIdentifierPart,
                         'entityAlias' => $rootAlias,
                         'alias'       => $rootIdentifierPart
@@ -259,13 +263,13 @@ class OrmTotalsExtension extends AbstractExtension
                         foreach ($selectPart->getParts() as $part) {
                             if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
                                 if (count($matches) == 3 && $groupPart == $matches[2]) {
-                                    $rootIdentifier[] = [
+                                    $rootIds[] = [
                                         'fieldAlias' => $matches[1],
                                         'alias'      => $matches[2]
                                     ];
                                 }
                             } else {
-                                $rootIdentifier[] = [
+                                $rootIds[] = [
                                     'fieldAlias' => $groupPart,
                                     'alias'      => $groupPart
                                 ];
@@ -276,32 +280,49 @@ class OrmTotalsExtension extends AbstractExtension
             }
         }
 
-        $dataQueryBuilder = $query
+        return $rootIds;
+    }
+
+    /**
+     * Get total row data from database
+     *
+     * @param ResultsObject $pageData Grid page data
+     * @param array $totalQueries Select part for query
+     * @param bool $perPage Get data only for page data or for all data
+     * @return array
+     */
+    protected function getData(ResultsObject $pageData, $totalQueries, $perPage = false)
+    {
+        $query = clone $this->masterQB;
+        $query
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
 
         if ($perPage) {
-            $this->addPageLimits($dataQueryBuilder, $rootIdentifier, $result, $query);
+            $this->addPageLimits($query, $pageData);
         }
 
-        return $dataQueryBuilder
+        $resultData = $query
             ->getQuery()
             ->setFirstResult(null)
             ->setMaxResults(null)
             ->getScalarResult();
+
+        return array_shift($resultData);
     }
 
     /**
-     * @param $dataQueryBuilder
-     * @param $rootIdentifier
-     * @param $result
-     * @param $query
+     * Add "in" expression as page limit to query builder
+     *
+     * @param QueryBuilder $dataQueryBuilder
+     * @param $pageData
      */
-    protected function addPageLimits($dataQueryBuilder, $rootIdentifier, $result, $query)
+    protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData)
     {
-        foreach ($rootIdentifier as $identifier) {
+        $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
+        foreach ($rootIdentifiers as $identifier) {
             $ids = [];
-            foreach ($result['data'] as $res) {
+            foreach ($pageData['data'] as $res) {
                 $ids[] = $res[$identifier['alias']];
             }
 
@@ -309,11 +330,13 @@ class OrmTotalsExtension extends AbstractExtension
                 ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
                 : $identifier['fieldAlias'];
 
-            $dataQueryBuilder->andWhere($query->expr()->in($field, $ids));
+            $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
         }
     }
 
     /**
+     * Apply formatting to totals values
+     *
      * @param mixed|null $val
      * @param string|null $formatter
      * @return string|null
@@ -347,6 +370,8 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
+     * Merge total rows configs
+     *
      * @param array $totalRows
      * @param string $rowName
      * @param array $rowConfig
@@ -356,27 +381,27 @@ class OrmTotalsExtension extends AbstractExtension
      */
     protected function mergeTotals(&$totalRows, $rowName, $rowConfig, $gridNme)
     {
-        if (isset($rowConfig[Configuration::TOTALS_EXTEND]) && $rowConfig[Configuration::TOTALS_EXTEND]) {
-            if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND]])) {
+        if (isset($rowConfig[Configuration::TOTALS_EXTEND_KEY]) && $rowConfig[Configuration::TOTALS_EXTEND_KEY]) {
+            if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]])) {
                 throw new \Exception(sprintf(
                     'Total row %s definition in %s datagrid config does not exists',
-                    $rowConfig[Configuration::TOTALS_EXTEND],
+                    $rowConfig[Configuration::TOTALS_EXTEND_KEY],
                     $gridNme
                 ));
             }
 
             $parentConfig = $this->mergeTotals(
                 $totalRows,
-                $rowConfig[Configuration::TOTALS_EXTEND],
-                $totalRows[$rowConfig[Configuration::TOTALS_EXTEND]],
+                $rowConfig[Configuration::TOTALS_EXTEND_KEY],
+                $totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]],
                 $gridNme
             );
 
-            $rowConfig  = array_replace_recursive(
+            $rowConfig = array_replace_recursive(
                 $parentConfig,
                 $totalRows[$rowName]
             );
-            unset($totalRows[$rowName][Configuration::TOTALS_EXTEND]);
+            unset($totalRows[$rowName][Configuration::TOTALS_EXTEND_KEY]);
 
             $totalRows[$rowName] = $rowConfig;
 

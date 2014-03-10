@@ -12,11 +12,11 @@ class Configuration implements ConfigurationInterface
 
     const TOTALS_LABEL_KEY     = 'label';
     const TOTALS_QUERY_KEY     = 'query';
-    const TOTALS_FORMATTER     = 'formatter';
+    const TOTALS_FORMATTER_KEY     = 'formatter';
 
-    const TOTALS_PER_PAGE_ROW  = 'per_page';
-    const TOTALS_HIDE_ON_FULL_SET  = 'hide_on_full_dataset';
-    const TOTALS_EXTEND         = 'extend';
+    const TOTALS_PER_PAGE_ROW_KEY  = 'per_page';
+    const TOTALS_HIDE_IF_ONE_PAGE_KEY = 'hide_if_one_page';
+    const TOTALS_EXTEND_KEY         = 'extend';
 
 
     /**
@@ -29,13 +29,19 @@ class Configuration implements ConfigurationInterface
             ->useAttributeAsKey('rows')
             ->prototype('array')
                 ->children()
-                    ->scalarNode(self::TOTALS_PER_PAGE_ROW)
+                    ->scalarNode(self::TOTALS_PER_PAGE_ROW_KEY)
+                        ->info('Determines whether totals should be calculated for current page data or all data')
                         ->defaultFalse()
                     ->end()
-                    ->scalarNode(self::TOTALS_HIDE_ON_FULL_SET)
+                    ->scalarNode(self::TOTALS_HIDE_IF_ONE_PAGE_KEY)
+                        ->info(
+                            'Determines whether this total row should not be visible '
+                            .'or not if all a grid has only one page'
+                        )
                         ->defaultFalse()
                     ->end()
-                    ->scalarNode(self::TOTALS_EXTEND)
+                    ->scalarNode(self::TOTALS_EXTEND_KEY)
+                        ->info('A parent total configuration')
                     ->end()
                     ->arrayNode('columns')
                         ->prototype('array')
@@ -44,7 +50,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                 ->scalarNode(self::TOTALS_QUERY_KEY)
                                     ->end()
-                                ->scalarNode(self::TOTALS_FORMATTER)
+                                ->scalarNode(self::TOTALS_FORMATTER_KEY)
                                     ->defaultFalse()
                                     ->end()
                             ->end()
