@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Groups
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Groups openGroups() openGroups()
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Groups assertTitle() assertTitle($title, $message = '')
+ * @method Groups openGroups() openGroups(string)
+ * {@inheritdoc}
  */
 class Groups extends AbstractPageFilteredGrid
 {

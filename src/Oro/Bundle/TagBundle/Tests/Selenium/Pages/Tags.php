@@ -8,8 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Tags
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages\Objects
- * @method \Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags openTags() openTags()
- * @method \Oro\Bundle\TagBundle\Tests\Selenium\Pages\Tags assertTitle() assertTitle($title, $message = '')
+ * @method Tags openTags() openTags(string)
  * {@inheritdoc}
  */
 class Tags extends AbstractPageFilteredGrid
