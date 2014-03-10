@@ -21,6 +21,9 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class OrmTotalsExtension extends AbstractExtension
 {
     /** @var RequestParameters */
