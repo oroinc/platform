@@ -1,6 +1,9 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget', 'oroworkflow/js/workflow-management/helper', 'oroui/js/layout'],
-function(_, Backbone, DialogWidget, Helper, layout) {
+define(['underscore', 'backbone', 'oro/dialog-widget', 'oroworkflow/js/workflow-management/helper',
+    'oroui/js/layout', 'oroworkflow/js/workflow-management/transition/view/list',
+    'oroworkflow/js/workflow-management/transition/model'
+],
+function(_, Backbone, DialogWidget, Helper, layout, TransitionsListView, TransitionModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -15,14 +18,21 @@ function(_, Backbone, DialogWidget, Helper, layout) {
             'class': 'widget-content'
         },
 
+        events: {
+            'click .add-transition': 'addStepTransition'
+        },
+
         options: {
-            template: null
+            template: null,
+            transitionListContainerEl: '.transitions-list-container',
+            workflow: null
         },
 
         initialize: function() {
             var template = this.options.template || $('#step-form-template').html();
             this.template = _.template(template);
             this.widget = null;
+            this.addedTransitions = [];
         },
 
         onStepAdd: function() {
@@ -40,10 +50,34 @@ function(_, Backbone, DialogWidget, Helper, layout) {
             this.widget.remove();
         },
 
+        addStepTransition: function() {
+            var transition = new TransitionModel();
+            this.addedTransitions.push(transition);
+            this.options.workflow.trigger('requestEditTransition', transition, this.model);
+        },
+
+        remove: function() {
+            this.transitionsListView.remove();
+            Backbone.View.prototype.remove.call(this);
+        },
+
+        onCancel: function() {
+            _.each(this.addedTransitions, function(transition) {
+                transition.destroy();
+            });
+        },
+
         render: function() {
             this.$el.append(
                 this.template(this.model.toJSON())
             );
+            this.transitionsListView = new TransitionsListView({
+                el: this.$el.find(this.options.transitionListContainerEl),
+                workflow: this.options.workflow,
+                collection: this.model.getAllowedTransitions(this.options.workflow),
+                stepFrom: this.model
+            });
+            this.transitionsListView.render();
 
             this.widget = new DialogWidget({
                 'title': this.model.get('name') ? 'Edit step' : 'Add new step',
@@ -66,6 +100,7 @@ function(_, Backbone, DialogWidget, Helper, layout) {
             this.widget.form.validate({
                 'submitHandler': _.bind(this.onStepAdd, this)
             });
+            this.listenTo(this.widget, 'adoptedFormResetClick', this.onCancel);
 
             return this;
         }

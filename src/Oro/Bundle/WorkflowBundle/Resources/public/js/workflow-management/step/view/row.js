@@ -34,7 +34,7 @@ function(_, Backbone, TransitionsShortListView) {
 
         triggerEditStep: function(e) {
             e.preventDefault();
-            this.model.trigger('requestEdit', this.model);
+            this.options.workflow.trigger('requestEditStep', this.model);
         },
 
         triggerRemoveStep: function(e) {
@@ -44,12 +44,12 @@ function(_, Backbone, TransitionsShortListView) {
 
         triggerCloneStep: function(e) {
             e.preventDefault();
-            this.model.trigger('requestClone', this.model);
+            this.options.workflow.trigger('requestCloneStep', this.model);
         },
 
         triggerAddStepTransition: function(e) {
             e.preventDefault();
-            this.model.trigger('requestAddTransition', this.model);
+            this.options.workflow.trigger('requestAddTransition', this.model);
         },
 
         remove: function() {
@@ -62,7 +62,8 @@ function(_, Backbone, TransitionsShortListView) {
         render: function() {
             this.transitionsListView = new TransitionsShortListView({
                 'collection': this.model.getAllowedTransitions(this.options.workflow),
-                'workflow': this.options.workflow
+                'workflow': this.options.workflow,
+                stepFrom: this.model
             });
             var rowHtml = $(this.template(this.model.toJSON()));
             var transitionsListEl = this.transitionsListView.render().$el;

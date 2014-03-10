@@ -6,7 +6,7 @@ function(_, Backbone) {
     var $ = Backbone.$;
 
     /**
-     * @export  oro/workflow-management/transition/view/row-short
+     * @export  oroworkflow/js/workflow-management/transition/view/row-short
      * @class   oro.WorkflowManagement.TransitionsShortRowView
      * @extends Backbone.View
      */
@@ -20,15 +20,16 @@ function(_, Backbone) {
 
         options: {
             workflow: null,
-            template: null
+            template: null,
+            stepFrom: null
         },
 
         initialize: function() {
             var template = this.options.template || $('#transition-row-short-template').html();
             this.template = _.template(template);
 
-            this.listenTo(this.options.model, 'change', this.render);
-            this.listenTo(this.options.model, 'destroy', this.remove);
+            this.listenTo(this.model, 'change', this.render);
+            this.listenTo(this.model, 'destroy', this.remove);
         },
 
         deleteTransition: function(e) {
@@ -38,7 +39,7 @@ function(_, Backbone) {
 
         triggerEditTransition: function (e) {
             e.preventDefault();
-            this.model.trigger('requestEdit', this.model);
+            this.options.workflow.trigger('requestEditTransition', this.model, this.options.stepFrom);
         },
 
         render: function() {

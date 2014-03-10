@@ -78,6 +78,9 @@
                         </div>
                     </div>
 
+                    <% if(!stepFrom || stepFrom.get('name')) {
+                        var stepFromName = stepFrom ? stepFrom.get('name') : '';
+                    %>
                     <div class="control-group">
                         <label class="control-label required">{{ "From step"|trans }}  <em>*</em></label>
                         <div class="controls">
@@ -87,12 +90,13 @@
                                 <% _.each(allowedStepsFrom, function (step) { %>
                                 <option
                                     value="<%= step.get('name') %>"
-                                    <% if (step.get('name') == stepFrom) { %>selected="selected"<% } %>
+                                    <% if (step.get('name') == stepFromName) { %>selected="selected"<% } %>
                                 ><%= step.get('label') %></option>
                                 <% }); %>
                             </select>
                         </div>
                     </div>
+                    <% } %>
 
                     <div class="control-group">
                         <label class="control-label required">{{ "To step"|trans }}  <em>*</em></label>
@@ -208,8 +212,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="transitions-list-container"></div>
             </div>
 
             <div class="widget-actions">
@@ -217,6 +219,10 @@
                 <button type="submit" class="btn btn-success">{{ "Ok"|trans }}</button>
             </div>
         </form>
+
+        <h5>{{ 'Transitions'|trans }}</h5>
+        <div class="transitions-list-container"></div>
+        <button type="button" class="btn btn-primary add-transition"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
     </script>
 
     <script type="text/template" id="step-list-template">
@@ -236,7 +242,7 @@
             <% if (_is_start) { %>
                 <%= label %>
             <% } else { %>
-                <a href="#" class="edit-step" title="Edit step"><%= label %></a>
+                <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><%= label %></a>
             <% } %>
             <% if (is_final) { %>&nbsp;<span class="label">{{ "Final"|trans }}</span><% } %>
         </td>
@@ -245,11 +251,11 @@
         <td class="step-actions">
             <div class="pull-right">
                 <% if (!_is_start) { %>
-                    <a href="#" class="clone-step" title="Clone step"><i class="icon-copy"/></a>
-                    <a href="#" class="edit-step" title="Edit step"><i class="icon-edit"/></a>
-                    <a href="#" class="delete-step" title="Delete step"><i class="icon-remove"/></a>
+                    <a href="#" class="clone-step" title="{{ 'Clone step'|trans}}"><i class="icon-copy"/></a>
+                    <a href="#" class="edit-step" title="{{ 'Edit step'|trans}}"><i class="icon-edit"/></a>
+                    <a href="#" class="delete-step" title="{{ 'Delete step'|trans}}"><i class="icon-remove"/></a>
                 <% } %>
-                <a href="#" class="add-step-transition" title="Add transition"><i class="icon-plus-sign"/></a>
+                <a href="#" class="add-step-transition" title="{{ 'Add transition'|trans}}"><i class="icon-plus-sign"/></a>
             </div>
         </td>
     </script>
@@ -322,6 +328,31 @@
                 <a href="#" class="edit-form-option" title="{{ 'Edit field'|trans }}"><i class="icon-edit"/></a>
                 <% } %>
                 <a href="#" class="delete-form-option" title="{{ 'Delete field'|trans }}"><i class="icon-remove"/></a>
+            </div>
+        </td>
+    </script>
+
+    <script type="text/template" id="transition-list-template">
+        <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <thead>
+            <th>{{ "Transition name"|trans }}</th>
+            <th>{{ "Step to"|trans }}</th>
+            <th>{{ "Actions"|trans }}</th>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </script>
+
+    <script type="text/template" id="transition-row-template">
+        <td class="transition-name">
+            <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><%= label %></a>
+        </td>
+        <td><%= stepToLabel %></td>
+        <td class="transition-actions">
+            <div class="pull-right">
+                <a href="#" class="clone-transition" title="{{ 'Clone transition'|trans }}"><i class="icon-copy"/></a>
+                <a href="#" class="edit-transition" title="{{ 'Edit transition'|trans }}"><i class="icon-edit"/></a>
+                <a href="#" class="delete-transition" title="{{ 'Delete transition'|trans }}"><i class="icon-remove"/></a>
             </div>
         </td>
     </script>

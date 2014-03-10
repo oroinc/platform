@@ -51,12 +51,13 @@ function(_, Backbone, messanger, __,
             this.$entitySelectEl = this.$('[name$="[related_entity]"]');
             this.initEntityFieldsLoader();
 
-            this.listenTo(this.model.get('steps'), 'requestAddTransition', this.addNewStepTransition);
-            this.listenTo(this.model.get('steps'), 'requestEdit', this.openManageStepForm);
-            this.listenTo(this.model.get('steps'), 'requestClone', this.cloneStep);
+            this.listenTo(this.model, 'requestAddTransition', this.addNewStepTransition);
+            this.listenTo(this.model, 'requestEditStep', this.openManageStepForm);
+            this.listenTo(this.model, 'requestCloneStep', this.cloneStep);
             this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
 
-            this.listenTo(this.model.get('transitions'), 'requestEdit', this.openManageTransitionForm);
+            this.listenTo(this.model, 'requestCloneTransition', this.cloneTransition);
+            this.listenTo(this.model, 'requestEditTransition', this.openManageTransitionForm);
 
             this.$saveBtn = $(this.options.saveBtnEl);
             this.$saveBtn.on('click', _.bind(this.saveConfiguration, this));
@@ -168,6 +169,13 @@ function(_, Backbone, messanger, __,
             this.addNewStepTransition(null);
         },
 
+        cloneTransition: function(transition, step) {
+            var clonedTransition = this.model.cloneTransition(transition);
+            if (!_.isUndefined(step)) {
+                step.getAllowedTransitions(this.model).add(clonedTransition);
+            }
+        },
+
         addNewStepTransition: function(step) {
             this.openManageTransitionForm(new TransitionModel(), step);
         },
@@ -184,9 +192,11 @@ function(_, Backbone, messanger, __,
             transitionEditView.render();
         },
 
-        addTransition: function(transition, stepFromName) {
+        addTransition: function(transition, stepFrom) {
             if (!this.model.get('transitions').get(transition.cid)) {
-                var stepFrom = this.model.getStepByName(stepFromName);
+                if (_.isString(stepFrom)) {
+                    stepFrom = this.model.getStepByName(stepFrom);
+                }
                 transition.set('is_start', stepFrom.get('_is_start'));
 
                 this.model
@@ -201,7 +211,8 @@ function(_, Backbone, messanger, __,
 
         openManageStepForm: function(step) {
             var stepEditView = new StepEditView({
-                'model': step
+                'model': step,
+                'workflow': this.model
             });
             stepEditView.on('stepAdd', this.addStep, this);
             stepEditView.render();

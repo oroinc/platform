@@ -107,7 +107,8 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
             });
             this.model.set('frontend_options', frontendOptions);
 
-            this.trigger('transitionAdd', this.model, formData.step_from);
+            var stepFrom = formData.step_from ? formData.step_from : this.options.step_from;
+            this.trigger('transitionAdd', this.model, stepFrom);
             this.widget.remove();
         },
 
@@ -213,7 +214,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
         render: function() {
             var data = this.model.toJSON();
             var steps = this.options.workflow.get('steps').models;
-            data.stepFrom = this.options.step_from ? this.options.step_from.get('name') : '';
+            data.stepFrom = this.options.step_from;
             data.allowedButtonStyles = this.options.allowed_button_styles;
             data.buttonIcon = this._getFrontendOption('icon');
             data.buttonStyle = this._getFrontendOption('class');

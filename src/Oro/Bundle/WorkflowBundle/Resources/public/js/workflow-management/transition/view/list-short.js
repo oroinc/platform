@@ -4,7 +4,7 @@ function(_, Backbone, TransitionsShortRowView) {
     'use strict';
 
     /**
-     * @export  oro/workflow-management/transition/view/list-short
+     * @export  oroworkflow/js/workflow-management/transition/view/list-short
      * @class   oro.WorkflowManagement.TransitionsShortListView
      * @extends Backbone.View
      */
@@ -13,7 +13,8 @@ function(_, Backbone, TransitionsShortRowView) {
 
         options: {
             collection: null,
-            workflow: null
+            workflow: null,
+            stepFrom: null
         },
 
         initialize: function() {
@@ -26,7 +27,8 @@ function(_, Backbone, TransitionsShortRowView) {
         addItem: function(item) {
             var rowView = new TransitionsShortRowView({
                 model: item,
-                workflow: this.options.workflow
+                workflow: this.options.workflow,
+                stepFrom: this.options.stepFrom
             });
             this.rowViews.push(rowView);
             this.$el.append(rowView.render().$el);
