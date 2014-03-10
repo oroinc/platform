@@ -7,6 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
@@ -63,7 +64,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
     ) {
         $className = ExtendConfigDumper::ENTITY . $entityName;
         $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
-        $table = $schema->createTable($tableName);
+        $table     = $schema->createTable($tableName);
 
         // set options
         if (!isset($options['extend'])) {
@@ -153,10 +154,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
 
-        $targetTableName = $this->getTableName($targetTable);
-        if (!($targetTable instanceof Table)) {
-            $targetTable = $schema->getTable($targetTable);
-        }
+        $targetTableName            = $this->getTableName($targetTable);
+        $targetTable                = $this->getTable($targetTable, $schema);
         $targetColumnName           = sprintf(
             '%s%s_%s_id',
             ExtendConfigDumper::FIELD_PREFIX,
@@ -238,14 +237,13 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
 
-        $targetTableName = $this->getTableName($targetTable);
-        if (!($targetTable instanceof Table)) {
-            $targetTable = $schema->getTable($targetTable);
-        }
+        $targetTableName            = $this->getTableName($targetTable);
+        $targetTable                = $this->getTable($targetTable, $schema);
         $targetClassName            = $this->getEntityClassByTableName($targetTableName);
         $targetRelationName         = sprintf('%s_id', strtolower($this->getShortClassName($targetClassName)));
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
+
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
         $this->checkColumnsExist($targetTable, $targetDetailedColumnNames);
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
@@ -325,10 +323,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $selfTable      = $this->getTable($table, $schema);
         $selfColumnName = sprintf('%s%s_id', ExtendConfigDumper::FIELD_PREFIX, $associationName);
 
-        $targetTableName = $this->getTableName($targetTable);
-        if (!($targetTable instanceof Table)) {
-            $targetTable = $schema->getTable($targetTable);
-        }
+        $targetTableName            = $this->getTableName($targetTable);
+        $targetTable                = $this->getTable($targetTable, $schema);
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
         $this->checkColumnsExist($targetTable, [$targetColumnName]);

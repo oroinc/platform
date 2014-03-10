@@ -117,10 +117,10 @@ class MigrationQueryLoader
      *
      * @param Table[]      $tables
      * @param Sequence[]   $sequences
-     * @param SchemaConfig $schemaConfig
+     * @param SchemaConfig|null $schemaConfig
      * @return Schema
      */
-    public function createSchemaObject($tables, $sequences, $schemaConfig)
+    protected function createSchemaObject(array $tables = [], array $sequences = [], $schemaConfig = null)
     {
         return new Schema($tables, $sequences, $schemaConfig);
     }
