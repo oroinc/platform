@@ -81,6 +81,10 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'value' => 'Namespace\\Entity',
                 'property' => 'relatedEntityClassName',
             ],
+            'recipientList' => [
+                'value' => $this->getMock('Oro\\Bundle\\NotificationBundle\\Entity\\RecipientList'),
+                'property' => 'recipientList',
+            ],
             'createdAt' => [
                 'value' => new \DateTime(),
                 'property' => 'createdAt',

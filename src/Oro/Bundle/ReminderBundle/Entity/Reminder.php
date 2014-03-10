@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\ReminderBundle\Model\ReminderState;
 
 /**
@@ -128,6 +129,18 @@ class Reminder
      * )
      */
     protected $relatedEntityClassName;
+
+    /**
+     * @var RecipientList
+     *
+     * @ORM\OneToOne(
+     *     targetEntity="Oro\Bundle\NotificationBundle\Entity\RecipientList",
+     *     cascade={"all"},
+     *     orphanRemoval=true
+     * )
+     * @ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id")
+     */
+    protected $recipientList;
 
     /**
      * @var \DateTime
@@ -339,6 +352,29 @@ class Reminder
     public function getRelatedEntityClassName()
     {
         return $this->relatedEntityClassName;
+    }
+
+    /**
+     * Set recipient list
+     *
+     * @param RecipientList $recipientList
+     * @return Reminder
+     */
+    public function setRecipientList(RecipientList $recipientList)
+    {
+        $this->recipientList = $recipientList;
+
+        return $this;
+    }
+
+    /**
+     * Get recipient list
+     *
+     * @return RecipientList
+     */
+    public function getRecipientList()
+    {
+        return $this->recipientList;
     }
 
     /**
