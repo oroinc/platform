@@ -1,0 +1,8 @@
+parameters:
+    oro_reminder.doctrine.event_listener.remindable_initializer.class: Oro\Bundle\ReminderBundle\Doctrine\EventListener\RemindableSubscriber
+
+services:
+    oro_reminder.doctrine.event_listener.remindable_initializer:
+        class: %oro_reminder.doctrine.event_listener.remindable_initializer.class%
+        tags:
+            - { name: doctrine.event_subscriber }
