@@ -8,8 +8,9 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
-use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\UserBundle\Entity\User;
+
+use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 
 /**
  * Reminder
@@ -91,7 +92,7 @@ class Reminder
     protected $expireAt;
 
     /**
-     * @var string $method
+     * @var string
      *
      * @ORM\Column(name="method", type="string", length=255, nullable=false)
      * @Oro\Versioned
@@ -104,7 +105,7 @@ class Reminder
     protected $method;
 
     /**
-     * @var ReminderInterval $interval
+     * @var ReminderInterval
      */
     protected $interval;
 
@@ -122,7 +123,7 @@ class Reminder
     protected $intervalNumber;
 
     /**
-     * @var integer $intervalNumber
+     * @var integer
      *
      * @ORM\Column(name="interval_unit", type="string", length=1, nullable=false)
      * @Oro\Versioned
@@ -148,7 +149,7 @@ class Reminder
     protected $state;
 
     /**
-     * @var integer $relatedEntityId
+     * @var integer
      *
      * @ORM\Column(name="related_entity_id", type="integer", nullable=false)
      * @Oro\Versioned
@@ -161,7 +162,7 @@ class Reminder
     protected $relatedEntityId;
 
     /**
-     * @var integer $relatedEntityClassName
+     * @var integer
      *
      * @ORM\Column(name="related_entity_classname", type="string", length=255, nullable=false)
      * @Oro\Versioned
@@ -200,13 +201,6 @@ class Reminder
      * @ORM\Column(name="sent_at", type="datetime", nullable=true)
      */
     protected $sentAt;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="is_sent", type="boolean")
-     */
-    protected $isSent = false;
 
     public function __construct()
     {
@@ -266,7 +260,7 @@ class Reminder
     {
         $this->expireAt = $expireAt;
 
-        $this->updateStartAt();
+        $this->syncStartAtAndInterval();
 
         return $this;
     }
@@ -314,10 +308,7 @@ class Reminder
     {
         $this->interval = $interval;
 
-        $this->intervalNumber = $interval->getNumber();
-        $this->intervalUnit = $interval->getUnit();
-
-        $this->updateStartAt();
+        $this->syncStartAtAndInterval();
 
         return $this;
     }
@@ -325,11 +316,15 @@ class Reminder
     /**
      * Update start date
      */
-    protected function updateStartAt()
+    protected function syncStartAtAndInterval()
     {
         if ($this->expireAt) {
             $this->startAt = clone $this->expireAt;
             $this->startAt->sub($this->getInterval()->createDateInterval());
+        }
+        if ($this->interval) {
+            $this->intervalNumber = $this->interval->getNumber();
+            $this->intervalUnit = $this->interval->getUnit();
         }
     }
 

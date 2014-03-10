@@ -82,7 +82,7 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
         $reminders = array($this->createReminder(), $this->createReminder());
 
         $this->repository->expects($this->once())
-            ->method('findNotSentReminders')
+            ->method('findRemindersToSend')
             ->will($this->returnValue($reminders));
 
         $output->expects($this->at(0))->method('writeln')->with('<comment>Reminders to send:</comment> 2');
@@ -115,7 +115,7 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
         $reminder = $this->createReminder();
 
         $this->repository->expects($this->once())
-            ->method('findNotSentReminders')
+            ->method('findRemindersToSend')
             ->will($this->returnValue(array($reminder)));
 
         $output->expects($this->at(0))->method('writeln')->with('<comment>Reminders to send:</comment> 1');

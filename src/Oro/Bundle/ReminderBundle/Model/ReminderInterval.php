@@ -67,7 +67,7 @@ class ReminderInterval
     {
         $this->unit = $unit;
 
-        if (!in_array($this->unit, array(self::UNIT_MINUTE, self::UNIT_HOUR, self::UNIT_DAY, self::UNIT_HOUR))) {
+        if (!in_array($this->unit, array(self::UNIT_MINUTE, self::UNIT_HOUR, self::UNIT_DAY, self::UNIT_WEEK))) {
             $this->unit = self::UNIT_MINUTE;
         }
 

@@ -13,10 +13,14 @@ class ReminderRepository extends EntityRepository
      *
      * @return Reminder[]
      */
-    public function findNotSentReminders()
+    public function findRemindersToSend()
     {
         return $this->createQueryBuilder('reminder')
-            ->where('reminder.isSent = false')
+            ->where('reminder.state != :sent_state')
+            ->andWhere('reminder.startAt <= :now')
+            ->andWhere('reminder.expireAt >= :now')
+            ->setParameter('now', new \DateTime())
+            ->setParameter('sent_state', Reminder::STATE_SENT)
             ->getQuery()
             ->execute();
     }
