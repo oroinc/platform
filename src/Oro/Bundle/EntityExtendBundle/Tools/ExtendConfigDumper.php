@@ -14,7 +14,6 @@ use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 class ExtendConfigDumper
 {
     const ENTITY         = 'Extend\\Entity\\';
-    const TABLE_PREFIX   = 'oro_ext_';
     const FIELD_PREFIX   = 'field_';
     const DEFAULT_PREFIX = 'default_';
 
@@ -29,18 +28,18 @@ class ExtendConfigDumper
     protected $em;
 
     /**
-     * @var DbIdentifierNameGenerator
+     * @var ExtendDbIdentifierNameGenerator
      */
     protected $nameGenerator;
 
     /**
-     * @param OroEntityManager          $em
-     * @param DbIdentifierNameGenerator $nameGenerator
-     * @param string                    $cacheDir
+     * @param OroEntityManager                $em
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param string                          $cacheDir
      */
     public function __construct(
         OroEntityManager $em,
-        DbIdentifierNameGenerator $nameGenerator,
+        ExtendDbIdentifierNameGenerator $nameGenerator,
         $cacheDir
     ) {
         $this->nameGenerator = $nameGenerator;

@@ -14,19 +14,19 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class DoctrineSubscriber implements EventSubscriber
 {
     /**
-     * @var DbIdentifierNameGenerator
+     * @var ExtendDbIdentifierNameGenerator
      */
     protected $nameGenerator;
 
     /**
-     * @param DbIdentifierNameGenerator $nameGenerator
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
      */
-    public function __construct(DbIdentifierNameGenerator $nameGenerator)
+    public function __construct(ExtendDbIdentifierNameGenerator $nameGenerator)
     {
         $this->nameGenerator = $nameGenerator;
     }

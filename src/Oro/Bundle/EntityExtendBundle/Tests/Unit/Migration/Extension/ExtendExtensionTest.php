@@ -8,7 +8,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
@@ -55,7 +55,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExtendSchema()
     {
-        return new ExtendSchema($this->extendOptionsManager, new DbIdentifierNameGenerator());
+        return new ExtendSchema($this->extendOptionsManager, new ExtendDbIdentifierNameGenerator());
     }
 
     /**
@@ -63,7 +63,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function getExtendExtension()
     {
-        return new ExtendExtension($this->extendOptionsManager, new DbIdentifierNameGenerator());
+        $result = new ExtendExtension($this->extendOptionsManager);
+        $result->setNameGenerator(new ExtendDbIdentifierNameGenerator());
+
+        return $result;
     }
 
     /**
@@ -222,15 +225,15 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 sprintf(
                     'CREATE TABLE %sentity_1 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                    ExtendConfigDumper::TABLE_PREFIX
+                    ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
                 ),
                 sprintf(
                     'CREATE TABLE %sentity2 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                    ExtendConfigDumper::TABLE_PREFIX
+                    ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
                 ),
                 sprintf(
                     'CREATE TABLE %sentity3 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                    ExtendConfigDumper::TABLE_PREFIX
+                    ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
                 ),
             ]
         );
@@ -240,7 +243,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'Entity_1' => [
                     'configs' => [
                         'extend' => [
-                            'table' => sprintf('%sentity_1', ExtendConfigDumper::TABLE_PREFIX),
+                            'table' => sprintf(
+                                '%sentity_1',
+                                ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                            ),
                             'owner' => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ]
@@ -249,7 +255,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'Entity2' => [
                     'configs' => [
                         'extend' => [
-                            'table' => sprintf('%sentity2', ExtendConfigDumper::TABLE_PREFIX),
+                            'table' => sprintf(
+                                '%sentity2',
+                                ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                            ),
                             'owner' => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ],
@@ -259,7 +268,10 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'Entity3' => [
                     'configs' => [
                         'extend' => [
-                            'table' => sprintf('%sentity3', ExtendConfigDumper::TABLE_PREFIX),
+                            'table' => sprintf(
+                                '%sentity3',
+                                ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                            ),
                             'owner' => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ]

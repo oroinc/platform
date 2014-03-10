@@ -11,9 +11,11 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
-class ExtendExtension
+class ExtendExtension implements NameGeneratorAwareInterface
 {
     const AUTO_GENERATED_ID_COLUMN_NAME = 'id';
 
@@ -23,20 +25,24 @@ class ExtendExtension
     protected $extendOptionsManager;
 
     /**
-     * @var DbIdentifierNameGenerator
+     * @var ExtendDbIdentifierNameGenerator
      */
     protected $nameGenerator;
 
     /**
-     * @param ExtendOptionsManager      $extendOptionsManager
-     * @param DbIdentifierNameGenerator $nameGenerator
+     * @param ExtendOptionsManager $extendOptionsManager
      */
-    public function __construct(
-        ExtendOptionsManager $extendOptionsManager,
-        DbIdentifierNameGenerator $nameGenerator
-    ) {
+    public function __construct(ExtendOptionsManager $extendOptionsManager)
+    {
         $this->extendOptionsManager = $extendOptionsManager;
-        $this->nameGenerator        = $nameGenerator;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
+    {
+        $this->nameGenerator = $nameGenerator;
     }
 
     /**

@@ -21,7 +21,7 @@ class MigrationConfigPass implements CompilerPassInterface
         if ($container->hasParameter(self::MIGRATIONS_NAME_GENERATOR_CLASS_PARAM)) {
             $container->setParameter(
                 self::MIGRATIONS_NAME_GENERATOR_CLASS_PARAM,
-                'Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator'
+                'Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator'
             );
         }
         if ($container->hasDefinition(self::MIGRATIONS_QUERY_LOADER_SERVICE)

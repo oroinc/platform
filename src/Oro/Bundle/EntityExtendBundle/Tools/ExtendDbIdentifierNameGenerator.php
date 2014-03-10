@@ -2,10 +2,24 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator as BaseGenerator;
+use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
-class DbIdentifierNameGenerator extends BaseGenerator
+class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 {
+    const CUSTOM_ENTITY_TABLE_PREFIX = 'oro_ext_';
+
+    /**
+     * Gets the max size of an custom entity name
+     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
+     * created automatically in Symfony cache
+     *
+     * @return int
+     */
+    public function getMaxCustomEntityNameSize()
+    {
+        return $this->getMaxIdentifierSize() - strlen(self::CUSTOM_ENTITY_TABLE_PREFIX);
+    }
+
     /**
      * Builds a table name for a custom entity
      * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
@@ -27,17 +41,17 @@ class DbIdentifierNameGenerator extends BaseGenerator
         if (empty($entityName) || !preg_match('/^[A-Za-z][\w]+$/', $entityName)) {
             throw new \InvalidArgumentException(sprintf('Invalid entity name. Class: %s.', $entityClassName));
         }
-        if (strlen($entityName) + strlen(ExtendConfigDumper::TABLE_PREFIX) > $this->getMaxIdentifierSize()) {
+        if (strlen($entityName) > $this->getMaxCustomEntityNameSize()) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'Entity name length must be less or equal %d characters. Class: %s.',
-                    $this->getMaxIdentifierSize() - strlen(ExtendConfigDumper::TABLE_PREFIX),
+                    $this->getMaxIdentifierSize() - strlen(self::CUSTOM_ENTITY_TABLE_PREFIX),
                     $entityClassName
                 )
             );
         }
 
-        return ExtendConfigDumper::TABLE_PREFIX . strtolower($entityName);
+        return self::CUSTOM_ENTITY_TABLE_PREFIX . strtolower($entityName);
     }
 
     /**
@@ -56,7 +70,7 @@ class DbIdentifierNameGenerator extends BaseGenerator
         $targetParts           = explode('\\', $targetEntityClassName);
         $targetEntityClassName = array_pop($targetParts);
 
-        $prefix = substr(ExtendConfigDumper::TABLE_PREFIX, 0, strlen(ExtendConfigDumper::TABLE_PREFIX) - 1);
+        $prefix = substr(self::CUSTOM_ENTITY_TABLE_PREFIX, 0, strlen(self::CUSTOM_ENTITY_TABLE_PREFIX) - 1);
 
         return $this->generateIdentifierName(
             [$entityClassName, $targetEntityClassName],

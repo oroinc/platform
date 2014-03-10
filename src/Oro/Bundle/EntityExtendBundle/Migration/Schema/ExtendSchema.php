@@ -6,7 +6,7 @@ use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Schema\SchemaWithNameGenerator;
 
 class ExtendSchema extends SchemaWithNameGenerator
@@ -19,15 +19,15 @@ class ExtendSchema extends SchemaWithNameGenerator
     protected $extendOptionsManager;
 
     /**
-     * @param ExtendOptionsManager      $extendOptionsManager
-     * @param DbIdentifierNameGenerator $nameGenerator
-     * @param Table[]                   $tables
-     * @param Sequence[]                $sequences
-     * @param SchemaConfig              $schemaConfig
+     * @param ExtendOptionsManager            $extendOptionsManager
+     * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param Table[]                         $tables
+     * @param Sequence[]                      $sequences
+     * @param SchemaConfig                    $schemaConfig
      */
     public function __construct(
         ExtendOptionsManager $extendOptionsManager,
-        DbIdentifierNameGenerator $nameGenerator,
+        ExtendDbIdentifierNameGenerator $nameGenerator,
         array $tables = [],
         array $sequences = [],
         SchemaConfig $schemaConfig = null

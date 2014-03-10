@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EventListener\PostUpMigrationListener;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
-use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
@@ -30,7 +30,7 @@ class PostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $nameGenerator = new DbIdentifierNameGenerator();
+        $nameGenerator = new ExtendDbIdentifierNameGenerator();
 
         /** @var PostUpMigrationListener $postUpMigrationListener */
         $postUpMigrationListener = new PostUpMigrationListener(

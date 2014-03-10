@@ -9,7 +9,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\EntityExtendBundle\Tools\DbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendOptionsManager */
     protected $extendOptionsManager;
 
-    /** @var DbIdentifierNameGenerator */
+    /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
     protected function setUp()
@@ -37,7 +37,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                 )
             );
         $this->extendOptionsManager = new ExtendOptionsManager($this->entityClassResolver);
-        $this->nameGenerator        = new DbIdentifierNameGenerator();
+        $this->nameGenerator        = new ExtendDbIdentifierNameGenerator();
     }
 
     public function testEmptySchema()

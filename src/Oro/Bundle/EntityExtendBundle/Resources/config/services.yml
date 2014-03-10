@@ -31,7 +31,7 @@ services:
         class: %oro_entity_extend.tools.dumper.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - @oro_migration.db_id_name_generator
+            - @oro_entity_extend.db_id_name_generator
             - %kernel.cache_dir%
 
     oro_entity_extend.listener.config_subscriber:
@@ -44,9 +44,12 @@ services:
     oro_entity_extend.listener.entity_subscriber:
         class: %oro_entity_extend.listener.entity_subscriber.class%
         arguments:
-            - @oro_migration.db_id_name_generator
+            - @oro_entity_extend.db_id_name_generator
         tags:
             - { name: doctrine.event_subscriber, connection: default }
+
+    oro_entity_extend.db_id_name_generator:
+        alias: oro_migration.db_id_name_generator
 
     oro_entity_extend.migration.config_processor:
         class: %oro_entity_extend.migration.config_processor.class%
@@ -70,7 +73,6 @@ services:
         class: %oro_entity_extend.migration.extension.extend.class%
         arguments:
             - @oro_entity_extend.migration.options_manager
-            - @oro_migration.db_id_name_generator
         tags:
             - { name: oro_migration.extension, extension_name: extend }
 
