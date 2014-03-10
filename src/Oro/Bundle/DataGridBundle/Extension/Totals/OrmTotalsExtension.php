@@ -97,7 +97,7 @@ class OrmTotalsExtension extends AbstractExtension
     {
         $onlyOnePage  = $result['options']['totalRecords'] == count($result['data']);
         $totals       = $config->offsetGetByPath(Configuration::TOTALS_PATH);
-        $frontendData = [];
+        $totalData = [];
         if (null != $totals && !empty($result['data'])) {
             foreach ($totals as $rowName => $rowConfig) {
                 if ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]) {
@@ -105,7 +105,7 @@ class OrmTotalsExtension extends AbstractExtension
                     continue;
                 }
 
-                $frontendData[$rowName] = $this->getFrontendData(
+                $totalData[$rowName] = $this->getTotalData(
                     $rowConfig,
                     $this->getData(
                         $result,
@@ -115,7 +115,7 @@ class OrmTotalsExtension extends AbstractExtension
                 );
             }
         }
-        $result->offsetAddToArray('options', ['totals' => $frontendData]);
+        $result->offsetAddToArray('options', ['totals' => $totalData]);
 
         return $result;
     }
@@ -170,7 +170,7 @@ class OrmTotalsExtension extends AbstractExtension
      * @param array $data Db result data for current total row config
      * @return array Array with array of columns total values and labels
      */
-    protected function getFrontendData($rowConfig, $data)
+    protected function getTotalData($rowConfig, $data)
     {
         $totalData = [];
         if (!empty($data)) {
