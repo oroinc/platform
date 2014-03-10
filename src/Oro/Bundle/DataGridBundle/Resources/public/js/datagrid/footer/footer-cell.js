@@ -44,11 +44,13 @@ define(['jquery', 'underscore', 'backbone', 'backgrid'
                 state      = this.collection.state || {},
                 totals     = state.totals || {};
 
-            if (_.has(totals[this.options.rowName].columns, columnName)) {
+            if (_.isUndefined(totals[this.options.rowName])){
+                this.$el.hide();
+                return;
+            }
+            if (!_.isUndefined(totals[this.options.rowName]) && _.has(totals[this.options.rowName].columns, columnName)) {
+                this.$el.show();
                 var columnTotals = totals[this.options.rowName].columns[columnName];
-                /*if (columnTotals.query && !columnTotals.total) {
-                    return this;
-                }*/
                 if (!columnTotals.label && !columnTotals.total) {
                     return this;
                 }

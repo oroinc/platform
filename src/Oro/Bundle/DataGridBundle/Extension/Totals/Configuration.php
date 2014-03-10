@@ -15,7 +15,9 @@ class Configuration implements ConfigurationInterface
     const TOTALS_FORMATTER     = 'formatter';
 
     const TOTALS_PER_PAGE_ROW  = 'per_page';
-    const TOTALS_EXTEND         = 'extend_config';
+    const TOTALS_HIDE_ON_FULL_SET  = 'hide_on_full_dataset';
+    const TOTALS_EXTEND         = 'extend';
+
 
     /**
      * {@inheritDoc}
@@ -28,21 +30,19 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->children()
                     ->scalarNode(self::TOTALS_PER_PAGE_ROW)
-                        ->cannotBeEmpty()
+                        ->defaultFalse()
+                    ->end()
+                    ->scalarNode(self::TOTALS_HIDE_ON_FULL_SET)
                         ->defaultFalse()
                     ->end()
                     ->scalarNode(self::TOTALS_EXTEND)
-                        ->cannotBeEmpty()
-                        ->defaultNull()
                     ->end()
                     ->arrayNode('columns')
                         ->prototype('array')
                             ->children()
                                 ->scalarNode(self::TOTALS_LABEL_KEY)
-                                    ->defaultFalse()
                                     ->end()
                                 ->scalarNode(self::TOTALS_QUERY_KEY)
-                                    ->defaultFalse()
                                     ->end()
                                 ->scalarNode(self::TOTALS_FORMATTER)
                                     ->defaultFalse()

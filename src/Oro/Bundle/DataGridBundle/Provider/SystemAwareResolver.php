@@ -25,19 +25,20 @@ class SystemAwareResolver implements ContainerAwareInterface
     /**
      * @param string $datagridName
      * @param array $datagridDefinition
+     * @param bool $recursion
      * @return array
      */
-    public function resolve($datagridName, $datagridDefinition)
+    public function resolve($datagridName, $datagridDefinition, $recursion = false)
     {
         foreach ($datagridDefinition as $key => $val) {
             if (is_array($val)) {
                 $this->parentNode = $val;
-                $datagridDefinition[$key] = $this->resolve($datagridName, $val);
+                $datagridDefinition[$key] = $this->resolve($datagridName, $val, true);
                 continue;
             }
 
             $val = $this->resolveSystemCall($datagridName, $key, $val);
-            if ('extend' === $key) {
+            if (!$recursion && 'extend' === $key) {
                 // get parent grid definition, resolved
                 $definition = $this->container
                     ->get('oro_datagrid.datagrid.manager')

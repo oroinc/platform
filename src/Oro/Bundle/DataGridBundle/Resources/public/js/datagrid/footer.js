@@ -29,6 +29,7 @@ define(['backbone', 'backgrid', './footer/footer-row', './footer/footer-cell'
          * @inheritDoc
          */
         initialize: function (options) {
+            this.rows = [];
             if (!options.collection) {
                 throw new TypeError("'collection' is required");
             }
