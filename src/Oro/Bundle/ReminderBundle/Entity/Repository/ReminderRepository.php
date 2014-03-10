@@ -24,4 +24,22 @@ class ReminderRepository extends EntityRepository
             ->getQuery()
             ->execute();
     }
+
+    /**
+     * Find reminders by entity class and entity id
+     *
+     * @param string $entityClassName
+     * @param integer $entityId
+     * @return Reminder[]
+     */
+    public function findRemindersByEntity($entityClassName, $entityId)
+    {
+        return $this->createQueryBuilder('reminder')
+            ->where('reminder.relatedEntityClassName = :entityClassName')
+            ->andWhere('reminder.relatedEntityId = :entityId')
+            ->setParameter('entityClassName', $entityClassName)
+            ->setParameter('entityId', $entityId)
+            ->getQuery()
+            ->execute();
+    }
 }
