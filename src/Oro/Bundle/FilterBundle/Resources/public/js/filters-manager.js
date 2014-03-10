@@ -299,7 +299,8 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/app',
 
             this.selectWidget.setViewDesign(this);
             this.$('.filter-list span:first').replaceWith(
-                '<a id="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +'</a>'
+                '<a id="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
+                    '<span class="caret"></span></a>'
             );
         },
 

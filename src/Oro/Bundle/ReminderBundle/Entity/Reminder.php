@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\ReminderBundle\Model\ReminderState;
 
 /**
@@ -86,9 +87,14 @@ class Reminder
     protected $reminderInterval;
 
     /**
-     * @var ReminderState $state
+     * @var ReminderState
+     */
+    protected $state;
+
+    /**
+     * @var string $rawState
      *
-     * @ORM\Column(name="state", type="object", nullable=false)
+     * @ORM\Column(name="state", type="text", nullable=false)
      * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
@@ -96,7 +102,7 @@ class Reminder
      *  }
      * )
      */
-    protected $state;
+    protected $rawState;
 
     /**
      * @var integer $relatedEntityId
@@ -125,6 +131,18 @@ class Reminder
     protected $relatedEntityClassName;
 
     /**
+     * @var RecipientList
+     *
+     * @ORM\OneToOne(
+     *     targetEntity="Oro\Bundle\NotificationBundle\Entity\RecipientList",
+     *     cascade={"all"},
+     *     orphanRemoval=true
+     * )
+     * @ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id")
+     */
+    protected $recipientList;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
@@ -141,7 +159,7 @@ class Reminder
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="sent_at", type="datetime", nullable=false)
+     * @ORM\Column(name="sent_at", type="datetime", nullable=true)
      */
     protected $sentAt;
 
@@ -162,7 +180,7 @@ class Reminder
 
     public function __construct()
     {
-        $this->state = new ReminderState();
+        $this->setState(new ReminderState());
     }
 
     /**
@@ -170,6 +188,7 @@ class Reminder
      */
     public function prePersist()
     {
+        $this->rawState = $this->getState()->serialize();
         $this->createdAt = new \DateTime();
     }
 
@@ -178,6 +197,7 @@ class Reminder
      */
     public function preUpdate()
     {
+        $this->rawState = $this->state->serialize();
         $this->updatedAt = new \DateTime();
     }
 
@@ -269,6 +289,7 @@ class Reminder
     public function setState(ReminderState $state)
     {
         $this->state = $state;
+        $this->rawState = $this->state->serialize();
 
         return $this;
     }
@@ -280,6 +301,10 @@ class Reminder
      */
     public function getState()
     {
+        if (!$this->state) {
+            $this->state = new ReminderState();
+            $this->state->unserialize($this->rawState);
+        }
         return $this->state;
     }
 
@@ -327,6 +352,29 @@ class Reminder
     public function getRelatedEntityClassName()
     {
         return $this->relatedEntityClassName;
+    }
+
+    /**
+     * Set recipient list
+     *
+     * @param RecipientList $recipientList
+     * @return Reminder
+     */
+    public function setRecipientList(RecipientList $recipientList)
+    {
+        $this->recipientList = $recipientList;
+
+        return $this;
+    }
+
+    /**
+     * Get recipient list
+     *
+     * @return RecipientList
+     */
+    public function getRecipientList()
+    {
+        return $this->recipientList;
     }
 
     /**
