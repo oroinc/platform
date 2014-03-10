@@ -81,7 +81,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
         foreach ($reminders as $reminder) {
             $sender->send($reminder);
 
-            if ($reminder->isSent()) {
+            if (Reminder::STATE_SENT == $reminder->getState()) {
                 $result += 1;
             }
         }

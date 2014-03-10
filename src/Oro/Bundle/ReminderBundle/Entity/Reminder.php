@@ -8,7 +8,7 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
-use Oro\Bundle\ReminderBundle\Model\ReminderState;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Reminder
@@ -26,8 +26,8 @@ use Oro\Bundle\ReminderBundle\Model\ReminderState;
  *      },
  *      "ownership"={
  *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="owner_id"
+ *          "owner_field_name"="recipient",
+ *          "owner_column_name"="recipient_id"
  *      },
  *      "security"={
  *          "type"="ACL"
@@ -38,6 +38,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderState;
  */
 class Reminder
 {
+    const STATE_SENT = 'sent';
+    const STATE_NOT_SENT = 'not_sent';
+
     /**
      * @var integer
      *
@@ -63,7 +66,7 @@ class Reminder
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="due_date", type="datetime", nullable=false)
+     * @ORM\Column(name="start_at", type="datetime", nullable=false)
      * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
@@ -71,12 +74,12 @@ class Reminder
      *  }
      * )
      */
-    protected $dueDate;
+    protected $startAt;
 
     /**
-     * @var integer $reminderInterval
+     * @var \DateTime
      *
-     * @ORM\Column(name="reminder_interval", type="integer", nullable=false)
+     * @ORM\Column(name="expire_at", type="datetime", nullable=false)
      * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
@@ -84,15 +87,49 @@ class Reminder
      *  }
      * )
      */
-    protected $reminderInterval;
+    protected $expireAt;
 
     /**
-     * @var ReminderState
+     * @var string $method
+     *
+     * @ORM\Column(name="method", type="string", length=255, nullable=false)
+     * @Oro\Versioned
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true}
+     *  }
+     * )
      */
-    protected $state;
+    protected $method;
 
     /**
-     * @var string $rawState
+     * @var integer $intervalNumber
+     *
+     * @ORM\Column(name="interval_number", type="integer", nullable=false)
+     * @Oro\Versioned
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true}
+     *  }
+     * )
+     */
+    protected $intervalNumber;
+
+    /**
+     * @var integer $intervalNumber
+     *
+     * @ORM\Column(name="interval_number", type="string", length=1, nullable=false)
+     * @Oro\Versioned
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true}
+     *  }
+     * )
+     */
+    protected $intervalUnit;
+
+    /**
+     * @var string $state
      *
      * @ORM\Column(name="state", type="text", nullable=false)
      * @Oro\Versioned
@@ -102,7 +139,7 @@ class Reminder
      *  }
      * )
      */
-    protected $rawState;
+    protected $state;
 
     /**
      * @var integer $relatedEntityId
@@ -131,16 +168,11 @@ class Reminder
     protected $relatedEntityClassName;
 
     /**
-     * @var RecipientList
-     *
-     * @ORM\OneToOne(
-     *     targetEntity="Oro\Bundle\NotificationBundle\Entity\RecipientList",
-     *     cascade={"all"},
-     *     orphanRemoval=true
-     * )
-     * @ORM\JoinColumn(name="recipient_list_id", referencedColumnName="id")
+     * @var User
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $recipientList;
+    protected $recipient;
 
     /**
      * @var \DateTime
@@ -170,35 +202,9 @@ class Reminder
      */
     protected $isSent = false;
 
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->subject;
-    }
-
     public function __construct()
     {
-        $this->setState(new ReminderState());
-    }
-
-    /**
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->rawState = $this->getState()->serialize();
-        $this->createdAt = new \DateTime();
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->rawState = $this->state->serialize();
-        $this->updatedAt = new \DateTime();
+        $this->setState(self::STATE_NOT_SENT);
     }
 
     /**
@@ -235,61 +241,129 @@ class Reminder
     }
 
     /**
-     * Set dueDate
+     * Set start DateTime
      *
-     * @param \DateTime $dueDate
+     * @param \DateTime $startAt
      * @return Reminder
      */
-    public function setDueDate(\DateTime $dueDate)
+    public function setStartAt(\DateTime $startAt)
     {
-        $this->dueDate = $dueDate;
+        $this->startAt = $startAt;
 
         return $this;
     }
 
     /**
-     * Get dueDate
+     * Get start DateTime
      *
      * @return \DateTime
      */
-    public function getDueDate()
+    public function getStartAt()
     {
-        return $this->dueDate;
+        return $this->startAt;
     }
 
     /**
-     * Set reminderInterval
+     * Set expiration DateTime
      *
-     * @param integer $reminderInterval
+     * @param \DateTime $expireAt
      * @return Reminder
      */
-    public function setReminderInterval($reminderInterval)
+    public function setExpireAt(\DateTime $expireAt)
     {
-        $this->reminderInterval = $reminderInterval;
+        $this->expireAt = $expireAt;
 
         return $this;
     }
 
     /**
-     * Get reminderInterval
+     * Get expiration DateTime
+     *
+     * @return \DateTime
+     */
+    public function getExpireAt()
+    {
+        return $this->expireAt;
+    }
+
+    /**
+     * Set method
+     *
+     * @param string $method
+     * @return Reminder
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+
+        return $this;
+    }
+
+    /**
+     * Get method
+     *
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * Set interval number
+     *
+     * @param integer $number
+     * @return Reminder
+     */
+    public function setIntervalNumber($number)
+    {
+        $this->intervalNumber = $number;
+
+        return $this;
+    }
+
+    /**
+     * Get interval number
      *
      * @return integer
      */
-    public function getReminderInterval()
+    public function getIntervalNumber()
     {
-        return $this->reminderInterval;
+        return $this->intervalNumber;
+    }
+
+    /**
+     * Set interval number
+     *
+     * @param string $string
+     * @return Reminder
+     */
+    public function setIntervalUnit($string)
+    {
+        $this->intervalUnit = $string;
+
+        return $this;
+    }
+
+    /**
+     * Get interval unit
+     *
+     * @return integer
+     */
+    public function getIntervalUnit()
+    {
+        return $this->intervalUnit;
     }
 
     /**
      * Set state
      *
-     * @param ReminderState $state
+     * @param string $state
      * @return Reminder
      */
-    public function setState(ReminderState $state)
+    public function setState($state)
     {
         $this->state = $state;
-        $this->rawState = $this->state->serialize();
 
         return $this;
     }
@@ -297,14 +371,10 @@ class Reminder
     /**
      * Get state
      *
-     * @return ReminderState
+     * @return string
      */
     public function getState()
     {
-        if (!$this->state) {
-            $this->state = new ReminderState();
-            $this->state->unserialize($this->rawState);
-        }
         return $this->state;
     }
 
@@ -355,26 +425,26 @@ class Reminder
     }
 
     /**
-     * Set recipient list
+     * Set recipient
      *
-     * @param RecipientList $recipientList
+     * @param User $recipient
      * @return Reminder
      */
-    public function setRecipientList(RecipientList $recipientList)
+    public function setRecipient(User $recipient)
     {
-        $this->recipientList = $recipientList;
+        $this->recipient = $recipient;
 
         return $this;
     }
 
     /**
-     * Get recipient list
+     * Get recipient
      *
-     * @return RecipientList
+     * @return User
      */
-    public function getRecipientList()
+    public function getRecipient()
     {
-        return $this->recipientList;
+        return $this->recipient;
     }
 
     /**
@@ -447,25 +517,26 @@ class Reminder
     }
 
     /**
-     * Set isSent
-     *
-     * @param boolean $isSent
-     * @return Reminder
+     * @ORM\PrePersist
      */
-    public function setSent($isSent)
+    public function prePersist()
     {
-        $this->isSent = $isSent;
-
-        return $this;
+        $this->createdAt = new \DateTime();
     }
 
     /**
-     * Get isSent
-     *
-     * @return boolean
+     * @ORM\PreUpdate
      */
-    public function isSent()
+    public function preUpdate()
     {
-        return $this->isSent;
+        $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->subject;
     }
 }
