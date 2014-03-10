@@ -8,13 +8,14 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
+use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Reminder
  *
  * @ORM\Table(name="oro_reminder", indexes={
- *     @ORM\Index(name="reminder_is_sent_idx", columns={"is_sent"})
+ *     @ORM\Index(name="reminder_state_idx", columns={"state"})
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository")
  * @Oro\Loggable
@@ -53,7 +54,7 @@ class Reminder
     /**
      * @var string
      *
-     * @ORM\Column(name="subject", type="string", length=255, nullable=false)
+     * @ORM\Column(name="subject", type="string", length=32, nullable=false)
      * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
@@ -103,6 +104,11 @@ class Reminder
     protected $method;
 
     /**
+     * @var ReminderInterval $interval
+     */
+    protected $interval;
+
+    /**
      * @var integer $intervalNumber
      *
      * @ORM\Column(name="interval_number", type="integer", nullable=false)
@@ -118,7 +124,7 @@ class Reminder
     /**
      * @var integer $intervalNumber
      *
-     * @ORM\Column(name="interval_number", type="string", length=1, nullable=false)
+     * @ORM\Column(name="interval_unit", type="string", length=1, nullable=false)
      * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
@@ -131,7 +137,7 @@ class Reminder
     /**
      * @var string $state
      *
-     * @ORM\Column(name="state", type="text", nullable=false)
+     * @ORM\Column(name="state", type="string", length=32, nullable=false)
      * @Oro\Versioned
      * @ConfigField(
      *  defaultValues={
@@ -241,19 +247,6 @@ class Reminder
     }
 
     /**
-     * Set start DateTime
-     *
-     * @param \DateTime $startAt
-     * @return Reminder
-     */
-    public function setStartAt(\DateTime $startAt)
-    {
-        $this->startAt = $startAt;
-
-        return $this;
-    }
-
-    /**
      * Get start DateTime
      *
      * @return \DateTime
@@ -272,6 +265,8 @@ class Reminder
     public function setExpireAt(\DateTime $expireAt)
     {
         $this->expireAt = $expireAt;
+
+        $this->updateStartAt();
 
         return $this;
     }
@@ -310,49 +305,45 @@ class Reminder
     }
 
     /**
-     * Set interval number
+     * Set remind interval
      *
-     * @param integer $number
+     * @param ReminderInterval $interval
      * @return Reminder
      */
-    public function setIntervalNumber($number)
+    public function setInterval(ReminderInterval $interval)
     {
-        $this->intervalNumber = $number;
+        $this->interval = $interval;
+
+        $this->intervalNumber = $interval->getNumber();
+        $this->intervalUnit = $interval->getUnit();
+
+        $this->updateStartAt();
 
         return $this;
     }
 
     /**
-     * Get interval number
-     *
-     * @return integer
+     * Update start date
      */
-    public function getIntervalNumber()
+    protected function updateStartAt()
     {
-        return $this->intervalNumber;
+        if ($this->expireAt) {
+            $this->startAt = clone $this->expireAt;
+            $this->startAt->sub($this->getInterval()->createDateInterval());
+        }
     }
 
     /**
-     * Set interval number
+     * Get remind interval
      *
-     * @param string $string
-     * @return Reminder
+     * @return ReminderInterval
      */
-    public function setIntervalUnit($string)
+    public function getInterval()
     {
-        $this->intervalUnit = $string;
-
-        return $this;
-    }
-
-    /**
-     * Get interval unit
-     *
-     * @return integer
-     */
-    public function getIntervalUnit()
-    {
-        return $this->intervalUnit;
+        if (!$this->interval) {
+            $this->interval = new ReminderInterval($this->intervalNumber, $this->intervalUnit);
+        }
+        return $this->interval;
     }
 
     /**

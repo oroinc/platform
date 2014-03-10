@@ -7,30 +7,50 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
 class ReminderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var Reminder
+     */
+    protected $entity;
+
+    protected function setUp()
+    {
+        $this->entity = new Reminder();
+    }
+
     public function testCreate()
     {
-        $entity = new Reminder();
+        $this->assertEmpty($this->entity->getId());
+        $this->assertEquals(Reminder::STATE_NOT_SENT, $this->entity->getState());
+    }
 
-        $this->assertEmpty($entity->getId());
-        $this->assertEquals(Reminder::STATE_NOT_SENT, $entity->getState());
+    public function testIntervalAndStartAt()
+    {
+        $expireAt = new \DateTime('2014-01-15');
+        $number = 3;
+        $unit = ReminderInterval::UNIT_DAY;
+        $interval = new ReminderInterval($number, $unit);
+
+        $this->assertNull($this->entity->getStartAt());
+        $this->entity->setExpireAt($expireAt);
+        $this->entity->setInterval($interval);
+        $this->assertAttributeEquals($number, 'intervalNumber', $this->entity);
+        $this->assertAttributeEquals($unit, 'intervalUnit', $this->entity);
+        $this->assertEquals(new \DateTime('2014-01-12'), $this->entity->getStartAt());
     }
 
     public function testPrePersist()
     {
-        $entity = new Reminder();
-        $entity->prePersist();
+        $this->entity->prePersist();
 
-        $this->assertEquals($entity->getCreatedAt()->format('Y-m-d'), date('Y-m-d'));
+        $this->assertEquals($this->entity->getCreatedAt()->format('Y-m-d'), date('Y-m-d'));
     }
 
     public function testPreUpdate()
     {
-        $entity = new Reminder();
-        $entity->preUpdate();
+        $this->entity->preUpdate();
 
-        $this->assertEquals($entity->getUpdatedAt()->format('Y-m-d'), date('Y-m-d'));
+        $this->assertEquals($this->entity->getUpdatedAt()->format('Y-m-d'), date('Y-m-d'));
     }
-
 
     public function testToString()
     {
@@ -45,13 +65,11 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
      */
     public function testSettersAndGetters($value, $property, $getter = null, $setter = null)
     {
-        $entity = new Reminder();
-
         $getter = $getter ?: 'get' . ucfirst($property);
         $setter = $setter ?: 'set' . ucfirst($property);
 
-        $this->assertEquals($entity, $entity->$setter($value));
-        $this->assertEquals($value, $entity->$getter());
+        $this->assertEquals($this->entity, $this->entity->$setter($value));
+        $this->assertEquals($value, $this->entity->$getter());
     }
 
     public function settersAndGettersDataProvider()
@@ -61,10 +79,6 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'value' => 'value',
                 'property' => 'subject',
             ],
-            'startAt' => [
-                'value' => new \DateTime(),
-                'property' => 'startAt',
-            ],
             'expireAt' => [
                 'value' => new \DateTime(),
                 'property' => 'expireAt',
@@ -73,13 +87,9 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'value' => 'email',
                 'property' => 'method',
             ],
-            'intervalNumber' => [
-                'value' => 5,
-                'property' => 'intervalNumber',
-            ],
-            'intervalUnit' => [
-                'value' => ReminderInterval::UNIT_HOUR,
-                'property' => 'intervalUnit',
+            'interval' => [
+                'value' => new ReminderInterval(1, ReminderInterval::UNIT_DAY),
+                'property' => 'interval',
             ],
             'state' => [
                 'value' => Reminder::STATE_NOT_SENT,
