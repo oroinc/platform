@@ -106,18 +106,11 @@ class OrmTotalsExtension extends AbstractExtension
                     continue;
                 }
 
-                $totalQueries = [];
-                foreach ($rowConfig['columns'] as $field => $totalData) {
-                    if (isset($totalData['query']) && $totalData['query']) {
-                        $totalQueries[] = $totalData['query'] . ' AS ' . $field;
-                    }
-                };
-
                 $this->appendData(
                     $rowConfig,
                     $this->getData(
                         $result,
-                        $totalQueries,
+                        $rowConfig['columns'],
                         $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY]
                     )
                 );
@@ -217,8 +210,8 @@ class OrmTotalsExtension extends AbstractExtension
                 unset($totals[$rowName][Configuration::TOTALS_PER_PAGE_ROW_KEY]);
             }
             foreach ($rowData['columns'] as $field => $totalData) {
-                if (isset($totalData[Configuration::TOTALS_QUERY_KEY])) {
-                    unset($totals[$rowName]['columns'][$field][Configuration::TOTALS_QUERY_KEY]);
+                if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])) {
+                    unset($totals[$rowName]['columns'][$field][Configuration::TOTALS_SQL_EXPRESSION_KEY]);
                 }
             }
         }
@@ -287,12 +280,21 @@ class OrmTotalsExtension extends AbstractExtension
      * Get total row data from database
      *
      * @param ResultsObject $pageData Grid page data
-     * @param array $totalQueries Select part for query
+     * @param array $columnsConfig Total row columns config
      * @param bool $perPage Get data only for page data or for all data
      * @return array
      */
-    protected function getData(ResultsObject $pageData, $totalQueries, $perPage = false)
+    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
     {
+        $totalQueries = [];
+        foreach ($columnsConfig as $field => $totalData) {
+            if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])
+                && $totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY]
+            ) {
+                $totalQueries[] = $totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY] . ' AS ' . $field;
+            }
+        };
+
         $query = clone $this->masterQB;
         $query
             ->select($totalQueries)

@@ -11,10 +11,10 @@ class Configuration implements ConfigurationInterface
     const COLUMNS_PATH         = '[totals][columns]';
 
     const TOTALS_LABEL_KEY     = 'label';
-    const TOTALS_QUERY_KEY     = 'query';
-    const TOTALS_FORMATTER_KEY     = 'formatter';
+    const TOTALS_SQL_EXPRESSION_KEY = 'sql_expression';
+    const TOTALS_FORMATTER_KEY      = 'formatter';
 
-    const TOTALS_PER_PAGE_ROW_KEY  = 'per_page';
+    const TOTALS_PER_PAGE_ROW_KEY   = 'per_page';
     const TOTALS_HIDE_IF_ONE_PAGE_KEY = 'hide_if_one_page';
     const TOTALS_EXTEND_KEY         = 'extend';
 
@@ -48,7 +48,7 @@ class Configuration implements ConfigurationInterface
                             ->children()
                                 ->scalarNode(self::TOTALS_LABEL_KEY)
                                     ->end()
-                                ->scalarNode(self::TOTALS_QUERY_KEY)
+                                ->scalarNode(self::TOTALS_SQL_EXPRESSION_KEY)
                                     ->end()
                                 ->scalarNode(self::TOTALS_FORMATTER_KEY)
                                     ->defaultFalse()
