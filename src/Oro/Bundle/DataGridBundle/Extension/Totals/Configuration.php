@@ -11,7 +11,7 @@ class Configuration implements ConfigurationInterface
     const COLUMNS_PATH         = '[totals][columns]';
 
     const TOTALS_LABEL_KEY     = 'label';
-    const TOTALS_SQL_EXPRESSION_KEY = 'sql_expression';
+    const TOTALS_SQL_EXPRESSION_KEY = 'expr';
     const TOTALS_FORMATTER_KEY      = 'formatter';
 
     const TOTALS_PER_PAGE_ROW_KEY   = 'per_page';

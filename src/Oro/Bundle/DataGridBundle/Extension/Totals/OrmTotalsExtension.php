@@ -95,18 +95,17 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $moreThanOnePage = $result['options']['totalRecords'] !== count($result['data']);
-        $totals          = $config->offsetGetByPath(Configuration::TOTALS_PATH);
+        $onlyOnePage  = $result['options']['totalRecords'] == count($result['data']);
+        $totals       = $config->offsetGetByPath(Configuration::TOTALS_PATH);
+        $frontendData = [];
         if (null != $totals && !empty($result['data'])) {
-            foreach ($totals as $rowName => &$rowConfig) {
-                if ($rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]
-                    && !$moreThanOnePage
-                ) {
+            foreach ($totals as $rowName => $rowConfig) {
+                if ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]) {
                     unset($totals[$rowName]);
                     continue;
                 }
 
-                $this->appendData(
+                $frontendData[$rowName] = $this->getFrontendData(
                     $rowConfig,
                     $this->getData(
                         $result,
@@ -115,12 +114,8 @@ class OrmTotalsExtension extends AbstractExtension
                     )
                 );
             }
-        } else {
-            $totals = [];
         }
-
-        $totals = $this->clearTotalsData($totals);
-        $result->offsetAddToArray('options', ['totals' => $totals]);
+        $result->offsetAddToArray('options', ['totals' => $frontendData]);
 
         return $result;
     }
@@ -169,15 +164,19 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * Append result data and labels to totals columns
+     * Get total row frontend data
      *
      * @param array $rowConfig Total row config
      * @param array $data Db result data for current total row config
+     * @return array Array with array of columns total values and labels
      */
-    protected function appendData(&$rowConfig, $data)
+    protected function getFrontendData($rowConfig, $data)
     {
+        $totalData = [];
         if (!empty($data)) {
-            foreach ($rowConfig['columns'] as $field => &$total) {
+            $totalData['columns'] = [];
+            foreach ($rowConfig['columns'] as $field => $total) {
+                $totalData['columns'][$field] = [];
                 if (isset($data[$field])) {
                     $totalValue = $data[$field];
                     if (isset($total[Configuration::TOTALS_FORMATTER_KEY])) {
@@ -186,37 +185,17 @@ class OrmTotalsExtension extends AbstractExtension
                             $total[Configuration::TOTALS_FORMATTER_KEY]
                         );
                     }
-                    $total['total'] = $totalValue;
+                    $totalData['columns'][$field]['total'] = $totalValue;
                 }
                 if (isset($total[Configuration::TOTALS_LABEL_KEY])) {
-                    $total[Configuration::TOTALS_LABEL_KEY] = $this->
+                    $totalData['columns'][$field][Configuration::TOTALS_LABEL_KEY] = $this->
                         translator
                         ->trans($total[Configuration::TOTALS_LABEL_KEY]);
                 }
             };
         }
-    }
 
-    /**
-     * Delete garbage configs from result totals data set
-     *
-     * @param array $totals
-     * @return array
-     */
-    protected function clearTotalsData($totals)
-    {
-        foreach ($totals as $rowName => $rowData) {
-            if (isset($rowData[Configuration::TOTALS_PER_PAGE_ROW_KEY])) {
-                unset($totals[$rowName][Configuration::TOTALS_PER_PAGE_ROW_KEY]);
-            }
-            foreach ($rowData['columns'] as $field => $totalData) {
-                if (isset($totalData[Configuration::TOTALS_SQL_EXPRESSION_KEY])) {
-                    unset($totals[$rowName]['columns'][$field][Configuration::TOTALS_SQL_EXPRESSION_KEY]);
-                }
-            }
-        }
-
-        return $totals;
+        return $totalData;
     }
 
     /**
@@ -377,18 +356,18 @@ class OrmTotalsExtension extends AbstractExtension
      * @param array $totalRows
      * @param string $rowName
      * @param array $rowConfig
-     * @param string $gridNme
+     * @param string $gridName
      * @return array
      * @throws \Exception
      */
-    protected function mergeTotals(&$totalRows, $rowName, $rowConfig, $gridNme)
+    protected function mergeTotals(&$totalRows, $rowName, $rowConfig, $gridName)
     {
         if (isset($rowConfig[Configuration::TOTALS_EXTEND_KEY]) && $rowConfig[Configuration::TOTALS_EXTEND_KEY]) {
             if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]])) {
                 throw new \Exception(sprintf(
-                    'Total row %s definition in %s datagrid config does not exists',
+                    'Total row "%s" definition in "%s" datagrid config does not exist',
                     $rowConfig[Configuration::TOTALS_EXTEND_KEY],
-                    $gridNme
+                    $gridName
                 ));
             }
 
@@ -396,7 +375,7 @@ class OrmTotalsExtension extends AbstractExtension
                 $totalRows,
                 $rowConfig[Configuration::TOTALS_EXTEND_KEY],
                 $totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]],
-                $gridNme
+                $gridName
             );
 
             $rowConfig = array_replace_recursive(
