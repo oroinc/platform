@@ -1,10 +1,25 @@
 /* global define */
-define(['underscore', 'backbone',
+define(['underscore', 'jquery', 'backbone', 'oroworkflow/js/workflow-management/helper',
     'oroworkflow/js/workflow-management/step/collection',
     'oroworkflow/js/workflow-management/transition/collection',
+    'oroworkflow/js/workflow-management/transition-definition/collection',
     'oroworkflow/js/workflow-management/attribute/collection',
-    'oroworkflow/js/workflow-management/attribute/model'],
-function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection, AttributeModel) {
+    'oroworkflow/js/workflow-management/step/model',
+    'oroworkflow/js/workflow-management/transition/model',
+    'oroworkflow/js/workflow-management/transition-definition/model',
+    'oroworkflow/js/workflow-management/attribute/model'
+
+],
+function(_, $, Backbone, Helper,
+     StepCollection,
+     TransitionCollection,
+     TransitionDefinitionCollection,
+     AttributeCollection,
+     StepModel,
+     TransitionModel,
+     TransitionDefinitionModel,
+     AttributeModel
+) {
     'use strict';
 
     /**
@@ -36,9 +51,70 @@ function(_, Backbone, StepCollection, TransitionCollection, AttributeCollection,
             if (this.get('transitions') === null) {
                 this.set('transitions', new TransitionCollection());
             }
+            if (this.get('transition_definitions') === null) {
+                this.set('transition_definitions', new TransitionDefinitionCollection());
+            }
             if (this.get('attributes') === null) {
                 this.set('attributes', new AttributeCollection());
             }
+        },
+
+        cloneTransitionDefinition: function(definition) {
+            if (_.isString(definition)) {
+                definition = this.getTransitionDefinitionByName(definition);
+            }
+            var cloned = this._getClonedItem(definition);
+
+            var clonedModel = new TransitionDefinitionModel(cloned);
+            this.get('transition_definitions').add(clonedModel);
+
+            return clonedModel;
+        },
+
+        cloneTransition: function(transition) {
+            if (_.isString(transition)) {
+                transition = this.getTransitionByName(transition);
+            }
+
+            var transitionDefinition = this.cloneTransitionDefinition(transition.get('transition_definition'));
+
+            var cloned = this._getClonedItem(transition);
+            cloned.transition_definition = transitionDefinition.get('name');
+            cloned.frontend_options = Helper.deepClone(cloned.frontend_options);
+            cloned.form_options = Helper.deepClone(cloned.form_options);
+            cloned.label = 'Copy of ' + cloned.label;
+
+            var clonedModel = new TransitionModel(cloned);
+            this.get('transitions').add(clonedModel);
+
+            return clonedModel;
+        },
+
+        cloneStep: function(step) {
+            if (_.isString(step)) {
+                step = this.getStepByName(step);
+            }
+
+            var cloned = this._getClonedItem(step);
+            var clonedAllowedTransitions = [];
+            _.each(step.getAllowedTransitions(this).models, function(transition) {
+                var clonedTransition = this.cloneTransition(transition);
+                clonedAllowedTransitions.push(clonedTransition.get('name'));
+            }, this);
+            cloned.allowed_transitions = clonedAllowedTransitions;
+            cloned.label = 'Copy of ' + cloned.label;
+
+            var clonedModel = new StepModel(cloned);
+            this.get('steps').add(clonedModel);
+
+            return clonedModel;
+        },
+
+        _getClonedItem: function(item) {
+            var cloned = _.clone(item.toJSON());
+            cloned.name += '_clone_' + Helper.getRandomId();
+
+            return cloned;
         },
 
         setPropertyPathToFieldIdMapping: function(mapping) {

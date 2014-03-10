@@ -35,6 +35,15 @@ define(function() {
                 result[name] = field.value;
             }
             return result;
+        },
+
+        deepClone: function(obj) {
+            var result = _.clone(obj);
+            for (var k in obj) if (obj.hasOwnProperty(k) && _.isObject(obj[k])) {
+                obj[k] = this.deepClone(obj[k]);
+            }
+
+            return result;
         }
     };
 });

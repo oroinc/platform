@@ -27,3 +27,6 @@ config:
         'oroworkflow/js/workflow-management/transition/view/list-short':      'bundles/oroworkflow/js/workflow-management/transition/view/list-short.js'
         'oroworkflow/js/workflow-management/transition/view/row-short':       'bundles/oroworkflow/js/workflow-management/transition/view/row-short.js'
         'oroworkflow/js/workflow-management/transition/view/edit':            'bundles/oroworkflow/js/workflow-management/transition/view/edit.js'
+
+        'oroworkflow/js/workflow-management/transition-definition/model':     'bundles/oroworkflow/js/workflow-management/transition-definition/model'
+        'oroworkflow/js/workflow-management/transition-definition/collection': 'bundles/oroworkflow/js/workflow-management/transition-definition/collection'

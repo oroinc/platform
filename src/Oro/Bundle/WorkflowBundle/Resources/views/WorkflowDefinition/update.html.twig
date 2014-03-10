@@ -355,41 +355,53 @@
                 'oroworkflow/js/workflow-management/workflow/model',
                 'oroworkflow/js/workflow-management/step/model',
                 'oroworkflow/js/workflow-management/transition/model',
+                'oroworkflow/js/workflow-management/transition-definition/model',
                 'oroworkflow/js/workflow-management/attribute/model',
                 'oroworkflow/js/workflow-management/step/collection',
                 'oroworkflow/js/workflow-management/transition/collection',
+                'oroworkflow/js/workflow-management/transition-definition/collection',
                 'oroworkflow/js/workflow-management/attribute/collection'
             ],
             function(WorkflowManagement, WorkflowModel,
                 StepModel,
                 TransitionModel,
+                TransitionDefinitionModel,
                 AttributeModel,
                 StepCollection,
                 TransitionCollection,
+                TransitionDefinitionCollection,
                 AttributeCollection
             ) {
                 var steps = new StepCollection(),
                     transitions = new TransitionCollection(),
+                    transitionDefinitions = new TransitionDefinitionCollection(),
                     attributes = new AttributeCollection();
 
                 {% if entity.configuration.steps is defined %}
-                    {% for stepName, stepConfig in entity.configuration.steps %}
-                        {% set stepConfig = stepConfig|merge({name: stepName}) %}
-                        steps.add(new StepModel({{ stepConfig|json_encode|raw }}));
+                    {% for name, config in entity.configuration.steps %}
+                        {% set config = config|merge({name: name}) %}
+                        steps.add(new StepModel({{ config|json_encode|raw }}));
+                    {% endfor %}
+                {% endif %}
+
+                {% if entity.configuration.transition_definitions is defined %}
+                    {% for name, config in entity.configuration.transition_definitions %}
+                        {% set config = config|merge({name: name}) %}
+                        transitionDefinitions.add(new TransitionDefinitionModel({{ config|json_encode|raw }}));
                     {% endfor %}
                 {% endif %}
 
                 {% if entity.configuration.transitions is defined %}
-                    {% for transitionName, transitionConfig in entity.configuration.transitions %}
-                        {% set transitionConfig = transitionConfig|merge({name: transitionName}) %}
-                        transitions.add(new TransitionModel({{ transitionConfig|json_encode|raw }}));
+                    {% for name, config in entity.configuration.transitions %}
+                        {% set config = config|merge({name: name}) %}
+                        transitions.add(new TransitionModel({{ config|json_encode|raw }}));
                     {% endfor %}
                 {% endif %}
 
                 {% if entity.configuration.attributes is defined %}
-                    {% for attributeName, attributeConfig in entity.configuration.attributes %}
-                        {% set attributeConfig = attributeConfig|merge({name: attributeName}) %}
-                        attributes.add(new AttributeModel({{ attributeConfig|json_encode|raw }}));
+                    {% for name, config in entity.configuration.attributes %}
+                        {% set config = config|merge({name: name}) %}
+                        attributes.add(new AttributeModel({{ config|json_encode|raw }}));
                     {% endfor %}
                 {% endif %}
 
@@ -400,6 +412,7 @@
                 configuration.start_step = {{ entity.startStep.name|default(null)|json_encode|raw }};
                 configuration.steps_display_ordered = {{ entity.stepsDisplayOrdered|json_encode|raw }};
                 configuration.steps = steps;
+                configuration.transition_definitions = transitionDefinitions;
                 configuration.transitions = transitions;
                 configuration.attributes = attributes;
 

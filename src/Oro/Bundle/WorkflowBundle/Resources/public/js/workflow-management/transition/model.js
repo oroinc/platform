@@ -25,6 +25,10 @@ function(Backbone) {
             if (this.get('form_options') === null) {
                 this.set('form_options', {'attribute_fields': {}});
             }
+        },
+
+        getTransitionDefinition: function(workflowModel) {
+            return workflowModel.getTransitionDefinitionByName(this.get('transition_definition'));
         }
     });
 });

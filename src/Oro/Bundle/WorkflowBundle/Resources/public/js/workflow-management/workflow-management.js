@@ -208,22 +208,7 @@ function(_, Backbone, messanger, __,
         },
 
         cloneStep: function(step) {
-//            var resetName = function(item) {
-//                item.set('name', item.get('name') + '_clone_' + Helper.getRandomId());
-//            };
-//
-//            var transitionsCollection = this.model.get('transitions');
-//            var clonedStep = $.clone(step);
-//            clonedStep.set('label', 'Clone of ' + clonedStep.get('label'));
-//            var allowedTransitions = clonedStep.get('allowed_transitions');
-//            allowedTransitions = [];
-//            resetName(clonedStep);
-//            _.each(clonedStep.getAllowedTransitions(this.model), function (transition) {
-//                resetName(transition);
-//                transitionsCollection.add(transition);
-//                allowedTransitions.push(transition.get('name'));
-//            }, this);
-//            this.model.get('steps').add(clonedStep);
+            this.model.cloneStep(step);
         },
 
         addStep: function(step) {

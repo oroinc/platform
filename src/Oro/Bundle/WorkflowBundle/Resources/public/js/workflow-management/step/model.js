@@ -25,6 +25,11 @@ function(_, Backbone, TransitionCollection) {
             }
         },
 
+        resetAllowedTransitions: function() {
+            this.allowedTransitions = null;
+            this.set('allowed_transitions', []);
+        },
+
         getAllowedTransitions: function(workflowModel) {
             // Initialize allowedTransitions as Backbone.Collection instance.
             // allowed_transitions transition attribute should contain only names
