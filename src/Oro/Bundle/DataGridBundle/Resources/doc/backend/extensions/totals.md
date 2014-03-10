@@ -15,7 +15,7 @@ datagrid:
     source:
       totals:
         page_total:
-            extend: grand_total
+            extends: grand_total
             per_page: true
             hide_if_one_page: true
             columns:
@@ -48,6 +48,6 @@ datagrid:
   -- available values: date, datetime, decimal, integer, percent
   -- if you add "label" and "query" config, but query aggregation returns nothing -> total's cell will be empty 
   -- generally they'll be shown as "`<label>: <query result>`"
-  -- total config can be taken from another total row with **extend** parameter.
+  -- total config can be taken from another total row with **extends** parameter.
   -- **per_page** parameter switch data calculation only for current page data
   -- if **hide_if_one_page** is true, then this total row will be hidden on full data set.

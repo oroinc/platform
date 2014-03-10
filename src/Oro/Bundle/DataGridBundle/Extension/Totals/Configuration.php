@@ -16,7 +16,7 @@ class Configuration implements ConfigurationInterface
 
     const TOTALS_PER_PAGE_ROW_KEY   = 'per_page';
     const TOTALS_HIDE_IF_ONE_PAGE_KEY = 'hide_if_one_page';
-    const TOTALS_EXTEND_KEY         = 'extend';
+    const TOTALS_EXTEND_KEY         = 'extends';
 
 
     /**

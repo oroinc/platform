@@ -38,7 +38,7 @@ class SystemAwareResolver implements ContainerAwareInterface
             }
 
             $val = $this->resolveSystemCall($datagridName, $key, $val);
-            if (!$recursion && 'extend' === $key) {
+            if (!$recursion && 'extends' === $key) {
                 // get parent grid definition, resolved
                 $definition = $this->container
                     ->get('oro_datagrid.datagrid.manager')
@@ -49,7 +49,7 @@ class SystemAwareResolver implements ContainerAwareInterface
                     $definition->toArray(),
                     $datagridDefinition
                 );
-                unset($datagridDefinition['extend']);
+                unset($datagridDefinition['extends']);
 
                 // run resolve again on merged grid definition
                 $datagridDefinition = $this->resolve($val, $datagridDefinition);
