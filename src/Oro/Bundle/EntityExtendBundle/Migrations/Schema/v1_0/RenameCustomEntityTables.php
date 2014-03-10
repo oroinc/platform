@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtensionAwareInterface
 
 class RenameCustomEntityTables implements Migration, RenameExtensionAwareInterface
 {
-    const OLD_TABLE_PREFIX = 'oro_extend_';
+    const OLD_CUSTOM_TABLE_PREFIX = 'oro_extend_';
 
     /**
      * @var RenameExtension
@@ -33,9 +33,9 @@ class RenameCustomEntityTables implements Migration, RenameExtensionAwareInterfa
     {
         $tables = $schema->getTables();
         foreach ($tables as $table) {
-            if (strpos($table->getName(), self::OLD_TABLE_PREFIX) === 0) {
-                $newTableName = ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
-                    . substr($table->getName(), strlen(self::OLD_TABLE_PREFIX));
+            if (strpos($table->getName(), self::OLD_CUSTOM_TABLE_PREFIX) === 0) {
+                $newTableName = ExtendDbIdentifierNameGenerator::
+                    . substr($table->getName(), strlen(self::OLD_CUSTOM_TABLE_PREFIX));
                 $this->renameExtension->renameTable(
                     $schema,
                     $queries,

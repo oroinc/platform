@@ -225,15 +225,15 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 sprintf(
                     'CREATE TABLE %sentity_1 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                    ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                    ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
                 ),
                 sprintf(
                     'CREATE TABLE %sentity2 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                    ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                    ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
                 ),
                 sprintf(
                     'CREATE TABLE %sentity3 (id INT AUTO_INCREMENT NOT NULL, PRIMARY KEY(id))',
-                    ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                    ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
                 ),
             ]
         );
@@ -245,7 +245,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         'extend' => [
                             'table' => sprintf(
                                 '%sentity_1',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
                             ),
                             'owner' => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
@@ -257,7 +257,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         'extend' => [
                             'table' => sprintf(
                                 '%sentity2',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
                             ),
                             'owner' => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
@@ -270,7 +270,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         'extend' => [
                             'table' => sprintf(
                                 '%sentity3',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_ENTITY_TABLE_PREFIX
+                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
                             ),
                             'owner' => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
@@ -768,17 +768,17 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'id SMALLINT NOT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
                 . 'PRIMARY KEY(id))',
-                'CREATE TABLE oro_ext_f061705960f46bf2d67f27 ('
+                'CREATE TABLE oro_rel_f061705960f46bf2d67f27 ('
                 . 'entity1_id INT NOT NULL, '
                 . 'entity2_id SMALLINT NOT NULL, '
-                . 'INDEX IDX_793D9D2BC33725A7 (entity1_id), '
-                . 'INDEX IDX_793D9D2BD1828A49 (entity2_id), '
+                . 'INDEX IDX_8CE090DAC33725A7 (entity1_id), '
+                . 'INDEX IDX_8CE090DAD1828A49 (entity2_id), '
                 . 'PRIMARY KEY(entity1_id, entity2_id))',
                 'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE oro_ext_f061705960f46bf2d67f27 ADD CONSTRAINT FK_793D9D2BC33725A7 '
+                'ALTER TABLE oro_rel_f061705960f46bf2d67f27 ADD CONSTRAINT FK_8CE090DAC33725A7 '
                 . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
-                'ALTER TABLE oro_ext_f061705960f46bf2d67f27 ADD CONSTRAINT FK_793D9D2BD1828A49 '
+                'ALTER TABLE oro_rel_f061705960f46bf2d67f27 ADD CONSTRAINT FK_8CE090DAD1828A49 '
                 . 'FOREIGN KEY (entity2_id) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );
@@ -847,17 +847,17 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 . 'id SMALLINT NOT NULL, '
                 . 'name VARCHAR(255) NOT NULL, '
                 . 'PRIMARY KEY(id))',
-                'CREATE TABLE oro_ext_f061705960f46bf2d67f27 ('
+                'CREATE TABLE oro_rel_f061705960f46bf2d67f27 ('
                 . 'entity1_id INT NOT NULL, '
                 . 'entity2_id SMALLINT NOT NULL, '
-                . 'INDEX IDX_793D9D2BC33725A7 (entity1_id), '
-                . 'INDEX IDX_793D9D2BD1828A49 (entity2_id), '
+                . 'INDEX IDX_8CE090DAC33725A7 (entity1_id), '
+                . 'INDEX IDX_8CE090DAD1828A49 (entity2_id), '
                 . 'PRIMARY KEY(entity1_id, entity2_id))',
                 'ALTER TABLE table1 ADD CONSTRAINT FK_1C95229D63A7B402 '
                 . 'FOREIGN KEY (default_relation_column1_id) REFERENCES table2 (id) ON DELETE SET NULL',
-                'ALTER TABLE oro_ext_f061705960f46bf2d67f27 ADD CONSTRAINT FK_793D9D2BC33725A7 '
+                'ALTER TABLE oro_rel_f061705960f46bf2d67f27 ADD CONSTRAINT FK_8CE090DAC33725A7 '
                 . 'FOREIGN KEY (entity1_id) REFERENCES table1 (id) ON DELETE CASCADE',
-                'ALTER TABLE oro_ext_f061705960f46bf2d67f27 ADD CONSTRAINT FK_793D9D2BD1828A49 '
+                'ALTER TABLE oro_rel_f061705960f46bf2d67f27 ADD CONSTRAINT FK_8CE090DAD1828A49 '
                 . 'FOREIGN KEY (entity2_id) REFERENCES table2 (id) ON DELETE CASCADE'
             ]
         );

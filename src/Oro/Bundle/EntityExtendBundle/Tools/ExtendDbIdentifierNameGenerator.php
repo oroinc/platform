@@ -6,7 +6,8 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 
 class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 {
-    const CUSTOM_ENTITY_TABLE_PREFIX = 'oro_ext_';
+    const CUSTOM_TABLE_PREFIX              = 'oro_ext_';
+    const CUSTOM_MANY_TO_MANY_TABLE_PREFIX = 'oro_rel_';
 
     /**
      * Gets the max size of an custom entity name
@@ -17,7 +18,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      */
     public function getMaxCustomEntityNameSize()
     {
-        return $this->getMaxIdentifierSize() - strlen(self::CUSTOM_ENTITY_TABLE_PREFIX);
+        return $this->getMaxIdentifierSize() - strlen(self::CUSTOM_TABLE_PREFIX);
     }
 
     /**
@@ -45,13 +46,13 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
             throw new \InvalidArgumentException(
                 sprintf(
                     'Entity name length must be less or equal %d characters. Class: %s.',
-                    $this->getMaxIdentifierSize() - strlen(self::CUSTOM_ENTITY_TABLE_PREFIX),
+                    $this->getMaxIdentifierSize() - strlen(self::CUSTOM_TABLE_PREFIX),
                     $entityClassName
                 )
             );
         }
 
-        return self::CUSTOM_ENTITY_TABLE_PREFIX . strtolower($entityName);
+        return self::CUSTOM_TABLE_PREFIX . strtolower($entityName);
     }
 
     /**
@@ -70,7 +71,11 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
         $targetParts           = explode('\\', $targetEntityClassName);
         $targetEntityClassName = array_pop($targetParts);
 
-        $prefix = substr(self::CUSTOM_ENTITY_TABLE_PREFIX, 0, strlen(self::CUSTOM_ENTITY_TABLE_PREFIX) - 1);
+        $prefix = substr(
+            self::CUSTOM_MANY_TO_MANY_TABLE_PREFIX,
+            0,
+            strlen(self::CUSTOM_MANY_TO_MANY_TABLE_PREFIX) - 1
+        );
 
         return $this->generateIdentifierName(
             [$entityClassName, $targetEntityClassName],
