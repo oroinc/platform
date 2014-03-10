@@ -34,7 +34,7 @@ class RenameCustomEntityTables implements Migration, RenameExtensionAwareInterfa
         $tables = $schema->getTables();
         foreach ($tables as $table) {
             if (strpos($table->getName(), self::OLD_CUSTOM_TABLE_PREFIX) === 0) {
-                $newTableName = ExtendDbIdentifierNameGenerator::
+                $newTableName = ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
                     . substr($table->getName(), strlen(self::OLD_CUSTOM_TABLE_PREFIX));
                 $this->renameExtension->renameTable(
                     $schema,
