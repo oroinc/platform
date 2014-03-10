@@ -26,4 +26,12 @@ class WebSocketSendProcessor implements SendProcessorInterface
     {
         return self::NAME;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return 'oro.reminder.processor.web_socket.label';
+    }
 }

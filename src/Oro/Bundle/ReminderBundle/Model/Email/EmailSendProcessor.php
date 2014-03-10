@@ -40,4 +40,12 @@ class EmailSendProcessor implements SendProcessorInterface
     {
         return self::NAME;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel()
+    {
+        return 'oro.reminder.processor.email.label';
+    }
 }
