@@ -17,7 +17,7 @@ datagrid:
         page_total:
             extend: grand_total
             per_page: true
-            hide_on_full_dataset: true
+            hide_if_one_page: true
             columns:
               name:
                   label: 'page total'
@@ -26,15 +26,15 @@ datagrid:
               name:
                   label: 'grand totals'
               contactName:
-                  sql_expression: 'COUNT(o.name)'
+                  expr: 'COUNT(o.name)'
                   formatter: integer
               closeDate:
                   label: 'Oldest'
-                  sql_expression: 'MIN(o.closeDate)'
+                  expr: 'MIN(o.closeDate)'
                   formatter: date
               probability:
                   label: 'Summary'
-                  sql_expression: 'SUM(o.probability)'
+                  expr: 'SUM(o.probability)'
                   formatter: percent
               statusLabel:
                   label: orocrm.sales.opportunity.status.label
@@ -43,11 +43,11 @@ datagrid:
 **Notes:**
   -- _Column name should be equal as name of correspond column_
   -- **label** can be just a text or translation placeholder (***not required***)
-  -- **sql_expression** data aggregation SQL expression (***not required***)
+  -- **expr** data aggregation SQL expression (***not required***)
   -- **formatter** backend formatter that will process the column value
   -- available values: date, datetime, decimal, integer, percent
   -- if you add "label" and "query" config, but query aggregation returns nothing -> total's cell will be empty 
   -- generally they'll be shown as "`<label>: <query result>`"
   -- total config can be taken from another total row with **extend** parameter.
   -- **per_page** parameter switch data calculation only for current page data
-  -- if **hide_on_full_dataset** is true, then this total row will be hidden on full data set. 
+  -- if **hide_if_one_page** is true, then this total row will be hidden on full data set.
