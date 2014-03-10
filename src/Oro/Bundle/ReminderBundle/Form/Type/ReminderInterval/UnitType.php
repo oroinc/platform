@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Form\Type;
+namespace Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 
-class IntervalUnitType extends AbstractType
+class UnitType extends AbstractType
 {
     /**
      * {@inheritdoc}

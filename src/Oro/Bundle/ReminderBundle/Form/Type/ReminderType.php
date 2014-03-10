@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Form\Type;
-
-use Doctrine\ORM\EntityManager;
+namespace Oro\Bundle\ReminderBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -10,16 +8,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class ReminderType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     /**
      * {@inheritdoc}
      */

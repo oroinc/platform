@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Form\Type;
+namespace Oro\Bundle\ReminderBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -14,6 +14,9 @@ class MethodType extends AbstractType
      */
     protected $sendProcessorRegistry;
 
+    /**
+     * @param SendProcessorRegistry $sendProcessorRegistry
+     */
     public function __construct(SendProcessorRegistry $sendProcessorRegistry)
     {
         $this->sendProcessorRegistry = $sendProcessorRegistry;
