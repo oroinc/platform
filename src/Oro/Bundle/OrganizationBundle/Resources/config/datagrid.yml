@@ -127,7 +127,7 @@ datagrid:
                     data_name: u.createdAt
 
     bu-update-users-grid:
-        extend: user-relation-grid
+        extends: user-relation-grid
         source:
             acl_resource: oro_business_unit_update
             query:
@@ -191,7 +191,7 @@ datagrid:
                     excluded: '#businessUnitRemoveUsers'
 
     bu-view-users-grid:
-        extend: user-relation-grid
+        extends: user-relation-grid
         options:
             entityHint: user
         source:

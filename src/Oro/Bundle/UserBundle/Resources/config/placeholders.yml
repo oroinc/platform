@@ -4,6 +4,14 @@ placeholders:
             menu_user:
                 order: 100
 
+    view_content_data_communications:
+        items:
+            oro_user_emails: ~
+
 items:
-   menu_user:
+    menu_user:
         template: OroUserBundle:Menu:menuProfile.html.twig
+
+    oro_user_emails:
+        template: OroUserBundle:User:userEmails.html.twig
+        attribute_instance_of: [entity, %oro_user.entity.class%]
