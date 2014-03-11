@@ -40,7 +40,6 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $this->nameGenerator = new ExtendDbIdentifierNameGenerator();
     }
 
-
     public function testProcessConfigs()
     {
         $configProcessor = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor')
