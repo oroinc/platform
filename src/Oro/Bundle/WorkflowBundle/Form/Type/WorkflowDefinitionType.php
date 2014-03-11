@@ -25,7 +25,7 @@ class WorkflowDefinitionType extends AbstractType
             )
             ->add(
                 'related_entity',
-                'oro_entity_choice',
+                'oro_workflow_applicable_entities',
                 array(
                     'label' => 'oro.workflow.workflowdefinition.related_entity.label',
                     'required' => true,
