@@ -31,15 +31,15 @@ class OroEntityBundle extends Bundle
      */
     public function boot()
     {
-        if ( ! Type::hasType(MoneyType::MONEY_TYPE)) {
+        if (!Type::hasType(MoneyType::MONEY_TYPE)) {
             Type::addType(MoneyType::MONEY_TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\MoneyType');
         }
 
-        if ( ! Type::hasType(PercentType::PERCENT_TYPE)) {
+        if (!Type::hasType(PercentType::PERCENT_TYPE)) {
             Type::addType(PercentType::PERCENT_TYPE, 'Oro\Bundle\EntityBundle\Entity\Type\PercentType');
         }
 
-        /** @var ManagerRegistry $registry*/
+        /** @var ManagerRegistry $registry */
         $registry = $this->container->get('doctrine');
         foreach ($registry->getConnections() as $con) {
             if ($con instanceof Connection) {

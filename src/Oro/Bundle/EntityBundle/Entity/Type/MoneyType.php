@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\EntityBundle\Entity\Type;
 
-use Doctrine\DBAL\Types\DecimalType;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class MoneyType extends DecimalType
+class MoneyType extends Type
 {
-    const MONEY_TYPE = 'money';
+    const MONEY_TYPE     = 'money';
     const TYPE_PRECISION = 19;
-    const TYPE_SCALE = 4;
+    const TYPE_SCALE     = 4;
 
     /**
      * {@inheritdoc}
@@ -27,5 +27,13 @@ class MoneyType extends DecimalType
         $fieldDeclaration['precision'] = self::TYPE_PRECISION;
         $fieldDeclaration['scale'] = self::TYPE_SCALE;
         return $platform->getDecimalTypeDeclarationSQL($fieldDeclaration);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertToPHPValue($value, AbstractPlatform $platform)
+    {
+        return (null === $value) ? null : $value;
     }
 }

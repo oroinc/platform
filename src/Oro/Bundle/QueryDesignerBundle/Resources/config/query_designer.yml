@@ -8,7 +8,7 @@ query_designer:
             type:       string
             query_type: [all]
         number:
-            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}]
+            applicable: [{type: integer}, {type: smallint}, {type: bigint}, {type: decimal}, {type: float}, {type: money}, {type: percent}]
             type:       number
             query_type: [all]
         date:

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Entity\Type;
 
-use Doctrine\DBAL\Types\DecimalType;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
-class PercentType extends DecimalType
+class PercentType extends Type
 {
     const PERCENT_TYPE = 'percent';
     const TYPE_PRECISION = 5;
@@ -27,5 +27,13 @@ class PercentType extends DecimalType
         $fieldDeclaration['precision'] = self::TYPE_PRECISION;
         $fieldDeclaration['scale'] = self::TYPE_SCALE;
         return $platform->getDecimalTypeDeclarationSQL($fieldDeclaration);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function convertToPHPValue($value, AbstractPlatform $platform)
+    {
+        return (null === $value) ? null : $value;
     }
 }

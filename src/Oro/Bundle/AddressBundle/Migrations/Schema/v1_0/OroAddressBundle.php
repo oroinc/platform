@@ -49,8 +49,7 @@ class OroAddressBundle implements Migration
         $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('name_suffix', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('created', 'datetime', []);
-        $column = $table->addColumn('updated', 'datetime', []);
-        $column->setType(Type::getType('money'));
+        $table->addColumn('updated', 'datetime', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['country_code'], 'IDX_C5E99957F026BB7C', []);
         $table->addIndex(['region_code'], 'IDX_C5E99957AEB327AF', []);
