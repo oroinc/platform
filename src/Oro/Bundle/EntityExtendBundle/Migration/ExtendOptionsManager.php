@@ -4,9 +4,10 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 class ExtendOptionsManager
 {
-    const TYPE_OPTION   = '_type';
-    const MODE_OPTION   = '_mode';
-    const TARGET_OPTION = '_target';
+    const ENTITY_CLASS_OPTION = '_entity_class';
+    const TYPE_OPTION         = '_type';
+    const MODE_OPTION         = '_mode';
+    const TARGET_OPTION       = '_target';
 
     /**
      * @var EntityMetadataHelper

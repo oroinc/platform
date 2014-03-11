@@ -118,124 +118,11 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
     }
 
-    public function testChangeTableNameOnlyOfNonConfigurableEntity()
-    {
-        $configs = [
-            self::CLASS_NAME => [
-                'configs' => [
-                    'extend' => ['table' => 'changed_table_name']
-                ]
-            ]
-        ];
-
-        $this->configManager->expects($this->any())
-            ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, false],
-                    ]
-                )
-            );
-
-        $this->configManager->expects($this->never())
-            ->method('flush');
-
-        $this->generator->processConfigs($configs);
-    }
-
-    public function testChangeTableNameOnlyOfNonCustomEntity()
-    {
-        $configs = [
-            self::CLASS_NAME => [
-                'configs' => [
-                    'extend' => ['table' => 'changed_table_name']
-                ]
-            ]
-        ];
-
-        $this->configManager->expects($this->any())
-            ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::CLASS_NAME, null, true],
-                    ]
-                )
-            );
-
-        $this->configManager->expects($this->never())
-            ->method('flush');
-
-        $this->generator->processConfigs($configs);
-    }
-
-    public function testChangeTableNameOnlyOfCustomEntity()
-    {
-        $testClassName = ExtendConfigDumper::ENTITY . 'TestEntity';
-        $configs = [
-            $testClassName => [
-                'configs' => [
-                    'extend' => ['table' => 'changed_table_name']
-                ]
-            ]
-        ];
-
-        $extendConfigEntity = $this->createConfig('extend', $testClassName);
-
-        // config providers configuration
-        $extendConfigProvider = $this->getConfigProviderMock();
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                    ]
-                )
-            );
-        // hasConfig/getConfig expectations
-        $this->configManager->expects($this->any())
-            ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$testClassName, null, true],
-                    ]
-                )
-            );
-        $extendConfigProvider->expects($this->any())
-            ->method('getConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$testClassName, null, $extendConfigEntity],
-                    ]
-                )
-            );
-
-        $this->configManager->expects($this->once())
-            ->method('flush');
-
-        $this->generator->processConfigs($configs);
-
-        $this->assertEquals(
-            [
-                'state'     => ExtendScope::STATE_UPDATED,
-                'table'     => 'changed_table_name',
-            ],
-            $extendConfigEntity->all()
-        );
-    }
-
     public function testModificationOfNonExtendEntity()
     {
         $configs = [
             self::CLASS_NAME => [
                 'configs' => [
-                    'extend' => [
-                        'table' => 'changed_table_name'
-                    ],
                     'entity' => [
                         'icon' => 'icon1'
                     ]
@@ -310,7 +197,6 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             $testClassName => [
                 'configs' => [
                     'extend' => [
-                        'table'     => 'test_table',
                         'owner'     => ExtendScope::OWNER_CUSTOM,
                         'is_extend' => true,
                     ],
@@ -374,7 +260,6 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'state'     => ExtendScope::STATE_NEW,
-                'table'     => 'test_table',
                 'owner'     => ExtendScope::OWNER_CUSTOM,
                 'is_extend' => true
             ],

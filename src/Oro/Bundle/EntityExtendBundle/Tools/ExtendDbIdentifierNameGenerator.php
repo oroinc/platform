@@ -145,6 +145,8 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     }
 
     /**
+     * Extracts a class name (last part) from the given full class name
+     *
      * @param string $className The full name of a class
      * @return string
      */

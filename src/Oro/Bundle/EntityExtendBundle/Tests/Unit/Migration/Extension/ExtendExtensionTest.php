@@ -247,10 +247,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'Entity_1' => [
                     'configs' => [
                         'extend' => [
-                            'table'     => sprintf(
-                                '%sentity_1',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
-                            ),
                             'owner'     => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ]
@@ -259,10 +255,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'Entity2'  => [
                     'configs' => [
                         'extend' => [
-                            'table'     => sprintf(
-                                '%sentity2',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
-                            ),
                             'owner'     => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ],
@@ -272,10 +264,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                 ExtendConfigDumper::ENTITY . 'Entity3'  => [
                     'configs' => [
                         'extend' => [
-                            'table'     => sprintf(
-                                '%sentity3',
-                                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX
-                            ),
                             'owner'     => ExtendScope::OWNER_CUSTOM,
                             'is_extend' => true
                         ]

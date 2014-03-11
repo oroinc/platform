@@ -11,7 +11,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -184,9 +183,17 @@ class RenameExtendTablesAndColumns implements
                 );
                 break;
             case 'oneToMany':
+                $config = $configManager->getConfig($fieldConfigId);
+                $targetEntityClassName = $config->get('target_entity');
+                $this->renameOneToManyExtendField(
+                    $schema,
+                    $queries,
+                    $table,
+                    $fieldConfigId->getFieldName(),
+                    $targetEntityClassName
+                );
                 break;
             case 'manyToMany':
-                break;
             case 'optionSet':
                 break;
             default:
@@ -225,6 +232,36 @@ class RenameExtendTablesAndColumns implements
         }
     }
 
+    protected function renameOneToManyExtendField(
+        Schema $schema,
+        QueryBag $queries,
+        Table $table,
+        $associationName,
+        $targetEntityClassName
+    ) {
+        $entityClassName = $this->getTableNameByEntityClass($table->getName());
+        $targetTableName = $this->getTableNameByEntityClass($targetEntityClassName);
+        if ($schema->hasTable($targetTableName)) {
+            $targetTable = $schema->getTable($targetTableName);
+            $oldTargetColumnName = sprintf(
+                'field_%s_%s_id',
+                strtolower($this->getShortClassName($entityClassName)),
+                $associationName
+            );
+            if ($targetTable->hasColumn($oldTargetColumnName)) {
+                $newTargetColumnName = $this->nameGenerator
+                    ->generateOneToManyRelationColumnName($entityClassName, $associationName);
+                $this->renameExtension->renameColumn(
+                    $schema,
+                    $queries,
+                    $table,
+                    $oldTargetColumnName,
+                    $newTargetColumnName
+                );
+            }
+        }
+    }
+
     /**
      * Builds old table name for many-to-many relation
      *
@@ -256,5 +293,18 @@ class RenameExtendTablesAndColumns implements
         $entityMetadataHelper = $this->container->get('oro_entity_extend.migration.entity_metadata_helper');
 
         return $entityMetadataHelper->getTableNameByEntityClass($className);
+    }
+
+    /**
+     * Extracts a class name (last part) from the given full class name
+     *
+     * @param string $className The full name of a class
+     * @return string
+     */
+    protected function getShortClassName($className)
+    {
+        $parts = explode('\\', $className);
+
+        return array_pop($parts);
     }
 }

@@ -43,20 +43,13 @@ class ExtendOptionsBuilder
      */
     public function addTableOptions($tableName, array $options)
     {
-        $customEntityClassName = null;
-        if (isset($options['_entity_class'])) {
-            $customEntityClassName = $options['_entity_class'];
-            unset($options['_entity_class']);
-        }
-        $entityClassName = $this->getEntityClassName($tableName, $customEntityClassName, false);
+        $customEntityClassName = $this->getAndRemoveOption($options, ExtendOptionsManager::ENTITY_CLASS_OPTION);
+        $entityClassName       = $this->getEntityClassName($tableName, $customEntityClassName, false);
         if (!$entityClassName) {
             return;
         }
 
-        $tableMode = isset($options[ExtendOptionsManager::MODE_OPTION])
-            ? $options[ExtendOptionsManager::MODE_OPTION]
-            : null;
-        unset($options[ExtendOptionsManager::MODE_OPTION]);
+        $tableMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
         if (!isset($this->result[$entityClassName])) {
             $this->result[$entityClassName] = [];
@@ -84,38 +77,27 @@ class ExtendOptionsBuilder
             return;
         }
 
-        $columnType = isset($options[ExtendOptionsManager::TYPE_OPTION])
-            ? $options[ExtendOptionsManager::TYPE_OPTION]
-            : null;
-        unset($options[ExtendOptionsManager::TYPE_OPTION]);
-        $columnMode = isset($options[ExtendOptionsManager::MODE_OPTION])
-            ? $options[ExtendOptionsManager::MODE_OPTION]
-            : null;
-        unset($options[ExtendOptionsManager::MODE_OPTION]);
+        $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
+        $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
         if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }
-            foreach ($options[ExtendOptionsManager::TARGET_OPTION] as $optionName => $optionValue) {
+            $target = $this->getAndRemoveOption($options, ExtendOptionsManager::TARGET_OPTION);
+            foreach ($target as $optionName => $optionValue) {
                 switch ($optionName) {
                     case 'table_name':
                         $options['extend']['target_entity'] = $this->getEntityClassName($optionValue);
                         break;
                     case 'column':
-                        $options['extend']['target_field'] = $this->getFieldName(
-                            $options[ExtendOptionsManager::TARGET_OPTION]['table_name'],
-                            $optionValue
-                        );
+                        $options['extend']['target_field'] = $this->getFieldName($target['table_name'], $optionValue);
                         break;
                     case 'columns':
                         foreach ($optionValue as $group => $columns) {
                             $values = [];
                             foreach ($columns as $column) {
-                                $values[] = $this->getFieldName(
-                                    $options[ExtendOptionsManager::TARGET_OPTION]['table_name'],
-                                    $column
-                                );
+                                $values[] = $this->getFieldName($target['table_name'], $column);
                             }
                             $options['extend']['target_' . $group] = $values;
                         }
@@ -129,8 +111,6 @@ class ExtendOptionsBuilder
                 $columnType,
                 $options['extend']['target_entity']
             );
-
-            unset($options[ExtendOptionsManager::TARGET_OPTION]);
         }
 
         if (!isset($this->result[$entityClassName])) {
@@ -192,5 +172,23 @@ class ExtendOptionsBuilder
         $fieldName = $this->entityMetadataHelper->getFieldNameByColumnName($tableName, $columnName);
 
         return $fieldName ? : $columnName;
+    }
+
+    /**
+     * Gets a value of an option with the given name and then remove the option from $options array
+     *
+     * @param array  $options
+     * @param string $name
+     * @return mixed
+     */
+    protected function getAndRemoveOption(array &$options, $name)
+    {
+        $value = null;
+        if (isset($options[$name])) {
+            $value = $options[$name];
+            unset($options[$name]);
+        }
+
+        return $value;
     }
 }

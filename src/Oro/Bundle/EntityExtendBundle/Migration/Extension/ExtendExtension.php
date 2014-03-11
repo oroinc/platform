@@ -79,8 +79,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         if (!isset($options['extend'])) {
             $options['extend'] = [];
         }
-        $options['_entity_class']   = $className;
-        $options['extend']['table'] = $tableName;
+        $options[ExtendOptionsManager::ENTITY_CLASS_OPTION] = $className;
         if (isset($options['extend']['owner'])) {
             if ($options['extend']['owner'] !== ExtendScope::OWNER_CUSTOM) {
                 throw new \InvalidArgumentException(
