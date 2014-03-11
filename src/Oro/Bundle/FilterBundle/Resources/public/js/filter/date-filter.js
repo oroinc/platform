@@ -289,7 +289,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             $calendar.data('datepicker').inline = false;
             $calendar.datepicker('refresh');
             $calendar.find('.ui-datepicker-close').click(function() {
-                $dropdown.find('.dropdown-menu-calendar').hide();
+                $dropdown.removeClass('open')
             });
 
             widgetOptions = _.extend({
