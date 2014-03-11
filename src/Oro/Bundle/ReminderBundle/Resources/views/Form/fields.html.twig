@@ -1,0 +1,15 @@
+{% block oro_reminder_collection_widget %}
+    {% set class = 'reminders-collection' %}
+    {% set attr = attr|merge({'class' : attr.class is defined ? attr.class ~ class : class}) %}
+    {{ block('oro_collection_widget') }}
+    {% set id = id ~ '_collection' %}
+{% endblock %}
+
+
+{% block oro_reminder_widget %}
+    <div {{ block('widget_container_attributes') }}>
+        {{ form_widget(form.method) }}
+        {{ form_widget(form.interval.number) }}
+        {{ form_widget(form.interval.unit) }}
+    </div>
+{% endblock %}

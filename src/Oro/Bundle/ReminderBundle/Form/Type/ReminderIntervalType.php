@@ -16,13 +16,19 @@ class ReminderIntervalType extends AbstractType
         $builder->add(
             'number',
             'integer',
-            array('required' => true)
+            array(
+                'required' => true,
+                'attr' => array('class' => 'number'),
+            )
         );
 
         $builder->add(
             'unit',
             'oro_reminder_interval_unit',
-            array('required' => true)
+            array(
+                'required' => true,
+                'attr' => array('class' => 'unit'),
+            )
         );
     }
 
