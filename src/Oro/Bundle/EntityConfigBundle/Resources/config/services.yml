@@ -131,5 +131,6 @@ services:
         class: %oro_entity_config.migration.post_up.listener.class%
         arguments:
             - @oro_entity_config.tools.dumper
+            - @kernel
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -90 }
