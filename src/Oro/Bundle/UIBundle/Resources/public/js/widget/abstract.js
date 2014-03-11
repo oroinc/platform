@@ -59,8 +59,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oroui/js/loading-mask', 
         remove: function() {
             this.trigger('widgetRemove', this.$el);
             mediator.trigger('widget_remove', this.getWid());
-            mediator.trigger('widget_remove:' + this.getAlias());
+            if (this.getAlias()) {
+                mediator.trigger('widget_remove:' + this.getAlias());
+            }
             Backbone.View.prototype.remove.call(this);
+            this.trigger('widgetRemoved');
         },
 
         /**

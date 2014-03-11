@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backbone', 'oro/block-widget'
-], function (_, Backbone, BlockWidget) {
+define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
+], function (_, Backbone, mediator, BlockWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -35,7 +35,7 @@ define(['underscore', 'backbone', 'oro/block-widget'
                     '</div>' +
                     '</div>' +
 
-                '<div class="layout-content <%= contentClasses.join(\' \') %>"></div>' +
+                '<div class="layout-content scrollable-container <%= contentClasses.join(\' \') %>"></div>' +
             '</div>'),
             replacementEl: null
         }),
@@ -43,6 +43,7 @@ define(['underscore', 'backbone', 'oro/block-widget'
         initialize: function(options) {
             this.$replacementEl = $(this.options.replacementEl);
             this.options.container = this.$replacementEl.parent();
+            this.on('adoptedFormResetClick', this.remove);
 
             BlockWidget.prototype.initialize.apply(this, options);
         },
@@ -51,12 +52,16 @@ define(['underscore', 'backbone', 'oro/block-widget'
             this.$replacementEl.show();
 
             BlockWidget.prototype.remove.apply(this);
+
+            mediator.trigger('layout:adjustHeight');
         },
 
         show: function() {
             this.$replacementEl.hide();
 
             BlockWidget.prototype.show.apply(this);
+
+            mediator.trigger('layout:adjustHeight');
         }
     });
 });

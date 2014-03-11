@@ -306,7 +306,8 @@ function(_, Backbone, messanger, __,
                 'workflow': this.model,
                 'step_from': step_from,
                 'entity_select_el': this.$entitySelectEl,
-                'entities': this.options.entities
+                'entities': this.options.entities,
+                'workflowContainer': this.$el
             });
             transitionEditView.on('transitionAdd', this.addTransition, this);
             transitionEditView.render();
