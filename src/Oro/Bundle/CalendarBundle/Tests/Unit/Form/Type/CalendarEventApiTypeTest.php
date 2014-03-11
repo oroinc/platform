@@ -69,8 +69,7 @@ class CalendarEventApiTypeTest extends TypeTestCase
             'title'    => 'testTitle',
             'start'    => '2013-10-05T13:00:00Z',
             'end'      => '2013-10-05T13:30:00+00:00',
-            'allDay'   => true,
-            'reminder' => true,
+            'allDay'   => true
         );
 
         $type = new CalendarEventApiType(array());
@@ -89,7 +88,6 @@ class CalendarEventApiTypeTest extends TypeTestCase
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:00:00Z'), $result->getStart());
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:30:00Z'), $result->getEnd());
         $this->assertTrue($result->getAllDay());
-        $this->assertTrue($result->getReminder());
 
         $view     = $form->createView();
         $children = $view->children;

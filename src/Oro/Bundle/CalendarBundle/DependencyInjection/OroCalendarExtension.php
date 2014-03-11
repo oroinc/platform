@@ -20,7 +20,5 @@ class OroCalendarExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('form.yml');
-
-        $container->setParameter('oro_calendar.reminder_time', (int) $config['reminder_time']);
     }
 }

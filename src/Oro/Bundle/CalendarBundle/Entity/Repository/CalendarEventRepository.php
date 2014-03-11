@@ -23,7 +23,7 @@ class CalendarEventRepository extends EntityRepository
         $includingConnectedCalendars = false
     ) {
         $qb = $this->createQueryBuilder('e')
-            ->select('c.id as calendar, e.id, e.title, e.start, e.end, e.allDay, e.reminder')
+            ->select('c.id as calendar, e.id, e.title, e.start, e.end, e.allDay')
             ->innerJoin('e.calendar', 'c')
             ->where(
                 '(e.start < :start AND e.end >= :start) OR '
