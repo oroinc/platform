@@ -62,10 +62,7 @@ class DoctrineSubscriber implements EventSubscriber
                         $fieldConfig = $configProvider->getConfig($className, $columnName);
 
                         if ($enabled && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
-                            $cmBuilder->addIndex(
-                                array(ExtendConfigDumper::FIELD_PREFIX . $columnName),
-                                'oro_idx_' . $columnName
-                            );
+                            $cmBuilder->addIndex([$columnName], 'oro_idx_' . $columnName);
                         }
                     }
                 }
@@ -91,10 +88,10 @@ class DoctrineSubscriber implements EventSubscriber
                     $targetFieldId = $relation['target_field_id'];
 
                     $targetFieldName = $targetFieldId
-                        ? ExtendConfigDumper::FIELD_PREFIX . $targetFieldId->getFieldName()
+                        ? $targetFieldId->getFieldName()
                         : null;
 
-                    $fieldName   = ExtendConfigDumper::FIELD_PREFIX . $fieldId->getFieldName();
+                    $fieldName   = $fieldId->getFieldName();
                     $defaultName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName();
 
                     switch ($fieldId->getFieldType()) {

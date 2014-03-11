@@ -313,7 +313,7 @@ class ConfigFieldGridController extends Controller
         $isFieldExist = class_exists($field->getEntity()->getClassName())
             && property_exists(
                 $field->getEntity()->getClassName(),
-                ExtendConfigDumper::FIELD_PREFIX . $field->getFieldName()
+                $field->getFieldName()
             );
         $fieldConfig->set(
             'state',

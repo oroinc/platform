@@ -50,7 +50,7 @@ class ExtendExtension extends AbstractExtension
         $fields         = $this->getDynamicFields($entityName);
         /** @var $field FieldConfigId */
         foreach ($fields as $field) {
-            $fieldName     = ExtendConfigDumper::FIELD_PREFIX . $field->getFieldName();
+            $fieldName     = $field->getFieldName();
             $fieldConfig   = $entityProvider->getConfigById($field);
             $filterOptions = [];
             switch ($field->getFieldType()) {
@@ -124,12 +124,12 @@ class ExtendExtension extends AbstractExtension
 
             if ($alias === false) {
                 // add entity if it not exists in from clause
-                $alias = ExtendConfigDumper::FIELD_PREFIX . 'o';
+                $alias = 'o';
                 $qb->from($entityName, $alias);
             }
 
             foreach ($fields as $field) {
-                $fn = ExtendConfigDumper::FIELD_PREFIX . $field->getFieldName();
+                $fn = $field->getFieldName();
                 $qb->addSelect(sprintf('%s.%s', $alias, $fn));
 
                 // set real "data name" for filters and sorters

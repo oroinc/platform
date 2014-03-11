@@ -65,7 +65,6 @@ class ExtendTable extends TableWithNameGenerator
             if (!isset($oroOptions['extend']['extend'])) {
                 $oroOptions['extend']['extend'] = true;
             }
-            $columnName         = ExtendConfigDumper::FIELD_PREFIX . $columnName;
             $options['notnull'] = false;
         }
 

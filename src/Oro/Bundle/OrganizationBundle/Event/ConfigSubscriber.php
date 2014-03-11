@@ -50,14 +50,8 @@ class ConfigSubscriber implements EventSubscriberInterface
                 $extendConfigProvider = $event->getConfigManager()->getProvider('extend');
                 if (!$extendConfigProvider->hasConfig($className, $ownerFieldName)) {
                     // update 'ownership' config for entity
-                    $ownershipConfig->set(
-                        'owner_field_name',
-                        ExtendConfigDumper::FIELD_PREFIX . $ownerFieldName
-                    );
-                    $ownershipConfig->set(
-                        'owner_column_name',
-                        ExtendConfigDumper::FIELD_PREFIX . $ownerFieldName . '_id'
-                    );
+                    $ownershipConfig->set('owner_field_name', $ownerFieldName);
+                    $ownershipConfig->set('owner_column_name', $ownerFieldName . '_id');
                     $event->getConfigManager()->persist($ownershipConfig);
 
                     // create 'owner' field

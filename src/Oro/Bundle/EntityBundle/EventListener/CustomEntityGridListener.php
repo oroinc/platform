@@ -225,9 +225,7 @@ class CustomEntityGridListener extends AbstractConfigGridListener
             );
 
             $label = $entityConfig->get('label') ?: $fieldConfigId->getFieldName();
-            $code  = $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldConfigId->getFieldName()
-                : $fieldConfigId->getFieldName();
+            $code  = $fieldConfigId->getFieldName();
 
             $this->queryFields[] = $code;
 

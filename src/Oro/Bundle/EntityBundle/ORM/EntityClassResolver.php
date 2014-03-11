@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
@@ -48,48 +49,6 @@ class EntityClassResolver
         }
 
         return $this->doctrine->getAliasNamespace($split[0]) . '\\' . $split[1];
-    }
-
-    /**
-     * Gets an entity full class name by entity table name
-     *
-     * @param string $tableName
-     * @return string|null
-     */
-    public function getEntityClassByTableName($tableName)
-    {
-        foreach (array_keys($this->doctrine->getManagers()) as $name) {
-            /** @var ClassMetadata[] $allMetadata */
-            $allMetadata = $this->doctrine->getManager($name)->getMetadataFactory()->getAllMetadata();
-            foreach ($allMetadata as $metadata) {
-                if ($metadata->getTableName() === $tableName) {
-                    return $metadata->getReflectionClass()->getName();
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets an entity field name by entity table name and column name
-     *
-     * @param string $tableName
-     * @param string $columnName
-     * @return string|null
-     */
-    public function getFieldNameByColumnName($tableName, $columnName)
-    {
-        $className = $this->getEntityClassByTableName($tableName);
-
-        if (null !== $className) {
-            /** @var ClassMetadata $classMetadata */
-            $classMetadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
-
-            return $classMetadata->getFieldName($columnName);
-        }
-
-        return null;
     }
 
     /**

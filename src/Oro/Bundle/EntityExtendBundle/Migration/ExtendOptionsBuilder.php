@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendOptionsBuilder
 {
     /**
-     * @var EntityClassResolver
+     * @var EntityMetadataHelper
      */
-    protected $entityClassResolver;
+    protected $entityMetadataHelper;
 
     /**
      * @var array
@@ -23,11 +22,11 @@ class ExtendOptionsBuilder
     protected $result = [];
 
     /**
-     * @param EntityClassResolver $entityClassResolver
+     * @param EntityMetadataHelper $entityMetadataHelper
      */
-    public function __construct(EntityClassResolver $entityClassResolver)
+    public function __construct(EntityMetadataHelper $entityMetadataHelper)
     {
-        $this->entityClassResolver = $entityClassResolver;
+        $this->entityMetadataHelper = $entityMetadataHelper;
     }
 
     /**
@@ -166,7 +165,7 @@ class ExtendOptionsBuilder
         if (!isset($this->tableToEntityMap[$tableName])) {
             $entityClassName = !empty($customEntityClassName)
                 ? $customEntityClassName
-                : $this->entityClassResolver->getEntityClassByTableName($tableName);
+                : $this->entityMetadataHelper->getEntityClassByTableName($tableName);
             if ($throwExceptionIfNotFound && empty($entityClassName)) {
                 throw new \RuntimeException(sprintf('Cannot find entity for "%s" table.', $tableName));
             }
@@ -190,11 +189,8 @@ class ExtendOptionsBuilder
      */
     protected function getFieldName($tableName, $columnName)
     {
-        $fieldName = $this->entityClassResolver->getFieldNameByColumnName($tableName, $columnName);
-        if (empty($fieldName)) {
-            $fieldName = $columnName;
-        }
+        $fieldName = $this->entityMetadataHelper->getFieldNameByColumnName($tableName, $columnName);
 
-        return $fieldName;
+        return $fieldName ? : $columnName;
     }
 }

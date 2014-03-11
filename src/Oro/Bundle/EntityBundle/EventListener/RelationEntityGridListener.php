@@ -135,9 +135,7 @@ class RelationEntityGridListener extends CustomEntityGridListener
             $entityConfig         = $entityConfigProvider->getConfig($this->entityClass, $fieldName);
 
             $label = $entityConfig->get('label') ? : $fieldName;
-            $code  = $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-                ? ExtendConfigDumper::FIELD_PREFIX . $fieldName
-                : $fieldName;
+            $code  = $fieldName;
 
             $this->queryFields[] = $code;
 
@@ -159,7 +157,7 @@ class RelationEntityGridListener extends CustomEntityGridListener
         $relations = $entityConfig->get('relation');
         $relation  = $relations[$this->relationConfig->get('relation_key')];
 
-        $fieldName = ExtendConfigDumper::FIELD_PREFIX . $relation['target_field_id']->getFieldName();
+        $fieldName = $relation['target_field_id']->getFieldName();
 
         if (null === $this->hasAssignedExpression) {
             $entityAlias = 'ce';

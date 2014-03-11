@@ -46,4 +46,14 @@ class Column extends BaseColumn
         $this->setPlatformOptions($baseColumn->getPlatformOptions());
         $this->setCustomSchemaOptions($baseColumn->getCustomSchemaOptions());
     }
+
+    /**
+     * Change a name of this column
+     *
+     * @param string $newName
+     */
+    public function changeName($newName)
+    {
+        $this->_setName($newName);
+    }
 }
