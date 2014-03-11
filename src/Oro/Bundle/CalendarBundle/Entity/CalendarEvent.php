@@ -12,7 +12,10 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      indexes={@ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"})})
  * @Config(
  *  defaultValues={
- *      "entity"={"icon"="icon-time"},
+ *      "entity"={
+ *          "icon"="icon-time",
+ *          "reminder_template_name"="calendar_reminder"
+ *      },
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE;EDIT;DELETE",
@@ -85,27 +88,6 @@ class CalendarEvent
      * )
      */
     protected $allDay;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="reminder", type="boolean")
-     */
-    protected $reminder;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="remind_at", type="datetime", nullable=true)
-     */
-    protected $remindAt;
-
-    /**
-     * @var bool
-     *
-     * @ORM\Column(name="reminded", type="boolean", options={"default":false})
-     */
-    protected $reminded;
 
     /**
      * Gets an calendar event id.
@@ -236,75 +218,6 @@ class CalendarEvent
     public function setAllDay($allDay)
     {
         $this->allDay = $allDay;
-
-        return $this;
-    }
-
-    /**
-     * Indicates whether an remind notification need to be send for an event.
-     *
-     * @return bool
-     */
-    public function getReminder()
-    {
-        return $this->reminder;
-    }
-
-    /**
-     * Sets a flag indicates whether an remind notification need to be send for an event.
-     *
-     * @param bool $reminder
-     * @return CalendarEvent
-     */
-    public function setReminder($reminder)
-    {
-        $this->reminder = $reminder;
-
-        return $this;
-    }
-
-    /**
-     * Gets date/time an remind notification should occurs.
-     *
-     * @return \DateTime
-     */
-    public function getRemindAt()
-    {
-        return $this->remindAt;
-    }
-
-    /**
-     * Sets date/time an remind notification should occurs.
-     *
-     * @param \DateTime $remindAt
-     * @return CalendarEvent
-     */
-    public function setRemindAt($remindAt)
-    {
-        $this->remindAt = $remindAt;
-
-        return $this;
-    }
-
-    /**
-     * Gets a flag indicates whether an remind notification has already occurred or not.
-     *
-     * @return bool
-     */
-    public function getReminded()
-    {
-        return $this->reminded;
-    }
-
-    /**
-     * Sets a flag indicates whether an remind notification has already occurred or not.
-     *
-     * @param bool $reminded
-     * @return CalendarEvent
-     */
-    public function setReminded($reminded)
-    {
-        $this->reminded = $reminded;
 
         return $this;
     }

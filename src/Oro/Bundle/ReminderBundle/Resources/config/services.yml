@@ -1,6 +1,8 @@
 parameters:
-    oro_reminder.entity.class:               Oro\Bundle\ReminderBundle\Entity\Reminder
-    oro_reminder.sender.class:               Oro\Bundle\ReminderBundle\Model\ReminderSender
+    oro_reminder.entity.class:                    Oro\Bundle\ReminderBundle\Entity\Reminder
+    oro_reminder.sender.class:                    Oro\Bundle\ReminderBundle\Model\ReminderSender
+    oro_reminder.send_processor_registry.class:   Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry
+    oro_reminder.model.email_notification.class:  Oro\Bundle\ReminderBundle\Model\Email\EmailNotification
     oro_reminder.send_processor.email.class:      Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
     oro_reminder.send_processor.web_socket.class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
 
@@ -8,12 +10,24 @@ services:
     oro_reminder.sender:
         class: %oro_reminder.sender.class%
         arguments:
+            - @oro_reminder.send_processor_registry
+
+    oro_reminder.send_processor_registry:
+        class: %oro_reminder.send_processor_registry.class%
+        arguments:
             - []
+
+    oro_reminder.model.email_notification:
+        class: %oro_reminder.model.email_notification.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.provider.entity
 
     oro_reminder.send_processor.email:
         class: %oro_reminder.send_processor.email.class%
         arguments:
             - @oro_notification.email_processor
+            - @oro_reminder.model.email_notification
         tags:
             - { name: oro_reminder.send_processor }
 

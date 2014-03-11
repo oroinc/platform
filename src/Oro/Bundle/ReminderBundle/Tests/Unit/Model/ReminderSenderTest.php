@@ -7,13 +7,10 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
 class ReminderSenderTest extends \PHPUnit_Framework_TestCase
 {
-    const FOO_METHOD = 'foo';
-    const BAR_METHOD = 'bar';
-
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject[]
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $processors;
+    protected $registry;
 
     /**
      * @var ReminderSender
@@ -22,23 +19,31 @@ class ReminderSenderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->processors = array();
+        $this->registry = $this->getMockBuilder('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->processors[self::FOO_METHOD] = $this->getMockProcessor(self::FOO_METHOD);
-        $this->processors[self::BAR_METHOD] = $this->getMockProcessor(self::BAR_METHOD);
-
-        $this->sender = new ReminderSender($this->processors);
+        $this->sender = new ReminderSender($this->registry);
     }
 
     public function testSend()
     {
+        $method = 'foo_method';
+
         $reminder = $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
 
         $reminder->expects($this->at(0))
             ->method('getMethod')
-            ->will($this->returnValue(self::FOO_METHOD));
+            ->will($this->returnValue($method));
 
-        $this->processors[self::FOO_METHOD]->expects($this->once())
+        $processor = $this->getMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
+
+        $this->registry->expects($this->once())
+            ->method('getProcessor')
+            ->with($method)
+            ->will($this->returnValue($processor));
+
+        $processor->expects($this->once())
             ->method('process')
             ->with($reminder);
 
@@ -51,33 +56,5 @@ class ReminderSenderTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('DateTime'));
 
         $this->sender->send($reminder);
-    }
-
-    /**
-     * @expectedException \Oro\Bundle\ReminderBundle\Exception\SendTypeNotSupportedException
-     * @expectedExceptionMessage Reminder method "not_exists" is not supported.
-     */
-    public function testNonExistingProvider()
-    {
-        $reminder = $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\Reminder');
-
-        $reminder->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('not_exists'));
-
-        $this->processors[self::FOO_METHOD]->expects($this->never())->method($this->anything());
-        $this->processors[self::BAR_METHOD]->expects($this->never())->method($this->anything());
-
-        $this->sender->send($reminder);
-    }
-
-    protected function getMockProcessor($name)
-    {
-        $result = $this->getMock('Oro\\Bundle\\ReminderBundle\\Model\\SendProcessorInterface');
-        $result->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($name));
-
-        return $result;
     }
 }

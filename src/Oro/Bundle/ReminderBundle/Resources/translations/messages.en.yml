@@ -4,7 +4,17 @@ oro:
         entity_plural_label: Reminders
         entity_description:  Represent reminder
 
-        subject.label:       Subject
-        due_date.label:      Due date
+
+        interval:
+            unit:
+                unit.minute.label: minutes
+                unit.hour.label:   hours
+                unit.day.label:    days
+                unit.week.label:   weeks
+
+
+        processor:
+            email.label:      Email
+            web_socket.label: Flash message
         
-        message: "Reminder for %subject% is due on %time%"
+         message: "Reminder for %subject% is due on %time%"

@@ -34,7 +34,7 @@ class AddSendProcessorCompilerPassTest extends \PHPUnit_Framework_TestCase
 
         $this->container->expects($this->once())
             ->method('getDefinition')
-            ->with(AddSendProcessorCompilerPass::SENDER_SERVICE)
+            ->with(AddSendProcessorCompilerPass::SEND_PROCESSOR_REGISTRY_SERVICE)
             ->will($this->returnValue($senderDefinition));
 
         $fooProcessorId = 'foo';

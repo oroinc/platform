@@ -1,8 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NotificationBundle\Form\Type;
-
-use Doctrine\ORM\EntityManager;
+namespace Oro\Bundle\ReminderBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,34 +9,21 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 class ReminderType extends AbstractType
 {
     /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'subject',
-            'string',
-            [
-                'required' => true,
-                'label' => 'oro.reminder.subject.label'
-            ]
+            'method',
+            'oro_reminder_method',
+            array('required' => true)
         );
 
-        // custom email
-        $builder->add('email', 'email', ['required' => false]);
-
-        // owner
-        $builder->add('owner', 'checkbox', ['required' => false]);
+        $builder->add(
+            'interval',
+            'oro_reminder_interval',
+            array('required' => true)
+        );
     }
 
     /**

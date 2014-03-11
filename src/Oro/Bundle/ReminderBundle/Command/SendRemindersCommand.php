@@ -42,7 +42,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $reminders = $this->getReminderRepository()->findNotSentReminders();
+        $reminders = $this->getReminderRepository()->findRemindersToSend();
 
         if (!$reminders) {
             $output->writeln('<info>No reminders to sent</info>');
