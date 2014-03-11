@@ -9,6 +9,8 @@ placeholders:
                 order: 40
             template_datagrid_toolbar_page_size:
                 order: 50
+            template_datagrid_action_header_cell:
+                order: 50
 
 items:
    template_datagrid_toolbar:
@@ -19,3 +21,5 @@ items:
         template: OroDataGridBundle:js:pagination-input.html.twig
    template_datagrid_toolbar_page_size:
         template: OroDataGridBundle:js:page-size.html.twig
+   template_datagrid_action_header_cell:
+       template: OroDataGridBundle:js:action-header-cell.html.twig

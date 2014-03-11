@@ -86,6 +86,19 @@
   }
   .action-column {
     width: 60px;
+    .dropdown>.dropdown-toggle {
+      padding-left: 3px;
+      padding-right: 5px;
+      [class^="icon-"], [class*=" icon-"]{
+        font-size: @baseFontSize;
+      }
+    }
+    .dropdown-menu {
+      right: 0;
+      left: auto;
+      padding-bottom: 5px;
+      min-width: 60px;
+    }
   }
   thead th {
     background-color: #eee;

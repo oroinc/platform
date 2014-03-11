@@ -88,7 +88,7 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'oronavigation/js/navigat
         /**
          * Creates launcher
          *
-         * @param {Object} options Launcher options
+         * @param {Object=} options Launcher options
          * @return {oro.datagrid.ActionLauncher}
          */
         createLauncher: function (options) {

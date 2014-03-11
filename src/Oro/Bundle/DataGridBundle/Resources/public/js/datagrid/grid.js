@@ -150,7 +150,7 @@ define(function (require) {
             }
 
             opts.columns.push(this._createActionsColumn());
-            opts.columns.unshift(this._getMassActionsColumn());
+            opts.columns.unshift(this._getSelectRowColumn());
 
             this.loadingMask = this._createLoadingMask();
             this.toolbar = this._createToolbar(this.toolbarOptions);
@@ -184,8 +184,9 @@ define(function (require) {
          */
         _createActionsColumn: function () {
             return new this.actionsColumn({
+                datagrid: this,
                 actions:  this.rowActions,
-                datagrid: this
+                massActions: this.massActions
             });
         },
 
@@ -195,9 +196,9 @@ define(function (require) {
          * @return {Backgrid.Column}
          * @private
          */
-        _getMassActionsColumn: function () {
-            if (!this.massActionsColumn) {
-                this.massActionsColumn = new Backgrid.Column({
+        _getSelectRowColumn: function () {
+            if (!this.selectRowColumn) {
+                this.selectRowColumn = new Backgrid.Column({
                     name:       "massAction",
                     label:      __("Selected Rows"),
                     renderable: !_.isEmpty(this.massActions),
@@ -208,7 +209,7 @@ define(function (require) {
                 });
             }
 
-            return this.massActionsColumn;
+            return this.selectRowColumn;
         },
 
         /**
@@ -249,8 +250,7 @@ define(function (require) {
             return new this.toolbar(_.extend({}, toolbarOptions, {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
-                extraActions: this._getToolbarExtraActions(),
-                massActions:  this._getToolbarMassActions()
+                extraActions: this._getToolbarExtraActions()
             }));
         },
 
@@ -283,36 +283,6 @@ define(function (require) {
                 result.push(this.getExportAction());
             }
             return result;
-        },
-
-        /**
-         * Get mass actions of toolbar
-         *
-         * @return {Array}
-         * @private
-         */
-        _getToolbarMassActions: function () {
-            var result = [];
-            _.each(this.massActions, function (action) {
-                result.push(this.createMassAction(action));
-            }, this);
-
-            return result;
-        },
-
-        /**
-         * Creates action
-         *
-         * @param {Function} ActionPrototype
-         * @protected
-         */
-        createMassAction: function (ActionPrototype) {
-            return new ActionPrototype({
-                datagrid:        this,
-                launcherOptions: {
-                    className: 'btn'
-                }
-            });
         },
 
         /**
@@ -591,6 +561,7 @@ define(function (require) {
         showLoading: function () {
             this.loadingMask.show();
             this.toolbar.disable();
+            this.trigger('disable');
         },
 
         /**
@@ -599,6 +570,7 @@ define(function (require) {
         hideLoading: function () {
             this.loadingMask.hide();
             this.toolbar.enable();
+            this.trigger('enable');
         },
 
         /**
