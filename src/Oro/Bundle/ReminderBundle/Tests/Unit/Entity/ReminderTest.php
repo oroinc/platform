@@ -103,9 +103,9 @@ class ReminderTest extends \PHPUnit_Framework_TestCase
                 'value' => 'Namespace\\Entity',
                 'property' => 'relatedEntityClassName',
             ],
-            'owner' => [
+            'recipient' => [
                 'value' => $this->getMock('Oro\\Bundle\\UserBundle\\Entity\\User'),
-                'property' => 'owner',
+                'property' => 'recipient',
             ],
             'createdAt' => [
                 'value' => new \DateTime(),
