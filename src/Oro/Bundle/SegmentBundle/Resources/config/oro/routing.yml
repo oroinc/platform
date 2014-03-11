@@ -1,0 +1,4 @@
+oro_segment:
+    resource:     "@OroSegmentBundle/Controller"
+    type:         annotation
+    prefix:       /segment

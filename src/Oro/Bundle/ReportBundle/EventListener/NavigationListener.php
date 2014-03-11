@@ -113,7 +113,8 @@ class NavigationListener
     {
         $menu->addChild('divider-' . rand(1, 99999))
             ->setLabel('')
-            ->setAttribute('class', 'divider');
+            ->setAttribute('class', 'divider')
+            ->setExtra('position', 15); // after manage report, we have 10 there
     }
 
     /**
@@ -133,6 +134,8 @@ class NavigationListener
                 [
                     'label' => $entityLabel,
                     'uri'   => '#',
+                    // after divider, all entities will be added in EntityName:ASC order
+                    'extras'=> ['position' => 20]
                 ]
             );
             $entityItem = $reportItem->getChild($entityItemName);

@@ -1,0 +1,89 @@
+datagrid:
+    oro_segments-grid:
+        source:
+            type:           orm
+            acl_resource:   oro_segment_view
+            query:
+                select:
+                    - s.id
+                    - s.name
+                    - s.entity
+                    - type.label as segmentType
+                from:
+                    - { table: %oro_segment.segment.entity.class%, alias: s }
+                join:
+                    left:
+                        - { join: s.type, alias: type }
+        properties:
+            id: ~
+            view_link:
+                type:       url
+                route:      oro_segment_view
+                params:     [ id ]
+            update_link:
+                type:       url
+                route:      oro_segment_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_api_delete_segment
+                params:     [ id ]
+        columns:
+            name:
+                label: oro.segment.name.label
+            entity:
+                label: oro.segment.entity.label
+                type: twig
+                template: OroEntityBundle:Datagrid:Property/entity.html.twig
+                frontend_type: html
+                context:
+                    entity_provider: @oro_segment.entity_provider
+            segmentType:
+                label: oro.segment.type.label
+                type: translatable
+                choices: @oro_segment.report_manager->getReportTypeChoices
+        sorters:
+            columns:
+                name:
+                    data_name: s.name
+        filters:
+            columns:
+                name:
+                    type:      string
+                    data_name: s.name
+                entity:
+                    type:      choice
+                    data_name: s.entity
+                    options:
+                        is_translated_choices: true
+                        field_options:
+                            multiple:       true
+                            choices:        @oro_entity.datagrid_helper->getEntityNames
+                reportType:
+                    type: choice
+                    data_name: s.type
+                    options:
+                        field_options:
+                            choices: @oro_segment.report_manager->getReportTypeChoices
+        actions:
+            view:
+                type:          navigate
+                acl_resource:  oro_segment_view
+                label:         View
+                icon:          user
+                link:          view_link
+                rowAction:     true
+            update:
+                type:          navigate
+                acl_resource:  oro_segment_update
+                label:         Update
+                icon:          edit
+                link:          update_link
+            delete:
+                type:          delete
+                acl_resource:  oro_segment_delete
+                label:         Delete
+                icon:          trash
+                link:          delete_link
+        options:
+            entityHint: segment

@@ -1,7 +1,3 @@
 parameters:
-#    oro_segment.example.class: Oro\Bundle\SegmentBundle\Example
-
+    oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
 services:
-#    oro_segment.example:
-#        class: %oro_segment.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]

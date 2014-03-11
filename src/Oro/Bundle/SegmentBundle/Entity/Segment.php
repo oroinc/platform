@@ -4,11 +4,9 @@ namespace Oro\Bundle\SegmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use JMS\Serializer\Annotation as JMS;
-
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * Segment
@@ -36,15 +34,11 @@ class Segment extends AbstractQueryDesigner
      * @ORM\Id
      * @ORM\Column(type="smallint", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @JMS\Type("integer")
-     * @JMS\Expose
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", unique=true, length=255, nullable=false)
-     * @JMS\Type("string")
-     * @JMS\Expose
      */
     protected $name;
 
@@ -56,17 +50,16 @@ class Segment extends AbstractQueryDesigner
     protected $description;
 
     /**
-     * @ORM\Column(name="entity_name", type="string", unique=false, length=100, nullable=false)
-     * @JMS\Type("string")
-     * @JMS\Expose
+     * @ORM\Column(name="entity", type="string", unique=false, length=100, nullable=false)
      */
-    protected $entityName;
+    protected $entity;
 
     /**
-     * @ORM\Column(type="string", unique=false, length=30, nullable=false)
-     * @JMS\Type("string")
-     * @JMS\Expose
-     */
+     * @var SegmentType
+     *
+     * @ORM\ManyToOne(targetEntity="SegmentType")
+     * @ORM\JoinColumn(name="type", referencedColumnName="name")
+     **/
     protected $type;
 
     /**
@@ -128,13 +121,10 @@ class Segment extends AbstractQueryDesigner
      * Set name
      *
      * @param string $name
-     * @return Segment
      */
     public function setName($name)
     {
         $this->name = $name;
-
-        return $this;
     }
 
     /**
@@ -151,19 +141,16 @@ class Segment extends AbstractQueryDesigner
      * Set description
      *
      * @param string $description
-     * @return Segment
      */
     public function setDescription($description)
     {
         $this->description = $description;
-
-        return $this;
     }
 
     /**
-     * Get report type
+     * Get segment type
      *
-     * @return string
+     * @return SegmentType
      */
     public function getType()
     {
@@ -171,20 +158,17 @@ class Segment extends AbstractQueryDesigner
     }
 
     /**
-     * Set report type
+     * Set segment type
      *
-     * @param string $type
-     * @return Segment
+     * @param SegmentType $type
      */
-    public function setType($type)
+    public function setType(SegmentType $type)
     {
         $this->type = $type;
-
-        return $this;
     }
 
     /**
-     * Get the full name of an entity on which this report is based
+     * Get the full name of an entity on which this segment is based
      *
      * @return string
      */
@@ -194,20 +178,17 @@ class Segment extends AbstractQueryDesigner
     }
 
     /**
-     * Set the full name of an entity on which this report is based
+     * Set the full name of an entity on which this segment is based
      *
      * @param string $entity
-     * @return Segment
      */
     public function setEntity($entity)
     {
         $this->entity = $entity;
-
-        return $this;
     }
 
     /**
-     * Get a business unit owning this report
+     * Get a business unit owning this segment
      *
      * @return BusinessUnit
      */
@@ -217,16 +198,13 @@ class Segment extends AbstractQueryDesigner
     }
 
     /**
-     * Set a business unit owning this report
+     * Set a business unit owning this segment
      *
      * @param BusinessUnit $owningBusinessUnit
-     * @return BusinessUnit
      */
-    public function setOwner($owningBusinessUnit)
+    public function setOwner(BusinessUnit $owningBusinessUnit)
     {
         $this->owner = $owningBusinessUnit;
-
-        return $this;
     }
 
     /**
@@ -243,13 +221,10 @@ class Segment extends AbstractQueryDesigner
      * Set this segment definition in YAML format
      *
      * @param string $definition
-     * @return Segment
      */
     public function setDefinition($definition)
     {
         $this->definition = $definition;
-
-        return $this;
     }
 
     /**
@@ -263,6 +238,16 @@ class Segment extends AbstractQueryDesigner
     }
 
     /**
+     * Set created date/time
+     *
+     * @param \DateTime $created
+     */
+    public function setCreatedAt(\DateTime $created)
+    {
+        $this->createdAt = $created;
+    }
+
+    /**
      * Get last update date/time
      *
      * @return \DateTime
@@ -273,13 +258,32 @@ class Segment extends AbstractQueryDesigner
     }
 
     /**
+     * Set last update date/time
+     *
      * @param \DateTime $updated
-     * @return Segment
      */
-    public function setUpdatedAt($updated)
+    public function setUpdatedAt(\DateTime $updated)
     {
         $this->updatedAt = $updated;
+    }
 
-        return $this;
+    /**
+     * Set last run date/time
+     *
+     * @param \Datetime $lastRun
+     */
+    public function setLastRun($lastRun)
+    {
+        $this->lastRun = $lastRun;
+    }
+
+    /**
+     * Get last run date/time
+     *
+     * @return \Datetime
+     */
+    public function getLastRun()
+    {
+        return $this->lastRun;
     }
 }
