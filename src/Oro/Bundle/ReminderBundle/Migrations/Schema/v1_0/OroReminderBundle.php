@@ -39,6 +39,7 @@ class OroReminderBundle implements Migration
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->addColumn('sent_at', 'datetime', ['notnull' => false]);
+        $table->addColumn('uri', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['recipient_id'], 'IDX_2F4F9F57E92F8F78', []);
         $table->addIndex(['state'], 'reminder_state_idx', []);

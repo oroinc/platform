@@ -204,6 +204,14 @@ class Reminder
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="uri", type="string", length=255, nullable=false)
+     * @Oro\Versioned
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true}
+     *  }
+     * )
      */
     protected $uri;
 
@@ -508,6 +516,8 @@ class Reminder
     }
 
     /**
+     * Get uri
+     *
      * @return string
      */
     public function getUri()
@@ -515,6 +525,12 @@ class Reminder
         return $this->uri;
     }
 
+    /**
+     * Set uri
+     *
+     * @param string $uri
+     * @return $this
+     */
     public function setUri($uri)
     {
         $this->uri = $uri;
