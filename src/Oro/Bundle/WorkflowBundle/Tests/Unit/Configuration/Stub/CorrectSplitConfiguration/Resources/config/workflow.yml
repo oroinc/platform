@@ -4,7 +4,6 @@ imports:
 workflows:
     second_workflow:
         label: 'Second Workflow'
-        enabled: false
         entity: Second\Entity
         start_step: second_step
         steps:

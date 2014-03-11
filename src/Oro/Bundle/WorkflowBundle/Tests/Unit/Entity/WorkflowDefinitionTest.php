@@ -40,13 +40,6 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->workflowDefinition->getLabel());
     }
 
-    public function testEnabled()
-    {
-        $this->assertFalse($this->workflowDefinition->isEnabled());
-        $this->workflowDefinition->setEnabled(true);
-        $this->assertTrue($this->workflowDefinition->isEnabled());
-    }
-
     public function testStartStep()
     {
         $this->assertNull($this->workflowDefinition->getStartStep());
@@ -88,7 +81,6 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         $expectedData = array(
             'name' => 'test_name',
             'label' => 'test_label',
-            'enabled' => false,
             'steps' => new ArrayCollection(array($startStep)),
             'start_step' => $startStep,
             'configuration' => array('test', 'configuration'),
@@ -181,7 +173,6 @@ class WorkflowDefinitionTest extends \PHPUnit_Framework_TestCase
         return array(
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
-            'enabled' => $definition->isEnabled(),
             'steps' => $definition->getSteps(),
             'start_step' => $definition->getStartStep(),
             'configuration' => $definition->getConfiguration(),

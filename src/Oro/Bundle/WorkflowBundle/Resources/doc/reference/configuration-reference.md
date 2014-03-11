@@ -78,9 +78,6 @@ Single workflow configuration has next properties:
 * **entity**
     *string*
     Class name of workflow related entity. **Important:** Entity must have fields to contain workflow item and step.
-* **enabled**
-    *boolean (true - default)*
-    If not enabled, operations with workflow will be be restricted.
 * **entity_attribute**
     *string*
     Name of the attribute used to store related entity
@@ -103,7 +100,6 @@ workflows:                        # Root elements
     phone_call:                   # A unique name of workflow
         label: Demo Call Workflow # This will be shown in UI
         entity: My\Custom\Entity  # Workflow will be used for this entity
-        enabled: true             # If not enabled, operations with workflow will be restricted.
         start_step: start_call    # name of start step
         attributes:               # configuration for Attributes
             # ...

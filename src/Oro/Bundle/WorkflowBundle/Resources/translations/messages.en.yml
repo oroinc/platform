@@ -96,7 +96,6 @@ oro:
             label.label:                  Label
             system.label:                 System
             configuration.label:          Configuration
-            enabled.label:                Enabled
             entity_acls.label:            Entity ACLs
             entity_attribute_name.label:  Entity attribute name
             name.label:                   Name
@@ -112,5 +111,3 @@ oro:
                 delete: Delete
         action:
             general: "Workflow manipulations"
-        enabled: enabled
-        disabled: disabled

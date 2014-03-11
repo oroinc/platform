@@ -123,7 +123,6 @@ workflows:
         label: 'Create User Workflow'        # workflow label
         entity: Acme\Bundle\DemoBundle\Entity\UserManager    # workflow related entity
         start_step: create_user_form         # step that will be shown first
-        enabled: true                        # is this workflow enabled, default true
         steps:                               # list of all existing steps in workflow
             user_form:                       # step where user should fill form with personal information
                 label: 'Enter User Data'                               # step label

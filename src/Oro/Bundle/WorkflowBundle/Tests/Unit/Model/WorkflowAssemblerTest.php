@@ -22,8 +22,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected $workflowParameters = array(
         'name' => 'test_name',
-        'label' => 'Test Label',
-        'enabled' => true,
+        'label' => 'Test Label'
     );
 
     protected $stepConfiguration = array(
@@ -65,7 +64,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $workflowDefinition
             ->setName($this->workflowParameters['name'])
             ->setLabel($this->workflowParameters['label'])
-            ->setEnabled($this->workflowParameters['enabled'])
             ->setConfiguration($configuration);
 
         return $workflowDefinition;
@@ -276,7 +274,6 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($workflow, $actualWorkflow);
         $this->assertEquals($workflowDefinition->getName(), $actualWorkflow->getName());
         $this->assertEquals($workflowDefinition->getLabel(), $actualWorkflow->getLabel());
-        $this->assertEquals($workflowDefinition->isEnabled(), $actualWorkflow->isEnabled());
         $this->assertEquals(
             $attributes,
             $actualWorkflow->getAttributeManager()->getAttributes(),

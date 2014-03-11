@@ -4,7 +4,6 @@ imports:
 workflows:
     first_workflow:
         label: 'First Workflow'
-        enabled: true
         is_system: true
         entity: First\Entity
         start_step: first_step

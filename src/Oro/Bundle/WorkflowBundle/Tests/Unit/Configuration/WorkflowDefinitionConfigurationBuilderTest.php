@@ -22,7 +22,6 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
         $data = array(
             'name' => $definition->getName(),
             'label' => $definition->getLabel(),
-            'enabled' => $definition->isEnabled(),
             'entity' => $definition->getRelatedEntity(),
             'configuration' => $definition->getConfiguration(),
         );
@@ -139,7 +138,6 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
 
         $maximumConfiguration = array(
             'label' => 'Test Workflow',
-            'enabled' => false,
             'is_system' => true,
             'entity' => 'My\Entity',
             'start_step' => 'test_step',
@@ -182,7 +180,6 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 'expectedData' => array(
                     'name'  => 'test_workflow',
                     'label' => 'Test Workflow',
-                    'enabled' => true,
                     'entity'     => 'My\Entity',
                     'configuration' => $this->filterConfiguration($minimumConfiguration),
                 ),
@@ -194,7 +191,6 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit_Framework_Test
                 'expectedData' => array(
                     'name'  => 'test_workflow',
                     'label' => 'Test Workflow',
-                    'enabled' => false,
                     'start_step' => 'test_step',
                     'entity' => 'My\Entity',
                     'configuration' => $this->filterConfiguration($maximumConfiguration),

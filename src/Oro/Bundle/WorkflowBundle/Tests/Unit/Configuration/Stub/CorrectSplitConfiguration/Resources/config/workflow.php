@@ -7,7 +7,6 @@ return array(
     'first_workflow' => array(
         'label' => 'First Workflow',
         'entity' => 'First\Entity',
-        'enabled' => true,
         'is_system' => true,
         'start_step' => 'first_step',
         'entity_attribute' => 'my_entity',
@@ -106,7 +105,6 @@ return array(
     'second_workflow' => array(
         'label' => 'Second Workflow',
         'entity' => 'Second\Entity',
-        'enabled' => false,
         'is_system' => false,
         'start_step' => 'second_step',
         'entity_attribute' => 'entity',

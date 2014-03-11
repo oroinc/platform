@@ -46,10 +46,9 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     /**
      * @param array $inputOptions
      * @param array $expectedOptions
-     * @param bool $enabled
      * @dataProvider setDefaultOptionsDataProvider
      */
-    public function testSetDefaultOptions(array $inputOptions, array $expectedOptions, $enabled = true)
+    public function testSetDefaultOptions(array $inputOptions, array $expectedOptions)
     {
         $entityConnector = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\EntityConnector')
             ->disableOriginalConstructor()
@@ -59,8 +58,7 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
             ->getMock();
         $testWorkflow = new Workflow($entityConnector, $aclManager);
         $testWorkflow->setName(self::TEST_WORKFLOW_NAME)
-            ->setLabel(self::TEST_WORKFLOW_LABEL)
-            ->setEnabled($enabled);
+            ->setLabel(self::TEST_WORKFLOW_LABEL);
         $this->workflowRegistry->expects($this->any())
             ->method('getWorkflowsByEntityClass')
             ->with(self::TEST_ENTITY_CLASS)

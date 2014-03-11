@@ -12,11 +12,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Table(
- *      name="oro_workflow_definition", indexes={
- *          @ORM\Index(name="oro_workflow_definition_enabled_idx", columns={"enabled"})
- *      }
- * )
+ * @ORM\Table(name="oro_workflow_definition")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
  * @Config(
  *  routeName="oro_workflow_definition_index",
@@ -72,13 +68,6 @@ class WorkflowDefinition implements DomainObjectInterface
      * @ORM\Column(name="steps_display_ordered", type="boolean")
      */
     protected $stepsDisplayOrdered = false;
-
-    /**
-     * @var boolean
-     *
-     * @ORM\Column(name="enabled", type="boolean")
-     */
-    protected $enabled = false;
 
     /**
      * @var boolean
@@ -231,29 +220,6 @@ class WorkflowDefinition implements DomainObjectInterface
     public function getEntityAttributeName()
     {
         return $this->entityAttributeName;
-    }
-
-    /**
-     * Set enabled
-     *
-     * @param boolean $enabled
-     * @return WorkflowDefinition
-     */
-    public function setEnabled($enabled)
-    {
-        $this->enabled = (bool)$enabled;
-
-        return $this;
-    }
-
-    /**
-     * Is enabled
-     *
-     * @return boolean
-     */
-    public function isEnabled()
-    {
-        return $this->enabled;
     }
 
     /**
@@ -517,7 +483,6 @@ class WorkflowDefinition implements DomainObjectInterface
      */
     public function import(WorkflowDefinition $definition)
     {
-        // enabled flag should not be imported
         $this->setName($definition->getName())
             ->setLabel($definition->getLabel())
             ->setRelatedEntity($definition->getRelatedEntity())

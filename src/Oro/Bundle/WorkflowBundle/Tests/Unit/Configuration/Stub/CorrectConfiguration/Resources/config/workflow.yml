@@ -1,7 +1,6 @@
 workflows:
     first_workflow:
         label: 'First Workflow'
-        enabled: true
         is_system: true
         entity: First\Entity
         start_step: first_step
@@ -71,7 +70,6 @@ workflows:
                     - @custom_post_action: ~
     second_workflow:
         label: 'Second Workflow'
-        enabled: false
         entity: Second\Entity
         start_step: second_step
         steps:
