@@ -4,7 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
 
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
-use Zend\Stdlib\DateTime;
+use \DateTime;
 
 class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,92 +16,42 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $configProvider;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $translator;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
     protected $topicPublisher;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $dateTimeFormatter;
+    protected $messageParamsProvider;
 
     public function setUp()
     {
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+
+        $this->messageParamsProvider = $this->getMockBuilder(
+            'Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider'
+        )
             ->disableOriginalConstructor()
             ->getMock();
-        $this->processor = new WebSocketSendProcessor(
-            $this->configProvider,
-            $this->translator,
-            $this->topicPublisher,
-            $this->dateTimeFormatter
-        );
-    }
 
-    public function testProcessSendToTranslatorCorrectTimeAndSubject()
-    {
-        $subject = 'testSubject';
-        $time = new DateTime();
-        $expectedTime = 'formatted date time';
-
-        $reminder = $this->setUpReminder('', $subject, $time, 1);
-        $this->dateTimeFormatter->expects($this->once())
-            ->method('format')
-            ->with($time)
-            ->will($this->returnValue($expectedTime));
-        $expected = $subject.$expectedTime;
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with(
-                'oro.reminder.message',
-                $this->callback(
-                    function ($params) use ($expected) {
-                        return $params['%subject%'].$params['%time%'] == $expected;
-                    }
-                )
-            );
-
-        $this->processor->process($reminder);
+        $this->processor = new WebSocketSendProcessor($this->topicPublisher, $this->messageParamsProvider);
     }
 
     public function testProcessSendMessageIntoCorrectChannel()
     {
         $userId = 9876;
-        $testUri = '/test.html';
-        $reminder = $this->setUpReminder($testUri, '', new DateTime(), $userId);
-
-        $expectedMessage = 'Sample message';
-
-        $this->translator->expects($this->once())->method('trans')->will($this->returnValue($expectedMessage));
-
+        $reminder = $this->setUpReminder('', '', new DateTime(), $userId);
+        $expectedParams = array('text'=>'simple text', 'uri'=>'test.org', 'reminderId'=>42);
+        $this->messageParamsProvider->expects($this->any())
+            ->method('getMessageParams')
+            ->will($this ->returnValue($expectedParams));
         $this->topicPublisher
             ->expects($this->once())
             ->method('send')
             ->with(
                 "oro/reminder/remind_user_{$userId}",
-                $this->callback(
-                    function ($params) use ($expectedMessage, $testUri) {
-                        $paramsArray = json_decode($params, true);
-                        return $paramsArray['text'] == $expectedMessage && $paramsArray['uri'] == $testUri;
-                    }
-                )
+                $this->equalTo(json_encode($expectedParams))
             );
 
         $this->processor->process($reminder);
@@ -110,7 +60,6 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessChangeReminderStateIntoCorrectOne()
     {
         $reminder = $this->setUpReminder('', '', new DateTime(), 1);
-        $this->translator->expects($this->any())->method('trans')->will($this->returnValue('Sample message'));
 
         $this->topicPublisher
             ->expects($this->at(0))
@@ -120,16 +69,16 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(1))
             ->method('send')
             ->will($this->returnValue(false));
-        $expected = Reminder::STATE_SENT;
+        $expected = Reminder::STATE_IN_PROGRESS;
         $reminder->expects($this->exactly(2))
-        ->method('setState')
-        ->with(
-            $this->callback(
-                function ($param) use (&$expected) {
-                    return $param == $expected;
-                }
-            )
-        );
+            ->method('setState')
+            ->with(
+                $this->callback(
+                    function ($param) use (&$expected) {
+                        return $param == $expected;
+                    }
+                )
+            );
         $this->processor->process($reminder);
         // i try at but it is not work correctly
         $expected = Reminder::STATE_NOT_SENT;

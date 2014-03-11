@@ -1,0 +1,9 @@
+placeholders:
+    scripts_after:
+        items:
+           subscriber_js:
+              order: 10
+
+items:
+    subscriber_js:
+        template: OroReminderBundle:Reminder:reminderScripts.html.twig

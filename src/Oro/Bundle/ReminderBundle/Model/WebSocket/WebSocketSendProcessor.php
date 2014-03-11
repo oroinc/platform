@@ -2,27 +2,13 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\WebSocket;
 
-use Symfony\Component\Translation\Translator;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 class WebSocketSendProcessor implements SendProcessorInterface
 {
     const NAME = 'web_socket';
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
 
     /**
      * @var TopicPublisher
@@ -30,20 +16,16 @@ class WebSocketSendProcessor implements SendProcessorInterface
     protected $topicPublisher;
 
     /**
-     * @var DateTimeFormatter
+     * @var MessageParamsProvider
      */
-    protected $dateTimeFormatter;
+    protected $messageParamsProvider;
 
     public function __construct(
-        ConfigProvider $entityConfigProvider,
-        Translator $translator,
         TopicPublisher $topicPublisher,
-        DateTimeFormatter $dateTimeFormatter
+        MessageParamsProvider $messageParamsProvider
     ) {
-        $this->configProvider = $entityConfigProvider;
-        $this->translator = $translator;
         $this->topicPublisher = $topicPublisher;
-        $this->dateTimeFormatter = $dateTimeFormatter;
+        $this->messageParamsProvider = $messageParamsProvider;
     }
 
     /**
@@ -54,15 +36,11 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     public function process(Reminder $reminder)
     {
-        $translationParams = array(
-            '%time%'   => $this->dateTimeFormatter->format($reminder->getExpireAt()),
-            '%subject%' => $reminder->getSubject()
-        );
-        $message = $this->translator->trans('oro.reminder.message', $translationParams);
+        $message = $this->messageParamsProvider->getMessageParams($reminder);
 
         $sentResult = $this->sendMessage($reminder, $message);
 
-        $reminder->setState($sentResult ? Reminder::STATE_SENT : Reminder::STATE_NOT_SENT);
+        $reminder->setState($sentResult ? Reminder::STATE_IN_PROGRESS : Reminder::STATE_NOT_SENT);
     }
 
     /**
@@ -73,8 +51,12 @@ class WebSocketSendProcessor implements SendProcessorInterface
     protected function sendMessage(Reminder $reminder, $message)
     {
         return $this->topicPublisher->send(
-            sprintf('oro/reminder/remind_user_%s', $reminder->getRecipient()->getId()),
-            json_encode(array('text' => $message, 'uri' => $reminder->getUri()))
+            sprintf(
+                'oro/reminder/remind_user_%s',
+                $reminder->getRecipient()
+                    ->getId()
+            ),
+            json_encode($message)
         );
     }
 

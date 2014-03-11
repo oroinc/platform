@@ -16,11 +16,11 @@ class ReminderRepository extends EntityRepository
     public function findRemindersToSend()
     {
         return $this->createQueryBuilder('reminder')
-            ->where('reminder.state != :sent_state')
+            ->where('reminder.state = :sent_state')
             ->andWhere('reminder.startAt <= :now')
             ->andWhere('reminder.expireAt >= :now')
             ->setParameter('now', new \DateTime())
-            ->setParameter('sent_state', Reminder::STATE_SENT)
+            ->setParameter('sent_state', Reminder::STATE_NOT_SENT)
             ->getQuery()
             ->execute();
     }
@@ -41,5 +41,23 @@ class ReminderRepository extends EntityRepository
             ->setParameter('entityId', $entityId)
             ->getQuery()
             ->execute();
+    }
+
+    public function findRemindersToShow($userId)
+    {
+        return $this->createQueryBuilder('reminder')
+            ->where('reminder.state = :sent_state')
+            ->andWhere('reminder.recipient = :userId')
+            ->setParameter('userId', $userId)
+            ->setParameter('sent_state', Reminder::STATE_IN_PROGRESS)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findReminders(array $reminderIds)
+    {
+        $qb = $this->createQueryBuilder('reminder');
+
+        return $qb->where($qb->expr()->in('reminder.id', $reminderIds))->getQuery()->execute();
     }
 }
