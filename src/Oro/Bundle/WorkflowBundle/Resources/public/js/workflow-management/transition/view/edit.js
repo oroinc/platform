@@ -1,10 +1,10 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget',
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
     'oroworkflow/js/workflow-management/helper',
     'oroworkflow/js/workflow-management/attribute/form-option-view/edit',
     'oroworkflow/js/workflow-management/attribute/form-option-view/list',
     'oroui/js/layout'],
-function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, layout) {
+function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, AttributeFormOptionListView, layout) {
     'use strict';
 
     var $ = Backbone.$;
@@ -35,35 +35,35 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
                 '<%= label %></button>',
             allowed_button_styles: [
                 {
-                    'label': 'Gray button',
+                    'label': __('Gray button'),
                     'name': ''
                 },
                 {
-                    'label': 'Navy blue button',
+                    'label': __('Navy blue button'),
                     'name': 'btn-primary'
                 },
                 {
-                    'label': 'Blue button',
+                    'label': __('Blue button'),
                     'name': 'btn-info'
                 },
                 {
-                    'label': 'Green button',
+                    'label': __('Green button'),
                     'name': 'btn-success'
                 },
                 {
-                    'label': 'Yellow button',
+                    'label': __('Yellow button'),
                     'name': 'btn-warning'
                 },
                 {
-                    'label': 'Red button',
+                    'label': __('Red button'),
                     'name': 'btn-danger'
                 },
                 {
-                    'label': 'Black button',
+                    'label': __('Black button'),
                     'name': 'btn-inverse'
                 },
                 {
-                    'label': 'Link',
+                    'label': __('Link'),
                     'name': 'btn-link'
                 }
             ]
@@ -229,7 +229,7 @@ function(_, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Attribu
             this.$el.append(form);
 
             this.widget = new DialogWidget({
-                'title': this.model.get('name') ? 'Edit transition' : 'Add new transition',
+                'title': this.model.get('name') ? __('Edit transition') : __('Add new transition'),
                 'el': this.$el,
                 'stateEnabled': false,
                 'incrementalPosition': false,

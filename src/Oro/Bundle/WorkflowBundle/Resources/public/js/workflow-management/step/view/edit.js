@@ -1,9 +1,10 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget', 'oroworkflow/js/workflow-management/helper',
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
+    'oroworkflow/js/workflow-management/helper',
     'oroui/js/layout', 'oroworkflow/js/workflow-management/transition/view/list',
     'oroworkflow/js/workflow-management/transition/model'
 ],
-function(_, Backbone, DialogWidget, Helper, layout, TransitionsListView, TransitionModel) {
+function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, TransitionModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -80,7 +81,7 @@ function(_, Backbone, DialogWidget, Helper, layout, TransitionsListView, Transit
             this.transitionsListView.render();
 
             this.widget = new DialogWidget({
-                'title': this.model.get('name') ? 'Edit step' : 'Add new step',
+                'title': this.model.get('name') ? __('Edit step') : __('Add new step'),
                 'el': this.$el,
                 'stateEnabled': false,
                 'incrementalPosition': false,

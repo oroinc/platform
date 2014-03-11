@@ -39,7 +39,7 @@ function(_, Backbone, TransitionsShortListView) {
 
         triggerRemoveStep: function(e) {
             e.preventDefault();
-            this.model.destroy();
+            this.options.workflow.trigger('requestRemoveStep', this.model);
         },
 
         triggerCloneStep: function(e) {
