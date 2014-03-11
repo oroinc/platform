@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReminderBundle\Model\Email;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -59,17 +60,17 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function getTemplate($locale = null)
     {
-        $entity    = $this->getEntity();
-        $className = ClassUtils::getRealClass($entity);
-        $config    = $this->configProvider->getConfig($className);
+        $className    = $this->getReminder()->getRelatedEntityClassName();
+        $templateName = $this->configProvider
+            ->getConfig($className)
+            ->get(self::CONFIG_FIELD, true);
 
-        $criteria = ['entityName' => $className];
-        if ($config->has(self::CONFIG_FIELD)) {
-            $criteria = ['name' => $config->get(self::CONFIG_FIELD)];
-        }
+        $criteria = [
+            'entityName' => $className,
+            'name'       => $templateName
+        ];
 
-        $repository = $this->em->getRepository(self::TEMPLATE_ENTITY);
-        $template   = $repository->findOneBy($criteria);
+        $template = $this->loadTemplate($criteria);
 
         if (!is_null($locale)) {
             foreach ($template->getTranslations() as $translation) {
@@ -90,13 +91,9 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function getEntity()
     {
-        if (!$this->reminder) {
-            throw new InvalidArgumentException('Reminder was not set');
-        }
-
         return $this->em
-            ->getRepository($this->reminder->getRelatedEntityClassName())
-            ->find($this->reminder->getRelatedEntityId());
+            ->getRepository($this->getReminder()->getRelatedEntityClassName())
+            ->find($this->getReminder()->getRelatedEntityId());
     }
 
     /**
@@ -104,10 +101,40 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function getRecipientEmails()
     {
+        return [$this->getReminder()->getRecipient()->getEmail()];
+    }
+
+    /**
+     * @param array $criteria
+     * @throws InvalidArgumentException
+     * @return EmailTemplate
+     */
+    protected function loadTemplate(array $criteria)
+    {
+        $repository = $this->em->getRepository(self::TEMPLATE_ENTITY);
+        $templates  = $repository->findBy($criteria);
+
+        if (!$templates) {
+            throw new InvalidArgumentException('Template not found');
+        }
+
+        if (count($templates) > 1) {
+            throw new InvalidArgumentException('Multiple templates found');
+        }
+
+        return reset($templates);
+    }
+
+    /**
+     * @return Reminder
+     * @throws InvalidArgumentException
+     */
+    protected function getReminder()
+    {
         if (!$this->reminder) {
             throw new InvalidArgumentException('Reminder was not set');
         }
 
-        return [$this->reminder->getRecipient()->getEmail()];
+        return $this->reminder;
     }
 }

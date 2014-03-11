@@ -14,3 +14,5 @@ oro:
         processor:
             email.label:      Email
             web_socket.label: Flash message
+        
+        message: "Reminder for %subject% is due on %time%"

@@ -14,11 +14,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
 {
     const LOCALE = 'locale';
     const EMAIL = 'test@example.com';
-
-    /**
-     * @var EmailNotification
-     */
-    protected $notification;
+    const ENTITY = 'Namespace\Entity';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -39,18 +35,6 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('\Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->notification = new EmailNotification(
-            $this->em,
-            $this->provider
-        );
-    }
-
-    public function testSetReminder()
-    {
-        $reminder = new Reminder();
-
-        $this->notification->setReminder($reminder);
     }
 
     /**
@@ -59,32 +43,51 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTemplateWithoutReminder()
     {
-        $this->notification->getTemplate();
+        $this->createNotification(false)->getTemplate();
+    }
+
+    /**
+     * @param string $exceptionMessage
+     * @param array  $templates
+     * @dataProvider templateProvider
+     */
+    public function testGetTemplateFromRepository($exceptionMessage, $templates)
+    {
+        $this->setExpectedException(
+            '\Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException',
+            $exceptionMessage
+        );
+
+        $notification = $this->createNotification(true, false, false, $templates);
+        $notification->getTemplate();
+    }
+
+    /**
+     * @return array
+     */
+    public function templateProvider()
+    {
+        return [
+            'one' => [
+                'exceptionMessage' => 'Template not found',
+                'templates' => []
+            ],
+            'multiple' => [
+                'exceptionMessage' => 'Multiple templates found',
+                'templates' => [$this->createTemplate(), $this->createTemplate()]
+            ]
+        ];
     }
 
     public function testGetTemplateByClassName()
     {
-        $this->prepareSource();
-
-        $reminder = new Reminder();
-        $notification = new EmailNotification(
-            $this->em,
-            $this->provider
-        );
-        $notification->setReminder($reminder);
+        $notification = $this->createNotification();
         $notification->getTemplate();
     }
 
     public function testGetTemplateByConfig()
     {
-        $this->prepareSource(true);
-
-        $reminder = new Reminder();
-        $notification = new EmailNotification(
-            $this->em,
-            $this->provider
-        );
-        $notification->setReminder($reminder);
+        $notification = $this->createNotification(true);
         $template = $notification->getTemplate(self::LOCALE);
         $this->assertEquals(self::LOCALE, $template->getLocale());
     }
@@ -93,45 +96,60 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException
      * @expectedExceptionMessage Reminder was not set
      */
+    public function testGetEntityWithoutReminder()
+    {
+        $this->createNotification(false)->getEntity();
+    }
+
+    public function testGetEntity()
+    {
+        $notification = $this->createNotification();
+        $notification->getEntity();
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Reminder was not set
+     */
     public function testGetRecipientEmailsWithoutReminder()
     {
-        $this->notification->getRecipientEmails();
+        $this->createNotification(false)->getRecipientEmails();
     }
 
     public function testGetRecipientEmails()
     {
-        $reminder = new Reminder();
-        $user = new User();
-        $user->setEmail(self::EMAIL);
-        $reminder->setRecipient($user);
-        $this->notification->setReminder($reminder);
-        $email = $this->notification->getRecipientEmails();
+        $email = $this->createNotification(true, false, true)->getRecipientEmails();
 
         $this->assertEquals([self::EMAIL], $email);
     }
 
-    protected function prepareSource($hasConfig = false)
-    {
+    /**
+     * @param bool  $hasReminder
+     * @param bool  $hasConfig
+     * @param bool  $hasRecipient
+     * @param array $templates
+     * @return EmailNotification
+     */
+    protected function createNotification(
+        $hasReminder = true,
+        $hasConfig = false,
+        $hasRecipient = false,
+        $templates = null
+    ) {
         $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
         $repository
-            ->expects($this->atLeastOnce())
+            ->expects($this->any())
             ->method('find')
             ->will($this->returnValue(new CalendarEvent()));
 
-        $template = new EmailTemplate();
-        $translation = new EmailTemplateTranslation();
-        $translation
-            ->setLocale(self::LOCALE)
-            ->setField('type');
-        $translations = new ArrayCollection([$translation]);
-        $template->setTranslations($translations);
+        $templates = is_array($templates) ? $templates : [$this->createTemplate()];
         $repository
-            ->expects($this->atLeastOnce())
-            ->method('findOneBy')
-            ->will($this->returnValue($template));
+            ->expects($this->any())
+            ->method('findBy')
+            ->will($this->returnValue($templates));
 
         $this->em
-            ->expects($this->atLeastOnce())
+            ->expects($this->any())
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
@@ -154,5 +172,45 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($config));
+
+        $notification = new EmailNotification(
+            $this->em,
+            $this->provider
+        );
+
+        if ($hasReminder) {
+            $reminder = new Reminder();
+            if (!$hasConfig) {
+                $reminder
+                    ->setRelatedEntityClassName(self::ENTITY)
+                    ->setRelatedEntityId(1);
+            }
+
+            if ($hasRecipient) {
+                $user = new User();
+                $user->setEmail(self::EMAIL);
+                $reminder->setRecipient($user);
+            }
+
+            $notification->setReminder($reminder);
+        }
+
+        return $notification;
+    }
+
+    /**
+     * @return EmailTemplate
+     */
+    protected function createTemplate()
+    {
+        $template = new EmailTemplate();
+        $translation = new EmailTemplateTranslation();
+        $translation
+            ->setLocale(self::LOCALE)
+            ->setField('type');
+        $translations = new ArrayCollection([$translation]);
+        $template->setTranslations($translations);
+
+        return $template;
     }
 }
