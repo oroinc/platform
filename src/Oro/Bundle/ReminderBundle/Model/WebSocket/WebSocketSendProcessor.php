@@ -60,12 +60,19 @@ class WebSocketSendProcessor implements SendProcessorInterface
         );
         $message = $this->translator->trans('oro.reminder.message', $translationParams);
 
-        $this->sendMessage($reminder, $message);
+        $sentResult = $this->sendMessage($reminder, $message);
+
+        $reminder->setState($sentResult ? Reminder::STATE_SENT : Reminder::STATE_NOT_SENT);
     }
 
+    /**
+     * @param Reminder $reminder
+     * @param string   $message
+     * @return bool
+     */
     protected function sendMessage(Reminder $reminder, $message)
     {
-        $this->topicPublisher->send(
+        return $this->topicPublisher->send(
             sprintf('oro/reminder/remind_user_%s', $reminder->getRecipient()->getId()),
             json_encode(array('text' => $message, 'uri' => $reminder->getUri()))
         );
