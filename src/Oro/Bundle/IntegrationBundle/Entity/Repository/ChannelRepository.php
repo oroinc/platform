@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity\Repository;
 
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityRepository;
 
-use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 
 class ChannelRepository extends EntityRepository
