@@ -6,6 +6,8 @@ parameters:
     oro_reminder.model.email_notification.class:  Oro\Bundle\ReminderBundle\Model\Email\EmailNotification
     oro_reminder.send_processor.email.class:      Oro\Bundle\ReminderBundle\Model\Email\EmailSendProcessor
     oro_reminder.send_processor.web_socket.class: Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor
+    oro_reminder.twig.subscriber_extension.class: Oro\Bundle\ReminderBundle\Twig\SubscriberExtension
+    oro_reminder.web_socket.message_params_provider.class: Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider
 
 services:
     oro_reminder.entity.manager:
@@ -40,9 +42,24 @@ services:
     oro_reminder.send_processor.web_socket:
         class: %oro_reminder.send_processor.web_socket.class%
         arguments:
-            - @oro_entity_config.provider.entity
-            - @translator
             - @oro_wamp.publisher
-            - @oro_locale.formatter.date_time
+            - @oro_reminder.web_socket.message_params_provider
         tags:
             - { name: oro_reminder.send_processor }
+
+    #Message params provider
+    oro_reminder.web_socket.message_params_provider:
+        class: %oro_reminder.web_socket.message_params_provider.class%
+        arguments:
+            - @translator
+            - @oro_locale.formatter.date_time
+
+    #twig extension
+    oro_reminder.twig.subscriber_extension:
+        class: %oro_reminder.twig.subscriber_extension.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @security.context
+            - @oro_reminder.web_socket.message_params_provider
+        tags:
+            - { name: twig.extension }

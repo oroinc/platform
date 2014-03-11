@@ -34,6 +34,7 @@ class Reminder
     const STATE_SENT = 'sent';
     const STATE_NOT_SENT = 'not_sent';
     const STATE_FAIL = 'fail';
+    const STATE_IN_PROGRESS = 'in_progress';
 
     /**
      * @var integer
