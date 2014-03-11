@@ -34,7 +34,7 @@ function(_, Backbone) {
 
         deleteTransition: function(e) {
             e.preventDefault();
-            this.model.destroy();
+            this.options.workflow.trigger('requestRemoveTransition', this.model);
         },
 
         triggerEditTransition: function (e) {

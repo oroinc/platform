@@ -40,7 +40,7 @@ function(_, Backbone) {
 
         triggerRemoveTransition: function(e) {
             e.preventDefault();
-            this.model.destroy();
+            this.options.workflow.trigger('requestRemoveTransition', this.model);
         },
 
         triggerCloneTransition: function(e) {

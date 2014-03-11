@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone'],
-function(_, Backbone) {
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oroui/js/delete-confirmation'],
+function(_, __, Backbone, Confirmation) {
     'use strict';
 
     var $ = Backbone.$;
@@ -41,8 +41,15 @@ function(_, Backbone) {
 
         triggerRemove: function(e) {
             e.preventDefault();
-            this.trigger('removeFormOption', this.options.data);
-            this.remove();
+
+            var confirm = new Confirmation({
+                content: __('Are you sure you want to delete this field?')
+            });
+            confirm.on('ok', _.bind(function () {
+                this.trigger('removeFormOption', this.options.data);
+                this.remove();
+            }, this));
+            confirm.open();
         },
 
         render: function() {

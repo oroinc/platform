@@ -220,9 +220,11 @@
             </div>
         </form>
 
-        <h5>{{ 'Transitions'|trans }}</h5>
-        <div class="transitions-list-container"></div>
-        <button type="button" class="btn btn-primary add-transition"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
+        <div class="transitions-section">
+            <h5>{{ 'Transitions'|trans }}</h5>
+            <div class="transitions-list-container"></div>
+            <button type="button" class="btn btn-primary add-transition"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
+        </div>
     </script>
 
     <script type="text/template" id="step-list-template">
@@ -357,6 +359,16 @@
         </td>
     </script>
 
+    {% set startStepSelector %}
+        {% set startStep = entity.startStep ? entity.startStep.name : '' %}
+        <div class="control-group">
+            <label class="control-label">{{ "Default step"|trans }} <em></em></label>
+            <div class="controls">
+                <input type="hidden" name="start_step" value="{{ startStep }}"/>
+            </div>
+        </div>
+    {% endset %}
+
     {% set dataBlocks = [{
         'title': 'General'|trans,
         'class': 'active',
@@ -365,6 +377,7 @@
             'data': [
                     form_row(form.label),
                     form_row(form.related_entity),
+                    startStepSelector,
                     form_row(form.steps_display_ordered)
                 ]
             }

@@ -1,6 +1,6 @@
 /* global define */
-define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/helper', 'oroentity/js/field-choice'],
-function(_, Backbone, Helper) {
+define(['underscore', 'backbone', 'oroworkflow/js/workflow-management/helper', 'orotranslation/js/translator', 'oroentity/js/field-choice'],
+function(_, Backbone, Helper, __) {
     'use strict';
 
     var $ = Backbone.$;
@@ -66,7 +66,7 @@ function(_, Backbone, Helper) {
             this.editViewId = null;
             this.entityFieldSelectEl.select2('val', '');
             this.form.get(0).reset();
-            this.submitBtn.html('<i class="icon-plus"></i> Add');
+            this.submitBtn.html('<i class="icon-plus"></i> ' + __('Add'));
         },
 
         initFieldChoice: function(container) {
@@ -76,7 +76,7 @@ function(_, Backbone, Helper) {
             this.entityFieldSelectEl.fieldChoice({
                 fieldsLoaderSelector: this.options.entity_select_el,
                 select2: {
-                    placeholder: "Choose field...",
+                    placeholder: __("Choose field..."),
                     formatSelectionTemplate: this.entity_field_template
                 },
                 util: {
@@ -95,7 +95,7 @@ function(_, Backbone, Helper) {
             );
             this.labelEl.val(data.label);
             this.requiredEl.get(0).checked = data.required;
-            this.submitBtn.html('<i class="icon-edit"></i> Edit');
+            this.submitBtn.html('<i class="icon-edit"></i> ' + __('Update'));
         },
 
         render: function() {

@@ -1,9 +1,10 @@
 /* global define */
-define(['underscore', 'backbone', 'oro/dialog-widget', 'oroworkflow/js/workflow-management/helper',
+define(['underscore', 'orotranslation/js/translator', 'backbone', 'oro/dialog-widget',
+    'oroworkflow/js/workflow-management/helper',
     'oroui/js/layout', 'oroworkflow/js/workflow-management/transition/view/list',
     'oroworkflow/js/workflow-management/transition/model'
 ],
-function(_, Backbone, DialogWidget, Helper, layout, TransitionsListView, TransitionModel) {
+function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, TransitionModel) {
     'use strict';
 
     var $ = Backbone.$;
@@ -67,20 +68,31 @@ function(_, Backbone, DialogWidget, Helper, layout, TransitionsListView, Transit
             });
         },
 
+        renderTransitions: function() {
+            var transitionsContainer = this.$('.transitions-section');
+            if (this.options.workflow.get('steps').length > 1) {
+                transitionsContainer.show();
+                this.transitionsListView = new TransitionsListView({
+                    el: this.$el.find(this.options.transitionListContainerEl),
+                    workflow: this.options.workflow,
+                    collection: this.model.getAllowedTransitions(this.options.workflow),
+                    stepFrom: this.model
+                });
+                this.transitionsListView.render();
+            } else {
+                transitionsContainer.hide();
+            }
+        },
+
         render: function() {
             this.$el.append(
                 this.template(this.model.toJSON())
             );
-            this.transitionsListView = new TransitionsListView({
-                el: this.$el.find(this.options.transitionListContainerEl),
-                workflow: this.options.workflow,
-                collection: this.model.getAllowedTransitions(this.options.workflow),
-                stepFrom: this.model
-            });
-            this.transitionsListView.render();
+
+            this.renderTransitions();
 
             this.widget = new DialogWidget({
-                'title': this.model.get('name') ? 'Edit step' : 'Add new step',
+                'title': this.model.get('name') ? __('Edit step') : __('Add new step'),
                 'el': this.$el,
                 'stateEnabled': false,
                 'incrementalPosition': false,

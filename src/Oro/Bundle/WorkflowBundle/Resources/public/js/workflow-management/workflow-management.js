@@ -8,6 +8,8 @@ define([
     'oroworkflow/js/workflow-management/transition/view/edit',
     'oroworkflow/js/workflow-management/helper',
     'oronavigation/js/navigation',
+    'oroui/js/app',
+    'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
 ],
 function(_, Backbone, messanger, __,
@@ -17,7 +19,9 @@ function(_, Backbone, messanger, __,
      StepEditView,
      TransitionEditForm,
      Helper,
-     Navigation
+     Navigation,
+     app,
+     Confirmation
 ) {
     'use strict';
 
@@ -42,7 +46,9 @@ function(_, Backbone, messanger, __,
         },
 
         initialize: function() {
-            this.model.get('steps').add(this._getStartStep());
+            this.addStartStep();
+            this.initStartStepSelector();
+
             this.stepListView = new StepsListView({
                 el: this.$(this.options.stepsEl),
                 collection: this.model.get('steps'),
@@ -54,8 +60,10 @@ function(_, Backbone, messanger, __,
             this.listenTo(this.model, 'requestAddTransition', this.addNewStepTransition);
             this.listenTo(this.model, 'requestEditStep', this.openManageStepForm);
             this.listenTo(this.model, 'requestCloneStep', this.cloneStep);
+            this.listenTo(this.model, 'requestRemoveStep', this.removeStep);
             this.listenTo(this.model.get('steps'), 'destroy', this.onStepRemove);
 
+            this.listenTo(this.model, 'requestRemoveTransition', this.removeTransition);
             this.listenTo(this.model, 'requestCloneTransition', this.cloneTransition);
             this.listenTo(this.model, 'requestEditTransition', this.openManageTransitionForm);
 
@@ -64,15 +72,84 @@ function(_, Backbone, messanger, __,
             this.model.url = this.$saveBtn.data('url');
         },
 
+        initStartStepSelector: function() {
+            var getSteps = _.bind(function(query) {
+                var steps = [];
+                _.each(this.model.get('steps').models, function(step) {
+                    if (!step.get('_is_start') && step.get('label').indexOf(query.term) !== -1) {
+                        steps.push({
+                            'id': step.get('name'),
+                            'text': step.get('label')
+                        });
+                    }
+                }, this);
+
+                query.callback({results: steps});
+            }, this);
+
+            this.$startStepEl = this.$('[name="start_step"]');
+
+            var select2Options = {
+                'allowClear': true,
+                'query': getSteps,
+                'placeholder': __('Choose step...'),
+                'initSelection' : _.bind(function (element, callback) {
+                    var startStep = this.model.getStepByName(element.val());
+                    callback({
+                        id: startStep.get('name'),
+                        text: startStep.get('label')
+                    });
+                }, this)
+            };
+
+            this.$startStepEl.select2(select2Options);
+        },
+
         initEntityFieldsLoader: function() {
+            var confirm = new Confirmation({
+                title: __('Change Entity Confirmation'),
+                okText: __('Yes, I Agree'),
+                content: __('Are you sure you want to change entity?')
+            });
+
+            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(this.resetWorkflow, this));
             this.$entitySelectEl.fieldsLoader({
                 router: 'oro_api_get_entity_fields',
-                routingParams: {"with-relations": 1,"with-entity-details": 1, "deep-level": 2}
+                routingParams: {"with-relations": 1, "with-entity-details": 1, "deep-level": 2},
+                confirm: confirm,
+                requireConfirm: _.bind(function () {
+                     return this.model.get('steps').length > 1 &&
+                         (this.model.get('transitions').length
+                            + this.model.get('transition_definitions').length
+                            + this.model.get('attributes').length) > 0;
+                }, this)
             });
 
             this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
                 this.createPathMapping($(e.target).data('fields'));
             }, this));
+        },
+
+        addStartStep: function() {
+            this.model.get('steps').add(this._getStartStep());
+        },
+
+        resetWorkflow: function() {
+            var resetCollection = function(collection) {
+                if (collection.length) {
+                    for (var i = collection.length -1; i > -1; i--) {
+                        collection.at(i).destroy();
+                    }
+                }
+            };
+
+            this.model.set('start_step', null);
+            resetCollection(this.model.get('attributes'));
+            resetCollection(this.model.get('steps'));
+            resetCollection(this.model.get('transition_definitions'));
+            resetCollection(this.model.get('transitions'));
+
+            this.addStartStep();
         },
 
         createPathMapping: function(fields) {
@@ -111,6 +188,15 @@ function(_, Backbone, messanger, __,
 
         saveConfiguration: function(e) {
             e.preventDefault();
+
+            if (this.model.get('steps').length == 1 || this.model.get('transitions').length == 0) {
+                messanger.notificationFlashMessage(
+                    'error',
+                    __('Could not save workflow. Please add steps and transitions.')
+                );
+                return;
+            }
+
             var navigation = Navigation.isEnabled() ? Navigation.getInstance() : null;
 
             var formData = Helper.getFormData(this.$el);
@@ -122,6 +208,7 @@ function(_, Backbone, messanger, __,
             this.model.set('label', formData.label);
             this.model.set('steps_display_ordered', formData.steps_display_ordered);
             this.model.set('entity', formData.related_entity);
+            this.model.set('start_step', formData.start_step);
 
             if (navigation) {
                 navigation.showLoading();
@@ -133,9 +220,12 @@ function(_, Backbone, messanger, __,
                     }
                     messanger.notificationFlashMessage('success', __('Workflow saved.'));
                 },
-                'error': function() {
+                'error': function(model, response) {
                     if (navigation) {
                         navigation.hideLoading();
+                    }
+                    if (app.debug && !_.isUndefined(console) && !_.isUndefined(response.responseJSON.error)) {
+                        console.error(response.responseJSON.error);
                     }
                     messanger.notificationFlashMessage('error', __('Could not save workflow.'));
                 }
@@ -176,11 +266,34 @@ function(_, Backbone, messanger, __,
             }
         },
 
+        removeTransition: function(model) {
+            this._removeHandler(model, __('Are you sure you want to delete this transition?'));
+        },
+
+        _removeHandler: function(model, message) {
+            var confirm = new Confirmation({
+                content: message
+            });
+            confirm.on('ok', function () {
+                model.destroy();
+            });
+            confirm.open();
+        },
+
         addNewStepTransition: function(step) {
             this.openManageTransitionForm(new TransitionModel(), step);
         },
 
         openManageTransitionForm: function(transition, step_from) {
+            if (this.model.get('steps').length == 1) {
+                messanger.notificationFlashMessage('error', __('At least one step should be added to add transition.'));
+                return;
+            }
+            if (!this.$entitySelectEl.val()) {
+                messanger.notificationFlashMessage('error', __('Related entity must be selected to add transition.'));
+                return;
+            }
+
             var transitionEditView = new TransitionEditForm({
                 'model': transition,
                 'workflow': this.model,
@@ -210,6 +323,11 @@ function(_, Backbone, messanger, __,
         },
 
         openManageStepForm: function(step) {
+            if (!this.$entitySelectEl.val()) {
+                messanger.notificationFlashMessage('error', __('Related entity must be selected to add step.'));
+                return;
+            }
+
             var stepEditView = new StepEditView({
                 'model': step,
                 'workflow': this.model
@@ -228,12 +346,22 @@ function(_, Backbone, messanger, __,
             }
         },
 
+        removeStep: function(model) {
+            this._removeHandler(model, __('Are you sure you want to delete this step?'));
+        },
+
         onStepRemove: function(step) {
+            //Deselect start_step if it was removed
+            if (this.$startStepEl.val() == step.get('name')) {
+                this.$startStepEl.select2('val', '');
+            }
+
             var removeTransitions = function (models) {
-                //Cloned because of iterator elements removing in loop
-                _.each(_.clone(models), function(transition) {
-                    transition.destroy();
-                });
+                if (models.length) {
+                    for (var i = models.length - 1; i > -1; i--) {
+                        models[i].destroy();
+                    }
+                }
             };
 
             //Remove step transitions
