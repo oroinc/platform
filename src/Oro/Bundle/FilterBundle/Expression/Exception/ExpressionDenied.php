@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 class ExpressionDenied extends SyntaxException implements UserInputErrorExceptionInterface
 {
     /** @var string */
-    private $template = 'Expression with "%s" are not supported!';
+    private $template = 'Variable of type “%s” cannot be used with a constant!';
 
     /** @var string */
     private $variableLabel;
