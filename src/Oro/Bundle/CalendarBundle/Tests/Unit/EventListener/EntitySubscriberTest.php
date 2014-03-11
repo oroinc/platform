@@ -3,14 +3,11 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Events;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarConnection;
 use Oro\Bundle\CalendarBundle\EventListener\EntitySubscriber;
-use Oro\Bundle\CalendarBundle\Notification\RemindTimeCalculator;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
@@ -36,7 +33,7 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
 
-        $this->subscriber = new EntitySubscriber(new RemindTimeCalculator(15));
+        $this->subscriber = new EntitySubscriber();
     }
 
     public function testGetSubscribedEvents()
