@@ -115,11 +115,23 @@ class EmailNotification implements EmailNotificationInterface
         $templates  = $repository->findBy($criteria);
 
         if (!$templates) {
-            throw new InvalidArgumentException('Template not found');
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Template with name "%s" for "%s" not found',
+                    $criteria['name'],
+                    $criteria['entityName']
+                )
+            );
         }
 
         if (count($templates) > 1) {
-            throw new InvalidArgumentException('Multiple templates found');
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Multiple templates with name "%s" for "%s" found',
+                    $criteria['name'],
+                    $criteria['entityName']
+                )
+            );
         }
 
         return reset($templates);

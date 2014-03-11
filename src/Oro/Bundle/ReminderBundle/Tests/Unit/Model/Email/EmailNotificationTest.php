@@ -15,6 +15,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     const LOCALE = 'locale';
     const EMAIL = 'test@example.com';
     const ENTITY = 'Namespace\Entity';
+    const TEMPLATE = 'template_reminder';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -69,11 +70,11 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'one' => [
-                'exceptionMessage' => 'Template not found',
+                'exceptionMessage' => 'Template with name "template_reminder" for "Namespace\Entity" not found',
                 'templates' => []
             ],
             'multiple' => [
-                'exceptionMessage' => 'Multiple templates found',
+                'exceptionMessage' => 'Multiple templates with name "template_reminder" for "Namespace\Entity" found',
                 'templates' => [$this->createTemplate(), $this->createTemplate()]
             ]
         ];
@@ -167,6 +168,11 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('has')
             ->will($this->returnValue($hasConfig));
+
+        $config
+            ->expects($this->any())
+            ->method('get')
+            ->will($this->returnValue(self::TEMPLATE));
 
         $this->provider
             ->expects($this->any())
