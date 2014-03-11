@@ -26,6 +26,7 @@ class OroReminderBundle implements Migration
         /** Generate table oro_reminder **/
         $table = $schema->createTable('oro_reminder');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('recipient_id', 'integer', ['notnull' => false]);
         $table->addColumn('subject', 'string', ['length' => 32]);
         $table->addColumn('start_at', 'datetime', []);
         $table->addColumn('expire_at', 'datetime', []);
@@ -35,10 +36,10 @@ class OroReminderBundle implements Migration
         $table->addColumn('state', 'string', ['length' => 32]);
         $table->addColumn('related_entity_id', 'integer', []);
         $table->addColumn('related_entity_classname', 'string', ['length' => 255]);
-        $table->addColumn('recipient_id', 'integer', ['notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->addColumn('sent_at', 'datetime', ['notnull' => false]);
+        $table->addColumn('failure_exception', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('uri', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['recipient_id'], 'IDX_2F4F9F57E92F8F78', []);

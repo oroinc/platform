@@ -65,14 +65,6 @@ class CalendarEventApiType extends CalendarEventType
                     'required' => false,
                     'label' => 'oro.calendar.calendarevent.all_day.label'
                 )
-            )
-            ->add(
-                'reminder',
-                'checkbox',
-                array(
-                    'required' => false,
-                    'label' => 'oro.calendar.calendarevent.reminder.label'
-                )
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());

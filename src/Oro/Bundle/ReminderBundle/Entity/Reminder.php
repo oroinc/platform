@@ -26,14 +26,6 @@ use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
  *      "entity"={
  *          "icon"="icon-bell-o"
  *      },
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="recipient",
- *          "owner_column_name"="recipient_id"
- *      },
- *      "security"={
- *          "type"="ACL"
- *      },
  *      "dataaudit"={"auditable"=true}
  *  }
  * )
@@ -42,6 +34,7 @@ class Reminder
 {
     const STATE_SENT = 'sent';
     const STATE_NOT_SENT = 'not_sent';
+    const STATE_FAIL = 'fail';
     const STATE_IN_PROGRESS = 'in_progress';
 
     /**
@@ -178,7 +171,7 @@ class Reminder
     /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $recipient;
 
@@ -202,6 +195,13 @@ class Reminder
      * @ORM\Column(name="sent_at", type="datetime", nullable=true)
      */
     protected $sentAt;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="failure_exception", type="array", nullable=true)
+     */
+    protected $failureException;
 
     /**
      * @var string
@@ -427,12 +427,12 @@ class Reminder
     /**
      * Set recipient
      *
-     * @param User $recipient
+     * @param User $owner
      * @return Reminder
      */
-    public function setRecipient(User $recipient)
+    public function setRecipient(User $owner)
     {
-        $this->recipient = $recipient;
+        $this->recipient = $owner;
 
         return $this;
     }
@@ -514,6 +514,35 @@ class Reminder
     public function getSentAt()
     {
         return $this->sentAt;
+    }
+
+    /**
+     * Get failure exceptions
+     *
+     * @return array
+     */
+    public function getFailureException()
+    {
+        return $this->failureException;
+    }
+
+    /**
+     * Add a failure exception
+     *
+     * @param \Exception $e
+     *
+     * @return Reminder
+     */
+    public function setFailureException(\Exception $e)
+    {
+        $this->failureException = [
+            'class'             => get_class($e),
+            'message'           => $e->getMessage(),
+            'code'              => $e->getCode(),
+            'trace'             => $e->getTraceAsString()
+        ];
+
+        return $this;
     }
 
     /**

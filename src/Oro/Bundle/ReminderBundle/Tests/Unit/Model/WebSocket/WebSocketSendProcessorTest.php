@@ -88,7 +88,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     protected function setUpReminder($uri, $subject, $expire, $userId)
     {
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $user = $this->getMock('\Oro\Bundle\UserBundle\Entity\User');
+        $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $user->expects($this->any())->method('getId')->will($this->returnValue($userId));
 
         $reminder->expects($this->any())->method('getRecipient')->will($this->returnValue($user));

@@ -58,6 +58,14 @@ class CollectionTypeSubscriber implements EventSubscriberInterface
             return;
         }
 
+        /** @var FormInterface $child */
+        foreach ($event->getForm() as $child) {
+            $dataClass = $child->getConfig()->getDataClass();
+            if ($dataClass && !in_array('Oro\\Bundle\\FormBundle\\Entity\\PrimaryItem', class_implements($dataClass))) {
+                return;
+            }
+        }
+
         $notEmptyItems = array();
         $hasPrimary = false;
 

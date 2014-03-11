@@ -89,11 +89,25 @@ class SendRemindersCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->expects($this->at(0))->method('beginTransaction');
 
-        $this->sender->expects($this->at(0))->method('send')->with($reminders[0]);
-        $reminders[0]->expects($this->once())->method('getState')->will($this->returnValue(Reminder::STATE_SENT));
+        $this->sender
+            ->expects($this->at(0))
+            ->method('send')
+            ->with($reminders[0]);
 
-        $this->sender->expects($this->at(1))->method('send')->with($reminders[1]);
-        $reminders[1]->expects($this->once())->method('getState')->will($this->returnValue(Reminder::STATE_NOT_SENT));
+        $reminders[0]
+            ->expects($this->exactly(2))
+            ->method('getState')
+            ->will($this->returnValue(Reminder::STATE_SENT));
+
+        $this->sender
+            ->expects($this->at(1))
+            ->method('send')
+            ->with($reminders[1]);
+
+        $reminders[1]
+            ->expects($this->exactly(2))
+            ->method('getState')
+            ->will($this->returnValue(Reminder::STATE_NOT_SENT));
 
         $output->expects($this->at(1))->method('writeln')->with('<info>Reminders sent:</info> 1');
 

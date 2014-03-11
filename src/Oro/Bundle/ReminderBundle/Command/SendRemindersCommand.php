@@ -20,7 +20,7 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 class SendRemindersCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
     public function getDefaultDefinition()
     {
@@ -28,7 +28,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
     }
 
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -38,7 +38,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
     }
 
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -49,13 +49,15 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
             return;
         }
 
-        $output->writeln(sprintf('<comment>Reminders to send:</comment> %d', count($reminders)));
+        $output->writeln(
+            sprintf('<comment>Reminders to send:</comment> %d', count($reminders))
+        );
 
         $em = $this->getEntityManager();
         try {
             $em->beginTransaction();
 
-            $sentCount = $this->sendReminders($reminders);
+            $sentCount = $this->sendReminders($output, $reminders);
 
             $output->writeln(sprintf('<info>Reminders sent:</info> %d', $sentCount));
 
@@ -70,10 +72,11 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
     /**
      * Send reminders
      *
-     * @param Reminder[] $reminders
+     * @param OutputInterface $output
+     * @param Reminder[]      $reminders
      * @return int Count of sent reminders
      */
-    protected function sendReminders(array $reminders)
+    protected function sendReminders($output, array $reminders)
     {
         $result = 0;
         $sender = $this->getReminderSender();
@@ -83,6 +86,13 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
 
             if (Reminder::STATE_SENT == $reminder->getState()) {
                 $result += 1;
+            }
+
+            if (Reminder::STATE_FAIL == $reminder->getState()) {
+                $exception = $reminder->getFailureException();
+                $output->write(sprintf('<error>Failed to send:</error> #%d; ', $reminder->getId()));
+                $output->write(sprintf('Class: %s; ', $exception['class']));
+                $output->writeln(sprintf('Message: %s;', $exception['message']));
             }
         }
 
