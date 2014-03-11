@@ -68,17 +68,28 @@ function(_, __, Backbone, DialogWidget, Helper, layout, TransitionsListView, Tra
             });
         },
 
+        renderTransitions: function() {
+            var transitionsContainer = this.$('.transitions-section');
+            if (this.options.workflow.get('steps').length > 1) {
+                transitionsContainer.show();
+                this.transitionsListView = new TransitionsListView({
+                    el: this.$el.find(this.options.transitionListContainerEl),
+                    workflow: this.options.workflow,
+                    collection: this.model.getAllowedTransitions(this.options.workflow),
+                    stepFrom: this.model
+                });
+                this.transitionsListView.render();
+            } else {
+                transitionsContainer.hide();
+            }
+        },
+
         render: function() {
             this.$el.append(
                 this.template(this.model.toJSON())
             );
-            this.transitionsListView = new TransitionsListView({
-                el: this.$el.find(this.options.transitionListContainerEl),
-                workflow: this.options.workflow,
-                collection: this.model.getAllowedTransitions(this.options.workflow),
-                stepFrom: this.model
-            });
-            this.transitionsListView.render();
+
+            this.renderTransitions();
 
             this.widget = new DialogWidget({
                 'title': this.model.get('name') ? __('Edit step') : __('Add new step'),

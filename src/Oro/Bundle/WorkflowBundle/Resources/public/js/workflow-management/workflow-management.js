@@ -87,7 +87,7 @@ function(_, Backbone, messanger, __,
                 query.callback({results: steps});
             }, this);
 
-            var startStepEl =this.$('[name="start_step"]');
+            this.$startStepEl = this.$('[name="start_step"]');
 
             var select2Options = {
                 'allowClear': true,
@@ -102,7 +102,7 @@ function(_, Backbone, messanger, __,
                 }, this)
             };
 
-            startStepEl.select2(select2Options);
+            this.$startStepEl.select2(select2Options);
         },
 
         initEntityFieldsLoader: function() {
@@ -188,6 +188,15 @@ function(_, Backbone, messanger, __,
 
         saveConfiguration: function(e) {
             e.preventDefault();
+
+            if (this.model.get('steps').length == 1 || this.model.get('transitions').length == 0) {
+                messanger.notificationFlashMessage(
+                    'error',
+                    __('Could not save workflow. Please add steps and transitions.')
+                );
+                return;
+            }
+
             var navigation = Navigation.isEnabled() ? Navigation.getInstance() : null;
 
             var formData = Helper.getFormData(this.$el);
@@ -276,6 +285,15 @@ function(_, Backbone, messanger, __,
         },
 
         openManageTransitionForm: function(transition, step_from) {
+            if (this.model.get('steps').length == 1) {
+                messanger.notificationFlashMessage('error', __('At least one step should be added to add transition.'));
+                return;
+            }
+            if (!this.$entitySelectEl.val()) {
+                messanger.notificationFlashMessage('error', __('Related entity must be selected to add transition.'));
+                return;
+            }
+
             var transitionEditView = new TransitionEditForm({
                 'model': transition,
                 'workflow': this.model,
@@ -305,6 +323,11 @@ function(_, Backbone, messanger, __,
         },
 
         openManageStepForm: function(step) {
+            if (!this.$entitySelectEl.val()) {
+                messanger.notificationFlashMessage('error', __('Related entity must be selected to add step.'));
+                return;
+            }
+
             var stepEditView = new StepEditView({
                 'model': step,
                 'workflow': this.model
@@ -328,11 +351,17 @@ function(_, Backbone, messanger, __,
         },
 
         onStepRemove: function(step) {
+            //Deselect start_step if it was removed
+            if (this.$startStepEl.val() == step.get('name')) {
+                this.$startStepEl.select2('val', '');
+            }
+
             var removeTransitions = function (models) {
-                //Cloned because of iterator elements removing in loop
-                _.each(_.clone(models), function(transition) {
-                    transition.destroy();
-                });
+                if (models.length) {
+                    for (var i = models.length - 1; i > -1; i--) {
+                        models[i].destroy();
+                    }
+                }
             };
 
             //Remove step transitions

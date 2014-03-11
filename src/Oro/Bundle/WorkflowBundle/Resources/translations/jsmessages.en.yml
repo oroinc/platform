@@ -16,3 +16,10 @@
 "Are you sure you want to delete this step?": "Are you sure you want to delete this step?"
 "Are you sure you want to delete this transition?": "Are you sure you want to delete this transition?"
 "Are you sure you want to delete this field?": "Are you sure you want to delete this field?"
+"Could not save workflow. Please add steps and transitions.": "Could not save workflow. Please add steps and transitions."
+"Workflow saved.": "Workflow saved."
+"Could not save workflow.": "Could not save workflow."
+"Related entity must be selected to add step.": "Related entity must be selected to add step."
+"Related entity must be selected to add transition.": "Related entity must be selected to add transition."
+"At least one step should be added to add transition.": "At least one step should be added to add transition."
+
