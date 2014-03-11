@@ -63,14 +63,14 @@ class BaseOrder
     /**
      * @var float
      *
-     * @ORM\Column(name="subtotal_amount", type="float", nullable=true)
+     * @ORM\Column(name="subtotal_amount", type="money", nullable=true)
      */
     protected $subtotalAmount;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="shipping_amount", type="float", nullable=true)
+     * @ORM\Column(name="shipping_amount", type="money", nullable=true)
      */
     protected $shippingAmount;
 
@@ -84,28 +84,28 @@ class BaseOrder
     /**
      * @var float
      *
-     * @ORM\Column(name="tax_amount", type="float", nullable=true)
+     * @ORM\Column(name="tax_amount", type="money", nullable=true)
      */
     protected $taxAmount;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="discount_amount", type="float", nullable=true)
+     * @ORM\Column(name="discount_amount", type="money", nullable=true)
      */
     protected $discountAmount;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="discount_percent", type="float", nullable=true)
+     * @ORM\Column(name="discount_percent", type="percent", nullable=true)
      */
     protected $discountPercent;
 
     /**
      * @var float
      *
-     * @ORM\Column(name="total_amount", type="float", nullable=true)
+     * @ORM\Column(name="total_amount", type="money", nullable=true)
      */
     protected $totalAmount;
 
