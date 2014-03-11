@@ -5,13 +5,17 @@ oro_menu_config:
             uri: '#'
 
         segments_divider:
-            class: divider
+            label: ''
+            extras:
+                position: 100
+            attributes:
+                class: divider
 
         manage_segments:
             label: 'Manage Segments'
             route: 'oro_segment_index'
             extras:
-                position: 100
+                position: 105
                 routes: ['oro_segment_*']
 
     tree:
