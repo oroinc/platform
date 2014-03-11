@@ -38,7 +38,7 @@ class MigrationQueryLoaderWithNameGenerator extends MigrationQueryLoader
     /**
      * {@inheritdoc}
      */
-    public function createSchemaObject($tables, $sequences, $schemaConfig)
+    protected function createSchemaObject(array $tables = [], array $sequences = [], $schemaConfig = null)
     {
         return new SchemaWithNameGenerator(
             $this->nameGenerator,

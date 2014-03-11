@@ -109,6 +109,8 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $table1->addOption('comment', 'test');
+
         $table1->addOption(
             'oro_options',
             [
@@ -131,7 +133,8 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                 'CREATE TABLE table1 ('
                 . 'column1 VARCHAR(100) NOT NULL, '
                 . 'configurable_column1 VARCHAR(100) NOT NULL, '
-                . 'extend_column1 VARCHAR(100) DEFAULT NULL)'
+                . 'extend_column1 VARCHAR(100) DEFAULT NULL) '
+                . 'COMMENT = \'test\' '
             ]
         );
         $this->assertExtendOptions(

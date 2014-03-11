@@ -539,20 +539,20 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $schema    = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
-        $table1 = $schema->createTable('table1');
-        $table1->addColumn('id', 'integer');
-        $table1->setPrimaryKey(['id']);
+        $selfTable = $schema->createTable('table1');
+        $selfTable->addColumn('id', 'integer');
+        $selfTable->setPrimaryKey(['id']);
 
-        $table2 = $schema->createTable('table2');
-        $table2->addColumn('id', 'smallint');
-        $table2->addColumn('name', 'string');
-        $table2->setPrimaryKey(['id']);
+        $targetTable = $schema->createTable('table2');
+        $targetTable->addColumn('id', 'smallint');
+        $targetTable->addColumn('name', 'string');
+        $targetTable->setPrimaryKey(['id']);
 
         $extension->addOneToManyRelation(
             $schema,
-            $table1,
+            $selfTable,
             'relation_column1',
-            $table2,
+            'table2',
             ['name'],
             ['name'],
             ['name'],
@@ -605,6 +605,67 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ]
+        );
+    }
+
+
+    /**
+     * @expectedException \Doctrine\DBAL\Schema\SchemaException
+     * @expectedExceptionMessage A relation column type must be an integer. "string" type is not supported.
+     */
+    public function testAddRelationColumn()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $selfTable = $schema->createTable('table1');
+        $selfTable->addColumn('id', 'integer');
+        $selfTable->setPrimaryKey(['id']);
+
+        $targetTable = $schema->createTable('table2');
+        $targetTable->addColumn('id', 'smallint');
+        $targetTable->addColumn('name', 'string');
+        $targetTable->setPrimaryKey(['name']);
+
+        $extension->addOneToManyRelation(
+            $schema,
+            $selfTable,
+            'relation_column1',
+            $targetTable,
+            ['name'],
+            ['name'],
+            ['name'],
+            ['extend' => ['is_extend' => true]]
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage At least one column must be specified.
+     */
+    public function testCheckColumnsExist()
+    {
+        $schema    = $this->getExtendSchema();
+        $extension = $this->getExtendExtension();
+
+        $selfTable = $schema->createTable('table1');
+        $selfTable->addColumn('id', 'integer');
+        $selfTable->setPrimaryKey(['id']);
+
+        $targetTable = $schema->createTable('table2');
+        $targetTable->addColumn('id', 'smallint');
+        $targetTable->addColumn('name', 'string');
+        $targetTable->setPrimaryKey(['name']);
+
+        $extension->addOneToManyRelation(
+            $schema,
+            $selfTable,
+            'relation_column1',
+            $targetTable,
+            ['name'],
+            [],
+            ['name'],
+            ['extend' => ['is_extend' => true]]
         );
     }
 
