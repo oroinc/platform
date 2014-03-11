@@ -9,7 +9,6 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorInterface;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 
 class WebSocketSendProcessor implements SendProcessorInterface
 {

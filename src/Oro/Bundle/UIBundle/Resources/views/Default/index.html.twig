@@ -26,6 +26,12 @@
                 {% if app.debug %}
                     require(['oroui/js/app'], function(app){app.debug = true;});
                 {% endif %}
+                    require(['ororeminder/js/subscriber', 'orosync/js/sync/wamp'], function(subscriber, Wamp){
+                        subscriber.init({{ app.user.id }}, new Wamp({
+                            host: '{{ ws.host == '*' ? app.request.headers.get('host') : ws.host }}',
+                            port: {{ ws.port }}
+                        }));
+                    });
                 </script>
                 {% block hash_nav %}
                     {% placeholder hash_nav %}
