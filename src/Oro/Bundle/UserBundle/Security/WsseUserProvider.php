@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Oro\Bundle\UserBundle\Entity\User;
-
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -26,10 +24,10 @@ class WsseUserProvider extends Provider
     /**
      * Constructor.
      *
-     * @param UserProviderInterface    $userProvider An UserProviderInterface instance
-     * @param PasswordEncoderInterface $encoder      A PasswordEncoderInterface instance
-     * @param Cache                    $nonceCache   Cache instance
-     * @param int                      $lifetime     The lifetime, in seconds
+     * @param UserProviderInterface    $userProvider    An UserProviderInterface instance
+     * @param PasswordEncoderInterface $encoder         A PasswordEncoderInterface instance
+     * @param Cache                    $nonceCache      Cache instance
+     * @param int                      $lifetime        The lifetime, in seconds
      */
     public function __construct(
         UserProviderInterface $userProvider,
@@ -45,30 +43,29 @@ class WsseUserProvider extends Provider
     /**
      * Authenticate API user by API key
      *
-     * @param  TokenInterface $token
-     *
+     * @param  TokenInterface          $token
      * @return Token
      * @throws AuthenticationException
      */
     public function authenticate(TokenInterface $token)
     {
-        /** @var User $user */
         $user = $this->userProvider->loadUserByUsername($token->getUsername());
 
-        if ($user && $user->getApi() &&
-            $this->validateDigest(
+        if ($user && $user->getApi()) {
+            if ($this->validateDigest(
                 $token->getAttribute('digest'),
                 $token->getAttribute('nonce'),
                 $token->getAttribute('created'),
                 $user->getApi()->getApiKey(),
                 $user->getSalt()
-            )
-        ) {
-            $authenticatedToken = new Token($user->getRoles());
-            $authenticatedToken->setUser($user);
-            $authenticatedToken->setAuthenticated(true);
+            )) {
+                $authToken = new Token($user->getRoles());
 
-            return $authenticatedToken;
+                $authToken->setUser($user);
+                $authToken->setAuthenticated(true);
+
+                return $authToken;
+            }
         }
 
         throw new AuthenticationException('WSSE authentication failed.');
