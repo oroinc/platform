@@ -67,6 +67,8 @@ function(_, Backbone, messanger, __,
             this.listenTo(this.model, 'requestCloneTransition', this.cloneTransition);
             this.listenTo(this.model, 'requestEditTransition', this.openManageTransitionForm);
 
+            this.listenTo(this.model, 'change:entity', this.resetWorkflow);
+
             this.$saveBtn = $(this.options.saveBtnEl);
             this.$saveBtn.on('click', _.bind(this.saveConfiguration, this));
             this.model.url = this.$saveBtn.data('url');
@@ -111,8 +113,13 @@ function(_, Backbone, messanger, __,
                 okText: __('Yes, I Agree'),
                 content: __('Are you sure you want to change entity?')
             });
+            confirm.on('ok', _.bind(function() {
+                this.model.set('entity', this.$entitySelectEl.val());
+            }, this));
+            confirm.on('cancel', _.bind(function() {
+                this.$entitySelectEl.select2('val', this.model.get('entity'));
+            }, this));
 
-            this.$entitySelectEl.on('fieldsloadercomplete', _.bind(this.resetWorkflow, this));
             this.$entitySelectEl.fieldsLoader({
                 router: 'oro_api_get_entity_fields',
                 routingParams: {"with-relations": 1, "with-entity-details": 1, "deep-level": 2},
