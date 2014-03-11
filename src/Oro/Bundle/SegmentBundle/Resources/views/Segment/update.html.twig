@@ -1,0 +1,218 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+
+{% oro_title_set({params : {"%segment.name%": entity.name} }) %}
+{% set formAction = form.vars.value.id ? path('oro_segment_update', { 'id': form.vars.value.id }) : path('oro_segment_create')  %}
+
+{% block head_script %}
+    {{ parent() }}
+
+    {% block stylesheets %}
+        {{ form_stylesheet(form) }}
+    {% endblock %}
+{% endblock %}
+
+{% block navButtons %}
+    {% if form.vars.value.id and resource_granted('DELETE', form.vars.value) %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_api_delete_segment', {'id': form.vars.value.id}),
+            'dataRedirect': path('oro_segment_index'),
+            'aCss': 'no-hash remove-button',
+            'id': 'btn-remove-report',
+            'dataId': form.vars.value.id,
+            'entity_label': 'oro.segment.entity_label'|trans
+        }) }}
+
+        {{ UI.buttonSeparator() }}
+    {% endif %}
+    {{ UI.cancelButton(path('oro_segment_index')) }}
+    {% if form.vars.value.id or resource_granted('oro_segment_update') %}
+        {{ UI.saveAndStayButton() }}
+    {% endif %}
+    {{ UI.saveAndCloseButton() }}
+{% endblock %}
+
+{% block pageHeader %}
+    {% if form.vars.value.id %}
+        {% set breadcrumbs = {
+            'entity':      form.vars.value,
+            'indexPath':   path('oro_segment_index'),
+            'indexLabel': 'oro.segment.entity_plural_label'|trans,
+            'entityTitle': entity.name
+        } %}
+        {{ parent() }}
+    {% else %}
+        {% set title = 'New Segment'|trans %}
+        {% include 'OroUIBundle::page_title_block.html.twig' %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {% set id = 'segment-profile' %}
+    {% set ownerDataBlock = {
+        'dataBlocks': [{
+            'subblocks': [{
+                'data': []
+            }]
+        }]
+    } %}
+
+    {% set ownerDataBlock = oro_form_process(ownerDataBlock, form) %}
+    {% set dataBlocks = [{
+            'title': 'General'|trans,
+            'class': 'active',
+            'subblocks': [
+                {
+                    'title': '',
+                    'data': [
+                        form_row(form.name, {'label': 'oro.segment.name.label'|trans}),
+                        form_row(form.description, {
+                            'label': 'oro.segment.description.label'|trans,
+                            'attr': {
+                                'class': 'segment-descr'
+                            }
+                        })
+                    ]
+                },
+                {
+                    'title': '',
+                    'data': [
+                        form_row(form.entity, {'label': 'oro.segment.entity.label'|trans}),
+                        form_row(form.type, {'label': 'oro.segment.type.label'|trans}),
+                        ownerDataBlock.dataBlocks[0].subblocks[0].data[0]
+                    ]
+                }
+            ]
+        }]
+    %}
+
+    {% set dataBlocks = dataBlocks|merge( [{
+        'title' : 'oro.segment.form.designer'|trans,
+        'content_attr': {'id': 'report-designer'},
+        'subblocks': [
+            {
+                'title': 'oro.segment.form.columns'|trans,
+                'spanClass': 'segment-columns responsive-cell',
+                'data': [
+                    QD.query_designer_grouping_form(
+                        form.grouping,
+                        {'id': 'segment-grouping-form'},
+                        {'entity_choice_id': 'oro_segment_form_entity'}
+                    ),
+                    QD.query_designer_grouping_list({'id': 'segment-grouping-list'}),
+                    QD.query_designer_grouping_item_template('segment-grouping-item-row'),
+                    QD.query_designer_column_form(
+                        form.column,
+                        {'id': 'segment-column-form'},
+                        {'entity_choice_id': 'oro_segment_form_entity'}
+                    ),
+                    QD.query_designer_column_list({'id': 'segment-column-list'}),
+                    QD.query_designer_column_template('segment-column-row')
+                ]
+            },
+            {
+                'title': 'oro.segment.form.filters'|trans,
+                'spanClass': 'segment-filters responsive-cell',
+                'data': [
+                    QD.query_designer_condition_builder({
+                        'id': 'segment-condition-builder',
+                        'criteria_list_id': 'filter-criteria-list',
+                        'entity_choice_id': 'oro_segment_form_entity'
+                    })
+                ]
+            },
+        ]
+    }] ) %}
+
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks,
+        'hiddenData': form_widget(form.definition)
+    } %}
+
+    {{ UI.scrollData(id, data, form) }}
+
+    {{ QD.query_designer_column_chain_template('report-column-chain-template') }}
+
+    {% set entityFieldsRouteParams = {
+        'with-relations': 1,
+        'with-entity-details': 1,
+        'deep-level': 2
+    } %}
+    <script type="text/javascript">
+        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/loading-mask',
+            'oroui/js/delete-confirmation', 'ororeport/js/report', 'oroentity/js/fields-loader'],
+            function ($, _, __, LoadingMask, DeleteConfirmation, reportManagerInit) {
+                var $entityChoice = $('#oro_report_form_entity');
+                var loadingMask = new LoadingMask();
+                var confirm = new DeleteConfirmation({
+                    title: __('Change Entity Confirmation'),
+                    okText: __('Yes, I Agree'),
+                    content: __('Are you sure you want to change entity?')
+                });
+
+                $('#report-designer').append(loadingMask.render().$el);
+
+                $entityChoice
+                    .fieldsLoader({
+                        router: 'oro_api_get_entity_fields',
+                        routingParams: {{ entityFieldsRouteParams|json_encode|raw }},
+                        confirm: confirm,
+                        requireConfirm: function () {
+                            var data = $('#oro_report_form_definition').val();
+                            if (!data) {
+                                return false;
+                            }
+                            try {
+                                data = JSON.parse(data);
+                            } catch (e) {
+                                return false;
+                            }
+                            return _.some(data, function (value) {
+                                return !_.isEmpty(value);
+                            });
+                        }
+                    })
+                    .on('fieldsloaderstart', $.proxy(loadingMask.show, loadingMask))
+                    .on('fieldsloadercomplete', $.proxy(loadingMask.hide, loadingMask));
+
+                {% if not form.entity.vars.value is empty %}
+                {% set fieldsData = render(path('oro_api_get_entity_fields', {
+                        'entityName': form.entity.vars.value|replace({'\\': '_'})
+                    }|merge(entityFieldsRouteParams))) %};
+                $entityChoice.fieldsLoader('setFieldsData', {{ fieldsData|raw }});
+                {% endif %}
+
+                reportManagerInit({
+                    entityChoice: '#oro_report_form_entity',
+                    valueSource: '#oro_report_form_definition',
+                    filters: {
+                        criteriaList: '#filter-criteria-list',
+                        conditionBuilder: '#report-condition-builder'
+                    },
+                    grouping: {
+                        editor: {
+                            mapping: {
+                                name: 'oro_report_form[grouping][columnNames]'
+                            }
+                        },
+                        form: '#report-grouping-form',
+                        itemContainer: '#report-grouping-list .grouping-item-container',
+                        itemTemplate: '#report-grouping-item-row'
+                    },
+                    column: {
+                        editor: {
+                            namePattern:  /^oro_report_form\[column\]\[([\w\W]*)\]$/
+                        },
+                        form: '#report-column-form',
+                        itemContainer: '#report-column-list .item-container',
+                        itemTemplate: '#report-column-row'
+                    },
+                    select2FieldChoiceTemplate: '#report-column-chain-template',
+                    entities: {{ entities|json_encode|raw }},
+                    metadata: {{ metadata|json_encode|raw }}
+                });
+            });
+    </script>
+{% endblock content_data %}
