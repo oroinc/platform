@@ -29,7 +29,11 @@ class EntitySubscriber implements EventSubscriber
      */
     public function getSubscribedEvents()
     {
-        return [Events::onFlush];
+        return [
+            // @codingStandardsIgnoreStart
+            Events::onFlush
+            // @codingStandardsIgnoreEnd
+        ];
     }
 
     /**

@@ -42,7 +42,11 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
     public function testGetSubscribedEvents()
     {
         $this->assertEquals(
-            [Events::onFlush],
+            [
+                // @codingStandardsIgnoreStart
+                Events::onFlush
+                // @codingStandardsIgnoreEnd
+            ],
             $this->subscriber->getSubscribedEvents()
         );
     }
