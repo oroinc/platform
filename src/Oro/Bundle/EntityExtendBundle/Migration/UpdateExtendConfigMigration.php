@@ -7,7 +7,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class UpdateExtendConfigMigration implements Migration
 {
@@ -17,18 +16,11 @@ class UpdateExtendConfigMigration implements Migration
     protected $configProcessor;
 
     /**
-     * @var ExtendConfigDumper
-     */
-    protected $configDumper;
-
-    /**
      * @param ExtendConfigProcessor $configProcessor
-     * @param ExtendConfigDumper    $configDumper
      */
-    public function __construct(ExtendConfigProcessor $configProcessor, ExtendConfigDumper $configDumper)
+    public function __construct(ExtendConfigProcessor $configProcessor)
     {
         $this->configProcessor = $configProcessor;
-        $this->configDumper    = $configDumper;
     }
 
     /**
@@ -40,12 +32,9 @@ class UpdateExtendConfigMigration implements Migration
             $queries->addQuery(
                 new UpdateExtendConfigMigrationQuery(
                     $schema->getExtendOptions(),
-                    $this->configProcessor,
-                    $this->configDumper
+                    $this->configProcessor
                 )
             );
         }
-
-        return [];
     }
 }
