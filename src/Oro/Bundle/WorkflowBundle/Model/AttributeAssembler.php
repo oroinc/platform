@@ -60,6 +60,8 @@ class AttributeAssembler extends AbstractAssembler
     {
         if (!empty($options['property_path'])) {
             $options = $this->guessOptions($options, $definition->getRelatedEntity(), $options['property_path']);
+            // TODO: Remove in scope of https://magecore.atlassian.net/browse/BAP-2907
+            $options['property_path'] = $this->attributeGuesser->fixPropertyPath($options['property_path']);
         }
 
         $this->assertOptions($options, array('label', 'type'));

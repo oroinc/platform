@@ -106,6 +106,16 @@ class WorkflowDefinitionController extends FOSRestController
     {
         if (!$workflowDefinition) {
             $workflowDefinition = new WorkflowDefinition();
+            $configuration = $this->getConfiguration();
+            if (!empty($configuration['name'])) {
+                $existingDefinition = $this->getEntityManager()->find(
+                    'OroWorkflowBundle:WorkflowDefinition',
+                    $configuration['name']
+                );
+                if ($existingDefinition) {
+                    $workflowDefinition = $existingDefinition;
+                }
+            }
         }
 
         return $this->putAction($workflowDefinition);
