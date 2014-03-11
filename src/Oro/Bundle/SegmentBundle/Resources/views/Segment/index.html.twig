@@ -1,0 +1,13 @@
+{% extends 'OroUIBundle:actions:index.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set gridName = 'oro_segments-grid' %}
+{% set pageTitle = 'oro.segment.entity_plural_label'|trans %}
+
+{% block navButtons %}
+    {% if resource_granted('oro_segment_create') %}
+        {{ UI.addButton({
+        'path': path('oro_segment_create'),
+        'entity_label': 'oro.segment.entity_label'|trans
+        }) }}
+    {% endif %}
+{% endblock %}

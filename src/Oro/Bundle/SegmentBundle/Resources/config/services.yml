@@ -1,3 +1,6 @@
 parameters:
     oro_segment.segment.entity.class:                        Oro\Bundle\SegmentBundle\Entity\Segment
+
 services:
+    oro_segment.entity_provider:
+        alias: oro_entity.entity_provider
