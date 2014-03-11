@@ -41,10 +41,24 @@
 .dropdown-menu-calendar {
   padding: 0;
   margin-top: -11px;
+  -webkit-border-radius: 0 0 3px 3px;
+  border-radius: 0 0 3px 3px;
   .ui-datepicker{
     width: auto;
     border: 0 !important;
+    padding: 0;
+    &.ui-corner-all{
+      background: none;
+    }
+    .ui-datepicker-buttonpane{
+      border: 0;
+      margin-top: 0;
+    }
     .ui-datepicker-calendar{
+      tbody tr:hover{
+        background: none;
+      }
+
       a.ui-state-default{
         background:none;
         font-size: 13px;
@@ -54,7 +68,7 @@
         &.ui-state-active,
         &:hover{
           #gradient > .vertical(#ffffff, #fafafa);
-          border-color: #ececec;
+          border-color: #ccc;
         }
       }
     }
@@ -94,13 +108,21 @@
         top: 6px;
         right: 2px;
         background-color: #ffffff;
+        background-image: url("../images/ui-icons_222222_256x240.png");
         border-color: #dfdfdf;
+        span{
+          background-color: none;
+        }
       }
       .ui-datepicker-prev-hover{
         top: 6px;
         left: 2px;
         background-color: #ffffff;
+        background-image: url("../images/ui-icons_222222_256x240.png");
         border-color: #dfdfdf;
+        span{
+          background-color: none;
+        }
       }
     }
   }
@@ -235,6 +257,12 @@
   border: solid #f3f3f3;
   border-width: 1px 0;
   padding: 0 12px;
+  dt{
+    font-weight: normal;
+  }
+  dl{
+    margin: 12px 0 20px;
+  }
   .ui-slider {
     &.ui-widget-content{
       overflow: visible;
@@ -249,3 +277,4 @@
 .ui-datepicker .ui-timepicker-div dl dd{
   line-height: 14px;
 }
+
