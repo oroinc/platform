@@ -55,7 +55,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     public function testGetTemplateFromRepository($exceptionMessage, $templates)
     {
         $this->setExpectedException(
-            '\Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException',
+            'Oro\\Bundle\\ReminderBundle\\Exception\\InvalidArgumentException',
             $exceptionMessage
         );
 

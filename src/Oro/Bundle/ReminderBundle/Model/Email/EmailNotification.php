@@ -65,12 +65,7 @@ class EmailNotification implements EmailNotificationInterface
             ->getConfig($className)
             ->get(self::CONFIG_FIELD, true);
 
-        $criteria = [
-            'entityName' => $className,
-            'name'       => $templateName
-        ];
-
-        $template = $this->loadTemplate($criteria);
+        $template = $this->loadTemplate($className, $templateName);
 
         if (!is_null($locale)) {
             foreach ($template->getTranslations() as $translation) {
@@ -105,32 +100,25 @@ class EmailNotification implements EmailNotificationInterface
     }
 
     /**
-     * @param array $criteria
+     * @param string $className
+     * @param string $templateName
      * @throws InvalidArgumentException
      * @return EmailTemplate
      */
-    protected function loadTemplate(array $criteria)
+    protected function loadTemplate($className, $templateName)
     {
         $repository = $this->em->getRepository(self::TEMPLATE_ENTITY);
-        $templates  = $repository->findBy($criteria);
+        $templates  = $repository->findBy(array('entityName' => $className, 'name' => $templateName));
 
         if (!$templates) {
             throw new InvalidArgumentException(
-                sprintf(
-                    'Template with name "%s" for "%s" not found',
-                    $criteria['name'],
-                    $criteria['entityName']
-                )
+                sprintf('Template with name "%s" for "%s" not found', $templateName, $className)
             );
         }
 
         if (count($templates) > 1) {
             throw new InvalidArgumentException(
-                sprintf(
-                    'Multiple templates with name "%s" for "%s" found',
-                    $criteria['name'],
-                    $criteria['entityName']
-                )
+                sprintf('Multiple templates with name "%s" for "%s" found', $templateName, $className)
             );
         }
 
