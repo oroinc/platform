@@ -16,7 +16,10 @@ class ReminderType extends AbstractType
         $builder->add(
             'method',
             'oro_reminder_method',
-            array('required' => true)
+            array(
+                'required' => true,
+                'attr' => array('class' => 'method'),
+            )
         );
 
         $builder->add(

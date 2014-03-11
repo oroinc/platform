@@ -4,14 +4,12 @@ oro:
         entity_plural_label: Reminders
         entity_description:  Represent reminder
 
-
         interval:
             unit:
-                unit.minute.label: minutes
-                unit.hour.label:   hours
-                unit.day.label:    days
-                unit.week.label:   weeks
-
+                minute.label: minutes
+                hour.label:   hours
+                day.label:    days
+                week.label:   weeks
 
         processor:
             email.label:      Email

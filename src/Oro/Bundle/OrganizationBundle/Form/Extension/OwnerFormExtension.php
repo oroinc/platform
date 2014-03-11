@@ -571,7 +571,8 @@ class OwnerFormExtension extends AbstractTypeExtension
         $metadata = $this->ownershipMetadataProvider->getMetadata($dataClassName);
 
         if ($metadata->hasOwner()) {
-            if (!method_exists($dataClassName, 'getOwner')) {
+            $ownerFieldName = $metadata->getOwnerFieldName();
+            if (!method_exists($dataClassName, 'get' . ucfirst($ownerFieldName))) {
                 throw new \LogicException(
                     sprintf('Method getOwner must be implemented for %s entity.', $dataClassName)
                 );
