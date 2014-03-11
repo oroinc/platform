@@ -32,6 +32,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $this->dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->messageParamsProvider = new MessageParamsProvider(
             $this->translator,
             $this->dateTimeFormatter
@@ -44,7 +45,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $time = new DateTime();
         $expectedTime = 'formatted date time';
 
-        $reminder = $this->setUpReminder('', $subject, $time, 1);
+        $reminder = $this->setUpReminder('', $subject, $time);
         $this->dateTimeFormatter->expects($this->once())
             ->method('format')
             ->with($time)
@@ -70,7 +71,7 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedId = 42;
         $expectedUri = 'www.tests.com';
 
-        $reminder = $this->setUpReminder($expectedUri, '', new DateTime(), 1);
+        $reminder = $this->setUpReminder($expectedUri, '', new DateTime());
         $reminder->expects($this->any())->method('getId')->will($this->returnValue($expectedId));
         $this->translator->expects($this->any())->method('trans')->will($this->returnValue($expectedMessage));
 
@@ -81,13 +82,9 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedMessage, $params['text']);
     }
 
-    protected function setUpReminder($uri, $subject, $expire, $userId)
+    protected function setUpReminder($uri, $subject, $expire)
     {
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $user = $this->getMock('\Oro\Bundle\UserBundle\Entity\User');
-        $user->expects($this->any())->method('getId')->will($this->returnValue($userId));
-
-        $reminder->expects($this->any())->method('getRecipient')->will($this->returnValue($user));
         $reminder->expects($this->any())->method('getUri')->will($this->returnValue($uri));
         $reminder->expects($this->any())->method('getSubject')->will($this->returnValue($subject));
         $reminder->expects($this->any())->method('getExpireAt')->will($this->returnValue($expire));

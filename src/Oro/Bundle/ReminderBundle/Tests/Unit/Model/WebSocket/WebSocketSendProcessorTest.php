@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\WebSocket;
 
+use \DateTime;
+
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\WebSocketSendProcessor;
-use \DateTime;
 
 class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -41,7 +42,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcessSendMessageIntoCorrectChannel()
     {
         $userId = 9876;
-        $reminder = $this->setUpReminder('', '', new DateTime(), $userId);
+        $reminder = $this->setUpReminder($userId);
         $expectedParams = array('text'=>'simple text', 'uri'=>'test.org', 'reminderId'=>42);
         $this->messageParamsProvider->expects($this->any())
             ->method('getMessageParams')
@@ -59,7 +60,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessChangeReminderStateIntoCorrectOne()
     {
-        $reminder = $this->setUpReminder('', '', new DateTime(), 1);
+        $reminder = $this->setUpReminder(1);
 
         $this->topicPublisher
             ->expects($this->at(0))
@@ -80,21 +81,18 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
         $this->processor->process($reminder);
-        // i try at but it is not work correctly
+        // i try "at" but it is not work correctly
         $expected = Reminder::STATE_NOT_SENT;
         $this->processor->process($reminder);
     }
 
-    protected function setUpReminder($uri, $subject, $expire, $userId)
+    protected function setUpReminder($userId)
     {
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
         $user = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
         $user->expects($this->any())->method('getId')->will($this->returnValue($userId));
 
         $reminder->expects($this->any())->method('getRecipient')->will($this->returnValue($user));
-        $reminder->expects($this->any())->method('getUri')->will($this->returnValue($uri));
-        $reminder->expects($this->any())->method('getSubject')->will($this->returnValue($subject));
-        $reminder->expects($this->any())->method('getExpireAt')->will($this->returnValue($expire));
         return $reminder;
     }
 }

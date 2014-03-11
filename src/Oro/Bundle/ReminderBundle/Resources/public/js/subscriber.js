@@ -20,7 +20,7 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
         },
 
         /**
-         * @param messageParamsArray
+         * @param {array} messageParamsArray
          */
         showReminders: function (messageParamsArray) {
             var reminderIds = [];
@@ -37,6 +37,7 @@ define(['orosync/js/sync', 'oroui/js/messenger', 'routing'], function (sync, mes
 
         /**
          * Change reminder state to sent one
+         * @param {array} $reminderIds
          */
         changeRemindersState: function ($reminderIds) {
             var url = routing.generate('oro_reminder_change_reminder_state', { 'ids': $reminderIds });
