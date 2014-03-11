@@ -28,8 +28,6 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract'
             '</div>')
         }),
 
-        widgetContentContainer: null,
-
         initialize: function(options) {
             options = options || {};
 
