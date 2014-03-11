@@ -16,6 +16,7 @@ class ReminderCollectionType extends AbstractType
             array(
                 'type' => 'oro_reminder',
                 'required' => false,
+                'show_form_when_empty' => false,
                 'options' => array(
                     'data_class' => 'Oro\\Bundle\\ReminderBundle\\Entity\\Reminder'
                 )
