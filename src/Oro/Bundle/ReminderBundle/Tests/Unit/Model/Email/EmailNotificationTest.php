@@ -195,7 +195,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
             if ($hasRecipient) {
                 $user = new User();
                 $user->setEmail(self::EMAIL);
-                $reminder->setRecipient($user);
+                $reminder->setOwner($user);
             }
 
             $notification->setReminder($reminder);

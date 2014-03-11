@@ -28,8 +28,8 @@ use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
  *      },
  *      "ownership"={
  *          "owner_type"="USER",
- *          "owner_field_name"="recipient",
- *          "owner_column_name"="recipient_id"
+ *          "owner_field_name"="owner",
+ *          "owner_column_name"="owner_id"
  *      },
  *      "security"={
  *          "type"="ACL"
@@ -178,9 +178,9 @@ class Reminder
     /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $recipient;
+    protected $owner;
 
     /**
      * @var \DateTime
@@ -432,26 +432,26 @@ class Reminder
     }
 
     /**
-     * Set recipient
+     * Set owner
      *
-     * @param User $recipient
+     * @param User $owner
      * @return Reminder
      */
-    public function setRecipient(User $recipient)
+    public function setOwner(User $owner)
     {
-        $this->recipient = $recipient;
+        $this->owner = $owner;
 
         return $this;
     }
 
     /**
-     * Get recipient
+     * Get owner
      *
      * @return User
      */
-    public function getRecipient()
+    public function getOwner()
     {
-        return $this->recipient;
+        return $this->owner;
     }
 
     /**

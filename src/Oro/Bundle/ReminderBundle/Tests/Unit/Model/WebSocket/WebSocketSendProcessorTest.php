@@ -142,7 +142,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
         $user = $this->getMock('\Oro\Bundle\UserBundle\Entity\User');
         $user->expects($this->any())->method('getId')->will($this->returnValue($userId));
 
-        $reminder->expects($this->any())->method('getRecipient')->will($this->returnValue($user));
+        $reminder->expects($this->any())->method('getOwner')->will($this->returnValue($user));
         $reminder->expects($this->any())->method('getUri')->will($this->returnValue($uri));
         $reminder->expects($this->any())->method('getSubject')->will($this->returnValue($subject));
         $reminder->expects($this->any())->method('getExpireAt')->will($this->returnValue($expire));

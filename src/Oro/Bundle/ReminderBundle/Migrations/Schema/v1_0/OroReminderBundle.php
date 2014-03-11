@@ -26,7 +26,7 @@ class OroReminderBundle implements Migration
         /** Generate table oro_reminder **/
         $table = $schema->createTable('oro_reminder');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('recipient_id', 'integer', ['notnull' => false]);
+        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('subject', 'string', ['length' => 32]);
         $table->addColumn('start_at', 'datetime', []);
         $table->addColumn('expire_at', 'datetime', []);
@@ -42,14 +42,14 @@ class OroReminderBundle implements Migration
         $table->addColumn('failure_exception', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('uri', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['recipient_id'], 'IDX_2F4F9F57E92F8F78', []);
+        $table->addIndex(['owner_id'], 'IDX_2F4F9F577E3C61F9', []);
         $table->addIndex(['state'], 'reminder_state_idx', []);
         /** End of generate table oro_reminder **/
 
         /** Generate foreign keys for table oro_reminder **/
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
-            ['recipient_id'],
+            ['owner_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );

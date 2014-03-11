@@ -26,10 +26,14 @@ class ReminderInterval
      * @param int $number
      * @param string $unit
      */
-    public function __construct($number, $unit)
+    public function __construct($number = null, $unit = null)
     {
-        $this->setNumber($number);
-        $this->setUnit($unit);
+        if (null !== $number) {
+            $this->setNumber($number);
+        }
+        if (null !== $unit) {
+            $this->setUnit($unit);
+        }
     }
 
     /**

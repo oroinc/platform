@@ -96,7 +96,7 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function getRecipientEmails()
     {
-        return [$this->getReminder()->getRecipient()->getEmail()];
+        return [$this->getReminder()->getOwner()->getEmail()];
     }
 
     /**
