@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Bundle\ReportBundle\Entity;
+namespace Oro\Bundle\SegmentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="oro_report_type")
+ * @ORM\Table(name="oro_segment_type")
  */
-class ReportType
+class SegmentType
 {
     /**
      * @var string
@@ -44,7 +44,7 @@ class ReportType
     }
 
     /**
-     * Get a label which may be used to localize report type
+     * Get a label which may be used to localize segment type
      *
      * @return string
      */
@@ -54,16 +54,13 @@ class ReportType
     }
 
     /**
-     * Set a label which may be used to localize report type
+     * Set a label which may be used to localize segment type
      *
      * @param string $label
-     * @return ReportType
      */
     public function setLabel($label)
     {
         $this->label = $label;
-
-        return $this;
     }
 
     /**
@@ -71,6 +68,6 @@ class ReportType
      */
     public function __toString()
     {
-        return (string) $this->label;
+        return (string)$this->label;
     }
 }
