@@ -36,11 +36,16 @@ class OroReminderBundle implements Migration
         $table->addColumn('state', 'string', ['length' => 32]);
         $table->addColumn('related_entity_id', 'integer', []);
         $table->addColumn('related_entity_classname', 'string', ['length' => 255]);
+        $table->addColumn('related_route_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn(
+            'related_route_parameters',
+            'array',
+            ['notnull' => false, 'comment' => '(DC2Type:array)']
+        );
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
         $table->addColumn('sent_at', 'datetime', ['notnull' => false]);
         $table->addColumn('failure_exception', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
-        $table->addColumn('uri', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['recipient_id'], 'IDX_2F4F9F57E92F8F78', []);
         $table->addIndex(['state'], 'reminder_state_idx', []);

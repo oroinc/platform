@@ -7,9 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\UserBundle\Entity\User;
-
+use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 
 /**
@@ -168,9 +167,35 @@ class Reminder
     protected $relatedEntityClassName;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="related_route_name", type="string", length=255, nullable=true)
+     * @Oro\Versioned
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true}
+     *  }
+     * )
+     */
+    protected $relatedRouteName;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="related_route_parameters", type="array", nullable=true)
+     * @Oro\Versioned
+     * @ConfigField(
+     *  defaultValues={
+     *      "dataaudit"={"auditable"=true}
+     *  }
+     * )
+     */
+    protected $relatedRouteParameters;
+
+    /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
-     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="recipient_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $recipient;
 
@@ -201,19 +226,6 @@ class Reminder
      * @ORM\Column(name="failure_exception", type="array", nullable=true)
      */
     protected $failureException;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="uri", type="string", length=255, nullable=false)
-     * @Oro\Versioned
-     * @ConfigField(
-     *  defaultValues={
-     *      "dataaudit"={"auditable"=true}
-     *  }
-     * )
-     */
-    protected $uri;
 
     public function __construct()
     {
@@ -378,7 +390,7 @@ class Reminder
     }
 
     /**
-     * Set relatedEntityId
+     * Set related entity id
      *
      * @param integer $relatedEntityId
      * @return Reminder
@@ -391,7 +403,7 @@ class Reminder
     }
 
     /**
-     * Get relatedEntityId
+     * Get related entity id
      *
      * @return integer
      */
@@ -401,7 +413,7 @@ class Reminder
     }
 
     /**
-     * Set relatedEntityClassName
+     * Set related entity class name
      *
      * @param string $relatedEntityClassName
      * @return Reminder
@@ -414,13 +426,59 @@ class Reminder
     }
 
     /**
-     * Get relatedEntityClassName
+     * Get related entity class name
      *
      * @return string
      */
     public function getRelatedEntityClassName()
     {
         return $this->relatedEntityClassName;
+    }
+
+    /**
+     * Get related route name
+     *
+     * @return string
+     */
+    public function getRelatedRouteName()
+    {
+        return $this->relatedRouteName;
+    }
+
+    /**
+     * Set related route name
+     *
+     * @param string $relatedRouteName
+     * @return Reminder
+     */
+    public function setRelatedRouteName($relatedRouteName)
+    {
+        $this->relatedRouteName = $relatedRouteName;
+
+        return $this;
+    }
+
+    /**
+     * Set related route parameters
+     *
+     * @param array $relatedRouteParameters
+     * @return Reminder
+     */
+    public function setRelatedRouteParameters(array $relatedRouteParameters)
+    {
+        $this->relatedRouteParameters = $relatedRouteParameters;
+
+        return $this;
+    }
+
+    /**
+     * Get related route parameters
+     *
+     * @return string
+     */
+    public function getRelatedRouteParameters()
+    {
+        return $this->relatedRouteParameters;
     }
 
     /**
@@ -444,6 +502,18 @@ class Reminder
     public function getRecipient()
     {
         return $this->recipient;
+    }
+
+    /**
+     * Sets reminder data
+     *
+     * @param ReminderDataInterface $data
+     */
+    public function setReminderData(ReminderDataInterface $data)
+    {
+        $this->setSubject($data->getSubject());
+        $this->setExpireAt($data->getExpireAt());
+        $this->setRecipient($data->getRecipient());
     }
 
     /**
@@ -540,29 +610,6 @@ class Reminder
             'code'              => $e->getCode(),
             'trace'             => $e->getTraceAsString()
         ];
-
-        return $this;
-    }
-
-    /**
-     * Get uri
-     *
-     * @return string
-     */
-    public function getUri()
-    {
-        return $this->uri;
-    }
-
-    /**
-     * Set uri
-     *
-     * @param string $uri
-     * @return $this
-     */
-    public function setUri($uri)
-    {
-        $this->uri = $uri;
 
         return $this;
     }

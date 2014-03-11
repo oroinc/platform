@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ReminderBundle\Model;
 
-use Oro\Bundle\ReminderBundle\Exception\SendTypeNotSupportedException;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
 /**

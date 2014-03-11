@@ -1,4 +1,6 @@
 parameters:
+    oro_reminder.form.extension.reminder.class: Oro\Bundle\ReminderBundle\Form\Extension\ReminderExtension
+
     oro_reminder.form.type.reminder.class: Oro\Bundle\ReminderBundle\Form\Type\ReminderType
     oro_reminder.form.type.reminder_collection.class: Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType
     oro_reminder.form.type.method.class: Oro\Bundle\ReminderBundle\Form\Type\MethodType
@@ -6,6 +8,15 @@ parameters:
     oro_reminder.form.type.reminder_interval.unit.class: Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType
 
 services:
+    # Extensions
+    oro_reminder.form.extension.reminder:
+        class: %oro_reminder.form.extension.reminder.class%
+        arguments:
+            - @oro_reminder.entity.manager
+        tags:
+            - { name: form.type_extension, alias: form }
+
+    # Form types
     oro_reminder.form.type.reminder:
         class: %oro_reminder.form.type.reminder.class%
         tags:

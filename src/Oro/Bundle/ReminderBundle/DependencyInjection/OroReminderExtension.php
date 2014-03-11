@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroReminderExtension extends Extension
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -19,7 +19,7 @@ class OroReminderExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('listeners.yml');
-        $loader->load('form_types.yml');
+        $loader->load('form.yml');
         $loader->load('services.yml');
     }
 }

@@ -4,6 +4,8 @@ namespace Oro\Bundle\ReminderBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
+
 interface RemindableInterface
 {
     /**
@@ -15,4 +17,9 @@ interface RemindableInterface
      * @param Collection $reminders
      */
     public function setReminders(Collection $reminders);
+
+    /**
+     * @return ReminderDataInterface
+     */
+    public function getReminderData();
 }

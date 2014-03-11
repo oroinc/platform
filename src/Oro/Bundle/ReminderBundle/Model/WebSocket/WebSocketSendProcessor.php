@@ -74,7 +74,7 @@ class WebSocketSendProcessor implements SendProcessorInterface
     {
         return $this->topicPublisher->send(
             sprintf('oro/reminder/remind_user_%s', $reminder->getRecipient()->getId()),
-            json_encode(array('text' => $message, 'uri' => $reminder->getUri()))
+            json_encode(array('text' => $message, 'uri' => '@todo replace with real url'))
         );
     }
 
