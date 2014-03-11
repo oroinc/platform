@@ -20,6 +20,11 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 class SendRemindersCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
+     * @var OutputInterface
+     */
+    protected $output;
+
+    /**
      * {@internaldoc}
      */
     public function getDefaultDefinition()
@@ -42,14 +47,17 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $output;
         $reminders = $this->getReminderRepository()->findRemindersToSend();
 
         if (!$reminders) {
-            $output->writeln('<info>No reminders to sent</info>');
+            $this->output->writeln('<info>No reminders to sent</info>');
             return;
         }
 
-        $output->writeln(sprintf('<comment>Reminders to send:</comment> %d', count($reminders)));
+        $this->output->writeln(
+            sprintf('<comment>Reminders to send:</comment> %d', count($reminders))
+        );
 
         $em = $this->getEntityManager();
         try {
@@ -57,7 +65,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
 
             $sentCount = $this->sendReminders($reminders);
 
-            $output->writeln(sprintf('<info>Reminders sent:</info> %d', $sentCount));
+            $this->output->writeln(sprintf('<info>Reminders sent:</info> %d', $sentCount));
 
             $em->flush();
             $em->commit();
@@ -83,6 +91,12 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
 
             if (Reminder::STATE_SENT == $reminder->getState()) {
                 $result += 1;
+            }
+
+            if (Reminder::STATE_FAIL == $reminder->getState()) {
+                $this->output->writeln(
+                    sprintf('<error>Failed to send:</error> #%d', $reminder->getId())
+                );
             }
         }
 

@@ -13,14 +13,16 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  * @Config(
  *  defaultValues={
  *      "entity"={
- *          "icon"="icon-time",
- *          "reminder_template_name"="calendar_reminder"
+ *          "icon"="icon-time"
  *      },
  *      "security"={
  *          "type"="ACL",
  *          "permissions"="VIEW;CREATE;EDIT;DELETE",
  *          "group_name"=""
- *      }
+ *      },
+ *      "reminder"={
+ *          "reminder_template_name"="calendar_reminder"
+ *      },
  *  }
  * )
  */

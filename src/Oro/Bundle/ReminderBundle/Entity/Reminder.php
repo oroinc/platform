@@ -42,6 +42,7 @@ class Reminder
 {
     const STATE_SENT = 'sent';
     const STATE_NOT_SENT = 'not_sent';
+    const STATE_FAIL = 'fail';
 
     /**
      * @var integer
@@ -201,6 +202,13 @@ class Reminder
      * @ORM\Column(name="sent_at", type="datetime", nullable=true)
      */
     protected $sentAt;
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(name="failure_exception", type="array", nullable=true)
+     */
+    protected $failureException;
 
     /**
      * @var string
@@ -513,6 +521,35 @@ class Reminder
     public function getSentAt()
     {
         return $this->sentAt;
+    }
+
+    /**
+     * Get failure exceptions
+     *
+     * @return array
+     */
+    public function getFailureException()
+    {
+        return $this->failureException;
+    }
+
+    /**
+     * Add a failure exception
+     *
+     * @param \Exception $e
+     *
+     * @return Reminder
+     */
+    public function setFailureException(\Exception $e)
+    {
+        $this->failureException = [
+            'class'             => get_class($e),
+            'message'           => $e->getMessage(),
+            'code'              => $e->getCode(),
+            'trace'             => $e->getTraceAsString()
+        ];
+
+        return $this;
     }
 
     /**
