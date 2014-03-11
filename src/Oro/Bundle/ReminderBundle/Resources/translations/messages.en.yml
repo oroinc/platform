@@ -6,3 +6,5 @@ oro:
 
         subject.label:       Subject
         due_date.label:      Due date
+        
+        message: "Reminder for %subject% is due on %time%"

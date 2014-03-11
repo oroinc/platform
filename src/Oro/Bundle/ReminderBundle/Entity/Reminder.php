@@ -202,6 +202,11 @@ class Reminder
      */
     protected $isSent = false;
 
+    /**
+     * @var string
+     */
+    protected $uri;
+
     public function __construct()
     {
         $this->setState(self::STATE_NOT_SENT);
@@ -514,6 +519,21 @@ class Reminder
     public function getSentAt()
     {
         return $this->sentAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUri()
+    {
+        return $this->uri;
+    }
+
+    public function setUri($uri)
+    {
+        $this->uri = $uri;
+
+        return $this;
     }
 
     /**
