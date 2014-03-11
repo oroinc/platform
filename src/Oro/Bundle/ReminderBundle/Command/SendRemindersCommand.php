@@ -20,7 +20,7 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 class SendRemindersCommand extends ContainerAwareCommand implements CronCommandInterface
 {
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
     public function getDefaultDefinition()
     {
@@ -28,7 +28,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
     }
 
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -38,7 +38,7 @@ class SendRemindersCommand extends ContainerAwareCommand implements CronCommandI
     }
 
     /**
-     * {@internaldoc}
+     * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
