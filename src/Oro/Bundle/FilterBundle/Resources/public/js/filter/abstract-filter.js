@@ -428,11 +428,14 @@ define(['jquery', 'underscore', 'backbone', 'oroui/js/app'
          * @private
          */
         _defineTemplate: function () {
+            this.template = this._getTemplate(this.templateSelector);
+        },
+
+        _getTemplate: function (selector) {
             var theme = this.templateTheme,
-                selector = this.templateSelector,
                 src = theme && $(selector + '-' + theme).text() || $(selector).text();
 
-            this.template = _.template(src);
+            return _.template(src);
         }
     });
 });
